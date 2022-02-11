@@ -38,6 +38,7 @@ with TGen.Types.Real_Types;   use TGen.Types.Real_Types;
 with TGen.Types.Enum_Types;   use TGen.Types.Enum_Types;
 with TGen.Types.Array_Types;  use TGen.Types.Array_Types;
 with TGen.Types.Record_Types; use TGen.Types.Record_Types;
+with TGen.Types.Constraints;  use TGen.Types.Constraints;
 
 package body TGen.Types.Translation is
    use LAL;
@@ -60,6 +61,9 @@ package body TGen.Types.Translation is
    Cache_Hits : Natural := 0;
    Cache_Miss : Natural := 0;
    --  Stats for the cache
+
+   type Local_Ada_Node_Arr is array (Positive range <>) of Ada_Node;
+   --  Like Ada_Node_List, but that we can build ourselves
 
    function Translate_Internal
      (N       : LAL.Base_Type_Decl;
@@ -98,8 +102,21 @@ package body TGen.Types.Translation is
       Pre => Decl.P_Is_Static_Decl and then Decl.P_Is_Fixed_Point;
 
    procedure Translate_Float_Range
-     (Decl     :     Base_Type_Decl; Has_Range : out Boolean;
-      Min, Max : out Long_Float);
+     (Decl      :     Base_Type_Decl;
+      Has_Range : out Boolean;
+      Min, Max  : out Long_Float);
+
+   function Extract_Real_Range_Spec
+     (Node : LAL.Constraint) return LAL.Range_Spec;
+   --  Analyze contraint to determine if there are range constraints in Node,
+   --  and if so, return the associated Range_Spec.
+
+   function Translate_Real_Range_Spec
+     (Node : LAL.Range_Spec) return Real_Range_Constraint;
+   --  Translate a Range_Spec (Assumed to be of a real type)
+   --  For practical reasons, the the range spec is an attribute reference to
+   --  a real type for which no range is defined, this will default to
+   --  Long_Float'Min .. Long_FLoat'Max
 
    function Translate_Array_Decl
      (Decl      : Base_Type_Decl;
@@ -127,7 +144,15 @@ package body TGen.Types.Translation is
       List        : in out Variant_Choice_Lists.List);
    --  Subtract the Integer ranges that correspond to the matching alternatives
    --  in Choice.Alt_Set from the corresponding set in the variant
-   --  choice denoted by Others_Cur
+   --  choice denoted by Others_Cur.
+
+   function Gather_Index_Constraint_Nodes
+     (Decl_Or_Constraint : Ada_Node'Class;
+      Num_Dims           : Positive) return Local_Ada_Node_Arr;
+   --  Collect all the constraints on the indexes that are present in
+   --  Decl_Or_Constraint, for which the kind should be one of Base_Type_Decl
+   --  or Constraint. Num_Dims should match the number of constraints defined
+   --  in Decl_Or_Constraint.
 
    function Translate_Record_Decl
      (Decl      : Base_Type_Decl;
@@ -167,6 +192,30 @@ package body TGen.Types.Translation is
       Root : Base_Type_Decl) return Boolean;
    --  Returns True if Decl has discriminants constraints at some stage in the
    --  chain of subtype definitions / type derivations.
+
+   function Eval_Discrete_Range
+     (Rng : Discrete_Range)
+     return TGen.Types.Constraints.Discrete_Range_Constraint;
+
+   function Translate_Discrete_Range_Constraint
+     (Node : LAL.Range_Constraint) return Discrete_Range_Constraint;
+   --  Translate a range constraint that applies to a discrete type
+
+   function Translate_Real_Constraints
+     (Node : LAL.Constraint) return TGen.Types.Constraints.Constraint'Class;
+   --  Translate constraints that apply to a real type. This can return
+   --  either a Real_Range_Constraint or a Digits_Constraint.
+   --  ??  Implement delta constraints and digits constraints for decimal fixed
+   --  points.
+
+   function Translate_Index_Constraints
+     (Node     : LAL.Constraint;
+      Num_Dims : Positive)
+      return TGen.Types.Constraints.Index_Constraints;
+
+   function Translate_Discriminant_Constraints
+     (Node : LAL.Discriminant_Constraint)
+     return TGen.Types.Constraints.Discriminant_Constraints;
 
    ------------------------
    -- Translate_Int_Decl --
@@ -274,7 +323,7 @@ package body TGen.Types.Translation is
       procedure Find_Digits (Decl : Base_Type_Decl; Digits_Value : out Natural)
       is
          Parent_Type : Subtype_Indication;
-         Constraints : Digits_Constraint;
+         Constraints : LAL.Digits_Constraint;
       begin
          if Decl = Decl.P_Root_Type then
 
@@ -402,7 +451,7 @@ package body TGen.Types.Translation is
          --  Convininece variable to hold constraints to shorten then length of
          --  chained Libadalang dot calls.
 
-         Subtype_Constraint : Constraint;
+         Subtype_Constraint : LAL.Constraint;
          --  Convininece variable to hold constraints to shorten then length of
          --  chained Libadalang dot calls.
       begin
@@ -536,7 +585,7 @@ package body TGen.Types.Translation is
       Min, Max : out Long_Float)
    is
       Root           : constant Type_Decl := Decl.P_Root_Type.As_Type_Decl;
-      Parent_Type    : Subtype_Indication;
+      Parent_Type    : Subtype_Indication := No_Subtype_Indication;
       Range_Spec_Val : Range_Spec         := No_Range_Spec;
    begin
       if Decl = Root then
@@ -558,7 +607,6 @@ package body TGen.Types.Translation is
          end case;
 
          if Is_Null (Range_Spec_Val) then
-            --  ???: shouldn't this also set Is_Static to False?
 
             Has_Range := False;
             Min       := 0.0;
@@ -578,6 +626,7 @@ package body TGen.Types.Translation is
             Parent_Type :=
               Decl.As_Type_Decl.F_Type_Def.As_Derived_Type_Def
                 .F_Subtype_Indication;
+
          elsif Kind (Decl) in Ada_Subtype_Decl_Range then
 
             --  Same but for a subtype declaration
@@ -599,79 +648,192 @@ package body TGen.Types.Translation is
          --  Otherwise inspect the parent type to see if it has a range
          --  constraint defined.
 
-         case Kind (Parent_Type.F_Constraint) is
-            when Ada_Range_Constraint_Range =>
-               Range_Spec_Val :=
-                 Parent_Type.F_Constraint.As_Range_Constraint.F_Range;
-            when Ada_Digits_Constraint_Range =>
-               if Is_Null
-                   (Parent_Type.F_Constraint.As_Digits_Constraint.F_Range)
-               then
-                  Translate_Float_Range
-                    (Parent_Type.P_Designated_Type_Decl, Has_Range, Min, Max);
-                  return;
-               end if;
-               Range_Spec_Val :=
-                 Parent_Type.F_Constraint.As_Digits_Constraint.F_Range;
-            when Ada_Delta_Constraint_Range =>
-               if Is_Null
-                   (Parent_Type.F_Constraint.As_Delta_Constraint.F_Range)
-               then
-                  Translate_Float_Range
-                    (Parent_Type.P_Designated_Type_Decl, Has_Range, Min, Max);
-                  return;
-               end if;
-               Range_Spec_Val :=
-                 Parent_Type.F_Constraint.As_Delta_Constraint.F_Range;
-            when others =>
-               raise Translation_Error
-                 with "Unexpected kind of constraint for a real type " &
-                 Kind_Name (Parent_Type.F_Constraint);
-         end case;
+         Range_Spec_Val := Extract_Real_Range_Spec (Parent_Type.F_Constraint);
+         if Is_Null (Range_Spec_Val) then
+            Translate_Float_Range
+                  (Parent_Type.P_Designated_Type_Decl, Has_Range, Min, Max);
+            return;
+         end if;
       end if;
 
-      --  At this point we should have a non null range constraint spec, lets
-      --  analyze it.
+      declare
+         Real_Rng : Real_Range_Constraint :=
+           Translate_Real_Range_Spec (Range_Spec_Val);
+      begin
+         pragma Assert (Real_Rng.Low_Bound.Kind = Static
+                        and then Real_Rng.High_Bound.Kind = Static);
+         Has_Range := True;
+         Min := Real_Rng.Low_Bound.Real_Val;
+         Max := Real_Rng.High_Bound.Real_Val;
+      end;
+   end Translate_Float_Range;
 
-      pragma Assert (not Is_Null (Range_Spec_Val));
-      case Kind (Range_Spec_Val.F_Range) is
+   function Extract_Real_Range_Spec
+     (Node : LAL.Constraint) return LAL.Range_Spec
+   is
+   begin
+      case Kind (Node) is
+         when Ada_Range_Constraint_Range =>
+            return Node.As_Range_Constraint.F_Range;
+         when Ada_Digits_Constraint_Range =>
+            return Node.As_Digits_Constraint.F_Range;
+         when Ada_Delta_Constraint_Range =>
+            return Node.As_Delta_Constraint.F_Range;
+         when others =>
+            raise Translation_Error
+               with "Unexpected kind of constraint for a real type " &
+               Kind_Name (Node);
+      end case;
+   end Extract_Real_Range_Spec;
+
+   function Translate_Real_Range_Spec
+     (Node : LAL.Range_Spec) return Real_Range_Constraint
+   is
+      Min, Max : Long_Float;
+      Has_Range : Boolean;
+      Min_Static, Max_Static : Boolean;
+   begin
+      case Kind (Node.F_Range) is
 
          --  According to RM 3.5 (3) a range constraint can only be of the form
          --  "Min .. Max" or "Name'Range", and assume we are analyzing a well
          --  formed AST.
 
          when Ada_Attribute_Ref_Range =>
-            Translate_Float_Range
-              (Range_Spec_Val.F_Range.As_Attribute_Ref.F_Prefix
-                 .P_Referenced_Decl
-                 .As_Base_Type_Decl,
-               Has_Range, Min, Max);
+            if Node.F_Range.P_Is_Static_Expr then
+               Translate_Float_Range
+                 (Node.F_Range.As_Attribute_Ref.F_Prefix
+                  .P_Referenced_Decl
+                  .As_Base_Type_Decl,
+                  Has_Range, Min, Max);
+               if not Has_Range then
+                  Min := Long_Float'First;
+                  Max := Long_Float'Last;
+               end if;
+               Min_Static := True;
+               Max_Static := True;
+            else
+               Min_Static := False;
+               Max_Static := False;
+            end if;
 
          when Ada_Bin_Op_Range =>
-            pragma Assert
-              (Range_Spec_Val.F_Range.As_Bin_Op.F_Left.P_Is_Static_Expr);
-            pragma Assert
-              (Range_Spec_Val.F_Range.As_Bin_Op.F_Right.P_Is_Static_Expr);
-            declare
-               Min_Eval : constant Eval_Result :=
-                 Expr_Eval (Range_Spec_Val.F_Range.As_Bin_Op.F_Left);
-               Max_Eval : constant Eval_Result :=
-                 Expr_Eval (Range_Spec_Val.F_Range.As_Bin_Op.F_Right);
-            begin
-               if Min_Eval.Kind /= Real or else Max_Eval.Kind /= Real then
-                  raise Translation_Error with
-                    "Wrong type of static eval for real range constraint.";
-               end if;
-               Has_Range := True;
-               Min       := Min_Eval.Real_Result;
-               Max       := Max_Eval.Real_Result;
-            end;
+            if Node.F_Range.As_Bin_Op.F_Left.P_Is_Static_Expr then
+               declare
+                  Min_Eval : constant Eval_Result :=
+                    Expr_Eval (Node.F_Range.As_Bin_Op.F_Left);
+               begin
+                  if Min_Eval.Kind /= Real then
+                     raise Translation_Error with
+                     "Wrong type of static eval for real range constraint.";
+                  end if;
+                  Min := Min_Eval.Real_Result;
+                  Min_Static := True;
+               end;
+            end if;
+            if Node.F_Range.As_Bin_Op.F_Right.P_Is_Static_Expr then
+               declare
+                  Max_Eval : constant Eval_Result :=
+                  Expr_Eval (Node.F_Range.As_Bin_Op.F_Right);
+               begin
+                  if Max_Eval.Kind /= Real then
+                     raise Translation_Error with
+                     "Wrong type of static eval for real range constraint.";
+                  end if;
+                  Max := Max_Eval.Real_Result;
+                  Max_Static := True;
+               end;
+            end if;
+
          when others =>
             raise Translation_Error
               with "Unexpected expression kind for real range constraint: " &
-              Kind_Name (Range_Spec_Val.F_Range);
+              Kind_Name (Node.F_Range);
       end case;
-   end Translate_Float_Range;
+
+      if Min_Static and then Max_Static then
+         return Real_Range_Constraint'
+           (Low_Bound  => (Kind => Static, Real_Val => Min),
+            High_Bound => (Kind => Static, Real_Val => Max));
+      elsif Min_Static then
+         return Real_Range_Constraint'
+           (Low_Bound  => (Kind => Static, Real_Val => Min),
+            High_Bound => (Kind => Non_Static));
+      elsif Max_Static then
+         return Real_Range_Constraint'
+           (Low_Bound  => (Kind => Non_Static),
+            High_Bound => (Kind => Static, Real_Val => Max));
+      else
+         return Real_Range_Constraint'
+           (Low_Bound  => (Kind => Non_Static),
+            High_Bound => (Kind => Non_Static));
+      end if;
+
+   end Translate_Real_Range_Spec;
+
+   -----------------------------------
+   -- Gather_Index_Constraint_Nodes --
+   -----------------------------------
+
+   function Gather_Index_Constraint_Nodes
+     (Decl_Or_Constraint : Ada_Node'Class;
+      Num_Dims          : Positive) return Local_Ada_Node_Arr
+   is
+      Res : Local_Ada_Node_Arr (1 .. Num_Dims);
+      Current_Index : Positive := 1;
+      Constraints : LAL.Constraint;
+   begin
+      case Kind (Decl_Or_Constraint) is
+         when Ada_Type_Decl_Range =>
+            case Kind (Decl_Or_Constraint.As_Type_Decl.F_Type_Def) is
+               when Ada_Array_Type_Def_Range =>
+                  for Node of Decl_Or_Constraint.As_Type_Decl.F_Type_Def
+                              .As_Array_Type_Def.F_Indices
+                              .As_Constrained_Array_Indices.F_List
+                  loop
+                     Res (Current_Index) := Node.As_Ada_Node;
+                     Current_Index := Current_Index + 1;
+                  end loop;
+                  return Res;
+               when Ada_Derived_Type_Def_Range =>
+                  Constraints := Decl_Or_Constraint.As_Type_Decl.F_Type_Def
+                                 .As_Derived_Type_Def.F_Subtype_Indication
+                                 .F_Constraint;
+               when others => raise Translation_Error with
+               "unexpected kind for index constraints in constrained array"
+               & " type declaration: " & Kind_Name (Decl_Or_Constraint);
+            end case;
+         when Ada_Subtype_Decl_Range =>
+            Constraints :=
+              Decl_Or_Constraint.As_Subtype_Decl.F_Subtype.F_Constraint;
+         when Ada_Constraint =>
+            Constraints := Decl_Or_Constraint.As_Constraint;
+         when others =>
+            raise Translation_Error with
+               "unexpected kind for index constraints: "
+               & Kind_Name (Decl_Or_Constraint);
+      end case;
+
+      case Kind (Constraints) is
+         when Ada_Index_Constraint_Range =>
+            for Node of Constraints.As_Index_Constraint.F_Constraints loop
+               Res (Current_Index) := Node.As_Ada_Node;
+               Current_Index := Current_Index + 1;
+            end loop;
+         when Ada_Discriminant_Constraint_Range =>
+            for Node of Constraints.As_Discriminant_Constraint.F_Constraints
+            loop
+               Res (Current_Index) :=
+                 Node.As_Discriminant_Assoc.F_Discr_Expr.As_Ada_Node;
+               Current_Index := Current_Index + 1;
+            end loop;
+         when others =>
+            raise Translation_Error with
+               "unexpected kind for index constraints: "
+               & Kind_Name (Constraints);
+      end case;
+      return Res;
+   end Gather_Index_Constraint_Nodes;
 
    --------------------------
    -- Translate_Array_Decl --
@@ -697,218 +859,167 @@ package body TGen.Types.Translation is
          (Decl      : Base_Type_Decl;
           Type_Name : Defining_Name) return Translation_Result
       is
-         Cmp_Typ_Def         : Component_Def;
-
-         type Local_Ada_Node_List is array (Positive range <>) of Ada_Node;
-
-         Num_Indices         : Natural := 0;
+         Cmp_Typ_Def : constant Component_Def :=
+            Decl.P_Root_Type.As_Type_Decl.F_Type_Def.As_Array_Type_Def
+            .F_Component_Type;
+         Num_Indices : Natural := 0;
       begin
-         --  Here we either have a constrained array type decl, or a subtype
-         --  decl that constrains a previous unconstrained array type decl.
+         --  Compute the number of indices
 
          while not Is_Null (Decl.P_Index_Type (Num_Indices)) loop
             Num_Indices := Num_Indices + 1;
          end loop;
 
          declare
+            Constraint_Nodes : Local_Ada_Node_Arr :=
+              Gather_Index_Constraint_Nodes (Decl.As_Ada_Node, Num_Indices);
 
-            Constraint_Nodes : Local_Ada_Node_List (1 .. Num_Indices);
+            Res_Typ : Constrained_Array_Typ (Num_Indices);
+
+            Component_Typ : constant Translation_Result :=
+              Translate (Cmp_Typ_Def.F_Type_Expr, Verbose_Diag);
+            --  This ignores any constraints on the element type that may
+            --  appear in the component definition.
+
+            Index_Typ                      : Base_Type_Decl;
+            Has_Constraints                : Boolean;
+            Constraints_Static             : Boolean;
+            Range_Exp                      : Expr;
+            Constraint_Min, Constraint_Max : Big_Integer;
+
             Current_Index : Positive := 1;
 
+            Failure_Reason : Unbounded_String;
          begin
-
-            if Kind (Decl) in Ada_Type_Decl_Range then
-               Cmp_Typ_Def :=
-               Decl.As_Type_Decl.F_Type_Def.As_Array_Type_Def.F_Component_Type;
-
-               for Constraint of Decl.As_Type_Decl.F_Type_Def.As_Array_Type_Def
-                                .F_Indices.As_Constrained_Array_Indices.F_List
-               loop
-                  Constraint_Nodes (Current_Index) := Constraint.As_Ada_Node;
-                  Current_Index := Current_Index + 1;
-               end loop;
-            else
-               Cmp_Typ_Def :=
-                 Decl.As_Subtype_Decl.F_Subtype.P_Designated_Type_Decl
-                 .P_Root_Type.As_Type_Decl.F_Type_Def.As_Array_Type_Def
-                 .F_Component_Type;
-               if Kind (Decl.As_Subtype_Decl.F_Subtype.F_Constraint)
-                  in Ada_Index_Constraint_Range
-               then
-                  for Constraint of Decl.As_Subtype_Decl.F_Subtype.F_Constraint
-                                    .As_Index_Constraint.F_Constraints
-                  loop
-                     Constraint_Nodes (Current_Index) :=
-                       Constraint.As_Ada_Node;
-                     Current_Index := Current_Index + 1;
-                  end loop;
-               else
-                  pragma Assert
-                  (Kind (Decl.As_Subtype_Decl.F_Subtype.F_Constraint)
-                     in Ada_Discriminant_Constraint_Range);
-                  for Assoc of Decl.As_Subtype_Decl.F_Subtype.F_Constraint
-                               .As_Discriminant_Constraint.F_Constraints
-                  loop
-                     Constraint_Nodes (Current_Index) :=
-                       Assoc.As_Discriminant_Assoc.F_Discr_Expr.As_Ada_Node;
-                     Current_Index := Current_Index + 1;
-                  end loop;
-               end if;
+            if not Component_Typ.Success then
+               return (Success     => False,
+                     Diagnostics => "Failed to translate component type of"
+                                    & " array decl : "
+                                    & Component_Typ.Diagnostics);
             end if;
+            Res_Typ.Component_Type := Component_Typ.Res;
 
-            declare
-               Res_Typ : Constrained_Array_Typ (Num_Indices);
+            for Constraint of Constraint_Nodes loop
+               case Kind (Constraint) is
+                  when Ada_Subtype_Indication_Range =>
+                     Index_Typ :=
+                        Constraint.As_Subtype_Indication
+                        .P_Designated_Type_Decl;
 
-               Component_Typ : constant Translation_Result :=
-               Translate (Cmp_Typ_Def.F_Type_Expr, Verbose_Diag);
-               --  This ignores any constraints on the element type that may
-               --  appear in the component definition.
-
-               Index_Typ                      : Base_Type_Decl;
-               Has_Constraints                : Boolean;
-               Constraints_Static             : Boolean;
-               Range_Exp                      : Expr;
-               Constraint_Min, Constraint_Max : Big_Integer;
-
-               Failure_Reason : Unbounded_String;
-            begin
-
-               Current_Index := 1;
-               if not Component_Typ.Success then
-                  return (Success     => False,
-                        Diagnostics => "Failed to translate component type of"
-                                       & " array decl : "
-                                       & Component_Typ.Diagnostics);
-               end if;
-               Res_Typ.Component_Type := Component_Typ.Res;
-
-               for Constraint of Constraint_Nodes loop
-                  case Kind (Constraint) is
-                     when Ada_Subtype_Indication_Range =>
-                        Index_Typ :=
-                          Constraint.As_Subtype_Indication
-                          .P_Designated_Type_Decl;
-
-                        if Is_Null
-                             (Constraint.As_Subtype_Indication.F_Constraint)
-                        then
-                           Has_Constraints := False;
-                        elsif not Constraint.As_Subtype_Indication.F_Constraint
-                                 .As_Range_Constraint.F_Range.F_Range
-                                 .P_Is_Static_Expr
-                        then
-                           Has_Constraints := True;
-                           Constraints_Static := False;
-                        elsif Kind
-                                (Constraint.As_Subtype_Indication.F_Constraint
-                                 .As_Range_Constraint.F_Range.F_Range)
-                                 in Ada_Attribute_Ref_Range | Ada_Bin_Op_Range
-                        then
-                           Range_Exp :=
-                           Constraint.As_Subtype_Indication.F_Constraint
-                                       .As_Range_Constraint.F_Range.F_Range;
-
-                           Has_Constraints := True;
-                           Constraints_Static := True;
-
-                        end if;
-                     when Ada_Bin_Op_Range =>
-                        Index_Typ :=
-                        Constraint.As_Bin_Op.F_Left.P_Expression_Type;
-                        Has_Constraints := True;
-                        if Constraint.As_Expr.P_Is_Static_Expr then
-                           Constraints_Static := True;
-                           Range_Exp := Constraint.As_Expr;
-                        else
-                           Constraints_Static := False;
-                        end if;
-
-                     when Ada_Attribute_Ref_Range =>
-                        Index_Typ :=
-                        Constraint.As_Attribute_Ref.F_Prefix
-                        .P_Name_Designated_Type;
-                        Has_Constraints := True;
-                        if Constraint.As_Expr.P_Is_Static_Expr then
-                           Constraints_Static := True;
-                           Range_Exp := Constraint.As_Expr;
-                        else
-                           Constraints_Static := False;
-                        end if;
-                     when Ada_Identifier_Range =>
-                        Index_Typ := Constraint.As_Identifier.P_Referenced_Decl
-                                     .As_Base_Type_Decl;
+                     if Is_Null
+                           (Constraint.As_Subtype_Indication.F_Constraint)
+                     then
                         Has_Constraints := False;
-                     when others =>
-                        Failure_Reason :=
-                        +"Unexpected constraint kind for a constrained array: "
-                        & Kind_Name (Constraint);
-                        goto Failed_UC_Translation;
-                  end case;
+                     elsif not Constraint.As_Subtype_Indication.F_Constraint
+                              .As_Range_Constraint.F_Range.F_Range
+                              .P_Is_Static_Expr
+                     then
+                        Has_Constraints := True;
+                        Constraints_Static := False;
+                     elsif Kind
+                              (Constraint.As_Subtype_Indication.F_Constraint
+                              .As_Range_Constraint.F_Range.F_Range)
+                              in Ada_Attribute_Ref_Range | Ada_Bin_Op_Range
+                     then
+                        Range_Exp :=
+                        Constraint.As_Subtype_Indication.F_Constraint
+                                    .As_Range_Constraint.F_Range.F_Range;
 
-                  declare
-                     Index_Trans : constant Translation_Result :=
-                     Translate (Index_Typ, Verbose_Diag);
-                  begin
-                     if not Index_Trans.Success then
-                        Failure_Reason :=
-                        "Failed to translate type of the index dimention"
-                        & Current_Index'Image & ": " & Index_Trans.Diagnostics;
-                        goto Failed_UC_Translation;
+                        Has_Constraints := True;
+                        Constraints_Static := True;
+
                      end if;
-                     Res_Typ.Index_Types (Current_Index) := Index_Trans.Res;
-                  end;
-
-                  if Has_Constraints and then Constraints_Static then
-                     --  We should only encouter either a Bin Op (A .. B) or a
-                     --  range attribute reference according to RM 3.5 (2).
-
-                     if Kind (Range_Exp) in Ada_Bin_Op_Range then
-                        Constraint_Min := Big_Int.From_String
-                        (Range_Exp.As_Bin_Op.F_Left.P_Eval_As_Int.Image);
-                        Constraint_Max := Big_Int.From_String
-                        (Range_Exp.As_Bin_Op.F_Right.P_Eval_As_Int.Image);
+                  when Ada_Bin_Op_Range =>
+                     Index_Typ :=
+                     Constraint.As_Bin_Op.F_Left.P_Expression_Type;
+                     Has_Constraints := True;
+                     if Constraint.As_Expr.P_Is_Static_Expr then
+                        Constraints_Static := True;
+                        Range_Exp := Constraint.As_Expr;
                      else
-                        Constraint_Min := Big_Int.From_String
-                        (Low_Bound (Range_Exp.As_Attribute_Ref.F_Prefix
-                           .P_Name_Designated_Type.P_Discrete_Range)
-                           .P_Eval_As_Int.Image);
-                        Constraint_Min := Big_Int.From_String
-                        (High_Bound (Range_Exp.As_Attribute_Ref.F_Prefix
-                           .P_Name_Designated_Type.P_Discrete_Range)
-                           .P_Eval_As_Int.Image);
+                        Constraints_Static := False;
                      end if;
-                  end if;
 
-                  if not Has_Constraints then
-                     Res_Typ.Index_Constraints (Current_Index) :=
-                     (Present => False);
-                  elsif not Constraints_Static then
-                     Res_Typ.Index_Constraints (Current_Index) :=
-                     (Present        => True,
-                        Discrete_range =>
-                        (Low_Bound  => (Kind => Non_Static),
-                           High_Bound => (Kind => Non_Static)));
+                  when Ada_Attribute_Ref_Range =>
+                     Index_Typ :=
+                     Constraint.As_Attribute_Ref.F_Prefix
+                     .P_Name_Designated_Type;
+                     Has_Constraints := True;
+                     if Constraint.As_Expr.P_Is_Static_Expr then
+                        Constraints_Static := True;
+                        Range_Exp := Constraint.As_Expr;
+                     else
+                        Constraints_Static := False;
+                     end if;
+                  when others =>
+                     Index_Typ := Constraint.As_Name.P_Referenced_Decl
+                                  .As_Base_Type_Decl;
+                     Has_Constraints := False;
+               end case;
+
+               declare
+                  Index_Trans : constant Translation_Result :=
+                  Translate (Index_Typ, Verbose_Diag);
+               begin
+                  if not Index_Trans.Success then
+                     Failure_Reason :=
+                     "Failed to translate type of the index dimention"
+                     & Current_Index'Image & ": " & Index_Trans.Diagnostics;
+                     goto Failed_UC_Translation;
+                  end if;
+                  Res_Typ.Index_Types (Current_Index) := Index_Trans.Res;
+               end;
+
+               if Has_Constraints and then Constraints_Static then
+                  --  We should only encouter either a Bin Op (A .. B) or a
+                  --  range attribute reference according to RM 3.5 (2).
+
+                  if Kind (Range_Exp) in Ada_Bin_Op_Range then
+                     Constraint_Min := Big_Int.From_String
+                     (Range_Exp.As_Bin_Op.F_Left.P_Eval_As_Int.Image);
+                     Constraint_Max := Big_Int.From_String
+                     (Range_Exp.As_Bin_Op.F_Right.P_Eval_As_Int.Image);
                   else
-                     Res_Typ.Index_Constraints (Current_Index) :=
-                     (Present        => True,
-                        Discrete_Range =>
-                        (Low_Bound  => (Kind    => Static,
-                                          Int_Val => Constraint_Min),
-                           High_Bound => (Kind    => Static,
-                                          Int_Val => Constraint_Max)));
+                     Constraint_Min := Big_Int.From_String
+                     (Low_Bound (Range_Exp.As_Attribute_Ref.F_Prefix
+                        .P_Name_Designated_Type.P_Discrete_Range)
+                        .P_Eval_As_Int.Image);
+                     Constraint_Min := Big_Int.From_String
+                     (High_Bound (Range_Exp.As_Attribute_Ref.F_Prefix
+                        .P_Name_Designated_Type.P_Discrete_Range)
+                        .P_Eval_As_Int.Image);
                   end if;
-                  Current_Index := Current_Index + 1;
-               end loop;
+               end if;
 
-               Res_Typ.Name := Type_Name;
+               if not Has_Constraints then
+                  Res_Typ.Index_Constraints (Current_Index) :=
+                  (Present => False);
+               elsif not Constraints_Static then
+                  Res_Typ.Index_Constraints (Current_Index) :=
+                  (Present        => True,
+                     Discrete_range =>
+                     (Low_Bound  => (Kind => Non_Static),
+                        High_Bound => (Kind => Non_Static)));
+               else
+                  Res_Typ.Index_Constraints (Current_Index) :=
+                  (Present        => True,
+                     Discrete_Range =>
+                     (Low_Bound  => (Kind    => Static,
+                                       Int_Val => Constraint_Min),
+                        High_Bound => (Kind    => Static,
+                                       Int_Val => Constraint_Max)));
+               end if;
+               Current_Index := Current_Index + 1;
+            end loop;
 
-               return Res : Translation_Result (Success => True) do
-                  Res.Res.Set (Res_Typ);
-               end return;
+            Res_Typ.Name := Type_Name;
 
-               <<Failed_UC_Translation>>
-               return (Success => False, Diagnostics => Failure_Reason);
-            end;
+            return Res : Translation_Result (Success => True) do
+               Res.Res.Set (Res_Typ);
+            end return;
+
+            <<Failed_UC_Translation>>
+            return (Success => False, Diagnostics => Failure_Reason);
          end;
       end Translate_Constrained;
 
@@ -1054,58 +1165,18 @@ package body TGen.Types.Translation is
       (Decl : Subtype_Indication;
        Res  : in out Discriminated_Record_Typ)
    is
-      Constraints : Assoc_List;
    begin
       if Is_Null (Decl.F_Constraint) then
          return;
       end if;
 
-      Constraints := Decl.F_Constraint.As_Discriminant_Constraint
-                     .F_Constraints;
-
-      for Assoc of Constraints loop
-         if Kind (Assoc.As_Discriminant_Assoc.F_Discr_Expr) in Ada_Name
-           and then not Is_Null (Assoc.As_Discriminant_Assoc.F_Discr_Expr
-                                 .As_Name.P_Referenced_Defining_Name)
-           and then Kind (Assoc.As_Discriminant_Assoc.F_Discr_Expr.As_Name
-                          .P_Referenced_Defining_Name.Parent.Parent) in
-                    Ada_Discriminant_Spec_Range
-         then
-            --  Case of a constraint referencing a discriminant of the
-            --  enclosing type.
-
-            for Id of Assoc.As_Discriminant_Assoc.F_Ids loop
-               Res.Discriminant_Constraint.Include
-                 (Key      => Id.P_Referenced_Defining_Name,
-                  New_Item => (Kind          => Discriminant,
-                               Disc_Name     => Assoc.As_Discriminant_Assoc
-                                                .F_Discr_Expr.As_Name
-                                                .P_Referenced_Defining_Name));
-
-            end loop;
-
-         elsif Assoc.As_Discriminant_Assoc.F_Discr_Expr.P_Is_Static_Expr then
-
-            --  Case of a static constraint
-
-            for Id of Assoc.As_Discriminant_Assoc.F_Ids loop
-               Res.Discriminant_Constraint.Include
-                  (Id.P_Referenced_Defining_Name,
-                  (Kind    => Static,
-                     Int_Val => Big_Int.From_String
-                       (Assoc.As_Discriminant_Assoc.F_Discr_Expr.P_Eval_As_Int
-                        .Image)));
-            end loop;
-         else
-            --  Case of a non static constraint
-
-            for Id of Assoc.As_Discriminant_Assoc.F_Ids loop
-               Res.Discriminant_Constraint.Include
-                 (Id.P_Referenced_Defining_Name, (Kind => Non_Static));
-            end loop;
-         end if;
-
-      end loop;
+      declare
+         Const : TGen.Types.Constraints.Discriminant_Constraints :=
+           Translate_Discriminant_Constraints
+             (Decl.F_Constraint.As_Discriminant_Constraint);
+      begin
+         Res.Discriminant_Constraint.Move (Const.Constraint_Map);
+      end;
    end Apply_Record_Subtype_Decl;
 
    -------------------------
@@ -1324,49 +1395,41 @@ package body TGen.Types.Translation is
              (Decl.F_Discriminants.As_Known_Discriminant_Part.F_Discr_Specs
               .First_Child.As_Discriminant_Spec.F_Default_Expr));
 
-         for Assoc of Decl.F_Type_Def.As_Derived_Type_Def
+         for Pair of Decl.F_Type_Def.As_Derived_Type_Def
                         .F_Subtype_Indication.F_Constraint
                         .As_Discriminant_Constraint.F_Constraints
+                        .P_Zip_With_Params
          loop
-            if Kind (Assoc.As_Discriminant_Assoc.F_Discr_Expr) in Ada_Name
-               and then not Is_Null (Assoc.As_Discriminant_Assoc.F_Discr_Expr
-                                    .As_Name.P_Referenced_Defining_Name)
-               and then Kind (Assoc.As_Discriminant_Assoc.F_Discr_Expr
-                                    .As_Name.P_Referenced_Defining_Name
-                                    .Parent.Parent) in
+            if Kind (Actual (Pair)) in Ada_Name
+               and then not Is_Null (Actual (Pair).As_Name
+                                     .P_Referenced_Defining_Name)
+               and then Kind (Actual (Pair).As_Name
+                              .P_Referenced_Defining_Name.Parent.Parent) in
                         Ada_Discriminant_Spec_Range
             then
                --  Case of a Discriminant correspondance
-               for Id of Assoc.As_Discriminant_Assoc.F_Ids loop
-                  Discr_Renaming_Map.Insert
-                     (Key      => Id.P_Referenced_Defining_Name,
-                      New_Item =>
-                       (Kind          => Discriminant,
-                        Disc_Name     => Assoc.As_Discriminant_Assoc
-                                          .F_Discr_Expr.As_Name
-                                          .P_Referenced_Defining_Name));
-               end loop;
-            elsif Assoc.As_Discriminant_Assoc.F_Discr_Expr.P_Is_Static_Expr
+
+               Discr_Renaming_Map.Insert
+                 (Key      => Param (Pair).As_Defining_Name,
+                  New_Item =>
+                    (Kind          => Discriminant,
+                     Disc_Name     => Actual (Pair).As_Name
+                                      .P_Referenced_Defining_Name));
+            elsif Actual (Pair).P_Is_Static_Expr
             then
                --  Static value in the discriminant constraint
-
-               for Id of Assoc.As_Discriminant_Assoc.F_Ids loop
-                  Constraints_Map.Insert
-                     (Key      => Id.P_Referenced_Defining_Name,
-                      New_Item =>
-                        (Kind    => Static,
-                         Int_Val => Big_Int.From_String
-                           (Assoc.As_Discriminant_Assoc.F_Discr_Expr
-                           .P_Eval_As_Int.Image)));
-               end loop;
+               Constraints_Map.Insert
+                 (Key      => Param (Pair).As_Defining_Name,
+                  New_Item =>
+                    (Kind    => Static,
+                     Int_Val => Big_Int.From_String
+                                  (Actual (Pair).P_Eval_As_Int.Image)));
             else
                --  Non static value
 
-               for Id of Assoc.As_Discriminant_Assoc.F_Ids loop
-                  Constraints_Map.Insert
-                     (Key => Id.P_Referenced_Defining_Name,
-                      New_Item => (Kind => Non_Static));
-               end loop;
+               Constraints_Map.Insert
+                 (Key      => Param (Pair).As_Defining_Name,
+                  New_Item => (Kind => Non_Static));
             end if;
          end loop;
 
@@ -1949,6 +2012,270 @@ package body TGen.Types.Translation is
                        (Ada.Exceptions.Exception_Message (Exc)));
    end Translate_Record_Decl;
 
+   -------------------------
+   -- Eval_Discrete_Range --
+   -------------------------
+
+   function Eval_Discrete_Range
+     (Rng : Discrete_Range)
+     return TGen.Types.Constraints.Discrete_Range_Constraint
+   is
+
+      Min_Eval, Max_Eval : Big_Int.Big_Integer;
+      Min_Def_Name, Max_Def_Name : Defining_Name;
+   begin
+      if Rng.Low_Bound.P_Is_Static_Expr then
+         Min_Eval := Big_Int.From_String (Rng.Low_Bound.P_Eval_As_Int.Image);
+      elsif Kind (Rng.Low_Bound) in Ada_Name
+           and then not Is_Null
+                          (Rng.Low_Bound.As_Name.P_Referenced_Defining_Name)
+           and then Kind (Rng.Low_Bound.As_Name.P_Referenced_Defining_Name
+                          .Parent.Parent) in Ada_Discriminant_Spec_Range
+      then
+         Min_Def_Name := Rng.Low_Bound.As_Name.P_Referenced_Defining_Name;
+      end if;
+
+      if Rng.High_Bound.P_Is_Static_Expr then
+         Max_Eval := Big_Int.From_String (Rng.High_Bound.P_Eval_As_Int.Image);
+      elsif Kind (Rng.High_Bound) in Ada_Name
+           and then not Is_Null
+                          (Rng.High_Bound.As_Name.P_Referenced_Defining_Name)
+           and then Kind (Rng.High_Bound.As_Name.P_Referenced_Defining_Name
+                          .Parent.Parent) in Ada_Discriminant_Spec_Range
+      then
+         Max_Def_Name := Rng.High_Bound.As_Name.P_Referenced_Defining_Name;
+      end if;
+
+      if Rng.Low_Bound.P_Is_Static_Expr
+        and then Rng.High_Bound.P_Is_Static_Expr
+      then
+         return Discrete_Range_Constraint'
+                  (Low_Bound  => (Kind => Static, Int_Val => Min_Eval),
+                   High_Bound => (Kind => Static, Int_Val => Max_Eval));
+      elsif Rng.Low_Bound.P_Is_Static_Expr
+           and then not Is_Null (Max_Def_Name)
+      then
+         return Discrete_Range_Constraint'
+                  (Low_Bound  => (Kind => Static, Int_Val => Min_Eval),
+                   High_Bound => (Kind      => Discriminant,
+                                  Disc_Name => Max_Def_Name));
+      elsif Rng.Low_Bound.P_Is_Static_Expr then
+         return Discrete_Range_Constraint'
+                  (Low_Bound  => (Kind => Static, Int_Val => Min_Eval),
+                   High_Bound => (Kind => Non_Static));
+      elsif Rng.High_Bound.P_Is_Static_Expr
+           and then not Is_Null (Min_Def_Name)
+      then
+         return Discrete_Range_Constraint'
+                  (Low_Bound  => (Kind      => Discriminant,
+                                  Disc_Name => Min_Def_Name),
+                   High_Bound => (Kind => Static, Int_Val => Max_Eval));
+      elsif Rng.High_Bound.P_Is_Static_Expr then
+         return Discrete_Range_Constraint'
+                  (Low_Bound  => (Kind => Non_Static),
+                   High_Bound => (Kind => Static, Int_Val => Max_Eval));
+      elsif not Is_Null (Min_Def_Name) and then not Is_Null (Max_Def_Name)
+      then
+         return Discrete_Range_Constraint'
+                  (Low_Bound  => (Kind      => Discriminant,
+                                  Disc_Name => Min_Def_Name),
+                   High_Bound => (Kind      => Discriminant,
+                                  Disc_Name => Max_Def_Name));
+      elsif not Is_Null (Min_Def_Name) then
+         return Discrete_Range_Constraint'
+                  (Low_Bound  => (Kind      => Discriminant,
+                                  Disc_Name => Min_Def_Name),
+                   High_Bound => (Kind => Non_Static));
+      elsif not Is_Null (Max_Def_Name) then
+         return Discrete_Range_Constraint'
+                  (Low_Bound  => (Kind => Non_Static),
+                   High_Bound => (Kind      => Discriminant,
+                                  Disc_Name => Max_Def_Name));
+      else
+         return Discrete_Range_Constraint'
+                  (Low_Bound  => (Kind => Non_Static),
+                   High_Bound => (Kind => Non_Static));
+      end if;
+   end Eval_Discrete_Range;
+
+   -----------------------------------------
+   -- Translate_Discrete_Range_Constraint --
+   -----------------------------------------
+
+   function Translate_Discrete_Range_Constraint
+     (Node : LAL.Range_Constraint) return Discrete_Range_Constraint
+   is
+      Min, Max : Expr;
+   begin
+      case Kind (Node.F_Range.F_Range) is
+         when Ada_Attribute_Ref_Range =>
+            pragma Assert (Node.F_Range.F_Range.As_Attribute_Ref.F_Prefix
+                           .P_Name_Designated_Type.P_Is_Discrete_Type);
+            Min := Node.F_Range.F_Range.As_Attribute_Ref.F_Prefix
+                   .P_Name_Designated_Type.P_Discrete_Range.Low_Bound.As_Expr;
+            Max := Node.F_Range.F_Range.As_Attribute_Ref.F_Prefix
+                   .P_Name_Designated_Type.P_Discrete_Range.High_Bound.As_Expr;
+         when Ada_Bin_Op_Range =>
+            pragma Assert (Node.F_Range.F_Range.As_Bin_Op.F_Op
+                           in Ada_Op_Double_Dot_Range);
+            Min := Node.F_Range.F_Range.As_Bin_Op.F_Left;
+            Max := Node.F_Range.F_Range.As_Bin_Op.F_Right;
+         when others =>
+            raise Translation_Error with
+              "Unexpected expression for a range constraint: "
+              & Kind_Name (Node.F_Range.F_Range);
+      end case;
+
+      return Eval_Discrete_Range (Create_Discrete_Range (Min, Max));
+
+   end Translate_Discrete_Range_Constraint;
+
+   function Translate_Real_Constraints
+     (Node : LAL.Constraint) return TGen.Types.Constraints.Constraint'Class
+   is
+      Range_Spc : constant LAL.Range_Spec := Extract_Real_Range_Spec (Node);
+      Rnge : Real_Range_Constraint;
+   begin
+
+      if not Is_Null (Range_Spc) then
+         Rnge := Translate_Real_Range_Spec (Range_Spc);
+      end if;
+
+      case Kind (Node) is
+         when Ada_Range_Constraint_Range =>
+            pragma Assert (not Is_Null (Range_Spc));
+            return Rnge;
+         when Ada_Digits_Constraint_Range =>
+            if Node.As_Digits_Constraint.F_Digits.P_Is_Static_Expr then
+               declare
+                  Digits_Val : constant Big_Int.Big_Integer :=
+                    Big_Int.From_String
+                      (Node.As_Digits_Constraint.F_Digits.P_Eval_As_Int.Image);
+               begin
+                  if not Is_Null (Range_Spc) then
+                     return TGen.Types.Constraints.Digits_Constraint'
+                       (Has_Range    => True,
+                        Digits_Value => (Kind    => Static,
+                                         Int_Val => Digits_Val),
+                        Low_Bound  => Rnge.Low_Bound,
+                        High_Bound => Rnge.High_Bound);
+                  else
+                     return TGen.Types.Constraints.Digits_Constraint'
+                       (Has_Range => False,
+                        Digits_Value => (Kind    => Static,
+                                         Int_Val => Digits_Val));
+                  end if;
+               end;
+            else
+               if not Is_Null (Range_Spc) then
+                  return TGen.Types.Constraints.Digits_Constraint'
+                     (Has_Range    => True,
+                      Digits_Value => (Kind => Non_Static),
+                      Low_Bound  => Rnge.Low_Bound,
+                      High_Bound => Rnge.High_Bound);
+               else
+                  return TGen.Types.Constraints.Digits_Constraint'
+                     (Has_Range => False,
+                      Digits_Value => (Kind => Non_Static));
+               end if;
+            end if;
+         when Ada_Delta_Constraint_Range =>
+            raise Translation_Error with
+              "Delta contraints for anonymous types not implemented yet";
+         when others =>
+            raise Translation_Error with
+              "Unexpected expression for a real type constraint: "
+              & Kind_Name (Node);
+      end case;
+   end Translate_Real_Constraints;
+
+   function Translate_Index_Constraints
+     (Node     : LAL.Constraint;
+      Num_Dims : Positive)
+     return TGen.Types.Constraints.Index_Constraints
+   is
+      Constraint_List : constant Local_Ada_Node_Arr :=
+        Gather_Index_Constraint_Nodes (Node, Num_Dims);
+      Current_Index : Positive := 1;
+
+      Discr_Range : Discrete_Range;
+   begin
+      return Res : Index_Constraints (Num_Dims) do
+         for Cst of Constraint_List loop
+            case Kind (Cst) is
+               when Ada_Subtype_Indication_Range =>
+                  if not Is_Null (Cst.As_Subtype_Indication.F_Constraint) then
+                     Res.Constraint_Array (Current_Index) :=
+                       TGen.Types.Constraints.Index_Constraint'
+                         (Present        => True,
+                          Discrete_Range => Translate_Discrete_Range_Constraint
+                            (Cst.As_Subtype_Indication.F_Constraint
+                             .As_Range_Constraint));
+                     goto Skip_Range_Translation;
+                  else
+                     Discr_Range := Cst.As_Subtype_Indication.F_Name
+                                    .P_Name_Designated_Type.P_Discrete_Range;
+                  end if;
+               when Ada_Bin_Op_Range =>
+                  pragma Assert
+                    (Kind (Cst.As_Bin_Op.F_Op) in Ada_Op_Double_Dot_Range);
+                  Discr_Range := Create_Discrete_Range
+                    (Cst.As_Bin_Op.F_Left, Cst.As_Bin_Op.F_Right);
+               when Ada_Attribute_Ref_Range =>
+                  Discr_Range := Cst.As_Attribute_Ref.F_Prefix
+                                 .P_Name_Designated_Type.P_Discrete_Range;
+               when others =>
+                  Discr_Range :=
+                    Cst.As_Name.P_Name_Designated_Type.P_Discrete_Range;
+            end case;
+
+            Res.Constraint_Array (Current_Index) :=
+            TGen.Types.Constraints.Index_Constraint'
+              (Present        => True,
+               Discrete_Range => Eval_Discrete_Range (Discr_Range));
+
+            <<Skip_Range_Translation>>
+            Current_Index := Current_Index + 1;
+         end loop;
+      end return;
+   end Translate_Index_Constraints;
+
+   function Translate_Discriminant_Constraints
+     (Node : LAL.Discriminant_Constraint)
+     return TGen.Types.Constraints.Discriminant_Constraints
+   is
+   begin
+      return Res : TGen.Types.Constraints.Discriminant_Constraints do
+         for Pair of Node.F_Constraints.P_Zip_With_Params loop
+            if Actual (Pair).P_Is_Static_Expr then
+               Res.Constraint_Map.Insert
+                 (Key      => Param (Pair).As_Defining_Name,
+                  New_Item =>
+                    (Kind    => Static,
+                     Int_Val => Big_Int.From_String
+                                    (Actual (Pair).P_Eval_As_Int.Image)));
+            elsif Kind (Actual (Pair)) in Ada_Name
+                 and then not Is_Null (
+                            Actual (Pair).As_Name.P_Referenced_Defining_Name)
+                 and then Kind (Actual (Pair).As_Name
+                                .P_Referenced_Defining_Name.Parent.Parent)
+                         in Ada_Discriminant_Spec_Range
+            then
+               Res.Constraint_Map.Insert
+                 (Key      => Param (Pair).As_Defining_Name,
+                  New_Item =>
+                    (Kind      => Discriminant,
+                     DIsc_Name => Actual (Pair).As_Name
+                                  .P_Referenced_Defining_Name));
+            else
+               Res.Constraint_Map.Insert
+                 (Key      => Param (Pair).As_Defining_Name,
+                  New_Item => (Kind      => Non_Static));
+            end if;
+         end loop;
+      end return;
+   end Translate_Discriminant_Constraints;
+
    ---------------
    -- Translate --
    ---------------
@@ -1980,30 +2307,51 @@ package body TGen.Types.Translation is
          return Intermediate_Result;
       end if;
       case Intermediate_Result.Res.Get.Kind is
-         when Disc_Record_Kind =>
-            declare
-               Constrained_Typ : Discriminated_Record_Typ
-                                   (Constrained => True);
-               Ancestor : constant Discriminated_Record_Typ'Class :=
-                 As_Discriminated_Record_Typ (Intermediate_Result.Res);
-            begin
-               Constrained_Typ.Discriminant_Types :=
-                 Ancestor.Discriminant_Types.Copy;
-               Constrained_Typ.Component_Types :=
-                 Ancestor.Component_Types.Copy;
-               Constrained_Typ.Variant := Ancestor.Variant;
-               Constrained_Typ.Mutable := Ancestor.Mutable;
-               if Ancestor.Constrained then
-                  Constrained_Typ.Discriminant_Constraint :=
-                    Ancestor.Discriminant_Constraint.Copy;
-               end if;
-               Apply_Record_Subtype_Decl
-                 (N.As_Subtype_Indication, Constrained_Typ);
-               Constrained_Typ.Name := No_Defining_Name;
-               return Res : Translation_Result (Success => True) do
-                  Res.Res.Set (Constrained_Typ);
-               end return;
-            end;
+         when Discrete_Typ_Range =>
+            pragma Assert (Kind (N.As_Subtype_Indication.F_Constraint)
+                           in Ada_Range_Constraint_Range);
+            return Res : Translation_Result (Success => True) do
+               Res.Res.Set (Anonymous_Typ'
+                 (Name                => No_Defining_Name,
+                  Named_Ancestor      => Intermediate_Result.Res,
+                  Subtype_Constraints => new Discrete_Range_Constraint'
+                    (Translate_Discrete_Range_Constraint
+                      (N.As_Subtype_Indication.F_Constraint
+                       .As_Range_Constraint))));
+            end return;
+         when Real_Typ_Range =>
+            return Res : Translation_Result (Success => True) do
+               Res.Res.Set (Anonymous_Typ'
+                 (Name                => No_Defining_Name,
+                  Named_Ancestor      => Intermediate_Result.Res,
+                  Subtype_Constraints =>
+                    new TGen.Types.Constraints.Constraint'Class'
+                    (Translate_Real_Constraints
+                      (N.As_Subtype_Indication.F_Constraint))));
+            end return;
+         when Array_Typ_Range =>
+            return Res : Translation_Result (Success => True) do
+               Res.Res.Set (Anonymous_Typ'
+                 (Name                => No_Defining_Name,
+                  Named_Ancestor      => Intermediate_Result.Res,
+                  Subtype_Constraints => new Index_Constraints'
+                    (Translate_Index_Constraints
+                      (N.As_Subtype_Indication.F_Constraint,
+                       As_Unconstrained_Array_Typ
+                         (Intermediate_Result.Res).Num_Dims))));
+            end return;
+         when Record_Typ_Range =>
+            return Res : Translation_Result (Success => True) do
+               pragma Assert (Kind (N.As_Subtype_Indication.F_Constraint)
+                              in Ada_Discriminant_Constraint_Range);
+               Res.Res.Set (Anonymous_Typ'
+                 (Name                => No_Defining_Name,
+                  Named_Ancestor      => Intermediate_Result.Res,
+                  Subtype_Constraints => new Discriminant_Constraints'
+                    (Translate_Discriminant_Constraints
+                      (N.As_Subtype_Indication.F_Constraint
+                       .As_Discriminant_Constraint))));
+            end return;
          when others =>
             return Intermediate_Result;
       end case;
@@ -2012,6 +2360,10 @@ package body TGen.Types.Translation is
          return (Success     => False,
                  Diagnostics => +"Error translating " & N.Image & " : "
                                  & Ada.Exceptions.Exception_Message (Exc));
+      when Exc : Translation_Error =>
+         return (Success     => False,
+                 Diagnostics => +"Error translating the following constraints:"
+                                & Ada.Exceptions.Exception_Information (Exc));
    end Translate;
 
    ---------------

@@ -22,6 +22,7 @@
 ------------------------------------------------------------------------------
 
 with Libadalang.Analysis;
+with Langkit_Support.Text;
 
 with Ada.Containers;
 with Ada.Containers.Hashed_Maps;
@@ -61,6 +62,7 @@ package TGen.Types is
                      Constrained_Array_Kind,
                      Disc_Record_Kind,
                      Non_Disc_Record_Kind,
+                     Anonymous_Kind,
                      Unsupported);
 
    subtype Discrete_Typ_Range is Typ_Kind range Signed_Int_Kind .. Enum_Kind;
@@ -74,35 +76,6 @@ package TGen.Types is
      is Typ_Kind range Disc_Record_Kind .. Non_Disc_Record_Kind;
 
    subtype Big_Integer is Big_Int.Big_Integer;
-
-   type Constraint_Value_Kind is (Static, Discriminant, Non_Static);
-   --  Constraint kind. Discriminant means that the constraint value is the
-   --  value of one of the discriminants of the enclosing record type. Does not
-   --  make sense if the constraints are not applied to a component of a
-   --  discriminated record type.
-
-   type Constraint_Value (Kind : Constraint_Value_Kind := Non_Static) is
-      record
-         case Kind is
-            when Static =>
-               Int_Val : Big_Integer;
-               --  The static integer value of the constraint
-
-            when Discriminant =>
-               Disc_Name : LAL.Defining_Name;
-               --  The defining name of the discriminant that appears in this
-               --  context.
-
-            when Non_Static =>
-               null;
-               --  We don't have any useful info that we can provide here.
-               --  May be revisited.
-         end case;
-      end record;
-
-   type Discrete_Range_Constraint is record
-      Low_Bound, High_Bound : Constraint_Value;
-   end record;
 
    function Hash (Name : LAL.Defining_Name) return Ada.Containers.Hash_Type is
      (Ada.Strings.Wide_Wide_Hash (Name.Text));
@@ -136,7 +109,9 @@ package TGen.Types is
           P_Fully_Qualified_Name);
 
    function Type_Name (Self : Typ) return Text_Type is
-     (Self.Name.F_Name.Text);
+     (if Is_Null (Self.Name)
+      then Langkit_Support.Text.To_Text ("anonymous")
+      else Self.Name.F_Name.Text);
 
    function Gen_Random_Function_Name
      (Self : Typ) return String is

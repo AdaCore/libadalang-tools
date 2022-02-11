@@ -30,9 +30,11 @@ with Ada.Unchecked_Deallocation;
 
 with Libadalang.Analysis;
 
-with TGen.Strategies; use TGen.Strategies;
-with TGen.Types; use TGen.Types;
+with TGen.Strategies;        use TGen.Strategies;
+with TGen.Types;             use TGen.Types;
 with TGen.Types.Int_Types;
+with TGen.Types.Constraints; use TGen.Types.Constraints;
+
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Streams; use Ada.Streams;
 
@@ -44,10 +46,6 @@ package TGen.Types.Record_Types is
    --  Will be raised each time an illegal value is used for a discriminant,
    --  either because it is outside the bounds of the type of the discriminant
    --  or because it does not respect the discriminant constraints of a record.
-
-   function Hash_Defining_Name
-     (Node : LAL.Defining_Name) return Ada.Containers.Hash_Type is
-       (Node.As_Ada_Node.Hash);
 
    package Component_Maps is new Ada.Containers.Hashed_Maps
      (Key_Type        => LAL.Defining_Name,
@@ -121,16 +119,6 @@ package TGen.Types.Record_Types is
    --  We cannot simply use a Defining_Name -> Choice_List map here because
    --  a discriminant may appear multiple time in the variant parts.
 
-   package Discriminant_Constraint_Maps is new Ada.Containers.Hashed_Maps
-     (Key_Type        => LAL.Defining_Name,
-      Element_Type    => Constraint_Value,
-      Hash            => Hash_Defining_Name,
-      Equivalent_Keys => LAL."=");
-   --  Maps to represent discriminant constraints. Each entry specifies the
-   --  value given to the discriminant of which the defining name is used as
-   --  key. For enumeration types used as discriminants, this is the 'Pos value
-   --  of the corresponding literal.
-
    package Alternatives_Sets is new Ada.Containers.Ordered_Sets
      (Element_Type => TGen.Types.Int_Types.Int_Range,
       "<"          => TGen.Types.Int_Types."<",
@@ -153,6 +141,8 @@ package TGen.Types.Record_Types is
    end record;
 
    procedure Free_Variant (Var : in out Variant_Part_Acc);
+
+   function Clone (Var : Variant_Part_Acc) return Variant_Part_Acc;
 
    package Variant_Choice_Lists is new Ada.Containers.Doubly_Linked_Lists
      (Element_Type => Variant_Choice);

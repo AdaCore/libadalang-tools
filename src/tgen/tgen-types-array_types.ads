@@ -22,6 +22,7 @@
 ------------------------------------------------------------------------------
 
 with TGen.Types; use TGen.Types;
+with TGen.Types.Constraints; use TGen.Types.Constraints;
 
 package TGen.Types.Array_Types is
 
@@ -32,19 +33,7 @@ package TGen.Types.Array_Types is
       Component_Type : TGen.Types.SP.Ref;
    end record;
 
-   type Index_Constraints (Present : Boolean := False) is record
-      case Present is
-         when True =>
-            Discrete_Range : Discrete_Range_Constraint;
-         when others =>
-            null;
-      end case;
-   end record;
-
-   type Index_Constraint_Arr is array (Positive range <>) of Index_Constraints;
-
-   type Unconstrained_Array_Typ (Num_Dims : Positive) is
-     new Array_Typ (Num_Dims) with null record;
+   type Unconstrained_Array_Typ is new Array_Typ with null record;
 
    function Image (Self : Unconstrained_Array_Typ) return String;
 
@@ -64,7 +53,10 @@ package TGen.Types.Array_Types is
 
    use type Big_Integer;
 
-   function Length (Constraint : Index_Constraints) return Big_Integer is
+   function Length
+     (Constraint : TGen.Types.Constraints.Index_Constraint)
+      return Big_Integer
+   is
      (case Constraint.Present is
          when True =>
         (case Constraint.Discrete_Range.Low_Bound.Kind is

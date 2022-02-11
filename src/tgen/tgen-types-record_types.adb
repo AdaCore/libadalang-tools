@@ -196,13 +196,37 @@ package body TGen.Types.Record_Types is
 
       Cur : Cursor := Var.Variant_Choices.First;
    begin
-      while Has_Element (Cur) loop
-         Var.Variant_Choices.Update_Element
-           (Cur, Destroy_Var_Choice'Access);
-         Next (Cur);
-      end loop;
-      Free (Var);
+      if Var /= null then
+         while Has_Element (Cur) loop
+            Var.Variant_Choices.Update_Element
+            (Cur, Destroy_Var_Choice'Access);
+            Next (Cur);
+         end loop;
+         Free (Var);
+      end if;
    end Free_Variant;
+
+   -------------------
+   -- Clone_Variant --
+   -------------------
+
+   function Clone (Var : Variant_Part_Acc) return Variant_Part_Acc is
+      Res : Variant_Part_Acc;
+   begin
+      if Var = null then
+         return null;
+      end if;
+      Res := new Variant_Part;
+      Res.Discr_Name := Var.Discr_Name;
+      for Choice of Var.Variant_Choices loop
+         Res.Variant_Choices.Append (Variant_Choice'
+           (Alternatives => Choice.Alternatives,
+            Alt_Set      => Choice.Alt_Set.Copy,
+            Components   => Choice.Components.Copy,
+            Variant      => Clone (Choice.Variant)));
+      end loop;
+      return Res;
+   end Clone;
 
    ------------------
    -- Check_Others --
@@ -474,6 +498,7 @@ package body TGen.Types.Record_Types is
 
    function Generate_All_Shapes
      (Components       : Component_Map;
+
       Discr            : Component_Map;
       Disc_Constraints : Alternative_Constraint_Map;
       Variant          : Variant_Part_Acc;
@@ -511,7 +536,7 @@ package body TGen.Types.Record_Types is
             declare
                use Discriminant_Constraint_Maps;
                D_Name : LAL.Defining_Name := Key (Cursor);
-               Constraint : Constraint_Value := Element (Cursor);
+               Constraint : Discrete_Constraint_Value := Element (Cursor);
             begin
                case Constraint.Kind is
 

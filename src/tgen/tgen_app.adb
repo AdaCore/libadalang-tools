@@ -130,6 +130,9 @@ procedure TGen_App is
                if Trans_Res.Success then
                   Put_Line (Trans_Res.Res.Get.Image);
                   Put_Line ("Example Value:");
+                  Put_Line
+                    (Trans_Res.Res.Get.Generate_Static
+                      (TGen.Types.Disc_Value_Maps.Empty_Map));
                else
                   Put_Line ("Failed: " & To_String (Trans_Res.Diagnostics));
                end if;
