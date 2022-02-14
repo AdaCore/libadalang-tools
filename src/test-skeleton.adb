@@ -3754,7 +3754,9 @@ package body Test.Skeleton is
             New_Line_Count;
             for Param of Single_Vec loop
                S_Put (8, Param.Get ("name") & " : " & Param.Get ("type_name")
-                 & " := " & Param.Get ("value") & ";");
+                 & (if Param.Get ("mode") in 0 | 1
+                    then " := " & Param.Get ("value") & ";"
+                    else ";"));
                New_Line_Count;
             end loop;
             if Is_Function then
@@ -5402,6 +5404,14 @@ package body Test.Skeleton is
                              (Subp_Data_List.Element (Subp_Cur));
                         end if;
                         if not Unparse_Success then
+                           if Test.Common.Generate_Test_Vectors then
+                              Report_Std
+                                ("Warning: (TGen) "
+                                 & Base_Name (Data.Unit_File_Name.all)
+                                 & " : Could not generate test"
+                                 & " vectors for "
+                                 & Current_Subp.Subp_Text_Name.all);
+                           end if;
                            S_Put (6, "AUnit.Assertions.Assert");
                            New_Line_Count;
                            S_Put
@@ -6577,6 +6587,14 @@ package body Test.Skeleton is
                                 (Current_Subp);
                            end if;
                            if not Unparse_Success then
+                              if Test.Common.Generate_Test_Vectors then
+                                 Report_Std
+                                   ("Warning: (TGen) "
+                                    & Base_Name (Data.Unit_File_Name.all)
+                                    & " : Could not generate test"
+                                    & " vectors for "
+                                    & Current_Subp.Subp_Text_Name.all);
+                              end if;
                               S_Put (6, "AUnit.Assertions.Assert");
                               New_Line_Count;
                               S_Put

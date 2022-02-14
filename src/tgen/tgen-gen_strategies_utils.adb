@@ -156,6 +156,13 @@ package body TGen.Gen_Strategies_Utils is
               Subp_Param_Spec.F_Type_Expr.
                 P_Designated_Type_Decl.P_Defining_Name;
 
+            Param_Mode : constant Parameter_Mode :=
+              (case Kind (Subp_Param_Spec.F_Mode) is
+                  when Ada_Mode_Default | Ada_Mode_In => In_Mode,
+                  when Ada_Mode_In_Out => In_Out_Mode,
+                  when Ada_Mode_Out => Out_Mode,
+                  when others => Out_Mode);
+
             Type_Name                 : constant Unbounded_Text_Type :=
               To_Unbounded_Text
                 (Parameters_Type.F_Name.Text);
@@ -170,7 +177,11 @@ package body TGen.Gen_Strategies_Utils is
               Parameters_Type.Kind;
 
             Translation_Res : Translation_Result :=
-              Translate (Subp_Param_Spec.F_Type_Expr.P_Designated_Type_Decl);
+              (if Param_Mode in In_Mode | In_Out_Mode
+               then Translate
+                      (Subp_Param_Spec.F_Type_Expr.P_Designated_Type_Decl)
+               else (Success => True,
+                     Res     => SP.Null_Ref));
             My_Typ : SP.Ref;
 
          begin
@@ -192,6 +203,7 @@ package body TGen.Gen_Strategies_Utils is
                     (Parameter_Data'
                        (Name                      => Name,
                         Index                     => Index,
+                        Mode                      => Param_Mode,
                         Type_Name                 => Type_Name,
                         Type_Fully_Qualified_Name => Type_Fully_Qualified_Name,
                         Type_Parent_Package       => Type_Parent_Package));

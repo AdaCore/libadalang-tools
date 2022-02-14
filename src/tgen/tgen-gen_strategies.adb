@@ -621,11 +621,15 @@ package body TGen.Gen_Strategies is
             begin
                Param_JSON.Set_Field ("name", Create (+Param.Name));
                Param_JSON.Set_Field ("type_name", Create (+Param.Type_Name));
+               if Param.Mode in In_Mode | In_Out_Mode then
+                  Param_JSON.Set_Field
+                    ("value",
+                     Context.Type_Translations
+                     .Element (Param.Type_Fully_Qualified_Name)
+                     .Get.Generate_Static (Disc_Context));
+               end if;
                Param_JSON.Set_Field
-                 ("value",
-                  Context.Type_Translations
-                  .Element (Param.Type_Fully_Qualified_Name)
-                  .Get.Generate_Static (Disc_Context));
+                 ("mode", Create (Integer'(Parameter_Mode'Pos (Param.Mode))));
                Append (Test_Vector_JSON, Param_JSON);
             end;
          end loop;

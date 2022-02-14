@@ -47,10 +47,13 @@ package TGen.Context is
    subtype Fully_Qualified_Name_To_Type_Map is
      Fully_Qualified_Name_To_Type_Maps.Map;
 
+   type Parameter_Mode is (In_Mode, In_Out_Mode, Out_Mode);
+
    type Parameter_Data is
       record
          Name                      : Unbounded_Text_Type;
          Index                     : Positive;
+         Mode                      : Parameter_Mode;
          Type_Name                 : Unbounded_Text_Type;
          Type_Fully_Qualified_Name : Unbounded_Text_Type;
          Type_Parent_Package       : Unbounded_Text_Type;
