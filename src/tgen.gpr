@@ -9,9 +9,9 @@ project TGen is
    type Build_Mode_Type is ("dev", "prod");
    Build_Mode : Build_Mode_Type := external ("BUILD_MODE", "dev"); 
    
-   for Source_Dirs use ("tgen", "tgen/templates");
+   for Source_Dirs use ("tgen", "tgen/templates", "tgen/marshalling_templates");
    for Object_Dir use "../obj/tgen";
-   for Main use ("tgen_app.adb");
+   for Main use ("tgen_app.adb", "tgen_marshalling.adb");
 
    for Languages use ("Ada", "Templates");
    
