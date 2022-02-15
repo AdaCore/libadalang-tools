@@ -25,6 +25,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with GNAT.Random_Numbers;
 
+with TGen.Context; use TGen.Context;
 with TGen.Strings; use TGen.Strings;
 with TGen.Random; use TGen.Random;
 
@@ -68,31 +69,32 @@ package body TGen.Types.Real_Types is
    -- Generate_Random_Strategy --
    ------------------------------
 
-   function Generate_Random_Strategy (Self : Float_Typ) return String
+   function Generate_Random_Strategy
+     (Self    : Float_Typ;
+      Context : in out Generation_Context) return Strategy_Type
    is
-      Result : Unbounded_String;
+      Res : Strategy_Type (Kind => Random_Kind, Constrained => False);
+      F_Body : Unbounded_String;
       F_Name : constant String := Self.Gen_Random_Function_Name;
       Indent : Natural := 0;
    begin
-      Write_Line
-        (Result,
-         "function " & F_Name & " return " & (+Self.Fully_Qualified_Name),
-         Indent);
-      Indent := @ + 3;
-      Write_Line (Result, "is", Indent);
+      Write_Line (F_Body, "declare", Indent);
       Indent := @ + 3;
       Write_Line
-        (Result,
+        (F_Body,
          "function Gen is new TGen.Types.Real_Types.Gen ("
          & (+Self.Fully_Qualified_Name) & ");",
          Indent);
       Indent := @ - 3;
-      Write_Line (Result, "begin", Indent);
+      Write_Line (F_Body, "begin", Indent);
       Indent := @ + 3;
-      Write_Line (Result, "return Gen;", Indent);
+      Write_Line (F_Body, "return Gen;", Indent);
       Indent := @ - 3;
-      Write_Line (Result, "end " & F_Name & ";", Indent);
-      return +Result;
+      Write_Line (F_Body, "end;", Indent);
+
+      Res.Strategy_Function := Self.Random_Strategy_Function;
+      Res.Strategy_Body := +(+F_Body);
+      return Res;
    end Generate_Random_Strategy;
 
    function Generate_Static

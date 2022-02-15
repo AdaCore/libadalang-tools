@@ -52,6 +52,9 @@ package TGen.Random is
 
    function More (Self : in out Many_Type) return Boolean;
 
+   function Rand_Float return Float;
+   --  Return a random number between 0 and 1
+
 private
    type Many_Type is tagged record
       Min_Size, Max_Size : Natural;

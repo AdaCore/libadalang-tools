@@ -52,10 +52,10 @@ package TGen.Files is
 
    function Get_Tmpl_Directory return Virtual_File;
 
-   function Get_Template_Strat_ADB return Virtual_File is
+   function Get_Template_Param_Strat_ADB return Virtual_File is
      (Get_Tmpl_Directory / "strat.adb.tmpl");
 
-   function Get_Template_Strat_ADS return Virtual_File is
+   function Get_Template_Param_Strat_ADS return Virtual_File is
      (Get_Tmpl_Directory / "strat.ads.tmpl");
 
    function Get_Template_Test_ADB return Virtual_File is

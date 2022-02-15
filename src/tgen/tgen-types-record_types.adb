@@ -39,6 +39,7 @@ with GNATCOLL.GMP.Integers;
 
 with TGen.Context; use TGen.Context;
 with TGen.Gen_Strategies_Utils; use TGen.Gen_Strategies_Utils;
+with TGen.Random;
 
 package body TGen.Types.Record_Types is
 
@@ -345,22 +346,6 @@ package body TGen.Types.Record_Types is
          end;
       end loop;
    end Fill_Components;
-
-   type A (I : Integer) is record
-      case I is
-         when 1 .. 2 | 3 =>
-            null;
-         when others =>
-            null;
-      end case;
-   end record;
-
-   type B (I : Character) is record
-      case I is
-         when others =>
-            null;
-      end case;
-   end record;
 
    function "+" (I : GNATCOLL.GMP.Integers.Big_Integer) return Big_Integer is
      (Big_Int.From_String (GNATCOLL.GMP.Integers.Image (I)));
@@ -813,11 +798,13 @@ package body TGen.Types.Record_Types is
    ------------------------------------------
 
    function Generate_Constrained_Random_Strategy
-     (Self : Discriminated_Record_Typ) return String
+     (Self    : Discriminated_Record_Typ;
+      Context : Generation_Context) return Strategy_Type
    is
       use Component_Maps;
 
-      Function_String : Unbounded_String;
+      Res : Strategy_Type (Kind => Random_Kind, Constrained => False);
+      F_Body : Unbounded_String;
       Indentation : Unbounded_String := +"";
       Rec_Name : constant String := "Rec";
 
@@ -832,12 +819,12 @@ package body TGen.Types.Record_Types is
 
       procedure A (Str : String) is
       begin
-         Append (Function_String, Str);
+         Append (F_Body, Str);
       end A;
 
       procedure NL is
       begin
-         Append (Function_String, Ada.Characters.Latin_1.LF & (+Indentation));
+         Append (F_Body, Ada.Characters.Latin_1.LF & (+Indentation));
       end NL;
 
       procedure I is
@@ -933,8 +920,7 @@ package body TGen.Types.Record_Types is
         Gen_Constrained_Function (Self);
    begin
 
-      A (To_String (Constrained_Function));
-      A ("is");
+      A ("declare");
       I;
       NL;
       A (Rec_Name & " : " & (+Self.Fully_Qualified_Name));
@@ -947,10 +933,9 @@ package body TGen.Types.Record_Types is
             A (+Key (Disc).F_Name.Text);
             if Next (Disc) /= No_Element then
                A (", ");
-               NL;
             end if;
-            A (");");
          end loop;
+         A (");");
       end if;
 
       --  Now generate a function that is similar to the record declaration:
@@ -972,43 +957,193 @@ package body TGen.Types.Record_Types is
       A ("return " & Rec_Name & ";");
       UI;
       NL;
-      A ("end " & (+Constrained_Function.Name) & ";");
+      A ("end;");
 
-      return +Function_String;
+      Res.Strategy_Function := Constrained_Function;
+      Res.Strategy_Body := +(+F_Body);
+
+      return Res;
    end Generate_Constrained_Random_Strategy;
+
+   ---------------
+   -- Nth_Child --
+   ---------------
+
+   function Nth_Child
+     (Parent : Intervals_Biased_Trees.Cursor;
+      N : Positive) return Intervals_Biased_Trees.Cursor
+   is
+      use Intervals_Biased_Trees;
+      Child : Cursor := First_Child (Parent);
+      I : Positive := 1;
+   begin
+      while I < N and then Child /= No_Element loop
+         Child := Next_Sibling (Child);
+         I := I + 1;
+      end loop;
+
+      if I /= N then
+         raise Program_Error with "Child " & Positive'Image (N) &
+           " not found";
+      end if;
+
+      return Child;
+   end Nth_Child;
+
+   function Pick_Choice (V : Intervals_With_Bias_Vector) return Positive
+     with Pre => V.Length > 0;
+
+   function Pick_Choice (V : Intervals_With_Bias_Vector) return Positive is
+      R : Float := TGen.Random.Rand_Float;
+      Cpt : Float := Float (0);
+      Choice : Positive := 1;
+   begin
+      for Elem of V loop
+         Cpt := Cpt + Elem.Bias;
+         if Cpt > R then
+            return Choice;
+         end if;
+         Choice := Choice + 1;
+      end loop;
+      return Choice;
+   end Pick_Choice;
+
+   function Draw (Intervals : Alternatives_Set) return Big_Integer;
+
+   --  TODO: pick a value in the intervals and not the first one
+
+   function Draw (Intervals : Alternatives_Set) return Big_Integer is
+   begin
+      return Intervals.First_Element.Min;
+   end Draw;
+
+   procedure Blll
+     (Node              : in out Intervals_Biased_Trees.Cursor;
+      Variant_Choices   : in out Positive_Vector;
+      Update_Disc_Value : access procedure (V : Big_Integer)) is
+
+      use Intervals_Biased_Trees;
+
+      V : Intervals_With_Bias_Vector := Element (Node).Data;
+      Intervals : Alternatives_Set;
+      Variant_Choice : constant Positive := Pick_Choice (V);
+   begin
+      Intervals := V.Element (Variant_Choice).Intervals;
+      Update_Disc_Value (Draw (Intervals));
+      Variant_Choices.Append (Variant_Choice);
+      Node := Nth_Child (Node, Variant_Choice);
+   end Blll;
+
+   procedure Fixup_Bias
+     (Tr   : in out Intervals_Biased_Trees.Tree;
+      Leaf : Intervals_Biased_Trees.Cursor;
+      Choices : Positive_Vector)
+   is
+
+      use Intervals_Biased_Trees;
+      use type Count_Type;
+
+      Current_Node : Cursor := Leaf.Parent;
+      Current_Choice_Index : Natural := Natural (Choices.Length);
+
+      procedure Redistribute_Bias
+        (V                  : in out Intervals_With_Bias_Vector;
+         Redistributed_Bias : Float);
+
+      procedure Process_Node
+        (Tr     : in out Tree;
+         Node   : in out Cursor;
+         Choice : Positive);
+
+      procedure Redistribute_Bias
+        (V                  : in out Intervals_With_Bias_Vector;
+         Redistributed_Bias : Float) is
+
+         procedure Update_Element
+           (IB : in out Intervals_With_Bias);
+
+         procedure Update_Element
+           (IB : in out Intervals_With_Bias) is
+         begin
+            --  Each element takes a chunk of the redistributed bias according
+            --  to what its bias was before.
+            IB.Bias :=
+              @ + (@ / (1.0 - Redistributed_Bias)) * Redistributed_Bias;
+         end Update_Element;
+
+         use Intervals_With_Bias_Vectors;
+      begin
+         for C in V.Iterate loop
+            Update_Element (V, C, Update_Element'Access);
+         end loop;
+      end Redistribute_Bias;
+
+
+      --  If the node has no subtree of index choice rooted to it, we will
+      --  suppress the choice from the list of alternatives. This happens
+      --  when a shape or all the shapes in the variant have been generated.
+      --  Note that this function should be customizable.
+
+      procedure Process_Node
+        (Tr     : in out Tree;
+         Node   : in out Cursor;
+         Choice : Positive) is
+         Variants : Intervals_With_Bias_Vector := Element (Node).Data;
+         Bias     : Float := Variants.Element (Choice).Bias;
+         Child    : Cursor := Nth_Child (Node, Choice);
+      begin
+         if Child_Count (Node) = 0 then
+            Intervals_With_Bias_Vectors.Delete
+              (Variants,
+               Intervals_With_Bias_Vectors.Extended_Index'(Choice));
+            Delete_Leaf (Tr, Child);
+
+            --  We redistribute all of its bias to its siblings
+
+            Redistribute_Bias (Variants, Bias);
+         end if;
+
+         --  Otherwise, let's do nothing. We could make bias modifications in
+         --  the uptree as well (see if part of the subtree was deleted, and
+         --  disminish the bias if that is the case, left as a TODO for later).
+
+      end Process_Node;
+
+   begin
+      while Current_Node /= No_Element loop
+         Process_Node
+           (Tr, Current_Node, Choices.Element (Current_Choice_Index));
+         Current_Node := Parent (Current_Node);
+         Current_Choice_Index := Current_Choice_Index - 1;
+      end loop;
+   end Fixup_Bias;
 
    ------------------------------
    -- Generate_Random_Strategy --
    ------------------------------
 
    function Generate_Random_Strategy
-     (Self : Discriminated_Record_Typ) return String
+     (Self    : Discriminated_Record_Typ;
+      Context : in out Generation_Context) return Strategy_Type
    is
-      Result : Unbounded_String;
-      F_Name : constant String := Self.Gen_Random_Function_Name;
+      Result : Strategy_Type (Kind => Random_Kind, Constrained => True);
+      F_Body : Unbounded_String;
+
       Indentation : Natural := 0;
 
       Constrained_Function : Subprogram_Data :=
         Gen_Constrained_Function (Self);
    begin
 
-      Write_Line
-        (Result,
-         "function " & F_Name & " return " & (+Self.Fully_Qualified_Name),
-         Indentation);
+      Write_Line (F_Body, "declare", Indentation);
+      Write_Line (F_Body, "begin", Indentation);
 
-      Write_Line (Result, "is", Indentation);
-      Write_Line (Result, "begin", Indentation);
+      Write_Line
+        (F_Body, "return " & (+Constrained_Function.Name), Indentation);
 
       Indentation := Indentation + 3;
 
-      Write_Line
-        (Result, "return " & (+Constrained_Function.Name), Indentation);
-
-      Indentation := Indentation + 3;
-
-      S_Write (Result, "( ", Indentation);
-
+      S_Write (F_Body, "( ", Indentation);
 
       --  Expected parameters are discriminant values; pass them
 
@@ -1024,7 +1159,7 @@ package body TGen.Types.Record_Types is
               (if Next (Disc_Cursor) = No_Element then ");" else " ,");
          begin
             Write_Line
-              (Result,
+              (F_Body,
                Disc_Name & " => "
                & Disc_Type.Gen_Random_Function_Name
                & Suffix,
@@ -1032,23 +1167,24 @@ package body TGen.Types.Record_Types is
          end;
       end loop;
 
-      Indentation := Indentation - 6;
-      Write_Line
-        (Result,
-         "end " & F_Name & ";",
-         Indentation);
-      return +Result;
-   end Generate_Random_Strategy;
+      Indentation := Indentation - 3;
+      Write_Line (F_Body, "end;", Indentation);
 
-   package body Random_Discriminated_Record_Strategy is
+      Result.Strategy_Body := +(+F_Body);
+      Result.Strategy_Function := Self.Random_Strategy_Function;
 
-      procedure Gen
-        (Strat : Random_Discriminated_Record_Strategy_Type;
-         Stream : access Root_Stream_Type'Class) is
+      --  This uses the constrained strategy
+
+      declare
+         Constrained_Strategy : aliased Strategy_Type :=
+           Self.Generate_Constrained_Random_Strategy (Context);
       begin
-         Discriminated_Record_Type'Output (Stream, Gen (Gen));
-      end Gen;
+         Context.Strategies.Insert (Constrained_Strategy);
+         Result.Constrained_Strategy_Function :=
+           Constrained_Strategy'Unchecked_Access;
+      end;
 
-   end Random_Discriminated_Record_Strategy;
+      return Result;
+   end Generate_Random_Strategy;
 
 end TGen.Types.Record_Types;

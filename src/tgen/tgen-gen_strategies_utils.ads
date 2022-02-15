@@ -67,6 +67,9 @@ package TGen.Gen_Strategies_Utils is
 
    function Type_Strat_Package_Name (Package_Name : String) return String;
 
+   function Strip (Package_Name : String) return String;
+   --  Strip the last dotted name. ??? What happens if no dotted name
+
    function Gen_Param_Function_Name
      (Subp_Data : Subprogram_Data;
       Param : Parameter_Data) return String is

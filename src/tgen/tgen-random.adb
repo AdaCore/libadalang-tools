@@ -160,6 +160,12 @@ package body TGen.Random is
       return Should_Continue;
    end More;
 
+   function Rand_Float return Float is
+      function Rand is new GNAT.Random_Numbers.Random_Float (Float);
+   begin
+      return Rand (Generator_Instance);
+   end Rand_Float;
+
 begin
    GNAT.Random_Numbers.Reset (Generator_Instance);
 end TGen.Random;

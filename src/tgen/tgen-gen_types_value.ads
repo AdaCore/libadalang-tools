@@ -40,9 +40,8 @@ package TGen.Gen_Types_Value is
    --  functions for the supported types.
 
    function Create
-     (Pkg_Name     : Unbounded_String;
-      Types        : Typ_Set;
-      Type_Depends : Typ_Set) return Type_Value_Generator;
+     (Context    : Generation_Context;
+      Strategies : Strategy_Set) return Type_Value_Generator;
    --  Create Ada packages with generation function for the given (supported)
    --  types. Type_Depends is the list of typse needed to build instances of
    --  the given types (e.g. if A is a record type with an Integer component,
@@ -54,37 +53,35 @@ package TGen.Gen_Types_Value is
 private
    type Type_Value_Generator is new Source_Code_File_Generator with
       record
-         Pkg_Name     : Unbounded_String;
-         Types        : Typ_Set;
-         Type_Depends : Typ_Set;
+         Context      : Generation_Context;
+         Strategies   : Strategy_Set;
       end record;
 
    type Type_Value_Translator is abstract new Translator_Container with
       record
-         Types : Typ_Set;
+         Strategies : Strategy_Set;
       end record;
 
    type Type_Value_ADS_Translator is
-     new Type_Value_Translator with null record;
+     new Type_Value_Translator with record
+      Context : Generation_Context;
+   end record;
    type Type_Value_ADB_Translator is
-     new Type_Value_Translator with null record;
-   type With_Clauses_Translator is
-     new Type_Value_Translator with null record;
+     new Type_Value_Translator with record
+      Context : Generation_Context;
+   end record;
 
    function Create_Type_Value_ADS_Translator
-     (Types : Typ_Set;
-      Next  : access constant Translator'Class := null)
+     (Context    : Generation_Context;
+      Strategies : Strategy_Set;
+      Next    : access constant Translator'Class := null)
       return Type_Value_ADS_Translator;
 
    function Create_Type_Value_ADB_Translator
-     (Types : Typ_Set;
-      Next  : access constant Translator'Class := null)
+     (Context    : Generation_Context;
+      Strategies : Strategy_Set;
+      Next       : access constant Translator'Class := null)
       return Type_Value_ADB_Translator;
-
-   function Create_With_Clauses_Translator
-     (Type_Depends : Typ_Set;
-      Next         : access constant Translator'Class := null)
-      return With_Clauses_Translator;
 
    overriding
    procedure Translate_Helper
@@ -94,11 +91,6 @@ private
    overriding
    procedure Translate_Helper
      (Self  : Type_Value_ADB_Translator;
-      Table : in out Templates_Parser.Translate_Set);
-
-   overriding
-   procedure Translate_Helper
-     (Self  : With_Clauses_Translator;
       Table : in out Templates_Parser.Translate_Set);
 
 end TGen.Gen_Types_Value;

@@ -22,7 +22,10 @@
 ------------------------------------------------------------------------------
 
 with Ada.Characters.Handling; use Ada.Characters.Handling;
+with Ada.Strings; use Ada.Strings;
+with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 with Ada.Strings.Unbounded;   use Ada.Strings.Unbounded;
+with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
 
 with TGen.Strings;            use TGen.Strings;
 with TGen.Types;              use TGen.Types;
@@ -191,8 +194,7 @@ package body TGen.Gen_Strategies_Utils is
                         Index                     => Index,
                         Type_Name                 => Type_Name,
                         Type_Fully_Qualified_Name => Type_Fully_Qualified_Name,
-                        Type_Parent_Package       => Type_Parent_Package,
-                        Type_Repr => My_Typ));
+                        Type_Parent_Package       => Type_Parent_Package));
                end;
 
                Index := Index + 1;
@@ -281,6 +283,17 @@ package body TGen.Gen_Strategies_Utils is
    end Type_Strat_Package_Name;
 
 
+   -----------
+   -- Strip --
+   -----------
+
+   function Strip (Package_Name : String) return String is
+   begin
+      return Package_Name
+        (Package_Name'First
+         .. (Index (Package_Name, ".", Package_Name'Last, Backward) - 1));
+   end Strip;
+
    -------------------
    -- Get_All_Types --
    -------------------
@@ -302,13 +315,13 @@ package body TGen.Gen_Strategies_Utils is
 
                for T of R.Component_Types loop
                   if not T.Get.Is_Anonymous then
-                     Result.Insert (T);
+                     Result.Include (T);
                   end if;
                end loop;
 
                for T of R.Discriminant_Types loop
                   if not T.Get.Is_Anonymous then
-                     Result.Insert (T);
+                     Result.Include (T);
                   end if;
                end loop;
 
@@ -353,8 +366,16 @@ package body TGen.Gen_Strategies_Utils is
                  Discriminated_Record_Typ (Self);
                F_Name : constant Unbounded_Text_Type :=
                  +(F_Prefix & Self.Gen_Random_Function_Name);
+               Parent_Package : constant Unbounded_Text_Type :=
+                 Generation_Package_For_Type (Self);
+               Fully_Qualified_Name : constant Unbounded_Text_Type :=
+                 Parent_Package
+                 & Unbounded_Wide_Wide_String'(+String'("."))
+                 & F_Name;
                Index  : Positive := 1;
             begin
+               Result.Fully_Qualified_Name := Fully_Qualified_Name;
+               Result.Parent_Package := Parent_Package;
                Result.Name := F_Name;
                Result.Return_Type_Fully_Qualified_Name := +Ret_Type;
                for D in Disc_Record.Discriminant_Types.Iterate loop
@@ -367,7 +388,11 @@ package body TGen.Gen_Strategies_Utils is
                   begin
                      P.Name := +D_Name;
                      P.Index := Index;
-                     P.Type_Repr := D_Type;
+                     P.Type_Name := +D_Type.Get.Type_Name;
+                     P.Type_Fully_Qualified_Name :=
+                       +D_Type.Get.Fully_Qualified_Name;
+                     P.Type_Parent_Package :=
+                       +D_Type.Get.Parent_Package_Fully_Qualified_Name;
                      Result.Parameters_Data.Append (P);
                      Index := Index + 1;
                   end;

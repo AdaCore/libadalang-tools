@@ -22,99 +22,73 @@
 ------------------------------------------------------------------------------
 
 with Ada.Containers.Vectors;
+with Ada.Finalization;
 with Ada.Streams; use Ada.Streams;
 
 with TGen.Types; use TGen.Types;
 
 package TGen.Strategies is
 
-   type Strategy_Type is interface;
+   type Strategy_Wrapper_Type is abstract new Ada.Finalization.Controlled
+   with null record;
+
+   type Strategy_Wrapper_Acc is access Strategy_Wrapper_Type'Class;
 
    procedure Gen
-     (Strat : Strategy_Type; Stream : access Root_Stream_Type'Class)
+     (Strat  : in out Strategy_Wrapper_Type;
+      Stream : access Root_Stream_Type'Class)
    is abstract;
 
-   type Random_Strategy_Type is abstract new Strategy_Type with null record;
+   type Random_Strategy_Wrapper_Type is
+     abstract new Strategy_Wrapper_Type with null record;
 
    generic
       type T (<>) is private;
       with function Gen return T is <>;
-   package Random_Strategy_Generic is
-      type Random_Strategy_Generic_Type is
-        new Random_Strategy_Type with null record;
+   package Random_Strategy_Wrapper_Generic is
+      type Random_Strategy_Wrapper_Generic_Type is
+        new Random_Strategy_Wrapper_Type with null record;
       overriding procedure Gen
-        (Strat : Random_Strategy_Generic_Type;
+        (Strat  : in out Random_Strategy_Wrapper_Generic_Type;
          Stream : access Root_Stream_Type'Class);
-      Strat : aliased Random_Strategy_Generic_Type;
-   end Random_Strategy_Generic;
+      Strat : aliased Random_Strategy_Wrapper_Generic_Type;
+   end Random_Strategy_Wrapper_Generic;
 
    generic
-      type T is (<>);
-   function Random_Discrete_Gen return T;
-
-   generic
-      type T is (<>);
-   package Random_Discrete_Strategy is
-      type Random_Discrete_Strategy_Type is
-        new Random_Strategy_Type with null record;
+      type T1 (<>) is private;
+      type State is new Ada.Finalization.Controlled with private;
+      with function Gen (S : in out State) return T1 is <>;
+   package State_Strategy_Wrapper_Generic is
+      type State_Strategy_Wrapper_Generic_Type is
+        new Strategy_Wrapper_Type with record
+         S : State;
+      end record;
       overriding procedure Gen
-        (Strat : Random_Discrete_Strategy_Type;
+        (Strat  : in out State_Strategy_Wrapper_Generic_Type;
          Stream : access Root_Stream_Type'Class);
-      Strat : aliased Random_Discrete_Strategy_Type;
-   end Random_Discrete_Strategy;
+      Strat : aliased State_Strategy_Wrapper_Generic_Type;
+   end State_Strategy_Wrapper_Generic;
 
    generic
-      type T is digits <>;
-   package Random_Float_Strategy is
-      type Random_Float_Strategy_Type is
-        new Random_Strategy_Type with null record;
+      type S1 is new Strategy_Wrapper_Type with private;
+      type S2 is new Strategy_Wrapper_Type with private;
+
+      Bias : Float;
+      --  Probability for picking the first strategy (between 0 and 1)
+
+   package Dispatching_Strategy_Wrapper_Generic is
+
+      type Dispatching_Strategy_Wrapper_Generic_Type is new
+        Strategy_Wrapper_Type with record
+         S1 : Strategy_Wrapper_Acc;
+         S2 : Strategy_Wrapper_Acc;
+      end record;
+
       overriding procedure Gen
-        (Strat : Random_Float_Strategy_Type;
+        (Strat  : in out Dispatching_Strategy_Wrapper_Generic_Type;
          Stream : access Root_Stream_Type'Class);
-      Strat : aliased Random_Float_Strategy_Type;
-   end Random_Float_Strategy;
+      Strat : aliased Dispatching_Strategy_Wrapper_Generic_Type;
 
-   generic
-      type Index_Type is (<>);
-      type Element_Type is private;
-      type Array_Type is array (Index_Type range <>) of Element_Type;
-      with function Gen return Element_Type is <>;
-   function Random_Constrained_Array_Gen
-        (LB : Index_Type; UB : Index_Type) return Array_Type;
-
-   generic
-      type Index_Type is (<>);
-      type Element_Type is private;
-      type Array_Type is array (Index_Type range <>) of Element_Type;
-      with function Gen return Element_Type is <>;
-
-   package Random_Unconstrained_Array_Strategy is
-      type Random_Unconstrained_Array_Strategy_Type is
-        new Random_Strategy_Type with null record;
-      overriding procedure Gen
-        (Strat : Random_Unconstrained_Array_Strategy_Type;
-         Stream : access Root_Stream_Type'Class);
-      Strat : aliased Random_Unconstrained_Array_Strategy_Type;
-   end Random_Unconstrained_Array_Strategy;
-
-   type Strategy_Acc is access all Strategy_Type'Class;
-
-   package Strategy_Vectors is new
-     Ada.Containers.Vectors
-       (Index_Type => Natural,
-        Element_Type => Strategy_Acc);
-
-   subtype Strategy_Vector is Strategy_Vectors.Vector;
-
-   generic
-      Strategies : Strategy_Vectors.Vector;
-   package Random_Record_Strategy is
-      type Random_Record_Strategy_Type is
-        new Random_Strategy_Type with null record;
-      overriding procedure Gen
-        (Strat : Random_Record_Strategy_Type;
-         Stream : access Root_Stream_Type'Class);
-      Strat : aliased Random_Record_Strategy_Type;
-   end Random_Record_Strategy;
+   end Dispatching_Strategy_Wrapper_Generic;
 
 end TGen.Strategies;

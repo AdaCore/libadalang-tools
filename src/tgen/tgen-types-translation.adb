@@ -25,6 +25,7 @@ with Ada.Exceptions;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Strings.Unbounded;
 with Ada.Containers.Hashed_Maps;
+with Ada.Containers.Multiway_Trees;
 
 with GNATCOLL.GMP.Integers;
 

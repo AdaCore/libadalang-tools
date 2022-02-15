@@ -21,17 +21,20 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Containers.Vectors;
-with Ada.Containers.Hashed_Maps;
-with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Doubly_Linked_Lists;
+with Ada.Containers.Hashed_Maps;
+with Ada.Containers.Multiway_Trees;
+with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Ordered_Sets;
+with Ada.Containers.Vectors;
+with Ada.Finalization;
 with Ada.Unchecked_Deallocation;
 
 with Libadalang.Analysis;
 
-with TGen.Strategies;        use TGen.Strategies;
-with TGen.Types;             use TGen.Types;
+with TGen.Context;    use TGen.Context;
+with TGen.Strategies; use TGen.Strategies;
+with TGen.Types; use TGen.Types;
 with TGen.Types.Int_Types;
 with TGen.Types.Constraints; use TGen.Types.Constraints;
 
@@ -210,10 +213,12 @@ package TGen.Types.Record_Types is
       Disc_Context : Disc_Value_Map) return String;
 
    overriding function Generate_Random_Strategy
-     (Self : Discriminated_Record_Typ) return String;
+     (Self    : Discriminated_Record_Typ;
+      Context : in out Generation_Context) return Strategy_Type;
 
    overriding function Generate_Constrained_Random_Strategy
-     (Self : Discriminated_Record_Typ) return String;
+     (Self    : Discriminated_Record_Typ;
+      Context : Generation_Context) return Strategy_Type;
 
    function Image_Internal
      (Self : Discriminated_Record_Typ; Padding : Natural := 0) return String;
@@ -234,23 +239,59 @@ package TGen.Types.Record_Types is
             and then (Self.Get.Kind in Disc_Record_Kind);
    pragma Inline (As_Discriminated_Record_Typ);
 
-   generic
-      type Discriminant_Type is (<>);
+   N : Integer;
+   subtype Int is Integer range 1 .. N;
+   type A (I : Int) is record
+      case I is
+         when 0 | 1 =>
+            null;
+         when others =>
+            null;
+      end case;
+   end record;
 
-      type Discriminated_Record_Type (D : Discriminant_Type) is private;
+   --  Dynamic generation
 
-      with function Gen return Discriminant_Type;
+   type Intervals_With_Bias is record
+      Intervals : TGen.Types.Record_Types.Alternatives_Set;
+      Bias : Float;
+   end record;
 
-      with function Gen
-        (D_Value : Discriminant_Type) return Discriminated_Record_Type;
+   function "=" (L, R : Intervals_With_Bias) return Boolean is
+     (TGen.Types.Record_Types.Alternatives_Sets."="
+        (L.Intervals, R.Intervals));
 
-   package Random_Discriminated_Record_Strategy is
-      type Random_Discriminated_Record_Strategy_Type is
-        new Random_Strategy_Type with null record;
-      overriding procedure Gen
-        (Strat : Random_Discriminated_Record_Strategy_Type;
-         Stream : access Root_Stream_Type'Class);
-      Strat : aliased Random_Discriminated_Record_Strategy_Type;
-   end Random_Discriminated_Record_Strategy;
+   package Intervals_With_Bias_Vectors is
+     new Ada.Containers.Vectors
+       (Index_Type => Positive, Element_Type => Intervals_With_Bias);
+   subtype Intervals_With_Bias_Vector is Intervals_With_Bias_Vectors.Vector;
+
+   type Tree_Node is record
+      Data : Intervals_With_Bias_Vector;
+   end record;
+
+   package Intervals_Biased_Trees is new Ada.Containers.Multiway_Trees
+     (Element_Type => Tree_Node);
+   type Gen_Record_Shapes_State is new Ada.Finalization.Controlled with record
+     Tr : Intervals_Biased_Trees.Tree;
+   end record;
+
+   package Positive_Vectors is new Ada.Containers.Vectors
+     (Index_Type => Natural, Element_Type => Positive);
+   subtype Positive_Vector is Positive_Vectors.Vector;
+
+   function Nth_Child
+     (Parent : Intervals_Biased_Trees.Cursor;
+      N : Positive) return Intervals_Biased_Trees.Cursor;
+
+   procedure Blll
+     (Node              : in out Intervals_Biased_Trees.Cursor;
+      Variant_Choices   : in out Positive_Vector;
+      Update_Disc_Value : access procedure (V : Big_Integer));
+
+   procedure Fixup_Bias
+     (Tr      : in out Intervals_Biased_Trees.Tree;
+      Leaf    : Intervals_Biased_Trees.Cursor;
+      Choices : Positive_Vector);
 
 end TGen.Types.Record_Types;

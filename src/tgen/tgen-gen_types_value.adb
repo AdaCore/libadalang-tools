@@ -53,11 +53,14 @@ package body TGen.Gen_Types_Value is
       use GNATCOLL.VFS;
 
       TS : aliased constant Type_Value_ADS_Translator :=
-        Create_Type_Value_ADS_Translator (Self.Types);
+        Create_Type_Value_ADS_Translator (Self.Context, Self.Strategies);
 
       Package_Name_Tag : constant String := "PACKAGE_NAME";
 
       Table : Templates_Parser.Translate_Set;
+
+      Pkg_Name : constant String :=
+        Package_Name (Self.Strategies.First_Element);
 
    begin
       TS.Translate (Table);
@@ -69,7 +72,7 @@ package body TGen.Gen_Types_Value is
         (Table,
          Templates_Parser.Assoc
            (Package_Name_Tag,
-            Self.Pkg_Name));
+            Pkg_Name));
 
       return
         To_Text
@@ -90,17 +93,17 @@ package body TGen.Gen_Types_Value is
       use GNATCOLL.VFS;
 
       TS : aliased constant Type_Value_ADB_Translator :=
-        Create_Type_Value_ADB_Translator (Self.Types);
-
-      WT : aliased constant With_Clauses_Translator :=
-        Create_With_Clauses_Translator (Self.Type_Depends, TS'Access);
+        Create_Type_Value_ADB_Translator (Self.Context, Self.Strategies);
 
       Package_Name_Tag : constant String := "PACKAGE_NAME";
 
       Table : Templates_Parser.Translate_Set;
 
+      Pkg_Name : constant String :=
+        Package_Name (Self.Strategies.First_Element);
+
    begin
-      WT.Translate (Table);
+      TS.Translate (Table);
 
       --  All the tables are translated. Now translate the individual
       --  tags.
@@ -109,7 +112,7 @@ package body TGen.Gen_Types_Value is
         (Table,
          Templates_Parser.Assoc
            (Package_Name_Tag,
-            Self.Pkg_Name));
+            Pkg_Name));
 
       return
         To_Text
@@ -128,15 +131,17 @@ package body TGen.Gen_Types_Value is
      (Self : Type_Value_Generator;
       Ctx  : TGen.Templates.Context'Class)
    is
+      Pkg_Name : constant String :=
+        Package_Name (Self.Strategies.First_Element);
 
       Type_Value_ADS_Filename : constant Virtual_File :=
         Gen_File
           (Ctx,
            Unit_To_Filename
-             (Ctx.Project, String'(+Self.Pkg_Name), Unit_Spec));
+             (Ctx.Project, String'(Pkg_Name), Unit_Spec));
       Type_Value_ADB_Filename : constant Virtual_File :=
         Gen_File
-          (Ctx, Unit_To_Filename (Ctx.Project, +Self.Pkg_Name, Unit_Body));
+          (Ctx, Unit_To_Filename (Ctx.Project, Pkg_Name, Unit_Body));
 
       Type_Value_ADS_File : File_Type;
       Type_Value_ADB_File : File_Type;
@@ -170,9 +175,8 @@ package body TGen.Gen_Types_Value is
    ------------
 
    function Create
-     (Pkg_Name     : Unbounded_String;
-      Types        : Typ_Set;
-      Type_Depends : Typ_Set) return Type_Value_Generator
+     (Context    : Generation_Context;
+      Strategies : Strategy_Set) return Type_Value_Generator
    is
       use type Ada.Calendar.Time;
    begin
@@ -183,27 +187,23 @@ package body TGen.Gen_Types_Value is
          raise Program_Error with "Template file does not exists.";
       end if;
 
-      return Type_Value_Generator'(Pkg_Name, Types, Type_Depends);
+      return Type_Value_Generator'(Context, Strategies);
    end Create;
 
    function Create_Type_Value_ADS_Translator
-     (Types : Typ_Set;
-      Next  : access constant Translator'Class := null)
+     (Context    : Generation_Context;
+      Strategies : Strategy_Set;
+      Next       : access constant Translator'Class := null)
       return Type_Value_ADS_Translator is
-      ((Next, Types));
+      ((Next, Strategies, Context));
 
    function Create_Type_Value_ADB_Translator
-     (Types : Typ_Set;
-      Next  : access constant Translator'Class := null)
+     (Context    : Generation_Context;
+      Strategies : Strategy_Set;
+      Next       : access constant Translator'Class := null)
       return Type_Value_ADB_Translator
    is
-     ((Next, Types));
-
-   function Create_With_Clauses_Translator
-     (Type_Depends : Typ_Set;
-      Next         : access constant Translator'Class := null)
-      return With_Clauses_Translator is
-     ((Next, Type_Depends));
+     ((Next, Strategies, Context));
 
    ----------------------
    -- Translate_Helper --
@@ -219,16 +219,10 @@ package body TGen.Gen_Types_Value is
 
       Type_Strategy_Vector_Tag : Templates_Parser.Vector_Tag;
    begin
-      for T of Self.Types loop
+      for Strat of Self.Strategies loop
          Templates_Parser.Append
            (Type_Strategy_Vector_Tag,
-            "function " & T.Get.Gen_Random_Function_Name & " return "
-            & (+T.Get.Fully_Qualified_Name) & ";");
-         if T.Get.Is_Constrained then
-            Templates_Parser.Append
-              (Type_Strategy_Vector_Tag,
-               To_String (Gen_Constrained_Function (T.Get)) & ";");
-         end if;
+            Image_Spec (Strat));
       end loop;
 
       Templates_Parser.Insert
@@ -251,16 +245,10 @@ package body TGen.Gen_Types_Value is
 
       Type_Strategy_Vector_Tag : Templates_Parser.Vector_Tag;
    begin
-      for T of Self.Types loop
+      for Strat of Self.Strategies loop
          Templates_Parser.Append
            (Type_Strategy_Vector_Tag,
-            T.Get.Generate_Random_Strategy);
-
-         if T.Get.Is_Constrained then
-            Templates_Parser.Append
-              (Type_Strategy_Vector_Tag,
-               T.Get.Generate_Constrained_Random_Strategy);
-         end if;
+            Image_Body (Strat));
       end loop;
 
       Templates_Parser.Insert
@@ -269,30 +257,4 @@ package body TGen.Gen_Types_Value is
            (Type_Strategy_Tag, Type_Strategy_Vector_Tag));
    end Translate_Helper;
 
-   ----------------------
-   -- Translate_Helper --
-   ----------------------
-
-   procedure Translate_Helper
-     (Self  : With_Clauses_Translator;
-      Table : in out Templates_Parser.Translate_Set)
-   is
-      use type Templates_Parser.Vector_Tag;
-
-      With_Clauses_Tag : constant String := "WITH_PACKAGE";
-
-      With_Clauses_Vector_Tag : Templates_Parser.Vector_Tag;
-   begin
-      for T of Self.Types loop
-         Templates_Parser.Append
-           (With_Clauses_Vector_Tag,
-            Type_Strat_Package_Name
-              (+T.Get.Parent_Package_Fully_Qualified_Name));
-      end loop;
-
-      Templates_Parser.Insert
-        (Table,
-         Templates_Parser.Assoc
-           (With_Clauses_Tag, With_Clauses_Vector_Tag));
-   end Translate_Helper;
 end TGen.Gen_Types_Value;

@@ -116,52 +116,6 @@ package TGen.Gen_Strategies is
       P    : Identifier) return String is
      (Get_Strategy_Signature (Self, F, P) & ";");
 
-   package Strategy_Generator is
-      type Strat_Generator is new Source_Code_File_Generator with private;
-
-      overriding
-      procedure Generate_Source_Code
-        (Self    : Strat_Generator;
-         Ctx : TGen.Templates.Context'Class);
-      --  Generates the Data Factory source file based on the Data Factory
-      --  template.
-
-      function Create
-        (Context : Generation_Context;
-         Pkg_Data : Package_Data)
-         return Strat_Generator;
-      --  Constructor of a DF_Generator. 'DF_Source_File' is the output
-      --  Fuzz Test Harness source file and 'DF_Template_File' is the template
-      --  used to generate it.
-
-   private
-      type Strat_Generator is new Source_Code_File_Generator with
-         record
-            Strat_Source_File_ADS : GNATCOLL.VFS.Virtual_File;
-            Strat_Source_File_ADB : GNATCOLL.VFS.Virtual_File;
-            Strat_Template_File_ADS   : GNATCOLL.VFS.Virtual_File;
-            Strat_Template_File_ADB : GNATCOLL.VFS.Virtual_File;
-            Pkg_Data            : Package_Data;
-         end record;
-
-      type Param_Strategy_Translator is new
-        Translator_Container with
-         record
-            Pkg_Data : Package_Data;
-         end record;
-
-      function Create_Param_Strategy_Translator
-        (Pkg_Data : Package_Data;
-         Next            : access constant Translator'Class := null)
-         return Param_Strategy_Translator;
-      --  With_Type_Parent_Package_Table_Translator constructor
-
-      overriding
-      procedure Translate_Helper
-        (Self  : Param_Strategy_Translator;
-         Table : in out Templates_Parser.Translate_Set);
-   end Strategy_Generator;
-
    package Test_Generator is
       type Test_Generator is new Source_Code_Generator with private;
 

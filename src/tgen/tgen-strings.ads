@@ -106,18 +106,30 @@ package TGen.Strings is
                Mapping => Dot_To_Underscore'Access));
 
    procedure New_Line (Str : in out Unbounded_String);
+   --  Append a new line to Str
 
    procedure Write_Line
      (Str  : in out Unbounded_String;
       Add  : String;
       Span : Natural);
+   --  Write Span spaces, append the String Add to Str, and append a new line
+   --  to Str.
 
    procedure S_Write
      (Str  : in out Unbounded_String;
       Add  : String;
       Span : Natural);
+   --  Write Span spaces and append the String Add to Str
 
    procedure Write
+     (Str : in out Unbounded_String;
+      Add : String);
+   --  Append the String Add to Str
+
+   procedure Indent_String
      (Str  : in out Unbounded_String;
-      Add  : String);
+      Span : Natural);
+   --  Indent the string by Span amount (replacing each line return with Span
+   --  spaces + line return).
+
 end TGen.Strings;

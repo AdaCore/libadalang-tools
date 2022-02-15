@@ -21,7 +21,8 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with TGen.Types; use TGen.Types;
+with TGen.Context; use TGen.Context;
+with TGen.Types;   use TGen.Types;
 
 package TGen.Types.Real_Types is
 
@@ -116,6 +117,7 @@ package TGen.Types.Real_Types is
       Disc_Context : Disc_Value_Map) return String;
 
    overriding function Generate_Random_Strategy
-     (Self : Float_Typ) return String;
+     (Self    : Float_Typ;
+      Context : in out Generation_Context) return Strategy_Type;
 
 end TGen.Types.Real_Types;

@@ -21,6 +21,7 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
+with TGen.Context; use TGen.Context;
 with TGen.Types; use TGen.Types;
 
 package TGen.Types.Int_Types is
@@ -43,7 +44,9 @@ package TGen.Types.Int_Types is
 
    type Int_Typ is new Discrete_Typ with null record;
 
-   overriding function Generate_Random_Strategy (Self : Int_Typ) return String;
+   overriding function Generate_Random_Strategy
+     (Self    : Int_Typ;
+      Context : in out Generation_Context) return Strategy_Type;
 
    type Signed_Int_Typ (Is_Static : Boolean) is new
      Int_Typ (Is_Static => Is_Static) with record

@@ -4,6 +4,8 @@ declare
    package @_STRATEGY_NAME_@ is new TGen.Strategies.Random_Strategy_Generic
       (T => @_TYPE_NAME_@, Gen => @_GEN_SUBP_NAME_@);
    @@END_TABLE@@
+   package Strategy is new TGen.Strategies.Random_Strategy_Generic_With_State
+   (
 
    @@IF@@ @_HAS_PARAMS_@
    @_PROC_NAME_@_Strategies : TGen.Strategies.Strategy_Vector :=
