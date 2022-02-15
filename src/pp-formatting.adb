@@ -129,6 +129,7 @@ package body Pp.Formatting is
    end Prev_ss;
 
    subtype Symbol is Syms.Symbol;
+
    function "=" (X, Y : Symbol) return Boolean renames Syms."=";
 
    subtype Ada_Node is Libadalang.Analysis.Ada_Node;
@@ -2403,7 +2404,7 @@ package body Pp.Formatting is
               Kind (Src_Tok) in Other_Whole_Line_Comment | Fillable_Comment
               and then Kind (Prev_ss (Src_Tok)) = True_End_Of_Line
               and then
-                (Kind (Prev (Prev_ss (Src_Tok))) in  ','
+                (Kind (Prev (Prev_ss (Src_Tok))) in  ',' | Res_Is
                  or else Kind (Prev (Prev_ss (Src_Tok))) = End_Of_Line_Comment
                  or else
                    (Kind (Prev (Prev_ss (Src_Tok))) = True_End_Of_Line
@@ -3417,20 +3418,58 @@ package body Pp.Formatting is
                   null;
 
                elsif Arg (Cmd, Source_Line_Breaks)
-                 and then Kind (Src_Tok) = True_End_Of_Line
-                 and then Kind (Prev (Src_Tok)) = True_End_Of_Line
                  and then
-                   (Kind (Prev (Prev (Src_Tok))) = Other_Whole_Line_Comment
-                    or else Kind (Prev (Prev (Src_Tok))) = Fillable_Comment)
-                 and then Kind (Next_ss (Src_Tok)) = Kind (New_Tok)
-                 and then Kind (Prev (Prev (New_Tok))) = Disabled_LB_Token
-                 and then Kind (Prev (Prev (Prev (New_Tok)))) = ','
+                   ((Kind (Src_Tok) = True_End_Of_Line
+                     and then Kind (Prev (Src_Tok)) = True_End_Of_Line
+                     and then Kind (Prev (Prev (Src_Tok))) in
+                       Other_Whole_Line_Comment | Fillable_Comment
+                     and then Kind (Next_ss (Src_Tok)) = Kind (New_Tok)
+                     and then Kind (Prev (Prev (New_Tok))) = Disabled_LB_Token
+                     and then Kind (Prev (Prev (Prev (New_Tok)))) in ',')
+                    or else
+                      (Kind (Src_Tok) = Kind (New_Tok)
+                       and then
+                         ((Kind (Prev (Prev (Src_Tok))) =
+                               Other_Whole_Line_Comment
+                           and then Kind (Prev (Prev (Prev (Src_Tok)))) =
+
+                             True_End_Of_Line)
+                          or else
+                            (Kind (Prev (Prev (Src_Tok))) = True_End_Of_Line
+                             and then Kind (Prev (Prev (Prev (Src_Tok)))) =
+                               Fillable_Comment))
+                       and then Kind (Next_ss (Src_Tok)) in Ident | ',' | ')'
+                       and then Kind (Prev (Prev (New_Tok))) = Disabled_LB_Token
+                       and then Kind (Prev (Prev (Prev (New_Tok)))) in
+                         Res_Is | ',')
+                    or else
+                      (Kind (Src_Tok) = True_End_Of_Line
+                       and then Kind (Prev (Prev (Src_Tok))) in
+                           Other_Whole_Line_Comment | Fillable_Comment
+                       and then Kind (Prev (Prev (Prev (Src_Tok)))) in
+                         True_End_Of_Line | Spaces
+                       and then Kind (New_Tok) = '('
+                       and then Kind (New_Tok) = Kind (Next_ss (Src_Tok))
+                       and then Kind (Prev (Prev (New_Tok))) = Disabled_LB_Token
+                       and then Kind (Prev (Prev (Prev (New_Tok)))) in
+                         Res_Is | ',')
+                    or else
+                      (Kind (Src_Tok) = True_End_Of_Line
+                       and then Kind (Prev (Prev (Src_Tok))) =
+                           Fillable_Comment
+                       and then Kind (Prev (Prev (Prev (Src_Tok)))) = Spaces
+                       and then Kind (New_Tok) = '('
+                       and then Kind (New_Tok) = Kind (Next_ss (Src_Tok))
+                       and then Kind (Prev (Prev (New_Tok))) = Spaces
+                       and then Kind (Prev (Prev (Prev (New_Tok)))) =
+                         Disabled_LB_Token))
                then
                   --  The Disabled_LB_Token was enabled and will match the
                   --  True_End_Of_Line between the source token and a blank line
                   null;
 
                else
+
                   Cur_Indentation := Indentation;
                   Append_Temp_Line_Break
                     (Lines_Data_P,
@@ -3901,6 +3940,9 @@ package body Pp.Formatting is
                            P : Tokn_Cursor := New_Tok;
                         begin
 
+                           --  Ada.Text_IO.Put_Line ("MKU Kind (New_Tok) =  "
+                           --                        & Kind (New_Tok)'Img);
+
                            case Kind (New_Tok) is
                               when Res_Is | Comment_Kind =>
                                  Indentation := Before_Indentation;
@@ -3916,6 +3958,8 @@ package body Pp.Formatting is
                                     if Kind (P) = Disabled_LB_Token
                                       and then LB_Needs_To_Be_Enabled (Src_Tok)
                                     then
+                                       --  Ada.Text_IO.Put_Line
+                                       --    ("MKU ==== > enabling LB");
                                        LB.Enabled := True;
                                        LB.Affects_Comments := True;
                                     end if;
@@ -3944,7 +3988,10 @@ package body Pp.Formatting is
                   --  In a paranthesized context, the indentation level should
                   --  be increased by 1 related to the last left paranthesis
                   --  position
-
+                  --  Ada.Text_IO.Put_Line ("MKU 2 Kind (Src_Tok) = "
+                  --                        & Kind (Src_Tok)'Img);
+                  --  Ada.Text_IO.Put_Line ("MKU 2 Kind (New_Tok) = "
+                  --                        & Kind (New_Tok)'Img);
                   if (Kind (Src_Tok) = Other_Whole_Line_Comment
                       or else Kind (Src_Tok) = Fillable_Comment)
                     and then (Kind (New_Tok) = Ident

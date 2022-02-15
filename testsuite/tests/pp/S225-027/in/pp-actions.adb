@@ -628,7 +628,7 @@ package body Pp.Actions is
            when Ada_Entry_Body =>
              L ("entry !?[# (~~)]~?~~~[# when !# is]$",
                 --  ???Perhaps "# is]" should be "#+1 is]" or "# ]is".
-      "!", "!", "end !1/"),
+                "!", "!", "end !1/"),
            when Ada_Enum_Literal_Decl             => L ("!"),
            when Ada_Exception_Decl => L ("?~,# ~~ ^: exception!", Aspects),
            when Ada_Generic_Package_Instantiation =>
