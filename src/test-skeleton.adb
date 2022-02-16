@@ -736,15 +736,11 @@ package body Test.Skeleton is
          if Generate_Test_Vectors then
             Subp_Cur := Data.Subp_List.First;
             while Subp_Cur /= Subp_Data_List.No_Element loop
-               declare
-                  Subp_Data : constant TGen.Context.Subprogram_Data :=
-                     TGen.Gen_Strategies_Utils.Extract_Subprogram_Data
-                       (Element (Subp_Cur).Subp_Declaration.As_Basic_Decl);
                begin
                   TGen.Gen_Strategies.Generate_Test_Vectors
                     (TGen_Ctx,
                      10,
-                     Subp_Data,
+                     Element (Subp_Cur).Subp_Declaration.As_Subp_Decl,
                      Ada.Strings.Unbounded.To_Unbounded_String
                        (Element (Subp_Cur).Subp_Full_Hash.all));
                exception

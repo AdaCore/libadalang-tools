@@ -341,6 +341,10 @@ package body TGen.Gen_Strategies is
       return +Res;
    end Indent;
 
+   ---------------------
+   -- Number_Of_Lines --
+   ---------------------
+
    function Number_Of_Lines (Str : String) return Natural is
    begin
       return Ada.Strings.Fixed.Count
@@ -349,12 +353,56 @@ package body TGen.Gen_Strategies is
            (Ada.Characters.Latin_9.LF)) + 1;
    end Number_Of_Lines;
 
+   procedure Collect_Type_Translations
+     (Context : in out Generation_Context;
+      Subp    : Subp_Decl);
+
+   -------------------------------
+   -- Collect_Type_Translations --
+   -------------------------------
+
+   procedure Collect_Type_Translations
+     (Context : in out Generation_Context;
+      Subp    : Subp_Decl)
+   is
+   begin
+      for Subp_Param_Spec of Get_Subp_Params (Subp).F_Params loop
+         declare
+            Parameters_Type : constant Defining_Name :=
+              Subp_Param_Spec.F_Type_Expr.
+                P_Designated_Type_Decl.P_Defining_Name;
+
+            Type_Fully_Qualified_Name : constant Unbounded_Text_Type :=
+              To_Unbounded_Text
+                (Parameters_Type.P_Basic_Decl.P_Fully_Qualified_Name);
+
+            Typ_Translation_Res : Translation_Result :=
+              Translate
+                (Subp_Param_Spec.F_Type_Expr.P_Designated_Type_Decl);
+            Typ_Translation : SP.Ref;
+         begin
+
+            if Typ_Translation_Res.Success then
+               Typ_Translation := Typ_Translation_Res.Res;
+            else
+               raise Program_Error with "Translation Error";
+            end if;
+            Context.Type_Translations.Include
+              (Type_Fully_Qualified_Name, Typ_Translation);
+         end;
+      end loop;
+   end Collect_Type_Translations;
+
+   ------------------------
+   -- Generate_Tests_For --
+   ------------------------
+
    function Generate_Tests_For
      (Context  : in out Generation_Context;
       Nb_Tests : Positive;
       Subp     : Subp_Decl) return Generated_Body is
 
-      Pkg : Package_Decl := Get_Parent_Package (Subp.As_Ada_Node);
+      Pkg      : Package_Decl := Get_Parent_Package (Subp.As_Ada_Node);
       Pkg_Data : Package_Data;
 
       Res : Generated_Body;
@@ -386,32 +434,7 @@ package body TGen.Gen_Strategies is
 
          --  Collect the type translations
 
-         for Subp_Param_Spec of Get_Subp_Params (Subp).F_Params loop
-            declare
-               Parameters_Type : constant Defining_Name :=
-                 Subp_Param_Spec.F_Type_Expr.
-                   P_Designated_Type_Decl.P_Defining_Name;
-
-               Type_Fully_Qualified_Name : constant Unbounded_Text_Type :=
-                 To_Unbounded_Text
-                   (Parameters_Type.P_Basic_Decl.P_Fully_Qualified_Name);
-
-               Typ_Translation_Res : Translation_Result :=
-                 Translate
-                   (Subp_Param_Spec.F_Type_Expr.P_Designated_Type_Decl);
-               Typ_Translation : SP.Ref;
-            begin
-
-               if Typ_Translation_Res.Success then
-                  Typ_Translation := Typ_Translation_Res.Res;
-               else
-                  raise Program_Error with "Translation Error";
-               end if;
-               Context.Type_Translations.Include
-                 (Type_Fully_Qualified_Name, Typ_Translation);
-            end;
-
-         end loop;
+         Collect_Type_Translations (Context, Subp);
 
          --  Generate the actual body of the test. Consists of the test body +
          --  the needed with clauses.
@@ -572,20 +595,27 @@ package body TGen.Gen_Strategies is
       end loop;
    end Dump_JSON;
 
+   ---------------------------
+   -- Generate_Test_Vectors --
+   ---------------------------
+
    procedure Generate_Test_Vectors
      (Context  : in out Generation_Context;
       Nb_Tests : Positive;
-      Subp     : Subprogram_Data;
+      Subp     : Subp_Decl;
       Subp_UID : Unbounded_String := Null_Unbounded_String)
    is
+      Subp_Data : Subprogram_Data :=
+        Extract_Subprogram_Data (Subp);
       Function_JSON     : JSON_Value := Create_Object;
       Test_Vectors_JSON : JSON_Array := Empty_Array;
       Test_Vector_JSON : JSON_Array;
       Disc_Context : Disc_Value_Map;
    begin
+      Collect_Type_Translations (Context, Subp);
       for J in 1 .. Nb_Tests loop
          Test_Vector_JSON := Empty_Array;
-         for Param of Subp.Parameters_Data loop
+         for Param of Subp_Data.Parameters_Data loop
             declare
                Param_JSON : JSON_Value := Create_Object;
             begin
@@ -605,17 +635,18 @@ package body TGen.Gen_Strategies is
       end loop;
 
       Function_JSON.Set_Field
-        ("fully_qualified_name", +Subp.Fully_Qualified_Name);
-      Function_JSON.Set_Field ("package_name", +Subp.Parent_Package);
+        ("fully_qualified_name", +Subp_Data.Fully_Qualified_Name);
+      Function_JSON.Set_Field ("package_name", +Subp_Data.Parent_Package);
       Function_JSON.Set_Field ("UID", +Subp_UID);
       if Subp.Kind = Ada_Subp_Kind_Function then
          Function_JSON.Set_Field
-           ("return_type", Create (+Subp.Return_Type_Fully_Qualified_Name));
+           ("return_type",
+            Create (+Subp_Data.Return_Type_Fully_Qualified_Name));
       end if;
       Function_JSON.Set_Field ("values", Test_Vectors_JSON);
 
-      if not Context.Test_Vectors.Contains (Subp.Parent_Package) then
-         Context.Test_Vectors.Insert (Subp.Parent_Package, Empty_Array);
+      if not Context.Test_Vectors.Contains (Subp_Data.Parent_Package) then
+         Context.Test_Vectors.Insert (Subp_Data.Parent_Package, Empty_Array);
       end if;
 
       declare
@@ -633,7 +664,7 @@ package body TGen.Gen_Strategies is
 
       begin
          Context.Test_Vectors.Update_Element
-           (Context.Test_Vectors.Find (Subp.Parent_Package),
+           (Context.Test_Vectors.Find (Subp_Data.Parent_Package),
             Add_Function_Testing'Access);
       end;
    end Generate_Test_Vectors;
