@@ -1542,6 +1542,7 @@ package body Pp.Actions is
          Vertical_Agg_Alt,
          Nonvertical_Agg_Alt,
          Enum_Rep_Nonvertical_Agg_Alt,
+         Obj_Decl_Alt,
          Obj_Decl_Vertical_Agg_Alt,
          Comp_Decl_Vertical_Agg_Alt,
          Generic_Package_Instantiation_Vertical_Agg_Alt,
@@ -1733,6 +1734,10 @@ package body Pp.Actions is
             Vertical_Agg_Alt => L ("(?~~ with #~?~,$~~)"),
             Nonvertical_Agg_Alt => L ("#(?~~ with #~?~,# ~~)"),
             Enum_Rep_Nonvertical_Agg_Alt => L ("#(?~~ with #~?~,#1 ~~)"),
+            Obj_Decl_Alt =>
+              L (Replace_One
+                (Ada_Object_Decl, From => ":[#1? ~~~? ~~~? ~~~ !]?",
+                 To => ":? ~~~? ~~~? ~~~ !?")),
             Obj_Decl_Vertical_Agg_Alt =>
               L (Replace_One
                  (Ada_Object_Decl, From => ":=[# ~~]~", To => ":=[$~~]~")),
@@ -4559,6 +4564,7 @@ package body Pp.Actions is
 
          procedure Do_Object_Decl is
          begin
+
             if Is_Generic_Formal_Object_Decl (Tree) then
                Do_Param_Spec;
 
@@ -4569,7 +4575,11 @@ package body Pp.Actions is
                Interpret_Alt_Template (Obj_Decl_Vertical_Agg_Alt);
 
             else
-               Interpret_Template;
+               if Arg (Cmd, Source_Line_Breaks) then
+                  Interpret_Alt_Template (Obj_Decl_Alt);
+               else
+                  Interpret_Template;
+               end if;
             end if;
          end Do_Object_Decl;
 
