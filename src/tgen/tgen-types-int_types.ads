@@ -46,7 +46,7 @@ package TGen.Types.Int_Types is
 
    overriding function Generate_Random_Strategy
      (Self    : Int_Typ;
-      Context : in out Generation_Context) return Strategy_Type;
+      Context : in out Generation_Context) return Strategy_Type'Class;
 
    type Signed_Int_Typ (Is_Static : Boolean) is new
      Int_Typ (Is_Static => Is_Static) with record
@@ -103,7 +103,21 @@ package TGen.Types.Int_Types is
    function Gen return T;
 
    overriding function Generate_Static
-     (Self         : Signed_Int_Typ;
-      Disc_Context : Disc_Value_Map) return String;
+     (Self    : Signed_Int_Typ;
+      Context : in out Generation_Context) return Static_Strategy_Type'Class;
+
+   type Static_Array_Constraint_Strategy_Type is new Static_Strategy_Type with
+      record
+         T : Signed_Int_Typ (Is_Static => True);
+         Avg_Size : Integer;
+      end record;
+   overriding function Generate_Static_Value
+     (Strat : in out Static_Array_Constraint_Strategy_Type;
+      Disc_Context : Disc_Value_Map)
+      return Static_Value;
+
+   function Generate_Array_Constraint_Strategy
+     (Self : Signed_Int_Typ)
+      return Static_Array_Constraint_Strategy_Type'Class;
 
 end TGen.Types.Int_Types;

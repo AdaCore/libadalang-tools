@@ -65,9 +65,10 @@ package body TGen.Types.Int_Types is
 
    function Generate_Random_Strategy
      (Self    : Int_Typ;
-      Context : in out Generation_Context) return Strategy_Type
+      Context : in out Generation_Context) return Strategy_Type'Class
    is
-      Result : Strategy_Type (Kind => Random_Kind, Constrained => False);
+      Result : Dynamic_Strategy_Type
+        (Kind => Random_Kind, Constrained => False);
       F_Body : Unbounded_String;
       Indent : Natural := 0;
    begin
@@ -142,19 +143,21 @@ package body TGen.Types.Int_Types is
    --  end Generate_Sample_Strategy;
 
    function Gen return T is
-      function Rand is new GNAT.Random_Numbers.Random_Discrete (T);
+      function Rand is new
+        GNAT.Random_Numbers.Random_Discrete (T, T'First);
    begin
-      return Rand (Generator_Instance, T'First, T'Last);
+      return Rand (Generator_Instance);
    end Gen;
 
-   function Generate_Static
-     (Self         : Signed_Int_Typ;
-      Disc_Context : Disc_Value_Map) return String
-   is
-      --  TODO: use Long_Long_Long_Integer (as it is the biggest possible type
-      --  for which ranges can be defined), and as support to it in
-      --  GNATCOLL.JSON.
+   function Generate (Ty : Typ'Class) return Static_Value;
 
+   --------------
+   -- Generate --
+   --------------
+
+   function Generate (Ty : Typ'Class) return Static_Value
+   is
+      Self : Signed_Int_Typ := Signed_Int_Typ (Ty);
       package LLLI_Conversions is
         new Big_Int.Signed_Conversions (Int => Long_Long_Integer);
 
@@ -165,6 +168,77 @@ package body TGen.Types.Int_Types is
       function Rand is new Gen (T);
    begin
       return Long_Long_Integer'Image (Long_Long_Integer (Rand));
+   end Generate;
+
+   ---------------------
+   -- Generate_Static --
+   ---------------------
+
+   function Generate_Static
+     (Self    : Signed_Int_Typ;
+      Context : in out Generation_Context) return Static_Strategy_Type'Class
+   is
+      --  TODO: use Long_Long_Long_Integer (as it is the biggest possible type
+      --  for which ranges can be defined), and add support to it in
+      --  GNATCOLL.JSON.
+
+      Type_Ref : SP.Ref;
+      Strat : Basic_Static_Strategy_Type;
+   begin
+      SP.From_Element (Type_Ref, Self'Unrestricted_Access);
+      Strat.T := Type_Ref;
+      Strat.F := Generate'Access;
+      Context.Strategies.Include (Strat);
+      return Strat;
    end Generate_Static;
+
+   ---------------------------
+   -- Generate_Static_Value --
+   ---------------------------
+
+   function Generate_Static_Value
+     (Strat : in out Static_Array_Constraint_Strategy_Type;
+      Disc_Context : Disc_Value_Map) return Static_Value
+   is
+      package N_Conversions is
+        new Big_Int.Signed_Conversions (Int => Natural);
+      use N_Conversions;
+
+      use Big_Int;
+
+      Picked_Size : Natural := 0;
+      Elements    : Many_Type :=
+        Many
+          (0,
+           From_Big_Integer
+             (Strat.T.Range_Value.Max - Strat.T.Range_Value.Min),
+           Strat.Avg_Size);
+   begin
+      while Elements.More loop
+         null;
+      end loop;
+      return Natural'Image (Elements.Count);
+   end Generate_Static_Value;
+
+   ----------------------------------------
+   -- Generate_Array_Constraint_Strategy --
+   ----------------------------------------
+
+   function Generate_Array_Constraint_Strategy
+     (Self : Signed_Int_Typ) return Static_Array_Constraint_Strategy_Type'Class
+   is
+   begin
+      case Self.Is_Static is
+         when True =>
+            declare
+               T : Static_Array_Constraint_Strategy_Type :=
+                 (T => Self, Avg_Size => 5);
+            begin
+               return T;
+            end;
+         when others =>
+            return raise Program_Error with "unsupported non static type";
+      end case;
+   end Generate_Array_Constraint_Strategy;
 
 end TGen.Types.Int_Types;

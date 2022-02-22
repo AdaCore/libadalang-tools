@@ -55,6 +55,8 @@ package TGen.Random is
    function Rand_Float return Float;
    --  Return a random number between 0 and 1
 
+   function Rand_Int (Min, Max : Integer) return Integer;
+   --  Returns a random integer
 private
    type Many_Type is tagged record
       Min_Size, Max_Size : Natural;

@@ -22,6 +22,7 @@
 ------------------------------------------------------------------------------
 
 with Ada.Containers.Indefinite_Hashed_Maps;
+with Ada.Containers.Indefinite_Ordered_Sets;
 with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Ordered_Sets;
 with Ada.Containers.Vectors;
@@ -144,12 +145,79 @@ package TGen.Context is
    type Strategy_Kind is
      (Random_Kind, State_Kind, Dispatching_Kind, Wrapping_Kind);
 
-   type Strategy_Type;
-   type Strategy_Type_Acc is access all Strategy_Type;
+   type Strategy_Type is abstract tagged null record;
 
-   type Strategy_Type
-     (Kind        : Strategy_Kind := Random_Kind;
-      Constrained : Boolean := False) is
+   function "<" (L, R : Strategy_Type'Class) return Boolean;
+   --  TODO: implement this function properly
+
+   type Unimplemented_Strategy_Type is new Strategy_Type with null record;
+
+   subtype Static_Value is String;
+   package Static_Value_Sets is new Ada.Containers.Indefinite_Ordered_Sets
+     (Element_Type => Static_Value);
+   subtype Static_Value_Set is Static_Value_Sets.Set;
+
+   type Static_Strategy_Type is abstract new Strategy_Type with
+     null record;
+   function Generate_Static_Value
+     (S : in out Static_Strategy_Type;
+      Disc_Context : Disc_Value_Map) return Static_Value
+      is abstract;
+   --  A static strategy returns a string representation of the generated
+   --  value, as we can't have a type that is generic enough to represent
+   --  all of the Ada values (we could probably use the yeison data
+   --  structure defined here https://github.com/mosteo/yeison, but it would
+   --  mean giving up the named notation for record initialization).
+   --
+   --  Note that in the future, this should be enhance as some objects
+   --  require statement sequences to be initialized (context objects, or
+   --  even containers before the aggregate notation was introduced for
+   --  them). TODO in the future.
+
+   type Static_Strategy_Acc is access all Static_Strategy_Type'Class;
+
+   type Unimplemented_Static_Strategy_Type is new Static_Strategy_Type with
+     null record;
+   overriding function Generate_Static_Value
+     (S : in out Unimplemented_Static_Strategy_Type;
+      Disc_Context : Disc_Value_Map) return Static_Value
+   is
+     (raise Program_Error with "Unimplemented static strategy");
+
+   type Basic_Static_Strategy_Type is new Static_Strategy_Type with record
+      T : SP.Ref;
+      F : access function (T : Typ'Class) return Static_Value;
+   end record;
+
+   overriding function Generate_Static_Value
+     (S : in out Basic_Static_Strategy_Type;
+      Disc_Context : Disc_Value_Map) return Static_Value
+   is
+     (S.F (S.T.Get));
+
+   type Sample_Static_Strategy_Type is new Static_Strategy_Type with record
+      Sample : Static_Value_Set;
+   end record;
+
+   overriding function Generate_Static_Value
+     (S : in out Sample_Static_Strategy_Type;
+      Disc_Context : Disc_Value_Map) return Static_Value;
+
+   type Dispatching_Static_Strategy_Type is new Static_Strategy_Type with
+      record
+         Bias : Float;
+         S1, S2 : Static_Strategy_Acc;
+      end record;
+   overriding function Generate_Static_Value
+     (S : in out Dispatching_Static_Strategy_Type;
+      Disc_Context : Disc_Value_Map) return Static_Value;
+
+   type Dynamic_Strategy_Type is tagged;
+   type Dynamic_Strategy_Type_Acc is access all Dynamic_Strategy_Type;
+
+   type Dynamic_Strategy_Type
+     (Kind        : Strategy_Kind;
+      Constrained : Boolean) is new Strategy_Type with
       record
          Generated : Boolean := True;
          --  Whether the strategy is generated or user-defined (and thus,
@@ -164,7 +232,7 @@ package TGen.Context is
          --  Textual representation of the strategy body. Should be left empty
          --  when Generated is False.
 
-         Constrained_Strategy_Function : Strategy_Type_Acc := null;
+         Constrained_Strategy_Function : Dynamic_Strategy_Type_Acc := null;
          --  For constrained types, we also need a separate generation function
          --  that takes care of generating the type once the constraints are
          --  fixed. TODO: rethink about how this should be implemented.
@@ -184,7 +252,7 @@ package TGen.Context is
                --  underlying strategies, randomly picking one of them each
                --  time.
 
-               S1, S2 : Strategy_Type_Acc;
+               S1, S2 : Dynamic_Strategy_Type_Acc;
                --  Wrapped strategies
 
                Bias   : Float;
@@ -195,34 +263,35 @@ package TGen.Context is
          end case;
       end record;
 
-   function "<" (L, R : Strategy_Type) return Boolean is
+   function "<" (L, R : Dynamic_Strategy_Type) return Boolean is
       (L.Strategy_Function.Name < R.Strategy_Function.Name);
 
-   function Image_Body (Strat : Strategy_Type) return String
+   function Image_Body (Strat : Dynamic_Strategy_Type) return String
      with Pre => Strat.Generated;
    --  Return the full body image of the strategy. Raise an error if this is
    --  not a generated strat. Also returns the Initialize procedure body if
    --  this is a stateful strategy.
 
-   function Image_Spec (Strat : Strategy_Type) return String
+   function Image_Spec (Strat : Dynamic_Strategy_Type) return String
      with Pre => Strat.Generated;
    --  Return the spec image of the strategy. Also return the Initialize
    --  procedure spec if this is a stateful strategy.
 
-   function Package_Name (Strat : Strategy_Type) return String is
+   function Package_Name (Strat : Dynamic_Strategy_Type) return String is
       (+Strat.Strategy_Function.Parent_Package);
 
    package Fully_Qualified_Name_To_Strat_Maps is
      new Ada.Containers.Indefinite_Hashed_Maps
      (Key_Type        => Unbounded_Text_Type,
-      Element_Type    => Strategy_Type,
+      Element_Type    => Strategy_Type'Class,
       Hash            => Ada.Strings.Wide_Wide_Unbounded.Wide_Wide_Hash,
       Equivalent_Keys => Ada.Strings.Wide_Wide_Unbounded."=");
    subtype Fully_Qualified_Name_To_Strat_Map is
      Fully_Qualified_Name_To_Strat_Maps.Map;
 
    package Strategy_Sets is new
-     Ada.Containers.Ordered_Sets (Element_Type => Strategy_Type);
+     Ada.Containers.Indefinite_Ordered_Sets
+       (Element_Type => Strategy_Type'Class);
    subtype Strategy_Set is Strategy_Sets.Set;
 
    --  General purpose context for test value generation purposes

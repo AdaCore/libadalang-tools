@@ -77,16 +77,17 @@ package TGen.Types.Record_Types is
 
    function Image (Self : Record_Typ) return String;
 
-   overriding function Generate_Static
-     (Self         : Record_Typ;
-      Disc_Context : Disc_Value_Map) return String;
-   --  Static generation for record types. Return an unusable value as it has
-   --  an ending "," that needs to be removed afterwards. Is used for code
-   --  factoring purposes.
+   --  overriding function Generate_Static
+   --    (Self         : Record_Typ;
+   --     Disc_Context : Disc_Value_Map) return String;
 
    function Image_Internal
      (Self    : Record_Typ;
       Padding : Natural := 0) return String;
+
+   overriding function Generate_Static
+     (Self    : Record_Typ;
+      Context : in out Generation_Context) return Static_Strategy_Type'Class;
 
    function As_Record_Typ (Self : SP.Ref)
      return Record_Typ'Class is
@@ -100,6 +101,10 @@ package TGen.Types.Record_Types is
    function Kind (Self : Nondiscriminated_Record_Typ) return Typ_Kind is
      (Non_Disc_Record_Kind);
 
+   overriding function Generate_Static
+     (Self    : Nondiscriminated_Record_Typ;
+      Context : in out Generation_Context) return Static_Strategy_Type'Class;
+
    function As_Nondiscriminated_Record_Typ (Self : SP.Ref)
      return Nondiscriminated_Record_Typ'Class is
      (Nondiscriminated_Record_Typ'Class (Self.Unchecked_Get.all)) with
@@ -107,9 +112,9 @@ package TGen.Types.Record_Types is
             and then (Self.Get.Kind in Non_Disc_Record_Kind);
    pragma Inline (As_Nondiscriminated_Record_Typ);
 
-   overriding function Generate_Static
-     (Self         : Nondiscriminated_Record_Typ;
-      Disc_Context : Disc_Value_Map) return String;
+   --  overriding function Generate_Static
+   --    (Self         : Nondiscriminated_Record_Typ;
+   --     Disc_Context : Disc_Value_Map) return String;
 
    type Discriminant_Choice_Entry is record
       Defining_Name : LAL.Defining_Name;
@@ -127,6 +132,12 @@ package TGen.Types.Record_Types is
       "<"          => TGen.Types.Int_Types."<",
       "="          => TGen.Types.Int_Types."=");
    subtype Alternatives_Set is Alternatives_Sets.Set;
+
+   package Alternatives_Set_Vectors is new Ada.Containers.Vectors
+     (Index_Type => Positive,
+      Element_Type => Alternatives_Set,
+      "="          => Alternatives_Sets."=");
+   subtype Alternatives_Set_Vector is Alternatives_Set_Vectors.Vector;
 
    type Variant_Part;
 
@@ -209,16 +220,22 @@ package TGen.Types.Record_Types is
    function Image (Self : Discriminated_Record_Typ) return String;
 
    overriding function Generate_Static
-     (Self         : Discriminated_Record_Typ;
-      Disc_Context : Disc_Value_Map) return String;
+     (Self    : Discriminated_Record_Typ;
+      Context : in out Generation_Context) return Static_Strategy_Type'Class;
 
    overriding function Generate_Random_Strategy
      (Self    : Discriminated_Record_Typ;
-      Context : in out Generation_Context) return Strategy_Type;
+      Context : in out Generation_Context) return Strategy_Type'Class;
 
    overriding function Generate_Constrained_Random_Strategy
      (Self    : Discriminated_Record_Typ;
-      Context : Generation_Context) return Strategy_Type;
+      Context : Generation_Context) return Strategy_Type'Class;
+
+   function Get_All_Components
+     (Self : Discriminated_Record_Typ) return Component_Map;
+   --  Aggregates all the components of a record (as two components of a record
+   --  cannot have the same name, even if they are in a distinct variant
+   --  choice).
 
    function Image_Internal
      (Self : Discriminated_Record_Typ; Padding : Natural := 0) return String;
@@ -238,17 +255,6 @@ package TGen.Types.Record_Types is
      Pre => (not SP.Is_Null (Self))
             and then (Self.Get.Kind in Disc_Record_Kind);
    pragma Inline (As_Discriminated_Record_Typ);
-
-   N : Integer;
-   subtype Int is Integer range 1 .. N;
-   type A (I : Int) is record
-      case I is
-         when 0 | 1 =>
-            null;
-         when others =>
-            null;
-      end case;
-   end record;
 
    --  Dynamic generation
 

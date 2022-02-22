@@ -23,7 +23,9 @@
 
 with Ada.Containers;        use Ada.Containers;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with Ada.Tags;              use Ada.Tags;
 
+with TGen.Random; use TGen.Random;
 with TGen.Strings; use TGen.Strings;
 
 package body TGen.Context is
@@ -153,7 +155,7 @@ package body TGen.Context is
    -- Image_Spec --
    ----------------
 
-   function Image_Spec (Strat : Strategy_Type) return String
+   function Image_Spec (Strat : Dynamic_Strategy_Type) return String
    is
       Result : Unbounded_String;
       Indent : Natural := 0;
@@ -198,7 +200,7 @@ package body TGen.Context is
    -- Image_Body --
    ----------------
 
-   function Image_Body (Strat : Strategy_Type) return String is
+   function Image_Body (Strat : Dynamic_Strategy_Type) return String is
       Result : Unbounded_String;
       Indent : Natural := 0;
    begin
@@ -245,5 +247,72 @@ package body TGen.Context is
       end;
       return +Result;
    end Image_Body;
+
+   ---------------------------
+   -- Generate_Static_Value --
+   ---------------------------
+
+   function Generate_Static_Value
+     (S : in out Sample_Static_Strategy_Type;
+      Disc_Context : Disc_Value_Map) return Static_Value
+   is
+      I : Integer := 1;
+      Picked_Index : Integer := Rand_Int (1, Integer (S.Sample.Length));
+   begin
+      for Elem of S.Sample loop
+         if I = Picked_Index then
+            return Elem;
+         end if;
+         I := I + 1;
+      end loop;
+      raise Program_Error with "Picked an index out of the sample";
+   end Generate_Static_Value;
+
+   ---------------------------
+   -- Generate_Static_Value --
+   ---------------------------
+
+   function Generate_Static_Value
+     (S            : in out Dispatching_Static_Strategy_Type;
+      Disc_Context : Disc_Value_Map) return Static_Value
+   is
+      Rnd : Float := Rand_Float;
+   begin
+      if Rnd <= S.Bias then
+         return S.S1.Generate_Static_Value (Disc_Context);
+      else
+         return S.S2.Generate_Static_Value (Disc_Context);
+      end if;
+   end Generate_Static_Value;
+
+   ---------
+   -- "<" --
+   ---------
+
+   function "<" (L, R : Strategy_Type'Class) return Boolean is
+   begin
+
+      --  TODO: code properly this function
+
+      if L'Tag = R'Tag then
+         if L'Tag = Dispatching_Static_Strategy_Type'Tag then
+            if Dispatching_Static_Strategy_Type (L).S1.all <
+              Dispatching_Static_Strategy_Type (R).S1.all
+            then
+               return True;
+            else
+               return Dispatching_Static_Strategy_Type (L).S1.all <
+                 Dispatching_Static_Strategy_Type (R).S1.all;
+            end if;
+         elsif L'Tag = Basic_Static_Strategy_Type'Tag then
+            return Basic_Static_Strategy_Type (L).T <
+              Basic_Static_Strategy_Type (R).T;
+         else
+            return False;
+         end if;
+      else
+         return Expanded_Name (L'Tag) < Expanded_Name (R'Tag);
+      end if;
+   end "<";
 
 end TGen.Context;

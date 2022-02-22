@@ -142,17 +142,18 @@ package TGen.Types is
    function Generate_Random_Strategy
      (Self    : Typ;
       Context : in out TGen.Context.Generation_Context)
-      return TGen.Context.Strategy_Type;
+      return TGen.Context.Strategy_Type'Class;
 
    function Generate_Constrained_Random_Strategy
      (Self    : Typ;
       Context : TGen.Context.Generation_Context)
-      return TGen.Context.Strategy_Type
+      return TGen.Context.Strategy_Type'Class
      with Pre => Self.Is_Constrained;
 
    function Generate_Static
-     (Self         : Typ;
-      Disc_Context : Disc_Value_Map) return String;
+     (Self    : Typ;
+      Context : in out TGen.Context.Generation_Context)
+      return TGen.Context.Static_Strategy_Type'Class;
    --  Generate statically a value of the given Typ and returns its string
    --  representation, so that it can be inlined in a program that want to use
    --  it. Default function returns an error. Derivation of this function

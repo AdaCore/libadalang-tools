@@ -52,6 +52,14 @@ package TGen.Types.Real_Types is
 
    function Kind (Self : Float_Typ) return Typ_Kind is (Float_Kind);
 
+   overriding function Generate_Static
+     (Self    : Float_Typ;
+      Context : in out Generation_Context) return Static_Strategy_Type'Class;
+
+   overriding function Generate_Random_Strategy
+     (Self    : Float_Typ;
+      Context : in out Generation_Context) return Strategy_Type'Class;
+
    function As_Float_Typ (Self : SP.Ref) return Float_Typ'Class is
      (Float_Typ'Class (Self.Unchecked_Get.all)) with
      Pre => (not SP.Is_Null (Self))
@@ -111,13 +119,5 @@ package TGen.Types.Real_Types is
    generic
       type T is digits <>;
    function Gen return T;
-
-   overriding function Generate_Static
-     (Self         : Float_Typ;
-      Disc_Context : Disc_Value_Map) return String;
-
-   overriding function Generate_Random_Strategy
-     (Self    : Float_Typ;
-      Context : in out Generation_Context) return Strategy_Type;
 
 end TGen.Types.Real_Types;

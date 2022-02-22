@@ -60,7 +60,7 @@ package body TGen.Gen_Types_Value is
       Table : Templates_Parser.Translate_Set;
 
       Pkg_Name : constant String :=
-        Package_Name (Self.Strategies.First_Element);
+        Package_Name (Dynamic_Strategy_Type (Self.Strategies.First_Element));
 
    begin
       TS.Translate (Table);
@@ -100,7 +100,7 @@ package body TGen.Gen_Types_Value is
       Table : Templates_Parser.Translate_Set;
 
       Pkg_Name : constant String :=
-        Package_Name (Self.Strategies.First_Element);
+        Package_Name (Dynamic_Strategy_Type (Self.Strategies.First_Element));
 
    begin
       TS.Translate (Table);
@@ -132,7 +132,7 @@ package body TGen.Gen_Types_Value is
       Ctx  : TGen.Templates.Context'Class)
    is
       Pkg_Name : constant String :=
-        Package_Name (Self.Strategies.First_Element);
+        Package_Name (Dynamic_Strategy_Type (Self.Strategies.First_Element));
 
       Type_Value_ADS_Filename : constant Virtual_File :=
         Gen_File
@@ -222,7 +222,7 @@ package body TGen.Gen_Types_Value is
       for Strat of Self.Strategies loop
          Templates_Parser.Append
            (Type_Strategy_Vector_Tag,
-            Image_Spec (Strat));
+            Image_Spec (Dynamic_Strategy_Type (Strat)));
       end loop;
 
       Templates_Parser.Insert
@@ -248,7 +248,7 @@ package body TGen.Gen_Types_Value is
       for Strat of Self.Strategies loop
          Templates_Parser.Append
            (Type_Strategy_Vector_Tag,
-            Image_Body (Strat));
+            Image_Body (Dynamic_Strategy_Type (Strat)));
       end loop;
 
       Templates_Parser.Insert

@@ -140,10 +140,12 @@ package body TGen.Random is
       Should_Continue : Boolean;
    begin
       if Self.Min_Size = Self.Max_Size then
+         Self.Count := Self.Count + 1;
          return Self.Count < Self.Min_Size;
       end if;
 
       if Self.Count < Self.Min_Size then
+         Self.Count := Self.Count + 1;
          return True;
       end if;
 
@@ -166,6 +168,11 @@ package body TGen.Random is
       return Rand (Generator_Instance);
    end Rand_Float;
 
+   function Rand_Int (Min, Max : Integer) return Integer is
+      function Rand is new GNAT.Random_Numbers.Random_Discrete (Integer);
+   begin
+      return Rand (Generator_Instance, Min, Max);
+   end Rand_Int;
 begin
    GNAT.Random_Numbers.Reset (Generator_Instance);
 end TGen.Random;

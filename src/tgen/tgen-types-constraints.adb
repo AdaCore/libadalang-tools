@@ -30,6 +30,7 @@ with TGen.Types.Enum_Types;   use TGen.Types.Enum_Types;
 with TGen.Types.Real_Types;   use TGen.Types.Real_Types;
 with TGen.Types.Array_Types;  use TGen.Types.Array_Types;
 with TGen.Types.Record_Types; use TGen.Types.Record_Types;
+with Ada.Text_IO; use Ada.Text_IO;
 
 package body TGen.Types.Constraints is
 
@@ -266,8 +267,7 @@ package body TGen.Types.Constraints is
                Index_Types =>
                  As_Unconstrained_Array_Typ (Self.Named_Ancestor).Index_Types,
                Index_Constraints =>
-                 Index_Constraints (Cst)
-                 .Constraint_Array));
+                 Index_Constraints (Cst).Constraint_Array));
          when Disc_Record_Kind =>
             Res.Set (Discriminated_Record_Typ'
               (Constrained        => True,
@@ -294,11 +294,12 @@ package body TGen.Types.Constraints is
    -- Generate_Static --
    ---------------------
 
-   overriding function Generate_Static
-     (Self : Anonymous_Typ; Disc_Context : Disc_Value_Map) return String
+   function Generate_Static
+     (Self    : Anonymous_Typ;
+      Context : in out Generation_Context) return Static_Strategy_Type'Class
    is
    begin
-      return Self.As_Named_Typ.Get.Generate_Static (Disc_Context);
+      return Self.As_Named_Typ.Get.Generate_Static (Context);
    end Generate_Static;
 
    ------------------

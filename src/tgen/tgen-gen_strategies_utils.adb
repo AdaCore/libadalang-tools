@@ -186,12 +186,6 @@ package body TGen.Gen_Strategies_Utils is
 
          begin
 
-            if Translation_Res.Success then
-               My_Typ := Translation_Res.Res;
-            else
-               raise Program_Error with "Translation Error";
-            end if;
-
             for Parameter of Subp_Param_Spec.F_Ids loop
                declare
                   Name : constant Unbounded_Text_Type :=

@@ -129,10 +129,7 @@ procedure TGen_App is
                Put_Line ("Param" & Param_Number'Image & " : ");
                if Trans_Res.Success then
                   Put_Line (Trans_Res.Res.Get.Image);
-                  -- Put_Line ("Example Value:");
-                  -- Put_Line
-                  --   (Trans_Res.Res.Get.Generate_Static
-                  --     (TGen.Types.Disc_Value_Maps.Empty_Map));
+                  Put_Line ("Example Value:");
                else
                   Put_Line ("Failed: " & To_String (Trans_Res.Diagnostics));
                end if;
@@ -140,18 +137,18 @@ procedure TGen_App is
             Param_Number := Param_Number + 1;
          end loop;
          return Over;
-      -- elsif Kind (Node) in Ada_Subp_Decl | Ada_Expr_Function_Range then
+      elsif Kind (Node) in Ada_Subp_Decl | Ada_Expr_Function_Range then
 
-      --    begin
-      --       Generate_Test_Vectors
-      --         (GC, 10, Extract_Subprogram_Data (Node.As_Basic_Decl));
-      --       return Into;
-      --    exception
-      --       when Program_Error =>
-      --          Put_Line ("Could not generate testcase values for procedure "
-      --                    & (+Node.As_Basic_Decl.P_Fully_Qualified_Name));
-      --          return Into;
-      --    end;
+         begin
+            Generate_Test_Vectors
+              (GC, 10, Node.As_Subp_Decl);
+            return Into;
+         exception
+            when Program_Error =>
+               Put_Line ("Could not generate testcase values for procedure "
+                         & (+Node.As_Basic_Decl.P_Fully_Qualified_Name));
+               return Into;
+         end;
       else
          return Into;
       end if;

@@ -70,6 +70,7 @@ package body TGen.Gen_Strategies is
          --  Fully static test value generation is ON
 
          Dump_JSON (Context);
+         return;
       end if;
 
       for Package_Data of Context.Packages_Data loop
@@ -144,7 +145,8 @@ package body TGen.Gen_Strategies is
             begin
                Strategies.Insert (Strat);
             end Update_Element;
-            Pkg_Name : constant Unbounded_Text_Type := +Package_Name (Strat);
+            Pkg_Name : constant Unbounded_Text_Type :=
+              +Package_Name (Dynamic_Strategy_Type (Strat));
          begin
             if not Strategies_Per_Package.Contains (Pkg_Name) then
                Strategies_Per_Package.Insert
@@ -509,27 +511,26 @@ package body TGen.Gen_Strategies is
                  Context.Type_Translations.Element
                    (Param.Type_Fully_Qualified_Name);
 
-               Type_Strategy : Strategy_Type;
-
             begin
-               if Context.Type_And_Param_Strategies.Contains
+               if not Context.Type_And_Param_Strategies.Contains
                  (Param.Type_Fully_Qualified_Name)
                then
-                  Type_Strategy :=
-                    Context.Type_And_Param_Strategies.Element
-                      (Param.Type_Fully_Qualified_Name);
-               else
-                  Type_Strategy :=
-                    Param_Type.Get.Generate_Random_Strategy (Context);
                   Context.Type_And_Param_Strategies.Insert
-                    (Param.Type_Fully_Qualified_Name, Type_Strategy);
+                    (Param.Type_Fully_Qualified_Name,
+                     Param_Type.Get.Generate_Random_Strategy (Context));
+               end if;
+               declare
+                  Type_Strategy : Dynamic_Strategy_Type :=
+                    Dynamic_Strategy_Type
+                      (Context.Type_And_Param_Strategies.Element
+                         (Param.Type_Fully_Qualified_Name));
+               begin
 
                   --  Insert in the context all the needed strategies for that
                   --  strategy. TODO: consider strategy nesting (for
                   --  dispatching strategies for example).
 
                   Context.Strategies.Include (Type_Strategy);
-               end if;
 
                --  Then, also generate a strategy for the parameter. This is
                --  by default a wrapping strategy around the default (random)
@@ -537,33 +538,35 @@ package body TGen.Gen_Strategies is
                --  function body and generate sampling strategies. TODO: think
                --  about this.
 
-               declare
-                  Param_Strategy : Strategy_Type
-                    (Kind => Wrapping_Kind, Constrained => False);
+                  declare
+                     Param_Strategy : Dynamic_Strategy_Type
+                       (Kind => Wrapping_Kind, Constrained => False);
 
-                  --  The param strategy function takes the same parameters as
-                  --  the default type strategy, but has a different name, and
-                  --  is defined in a different package.
+                     --  The param strategy function takes the same parameters
+                     --  as the default type strategy, but has a different
+                     --  name, and is defined in a different package.
 
-                  Param_Strategy_Function : Subprogram_Data :=
-                    Type_Strategy.Strategy_Function;
+                     Param_Strategy_Function : Subprogram_Data :=
+                       Type_Strategy.Strategy_Function;
 
-               begin
-                  Param_Strategy_Function.Parent_Package :=
-                    +Param_Strat_Package_Name
-                    (Strip (+Param_Strategy_Function.Parent_Package));
-                  Param_Strategy_Function.Name :=
-                    +Gen_Param_Function_Name (Subp_Data, Param);
-                  Param_Strategy_Function.Fully_Qualified_Name :=
-                    +Param_Strat_Package_Name
-                    (Strip (+Param_Strategy_Function.Name));
-                  Param_Strategy.Strategy_Function := Param_Strategy_Function;
+                  begin
+                     Param_Strategy_Function.Parent_Package :=
+                       +Param_Strat_Package_Name
+                       (Strip (+Param_Strategy_Function.Parent_Package));
+                     Param_Strategy_Function.Name :=
+                       +Gen_Param_Function_Name (Subp_Data, Param);
+                     Param_Strategy_Function.Fully_Qualified_Name :=
+                       +Param_Strat_Package_Name
+                       (Strip (+Param_Strategy_Function.Name));
+                     Param_Strategy.Strategy_Function :=
+                       Param_Strategy_Function;
 
-                  Context.Type_And_Param_Strategies.Insert
-                    (Subp_Data.Fully_Qualified_Name & Param.Name,
-                     Param_Strategy);
+                     Context.Type_And_Param_Strategies.Insert
+                       (Subp_Data.Fully_Qualified_Name & Param.Name,
+                        Param_Strategy);
 
-                  Context.Strategies.Insert (Param_Strategy);
+                     Context.Strategies.Insert (Param_Strategy);
+                  end;
                end;
             end;
          end loop;
@@ -613,11 +616,32 @@ package body TGen.Gen_Strategies is
       Disc_Context : Disc_Value_Map;
    begin
       Collect_Type_Translations (Context, Subp);
-      for J in 1 .. Nb_Tests loop
+      for Param of Subp_Data.Parameters_Data loop
+         declare
+            Param_Type : SP.Ref :=
+              Context.Type_Translations.Element
+                (Param.Type_Fully_Qualified_Name);
+         begin
+            if not Context.Type_And_Param_Strategies.Contains
+              (Param.Type_Fully_Qualified_Name)
+            then
+               Context.Type_And_Param_Strategies.Insert
+                 (Param.Type_Fully_Qualified_Name,
+                  Param_Type.Get.Generate_Static (Context));
+            end if;
+         end;
+      end loop;
+
+      for J in 1 .. 1 loop
          Test_Vector_JSON := Empty_Array;
          for Param of Subp_Data.Parameters_Data loop
             declare
                Param_JSON : JSON_Value := Create_Object;
+
+               Strat : Static_Strategy_Type'Class :=
+                 Static_Strategy_Type
+                   (Context.Type_And_Param_Strategies.Element
+                      (Param.Type_Fully_Qualified_Name));
             begin
                Param_JSON.Set_Field ("name", Create (+Param.Name));
                Param_JSON.Set_Field ("type_name", Create (+Param.Type_Name));
@@ -630,6 +654,9 @@ package body TGen.Gen_Strategies is
                end if;
                Param_JSON.Set_Field
                  ("mode", Create (Integer'(Parameter_Mode'Pos (Param.Mode))));
+               Param_JSON.Set_Field
+                 ("value",
+                  Strat.Generate_Static_Value (Disc_Value_Maps.Empty_Map));
                Append (Test_Vector_JSON, Param_JSON);
             end;
          end loop;

@@ -63,9 +63,7 @@ with Test.Stub;
 with Utils.Command_Lines; use Utils.Command_Lines;
 with Utils.Environment;
 
-with TGen.Context;
 with TGen.Gen_Strategies;
-with TGen.Gen_Strategies_Utils;
 
 package body Test.Skeleton is
    Me                : constant Trace_Handle :=

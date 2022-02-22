@@ -61,6 +61,10 @@ package body TGen.Types.Real_Types is
 
    function Gen return T is
       function Rand is new GNAT.Random_Numbers.Random_Float (T);
+
+      --  TODO: the random number generator generates number between 0 and 1:
+      --  enhance that to generate number over the whole type span.
+
    begin
       return Rand (Generator_Instance);
    end Gen;
@@ -71,9 +75,9 @@ package body TGen.Types.Real_Types is
 
    function Generate_Random_Strategy
      (Self    : Float_Typ;
-      Context : in out Generation_Context) return Strategy_Type
+      Context : in out Generation_Context) return Strategy_Type'Class
    is
-      Res : Strategy_Type (Kind => Random_Kind, Constrained => False);
+      Res : Dynamic_Strategy_Type (Kind => Random_Kind, Constrained => False);
       F_Body : Unbounded_String;
       F_Name : constant String := Self.Gen_Random_Function_Name;
       Indent : Natural := 0;
@@ -97,22 +101,43 @@ package body TGen.Types.Real_Types is
       return Res;
    end Generate_Random_Strategy;
 
-   function Generate_Static
-     (Self         : Float_Typ;
-      Disc_Context : Disc_Value_Map) return String is
+   function Generate (Ty : Typ'Class) return Static_Value;
 
+   --------------
+   -- Generate --
+   --------------
+
+   function Generate (Ty : Typ'Class) return Static_Value
+   is
+      Self : Float_Typ := Float_Typ (Ty);
+
+      type T is new Long_Float
+      range Self.Range_Value.Min .. Self.Range_Value.Max;
+
+      function Rand is new Gen (T);
    begin
-      if not Self.Is_Static or not Self.Has_Range then
-         raise Program_Error with "Cannot generate values for non static type "
-           & Image (Self);
-      end if;
-      declare
-         type Float_Type is new Long_Float
-           range Self.Range_Value.Min .. Self.Range_Value.Max;
-         function Rand_Value is new Gen (Float_Type);
-      begin
-         return Long_Float'Image (Long_Float (Rand_Value));
-      end;
+      return Long_Float'Image (Long_Float (Rand));
+   end Generate;
+
+   ---------------------
+   -- Generate_Static --
+   ---------------------
+
+   function Generate_Static
+     (Self    : Float_Typ;
+      Context : in out Generation_Context) return Static_Strategy_Type'Class
+   is
+      --  TODO: use Long_Long_Long_Integer (as it is the biggest possible type
+      --  for which ranges can be defined), and add support to it in
+      --  GNATCOLL.JSON.
+
+      Type_Ref : SP.Ref;
+      Strat : Basic_Static_Strategy_Type;
+   begin
+      SP.From_Element (Type_Ref, Self'Unrestricted_Access);
+      Strat.T := Type_Ref;
+      Strat.F := Generate'Access;
+      return Strat;
    end Generate_Static;
 
 end TGen.Types.Real_Types;

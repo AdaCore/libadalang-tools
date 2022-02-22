@@ -21,6 +21,7 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
+with TGen.Context; use TGen.Context;
 with TGen.Types; use TGen.Types;
 with TGen.Types.Constraints; use TGen.Types.Constraints;
 
@@ -33,6 +34,10 @@ package TGen.Types.Array_Types is
       Component_Type : TGen.Types.SP.Ref;
    end record;
 
+   overriding function Generate_Static
+     (Self    : Array_Typ;
+      Context : in out Generation_Context) return Static_Strategy_Type'Class;
+
    type Unconstrained_Array_Typ is new Array_Typ with null record;
 
    function Image (Self : Unconstrained_Array_Typ) return String;
@@ -40,32 +45,12 @@ package TGen.Types.Array_Types is
    function Kind (Self : Unconstrained_Array_Typ) return Typ_Kind is
      (Unconstrained_Array_Kind);
 
-   overriding function Generate_Static
-     (Self         : Unconstrained_Array_Typ;
-      Disc_Context : Disc_Value_Map) return String;
-
    function As_Unconstrained_Array_Typ (Self : SP.Ref)
      return Unconstrained_Array_Typ'Class is
      (Unconstrained_Array_Typ'Class (Self.Unchecked_Get.all)) with
      Pre => (not SP.Is_Null (Self))
             and then (Self.Get.Kind in Unconstrained_Array_Kind);
    pragma Inline (As_Unconstrained_Array_Typ);
-
-   use type Big_Integer;
-
-   function Length
-     (Constraint : TGen.Types.Constraints.Index_Constraint)
-      return Big_Integer
-   is
-     (case Constraint.Present is
-         when True =>
-        (case Constraint.Discrete_Range.Low_Bound.Kind is
-            when Static =>
-               Constraint.Discrete_Range.High_Bound.Int_Val -
-                 Constraint.Discrete_Range.Low_Bound.Int_Val,
-            when others =>
-               raise Program_Error with "Unsupported constraint"),
-         when False => raise Program_Error with "Unsupported constraint");
 
    type Constrained_Array_Typ (Num_Dims : Positive) is new
      Array_Typ (Num_Dims) with record
@@ -76,10 +61,6 @@ package TGen.Types.Array_Types is
 
    function Kind (Self : Constrained_Array_Typ) return Typ_Kind is
      (Constrained_Array_Kind);
-
-   overriding function Generate_Static
-     (Self         : Constrained_Array_Typ;
-      Disc_Context : Disc_Value_Map) return String;
 
    function As_Constrained_Array_Typ (Self : SP.Ref)
      return Constrained_Array_Typ'Class is

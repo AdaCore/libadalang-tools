@@ -24,6 +24,8 @@
 with Ada.Containers.Hashed_Maps;
 with Ada.Unchecked_Deallocation;
 
+with TGen.Context; use TGen.Context;
+
 package TGen.Types.Constraints is
 
    type Constraint is abstract tagged null record;
@@ -161,6 +163,7 @@ package TGen.Types.Constraints is
       Element_Type    => Discrete_Constraint_Value,
       Hash            => Hash_Defining_Name,
       Equivalent_Keys => LAL."=");
+   subtype Discriminant_Constraint_Map is Discriminant_Constraint_Maps.Map;
    --  Maps to represent discriminant constraints. Each entry specifies the
    --  value given to the discriminant of which the defining name is used as
    --  key. For enumeration types used as discriminants, this is the 'Pos value
@@ -199,7 +202,8 @@ package TGen.Types.Constraints is
    --  relatively slow.
 
    overriding function Generate_Static
-     (Self : Anonymous_Typ; Disc_Context : Disc_Value_Map) return String;
+     (Self    : Anonymous_Typ;
+      Context : in out Generation_Context) return Static_Strategy_Type'Class;
 
    procedure Free_Content (Self : in out Anonymous_Typ);
 

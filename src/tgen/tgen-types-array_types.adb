@@ -23,7 +23,9 @@
 
 with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with Ada.Tags; use Ada.Tags;
 
+with TGen.Context; use TGen.Context;
 with TGen.Random;  use TGen.Random;
 with TGen.Strings; use TGen.Strings;
 
@@ -102,7 +104,7 @@ package body TGen.Types.Array_Types is
    generic
       type Element_Type is private;
       with function Generate_Value (Data : Data_Type) return Element_Type;
-   package Array_Strategy_Package is
+   package Array_Generation_Package is
       type Array_Type is array (Positive range <>) of Element_Type;
 
       type Array_Strategy_Type (Dimensions : Natural) is tagged record
@@ -118,9 +120,9 @@ package body TGen.Types.Array_Types is
          Data : Data_Type;
          Dimension_Sizes : out Nat_Array) return Array_Type;
 
-   end Array_Strategy_Package;
+   end Array_Generation_Package;
 
-   package body Array_Strategy_Package is
+   package body Array_Generation_Package is
 
       --------------------
       -- Array_Strategy --
@@ -194,7 +196,7 @@ package body TGen.Types.Array_Types is
          end;
       end Draw;
 
-   end Array_Strategy_Package;
+   end Array_Generation_Package;
 
    generic
       type Element_Type is private;
@@ -262,30 +264,65 @@ package body TGen.Types.Array_Types is
       return Res;
    end Reshape_2;
 
+   function Length
+     (I_Constraint : TGen.Types.Constraints.Index_Constraint;
+      Disc_Context : Disc_Value_Map) return Big_Integer;
+   --  Returns the length of the array from its Index_Constraint
+
    function Generate_Static_Common
      (Self         : Array_Typ'Class;
       Disc_Context : Disc_Value_Map;
       Constrained  : Boolean;
-      Constraints  : Index_Constraint_Arr) return String;
+      Constraints  : Index_Constraint_Arr;
+      Generate_Element_Strat : in out Static_Strategy_Type'Class)
+      return Static_Value;
 
    package Big_Integer_Conversion is new Big_Int.Signed_Conversions (Natural);
 
    function "+" (BI : Big_Integer) return Natural renames
      Big_Integer_Conversion.From_Big_Integer;
 
+   ------------
+   -- Length --
+   ------------
+
+   function Length
+     (I_Constraint : TGen.Types.Constraints.Index_Constraint;
+      Disc_Context : Disc_Value_Map) return Big_Integer
+
+   is
+      function Constraint_Value
+        (Constraint : Discrete_Constraint_Value) return Big_Integer is
+        (case Constraint.Kind is
+            when Static =>
+               Constraint.Int_Val,
+            when Discriminant =>
+               Disc_Context.Element (Constraint.Disc_Name),
+            when others =>
+               raise Program_Error with
+                 "Dynamic constraint unsupported for static generation");
+
+      use type Big_Integer;
+   begin
+      return Constraint_Value (I_Constraint.Discrete_Range.High_Bound) -
+        Constraint_Value (I_Constraint.Discrete_Range.Low_Bound) + 1;
+   end Length;
+
    ----------------------------
    -- Generate_Static_Common --
    ----------------------------
 
    function Generate_Static_Common
-     (Self : Array_Typ'Class;
+     (Self         : Array_Typ'Class;
       Disc_Context : Disc_Value_Map;
-      Constrained : Boolean;
-      Constraints : Index_Constraint_Arr) return String
+      Constrained  : Boolean;
+      Constraints  : Index_Constraint_Arr;
+      Generate_Element_Strat : in out Static_Strategy_Type'Class)
+      return Static_Value
    is
       function Generate_Component_Wrapper
         (Data : Data_Type with Unreferenced) return Unbounded_String is
-          (+Self.Component_Type.Get.Generate_Static (Disc_Context));
+          (+Generate_Element_Strat.Generate_Static_Value (Disc_Context));
 
       Res : Unbounded_String;
 
@@ -296,11 +333,11 @@ package body TGen.Types.Array_Types is
 
       Data : Data_Type;
 
-      package Strategy is new Array_Strategy_Package
+      package Array_Generation_Static is new Array_Generation_Package
         (Element_Type   => Unbounded_String,
          Generate_Value => Generate_Component_Wrapper);
 
-      use Strategy;
+      use Array_Generation_Static;
 
       type Expected_Array_Type is array (Natural range <>) of Unbounded_String;
 
@@ -315,8 +352,8 @@ package body TGen.Types.Array_Types is
             (if not Constrained then
               (Min_Size => 0, Max_Size => 10)
             else
-               (Min_Size => +Length (Constraints (I)),
-                Max_Size => +Length (Constraints (I)))));
+               (Min_Size => +Length (Constraints (I), Disc_Context),
+                Max_Size => +Length (Constraints (I), Disc_Context))));
 
       Strat : Array_Strategy_Type := Array_Strategy (Sizes);
 
@@ -328,6 +365,10 @@ package body TGen.Types.Array_Types is
         (Arr   : Array_Type;
          Index : in out Positive;
          Sizes : Nat_Array);
+
+      ------------
+      -- Pp_Arr --
+      ------------
 
       procedure Pp_Arr
         (Arr   : Array_Type;
@@ -371,32 +412,84 @@ package body TGen.Types.Array_Types is
       return +Res;
    end Generate_Static_Common;
 
+   type Array_Static_Strategy_Type is new Static_Strategy_Type with
+      record
+         T : SP.Ref;
+         Generate_Element_Strategy : Static_Strategy_Acc;
+         F : access function
+           (Self         : Array_Typ'Class;
+            Disc_Context : Disc_Value_Map;
+            Constrained  : Boolean;
+            Constraints  : Index_Constraint_Arr;
+            Generate_Element_Strat : in out Static_Strategy_Type'Class)
+         return Static_Value;
+      end record;
+
+   overriding function Generate_Static_Value
+     (S            : in out Array_Static_Strategy_Type;
+      Disc_Context : Disc_Value_Map) return Static_Value;
+
+   function Generate_Static_Value
+     (S            : in out Array_Static_Strategy_Type;
+      Disc_Context : Disc_Value_Map) return Static_Value
+   is
+      T_Classwide : Typ'Class := S.T.Get;
+   begin
+      --  TODO: refactor that code
+
+      if T_Classwide'Tag = Constrained_Array_Typ'Tag then
+         declare
+            T : Constrained_Array_Typ := Constrained_Array_Typ (T_Classwide);
+         begin
+            return S.F
+              (T,
+               Disc_Context,
+               True,
+               T.Index_Constraints,
+               S.Generate_Element_Strategy.all);
+         end;
+      elsif T_Classwide'Tag = Unconstrained_Array_Typ'Tag then
+         declare
+            T : Unconstrained_Array_Typ :=
+              Unconstrained_Array_Typ (T_Classwide);
+            No_Constraints : Index_Constraint_Arr (2 .. 1);
+         begin
+            return S.F
+              (T,
+               Disc_Context,
+               False,
+               No_Constraints,
+               S.Generate_Element_Strategy.all);
+         end;
+      else
+         return raise Program_Error with
+           "Expecting an array type but got a "
+           & Expanded_Name (T_Classwide'Tag);
+      end if;
+
+   end Generate_Static_Value;
+
    ---------------------
    -- Generate_Static --
    ---------------------
 
    function Generate_Static
-     (Self         : Unconstrained_Array_Typ;
-      Disc_Context : Disc_Value_Map) return String is
-
-      No_Constraints : Index_Constraint_Arr (2 .. 1);
+     (Self    : Array_Typ;
+      Context : in out Generation_Context) return Static_Strategy_Type'Class
+   is
+      Strat : Array_Static_Strategy_Type;
+      Element_Strategy : Static_Strategy_Type'Class :=
+        Self.Component_Type.Get.Generate_Static (Context);
    begin
-
-      return Generate_Static_Common
-        (Self, Disc_Context, False, No_Constraints);
+      Context.Strategies.Include (Element_Strategy);
+      Strat.Generate_Element_Strategy :=
+        new Basic_Static_Strategy_Type'
+          (Basic_Static_Strategy_Type
+             (Strategy_Sets.Element
+                (Context.Strategies.Find (Element_Strategy))));
+      SP.From_Element (Strat.T, Self'Unrestricted_Access);
+      Strat.F := Generate_Static_Common'Access;
+      return Strat;
    end Generate_Static;
-
-   ---------------------
-   -- Generate_Static --
-   ---------------------
-
-   function Generate_Static
-     (Self         : Constrained_Array_Typ;
-      Disc_Context : Disc_Value_Map) return String is
-   begin
-      return Generate_Static_Common
-        (Self, Disc_Context, True, Self.Index_Constraints);
-   end Generate_Static;
-
 
 end TGen.Types.Array_Types;

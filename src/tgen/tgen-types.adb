@@ -112,11 +112,12 @@ package body TGen.Types is
    -- Generate_Static --
    ---------------------
 
-   function Generate_Static (Self         : Typ;
-                             Disc_Context : Disc_Value_Map) return String is
+   function Generate_Static
+     (Self    : Typ;
+      Context : in out Generation_Context) return Static_Strategy_Type'Class
+   is
    begin
-      raise Program_Error with "Static strategy not implemented";
-      return "";
+      return raise Program_Error with "Static strategy not implemented";
    end Generate_Static;
 
    ------------------------------
@@ -125,9 +126,9 @@ package body TGen.Types is
 
    function Generate_Random_Strategy
      (Self    : Typ;
-      Context : in out  Generation_Context) return Strategy_Type
+      Context : in out Generation_Context) return Strategy_Type'Class
    is
-      Res : Strategy_Type;
+      Res : Unimplemented_Strategy_Type;
    begin
       raise Program_Error
         with "Generation of dynamic strategy not implemented";
@@ -140,9 +141,9 @@ package body TGen.Types is
 
    function Generate_Constrained_Random_Strategy
      (Self    : Typ;
-      Context : Generation_Context) return Strategy_Type
+      Context : Generation_Context) return Strategy_Type'Class
    is
-      Res : Strategy_Type;
+      Res : Unimplemented_Strategy_Type;
    begin
       raise Program_Error
         with "Generation of dynamic strategy not implemented";
