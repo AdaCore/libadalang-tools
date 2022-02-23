@@ -1096,8 +1096,8 @@ package body TGen.Types.Translation is
                            .F_Subtype_Indication.F_Constraint)
                then
                   return Translate_Array_Decl
-                    (Decl.As_Type_Decl.As_Derived_Type_Def.F_Subtype_Indication
-                     .P_Designated_Type_Decl, Type_Name);
+                    (Decl.As_Type_Decl.F_Type_Def.As_Derived_Type_Def
+                     .F_Subtype_Indication.P_Designated_Type_Decl, Type_Name);
                else
                   return Translate_Constrained (Decl, Type_Name);
                end if;
