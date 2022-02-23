@@ -901,12 +901,9 @@ package body TGen.Types.Translation is
             Res_Typ.Component_Type := Component_Typ.Res;
 
             for Constraint of Constraint_Nodes loop
+               Index_Typ := Decl.P_Index_Type (Current_Index - 1);
                case Kind (Constraint) is
                   when Ada_Subtype_Indication_Range =>
-                     Index_Typ :=
-                        Constraint.As_Subtype_Indication
-                        .P_Designated_Type_Decl;
-
                      if Is_Null
                            (Constraint.As_Subtype_Indication.F_Constraint)
                      then
@@ -931,8 +928,6 @@ package body TGen.Types.Translation is
 
                      end if;
                   when Ada_Bin_Op_Range =>
-                     Index_Typ :=
-                     Constraint.As_Bin_Op.F_Left.P_Expression_Type;
                      Has_Constraints := True;
                      if Constraint.As_Expr.P_Is_Static_Expr then
                         Constraints_Static := True;
@@ -942,9 +937,6 @@ package body TGen.Types.Translation is
                      end if;
 
                   when Ada_Attribute_Ref_Range =>
-                     Index_Typ :=
-                     Constraint.As_Attribute_Ref.F_Prefix
-                     .P_Name_Designated_Type;
                      Has_Constraints := True;
                      if Constraint.As_Expr.P_Is_Static_Expr then
                         Constraints_Static := True;
@@ -953,8 +945,6 @@ package body TGen.Types.Translation is
                         Constraints_Static := False;
                      end if;
                   when others =>
-                     Index_Typ := Constraint.As_Name.P_Referenced_Decl
-                                  .As_Base_Type_Decl;
                      Has_Constraints := False;
                end case;
 
@@ -1089,27 +1079,48 @@ package body TGen.Types.Translation is
    begin
       case Kind (Decl) is
          when Ada_Subtype_Decl_Range =>
-            return Translate_Constrained (Decl, Type_Name);
+            if Is_Null (Decl.As_Subtype_Decl.F_Subtype.F_Constraint) then
+               return Translate_Array_Decl
+                 (Decl.As_Subtype_Decl.F_Subtype.P_Designated_Type_Decl,
+                  Type_Name);
+            else
+               return Translate_Constrained (Decl, Type_Name);
+            end if;
 
          when Ada_Type_Decl_Range =>
-            case Kind (Decl.As_Type_Decl.F_Type_Def
-                       .As_Array_Type_Def.F_Indices) is
-               when Ada_Constrained_Array_Indices_Range =>
+
+            if Kind (Decl.As_Type_Decl.F_Type_Def)
+              in Ada_Derived_Type_Def_Range
+            then
+               if Is_Null (Decl.As_Type_Decl.F_Type_Def.As_Derived_Type_Def
+                           .F_Subtype_Indication.F_Constraint)
+               then
+                  return Translate_Array_Decl
+                    (Decl.As_Type_Decl.As_Derived_Type_Def.F_Subtype_Indication
+                     .P_Designated_Type_Decl, Type_Name);
+               else
                   return Translate_Constrained (Decl, Type_Name);
+               end if;
+            else
+               case Kind (Decl.As_Type_Decl.F_Type_Def
+                        .As_Array_Type_Def.F_Indices) is
+                  when Ada_Constrained_Array_Indices_Range =>
+                     return Translate_Constrained (Decl, Type_Name);
 
-               when Ada_Unconstrained_Array_Indices_Range =>
-                  return Translate_Unconstrained
-                    (Decl.As_Type_Decl.F_Type_Def.As_Array_Type_Def,
-                     Type_Name);
+                  when Ada_Unconstrained_Array_Indices_Range =>
+                     return Translate_Unconstrained
+                     (Decl.As_Type_Decl.F_Type_Def.As_Array_Type_Def,
+                        Type_Name);
 
-               when others =>
-                  return
-                    (Success     => False,
-                     Diagnostics =>
-                       +"Unexpected array indices for array type def:"
-                        & Kind_Name (Decl.As_Type_Decl.F_Type_Def
-                                     .As_Array_Type_Def.F_Indices));
-            end case;
+                  when others =>
+                     return
+                     (Success     => False,
+                        Diagnostics =>
+                        +"Unexpected array indices for array type def:"
+                           & Kind_Name (Decl.As_Type_Decl.F_Type_Def
+                                       .As_Array_Type_Def.F_Indices));
+               end case;
+            end if;
 
          when others =>
             return

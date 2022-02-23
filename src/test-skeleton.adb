@@ -3707,16 +3707,29 @@ package body Test.Skeleton is
          JSON_Unit_File : constant Virtual_File := GNATCOLL.VFS.Create
            (+(Test.Common.JSON_Test_Dir.all & Data.Unit_Full_Name.all
             & ".json"));
-         Unit_File_Content : GNAT.Strings.String_Access :=
-           GNATCOLL.VFS.Read_File (JSON_Unit_File);
-         Unit_Content : constant JSON_Array := Read
-           (Unit_File_Content.all, +JSON_Unit_File.Full_Name).Get;
+         Unit_File_Content : GNAT.Strings.String_Access;
+         Unit_Content : JSON_Array;
          Subp_Content : JSON_Value := JSON_Null;
          Subp_Vectors : JSON_Array;
          Single_Vec   : JSON_Array;
          Test_Count   : Positive := 1;
          Is_Function  : Boolean;
       begin
+
+         if not Is_Regular_File (JSON_Unit_File)
+           and then not Is_Readable (JSON_Unit_File)
+         then
+            return False;
+         end if;
+
+         Unit_File_Content := GNATCOLL.VFS.Read_File (JSON_Unit_File);
+
+         if Unit_File_Content in null then
+            return False;
+         end if;
+
+         Unit_Content := Read
+           (Unit_File_Content.all, +JSON_Unit_File.Full_Name).Get;
 
          if Unit_Content = Empty_Array then
             return False;
