@@ -350,7 +350,8 @@ package body TGen.Types.Array_Types is
       Sizes : Size_Interval_Array :=
         (for I in 1 .. Self.Num_Dims =>
             (if not Constrained then
-              (Min_Size => 0, Max_Size => 10)
+                 (Min_Size => Unconstrained_Array_Size_Min,
+                  Max_Size => Unconstrained_Array_Size_Max)
             else
                (Min_Size => +Length (Constraints (I), Disc_Context),
                 Max_Size => +Length (Constraints (I), Disc_Context))));

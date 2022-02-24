@@ -27,6 +27,11 @@ with TGen.Types.Constraints; use TGen.Types.Constraints;
 
 package TGen.Types.Array_Types is
 
+   Unconstrained_Array_Size_Min : constant Positive := 0;
+   Unconstrained_Array_Size_Max : constant Positive := 10;
+   --  Min / max size of generated unconstrained arrays. Hardcoded at the
+   --  moment.
+
    type Index_Typ_Arr is array (Positive range <>) of TGen.Types.SP.Ref;
 
    type Array_Typ (Num_Dims : Positive) is new Composite_Typ with record
