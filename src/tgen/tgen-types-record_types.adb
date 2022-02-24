@@ -760,24 +760,6 @@ package body TGen.Types.Record_Types is
       return Default_Strategy;
    end Pick_Strat_For_Disc;
 
-   function Pick_Choice (V : Intervals_With_Bias_Vector) return Positive with
-      Pre => V.Length > 0;
-
-   function Pick_Choice (V : Intervals_With_Bias_Vector) return Positive is
-      R      : Float    := TGen.Random.Rand_Float;
-      Cpt    : Float    := Float (0);
-      Choice : Positive := 1;
-   begin
-      for Elem of V loop
-         Cpt := Cpt + Elem.Bias;
-         if Cpt > R then
-            return Choice;
-         end if;
-         Choice := Choice + 1;
-      end loop;
-      return Choice;
-   end Pick_Choice;
-
    --  Static strategy for record types
 
    type Nondisc_Record_Static_Strategy_Type is
@@ -1172,129 +1154,12 @@ package body TGen.Types.Record_Types is
       return Res;
    end Generate_Constrained_Random_Strategy;
 
-   ---------------
-   -- Nth_Child --
-   ---------------
-
-   function Nth_Child
-     (Parent : Intervals_Biased_Trees.Cursor; N : Positive)
-      return Intervals_Biased_Trees.Cursor
-   is
-      use Intervals_Biased_Trees;
-      Child : Cursor   := First_Child (Parent);
-      I     : Positive := 1;
-   begin
-      while I < N and then Child /= No_Element loop
-         Child := Next_Sibling (Child);
-         I     := I + 1;
-      end loop;
-
-      if I /= N then
-         raise Program_Error with "Child " & Positive'Image (N) & " not found";
-      end if;
-
-      return Child;
-   end Nth_Child;
-
    --  TODO: pick a value in the intervals and not the first one
 
    function Draw (Intervals : Alternatives_Set) return Big_Integer is
    begin
       return Intervals.First_Element.Min;
    end Draw;
-
-   procedure Blll
-     (Node              : in out Intervals_Biased_Trees.Cursor;
-      Variant_Choices   : in out Positive_Vector;
-      Update_Disc_Value :        access procedure (V : Big_Integer))
-   is
-
-      use Intervals_Biased_Trees;
-
-      V              : Intervals_With_Bias_Vector := Element (Node).Data;
-      Intervals      : Alternatives_Set;
-      Variant_Choice : constant Positive          := Pick_Choice (V);
-   begin
-      Intervals := V.Element (Variant_Choice).Intervals;
-      Update_Disc_Value (Draw (Intervals));
-      Variant_Choices.Append (Variant_Choice);
-      Node := Nth_Child (Node, Variant_Choice);
-   end Blll;
-
-   procedure Fixup_Bias
-     (Tr   : in out Intervals_Biased_Trees.Tree;
-      Leaf :        Intervals_Biased_Trees.Cursor; Choices : Positive_Vector)
-   is
-
-      use Intervals_Biased_Trees;
-      use type Count_Type;
-
-      Current_Node         : Cursor  := Leaf.Parent;
-      Current_Choice_Index : Natural := Natural (Choices.Length);
-
-      procedure Redistribute_Bias
-        (V : in out Intervals_With_Bias_Vector; Redistributed_Bias : Float);
-
-      procedure Process_Node
-        (Tr : in out Tree; Node : in out Cursor; Choice : Positive);
-
-      procedure Redistribute_Bias
-        (V : in out Intervals_With_Bias_Vector; Redistributed_Bias : Float)
-      is
-
-         procedure Update_Element (IB : in out Intervals_With_Bias);
-
-         procedure Update_Element (IB : in out Intervals_With_Bias) is
-         begin
-            --  Each element takes a chunk of the redistributed bias according
-            --  to what its bias was before.
-            IB.Bias :=
-              @ + (@ / (1.0 - Redistributed_Bias)) * Redistributed_Bias;
-         end Update_Element;
-
-         use Intervals_With_Bias_Vectors;
-      begin
-         for C in V.Iterate loop
-            Update_Element (V, C, Update_Element'Access);
-         end loop;
-      end Redistribute_Bias;
-
-      --  If the node has no subtree of index choice rooted to it, we will
-      --  suppress the choice from the list of alternatives. This happens
-      --  when a shape or all the shapes in the variant have been generated.
-      --  Note that this function should be customizable.
-
-      procedure Process_Node
-        (Tr : in out Tree; Node : in out Cursor; Choice : Positive)
-      is
-         Variants : Intervals_With_Bias_Vector := Element (Node).Data;
-         Bias     : Float := Variants.Element (Choice).Bias;
-         Child    : Cursor                     := Nth_Child (Node, Choice);
-      begin
-         if Child_Count (Node) = 0 then
-            Intervals_With_Bias_Vectors.Delete
-              (Variants, Intervals_With_Bias_Vectors.Extended_Index'(Choice));
-            Delete_Leaf (Tr, Child);
-
-            --  We redistribute all of its bias to its siblings
-
-            Redistribute_Bias (Variants, Bias);
-         end if;
-
-         --  Otherwise, let's do nothing. We could make bias modifications in
-         --  the uptree as well (see if part of the subtree was deleted, and
-         --  disminish the bias if that is the case, left as a TODO for later).
-
-      end Process_Node;
-
-   begin
-      while Current_Node /= No_Element loop
-         Process_Node
-           (Tr, Current_Node, Choices.Element (Current_Choice_Index));
-         Current_Node         := Parent (Current_Node);
-         Current_Choice_Index := Current_Choice_Index - 1;
-      end loop;
-   end Fixup_Bias;
 
    ------------------------------
    -- Generate_Random_Strategy --

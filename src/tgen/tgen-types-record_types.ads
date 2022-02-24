@@ -256,48 +256,4 @@ package TGen.Types.Record_Types is
             and then (Self.Get.Kind in Disc_Record_Kind);
    pragma Inline (As_Discriminated_Record_Typ);
 
-   --  Dynamic generation
-
-   type Intervals_With_Bias is record
-      Intervals : TGen.Types.Record_Types.Alternatives_Set;
-      Bias : Float;
-   end record;
-
-   function "=" (L, R : Intervals_With_Bias) return Boolean is
-     (TGen.Types.Record_Types.Alternatives_Sets."="
-        (L.Intervals, R.Intervals));
-
-   package Intervals_With_Bias_Vectors is
-     new Ada.Containers.Vectors
-       (Index_Type => Positive, Element_Type => Intervals_With_Bias);
-   subtype Intervals_With_Bias_Vector is Intervals_With_Bias_Vectors.Vector;
-
-   type Tree_Node is record
-      Data : Intervals_With_Bias_Vector;
-   end record;
-
-   package Intervals_Biased_Trees is new Ada.Containers.Multiway_Trees
-     (Element_Type => Tree_Node);
-   type Gen_Record_Shapes_State is new Ada.Finalization.Controlled with record
-     Tr : Intervals_Biased_Trees.Tree;
-   end record;
-
-   package Positive_Vectors is new Ada.Containers.Vectors
-     (Index_Type => Natural, Element_Type => Positive);
-   subtype Positive_Vector is Positive_Vectors.Vector;
-
-   function Nth_Child
-     (Parent : Intervals_Biased_Trees.Cursor;
-      N : Positive) return Intervals_Biased_Trees.Cursor;
-
-   procedure Blll
-     (Node              : in out Intervals_Biased_Trees.Cursor;
-      Variant_Choices   : in out Positive_Vector;
-      Update_Disc_Value : access procedure (V : Big_Integer));
-
-   procedure Fixup_Bias
-     (Tr      : in out Intervals_Biased_Trees.Tree;
-      Leaf    : Intervals_Biased_Trees.Cursor;
-      Choices : Positive_Vector);
-
 end TGen.Types.Record_Types;
