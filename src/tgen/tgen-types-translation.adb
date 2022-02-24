@@ -2032,82 +2032,42 @@ package body TGen.Types.Translation is
      (Rng : Discrete_Range)
      return TGen.Types.Constraints.Discrete_Range_Constraint
    is
-
-      Min_Eval, Max_Eval : Big_Int.Big_Integer;
-      Min_Def_Name, Max_Def_Name : Defining_Name;
+      Low_Bound  : Discrete_Constraint_Value;
+      High_Bound : Discrete_Constraint_Value;
    begin
       if Rng.Low_Bound.P_Is_Static_Expr then
-         Min_Eval := Big_Int.From_String (Rng.Low_Bound.P_Eval_As_Int.Image);
+         Low_Bound :=
+           (Kind    => Static,
+            Int_Val =>
+              Big_Int.From_String (Rng.Low_Bound.P_Eval_As_Int.Image));
       elsif Kind (Rng.Low_Bound) in Ada_Name
            and then not Is_Null
                           (Rng.Low_Bound.As_Name.P_Referenced_Defining_Name)
            and then Kind (Rng.Low_Bound.As_Name.P_Referenced_Defining_Name
                           .Parent.Parent) in Ada_Discriminant_Spec_Range
       then
-         Min_Def_Name := Rng.Low_Bound.As_Name.P_Referenced_Defining_Name;
+         Low_Bound :=
+           (Kind      => Discriminant,
+            Disc_Name => Rng.Low_Bound.As_Name.P_Referenced_Defining_Name);
       end if;
 
       if Rng.High_Bound.P_Is_Static_Expr then
-         Max_Eval := Big_Int.From_String (Rng.High_Bound.P_Eval_As_Int.Image);
+         High_Bound :=
+           (Kind    => Static,
+            Int_Val =>
+              Big_Int.From_String (Rng.High_Bound.P_Eval_As_Int.Image));
       elsif Kind (Rng.High_Bound) in Ada_Name
            and then not Is_Null
                           (Rng.High_Bound.As_Name.P_Referenced_Defining_Name)
            and then Kind (Rng.High_Bound.As_Name.P_Referenced_Defining_Name
                           .Parent.Parent) in Ada_Discriminant_Spec_Range
       then
-         Max_Def_Name := Rng.High_Bound.As_Name.P_Referenced_Defining_Name;
+         High_Bound :=
+           (Kind      => Discriminant,
+            Disc_Name => Rng.High_Bound.As_Name.P_Referenced_Defining_Name);
       end if;
 
-      if Rng.Low_Bound.P_Is_Static_Expr
-        and then Rng.High_Bound.P_Is_Static_Expr
-      then
-         return Discrete_Range_Constraint'
-                  (Low_Bound  => (Kind => Static, Int_Val => Min_Eval),
-                   High_Bound => (Kind => Static, Int_Val => Max_Eval));
-      elsif Rng.Low_Bound.P_Is_Static_Expr
-           and then not Is_Null (Max_Def_Name)
-      then
-         return Discrete_Range_Constraint'
-                  (Low_Bound  => (Kind => Static, Int_Val => Min_Eval),
-                   High_Bound => (Kind      => Discriminant,
-                                  Disc_Name => Max_Def_Name));
-      elsif Rng.Low_Bound.P_Is_Static_Expr then
-         return Discrete_Range_Constraint'
-                  (Low_Bound  => (Kind => Static, Int_Val => Min_Eval),
-                   High_Bound => (Kind => Non_Static));
-      elsif Rng.High_Bound.P_Is_Static_Expr
-           and then not Is_Null (Min_Def_Name)
-      then
-         return Discrete_Range_Constraint'
-                  (Low_Bound  => (Kind      => Discriminant,
-                                  Disc_Name => Min_Def_Name),
-                   High_Bound => (Kind => Static, Int_Val => Max_Eval));
-      elsif Rng.High_Bound.P_Is_Static_Expr then
-         return Discrete_Range_Constraint'
-                  (Low_Bound  => (Kind => Non_Static),
-                   High_Bound => (Kind => Static, Int_Val => Max_Eval));
-      elsif not Is_Null (Min_Def_Name) and then not Is_Null (Max_Def_Name)
-      then
-         return Discrete_Range_Constraint'
-                  (Low_Bound  => (Kind      => Discriminant,
-                                  Disc_Name => Min_Def_Name),
-                   High_Bound => (Kind      => Discriminant,
-                                  Disc_Name => Max_Def_Name));
-      elsif not Is_Null (Min_Def_Name) then
-         return Discrete_Range_Constraint'
-                  (Low_Bound  => (Kind      => Discriminant,
-                                  Disc_Name => Min_Def_Name),
-                   High_Bound => (Kind => Non_Static));
-      elsif not Is_Null (Max_Def_Name) then
-         return Discrete_Range_Constraint'
-                  (Low_Bound  => (Kind => Non_Static),
-                   High_Bound => (Kind      => Discriminant,
-                                  Disc_Name => Max_Def_Name));
-      else
-         return Discrete_Range_Constraint'
-                  (Low_Bound  => (Kind => Non_Static),
-                   High_Bound => (Kind => Non_Static));
-      end if;
+      return (Low_Bound, High_Bound);
    end Eval_Discrete_Range;
 
    -----------------------------------------
