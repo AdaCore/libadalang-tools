@@ -187,13 +187,13 @@ package body TGen.Types.Int_Types is
       return Rand (Generator_Instance);
    end Gen;
 
-   function Generate (Ty : Typ'Class) return Static_Value;
+   function Generate_Static_Value_Int_Typ (Ty : Typ'Class) return Static_Value;
 
-   --------------
-   -- Generate --
-   --------------
+   -----------------------------------
+   -- Generate_Static_Value_Int_Typ --
+   -----------------------------------
 
-   function Generate (Ty : Typ'Class) return Static_Value
+   function Generate_Static_Value_Int_Typ (Ty : Typ'Class) return Static_Value
    is
       Self : Signed_Int_Typ := Signed_Int_Typ (Ty);
       package LLLI_Conversions is
@@ -206,7 +206,7 @@ package body TGen.Types.Int_Types is
       function Rand is new Gen (T);
    begin
       return Long_Long_Integer'Image (Long_Long_Integer (Rand));
-   end Generate;
+   end Generate_Static_Value_Int_Typ;
 
    ---------------------
    -- Generate_Static --
@@ -225,7 +225,7 @@ package body TGen.Types.Int_Types is
    begin
       SP.From_Element (Type_Ref, Self'Unrestricted_Access);
       Strat.T := Type_Ref;
-      Strat.F := Generate'Access;
+      Strat.F := Generate_Static_Value_Int_Typ'Access;
       Context.Strategies.Include (Strat);
       return Strat;
    end Generate_Static;
