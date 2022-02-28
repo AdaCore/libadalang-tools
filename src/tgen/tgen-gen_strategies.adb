@@ -648,15 +648,10 @@ package body TGen.Gen_Strategies is
                if Param.Mode in In_Mode | In_Out_Mode then
                   Param_JSON.Set_Field
                     ("value",
-                     Context.Type_Translations
-                     .Element (Param.Type_Fully_Qualified_Name)
-                     .Get.Generate_Static (Disc_Context));
+                     Strat.Generate_Static_Value (Disc_Value_Maps.Empty_Map));
                end if;
                Param_JSON.Set_Field
                  ("mode", Create (Integer'(Parameter_Mode'Pos (Param.Mode))));
-               Param_JSON.Set_Field
-                 ("value",
-                  Strat.Generate_Static_Value (Disc_Value_Maps.Empty_Map));
                Append (Test_Vector_JSON, Param_JSON);
             end;
          end loop;
