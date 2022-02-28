@@ -25,6 +25,8 @@ with Interfaces; use Interfaces;
 
 with GNAT.Random_Numbers;
 
+with TGen.Numerics; use TGen.Numerics;
+
 package TGen.Random is
    pragma Elaborate_Body;
 
@@ -57,6 +59,18 @@ package TGen.Random is
 
    function Rand_Int (Min, Max : Integer) return Integer;
    --  Returns a random integer
+
+   function Rand_LLLI
+     (Min, Max : Long_Long_Long_Integer) return Long_Long_Long_Integer;
+
+   function Rand_BI
+     (Min, Max : Big_Int.Big_Integer) return Big_Int.Big_Integer is
+      (LLLI_Conversions.To_Big_Integer
+         (Rand_LLLI
+              (LLLI_Conversions.From_Big_Integer (Min),
+               LLLI_Conversions.From_Big_Integer (Max))));
+   --  Assumes that Min / Max fit on a Long_Long_Long_Integer
+
 private
    type Many_Type is tagged record
       Min_Size, Max_Size : Natural;

@@ -23,7 +23,8 @@
 
 with Ada.Containers.Ordered_Maps;
 
-with TGen.Types;        use TGen.Types;
+with TGen.Context; use TGen.Context;
+with TGen.Types;   use TGen.Types;
 
 package TGen.Types.Enum_Types is
 
@@ -39,6 +40,11 @@ package TGen.Types.Enum_Types is
      Pre => Self.Is_Static;
 
    function Kind (Self : Char_Typ) return Typ_Kind is (Char_Kind);
+
+   function Generate_Static
+     (Self    : Char_Typ;
+      Context : in out Generation_Context)
+      return Static_Strategy_Type'Class;
 
    function As_Char_Typ (Self : SP.Ref) return Char_Typ'Class is
      (Char_Typ'Class (Self.Unchecked_Get.all)) with
@@ -56,6 +62,11 @@ package TGen.Types.Enum_Types is
      Pre => Self.Is_Static;
 
    function Kind (Self : Bool_Typ) return Typ_Kind is (Bool_Kind);
+
+   function Generate_Static
+     (Self    : Bool_Typ;
+      Context : in out Generation_Context)
+      return Static_Strategy_Type'Class;
 
    function As_Bool_Typ (Self : SP.Ref) return Bool_Typ'Class is
      (Bool_Typ'Class (Self.Unchecked_Get.all)) with
@@ -92,6 +103,11 @@ package TGen.Types.Enum_Types is
      Pre => Self.Is_Static;
 
    function Kind (Self : Other_Enum_Typ) return Typ_Kind is (Enum_Kind);
+
+   function Generate_Static
+     (Self    : Other_Enum_Typ;
+      Context : in out Generation_Context)
+      return Static_Strategy_Type'Class;
 
    function As_Other_Enum_Typ (Self : SP.Ref) return Other_Enum_Typ'Class is
      (Other_Enum_Typ'Class (Self.Unchecked_Get.all)) with
