@@ -59,6 +59,44 @@ package body TGen.Types.Int_Types is
    function High_Bound (Self : Mod_Int_Typ) return Big_Integer is
      (Self.Mod_Value);
 
+   function Generate_Static_Value_Mod_Typ (Ty : Typ'Class) return Static_Value;
+
+   -----------------------------------
+   -- Generate_Static_Value_Mod_Typ --
+   -----------------------------------
+
+   function Generate_Static_Value_Mod_Typ (Ty : Typ'Class) return Static_Value
+   is
+      Self : Mod_Int_Typ := Mod_Int_Typ (Ty);
+      package LLLI_Conversions is
+        new Big_Int.Signed_Conversions (Int => Long_Long_Integer);
+
+      type T is new Long_Long_Integer
+      range 0 .. LLLI_Conversions.From_Big_Integer (Self.High_Bound);
+
+      function Rand is new Gen (T);
+   begin
+      return Long_Long_Integer'Image (Long_Long_Integer (Rand));
+   end Generate_Static_Value_Mod_Typ;
+
+   ---------------------
+   -- Generate_Static --
+   ---------------------
+
+   function Generate_Static
+     (Self    : Mod_Int_Typ;
+      Context : in out Generation_Context) return Static_Strategy_Type'Class
+   is
+      Type_Ref : SP.Ref;
+      Strat    : Basic_Static_Strategy_Type;
+   begin
+      SP.From_Element (Type_Ref, Self'Unrestricted_Access);
+      Strat.T := Type_Ref;
+      Strat.F := Generate_Static_Value_Mod_Typ'Access;
+      Context.Strategies.Include (Strat);
+      return Strat;
+   end Generate_Static;
+
    ------------------------------
    -- Generate_Random_Strategy --
    ------------------------------

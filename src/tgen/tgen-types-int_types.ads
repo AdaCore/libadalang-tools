@@ -92,6 +92,10 @@ package TGen.Types.Int_Types is
 
    function Kind (Self : Mod_Int_Typ) return Typ_Kind is (Mod_Int_Kind);
 
+   overriding function Generate_Static
+     (Self    : Mod_Int_Typ;
+      Context : in out Generation_Context) return Static_Strategy_Type'Class;
+
    function As_Mod_Int_Typ (Self : SP.Ref) return Mod_Int_Typ'Class is
      (Mod_Int_Typ'Class (Self.Unchecked_Get.all)) with
      Pre => (not SP.Is_Null (Self))
