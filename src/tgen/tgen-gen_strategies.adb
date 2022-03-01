@@ -632,7 +632,7 @@ package body TGen.Gen_Strategies is
          end;
       end loop;
 
-      for J in 1 .. 1 loop
+      for J in 1 .. Nb_Tests loop
          Test_Vector_JSON := Empty_Array;
          for Param of Subp_Data.Parameters_Data loop
             declare
