@@ -212,6 +212,27 @@ package TGen.Context is
      (S : in out Dispatching_Static_Strategy_Type;
       Disc_Context : Disc_Value_Map) return Static_Value;
 
+   function Make_Dispatching_Strat
+     (S1, S2 : Static_Strategy_Type'Class;
+      Bias   : Float := 0.5) return Dispatching_Static_Strategy_Type;
+
+   generic
+      type Equivalence_Class_Type is private;
+      with package Equivalence_Classes_Vectors is
+        new Ada.Containers.Vectors
+          (Index_Type => Positive, Element_Type => Equivalence_Class_Type);
+   package Equivalence_Classes_Strategy_Package is
+      type Equivalence_Class_Strategy_Type is new Static_Strategy_Type with
+         record
+            Classes : Equivalence_Classes_Vectors.Vector;
+            Draw : access function
+              (Class : Equivalence_Class_Type) return Static_Value;
+         end record;
+      overriding function Generate_Static_Value
+        (S : in out Equivalence_Class_Strategy_Type;
+         Disc_Context : Disc_Value_Map) return Static_Value;
+   end Equivalence_Classes_Strategy_Package;
+
    type Dynamic_Strategy_Type is tagged;
    type Dynamic_Strategy_Type_Acc is access all Dynamic_Strategy_Type;
 

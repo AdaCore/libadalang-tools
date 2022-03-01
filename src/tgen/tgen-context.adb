@@ -285,6 +285,39 @@ package body TGen.Context is
       end if;
    end Generate_Static_Value;
 
+   ----------------------------
+   -- Make_Dispatching_Strat --
+   ----------------------------
+
+   function Make_Dispatching_Strat
+     (S1, S2 : Static_Strategy_Type'Class;
+      Bias   : Float := 0.5) return Dispatching_Static_Strategy_Type
+   is
+      Strat : Dispatching_Static_Strategy_Type;
+   begin
+      Strat.Bias := Bias;
+      Strat.S1 := new Static_Strategy_Type'Class'(S1);
+      Strat.S2 := new Static_Strategy_Type'Class'(S2);
+      return Strat;
+   end Make_Dispatching_Strat;
+
+   package body Equivalence_Classes_Strategy_Package is
+
+      ---------------------------
+      -- Generate_Static_Value --
+      ---------------------------
+
+      function Generate_Static_Value
+        (S            : in out Equivalence_Class_Strategy_Type;
+         Disc_Context : Disc_Value_Map) return Static_Value
+      is
+         Idx : Integer := Rand_Int (1, Integer (S.Classes.Length));
+      begin
+         return S.Draw (S.Classes.Element (Idx));
+      end Generate_Static_Value;
+
+   end Equivalence_Classes_Strategy_Package;
+
    ---------
    -- "<" --
    ---------

@@ -34,6 +34,7 @@ with GNATCOLL.JSON; use GNATCOLL.JSON;
 with GNATCOLL.Refcount; use GNATCOLL.Refcount;
 
 limited with TGen.Context;
+with TGen.Numerics; use TGen.Numerics;
 limited with Tgen.Types.Array_Types;
 limited with Tgen.Types.Enum_Types;
 limited with Tgen.Types.Int_Types;
@@ -44,7 +45,6 @@ with TGen.Strings; use TGen.Strings;
 package TGen.Types is
 
    package LAL renames Libadalang.Analysis;
-   package Big_Int renames Ada.Numerics.Big_Numbers.Big_Integers;
    type Typ is tagged record
       Name : LAL.Defining_Name;
    end record;

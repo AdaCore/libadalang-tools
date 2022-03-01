@@ -21,11 +21,13 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with GNAT.Random_Numbers;
 
 with TGen.Context; use TGen.Context;
+with TGen.Numerics; use TGen.Numerics;
 with TGen.Strings; use TGen.Strings;
 with TGen.Random; use TGen.Random;
 
@@ -208,6 +210,104 @@ package body TGen.Types.Int_Types is
       return Long_Long_Integer'Image (Long_Long_Integer (Rand));
    end Generate_Static_Value_Int_Typ;
 
+
+   package Interval_Vectors is new Ada.Containers.Vectors
+     (Index_Type => Positive, Element_Type => Int_Range);
+   subtype Interval_Vector is Interval_Vectors.Vector;
+
+   function Get_Digits_Equivalence_Classes
+     (R : Int_Range) return Interval_Vector;
+   --  Cut the Int_Range space in same-number-of-digits partition, e.g.
+   --  passing [0, 999] will return [0, 9], [10, 99], [100, 999].
+
+   ------------------------------------
+   -- Get_Digits_Equivalence_Classes --
+   ------------------------------------
+
+   function Get_Digits_Equivalence_Classes
+     (R : Int_Range) return Interval_Vector
+   is
+      use LLF_Functions;
+      use LLLI_Conversions;
+      use type Big_Int.Big_Integer;
+
+      Result : Interval_Vector;
+
+   begin
+
+      --  Positive intervals: for Integer -> [0, 9], [10, 99], ...
+      --                      for Positive -> [1, 9], [10, 99], ...
+      declare
+
+         Low_Bound        : Big_Integer := Big_Int.Max (R.Min, 0);
+         Number_Of_Digits : Integer :=
+           (if Low_Bound = 0 then 1 else Log (Low_Bound, 10.0) + 1);
+         High_Bound       : Big_Integer :=
+           Big_Int.Min
+             (10 ** Number_Of_Digits - 1, R.Max);
+
+      begin
+         while Low_Bound < R.Max loop
+            Result.Append (Int_Range'(Min => Low_Bound, Max => High_Bound));
+            Low_Bound := High_Bound + 1;
+            Number_Of_Digits := Number_Of_Digits + 1;
+            High_Bound :=
+              Big_Int.Min (10 ** Number_Of_Digits - 1, R.Max);
+         end loop;
+      end;
+
+      --  Negative intervals: for Integer -> [-9, -1], [-99, -10], ...
+
+      declare
+         High_Bound       : Big_Integer := Big_Int.Min (R.Max, -1);
+         Number_Of_Digits : Integer := Log (-High_Bound, 10.0) + 1;
+         Low_Bound        : Big_Integer :=
+           Big_Int.Max (-10 ** Number_Of_Digits + 1, R.Min);
+      begin
+         while High_Bound > R.Min loop
+            Result.Append (Int_Range'(Min => Low_Bound, Max => High_Bound));
+            High_Bound := Low_Bound - 1;
+            Number_Of_Digits := Number_Of_Digits + 1;
+            Low_Bound :=
+              Big_Int.Max (-10 ** Number_Of_Digits + 1, R.Min);
+         end loop;
+      end;
+      return Result;
+   end Get_Digits_Equivalence_Classes;
+
+   package Equivalence_Classes_Strategy_Int_Typ is
+
+      package Equivalence_Classes_Strategy_Internal is
+        new Equivalence_Classes_Strategy_Package
+          (Equivalence_Class_Type      => Int_Range,
+           Equivalence_Classes_Vectors => Interval_Vectors);
+
+      subtype Strategy is
+        Equivalence_Classes_Strategy_Internal.Equivalence_Class_Strategy_Type;
+
+      use LLLI_Conversions;
+
+      function Draw (R : Int_Range) return Static_Value is
+        (Long_Long_Long_Integer'Image
+           (Rand_LLLI (From_Big_Integer (R.Min), From_Big_Integer (R.Max))));
+   end Equivalence_Classes_Strategy_Int_Typ;
+
+   function Generate_Equivalence_Class_Digit_Strategy
+     (T : Signed_Int_Typ'Class) return Static_Strategy_Type'Class;
+
+   -----------------------------------------------
+   -- Generate_Equivalence_Class_Digit_Strategy --
+   -----------------------------------------------
+
+   function Generate_Equivalence_Class_Digit_Strategy
+     (T : Signed_Int_Typ'Class) return Static_Strategy_Type'Class is
+      Strat : Equivalence_Classes_Strategy_Int_Typ.Strategy;
+   begin
+      Strat.Classes := Get_Digits_Equivalence_Classes (T.Range_Value);
+      Strat.Draw := Equivalence_Classes_Strategy_Int_Typ.Draw'Access;
+      return Strat;
+   end Generate_Equivalence_Class_Digit_Strategy;
+
    ---------------------
    -- Generate_Static --
    ---------------------
@@ -216,18 +316,15 @@ package body TGen.Types.Int_Types is
      (Self    : Signed_Int_Typ;
       Context : in out Generation_Context) return Static_Strategy_Type'Class
    is
-      --  TODO: use Long_Long_Long_Integer (as it is the biggest possible type
-      --  for which ranges can be defined), and add support to it in
-      --  GNATCOLL.JSON.
-
-      Type_Ref : SP.Ref;
-      Strat : Basic_Static_Strategy_Type;
+      Strat_Random : Basic_Static_Strategy_Type;
+      Strat_Equivalence_Classes : Static_Strategy_Type'Class :=
+        Generate_Equivalence_Class_Digit_Strategy (Self);
    begin
-      SP.From_Element (Type_Ref, Self'Unrestricted_Access);
-      Strat.T := Type_Ref;
-      Strat.F := Generate_Static_Value_Int_Typ'Access;
-      Context.Strategies.Include (Strat);
-      return Strat;
+      SP.From_Element (Strat_Random.T, Self'Unrestricted_Access);
+      Strat_Random.F := Generate_Static_Value_Int_Typ'Access;
+
+      return Make_Dispatching_Strat
+        (Strat_Random, Strat_Equivalence_Classes, 0.25);
    end Generate_Static;
 
    ---------------------------

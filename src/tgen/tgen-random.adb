@@ -173,6 +173,14 @@ package body TGen.Random is
    begin
       return Rand (Generator_Instance, Min, Max);
    end Rand_Int;
+
+   function Rand_LLLI
+     (Min, Max : Long_Long_Long_Integer) return Long_Long_Long_Integer is
+      function Rand is
+        new GNAT.Random_Numbers.Random_Discrete (Long_Long_Long_Integer);
+   begin
+      return Rand (Generator_Instance, Min, Max);
+   end Rand_LLLI;
 begin
    GNAT.Random_Numbers.Reset (Generator_Instance);
 end TGen.Random;
