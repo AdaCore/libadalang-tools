@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                       Copyright (C) 2021-2022, AdaCore                   --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -409,6 +409,15 @@ package Laltools.Common is
    --- names and profiles.
    --  This should be called only if straightforward Libadalang calls
    --  have failed.
+
+   function Find_Next_Part_For_Decl
+     (Decl               : Basic_Decl;
+      Trace              : GNATCOLL.Traces.Trace_Handle;
+      Imprecise_Fallback : Boolean := False)
+      return Basic_Decl;
+   --  Wrapper around P_Next_Part_For_Decl that returns No_Basic_Decl if
+   --  next part is name itself. It also catches Property_Error and reports
+   --  it in traces.
 
    function Find_Subp_Body (Subp : Basic_Decl'Class) return Base_Subp_Body
      with Pre => Is_Subprogram (Subp);

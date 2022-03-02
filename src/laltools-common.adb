@@ -902,7 +902,7 @@ package body Laltools.Common is
       Imprecise_Fallback : Boolean := False)
       return Defining_Name
    is
-      Next   : Defining_Name;
+      Next : Defining_Name;
    begin
       Next :=
         Definition.P_Next_Part (Imprecise_Fallback => Imprecise_Fallback);
@@ -918,6 +918,34 @@ package body Laltools.Common is
          return No_Defining_Name;
    end Find_Next_Part;
 
+   -----------------------------
+   -- Find_Next_Part_For_Decl --
+   -----------------------------
+
+   function Find_Next_Part_For_Decl
+     (Decl               : Basic_Decl;
+      Trace              : GNATCOLL.Traces.Trace_Handle;
+      Imprecise_Fallback : Boolean := False)
+      return Basic_Decl
+   is
+      Next : Basic_Decl;
+   begin
+      Next :=
+        Decl.P_Next_Part_For_Decl
+          (Imprecise_Fallback => Imprecise_Fallback);
+
+      if Next = Decl then
+         return No_Basic_Decl;
+      else
+         return Next;
+      end if;
+   exception
+      when E :  Libadalang.Common.Property_Error =>
+         Log (Trace, E);
+         return No_Basic_Decl;
+
+   end Find_Next_Part_For_Decl;
+
    ------------------------
    -- Find_Previous_Part --
    ------------------------
@@ -928,7 +956,7 @@ package body Laltools.Common is
       Imprecise_Fallback : Boolean := False)
       return Defining_Name
    is
-      Next   : Defining_Name;
+      Next : Defining_Name;
    begin
       Next :=
         Definition.P_Previous_Part (Imprecise_Fallback => Imprecise_Fallback);
