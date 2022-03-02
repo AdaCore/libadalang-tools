@@ -29,6 +29,7 @@ with Langkit_Support.Text;
 with Libadalang.Common; use Libadalang.Common;
 
 with TGen.Context; use TGen.Context;
+with TGen.Strategies; use TGen.Strategies;
 
 package body TGen.Types is
 
@@ -67,28 +68,6 @@ package body TGen.Types is
 
    function Image (Self : Access_Typ) return String is
      (Typ (Self).Image & ": access type");
-
-   ---------------
-   -- Lit_Image --
-   ---------------
-
-   function Lit_Image
-     (Self : Discrete_Typ; Lit : Big_Integer) return String is
-     (Big_Int.To_String (Lit));
-
-   ---------------
-   -- Low_Bound --
-   ---------------
-
-   function Low_Bound (Self : Discrete_Typ) return Big_Integer is
-     (Big_Zero);
-
-   ----------------
-   -- High_Bound --
-   ----------------
-
-   function High_Bound (Self : Discrete_Typ) return Big_Integer is
-     (Big_Zero);
 
    ------------------
    -- Package_Name --
@@ -170,7 +149,7 @@ package body TGen.Types is
    ------------------------------
 
    function Random_Strategy_Function
-     (Self : Typ) return TGen.Context.Subprogram_Data
+     (Self : Typ) return Subprogram_Data
    is
       Result : Subprogram_Data (Kind => Ada_Subp_Kind_Function);
    begin

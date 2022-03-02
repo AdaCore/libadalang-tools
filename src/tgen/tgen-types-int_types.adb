@@ -61,44 +61,6 @@ package body TGen.Types.Int_Types is
    function High_Bound (Self : Mod_Int_Typ) return Big_Integer is
      (Self.Mod_Value);
 
-   function Generate_Static_Value_Mod_Typ (Ty : Typ'Class) return Static_Value;
-
-   -----------------------------------
-   -- Generate_Static_Value_Mod_Typ --
-   -----------------------------------
-
-   function Generate_Static_Value_Mod_Typ (Ty : Typ'Class) return Static_Value
-   is
-      Self : Mod_Int_Typ := Mod_Int_Typ (Ty);
-      package LLLI_Conversions is
-        new Big_Int.Signed_Conversions (Int => Long_Long_Integer);
-
-      type T is new Long_Long_Integer
-      range 0 .. LLLI_Conversions.From_Big_Integer (Self.High_Bound);
-
-      function Rand is new Gen (T);
-   begin
-      return Long_Long_Integer'Image (Long_Long_Integer (Rand));
-   end Generate_Static_Value_Mod_Typ;
-
-   ---------------------
-   -- Generate_Static --
-   ---------------------
-
-   function Generate_Static
-     (Self    : Mod_Int_Typ;
-      Context : in out Generation_Context) return Static_Strategy_Type'Class
-   is
-      Type_Ref : SP.Ref;
-      Strat    : Basic_Static_Strategy_Type;
-   begin
-      SP.From_Element (Type_Ref, Self'Unrestricted_Access);
-      Strat.T := Type_Ref;
-      Strat.F := Generate_Static_Value_Mod_Typ'Access;
-      Context.Strategies.Include (Strat);
-      return Strat;
-   end Generate_Static;
-
    ------------------------------
    -- Generate_Random_Strategy --
    ------------------------------
@@ -189,28 +151,6 @@ package body TGen.Types.Int_Types is
       return Rand (Generator_Instance);
    end Gen;
 
-   function Generate_Static_Value_Int_Typ (Ty : Typ'Class) return Static_Value;
-
-   -----------------------------------
-   -- Generate_Static_Value_Int_Typ --
-   -----------------------------------
-
-   function Generate_Static_Value_Int_Typ (Ty : Typ'Class) return Static_Value
-   is
-      Self : Signed_Int_Typ := Signed_Int_Typ (Ty);
-      package LLLI_Conversions is
-        new Big_Int.Signed_Conversions (Int => Long_Long_Integer);
-
-      type T is new Long_Long_Integer
-      range LLLI_Conversions.From_Big_Integer (Self.Range_Value.Min) ..
-        LLLI_Conversions.From_Big_Integer (Self.Range_Value.Max);
-
-      function Rand is new Gen (T);
-   begin
-      return Long_Long_Integer'Image (Long_Long_Integer (Rand));
-   end Generate_Static_Value_Int_Typ;
-
-
    package Interval_Vectors is new Ada.Containers.Vectors
      (Index_Type => Positive, Element_Type => Int_Range);
    subtype Interval_Vector is Interval_Vectors.Vector;
@@ -287,9 +227,13 @@ package body TGen.Types.Int_Types is
 
       use LLLI_Conversions;
 
-      function Draw (R : Int_Range) return Static_Value is
-        (Long_Long_Long_Integer'Image
-           (Rand_LLLI (From_Big_Integer (R.Min), From_Big_Integer (R.Max))));
+      function Draw (T : SP.Ref; R : Int_Range) return Static_Value'Class is
+        (Discrete_Static_Value'
+           (T     => T,
+            Value =>
+               LLLI_Conversions.To_Big_Integer
+              (Rand_LLLI (From_Big_Integer (R.Min),
+               From_Big_Integer (R.Max)))));
    end Equivalence_Classes_Strategy_Int_Typ;
 
    function Generate_Equivalence_Class_Digit_Strategy
@@ -303,6 +247,7 @@ package body TGen.Types.Int_Types is
      (T : Signed_Int_Typ'Class) return Static_Strategy_Type'Class is
       Strat : Equivalence_Classes_Strategy_Int_Typ.Strategy;
    begin
+      SP.From_Element (Strat.T, T'Unrestricted_Access);
       Strat.Classes := Get_Digits_Equivalence_Classes (T.Range_Value);
       Strat.Draw := Equivalence_Classes_Strategy_Int_Typ.Draw'Access;
       return Strat;
@@ -316,13 +261,11 @@ package body TGen.Types.Int_Types is
      (Self    : Signed_Int_Typ;
       Context : in out Generation_Context) return Static_Strategy_Type'Class
    is
-      Strat_Random : Basic_Static_Strategy_Type;
+      Strat_Random : Static_Strategy_Type'Class :=
+        Generate_Static (Discrete_Typ (Self), Context);
       Strat_Equivalence_Classes : Static_Strategy_Type'Class :=
         Generate_Equivalence_Class_Digit_Strategy (Self);
    begin
-      SP.From_Element (Strat_Random.T, Self'Unrestricted_Access);
-      Strat_Random.F := Generate_Static_Value_Int_Typ'Access;
-
       return Make_Dispatching_Strat
         (Strat_Random, Strat_Equivalence_Classes, 0.25);
    end Generate_Static;
@@ -333,7 +276,7 @@ package body TGen.Types.Int_Types is
 
    function Generate_Static_Value
      (Strat : in out Static_Array_Constraint_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return Static_Value
+      Disc_Context : Disc_Value_Map) return Static_Value'Class
    is
       package N_Conversions is
         new Big_Int.Signed_Conversions (Int => Natural);
@@ -352,7 +295,7 @@ package body TGen.Types.Int_Types is
       while Elements.More loop
          null;
       end loop;
-      return Natural'Image (Elements.Count);
+      return Base_Static_Value'(Value => +Natural'Image (Elements.Count));
    end Generate_Static_Value;
 
    ----------------------------------------

@@ -101,13 +101,13 @@ package body TGen.Types.Real_Types is
       return Res;
    end Generate_Random_Strategy;
 
-   function Generate (Ty : Typ'Class) return Static_Value;
+   function Generate_Float_Typ (Ty : Typ'Class) return Static_Value'Class;
 
    --------------
    -- Generate --
    --------------
 
-   function Generate (Ty : Typ'Class) return Static_Value
+   function Generate_Float_Typ (Ty : Typ'Class) return Static_Value'Class
    is
       Self : Float_Typ := Float_Typ (Ty);
 
@@ -116,8 +116,9 @@ package body TGen.Types.Real_Types is
 
       function Rand is new Gen (T);
    begin
-      return Long_Float'Image (Long_Float (Rand));
-   end Generate;
+      return Base_Static_Value'
+        (Value => +Long_Float'Image (Long_Float (Rand)));
+   end Generate_Float_Typ;
 
    ---------------------
    -- Generate_Static --
@@ -136,7 +137,7 @@ package body TGen.Types.Real_Types is
    begin
       SP.From_Element (Type_Ref, Self'Unrestricted_Access);
       Strat.T := Type_Ref;
-      Strat.F := Generate'Access;
+      Strat.F := Generate_Float_Typ'Access;
       return Strat;
    end Generate_Static;
 

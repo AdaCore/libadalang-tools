@@ -41,7 +41,8 @@ with TGen.Gen_Strategies_Utils; use TGen.Gen_Strategies_Utils;
 with TGen.Strings;              use TGen.Strings;
 with TGen.Templates;            use TGen.Templates;
 with TGen.Types;                use TGen.Types;
-with TGen.Files; use TGen.Files;
+with TGen.Files;                use TGen.Files;
+with TGen.Subprograms;          use TGen.Subprograms;
 
 package TGen.Gen_Strategies is
 

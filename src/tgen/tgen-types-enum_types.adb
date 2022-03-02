@@ -23,8 +23,8 @@
 
 with Langkit_Support.Text;
 
-with TGen.Random; use TGen.Random;
-with Ada.Text_IO; use Ada.Text_IO;
+with TGen.Types.Int_Types; use TGen.Types.Int_Types;
+with TGen.Random;          use TGen.Random;
 
 package body TGen.Types.Enum_Types is
 
@@ -46,43 +46,6 @@ package body TGen.Types.Enum_Types is
    --  1 is the value representing True for boolean in the LAL static
    --  expression evaluator so use this value for now.
 
-   function Generate_Static_Value_Bool_Typ
-     (Ty : Typ'Class) return Static_Value;
-
-   ------------------------------------
-   -- Generate_Static_Value_Bool_Typ --
-   ------------------------------------
-
-   function Generate_Static_Value_Bool_Typ (Ty : Typ'Class) return Static_Value
-   is
-      Self : Bool_Typ := Bool_Typ (Ty);
-
-      --  Let's not include the NUL character (ASCII code 0). TODO
-
-      use Big_Int;
-
-      Lit : Integer :=
-        Rand_Int (Min => 0, Max => To_Integer (Self.High_Bound));
-   begin
-      return Self.Lit_Image (To_Big_Integer (Lit));
-   end Generate_Static_Value_Bool_Typ;
-
-   ---------------------
-   -- Generate_Static --
-   ---------------------
-
-   function Generate_Static
-     (Self    : Bool_Typ;
-      Context : in out Generation_Context)
-      return Static_Strategy_Type'Class
-   is
-      Strat : Basic_Static_Strategy_Type;
-   begin
-      SP.From_Element (Strat.T, Self'Unrestricted_Access);
-      Strat.F := Generate_Static_Value_Bool_Typ'Access;
-      return Strat;
-   end Generate_Static;
-
    function Image (Self : Char_Typ) return String is
    begin
       return Typ (Self).Image & ": Char";
@@ -95,7 +58,7 @@ package body TGen.Types.Enum_Types is
       --  Wide_Wide_Character is 32 bits wide so we should be fine with
       --  Long_Long_Integer
    begin
-      return Res;
+      return "'" & Res & "'";
    end Lit_Image;
 
    function High_Bound (Self : Char_Typ) return Big_Integer is
@@ -105,15 +68,17 @@ package body TGen.Types.Enum_Types is
    --  bound.
 
    function Generate_Static_Value_Char_Typ
-     (Ty : Typ'Class) return Static_Value;
+     (Ty : Typ'Class) return Static_Value'Class;
 
    ------------------------------------
    -- Generate_Static_Value_Char_Typ --
    ------------------------------------
 
-   function Generate_Static_Value_Char_Typ (Ty : Typ'Class) return Static_Value
+   function Generate_Static_Value_Char_Typ
+     (Ty : Typ'Class) return Static_Value'Class
    is
-      Self : Char_Typ := Char_Typ (Ty);
+      Self   : Char_Typ := Char_Typ (Ty);
+      Result : Discrete_Static_Value;
 
       --  Let's use only the standard characters in the ASCII table. Others
       --  can't be represented as Character literals. Improvements TODO.
@@ -123,8 +88,9 @@ package body TGen.Types.Enum_Types is
       Lit : Integer :=
         Rand_Int (Min => 32, Max => 126);
    begin
-      Put_Line ("Value of enum is " & Integer'Image (Lit));
-      return "'" & Lit_Image (Self, To_Big_Integer (Lit)) (1) & "'";
+      SP.From_Element (Result.T, Ty'Unrestricted_Access);
+      Result.Value := To_Big_Integer (Lit);
+      return Result;
    end Generate_Static_Value_Char_Typ;
 
    ---------------------
@@ -148,7 +114,7 @@ package body TGen.Types.Enum_Types is
       return
         Typ (Self).Image & ": Enum"
         & (if Self.Is_Static
-           then " range " & Text.Image (Self.Literals.First_Element.Text)
+           thenElement (Disc).Get " range " & Text.Image (Self.Literals.First_Element.Text)
                 & " .. " & Text.Image (Self.Literals.Last_Element.Text)
            else " (non static)");
    end Image;
@@ -163,35 +129,4 @@ package body TGen.Types.Enum_Types is
    function High_Bound (Self : Other_Enum_Typ) return Big_Integer is
      (Self.Literals.Last_Key);
 
-   function Generate_Static_Value_Other_Enum_Typ
-     (Ty : Typ'Class) return Static_Value;
-
-   ------------------------------------------
-   -- Generate_Static_Value_Other_Enum_Typ --
-   ------------------------------------------
-
-   function Generate_Static_Value_Other_Enum_Typ
-     (Ty : Typ'Class) return Static_Value
-   is
-      Self : Other_Enum_Typ := Other_Enum_Typ (Ty);
-   begin
-      return Self.Lit_Image
-        (Rand_BI (Min => Self.Low_Bound, Max =>  Self.High_Bound));
-   end Generate_Static_Value_Other_Enum_Typ;
-
-   ---------------------
-   -- Generate_Static --
-   ---------------------
-
-   function Generate_Static
-     (Self    : Other_Enum_Typ;
-      Context : in out Generation_Context)
-      return Static_Strategy_Type'Class
-   is
-      Strat : Basic_Static_Strategy_Type;
-   begin
-      SP.From_Element (Strat.T, Self'Unrestricted_Access);
-      Strat.F := Generate_Static_Value_Other_Enum_Typ'Access;
-      return Strat;
-   end Generate_Static;
 end TGen.Types.Enum_Types;

@@ -28,6 +28,7 @@ with Ada.Strings.Wide_Wide_Unbounded;
 
 with TGen.Context; use TGen.Context;
 with TGen.Strings; use TGen.Strings;
+with TGen.Subprograms; use TGen.Subprograms;
 with TGen.Types; use TGen.Types;
 
 with GNATCOLL.VFS;

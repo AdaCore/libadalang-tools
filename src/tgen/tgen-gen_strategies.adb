@@ -40,6 +40,7 @@ with Templates_Parser; use Templates_Parser;
 
 with TGen.Gen_Types_Value;   use TGen.Gen_Types_Value;
 with TGen.Files;             use TGen.Files;
+with TGen.Strategies;        use TGen.Strategies;
 with TGen.Strings;           use TGen.Strings;
 with TGen.Types.Translation; use TGen.Types.Translation;
 with TGen.Types;             use TGen.Types;
@@ -648,7 +649,8 @@ package body TGen.Gen_Strategies is
                if Param.Mode in In_Mode | In_Out_Mode then
                   Param_JSON.Set_Field
                     ("value",
-                     Strat.Generate_Static_Value (Disc_Value_Maps.Empty_Map));
+                     Strat.Generate_Static_Value
+                       (Disc_Value_Maps.Empty_Map).To_String);
                end if;
                Param_JSON.Set_Field
                  ("mode", Create (Integer'(Parameter_Mode'Pos (Param.Mode))));

@@ -32,11 +32,12 @@ with Ada.Unchecked_Deallocation;
 
 with Libadalang.Analysis;
 
-with TGen.Context;    use TGen.Context;
-with TGen.Strategies; use TGen.Strategies;
-with TGen.Types; use TGen.Types;
-with TGen.Types.Int_Types;
-with TGen.Types.Constraints; use TGen.Types.Constraints;
+with TGen.Context;              use TGen.Context;
+with TGen.Strategies;           use TGen.Strategies;
+with TGen.Types;                use TGen.Types;
+with TGen.Types.Discrete_Types; use TGen.Types.Discrete_Types;
+with TGen.Types.Int_Types;      use TGen.Types.Int_Types;
+with TGen.Types.Constraints;    use TGen.Types.Constraints;
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Streams; use Ada.Streams;
@@ -126,18 +127,6 @@ package TGen.Types.Record_Types is
       Element_Type    => Discriminant_Choice_Entry);
    --  We cannot simply use a Defining_Name -> Choice_List map here because
    --  a discriminant may appear multiple time in the variant parts.
-
-   package Alternatives_Sets is new Ada.Containers.Ordered_Sets
-     (Element_Type => TGen.Types.Int_Types.Int_Range,
-      "<"          => TGen.Types.Int_Types."<",
-      "="          => TGen.Types.Int_Types."=");
-   subtype Alternatives_Set is Alternatives_Sets.Set;
-
-   package Alternatives_Set_Vectors is new Ada.Containers.Vectors
-     (Index_Type => Positive,
-      Element_Type => Alternatives_Set,
-      "="          => Alternatives_Sets."=");
-   subtype Alternatives_Set_Vector is Alternatives_Set_Vectors.Vector;
 
    type Variant_Part;
 

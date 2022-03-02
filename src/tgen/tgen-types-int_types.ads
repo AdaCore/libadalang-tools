@@ -21,26 +21,14 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with TGen.Context; use TGen.Context;
-with TGen.Types; use TGen.Types;
+with Ada.Containers.Vectors;
+
+with TGen.Context;      use TGen.Context;
+with TGen.Types;        use TGen.Types;
+with TGen.Types.Discrete_Types; use TGen.Types.Discrete_Types;
+with TGen.Strategies;   use TGen.Strategies;
 
 package TGen.Types.Int_Types is
-
-   type Int_Range is record
-      Min, Max : Big_Integer;
-   end record;
-
-   function To_String (Rang : Int_Range) return String is
-     ("[" & Big_Int.To_String (Rang.Min) & ", "
-      & Big_Int.To_String (Rang.Max) & "]");
-
-   function "<" (L, R : Int_Range) return Boolean is
-     (if Big_Int."=" (L.Min, R.Min)
-      then Big_Int."<" (L.Max, R.Max)
-      else Big_Int."<" (L.Min, R.Min));
-
-   function "=" (L, R : Int_Range) return Boolean is
-     (Big_Int."=" (L.Min, R.Min) and then Big_Int."=" (L.Max, R.Max));
 
    type Int_Typ is new Discrete_Typ with null record;
 
@@ -92,10 +80,6 @@ package TGen.Types.Int_Types is
 
    function Kind (Self : Mod_Int_Typ) return Typ_Kind is (Mod_Int_Kind);
 
-   overriding function Generate_Static
-     (Self    : Mod_Int_Typ;
-      Context : in out Generation_Context) return Static_Strategy_Type'Class;
-
    function As_Mod_Int_Typ (Self : SP.Ref) return Mod_Int_Typ'Class is
      (Mod_Int_Typ'Class (Self.Unchecked_Get.all)) with
      Pre => (not SP.Is_Null (Self))
@@ -118,7 +102,7 @@ package TGen.Types.Int_Types is
    overriding function Generate_Static_Value
      (Strat : in out Static_Array_Constraint_Strategy_Type;
       Disc_Context : Disc_Value_Map)
-      return Static_Value;
+      return Static_Value'Class;
 
    function Generate_Array_Constraint_Strategy
      (Self : Signed_Int_Typ)

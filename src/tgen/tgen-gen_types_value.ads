@@ -25,9 +25,10 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with Templates_Parser; use Templates_Parser;
 
-with TGen.Context;   use TGen.Context;
-with TGen.Templates; use TGen.Templates;
-with TGen.Types;     use TGen.Types;
+with TGen.Context;    use TGen.Context;
+with TGen.Strategies; use TGen.Strategies;
+with TGen.Templates;  use TGen.Templates;
+with TGen.Types;      use TGen.Types;
 
 package TGen.Gen_Types_Value is
    type Type_Value_Generator is new Source_Code_File_Generator with private;

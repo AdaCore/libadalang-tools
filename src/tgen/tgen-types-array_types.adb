@@ -25,9 +25,11 @@ with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Tags; use Ada.Tags;
 
-with TGen.Context; use TGen.Context;
-with TGen.Random;  use TGen.Random;
-with TGen.Strings; use TGen.Strings;
+with TGen.Context;              use TGen.Context;
+with TGen.Numerics;             use TGen.Numerics;
+with TGen.Random;               use TGen.Random;
+with TGen.Strings;              use TGen.Strings;
+with TGen.Types.Discrete_Types; use TGen.Types.Discrete_Types;
 
 package body TGen.Types.Array_Types is
 
@@ -275,7 +277,7 @@ package body TGen.Types.Array_Types is
       Constrained  : Boolean;
       Constraints  : Index_Constraint_Arr;
       Generate_Element_Strat : in out Static_Strategy_Type'Class)
-      return Static_Value;
+      return Static_Value'Class;
 
    package Big_Integer_Conversion is new Big_Int.Signed_Conversions (Natural);
 
@@ -318,11 +320,12 @@ package body TGen.Types.Array_Types is
       Constrained  : Boolean;
       Constraints  : Index_Constraint_Arr;
       Generate_Element_Strat : in out Static_Strategy_Type'Class)
-      return Static_Value
+      return Static_Value'Class
    is
       function Generate_Component_Wrapper
         (Data : Data_Type with Unreferenced) return Unbounded_String is
-          (+Generate_Element_Strat.Generate_Static_Value (Disc_Context));
+          (+Generate_Element_Strat.Generate_Static_Value
+             (Disc_Context).To_String);
 
       Res : Unbounded_String;
 
@@ -410,7 +413,7 @@ package body TGen.Types.Array_Types is
 
       Pp_Arr_Wrapper (Random_Arr, Dimension_Sizes);
 
-      return +Res;
+      return Base_Static_Value'(Value => Res);
    end Generate_Static_Common;
 
    type Array_Static_Strategy_Type is new Static_Strategy_Type with
@@ -423,16 +426,16 @@ package body TGen.Types.Array_Types is
             Constrained  : Boolean;
             Constraints  : Index_Constraint_Arr;
             Generate_Element_Strat : in out Static_Strategy_Type'Class)
-         return Static_Value;
+         return Static_Value'Class;
       end record;
 
    overriding function Generate_Static_Value
      (S            : in out Array_Static_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return Static_Value;
+      Disc_Context : Disc_Value_Map) return Static_Value'Class;
 
    function Generate_Static_Value
      (S            : in out Array_Static_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return Static_Value
+      Disc_Context : Disc_Value_Map) return Static_Value'Class
    is
       T_Classwide : Typ'Class := S.T.Get;
    begin

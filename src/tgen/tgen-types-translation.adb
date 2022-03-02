@@ -34,12 +34,13 @@ with Langkit_Support.Text;
 with Libadalang.Common;    use Libadalang.Common;
 with Libadalang.Expr_Eval; use Libadalang.Expr_Eval;
 
-with TGen.Types.Int_Types;    use TGen.Types.Int_Types;
-with TGen.Types.Real_Types;   use TGen.Types.Real_Types;
-with TGen.Types.Enum_Types;   use TGen.Types.Enum_Types;
-with TGen.Types.Array_Types;  use TGen.Types.Array_Types;
-with TGen.Types.Record_Types; use TGen.Types.Record_Types;
-with TGen.Types.Constraints;  use TGen.Types.Constraints;
+with TGen.Types.Discrete_Types; use TGen.Types.Discrete_Types;
+with TGen.Types.Int_Types;      use TGen.Types.Int_Types;
+with TGen.Types.Real_Types;     use TGen.Types.Real_Types;
+with TGen.Types.Enum_Types;     use TGen.Types.Enum_Types;
+with TGen.Types.Array_Types;    use TGen.Types.Array_Types;
+with TGen.Types.Record_Types;   use TGen.Types.Record_Types;
+with TGen.Types.Constraints;    use TGen.Types.Constraints;
 
 package body TGen.Types.Translation is
    use LAL;

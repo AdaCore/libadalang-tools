@@ -24,7 +24,9 @@
 with Ada.Containers.Hashed_Maps;
 with Ada.Unchecked_Deallocation;
 
-with TGen.Context; use TGen.Context;
+with TGen.Context;              use TGen.Context;
+with TGen.Types.Discrete_Types; use TGen.Types.Discrete_Types;
+with TGen.Strategies;           use TGen.Strategies;
 
 package TGen.Types.Constraints is
 
