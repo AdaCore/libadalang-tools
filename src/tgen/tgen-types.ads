@@ -155,10 +155,6 @@ package TGen.Types is
 
    type Scalar_Typ (Is_Static : Boolean) is new Typ with null record;
 
-   type Access_Typ is new Typ with null record;
-
-   function Image (Self : Access_Typ) return String;
-
    type Composite_Typ is new Typ with null record;
 
    procedure Free_Content_Wide (Self : in out Typ'Class);
@@ -191,5 +187,11 @@ package TGen.Types is
    type Unsupported_Typ is new Typ with null record;
 
    function Kind (Self : Unsupported_Typ) return Typ_Kind is (Unsupported);
+
+   type Access_Typ is new Unsupported_Typ with null record;
+
+   function Image (Self : Access_Typ) return String;
+
+   type Formal_Typ is new Unsupported_Typ with null record;
 
 end TGen.Types;

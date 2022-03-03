@@ -47,6 +47,17 @@ package body TGen.Types.Translation is
 
    Translation_Error : exception;
 
+   Non_Static_Error : exception;
+   --  Exception raised when the translation of a type that should be static
+   --  ends up not being static, due to missing bits in the static evaluator
+   --  in LAL.
+
+   function New_Eval_As_Int
+     (Node : Expr'Class) return GNATCOLL.GMP.Integers.Big_Integer;
+   --  Wrapper arround P_Eval_As_Int which raises Non_Static_Error when
+   --  something that should be static turns out not to be due to a LAL
+   --  limitation.
+
    Verbose_Diag : Boolean := False;
    package Text renames Langkit_Support.Text;
 
@@ -60,6 +71,18 @@ package body TGen.Types.Translation is
    Translation_Cache : Translation_Maps.Map;
    --  Cache used for the memoization of Translate.
 
+   procedure PP_Cache is
+      use Translation_Maps;
+      Cache_Cur : Cursor := Translation_Cache.First;
+   begin
+      while Has_Element (Cache_Cur) loop
+         Put_Line
+           (Text.Image (Key (Cache_Cur).As_Base_Type_Decl.P_Defining_Name.Text)
+            & " => " & Element (Cache_Cur).Get.Image);
+         Next (Cache_Cur);
+      end loop;
+   end PP_Cache;
+
    Cache_Hits : Natural := 0;
    Cache_Miss : Natural := 0;
    --  Stats for the cache
@@ -68,10 +91,13 @@ package body TGen.Types.Translation is
    --  Like Ada_Node_List, but that we can build ourselves
 
    function Translate_Internal
-     (N       : LAL.Base_Type_Decl;
-      Verbose : Boolean := False) return Translation_Result;
+     (N                 : LAL.Base_Type_Decl;
+      Verbose           : Boolean := False;
+      Assume_Non_Static : Boolean := False) return Translation_Result;
    --  Actually translates the Base_Type_Decl. Translate is simply a
    --  memoization wrapper.
+   --  If Assume_Non_Static is true, the the translated type will always be
+   --  flaged as non static.
 
    function "+" (Str : String) return Unbounded_String is
      (To_Unbounded_String (Str));
@@ -118,7 +144,7 @@ package body TGen.Types.Translation is
    --  Translate a Range_Spec (Assumed to be of a real type)
    --  For practical reasons, the the range spec is an attribute reference to
    --  a real type for which no range is defined, this will default to
-   --  Long_Float'Min .. Long_FLoat'Max
+   --  Long_Float'First .. Long_Float'Last
 
    function Translate_Array_Decl
      (Decl      : Base_Type_Decl;
@@ -219,6 +245,39 @@ package body TGen.Types.Translation is
      (Node : LAL.Discriminant_Constraint)
      return TGen.Types.Constraints.Discriminant_Constraints;
 
+   ----------------------
+   -- New_Eval_As_Int --
+   ----------------------
+
+   function New_Eval_As_Int
+     (Node : Expr'Class) return GNATCOLL.GMP.Integers.Big_Integer
+   is
+   begin
+      return Node.P_Eval_As_Int;
+   exception
+      when Exc : Property_Error =>
+         declare
+            Error_Msg : constant String :=
+              Ada.Exceptions.Exception_Message (Exc);
+         begin
+            if Error_Msg'Length >= 9 and then Error_Msg (1 .. 9) = "Unhandled"
+            then
+
+               --  Quick and dirty heuristic: cases where LAL should be able
+               --  to statically evaluate the expression but isn't able to have
+               --  an exception message that starts with "Unhandled"
+
+               raise Non_Static_Error with Error_Msg;
+            else
+
+               --  We still want the Property_Error to propagate when we are
+               --  not using the static evaluator correctly
+
+               raise;
+            end if;
+         end;
+   end New_Eval_As_Int;
+
    ------------------------
    -- Translate_Int_Decl --
    ------------------------
@@ -230,7 +289,7 @@ package body TGen.Types.Translation is
       Rang : constant Discrete_Range := Decl.P_Discrete_Range;
 
       Max : constant Big_Integer :=
-        Big_Int.From_String (High_Bound (Rang).P_Eval_As_Int.Image);
+        Big_Int.From_String (New_Eval_As_Int (High_Bound (Rang)).Image);
       --  Since Decl is a static subtype, its bounds are also static
       --  expressions according to RM 4.9(26/2).
       Res : Translation_Result (Success => True);
@@ -243,7 +302,7 @@ package body TGen.Types.Translation is
       else
          declare
             Min : constant Big_Integer :=
-              Big_Int.From_String (Low_Bound (Rang).P_Eval_As_Int.Image);
+              Big_Int.From_String (New_Eval_As_Int (Low_Bound (Rang)).Image);
          begin
             Res.Res.Set
               (Signed_Int_Typ'(Is_Static   => True,
@@ -292,9 +351,9 @@ package body TGen.Types.Translation is
         and then not Is_Null (Low_Bound (Rang))
       then
          Max :=
-           Long_Long_Integer'Value (High_Bound (Rang).P_Eval_As_Int.Image);
+           Long_Long_Integer'Value (New_Eval_As_Int (High_Bound (Rang)).Image);
          Min :=
-           Long_Long_Integer'Value (Low_Bound (Rang).P_Eval_As_Int.Image);
+           Long_Long_Integer'Value (New_Eval_As_Int (Low_Bound (Rang)).Image);
          for Pos in From_Big_Integer (Enum_Lits.First_Key) .. Min - 1 loop
             Enum_Lits.Delete (To_Big_Integer (Pos));
          end loop;
@@ -337,10 +396,9 @@ package body TGen.Types.Translation is
 
             Digits_Value :=
               Natural'Value
-                (Decl.As_Type_Decl.F_Type_Def.As_Floating_Point_Def
-                   .F_Num_Digits
-                   .P_Eval_As_Int
-                   .Image);
+                (New_Eval_As_Int
+                  (Decl.As_Type_Decl.F_Type_Def.As_Floating_Point_Def
+                  .F_Num_Digits).Image);
             return;
          end if;
 
@@ -378,7 +436,8 @@ package body TGen.Types.Translation is
                when Ada_Digits_Constraint_Range =>
                   Constraints := Parent_Type.F_Constraint.As_Digits_Constraint;
                   Digits_Value :=
-                    Natural'Value (Constraints.F_Digits.P_Eval_As_Int.Image);
+                    Natural'Value
+                      (New_Eval_As_Int (Constraints.F_Digits).Image);
                when others =>
                   raise Translation_Error
                     with "Unexpected kind of" &
@@ -971,22 +1030,28 @@ package body TGen.Types.Translation is
                if Has_Constraints and then Constraints_Static then
                   --  We should only encouter either a Bin Op (A .. B) or a
                   --  range attribute reference according to RM 3.5 (2).
-
-                  if Kind (Range_Exp) in Ada_Bin_Op_Range then
-                     Constraint_Min := Big_Int.From_String
-                     (Range_Exp.As_Bin_Op.F_Left.P_Eval_As_Int.Image);
-                     Constraint_Max := Big_Int.From_String
-                     (Range_Exp.As_Bin_Op.F_Right.P_Eval_As_Int.Image);
-                  else
-                     Constraint_Min := Big_Int.From_String
-                     (Low_Bound (Range_Exp.As_Attribute_Ref.F_Prefix
-                        .P_Name_Designated_Type.P_Discrete_Range)
-                        .P_Eval_As_Int.Image);
-                     Constraint_Min := Big_Int.From_String
-                     (High_Bound (Range_Exp.As_Attribute_Ref.F_Prefix
-                        .P_Name_Designated_Type.P_Discrete_Range)
-                        .P_Eval_As_Int.Image);
-                  end if;
+                  begin
+                     if Kind (Range_Exp) in Ada_Bin_Op_Range then
+                        Constraint_Min := Big_Int.From_String
+                        (New_Eval_As_Int (Range_Exp.As_Bin_Op.F_Left).Image);
+                        Constraint_Max := Big_Int.From_String
+                        (New_Eval_As_Int (Range_Exp.As_Bin_Op.F_Right).Image);
+                     else
+                        Constraint_Min := Big_Int.From_String
+                        (New_Eval_As_Int
+                           (Low_Bound (Range_Exp.As_Attribute_Ref.F_Prefix
+                           .P_Name_Designated_Type.P_Discrete_Range))
+                           .Image);
+                        Constraint_Max := Big_Int.From_String
+                        (New_Eval_As_Int
+                           (High_Bound (Range_Exp.As_Attribute_Ref.F_Prefix
+                           .P_Name_Designated_Type.P_Discrete_Range))
+                           .Image);
+                     end if;
+                  exception
+                     when Non_Static_Error =>
+                        Constraints_Static := False;
+                  end;
                end if;
 
                if not Has_Constraints then
@@ -1440,13 +1505,20 @@ package body TGen.Types.Translation is
                                       .P_Referenced_Defining_Name.Text));
             elsif Actual (Pair).P_Is_Static_Expr
             then
-               --  Static value in the discriminant constraint
-               Constraints_Map.Insert
-                 (Key      => +Param (Pair).As_Defining_Name.Text,
-                  New_Item =>
-                    (Kind    => Static,
-                     Int_Val => Big_Int.From_String
-                                  (Actual (Pair).P_Eval_As_Int.Image)));
+               begin
+                  --  Static value in the discriminant constraint
+                  Constraints_Map.Insert
+                  (Key      => +Param (Pair).As_Defining_Name.Text,
+                     New_Item =>
+                     (Kind    => Static,
+                        Int_Val => Big_Int.From_String
+                                    (New_Eval_As_Int (Actual (Pair)).Image)));
+               exception
+                  when Non_Static_Error =>
+                     Constraints_Map.Insert
+                       (Key      => +Param (Pair).As_Defining_Name.Text,
+                        New_Item => (Kind => Non_Static));
+               end;
             else
                --  Non static value
 
@@ -1675,7 +1747,8 @@ package body TGen.Types.Translation is
             return Null_Unbounded_String;
          end if;
          Comp_Decl := Decl.As_Component_Decl;
-         Current_Typ := Translate (Comp_Decl.F_Component_Def.F_Type_Expr);
+         Current_Typ := Translate
+           (Comp_Decl.F_Component_Def.F_Type_Expr, Verbose_Diag);
          if not Current_Typ.Success then
             return "Failed to translate type of component"
                      & Comp_Decl.Image & ": " & Current_Typ.Diagnostics;
@@ -1724,23 +1797,41 @@ package body TGen.Types.Translation is
                   when Ada_Bin_Op =>
                      if Alt.As_Bin_Op.F_Op.Kind in Ada_Op_Double_Dot then
                         Choice_Min := Big_Int.From_String
-                          (Alt.As_Bin_Op.F_Left.P_Eval_As_Int.Image);
+                          (New_Eval_As_Int (Alt.As_Bin_Op.F_Left).Image);
                         Choice_Max := Big_Int.From_String
-                         (Alt.As_Bin_Op.F_Right.P_Eval_As_Int.Image);
+                          (New_Eval_As_Int (Alt.As_Bin_Op.F_Right).Image);
                         Choice_Trans.Alt_Set.Insert
                           ((Min => Choice_Min, Max => Choice_Max));
                      else
                         Choice_Min := Big_Int.From_String
-                          (Alt.As_Expr.P_Eval_As_Int.Image);
+                          (New_Eval_As_Int (Alt.As_Expr).Image);
                         Choice_Trans.Alt_Set.Insert
                           ((Min => Choice_Min, Max => Choice_Min));
                      end if;
                   when Ada_Expr'First .. Ada_Null_Record_Aggregate
                       | Ada_Relation_Op .. Ada_Un_Op =>
-                     Choice_Min := Big_Int.From_String
-                       (Alt.As_Expr.P_Eval_As_Int.Image);
-                     Choice_Trans.Alt_Set.Insert
-                       ((Min => Choice_Min, Max => Choice_Min));
+                     if Alt.Kind in Ada_Name
+                       and then not Is_Null
+                         (Alt.As_Name.P_Name_Designated_Type)
+                     then
+                        Choice_Min :=
+                          Big_Int.From_String
+                            (New_Eval_As_Int (Low_Bound
+                               (Alt.As_Name.P_Name_Designated_Type
+                                .P_Discrete_Range)).Image);
+                        Choice_Max :=
+                          Big_Int.From_String
+                            (New_Eval_As_Int (High_Bound
+                              (Alt.As_Name.P_Name_Designated_Type
+                               .P_Discrete_Range)).Image);
+                        Choice_Trans.Alt_Set.Insert
+                          ((Min => Choice_Min, Max => Choice_Max));
+                     else
+                        Choice_Min := Big_Int.From_String
+                        (New_Eval_As_Int (Alt.As_Expr).Image);
+                        Choice_Trans.Alt_Set.Insert
+                        ((Min => Choice_Min, Max => Choice_Min));
+                     end if;
                   when Ada_Others_Designator_Range =>
                      Choice_Trans.Alt_Set.Clear;
                      Has_Others := True;
@@ -2040,44 +2131,54 @@ package body TGen.Types.Translation is
 
    function Eval_Discrete_Range
      (Rng : Discrete_Range)
-     return TGen.Types.Constraints.Discrete_Range_Constraint
+      return TGen.Types.Constraints.Discrete_Range_Constraint
    is
       Low_Bound  : Discrete_Constraint_Value;
       High_Bound : Discrete_Constraint_Value;
    begin
-      if Rng.Low_Bound.P_Is_Static_Expr then
-         Low_Bound :=
-           (Kind    => Static,
-            Int_Val =>
-              Big_Int.From_String (Rng.Low_Bound.P_Eval_As_Int.Image));
-      elsif Kind (Rng.Low_Bound) in Ada_Name
-           and then not Is_Null
-                          (Rng.Low_Bound.As_Name.P_Referenced_Defining_Name)
-           and then Kind (Rng.Low_Bound.As_Name.P_Referenced_Defining_Name
-                          .Parent.Parent) in Ada_Discriminant_Spec_Range
-      then
-         Low_Bound :=
-           (Kind      => Discriminant,
-            Disc_Name =>
-              +Rng.Low_Bound.As_Name.P_Referenced_Defining_Name.Text);
-      end if;
+      begin
+         if Rng.Low_Bound.P_Is_Static_Expr then
+            Low_Bound :=
+            (Kind    => Static,
+               Int_Val =>
+               Big_Int.From_String (New_Eval_As_Int (Rng.Low_Bound).Image));
+         elsif Kind (Rng.Low_Bound) in Ada_Name
+            and then not Is_Null
+                           (Rng.Low_Bound.As_Name.P_Referenced_Defining_Name)
+            and then Kind (Rng.Low_Bound.As_Name.P_Referenced_Defining_Name
+                           .Parent.Parent) in Ada_Discriminant_Spec_Range
+         then
+            Low_Bound :=
+            (Kind      => Discriminant,
+             Disc_Name => +Rng.Low_Bound.As_Name.P_Referenced_Defining_Name
+                          .Text);
+         end if;
+      exception
+         when Non_Static_Error =>
+            Low_Bound := (Kind => Non_Static);
+      end;
 
-      if Rng.High_Bound.P_Is_Static_Expr then
-         High_Bound :=
-           (Kind    => Static,
-            Int_Val =>
-              Big_Int.From_String (Rng.High_Bound.P_Eval_As_Int.Image));
-      elsif Kind (Rng.High_Bound) in Ada_Name
-           and then not Is_Null
-                          (Rng.High_Bound.As_Name.P_Referenced_Defining_Name)
-           and then Kind (Rng.High_Bound.As_Name.P_Referenced_Defining_Name
-                          .Parent.Parent) in Ada_Discriminant_Spec_Range
-      then
-         High_Bound :=
-           (Kind      => Discriminant,
-            Disc_Name =>
-              +Rng.High_Bound.As_Name.P_Referenced_Defining_Name.Text);
-      end if;
+      begin
+         if Rng.High_Bound.P_Is_Static_Expr then
+            High_Bound :=
+            (Kind    => Static,
+               Int_Val =>
+               Big_Int.From_String (New_Eval_As_Int (Rng.High_Bound).Image));
+         elsif Kind (Rng.High_Bound) in Ada_Name
+            and then not Is_Null
+                           (Rng.High_Bound.As_Name.P_Referenced_Defining_Name)
+            and then Kind (Rng.High_Bound.As_Name.P_Referenced_Defining_Name
+                           .Parent.Parent) in Ada_Discriminant_Spec_Range
+         then
+            High_Bound :=
+            (Kind      => Discriminant,
+             Disc_Name => +Rng.High_Bound.As_Name.P_Referenced_Defining_Name
+                          .Text);
+         end if;
+      exception
+         when Non_Static_Error =>
+            High_Bound := (Kind => Non_Static);
+      end;
 
       return (Low_Bound, High_Bound);
    end Eval_Discrete_Range;
@@ -2131,38 +2232,44 @@ package body TGen.Types.Translation is
             return Rnge;
          when Ada_Digits_Constraint_Range =>
             if Node.As_Digits_Constraint.F_Digits.P_Is_Static_Expr then
-               declare
-                  Digits_Val : constant Big_Int.Big_Integer :=
-                    Big_Int.From_String
-                      (Node.As_Digits_Constraint.F_Digits.P_Eval_As_Int.Image);
                begin
-                  if not Is_Null (Range_Spc) then
-                     return TGen.Types.Constraints.Digits_Constraint'
-                       (Has_Range    => True,
-                        Digits_Value => (Kind    => Static,
-                                         Int_Val => Digits_Val),
-                        Low_Bound  => Rnge.Low_Bound,
-                        High_Bound => Rnge.High_Bound);
-                  else
-                     return TGen.Types.Constraints.Digits_Constraint'
-                       (Has_Range => False,
-                        Digits_Value => (Kind    => Static,
-                                         Int_Val => Digits_Val));
-                  end if;
+                  declare
+                     Digits_Val : constant Big_Int.Big_Integer :=
+                     Big_Int.From_String
+                        (New_Eval_As_Int
+                           (Node.As_Digits_Constraint.F_Digits).Image);
+                  begin
+                     if not Is_Null (Range_Spc) then
+                        return TGen.Types.Constraints.Digits_Constraint'
+                        (Has_Range    => True,
+                         Digits_Value => (Kind    => Static,
+                                          Int_Val => Digits_Val),
+                           Low_Bound  => Rnge.Low_Bound,
+                           High_Bound => Rnge.High_Bound);
+                     else
+                        return TGen.Types.Constraints.Digits_Constraint'
+                        (Has_Range   => False,
+                         Digits_Value => (Kind    => Static,
+                                          Int_Val => Digits_Val));
+                     end if;
+                  end;
+               exception
+                  when Non_Static_Error =>
+                     null;
                end;
-            else
-               if not Is_Null (Range_Spc) then
-                  return TGen.Types.Constraints.Digits_Constraint'
-                     (Has_Range    => True,
-                      Digits_Value => (Kind => Non_Static),
-                      Low_Bound  => Rnge.Low_Bound,
-                      High_Bound => Rnge.High_Bound);
-               else
-                  return TGen.Types.Constraints.Digits_Constraint'
-                     (Has_Range => False,
-                      Digits_Value => (Kind => Non_Static));
-               end if;
             end if;
+            if not Is_Null (Range_Spc) then
+               return TGen.Types.Constraints.Digits_Constraint'
+                  (Has_Range    => True,
+                   Digits_Value => (Kind => Non_Static),
+                   Low_Bound    => Rnge.Low_Bound,
+                   High_Bound   => Rnge.High_Bound);
+            else
+               return TGen.Types.Constraints.Digits_Constraint'
+                  (Has_Range    => False,
+                   Digits_Value => (Kind => Non_Static));
+            end if;
+
          when Ada_Delta_Constraint_Range =>
             raise Translation_Error with
               "Delta contraints for anonymous types not implemented yet";
@@ -2228,34 +2335,38 @@ package body TGen.Types.Translation is
      (Node : LAL.Discriminant_Constraint)
      return TGen.Types.Constraints.Discriminant_Constraints
    is
+      New_Item : Discrete_Constraint_Value;
    begin
       return Res : TGen.Types.Constraints.Discriminant_Constraints do
          for Pair of Node.F_Constraints.P_Zip_With_Params loop
-            if Actual (Pair).P_Is_Static_Expr then
-               Res.Constraint_Map.Insert
-                 (Key      => +Param (Pair).As_Defining_Name.Text,
-                  New_Item =>
+            New_Item := (Kind => Non_Static);
+            begin
+               if Actual (Pair).P_Is_Static_Expr then
+                  New_Item :=
                     (Kind    => Static,
                      Int_Val => Big_Int.From_String
-                                    (Actual (Pair).P_Eval_As_Int.Image)));
-            elsif Kind (Actual (Pair)) in Ada_Name
-                 and then not Is_Null (
-                            Actual (Pair).As_Name.P_Referenced_Defining_Name)
-                 and then Kind (Actual (Pair).As_Name
-                                .P_Referenced_Defining_Name.Parent.Parent)
-                         in Ada_Discriminant_Spec_Range
-            then
-               Res.Constraint_Map.Insert
-                 (Key      => +Param (Pair).As_Defining_Name.Text,
-                  New_Item =>
+                                  (New_Eval_As_Int (Actual (Pair)).Image));
+               elsif Kind (Actual (Pair)) in Ada_Name
+                  and then not Is_Null (
+                              Actual (Pair).As_Name.P_Referenced_Defining_Name)
+                  and then Kind (Actual (Pair).As_Name
+                                 .P_Referenced_Defining_Name.Parent.Parent)
+                           in Ada_Discriminant_Spec_Range
+               then
+                  New_Item :=
                     (Kind      => Discriminant,
-                     DIsc_Name => +Actual (Pair).As_Name
-                                  .P_Referenced_Defining_Name.Text));
-            else
-               Res.Constraint_Map.Insert
-                 (Key      => +Param (Pair).As_Defining_Name.Text,
-                  New_Item => (Kind      => Non_Static));
-            end if;
+                     Disc_Name => +Actual (Pair).As_Name
+                                  .P_Referenced_Defining_Name.Text);
+               else
+                  New_Item := (Kind => Non_Static);
+               end if;
+               exception
+                  when Non_Static_Error =>
+                     New_Item := (Kind => Non_Static);
+            end;
+            Res.Constraint_Map.Insert
+              (Key      => +Param (Pair).Text,
+               New_Item => New_Item);
          end loop;
       end return;
    end Translate_Discriminant_Constraints;
@@ -2286,6 +2397,7 @@ package body TGen.Types.Translation is
 
       if not Intermediate_Result.Success
         or else Kind (N) in Ada_Anonymous_Type
+        or else Intermediate_Result.Res.Get.Kind in Unsupported
         or else Is_Null (N.As_Subtype_Indication.F_Constraint)
       then
          return Intermediate_Result;
@@ -2360,7 +2472,9 @@ package body TGen.Types.Translation is
    is
       use Translation_Maps;
 
-      Cache_Cur : constant Cursor := Translation_Cache.Find (N.As_Ada_Node);
+      Full_Decl : constant Base_Type_Decl := N.P_Full_View;
+      Cache_Cur : constant Cursor :=
+        Translation_Cache.Find (Full_Decl.As_Ada_Node);
    begin
       --  If we still have the base_type_decl in the cache, return it
 
@@ -2377,10 +2491,10 @@ package body TGen.Types.Translation is
 
       declare
          Trans_Res : constant Translation_Result :=
-           Translate_Internal (N, Verbose);
+           Translate_Internal (Full_Decl, Verbose);
       begin
          if Trans_Res.Success then
-            Translation_Cache.Insert (N.As_Ada_Node, Trans_Res.Res);
+            Translation_Cache.Insert (Full_Decl.As_Ada_Node, Trans_Res.Res);
          end if;
          return Trans_Res;
       end;
@@ -2392,12 +2506,14 @@ package body TGen.Types.Translation is
    ------------------------
 
    function Translate_Internal
-     (N       : LAL.Base_Type_Decl;
-      Verbose : Boolean := False) return Translation_Result
+     (N                 : LAL.Base_Type_Decl;
+      Verbose           : Boolean := False;
+      Assume_Non_Static : Boolean := False) return Translation_Result
    is
       Root_Type : constant Base_Type_Decl := N.P_Root_Type;
-      Is_Static : Boolean;
+      Is_Static : Boolean := not Assume_Non_Static;
       --  Relevant only for Scalar types / array bounds
+      --  / discriminant constraints.
 
       Type_Name : constant Defining_Name :=
         (if not (Kind (N) in Ada_Anonymous_Type_Decl_Range)
@@ -2406,9 +2522,27 @@ package body TGen.Types.Translation is
 
    begin
       Verbose_Diag := Verbose;
-      Is_Static := N.P_Is_Static_Decl;
+      Is_Static := Is_Static and then N.P_Is_Static_Decl;
 
-      if N.P_Is_Int_Type then
+      if not Is_Null (Type_Name)
+        and then Text.Image (Type_Name.P_Fully_Qualified_Name)
+                 = "System.Address"
+      then
+
+         --  Special case for System.Address, which is actually defined as a
+         --  modular integer but for which we do not want to generate any
+         --  values.
+
+         return Res : Translation_Result (Success => True) do
+            Res.Res.Set (Unsupported_Typ'
+              (Name => To_Qualified_Name (Type_Name.F_Name)));
+         end return;
+      elsif N.P_Is_Formal then
+         return Res : Translation_Result (Success => True) do
+            Res.Res.Set
+              (Formal_Typ'(Name => To_Qualified_Name (Type_Name.F_Name)));
+         end return;
+      elsif N.P_Is_Int_Type then
          if Is_Static then
             return Translate_Int_Decl (N, Type_Name);
          else
@@ -2520,7 +2654,10 @@ package body TGen.Types.Translation is
          end return;
       end if;
 
-      return (Success => False, Diagnostics => +"Unknown type kind");
+      return Res : Translation_Result (Success => True) do
+         Res.Res.Set (Unsupported_Typ'
+           (Name => To_Qualified_Name (Type_Name.F_Name)));
+      end return;
 
    exception
       when Exc : Property_Error =>
@@ -2529,7 +2666,12 @@ package body TGen.Types.Translation is
             Diagnostics =>
               +"Error translating " & N.Image & " : " &
               Ada.Exceptions.Exception_Information (Exc));
-
+      when Exc : Non_Static_Error =>
+         if Verbose_Diag then
+            Put_Line ("Lal limitation during static evaluation: "
+                      & Ada.Exceptions.Exception_Message (Exc));
+         end if;
+         return Translate_Internal (N, Verbose_Diag, True);
    end Translate_Internal;
 
    procedure Print_Cache_Stats is
@@ -2539,5 +2681,10 @@ package body TGen.Types.Translation is
       Put_Line ("Cache hits  :" & Cache_Hits'Image);
       Put_Line ("Cache misses:" & Cache_Miss'Image);
    end Print_Cache_Stats;
+
+   procedure Clear_Cache is
+   begin
+      Translation_Cache.Clear;
+   end Clear_Cache;
 
 end TGen.Types.Translation;

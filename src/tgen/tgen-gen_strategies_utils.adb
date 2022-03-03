@@ -73,10 +73,11 @@ package body TGen.Gen_Strategies_Utils is
                Parent_Package                   => +Parent_Package,
                Parameters_Data                  => Params_Data,
                Return_Type_Fully_Qualified_Name =>
-                  +Spec.P_Return_Type.P_Fully_Qualified_Name,
+                  +(if Is_Null (Spec.P_Return_Type)
+                    then Spec.P_Return_Type.P_Fully_Qualified_Name
+                    else ""),
                Return_Type_Parent_Package       =>
-                  +Spec.P_Top_Level_Decl (Spec.P_Return_Type.Unit).
-                   P_Fully_Qualified_Name,
+                  +Spec.P_Top_Level_Decl (Spec.Unit).P_Fully_Qualified_Name,
                Precondition                     => Precondition);
 
          when Ada_Subp_Kind_Procedure =>
@@ -164,22 +165,25 @@ package body TGen.Gen_Strategies_Utils is
                   when others => Out_Mode);
 
             Type_Name                 : constant Unbounded_Text_Type :=
-              To_Unbounded_Text
-                (Parameters_Type.F_Name.Text);
+              To_Unbounded_Text (
+                if Is_Null (Parameters_Type)
+                then ""
+                else (Parameters_Type.F_Name.Text));
             Type_Fully_Qualified_Name : constant Unbounded_Text_Type :=
               To_Unbounded_Text
-                (Parameters_Type.P_Basic_Decl.P_Fully_Qualified_Name);
+                (if Is_Null (Parameters_Type)
+                 then ""
+                 else Parameters_Type.P_Basic_Decl.P_Fully_Qualified_Name);
             Type_Parent_Package       : constant Unbounded_Text_Type :=
               To_Unbounded_Text
-                (Parameters_Type.P_Basic_Decl.P_Top_Level_Decl
-                   (Parameters_Type.Unit).P_Defining_Name.F_Name.Text);
-            Type_Kind                 : constant Ada_Node_Kind_Type :=
-              Parameters_Type.Kind;
+                (if Is_Null (Parameters_Type)
+                 then ""
+                 else Parameters_Type.P_Basic_Decl.P_Top_Level_Decl
+                        (Parameters_Type.Unit).P_Defining_Name.F_Name.Text);
 
             Translation_Res : Translation_Result :=
               (if Param_Mode in In_Mode | In_Out_Mode
-               then Translate
-                      (Subp_Param_Spec.F_Type_Expr.P_Designated_Type_Decl)
+               then Translate (Subp_Param_Spec.F_Type_Expr)
                else (Success => True,
                      Res     => SP.Null_Ref));
             My_Typ : SP.Ref;

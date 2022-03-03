@@ -24,6 +24,7 @@
 with Ada.Characters.Handling;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO;           use Ada.Text_IO;
+with Ada.Exceptions;
 
 with GNATCOLL.Projects; use GNATCOLL.Projects;
 with GNATCOLL.VFS; use GNATCOLL.VFS;
@@ -83,8 +84,10 @@ procedure TGen_App is
      (Context : Helpers.App_Context; Jobs : Helpers.App_Job_Context_Array)
    is
    begin
-      Generate_Type_Strategies (GC);
-      Generate_Artifacts (GC);
+      --  Generate_Type_Strategies (GC);
+      --  Generate_Artifacts (GC);
+      TGen.Types.Translation.Print_Cache_Stats;
+      TGen.Types.Translation.PP_Cache;
    end App_Post_Process;
 
    procedure Process_Unit
@@ -129,7 +132,6 @@ procedure TGen_App is
                Put_Line ("Param" & Param_Number'Image & " : ");
                if Trans_Res.Success then
                   Put_Line (Trans_Res.Res.Get.Image);
-                  Put_Line ("Example Value:");
                else
                   Put_Line ("Failed: " & To_String (Trans_Res.Diagnostics));
                end if;
@@ -144,9 +146,10 @@ procedure TGen_App is
               (GC, 10, Node.As_Subp_Decl);
             return Into;
          exception
-            when Program_Error =>
+            when Exc : Program_Error =>
                Put_Line ("Could not generate testcase values for procedure "
-                         & (+Node.As_Basic_Decl.P_Fully_Qualified_Name));
+                         & (+Node.As_Basic_Decl.P_Fully_Qualified_Name)
+                         & ": " & Ada.Exceptions.Exception_Information (Exc));
                return Into;
          end;
       else
@@ -156,5 +159,4 @@ procedure TGen_App is
 
 begin
    App.Run;
-   TGen.Types.Translation.Print_Cache_Stats;
 end TGen_App;

@@ -33,6 +33,12 @@ package TGen.Types.Real_Types is
 
    type Real_Typ is new Scalar_Typ with null record;
 
+   function Low_Bound_Or_Default (Self : Real_Typ) return Long_Float is
+     (Long_Float'First);
+
+   function High_Bound_Or_Default (Self : Real_Typ) return Long_Float is
+     (Long_Float'Last);
+
    type Float_Typ (Is_Static, Has_Range : Boolean) is new
      Real_Typ (Is_Static => Is_Static) with record
       case Is_Static is
@@ -48,6 +54,12 @@ package TGen.Types.Real_Types is
             null;
       end case;
    end record;
+
+   function Low_Bound_Or_Default (Self : Float_Typ) return Long_Float
+   with Pre => Self.Is_Static;
+
+   function High_Bound_Or_Default (Self : Float_Typ) return Long_Float
+   with Pre => Self.Is_Static;
 
    function Image (Self : Float_Typ) return String;
 
@@ -77,6 +89,12 @@ package TGen.Types.Real_Types is
             null;
       end case;
    end record;
+
+   function Low_Bound_Or_Default (Self : Ordinary_Fixed_Typ) return Long_Float
+   with Pre => Self.Is_Static;
+
+   function High_Bound_Or_Default (Self : Ordinary_Fixed_Typ) return Long_Float
+   with Pre => Self.Is_Static;
 
    function Image (Self : Ordinary_Fixed_Typ) return String;
 
@@ -109,6 +127,12 @@ package TGen.Types.Real_Types is
    function Image (Self : Decimal_Fixed_Typ) return String;
 
    function Kind (Self : Decimal_Fixed_Typ) return Typ_Kind is (Decimal_Kind);
+
+   function Low_Bound_Or_Default (Self : Decimal_Fixed_Typ) return Long_Float
+   with Pre => Self.Is_Static;
+
+   function High_Bound_Or_Default (Self : Decimal_Fixed_Typ) return Long_Float
+   with Pre => Self.Is_Static;
 
    function As_Decimal_Fixed_Typ (Self : SP.Ref)
      return Decimal_Fixed_Typ'Class is

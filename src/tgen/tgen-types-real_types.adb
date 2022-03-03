@@ -59,6 +59,24 @@ package body TGen.Types.Real_Types is
                  else "")
          else " (non static)"));
 
+   function Low_Bound_Or_Default (Self : Float_Typ) return Long_Float is
+     (if Self.Has_Range then Self.Range_Value.Min else Long_Float'First);
+
+   function High_Bound_Or_Default (Self : Float_Typ) return Long_Float is
+     (if Self.Has_Range then Self.Range_Value.Max else Long_Float'Last);
+
+   function Low_Bound_Or_Default (Self : Ordinary_Fixed_Typ) return Long_Float
+   is (Self.Range_Value.Min);
+
+   function High_Bound_Or_Default (Self : Ordinary_Fixed_Typ) return Long_Float
+   is (Self.Range_Value.Max);
+
+   function Low_Bound_Or_Default (Self : Decimal_Fixed_Typ) return Long_Float
+   is (if Self.Has_Range then Self.Range_Value.Min else Long_Float'First);
+
+   function High_Bound_Or_Default (Self : Decimal_Fixed_Typ) return Long_Float
+   is (if Self.Has_Range then Self.Range_Value.Max else Long_Float'Last);
+
    function Gen return T is
       function Rand is new GNAT.Random_Numbers.Random_Float (T);
 
@@ -112,7 +130,7 @@ package body TGen.Types.Real_Types is
       Self : Float_Typ := Float_Typ (Ty);
 
       type T is new Long_Float
-      range Self.Range_Value.Min .. Self.Range_Value.Max;
+        range Self.Low_Bound_Or_Default .. Self.High_Bound_Or_Default;
 
       function Rand is new Gen (T);
    begin

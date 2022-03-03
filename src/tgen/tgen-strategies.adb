@@ -28,8 +28,9 @@ with Ada.Tags;    use Ada.Tags;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Libadalang.Common; use Libadalang.Common;
-
-with TGen.Random; use TGen.Random;
+with TGen.Random;            use TGen.Random;
+with TGen.Strings;           use TGen.Strings;
+with TGen.Types.Translation;
 
 package body TGen.Strategies is
 

@@ -98,4 +98,6 @@ package TGen.Context is
       --  Targeted types for generation
    end record;
 
+   procedure Clear_Context (Self : in out Generation_Context);
+
 end TGen.Context;

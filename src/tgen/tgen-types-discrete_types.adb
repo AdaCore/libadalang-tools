@@ -147,14 +147,15 @@ package body TGen.Types.Discrete_Types is
 
       type T is new Long_Long_Integer range
         LLI_Conversions.From_Big_Integer
-          (Big_Int.Min
+          (Big_Int.Max
              (Self.Low_Bound,
-              LLI_Conversions.To_Big_Integer (Long_Long_Integer'First)))
+              LLI_Conversions.To_Big_Integer (Long_Long_Integer'First + 1)))
           ..
             LLI_Conversions.From_Big_Integer
-              (Big_Int.Max
+              (Big_Int.Min
                  (Self.High_Bound,
-                  LLI_Conversions.To_Big_Integer (Long_Long_Integer'Last)));
+                  LLI_Conversions.To_Big_Integer
+                    (Long_Long_Integer'Last - 1)));
 
       function Rand is new Gen (T);
    begin

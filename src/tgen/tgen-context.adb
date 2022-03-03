@@ -21,32 +21,20 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with TGen.Types.Translation;
 
-package TGen.Types.Translation is
+package body TGen.Context is
 
-   type Translation_Result (Success : Boolean := False) is record
-      case Success is
-         when True =>
-            Res : SP.Ref;
-         when False =>
-            Diagnostics : Unbounded_String :=
-              To_Unbounded_String ("Error during translation");
-      end case;
-   end record;
+   procedure Clear_Context (Self : in out Generation_Context) is
+   begin
+      TGen.Types.Translation.Clear_Cache;
+      Self.Codegen_Required := False;
+      Self.Packages_Data.Clear;
+      Self.Required_Type_Strategies.Clear;
+      Self.Strategies.Clear;
+      Self.Test_Vectors.Clear;
+      Self.Type_And_Param_Strategies.Clear;
+      Self.Type_Translations.Clear;
+   end Clear_Context;
 
-   function Translate
-     (N       : LAL.Type_Expr;
-      Verbose : Boolean := False) return Translation_Result;
-
-   function Translate
-     (N : LAL.Base_Type_Decl;
-      Verbose : Boolean := False) return Translation_Result;
-
-   procedure Print_Cache_Stats;
-
-   procedure PP_Cache;
-
-   procedure Clear_Cache;
-
-end TGen.Types.Translation;
+end TGen.Context;

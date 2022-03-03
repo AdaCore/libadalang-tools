@@ -731,23 +731,50 @@ package body Test.Skeleton is
             Process_Stubs (Data.Units_To_Stub);
          end if;
 
-         if Generate_Test_Vectors then
+         if Generate_Test_Vectors and then not Data.Is_Generic then
             Subp_Cur := Data.Subp_List.First;
             while Subp_Cur /= Subp_Data_List.No_Element loop
                begin
-                  TGen.Gen_Strategies.Generate_Test_Vectors
-                    (TGen_Ctx,
-                     10,
-                     Element (Subp_Cur).Subp_Declaration.As_Subp_Decl,
-                     Ada.Strings.Unbounded.To_Unbounded_String
-                       (Element (Subp_Cur).Subp_Full_Hash.all));
+                  case Kind (Element (Subp_Cur).Subp_Declaration) is
+                     when Ada_Subp_Decl =>
+                     TGen.Gen_Strategies.Generate_Test_Vectors
+                     (TGen_Ctx,
+                        10,
+                        Element (Subp_Cur).Subp_Declaration.As_Subp_Decl,
+                        Ada.Strings.Unbounded.To_Unbounded_String
+                        (Element (Subp_Cur).Subp_Full_Hash.all));
+                  when others =>
+                     Report_Std ("Warning: (TGen) "
+                                 & Base_Name (Data.Unit_File_Name.all)
+                                 & " : Could not generate test vectors for "
+                                 & Element (Subp_Cur).Subp_Text_Name.all
+                                 & " : " & ASCII.LF
+                                 & "Unsupported subprogram declaration kind: "
+                                 & Kind_Name
+                                    (Element (Subp_Cur).Subp_Declaration));
+                  end case;
                exception
                   when Exc : Program_Error =>
-                     Report (Exc);
+                     Report_Std ("Warning: (TGen) "
+                                 & Base_Name (Data.Unit_File_Name.all)
+                                 & " : Unexpected error generating test"
+                                 & " vectors for "
+                                 & Element (Subp_Cur).Subp_Text_Name.all
+                                 & " : " & ASCII.LF
+                                 & Ada.Exceptions.Exception_Message (Exc));
+                  when Exc : others =>
+                     Report_Std ("Warning: (TGen) "
+                                 & Base_Name (Data.Unit_File_Name.all)
+                                 & " : Unexpected error generating test"
+                                 & " vectors for "
+                                 & Element (Subp_Cur).Subp_Text_Name.all
+                                 & " : " & ASCII.LF
+                                 & Ada.Exceptions.Exception_Information (Exc));
                end;
                Subp_Data_List.Next (Subp_Cur);
             end loop;
             TGen.Gen_Strategies.Generate_Artifacts (TGen_Ctx);
+            TGen_Ctx.Clear_Context;
          end if;
 
          declare
@@ -5277,7 +5304,8 @@ package body Test.Skeleton is
             New_Line_Count;
             S_Put (0, "with System.Assertions;");
             New_Line_Count;
-            if Test.Common.Generate_Test_Vectors then
+            if Test.Common.Generate_Test_Vectors and then not Data.Is_Generic
+            then
                S_Put (0, "with Ada.Exceptions;");
                New_Line_Count;
             end if;
@@ -5415,7 +5443,9 @@ package body Test.Skeleton is
                              (Subp_Data_List.Element (Subp_Cur));
                         end if;
                         if not Unparse_Success then
-                           if Test.Common.Generate_Test_Vectors then
+                           if Test.Common.Generate_Test_Vectors
+                             and then not Data.Is_Generic
+                           then
                               Report_Std
                                 ("Warning: (TGen) "
                                  & Base_Name (Data.Unit_File_Name.all)
@@ -6466,7 +6496,9 @@ package body Test.Skeleton is
                New_Line_Count;
                S_Put (0, "with System.Assertions;");
                New_Line_Count;
-               if Test.Common.Generate_Test_Vectors then
+               if Test.Common.Generate_Test_Vectors
+                 and then not Data.Is_Generic
+               then
                   S_Put (0, "with Ada.Exceptions;");
                   New_Line_Count;
                end if;
@@ -6593,12 +6625,16 @@ package body Test.Skeleton is
                               New_Line_Count;
                               Setters_Set.Clear;
                            end if;
-                           if Test.Common.Generate_Test_Vectors then
+                           if Test.Common.Generate_Test_Vectors
+                             and then not Data.Is_Generic
+                           then
                               Unparse_Success := Unparse_Test_Vectors
                                 (Current_Subp);
                            end if;
                            if not Unparse_Success then
-                              if Test.Common.Generate_Test_Vectors then
+                              if Test.Common.Generate_Test_Vectors
+                                and then not Data.Is_Generic
+                              then
                                  Report_Std
                                    ("Warning: (TGen) "
                                     & Base_Name (Data.Unit_File_Name.all)

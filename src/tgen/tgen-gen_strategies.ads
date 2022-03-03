@@ -58,6 +58,8 @@ package TGen.Gen_Strategies is
       Nb_Tests : Positive;
       Subp     : Subp_Decl;
       Subp_UID : Unbounded_String := Null_Unbounded_String);
+   --  TODO: Handle (or not) subprocedure renaming in the spec.
+   --  This is not the case currently
 
    type Generated_Body is
       record

@@ -368,8 +368,12 @@ package body TGen.Gen_Strategies is
      (Context : in out Generation_Context;
       Subp    : Subp_Decl)
    is
+      Subp_Params : constant Params := Get_Subp_Params (Subp);
    begin
-      for Subp_Param_Spec of Get_Subp_Params (Subp).F_Params loop
+      if Subp_Params = No_Params then
+         return;
+      end if;
+      for Subp_Param_Spec of Subp_Params.F_Params loop
          declare
             Parameters_Type : constant Defining_Name :=
               Subp_Param_Spec.F_Type_Expr.
@@ -377,18 +381,20 @@ package body TGen.Gen_Strategies is
 
             Type_Fully_Qualified_Name : constant Unbounded_Text_Type :=
               To_Unbounded_Text
-                (Parameters_Type.P_Basic_Decl.P_Fully_Qualified_Name);
+                (if not Is_Null (Parameters_Type)
+                 then Parameters_Type.P_Basic_Decl.P_Fully_Qualified_Name
+                 else "");
 
             Typ_Translation_Res : Translation_Result :=
-              Translate
-                (Subp_Param_Spec.F_Type_Expr.P_Designated_Type_Decl);
+              Translate (Subp_Param_Spec.F_Type_Expr);
             Typ_Translation : SP.Ref;
          begin
 
             if Typ_Translation_Res.Success then
                Typ_Translation := Typ_Translation_Res.Res;
             else
-               raise Program_Error with "Translation Error";
+               raise Program_Error with
+                 To_String (Typ_Translation_Res.Diagnostics);
             end if;
             Context.Type_Translations.Include
               (Type_Fully_Qualified_Name, Typ_Translation);
