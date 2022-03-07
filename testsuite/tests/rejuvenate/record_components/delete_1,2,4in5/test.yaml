@@ -1,0 +1,5 @@
+title: delete_1,2,4in5
+
+description: remove the 1,2,4th components in the record with 5 components in total. Also test the case that use the record as return type.
+
+driver: shell_script

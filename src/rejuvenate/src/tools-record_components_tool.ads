@@ -24,10 +24,14 @@
 --  Rejuvenate record components tool
 
 with Ada.Strings.Unbounded;
+with Libadalang.Analysis;
+with Laltools.Refactor;
 
 with GNATCOLL.Opt_Parse; use GNATCOLL.Opt_Parse;
 
 package Tools.Record_Components_Tool is
+   package LAL renames Libadalang.Analysis;
+   package ReFac renames Laltools.Refactor;
 
    Parser : Argument_Parser :=
      Create_Argument_Parser (Help => "Record Components");
@@ -41,6 +45,8 @@ package Tools.Record_Components_Tool is
       Convert     => Ada.Strings.Unbounded.To_Unbounded_String,
       Default_Val => Ada.Strings.Unbounded.Null_Unbounded_String);
 
+   function Find_Unused_Components (Unit_Array : LAL.Analysis_Unit_Array)
+     return ReFac.Text_Edit_Ordered_Maps.Map;
    procedure Run;
    --  Record_Components_Tool main procedure
 

@@ -1,0 +1,5 @@
+title: delete_record
+
+description: delete the whole record (set null), test the case reference as return of function and object declarations.
+
+driver: shell_script

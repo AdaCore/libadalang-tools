@@ -1,0 +1,5 @@
+title: delete_last_two_names
+
+description: delete last two components of the record, specially test the "others => <>" case in this case others won't be delete since Baz.B is read.
+
+driver: shell_script
