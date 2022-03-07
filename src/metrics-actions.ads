@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -73,11 +73,11 @@ private
 
    type Metrics_Values is array (Metrics_Enum) of Metric_Nat;
    Initial_Metrics_Values : constant Metrics_Values :=
-     (Complexity_Statement |
+     [Complexity_Statement |
         Complexity_Cyclomatic |
         Complexity_Essential |
         Contract_Complexity => 1,
-      others => 0);
+      others => 0];
 
    type Metrix;
    type Metrix_Ref is access all Metrix;

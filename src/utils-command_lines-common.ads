@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -49,7 +49,7 @@ package Utils.Command_Lines.Common is
       Common_Flags);
 
    package Common_Flag_Shorthands is new Common_Flag_Switches.Set_Shorthands
-     ((Version | Help => null,
+     ([Version | Help => null,
        Verbose                   => +"-v",
        Quiet                     => +"-q",
        Compile_Switch            => +"-c", -- ignored
@@ -62,7 +62,7 @@ package Utils.Command_Lines.Common is
        No_Objects_Dir            => null,
        Compute_Timing            => +"-t",
        Process_RTL_Units         => +"-a",
-       Cargs                     => +"-cargs"));
+       Cargs                     => +"-cargs"]);
 
    type Common_Booleans is (Syntax_Only);
 
@@ -72,11 +72,11 @@ package Utils.Command_Lines.Common is
 
    package Common_Boolean_Defaults is new
      Common_Boolean_Switches.Set_Defaults
-       ((Syntax_Only => False));
+       ([Syntax_Only => False]);
 
    package Common_Boolean_Shorthands is new
      Common_Boolean_Switches.Set_Shorthands
-       ((Syntax_Only => +"-so"));
+       ([Syntax_Only => +"-so"]);
 
    type Ada_Version_Type is (Ada_83, Ada_95, Ada_2005, Ada_2012);
 
@@ -88,14 +88,14 @@ package Utils.Command_Lines.Common is
    --  know the version.
 
    package Ada_Version_Shorthands is new Ada_Version_Switches.Set_Shorthands
-     ((Ada_83 => +"-gnat83",
+     ([Ada_83 => +"-gnat83",
        Ada_95 => +"-gnat95",
        Ada_2005 => +"-gnat2005",
-       Ada_2012 => +"-gnat2012"));
+       Ada_2012 => +"-gnat2012"]);
 
    package Ada_Version_Shorthands_2 is new Ada_Version_Switches.Set_Shorthands
-     ((Ada_2005 => +"-gnat05",
-       others => null));
+     ([Ada_2005 => +"-gnat05",
+       others => null]);
 
    type Source_Selection_Type is
      (Update_All, No_Subprojects, No_Source_Selection);
@@ -106,8 +106,8 @@ package Utils.Command_Lines.Common is
 
    package Source_Selection_Shorthands is new
      Source_Selection_Switches.Set_Shorthands
-       ((Update_All => +"-U",
-         others => null));
+       ([Update_All => +"-U",
+         others => null]);
 
    type Common_Strings is
      (Project_File,
@@ -138,7 +138,7 @@ package Utils.Command_Lines.Common is
       Common_Strings);
 
    package Common_String_Syntax is new Common_String_Switches.Set_Syntax
-     ((Project_File               => ':',
+     ([Project_File               => ':',
        Aggregated_Project_File    => '=',
        Run_Time_System            => '=',
        Configuration_Pragmas_File => '!',
@@ -149,10 +149,10 @@ package Utils.Command_Lines.Common is
        Output_Directory           => '=',
        Target                     => '=',
        Subdirs                    => '=',
-       Wide_Character_Encoding    => '!'));
+       Wide_Character_Encoding    => '!']);
 
    package Common_String_Defaults is new Common_String_Switches.Set_Defaults
-     ((Project_File               => null,
+     ([Project_File               => null,
        Aggregated_Project_File    => null,
        Run_Time_System            => +"", -- ????Needed?
        Configuration_Pragmas_File => null,
@@ -163,11 +163,11 @@ package Utils.Command_Lines.Common is
        Output_Directory           => null,
        Target                     => null,
        Subdirs                    => null,
-       Wide_Character_Encoding    => null));
+       Wide_Character_Encoding    => null]);
 
    package Common_String_Shorthands is new Common_String_Switches
      .Set_Shorthands
-     ((Project_File               => +"-P",
+     ([Project_File               => +"-P",
        Aggregated_Project_File    => null,
        Run_Time_System            => +"--RTS",
        Configuration_Pragmas_File => +"-gnatec",
@@ -178,12 +178,12 @@ package Utils.Command_Lines.Common is
        Output_Directory           => +"--output-dir",
        Target                     => null,
        Subdirs                    => null,
-       Wide_Character_Encoding    => +"-W"));
+       Wide_Character_Encoding    => +"-W"]);
 
    package Common_String_Shorthands_2 is new Common_String_Switches
      .Set_Shorthands
-     ((Output_Directory => +"--dir",
-       others => null));
+     ([Output_Directory => +"--dir",
+       others => null]);
 
    --  Note: Most tools allow "--debugx" with a shorthand of "-dx".
    --  Gnatmetric, however, uses "--gnatmetric-debugx" with a shorthand
@@ -197,12 +197,12 @@ package Utils.Command_Lines.Common is
 
    package Common_String_Seq_Syntax is new Common_String_Seq_Switches
      .Set_Syntax
-     ((Debug => '!', Files => '=', Ignore => '=', External_Variable => '!'));
+     ([Debug => '!', Files => '=', Ignore => '=', External_Variable => '!']);
 
    package Common_String_Seq_Shorthands is new Common_String_Seq_Switches
      .Set_Shorthands
-     ((Debug => +"-d", Files => +"-files", Ignore => null,
-       External_Variable => +"-X"));
+     ([Debug => +"-d", Files => +"-files", Ignore => null,
+       External_Variable => +"-X"]);
 
    --  ??? -j is ignored.
    type Common_Nats is (Jobs);
@@ -213,16 +213,16 @@ package Utils.Command_Lines.Common is
       Natural'Image,
       Natural'Value);
    package Common_Nat_Syntax is new Common_Nat_Switches.Set_Syntax
-     ((Jobs => '!'));
+     ([Jobs => '!']);
    package Common_Nat_Defaults is new Common_Nat_Switches.Set_Defaults
-     ((Jobs => 1));
+     ([Jobs => 1]);
    package Common_Nat_Shorthands is new Common_Nat_Switches.Set_Shorthands
-     ((Jobs => +"-j"));
+     ([Jobs => +"-j"]);
 
    use Common_Flag_Switches, Common_String_Switches;
 
    Incremental_Switches : constant Switch_Array :=
-     (To_All (Incremental),
+     [To_All (Incremental),
       To_All (Outer_Parallel),
       To_All (Outer_Dir),
       To_All (Compile_Switch),
@@ -230,7 +230,7 @@ package Utils.Command_Lines.Common is
       To_All (Avoid_Processing_Gnat_Adc),
       To_All (Mapping_File),
       To_All (Configuration_Pragmas_File),
-      To_All (Object_Path_File_Name));
+      To_All (Object_Path_File_Name)];
 
    ----------------
 

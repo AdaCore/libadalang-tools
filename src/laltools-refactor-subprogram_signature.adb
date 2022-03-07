@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -815,7 +815,7 @@ package body Laltools.Refactor.Subprogram_Signature is
 
    begin
       if Max_Length = 0 then
-         return (1 .. 0 => <>);
+         return [];
       end if;
 
       --  Start by transforming 'Sorted_Indices' in 'Indices_Ranges'.
@@ -924,7 +924,7 @@ package body Laltools.Refactor.Subprogram_Signature is
          Subp := No_Basic_Decl;
          Parameter_Indices_Range := (1, 1);
          Mode_Alternatives :=
-           (Ada_Mode_Default, Ada_Mode_Default, Ada_Mode_Default);
+           [Ada_Mode_Default, Ada_Mode_Default, Ada_Mode_Default];
       end Initialize_Out_Parameters;
 
       Parent_Defining_Name       : Defining_Name := No_Defining_Name;
@@ -1048,7 +1048,7 @@ package body Laltools.Refactor.Subprogram_Signature is
       begin
          Subp := No_Basic_Decl;
          Parameter_Index := 1;
-         Move_Directions := (False, False);
+         Move_Directions := [False, False];
       end Initialize_Out_Parameters;
 
       --  Aux_Node must have the following parent nodes in order to guarantee
@@ -1619,7 +1619,7 @@ package body Laltools.Refactor.Subprogram_Signature is
       return Text_Edit_Map
    is (Remove_Parameters
        (Subp              => Subp,
-        Parameter_Indices => (1 => Parameter_Index),
+        Parameter_Indices => [1 => Parameter_Index],
         Units             => Units));
 
    -----------------------
@@ -1715,7 +1715,7 @@ package body Laltools.Refactor.Subprogram_Signature is
       end Map_Parameter_To_Named_Argument;
 
       Map : Extended_Argument_Indicies_Type (1 .. Parameters_Count) :=
-        (others => 0);
+        [others => 0];
 
    begin
       Assert
@@ -2034,7 +2034,7 @@ package body Laltools.Refactor.Subprogram_Signature is
         (Text_Edits =>
            Remove_Parameters
              (Subp                     => Self.Subp,
-              Parameter_Indices_Ranges => (1 => Self.Parameter_Indices_Range),
+              Parameter_Indices_Ranges => [1 => Self.Parameter_Indices_Range],
               Units                    => Analysis_Units.all),
          others     => <>);
    end Refactor;

@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -93,7 +93,7 @@ package body Utils.Generic_Symbols is
    Hash_Table_Size    : constant := 2**Lg_Hash_Table_Size;
 
    Hash_Table : array (Hash_Type range 0 .. Hash_Table_Size - 1) of
-     Opt_Symbol := (others => No_Symbol);
+     Opt_Symbol := [others => No_Symbol];
    --  Each component is the head of a null-terminated linear chain of
    --  Symbol_Recs, linked through Same_Hash_Link.
    --  New Symbol_Recs are linked in at the head.

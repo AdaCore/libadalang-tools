@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -127,7 +127,7 @@ package Utils.Predefined_Symbols is
 
    Name_Empty : constant Symbol := Intern ("");
    Name_NL    : constant Symbol :=
-     W_Intern ((1 => Utils.String_Utilities.NL));
+     W_Intern ([1 => Utils.String_Utilities.NL]);
    Name_CRLF    : constant Symbol := Intern (ASCII.CR & ASCII.LF);
 
    Name_Semicolon : constant Symbol := Intern (";");

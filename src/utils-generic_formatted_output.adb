@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2012-2021, AdaCore                    --
+--                      Copyright (C) 2012-2022, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -106,10 +106,10 @@ package body Utils.Generic_Formatted_Output is
 
    procedure Put
      (T                      : Template;
-      X1, X2, X3, X4, X5, X6 : Str_Type := (1 .. 0 => <>))
+      X1, X2, X3, X4, X5, X6 : Str_Type := [])
    is
       J    : Positive                  := T'First;
-      Used : array (1 .. 6) of Boolean := (others => False);
+      Used : array (1 .. 6) of Boolean := [others => False];
 
    begin
       if not Output_Enabled then

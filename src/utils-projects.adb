@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -68,9 +68,9 @@ package body Utils.Projects is
      (if
         Arg (Cmd) = Update_All
       then
-        (if Num_File_Names (Cmd) = 0 then (1 .. 0 => null)
+        (if Num_File_Names (Cmd) = 0 then []
          else File_Names (Cmd))
-      else (1 .. 0 => null));
+      else []);
    --  If "-U main_unit_1 main_unit_2 ..." was specified, this returns the list
    --  of main units. Otherwise (-U was not specified, or was specified without
    --  main unit names), returns empty array.

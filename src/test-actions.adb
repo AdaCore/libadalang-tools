@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2019-2021, AdaCore                    --
+--                      Copyright (C) 2019-2022, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -1214,7 +1214,7 @@ package body Test.Actions is
         GNATCOLL.VFS.Create (+Test_Dir_Name.all);
       Future_Dirs : File_Array_Access := new File_Array'(Empty_File_Array);
       Harness_Dir_Ar : constant File_Array (1 .. 1) :=
-        (1 => Create (+(Harness_Dir_Str.all)));
+        [1 => Create (+(Harness_Dir_Str.all))];
 
       Obj_Dir : String_Access;
 
@@ -1272,7 +1272,7 @@ package body Test.Actions is
       --  with source dirs before any new directories are created.
 
       Harness_Dir_Ar : constant File_Array (1 .. 1) :=
-        (1 => Create (+(Harness_Dir_Str.all)));
+        [1 => Create (+(Harness_Dir_Str.all))];
 
       All_Source_Locations : constant File_Array :=
         Source_Project_Tree.Root_Project.Source_Dirs (Recursive => True);
@@ -1315,7 +1315,7 @@ package body Test.Actions is
       --  with source dirs before any new directories are created.
 
       Harness_Dir_Ar : constant File_Array (1 .. 1) :=
-        (1 => Create (+(Harness_Dir_Str.all)));
+        [1 => Create (+(Harness_Dir_Str.all))];
 
       All_Source_Locations : constant File_Array :=
         Source_Project_Tree.Root_Project.Source_Dirs (Recursive => True);

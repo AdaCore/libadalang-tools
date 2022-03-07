@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2013-2021, AdaCore                    --
+--                      Copyright (C) 2013-2022, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -251,7 +251,7 @@ private
       EA : aliased Elements_Array (Index_Type'First .. Last);
    end record;
 
-   Empty_Elements : aliased Elements_Type := (Last => 0, EA => (others => <>));
+   Empty_Elements : aliased Elements_Type := (Last => 0, EA => [others => <>]);
 
    type Elements_Access is access all Elements_Type;
 

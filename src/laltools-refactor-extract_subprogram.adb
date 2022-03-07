@@ -783,9 +783,9 @@ package body Laltools.Refactor.Extract_Subprogram is
         1 + Positive (End_Line) - Positive (Start_Line);
 
       Start_Index_To_Extract : array (Start_Line .. End_Line) of Natural :=
-        (others => 0);
+        [others => 0];
       End_Index_To_Extract : array (Start_Line .. End_Line) of Natural :=
-        (others => 0);
+        [others => 0];
 
       Minimum_Indentation : Natural := Natural'Last;
 
@@ -1925,7 +1925,7 @@ package body Laltools.Refactor.Extract_Subprogram is
 
    begin
       if Start_Node.Is_Null or else End_Node.Is_Null then
-         Available_Subprogram_Kinds := (others => False);
+         Available_Subprogram_Kinds := [others => False];
          return False;
       end if;
 
@@ -1934,7 +1934,7 @@ package body Laltools.Refactor.Extract_Subprogram is
            (Start_Node, Is_Stmt'Access, Is_Stmt_Callback'Access);
 
          if Aux.Is_Null then
-            Available_Subprogram_Kinds := (others => False);
+            Available_Subprogram_Kinds := [others => False];
             return False;
          end if;
 
@@ -1957,7 +1957,7 @@ package body Laltools.Refactor.Extract_Subprogram is
            (End_Node, Is_Stmt'Access, Is_Stmt_Callback'Access);
 
          if Aux.Is_Null then
-            Available_Subprogram_Kinds := (others => False);
+            Available_Subprogram_Kinds := [others => False];
             return False;
          end if;
 
@@ -1974,24 +1974,24 @@ package body Laltools.Refactor.Extract_Subprogram is
       end if;
 
       if Start_Stmt.Parent /= End_Stmt.Parent then
-         Available_Subprogram_Kinds := (others => False);
+         Available_Subprogram_Kinds := [others => False];
          return False;
       end if;
 
       if End_Stmt.Kind in Ada_Return_Stmt_Range then
          Available_Subprogram_Kinds :=
-           (Ada_Subp_Kind_Function  => True,
-            Ada_Subp_Kind_Procedure => False);
+           [Ada_Subp_Kind_Function  => True,
+            Ada_Subp_Kind_Procedure => False];
 
       elsif End_Stmt.Kind in Ada_Assign_Stmt_Range then
          Available_Subprogram_Kinds :=
-           (Ada_Subp_Kind_Function  => True,
-            Ada_Subp_Kind_Procedure => True);
+           [Ada_Subp_Kind_Function  => True,
+            Ada_Subp_Kind_Procedure => True];
 
       else
          Available_Subprogram_Kinds :=
-           (Ada_Subp_Kind_Function  => False,
-            Ada_Subp_Kind_Procedure => True);
+           [Ada_Subp_Kind_Function  => False,
+            Ada_Subp_Kind_Procedure => True];
       end if;
 
       return True;

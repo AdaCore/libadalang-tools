@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2013-2021, AdaCore                    --
+--                      Copyright (C) 2013-2022, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -231,7 +231,7 @@ package body Pp.Buffers is
         ("\1 --> \2 '\3'  \4\n",
          Image (Rec.Position),
          Image (Pos),
-         To_UTF8 ((1 => Rec.Name)),
+         To_UTF8 ([1 => Rec.Name]),
          Image (Modular (Mark)));
 
       Put ("<<");
@@ -244,7 +244,7 @@ package body Pp.Buffers is
             if Char_At (Buf, P) = NL then
                Put_Char ('$');
             else
-               Put ("\1", To_UTF8 ((1 => Char_At (Buf, P))));
+               Put ("\1", To_UTF8 ([1 => Char_At (Buf, P)]));
             end if;
          end if;
          if P = Pos then

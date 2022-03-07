@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -58,7 +58,7 @@ package body METRICS.Actions is
    --    3 partially implemented
    --    1 not implemented
 
-     (Contract            => True,
+     [Contract            => True,
       Post                => True,
       Contract_Complete   => False, ---------------- (needs semantic info)
       --  We need to know what each name in pre/etc denotes
@@ -119,7 +119,7 @@ package body METRICS.Actions is
       Control_Coupling_Out   => True,
       Control_Coupling_In    => True,
       Unit_Coupling_Out      => True,
-      Unit_Coupling_In       => True);
+      Unit_Coupling_In       => True];
 
    function Image (X : Integer) return String
      renames Utils.String_Utilities.Image;
@@ -1096,7 +1096,7 @@ package body METRICS.Actions is
       end case;
    end Should_Print;
 
-   Metric_Found : Metrics_Set := (others => False);
+   Metric_Found : Metrics_Set := [others => False];
    --  Metric_Found(M) is True if we computed some non-default value for M.
 
    function Val_To_Print
@@ -1885,23 +1885,23 @@ package body METRICS.Actions is
             --  "all" switches:
 
             if Arg (Cmd, Contract_All) then
-               Result (Contract_Metrics) := (others => True);
+               Result (Contract_Metrics) := [others => True];
             end if;
 
             if Arg (Cmd, Complexity_All) then
-               Result (Complexity_Metrics) := (others => True);
+               Result (Complexity_Metrics) := [others => True];
             end if;
 
             if Arg (Cmd, Lines_All) then
-               Result (Lines_Metrics) := (others => True);
+               Result (Lines_Metrics) := [others => True];
             end if;
 
             if Arg (Cmd, Syntax_All) then
-               Result (Syntax_Metrics) := (others => True);
+               Result (Syntax_Metrics) := [others => True];
             end if;
 
             if Arg (Cmd, Coupling_All) then
-               Result (Coupling_Metrics) := (others => True);
+               Result (Coupling_Metrics) := [others => True];
             end if;
 
             --  Special cases
@@ -1932,7 +1932,7 @@ package body METRICS.Actions is
             --  Line).
 
             if Result = Empty_Metrics_Set or else Arg (Cmd, Metrics_All) then
-               Result := (Computed_Metrics => False, others => True);
+               Result := [Computed_Metrics => False, others => True];
                Result (Lines_Code_In_Bodies) :=
                  Arg (Cmd, Lines_Code_In_Bodies);
                Result (Num_Bodies) := Arg (Cmd, Num_Bodies);
@@ -2169,7 +2169,7 @@ package body METRICS.Actions is
                   Longest_Metric_Name : constant String :=
                     XML_Metric_Name_String (Hierarchy_Coupling_Out);
                   Spaces : constant String :=
-                    (Metric_Name'Length .. Longest_Metric_Name'Length => ' ');
+                    [Metric_Name'Length .. Longest_Metric_Name'Length => ' '];
                begin
                   Put ("\1\2: \3 --> \4\n", Metric_Name, Spaces,
                        Str (From.XML_Name).S, Str (To.XML_Name).S);
@@ -2580,7 +2580,7 @@ package body METRICS.Actions is
          then
             declare
                All_But_Complexity_Average : constant Metrics_Set :=
-                 (Complexity_Average => False, others => True);
+                 [Complexity_Average => False, others => True];
             begin
                --  If Complexity_Average is the only one we're printing,
                --  then suppress two NLs, so we don't get NLs at the beginning
@@ -4488,7 +4488,7 @@ package body METRICS.Actions is
    end Validate;
 
    procedure Validate_Coupling (Units_For_Coupling : Metrix_Vectors.Vector) is
-      Totals : array (Coupling_Metrics) of Metric_Nat := (others => 0);
+      Totals : array (Coupling_Metrics) of Metric_Nat := [others => 0];
    begin
       for File_M of Units_For_Coupling loop
          Validate (File_M.all);

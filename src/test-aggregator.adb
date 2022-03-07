@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2014-2021, AdaCore                    --
+--                      Copyright (C) 2014-2022, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -762,7 +762,7 @@ package body Test.Aggregator is
          if Not_A_Comment (Tmp.all) and then Tmp.all /= "" then
             if Aggregate_Subdir_Name.all /= "" then
                Idx :=
-                 Index (Tmp.all, (1 => Directory_Separator), Backward);
+                 Index (Tmp.all, [1 => Directory_Separator], Backward);
                if Idx /= 0 then
                   TD_Table.Include
                     (Tmp (Tmp.all'First .. Idx)

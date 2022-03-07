@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2012-2021, AdaCore                    --
+--                      Copyright (C) 2012-2022, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -37,7 +37,7 @@ package Utils.Generic_Formatted_Output is
    type Template is new String;
    procedure Put
      (T                      : Template;
-      X1, X2, X3, X4, X5, X6 : Str_Type := (1 .. 0 => <>));
+      X1, X2, X3, X4, X5, X6 : Str_Type := []);
    --  Prints the template as is, except for the following escape characters:
    --    "\n" is end of line.
    --    "\r" is ASCII.CR (carriage return).

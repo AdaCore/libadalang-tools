@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -33,7 +33,7 @@ package Utils.Test_Pkg is
 
    use Common_String_Seq_Switches;
 
-   package Disable is new Disable_Switches (Descriptor, (1 => To_All (Debug)));
+   package Disable is new Disable_Switches (Descriptor, [To_All (Debug)]);
 
    type Some_Flags is (Do_This, Do_That, Do_The_Other_Thing);
    package Some_Flags_Switches is new Flag_Switches (Descriptor, Some_Flags);
@@ -43,7 +43,7 @@ package Utils.Test_Pkg is
      (Descriptor,
       Some_Booleans);
    package Some_Boolean_Defaults is new Some_Boolean_Switches.Set_Defaults
-     ((Syntax_Check => False, Code_Gen => True));
+     ([Syntax_Check => False, Code_Gen => True]);
 
    type My_Enum is (Th, This, That, The_Other_Thing);
    package My_Enum_Switches is new Enum_Switches (Descriptor, My_Enum);
@@ -54,10 +54,10 @@ package Utils.Test_Pkg is
       Test_Debug_Switch);
 
    package Test_Debug_Options is new My_Test_Debug_Switches.Set_Syntax
-     ((Test_Debug => '!'));
+     ([Test_Debug => '!']);
 
    package Test_Debug_Shorthands is new My_Test_Debug_Switches.Set_Shorthands
-     ((Test_Debug => +"-debug"));
+     ([Test_Debug => +"-debug"]);
 
    package Freeze is new Freeze_Descriptor (Descriptor);
 

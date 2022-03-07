@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -1184,10 +1184,10 @@ package body Utils.Command_Lines is
       R_Last : constant Natural := R'Last;
 
       L_Dir_Separator : Natural :=
-        Index (L, (1 => Directory_Separator), Backward);
+        Index (L, [1 => Directory_Separator], Backward);
 
       R_Dir_Separator : Natural :=
-        Index (R, (1 => Directory_Separator), Backward);
+        Index (R, [1 => Directory_Separator], Backward);
 
    begin
       if L_Dir_Separator = 0 and then R_Dir_Separator = 0 then

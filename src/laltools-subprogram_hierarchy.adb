@@ -50,7 +50,7 @@ package body Laltools.Subprogram_Hierarchy is
 
    begin
       if Subp.Is_Null then
-         return (1 .. 0 => <>);
+         return [];
       end if;
 
       if Subp.Kind in Ada_Subp_Renaming_Decl_Range then
@@ -61,7 +61,7 @@ package body Laltools.Subprogram_Hierarchy is
       end if;
 
       if Unwinded_Subp.Is_Null then
-         return (1 .. 0 => <>);
+         return [];
       end if;
 
       declare
@@ -75,7 +75,7 @@ package body Laltools.Subprogram_Hierarchy is
          --  that's a primitive of a tagged type.
 
          if Lal_Result'Length = 0 then
-            return (1 .. 0 => <>);
+            return [];
          end if;
 
          --  The result returned by Libadalang includes Subp; we want to remove
@@ -182,7 +182,7 @@ package body Laltools.Subprogram_Hierarchy is
 
    begin
       if Subp.Is_Null then
-         return (1 .. 0 => <>);
+         return [];
       end if;
 
       if Subp.Kind in Ada_Subp_Renaming_Decl_Range then
@@ -193,13 +193,13 @@ package body Laltools.Subprogram_Hierarchy is
       end if;
 
       if Unwinded_Subp.Is_Null then
-         return (1 .. 0 => <>);
+         return [];
       end if;
 
       Create_Hierarchy (Unwinded_Subp);
 
       if Hierarchy.Length = 0 then
-         return (1 .. 0 => <>);
+         return [];
 
       else
          return Hierarchy_As_Array : Subp_Renaming_Decl_Array
@@ -387,7 +387,7 @@ package body Laltools.Subprogram_Hierarchy is
 
    begin
       if Subp.Is_Null then
-         return (1 .. 0 => <>);
+         return [];
       end if;
 
       if not Include_Base_Subps and not Include_Overrides then

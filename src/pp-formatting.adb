@@ -138,13 +138,13 @@ package body Pp.Formatting is
    function T_Img (Tree : Ada_Node) return String is (Tree.Image);
 
    Op_Sym_Table : constant array (Positive range <>) of Symbol :=
-     (Name_Q_And,
+     [Name_Q_And,
       Name_Q_Or,
       Name_Q_Xor,
       Name_Q_Mod,
       Name_Q_Rem,
       Name_Q_Abs,
-      Name_Q_Not);
+      Name_Q_Not];
 
    function Is_Op_Sym_With_Letters (N : Symbol) return Boolean is
      (for some Op of Op_Sym_Table => Case_Insensitive_Equal (N, Op));
@@ -190,7 +190,7 @@ package body Pp.Formatting is
       end if;
 
       return Replace_String
-        (Str (Src_S).S, From => (1 => ASCII.CR), To => "")
+        (Str (Src_S).S, From => [1 => ASCII.CR], To => "")
        = Str (Out_S).S;
    end Equal_Ignoring_CR;
 
@@ -821,7 +821,7 @@ package body Pp.Formatting is
       begin
          if Kind (Out_Tok) = Pp_Off_Comment then
             Insert (New_Buf,
-                    (Sloc_Col (Out_Tok) .. Sloc_Col (Src_Tok) - 1 => ' '));
+                    [Sloc_Col (Out_Tok) .. Sloc_Col (Src_Tok) - 1 => ' ']);
          end if;
       end Indent_Pp_Off;
 

@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -334,10 +334,10 @@ package body Stub.Actions is
    Based_Grouping_Arg : aliased String := "--based-grouping=4";
 
    Args : aliased GNAT.OS_Lib.Argument_List :=
-     (Syntax_Only_Arg'Access,
+     [Syntax_Only_Arg'Access,
       Comments_Fill_Arg'Access,
       Decimal_Grouping_Arg'Access,
-      Based_Grouping_Arg'Access);
+      Based_Grouping_Arg'Access];
 
    function Get_Pp_Cmd return Command_Line is
    begin
@@ -661,7 +661,7 @@ package body Stub.Actions is
                With_Spaces : constant W_Str :=
                  Intersperse_Spaces (UC_Root_Node_Name);
                Len : constant Natural := Arg (Cmd, Max_Line_Length);
-               Dashes : constant W_Str := (1 .. Len => '-');
+               Dashes : constant W_Str := [1 .. Len => '-'];
                Spaces : constant W_Str := "--" & (1 .. Len - 4 => ' ') & "--";
             begin
                Put ("\1\n", Dashes);
@@ -716,7 +716,7 @@ package body Stub.Actions is
          if not Arg (Cmd, No_Local_Header) and then Level > 0 then
             declare
                Header_Length : constant Natural := Name'Length + 6;
-               Header_Line : constant W_Str := (1 .. Header_Length => '-');
+               Header_Line : constant W_Str := [1 .. Header_Length => '-'];
             begin
                Put (" \1\n", Header_Line);
                Put (" -- \1 --\n", Name);
@@ -1407,7 +1407,7 @@ package body Stub.Actions is
          end Find_Insertion_Index;
 
          procedure Indent_Stub (Amount : Natural) is
-            Ind : constant String := (1 .. Amount => ' ');
+            Ind : constant String := [1 .. Amount => ' '];
             Temp : Char_Vector;
          begin
             Append (Temp, Ind);

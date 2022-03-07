@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -59,10 +59,10 @@ package Laltools.Refactor.Subprogram_Signature is
      of Mode_Alternatives_Type;
 
    Mode_Alternatives_Map : constant Mode_Alternatives_Map_Type :=
-     (Ada_Mode_Default => (Ada_Mode_In,      Ada_Mode_Out, Ada_Mode_In_Out),
-      Ada_Mode_In      => (Ada_Mode_Default, Ada_Mode_Out, Ada_Mode_In_Out),
-      Ada_Mode_Out     => (Ada_Mode_Default, Ada_Mode_In,  Ada_Mode_In_Out),
-      Ada_Mode_In_Out  => (Ada_Mode_Default, Ada_Mode_In,  Ada_Mode_Out));
+     [Ada_Mode_Default => [Ada_Mode_In,      Ada_Mode_Out, Ada_Mode_In_Out],
+      Ada_Mode_In      => [Ada_Mode_Default, Ada_Mode_Out, Ada_Mode_In_Out],
+      Ada_Mode_Out     => [Ada_Mode_Default, Ada_Mode_In,  Ada_Mode_In_Out],
+      Ada_Mode_In_Out  => [Ada_Mode_Default, Ada_Mode_In,  Ada_Mode_Out]];
 
    function Is_Change_Mode_Available
      (Node                    : Ada_Node'Class;
@@ -85,11 +85,11 @@ package Laltools.Refactor.Subprogram_Signature is
      array (Move_Direction_Type) of Boolean;
 
    Only_Backward   : constant Move_Direction_Availability_Type :=
-     (True, False);
+     [True, False];
    Only_Forward    : constant Move_Direction_Availability_Type :=
-     (False, True);
+     [False, True];
    Both_Directions : constant Move_Direction_Availability_Type :=
-     (True, True);
+     [True, True];
 
    function Is_Move_Parameter_Available
      (Node            : Ada_Node'Class;
@@ -204,7 +204,7 @@ package Laltools.Refactor.Subprogram_Signature is
      array (Signature_Changer_Option_Type) of Boolean;
 
    Default_Configuration : Signature_Changer_Configuration_Type :=
-     (Include_Parents .. Include_Children  => True);
+     [Include_Parents .. Include_Children  => True];
 
    type Signature_Changer is limited interface and Refactoring_Tool;
 

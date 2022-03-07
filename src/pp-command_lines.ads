@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -33,7 +33,7 @@ package Pp.Command_Lines is
    use Common_Flag_Switches;
 
    package Pp_Disable is new Disable_Switches
-     (Descriptor, (1 => To_All (Rep_Clauses)));
+     (Descriptor, [1 => To_All (Rep_Clauses)]);
 
    type Pp_Flags is
      (Obsolete_A0,
@@ -68,7 +68,7 @@ package Pp.Command_Lines is
       Pp_Flags);
 
    package Pp_Flag_Shorthands is new Pp_Flag_Switches.Set_Shorthands
-     ((Obsolete_A0 => +"-A0",
+     ([Obsolete_A0 => +"-A0",
        Obsolete_A1 => +"-A1",
        Obsolete_A2 => +"-A2",
        Obsolete_A3 => +"-A3",
@@ -93,11 +93,11 @@ package Pp.Command_Lines is
        Separate_Label => null, -- Not documented
        Separate_Stmt_Name => null, -- Not documented
        Test => null, -- Not documented
-       Warnings => +"-w")); -- Not documented
+       Warnings => +"-w"]); -- Not documented
 
    package Pp_Flag_Shorthands_N is new Pp_Flag_Switches.Set_Shorthands
-     ((No_Tab => +"-N", -- Not documented
-       others => null));
+     ([No_Tab => +"-N", -- Not documented
+       others => null]);
 
    type Attribute_Casing is
      (Attribute_Mixed_Case,
@@ -110,9 +110,9 @@ package Pp.Command_Lines is
 
    package Attribute_Casing_Shorthands is
       new Attribute_Casing_Switches.Set_Shorthands
-     ((Attribute_Lower_Case => +"-aL",
+     ([Attribute_Lower_Case => +"-aL",
        Attribute_Upper_Case => +"-aU",
-       Attribute_Mixed_Case => +"-aM"));
+       Attribute_Mixed_Case => +"-aM"]);
 
    type Keyword_Casing is
      (Keyword_Lower_Case,
@@ -124,8 +124,8 @@ package Pp.Command_Lines is
 
    package Keyword_Casing_Shorthands is
       new Keyword_Casing_Switches.Set_Shorthands
-     ((Keyword_Lower_Case => +"-kL",
-       Keyword_Upper_Case => +"-kU"));
+     ([Keyword_Lower_Case => +"-kL",
+       Keyword_Upper_Case => +"-kU"]);
 
    type Name_Casing is
      (Name_Case_As_Declared,
@@ -139,10 +139,10 @@ package Pp.Command_Lines is
 
    package Name_Casing_Shorthands is
       new Name_Casing_Switches.Set_Shorthands
-     ((Name_Case_As_Declared => +"-nD",
+     ([Name_Case_As_Declared => +"-nD",
        Name_Lower_Case => +"-nL",
        Name_Upper_Case => +"-nU",
-       Name_Mixed_Case => +"-nM"));
+       Name_Mixed_Case => +"-nM"]);
 
    type Enum_Casing is
      (Enum_Case_As_Declared,
@@ -156,10 +156,10 @@ package Pp.Command_Lines is
 
    package Enum_Casing_Shorthands is
       new Enum_Casing_Switches.Set_Shorthands
-     ((Enum_Case_As_Declared => +"-neD",
+     ([Enum_Case_As_Declared => +"-neD",
        Enum_Lower_Case => +"-neL",
        Enum_Upper_Case => +"-neU",
-       Enum_Mixed_Case => +"-neM"));
+       Enum_Mixed_Case => +"-neM"]);
 
    type Type_Casing is
      (Type_Case_As_Declared,
@@ -173,10 +173,10 @@ package Pp.Command_Lines is
 
    package Type_Casing_Shorthands is
       new Type_Casing_Switches.Set_Shorthands
-     ((Type_Case_As_Declared => +"-ntD",
+     ([Type_Case_As_Declared => +"-ntD",
        Type_Lower_Case => +"-ntL",
        Type_Upper_Case => +"-ntU",
-       Type_Mixed_Case => +"-ntM"));
+       Type_Mixed_Case => +"-ntM"]);
 
    type Number_Casing is
      (Number_Case_As_Constant,
@@ -191,11 +191,11 @@ package Pp.Command_Lines is
 
    package Number_Casing_Shorthands is
       new Number_Casing_Switches.Set_Shorthands
-     ((Number_Case_As_Constant => +"-nnC",
+     ([Number_Case_As_Constant => +"-nnC",
        Number_Case_As_Declared => +"-nnD",
        Number_Lower_Case => +"-nnL",
        Number_Upper_Case => +"-nnU",
-       Number_Mixed_Case => +"-nnM"));
+       Number_Mixed_Case => +"-nnM"]);
 
    type Pragma_Casing is
      (Pragma_Mixed_Case,
@@ -208,9 +208,9 @@ package Pp.Command_Lines is
 
    package Pragma_Casing_Shorthands is
       new Pragma_Casing_Switches.Set_Shorthands
-     ((Pragma_Lower_Case => +"-pL",
+     ([Pragma_Lower_Case => +"-pL",
        Pragma_Upper_Case => +"-pU",
-       Pragma_Mixed_Case => +"-pM"));
+       Pragma_Mixed_Case => +"-pM"]);
 
    type Constant_Casing is
      (Constant_Case_As_Non_Constant,
@@ -225,11 +225,11 @@ package Pp.Command_Lines is
 
    package Constant_Casing_Shorthands is
       new Constant_Casing_Switches.Set_Shorthands
-       ((Constant_Case_As_Non_Constant => +"-cN",
+       ([Constant_Case_As_Non_Constant => +"-cN",
          Constant_Case_As_Declared => +"-cD",
          Constant_Lower_Case => +"-cL",
          Constant_Upper_Case => +"-cU",
-         Constant_Mixed_Case => +"-cM"));
+         Constant_Mixed_Case => +"-cM"]);
 
    type Pp_Booleans is
      (Alignment,
@@ -269,7 +269,7 @@ package Pp.Command_Lines is
       Pp_Booleans);
 
    package Pp_Boolean_Shorthands is new Pp_Boolean_Switches.Set_Shorthands
-     ((Alignment => null,
+     ([Alignment => null,
        Align_Modes => null,
        Comments_Unchanged => +"-c0",
        Comments_Gnat_Indentation => +"-c1",
@@ -295,11 +295,11 @@ package Pp.Command_Lines is
        Vertical_Enum_Types => null,
        Vertical_Array_Types => null,
        Vertical_Named_Aggregates => null,
-       Vertical_Case_Alternatives => null));
+       Vertical_Case_Alternatives => null]);
 
    package Pp_Boolean_Defaults is new
      Pp_Boolean_Switches.Set_Defaults
-       ((Alignment => True,
+       ([Alignment => True,
          Align_Modes => True,
          Comments_Unchanged => False,
          Comments_Gnat_Indentation => False,
@@ -325,7 +325,7 @@ package Pp.Command_Lines is
          Vertical_Enum_Types => False,
          Vertical_Array_Types => False,
          Vertical_Named_Aggregates => False,
-         Vertical_Case_Alternatives => False));
+         Vertical_Case_Alternatives => False]);
 
    type Pp_Strings is
      (File_Name_File, -- Not documented
@@ -341,23 +341,23 @@ package Pp.Command_Lines is
       Pp_Strings);
 
    package Pp_String_Syntax is new Pp_String_Switches.Set_Syntax
-     ((File_Name_File => '=',
+     ([File_Name_File => '=',
        Output => '=',
        Output_Force => '=',
        End_Of_Line => '=',
        Pp_Off => '=',
        Pp_On => '=',
-       Templates => '='));
+       Templates => '=']);
 
    package Pp_String_Shorthands is new Pp_String_Switches
      .Set_Shorthands
-     ((File_Name_File => null,
+     ([File_Name_File => null,
        Output => +"-o",
        Output_Force => +"-of",
        End_Of_Line => +"--eol",
        Pp_Off => null,
        Pp_On => null,
-       Templates => null));
+       Templates => null]);
 
    type Pp_String_Seqs is (Dictionary);
 
@@ -367,11 +367,11 @@ package Pp.Command_Lines is
 
    package Pp_String_Seq_Syntax is new Pp_String_Seq_Switches
      .Set_Syntax
-     ((Dictionary => ':'));
+     ([Dictionary => ':']);
 
    package Pp_String_Seq_Shorthands is new Pp_String_Seq_Switches
      .Set_Shorthands
-     ((Dictionary => +"-D"));
+     ([Dictionary => +"-D"]);
 
    type Pp_Nats is
      (Max_Line_Length,
@@ -392,7 +392,7 @@ package Pp.Command_Lines is
       Natural'Value);
 
    package Pp_Nat_Syntax is new Pp_Nat_Switches.Set_Syntax
-     ((Max_Line_Length => '!',
+     ([Max_Line_Length => '!',
        Indentation => '!',
        Indent_Continuation => '!',
        Initial_Indentation => '=',
@@ -400,10 +400,10 @@ package Pp.Command_Lines is
        Based_Grouping => '=',
        Call_Threshold => '=',
        Par_Threshold => '=',
-       Case_Threshold => '!')); -- Not documented
+       Case_Threshold => '!']); -- Not documented
 
    package Pp_Nat_Defaults is new Pp_Nat_Switches.Set_Defaults
-     ((Max_Line_Length => 79,
+     ([Max_Line_Length => 79,
        Indentation => 3,
        Indent_Continuation => 0,
    --  Default for Indent_Continuation is one less than Indentation, or 1.
@@ -412,10 +412,10 @@ package Pp.Command_Lines is
        Based_Grouping => 4,
        Call_Threshold => Natural'Last,
        Par_Threshold => Natural'Last,
-       Case_Threshold => 10)); -- Not documented
+       Case_Threshold => 10]); -- Not documented
 
    package Pp_Nat_Shorthands is new Pp_Nat_Switches.Set_Shorthands
-     ((Max_Line_Length => +"-M",
+     ([Max_Line_Length => +"-M",
        Indentation => +"-i",
        Indent_Continuation => +"-cl",
        Initial_Indentation => null,
@@ -423,7 +423,7 @@ package Pp.Command_Lines is
        Based_Grouping => null,
        Call_Threshold => null,
        Par_Threshold => null,
-       Case_Threshold => +"-T")); -- Not documented
+       Case_Threshold => +"-T"]); -- Not documented
 
    package Freeze is new Freeze_Descriptor (Descriptor);
 

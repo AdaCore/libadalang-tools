@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -29,7 +29,7 @@ package METRICS.Command_Lines is
 
    package Metrics_Disable is new Disable_Switches
      (Common_Descriptor,
-      (To_All (Rep_Clauses), To_All (Debug)) & Incremental_Switches);
+      [To_All (Rep_Clauses), To_All (Debug)] & Incremental_Switches);
 
    --  Note: Most tools allow "--debugx" with a shorthand of "-dx".
    --  Gnatmetric, however, uses "--gnatmetric-debugx" with a shorthand
@@ -38,7 +38,7 @@ package METRICS.Command_Lines is
 
    package Metrics_Common_String_Shorthands is new Common_String_Switches
      .Set_Shorthands
-     ((Output_Directory => +"-d", others => null));
+     ([Output_Directory => +"-d", others => null]);
    --  Note: gnatmetric allows -d to specify the directory. This must come
    --  before the Copy_Descriptor below. This shorthand is in addition to
    --  --output-dir, as defined in Utils.Command_Lines.Common.
@@ -67,7 +67,7 @@ package METRICS.Command_Lines is
       Metrics_Flags);
 
    package Metrics_Flag_Shorthands is new Metrics_Flag_Switches.Set_Shorthands
-     ((Test => null,
+     ([Test => null,
 
        No_Treat_Exit_As_Goto => +"-ne",
        No_Local_Metrics      => +"-nolocal",
@@ -78,7 +78,7 @@ package METRICS.Command_Lines is
        Generate_XML_Schema       => +"-xs",
        No_Text_Output            => +"-nt",
        Short_File_Names          => +"-sfn",
-       Progress_Indicator_Mode   => +"-dd"));
+       Progress_Indicator_Mode   => +"-dd"]);
 
    --  Metrics_Booleans serves both as switch names, and as index into
    --  arrays of metric values. The ones marked "undocumented" below
@@ -195,15 +195,15 @@ package METRICS.Command_Lines is
      Metrics_Enum range Tagged_Coupling_Out .. Unit_Coupling_In;
 
    type Metrics_Set is array (Metrics_Enum) of Boolean with Pack;
-   function Empty_Metrics_Set return Metrics_Set is (others => False);
-   function All_Metrics_Set return Metrics_Set is (others => True);
+   function Empty_Metrics_Set return Metrics_Set is ([others => False]);
+   function All_Metrics_Set return Metrics_Set is ([others => True]);
 
    Complexity_Only : constant Metrics_Set :=
-     (Complexity_Metrics => True, others => False);
+     [Complexity_Metrics => True, others => False];
    --  Set of complexity metrics
 
    Coupling_Only : constant Metrics_Set :=
-     (Coupling_Metrics => True, others => False);
+     [Coupling_Metrics => True, others => False];
    --  Set of coupling metrics
 
    package Metrics_Boolean_Switches is new Boolean_Switches
@@ -222,7 +222,7 @@ package METRICS.Command_Lines is
    --  The old version also had -nocc (turns off Complexity_Cyclomatic), -noec
    --  (turns off Complexity_Essential), and -nonl (turns off Loop_Nesting).
    --  We no longer support those.
-     ((Lines              => +"-la",
+     ([Lines              => +"-la",
        Lines_Code         => +"-lcode",
        Lines_Comment      => +"-lcomm",
        Lines_Eol_Comment  => +"-leol",
@@ -246,11 +246,11 @@ package METRICS.Command_Lines is
        Hierarchy_Coupling_Out => +"--category-efferent-coupling",
        Hierarchy_Coupling_In  => +"--category-afferent-coupling",
        Metrics_All            => +"--all",
-       others                 => null));
+       others                 => null]);
 
    package Metrics_Boolean_Defaults is new
      Metrics_Boolean_Switches.Set_Defaults
-       ((XML_Config | Ignore_Assertions => True, others => False));
+       ([XML_Config | Ignore_Assertions => True, others => False]);
 
    type Metrics_Strings is (Output_Suffix, Global_File_Name, Xml_File_Name);
 
@@ -259,13 +259,13 @@ package METRICS.Command_Lines is
       Metrics_Strings);
 
    package Metrics_String_Syntax is new Metrics_String_Switches.Set_Syntax
-     ((Output_Suffix => '=', Global_File_Name => '=', Xml_File_Name => '='));
+     ([Output_Suffix => '=', Global_File_Name => '=', Xml_File_Name => '=']);
 
    package Metrics_String_Shorthands is new Metrics_String_Switches
      .Set_Shorthands
-     ((Output_Suffix    => +"-o",
+     ([Output_Suffix    => +"-o",
        Global_File_Name => +"-og",
-       Xml_File_Name    => +"-ox"));
+       Xml_File_Name    => +"-ox"]);
 
    type Metrics_String_Seqs is (Gnatmetric_Debug);
 
@@ -275,11 +275,11 @@ package METRICS.Command_Lines is
 
    package Metrics_String_Seq_Syntax is new Metrics_String_Seq_Switches
      .Set_Syntax
-     ((Gnatmetric_Debug => '!'));
+     ([Gnatmetric_Debug => '!']);
 
    package Metrics_String_Seq_Shorthands is new Metrics_String_Seq_Switches
      .Set_Shorthands
-     ((Gnatmetric_Debug => +"-debug"));
+     ([Gnatmetric_Debug => +"-debug"]);
 
    package Freeze is new Freeze_Descriptor (Descriptor);
 

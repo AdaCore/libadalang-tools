@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -33,7 +33,7 @@ package Stub.Command_Lines is
    use Common_Flag_Switches;
 
    package Stub_Disable is new Disable_Switches
-     (Descriptor, (To_All (Rep_Clauses), To_All (Compute_Timing)));
+     (Descriptor, [To_All (Rep_Clauses), To_All (Compute_Timing)]);
 
    type Stub_Flags is
      (Subunits,
@@ -54,7 +54,7 @@ package Stub.Command_Lines is
       Stub_Flags);
 
    package Stub_Flag_Shorthands is new Stub_Flag_Switches.Set_Shorthands
-     ((Subunits => null,
+     ([Subunits => null,
        Force => +"-f",
        Alphabetical_Order => +"-gnatyo",
        Comment_Header_Sample => +"-hg",
@@ -63,7 +63,7 @@ package Stub.Command_Lines is
        No_Exception => null,
        No_Local_Header => null,
        Ignored_Reuse_Tree_File => +"-r",
-       Ignored_Overwrite_Tree_File => +"-t"));
+       Ignored_Overwrite_Tree_File => +"-t"]);
 
    type Stub_Strings is
      (Header_File,
@@ -74,13 +74,13 @@ package Stub.Command_Lines is
       Stub_Strings);
 
    package Stub_String_Syntax is new Stub_String_Switches.Set_Syntax
-     ((Header_File => '=',
-       Output => '='));
+     ([Header_File => '=',
+       Output => '=']);
 
    package Stub_String_Shorthands is new Stub_String_Switches
      .Set_Shorthands
-     ((Header_File => null,
-       Output => +"-o"));
+     ([Header_File => null,
+       Output => +"-o"]);
 
    --  ???Perhaps Max_Line_Length, Indentation should be moved to Common, and
    --  gnatpp and gnatstub shorthands unified. Output is also shared between
@@ -100,26 +100,26 @@ package Stub.Command_Lines is
       Natural'Value);
 
    package Stub_Nat_Syntax is new Stub_Nat_Switches.Set_Syntax
-     ((Max_Line_Length => '!',
+     ([Max_Line_Length => '!',
        Indentation => '!',
-       Update_Body => '='));
+       Update_Body => '=']);
 
    No_Update_Body : constant Natural := 0;
 
    package Stub_Nat_Defaults is new Stub_Nat_Switches.Set_Defaults
-     ((Max_Line_Length => 79,
+     ([Max_Line_Length => 79,
        Indentation => 3,
-       Update_Body => No_Update_Body));
+       Update_Body => No_Update_Body]);
 
    package Stub_Nat_Shorthands is new Stub_Nat_Switches.Set_Shorthands
-     ((Max_Line_Length => +"-gnatyM",
+     ([Max_Line_Length => +"-gnatyM",
        Indentation => +"-gnaty",
-       Update_Body => null));
+       Update_Body => null]);
 
    package Stub_Nat_Shorthands_2 is new Stub_Nat_Switches.Set_Shorthands
-     ((Max_Line_Length => +"-l",
+     ([Max_Line_Length => +"-l",
        Indentation => +"-i",
-       Update_Body => null));
+       Update_Body => null]);
 
    package Freeze is new Freeze_Descriptor (Descriptor);
 

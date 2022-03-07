@@ -219,7 +219,7 @@ package body Pp.Actions is
          --  Set those to their default values, which is always the first
          --  enumeral.
 
-         Set_Arg (Cmd, Dictionary, (1 .. 0 => <>));
+         Set_Arg (Cmd, Dictionary, []);
 
          Set_Arg (Cmd, End_Id, False);
          Set_Arg (Cmd, Decimal_Grouping, 0);
@@ -560,7 +560,7 @@ package body Pp.Actions is
      (T : Ada_Node'Class) return Query_Count is
        (if Is_Nil (T) then 0 else Last_Child_Index (T));
    function Empty_Tree_Array return Ada_Node_Array is
-     ((1 .. 0 => <>));
+     ([]);
    function Subtrees (T : Ada_Node'Class) return Ada_Tree_Array is
      (if Is_Nil (T) then Empty_Tree_Array else Children (T));
    function Subtree
@@ -584,7 +584,7 @@ package body Pp.Actions is
 
    Custom_Templates : array (Ada_Tree_Kind) of
      Ada.Strings.Wide_Unbounded.Unbounded_Wide_String :=
-       (others => Ada.Strings.Wide_Unbounded.Null_Unbounded_Wide_String);
+       [others => Ada.Strings.Wide_Unbounded.Null_Unbounded_Wide_String];
    --  Custom templates loaded from a json file
 
    function Custom_Template_For_Kind (Kind : Ada_Tree_Kind) return Str_Template
@@ -1720,7 +1720,7 @@ package body Pp.Actions is
            "{~$~}~";
       begin
          Str_Alt_Table :=
-           (Empty_Alt => L (""),
+           [Empty_Alt => L (""),
             Hard_Break_Alt => L ("$"),
             Semi_LB_Alt => L (";$"),
             Semi_LB_LB_Alt => L (";$$"),
@@ -1851,7 +1851,7 @@ package body Pp.Actions is
                --  gnatpp doesn't put a line break after "is" in this case.
             Enum_Array_Decl_Alt => L ("type !! is$[!]" & Aspects),
             Type_Decl_Alt => L ("type !! is[# !]" & Aspects),
-            Boxy_Constrained_Alt => L ("(?~,# ~~)"));
+            Boxy_Constrained_Alt => L ("(?~,# ~~)")];
 
          for Alt in Alt_Templates loop
             declare
@@ -2593,7 +2593,7 @@ package body Pp.Actions is
 
       Special_Case_Names : constant
           array (Positive range <>) of access constant W_Str :=
-        (Name_CPP_Class'Access,
+        [Name_CPP_Class'Access,
          Name_CPP_Constructor'Access,
          Name_CPP_Virtual'Access,
          Name_CPP_Vtable 'Access,
@@ -2601,7 +2601,7 @@ package body Pp.Actions is
          Name_Persistent_BSS'Access,
          Name_SPARK_Mode'Access,
          Name_Use_VADS_Size'Access,
-         Name_VADS_Size'Access);
+         Name_VADS_Size'Access];
 
       function Id_With_Casing
         (Id          : W_Str;
@@ -3404,7 +3404,7 @@ package body Pp.Actions is
             Kind      : Ada_Tree_Kind  := Tree.Kind)
          is
             subtype Subtrees_Index is Query_Index range 1 .. Subtrees'Last;
-            Used : array (Subtrees_Index) of Boolean := (others => False);
+            Used : array (Subtrees_Index) of Boolean := [others => False];
             Cur_Subtree_Index : Query_Count := 0;
             Inst : Instr;
 
@@ -3689,7 +3689,7 @@ package body Pp.Actions is
             end loop;
 
             pragma Assert
-              (Used = (Subtrees_Index => True), "Not all used: " & Kind'Img);
+              (Used = [Subtrees_Index => True], "Not all used: " & Kind'Img);
 
          end Interpret_Template;
 
@@ -4277,7 +4277,7 @@ package body Pp.Actions is
             else
                Interpret_Alt_Template
                  (Subtree_Alt,
-                  Subtrees  => (1 => Arg1),
+                  Subtrees  => [1 => Arg1],
                   Cur_Level => Cur_Level);
             end if;
 
@@ -4316,7 +4316,7 @@ package body Pp.Actions is
             else
                Interpret_Alt_Template
                  (Subtree_Alt,
-                  Subtrees  => (1 => Arg2),
+                  Subtrees  => [1 => Arg2],
                   Cur_Level => Cur_Level + 1);
             end if;
 
@@ -4557,7 +4557,7 @@ package body Pp.Actions is
                      else (if AM then AM_Tab_4_Alt else Not_AM_Default_Alt));
                begin
                   Interpret_Alt_Template
-                    (T, Subtrees => (1 => Subtree (Tree, Index)));
+                    (T, Subtrees => [1 => Subtree (Tree, Index)]);
                end;
             end if;
 

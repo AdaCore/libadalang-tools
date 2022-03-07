@@ -293,7 +293,7 @@ package body Laltools.Common is
       Hierarchy : constant Basic_Decl_Array :=
         (if Is_Semantic_Parent_Subp then
             Get_Subp_Hierarchy (Semantic_Parent_Subp, Units)
-         else (1 .. 0 => <>));
+         else []);
 
       Param_References : Base_Id_Vectors.Vector;
 
@@ -1948,7 +1948,7 @@ package body Laltools.Common is
 
    begin
       if Node.Is_Null then
-         return R : constant Compilation_Unit_Array (1 .. 0) := (others => <>);
+         return [];
       end if;
 
       for Clause of Node.F_Prelude loop

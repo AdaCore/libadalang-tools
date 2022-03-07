@@ -10,6 +10,7 @@ abstract project LAL_Tools_Common is
          when "dev" =>
             for Default_Switches ("Ada") use
               ("-fPIC",
+               "-gnatX",
                "-gnatyg",
                "-gnatwae",
                "-gnatw.u", -- warn inappropriate use of unordered enums
@@ -21,6 +22,7 @@ abstract project LAL_Tools_Common is
          when "prod" =>
             for Default_Switches ("Ada") use
               ("-fPIC",
+               "-gnatX",
                "-gnatyg",
                "-g",
                "-Ofast",
@@ -31,6 +33,7 @@ abstract project LAL_Tools_Common is
          when "AddressSanitizer" =>
            for Default_Switches ("Ada") use
               ("-fPIC",
+               "-gnatX",
                "-gnatyg",
                "-gnatwae",
                "-gnatw.u", -- warn inappropriate use of unordered enums

@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2019-2021, AdaCore                    --
+--                      Copyright (C) 2019-2022, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -27,7 +27,7 @@ package Test.Command_Lines is
 
    package Test_Common_Nat_Shorthands is new Common_Nat_Switches
      .Set_Shorthands
-       ((Jobs => +"--queues"));
+       ([Jobs => +"--queues"]);
 
    package Freeze_Common is new Freeze_Descriptor (Common_Descriptor);
 
@@ -53,9 +53,9 @@ package Test.Command_Lines is
 
    package Test_Boolean_Shorthands is new Test_Boolean_Switches
      .Set_Shorthands
-     ((Recursive => +"-r",
+     ([Recursive => +"-r",
        Command_Line_Support => +"--command-line",
-       others => null));
+       others => null]);
 
    --  Re: the --command-line/--no-command-line switch. We don't want an
    --  enumeration literal Command_Line here, because it causes conflicts
@@ -64,10 +64,10 @@ package Test.Command_Lines is
 
    package Test_Boolean_Defaults is new
      Test_Boolean_Switches.Set_Defaults
-       ((Inheritance_Check => True,
+       ([Inheritance_Check => True,
          Command_Line_Support => True,
          Harness_Only => False,
-         others => False));
+         others => False]);
 
    type Test_Strings is
      (Separate_Drivers,
@@ -87,7 +87,7 @@ package Test.Command_Lines is
       Test_Strings);
 
    package Test_String_Syntax is new Test_String_Switches.Set_Syntax
-     ((Separate_Drivers => '?',
+     ([Separate_Drivers => '?',
        Harness_Dir      => '=',
        Tests_Dir        => '=',
        Tests_Root       => '=',
@@ -97,7 +97,7 @@ package Test.Command_Lines is
        Passed_Tests     => '=',
        Exit_Status      => '=',
        Copy_Environment => '=',
-       Reporter         => '='));
+       Reporter         => '=']);
 
    type Test_String_Seqs is (Exclude_From_Stubbing);
 
@@ -107,7 +107,7 @@ package Test.Command_Lines is
 
    package Test_String_Seq_Syntax is new Test_String_Seq_Switches
      .Set_Syntax
-     ((Exclude_From_Stubbing => '!'));
+     ([Exclude_From_Stubbing => '!']);
 
    package Freeze is new Freeze_Descriptor (Descriptor);
 

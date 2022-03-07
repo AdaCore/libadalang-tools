@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2012-2021, AdaCore                    --
+--                      Copyright (C) 2012-2022, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -33,7 +33,7 @@ package body Pp.Scanner is
    use Syms;
 
    Token_To_Symbol_Map : constant array (Same_Text_Kind) of Symbol :=
-     (Start_Of_Input | End_Of_Input => Name_Empty,
+     [Start_Of_Input | End_Of_Input => Name_Empty,
       Enabled_LB_Token => Name_NL,
       Disabled_LB_Token | Tab_Token => Name_Empty,
       False_End_Of_Line => Name_Empty,
@@ -166,7 +166,7 @@ package body Pp.Scanner is
       --  Ada 2012 reserved words
 
       Res_Some => Intern ("some")
-     ); -- Token_To_Symbol_Map
+     ]; -- Token_To_Symbol_Map
 
    function Lookup_Reserved_Word (Text : Symbol) return Reserved_Word_Or_Id;
    --  If Text is a reserved word, return that Reserved_Word. Otherwise, return
@@ -824,7 +824,7 @@ package body Pp.Scanner is
      return Symbol_To_Reserved_Word_Mapping
    is
    begin
-      return R : Symbol_To_Reserved_Word_Mapping := (others => Ident) do
+      return R : Symbol_To_Reserved_Word_Mapping := [others => Ident] do
          for Res in Reserved_Word loop
             R (Token_To_Symbol_Map (Res)) := Res;
          end loop;
@@ -1545,9 +1545,9 @@ package body Pp.Scanner is
                  (case Tok.Kind is
                     when Comment_Kind => True,
                     when EOL_Token =>
-                      Inp in (1 => W_LF) | (W_CR, W_LF)
-                        | (1 => W_FF) | (1 => W_VT) | (1 => W_CR)
-                        and then Outp = (1 => NL),
+                      Inp in [1 => W_LF] | [W_CR, W_LF]
+                        | [1 => W_FF] | [1 => W_VT] | [1 => W_CR]
+                        and then Outp = [1 => NL],
                     when Reserved_Word => To_Lower (Inp) = Outp,
                     when others => Inp = Outp);
             end;
@@ -1892,7 +1892,7 @@ package body Pp.Scanner is
       if Kind (Tok) in Comment_Kind then
          Text_IO.Put
            (Text_IO.Standard_Output,
-            "--" & (1 .. Leading_Blanks (Tok) => ' '));
+            "--" & [1 .. Leading_Blanks (Tok) => ' ']);
       end if;
       for C of Str (Text (Tok)).S loop
          if Kind (Tok) in Comment_Kind and then C = ASCII.LF then

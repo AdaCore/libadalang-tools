@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2011-2021, AdaCore                    --
+--                      Copyright (C) 2011-2022, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -4280,7 +4280,7 @@ package body Test.Harness is
       type Duplication_Array is array
         (Data.Test_Types.First_Index .. Data.Test_Types.Last_Index) of Boolean;
 
-      Duplication : Duplication_Array := (others => False);
+      Duplication : Duplication_Array := [others => False];
 
       Include_Units : Include_Sets.Set;
       Include_Cur   : Include_Sets.Cursor;
