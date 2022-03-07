@@ -13,7 +13,8 @@ LIB_PROJECTS = \
    src/lal_tools.gpr
 
 BIN_PROJECTS = \
-   src/build.gpr
+   src/build.gpr \
+   src/rejuvenate/rejuvenate.gpr
 
 TESTSUITE_PROJECTS = \
    testsuite/ada_drivers/partial_gnatpp/partial_gnatpp.gpr \

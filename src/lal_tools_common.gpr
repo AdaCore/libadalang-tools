@@ -18,7 +18,6 @@ abstract project LAL_Tools_Common is
                "-O0",
                "-gnata",
                "-gnatVa");
-
          when "prod" =>
             for Default_Switches ("Ada") use
               ("-fPIC",
