@@ -1,0 +1,5 @@
+title: delete_1,2,4in4
+
+description: delete the 1,2,4 components of the 4 components in total. the new object declare reference also included in this test.
+
+driver: shell_script

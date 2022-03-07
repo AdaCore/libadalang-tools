@@ -1,4 +1,5 @@
 with "libadalang.gpr";
+with "lal_tools.gpr";
 with "lal_tools_common.gpr";
 
 project Rejuvenate is
