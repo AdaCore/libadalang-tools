@@ -68,10 +68,10 @@ package TGen.Strategies is
      (Left.Text = Right.Text);
 
    package Disc_Value_Maps is new Ada.Containers.Indefinite_Hashed_Maps
-     (Key_Type        => LAL.Defining_Name,
+     (Key_Type        => Unbounded_Text_Type,
       Element_Type    => Big_Integer,
-      Hash            => Hash,
-      Equivalent_Keys => Equivalent_Keys,
+      Hash            => Ada.Strings.Wide_Wide_Unbounded.Wide_Wide_Hash,
+      Equivalent_Keys => "=",
       "="             => Big_Int."=");
    subtype Disc_Value_Map is Disc_Value_Maps.Map;
 

@@ -40,6 +40,7 @@ with TGen.Types.Int_Types;      use TGen.Types.Int_Types;
 with TGen.Types.Constraints;    use TGen.Types.Constraints;
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with Ada.Strings.Wide_Wide_Unbounded.Wide_Wide_Hash;
 with Ada.Streams; use Ada.Streams;
 
 package TGen.Types.Record_Types is
@@ -52,10 +53,10 @@ package TGen.Types.Record_Types is
    --  or because it does not respect the discriminant constraints of a record.
 
    package Component_Maps is new Ada.Containers.Hashed_Maps
-     (Key_Type        => LAL.Defining_Name,
+     (Key_Type        => Unbounded_Text_Type,
       Element_Type    => SP.Ref,
-      Hash            => Hash_Defining_Name,
-      Equivalent_Keys => LAL."=",
+      Hash            => Ada.Strings.Wide_Wide_Unbounded.Wide_Wide_Hash,
+      Equivalent_Keys => "=",
       "="             => SP."=");
    subtype Component_Map is Component_Maps.Map;
    --  Maps for discriminants and components, from their defining name to
@@ -66,14 +67,12 @@ package TGen.Types.Record_Types is
 
    package Component_Vectors is new Ada.Containers.Vectors
      (Index_Type   => Positive,
-      Element_Type => LAL.Defining_Name,
-      "="          => LAL."=");
+      Element_Type => Unbounded_Text_Type,
+      "="          => "=");
    subtype Component_Vector is Component_Vectors.Vector;
 
    type Record_Typ is new Composite_Typ with record
-
       Component_Types : Component_Maps.Map;
-
    end record;
 
    function Image (Self : Record_Typ) return String;
@@ -118,7 +117,7 @@ package TGen.Types.Record_Types is
    --     Disc_Context : Disc_Value_Map) return String;
 
    type Discriminant_Choice_Entry is record
-      Defining_Name : LAL.Defining_Name;
+      Defining_Name : Unbounded_Text_Type;
       Choices       : LAL.Alternatives_List;
    end record;
 
@@ -133,9 +132,8 @@ package TGen.Types.Record_Types is
    type Variant_Part_Acc is access Variant_Part;
 
    type Variant_Choice is record
-      Alternatives : LAL.Alternatives_List;
-      Alt_Set      : Alternatives_Set;
-      Components   : Component_Maps.Map;
+      Alt_Set    : Alternatives_Set;
+      Components : Component_Maps.Map;
 
       Variant : Variant_Part_Acc;
       --  Variant part associated to this variant choice. Null if there is no
@@ -151,7 +149,7 @@ package TGen.Types.Record_Types is
      (Element_Type => Variant_Choice);
 
    type Variant_Part is record
-      Discr_Name : LAL.Defining_Name;
+      Discr_Name      : Unbounded_Text_Type;
       Variant_Choices : Variant_Choice_Lists.List;
    end record;
 

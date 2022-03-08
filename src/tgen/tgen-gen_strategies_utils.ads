@@ -57,7 +57,7 @@ package TGen.Gen_Strategies_Utils is
 
    function Gen_Random_Function_Name
      (T : Typ'Class) return String is
-      ("Gen_" & (+T.Type_Name));
+      ("Gen_" & T.Type_Name);
 
    function Strat_Param_Name
      (Subp_Data : Subprogram_Data; Param : Parameter_Data) return String is

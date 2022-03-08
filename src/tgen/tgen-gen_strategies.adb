@@ -470,7 +470,7 @@ package body TGen.Gen_Strategies is
                Type_Depends : Typ_Set := Get_All_Types (Param_Type.Get);
                Typ_Parent_Package : Unbounded_Text_Type :=
                  To_Unbounded_Text
-                   (Param_Type.Get.Parent_Package_Name);
+                   (+Param_Type.Get.Parent_Package_Name);
 
                procedure Add_To_Set
                  (Parent_Pkg_Name : Unbounded_Text_Type;

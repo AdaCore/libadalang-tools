@@ -137,7 +137,7 @@ procedure TGen_App is
             Param_Number := Param_Number + 1;
          end loop;
          return Over;
-      elsif Kind (Node) in Ada_Subp_Decl | Ada_Expr_Function_Range then
+      elsif Kind (Node) in Ada_Subp_Decl then
 
          begin
             Generate_Test_Vectors

@@ -363,7 +363,7 @@ package body TGen.Gen_Strategies_Utils is
    is
       Result : Subprogram_Data (Ada_Subp_Kind_Function);
       F_Prefix : constant String := "Constrained_";
-      Ret_Type : constant String := +(Self.Fully_Qualified_Name);
+      Ret_Type : constant String := Self.Fully_Qualified_Name;
    begin
       case Self.Kind is
          when Disc_Record_Kind =>
@@ -388,7 +388,7 @@ package body TGen.Gen_Strategies_Utils is
                   declare
                      use Component_Maps;
 
-                     D_Name : constant String := +Key (D).F_Name.Text;
+                     D_Name : constant String := +Key (D);
                      D_Type : SP.Ref := Element (D);
                      P      : Parameter_Data;
                   begin
@@ -398,7 +398,7 @@ package body TGen.Gen_Strategies_Utils is
                      P.Type_Fully_Qualified_Name :=
                        +D_Type.Get.Fully_Qualified_Name;
                      P.Type_Parent_Package :=
-                       +D_Type.Get.Parent_Package_Fully_Qualified_Name;
+                       +D_Type.Get.Parent_Package_Name;
                      Result.Parameters_Data.Append (P);
                      Index := Index + 1;
                   end;

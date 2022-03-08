@@ -1,5 +1,30 @@
+------------------------------------------------------------------------------
+--                                                                          --
+--                                  TGen                                    --
+--                                                                          --
+--                       Copyright (C) 2022, AdaCore                        --
+--                                                                          --
+-- TGen  is  free software; you can redistribute it and/or modify it  under --
+-- under  terms of  the  GNU General  Public License  as  published by  the --
+-- Free  Software  Foundation;  either version 3, or  (at your option)  any --
+-- later version. This software  is distributed in the hope that it will be --
+-- useful but  WITHOUT  ANY  WARRANTY; without even the implied warranty of --
+-- MERCHANTABILITY  or  FITNESS  FOR A PARTICULAR PURPOSE.                  --
+--                                                                          --
+-- As a special  exception  under  Section 7  of  GPL  version 3,  you are  --
+-- granted additional  permissions described in the  GCC  Runtime  Library  --
+-- Exception, version 3.1, as published by the Free Software Foundation.    --
+--                                                                          --
+-- You should have received a copy of the GNU General Public License and a  --
+-- copy of the GCC Runtime Library Exception along with this program;  see  --
+-- the files COPYING3 and COPYING.RUNTIME respectively.  If not, see        --
+-- <http://www.gnu.org/licenses/>.                                          --
+------------------------------------------------------------------------------
+
 with Ada.Characters.Latin_1;
 with Ada.Text_IO; use Ada.Text_IO;
+
+with Libadalang.Common; use Libadalang.Common;
 
 package body TGen.Strings is
 
@@ -86,5 +111,63 @@ package body TGen.Strings is
          Length := Str.Length;
       end loop;
    end Indent_String;
+
+   -----------------------
+   -- To_Qualified_Name --
+   -----------------------
+
+   function To_Qualified_Name
+     (Name : Libadalang.Analysis.Name) return Ada_Qualified_Name
+   is
+   begin
+      return Result : Ada_Qualified_Name do
+         case Ada_Name (Name.Kind) is
+            when Ada_Dotted_Name =>
+               declare
+                  DN     : constant Dotted_Name := Name.As_Dotted_Name;
+                  Suffix : constant Ada_Qualified_Name := To_Qualified_Name
+                     (DN.F_Suffix.As_Name);
+               begin
+                  Result := To_Qualified_Name (DN.F_Prefix);
+                  Result.Append (Suffix);
+               end;
+
+            when Ada_Single_Tok_Node =>
+               declare
+
+                  --  ??? GNATCOLL.Projects does not specify how to encode
+                  --  Unicode unit names as strings, so for now, assume that we
+                  --  process only codepoints in the ASCII range and thus use
+                  --  Langkit_Support.Text.Image.
+
+                  Identifier : constant Ada_Identifier :=
+                     To_Unbounded_String (Image (Name.Text));
+               begin
+                  Result.Append (Identifier);
+               end;
+
+            when others =>
+               raise Constraint_Error
+                  with "no qualified name for " & Name.Kind'Image & " nodes";
+         end case;
+      end return;
+   end To_Qualified_Name;
+
+   ------------
+   -- To_Ada --
+   ------------
+
+   function To_Ada (Name : Ada_Qualified_Name) return String is
+      Result : Unbounded_String;
+   begin
+      for Id of Name loop
+         if Length (Result) > 0 then
+            Append (Result, ".");
+         end if;
+         Append (Result, To_String (Id));
+      end loop;
+
+      return +Result;
+   end To_Ada;
 
 end TGen.Strings;

@@ -24,11 +24,13 @@
 with Ada.Containers;               use Ada.Containers;
 with Ada.Containers.Hashed_Maps;
 with Ada.Containers.Hashed_Sets;
+with Ada.Containers.Indefinite_Hashed_Sets;
 with Ada.Containers.Indefinite_Vectors;
 with Ada.Numerics.Big_Numbers.Big_Integers;
 use  Ada.Numerics.Big_Numbers.Big_Integers;
 with Ada.Strings;                  use Ada.Strings;
 with Ada.Strings.Fixed;            use Ada.Strings.Fixed;
+with Ada.Strings.Hash;
 with Ada.Strings.Unbounded;        use Ada.Strings.Unbounded;
 with Ada.Text_IO;                  use Ada.Text_IO;
 
@@ -36,8 +38,10 @@ with Libadalang.Analysis;
 
 with Templates_Parser;             use Templates_Parser;
 
+with TGen.Strings;                 use TGen.Strings;
 with TGen.Types.Array_Types;       use TGen.Types.Array_Types;
 with TGen.Types.Constraints;       use TGen.Types.Constraints;
+with TGen.Types.Discrete_Types;    use TGen.Types.Discrete_Types;
 with TGen.Types.Enum_Types;        use TGen.Types.Enum_Types;
 with TGen.Types.Int_Types;         use TGen.Types.Int_Types;
 with TGen.Types.Real_Types;        use TGen.Types.Real_Types;
@@ -89,11 +93,11 @@ package body TGen.Marshalling is
      (Node : LAL.Defining_Name) return Ada.Containers.Hash_Type is
        (Node.As_Ada_Node.Hash);
 
-   package Name_Sets is new Ada.Containers.Hashed_Sets
-     (Element_Type        => LAL.Defining_Name,
-      Hash                => Hash_Defining_Name,
-      Equivalent_Elements => LAL."=",
-      "="                 => LAL."=");
+   package Name_Sets is new Ada.Containers.Indefinite_Hashed_Sets
+     (Element_Type        => String,
+      Hash                => Ada.Strings.Hash,
+      Equivalent_Elements => "=",
+      "="                 => "=");
 
    function Needs_Header (Typ : TGen.Types.Typ'Class) return Boolean;
    --  Retyrn True for type which have an immutable part (bounds of
@@ -167,9 +171,7 @@ package body TGen.Marshalling is
          begin
             for Cu in D_Typ.Discriminant_Types.Iterate loop
                declare
-                  Comp_Name : constant String :=
-                    Langkit_Support.Text.Image
-                      (Component_Maps.Key (Cu).Text);
+                  Comp_Name : constant String := +Component_Maps.Key (Cu);
                begin
                   Constraints_Tag := Constraints_Tag
                     & Translate
@@ -191,8 +193,7 @@ package body TGen.Marshalling is
    function Create_Tag_For_Intervals
      (Intervals : Alternatives_Set; Typ : TGen.Types.Typ'Class) return Tag
    is
-      Ty_Name : constant String :=
-        Langkit_Support.Text.Image (Typ.Name.Text);
+      Ty_Name : constant String := Typ.Type_Name;
 
       function String_Value (V : TGen.Types.Big_Integer) return String;
       --  Get a string for the value at position V in Typ
@@ -241,8 +242,7 @@ package body TGen.Marshalling is
    procedure Generate_Base_Functions_For_Typ
      (F : File_Type; Typ : TGen.Types.Typ'Class; For_Base : Boolean := False)
    is
-      B_Name    : constant String := Langkit_Support.Text.Image
-        (Typ.Name.Text);
+      B_Name    : constant String := Typ.Type_Name;
       Ty_Prefix : constant String := Prefix_For_Typ (B_Name, For_Base);
       Ty_Name   : constant String :=
         (if For_Base then B_Name & "'Base" else B_Name);
@@ -282,12 +282,9 @@ package body TGen.Marshalling is
                  (if Comp_Ty in Anonymous_Typ'Class
                   then Anonymous_Typ'Class (Comp_Ty).Named_Ancestor.Get
                   else Comp_Ty);
-               Comp_Name     : constant String :=
-                 Langkit_Support.Text.Image
-                   (Component_Maps.Key (Cu).Text);
+               Comp_Name     : constant String := +Component_Maps.Key (Cu);
                Comp_Prefix   : constant String :=
-                 Prefix_For_Typ
-                   (Langkit_Support.Text.Image (Named_Comp_Ty.Name.Text));
+                 Prefix_For_Typ (Named_Comp_Ty.Type_Name);
             begin
                Generate_Base_Functions_For_Typ (F, Named_Comp_Ty);
                Comp_Name_Tag := Comp_Name_Tag & Comp_Name;
@@ -305,8 +302,7 @@ package body TGen.Marshalling is
          Discriminants : Component_Maps.Map;
          Spacing       : Natural) return String
       is
-         Discr_Name : constant String := Langkit_Support.Text.Image
-           (V.Discr_Name.Text);
+         Discr_Name : constant String := +V.Discr_Name;
          Discr_Typ  : constant TGen.Types.Typ'Class :=
            Discriminants (V.Discr_Name).Get;
 
@@ -364,15 +360,15 @@ package body TGen.Marshalling is
       --  Check for inclusion in the general map or in the map for base types
 
       if For_Base then
-         if Base_Seen.Contains (Typ.Name) then
+         if Base_Seen.Contains (Typ.Fully_Qualified_Name) then
             return;
          end if;
-         Base_Seen.Include (Typ.Name);
+         Base_Seen.Include (Typ.Fully_Qualified_Name);
       else
-         if Already_Seen.Contains (Typ.Name) then
+         if Already_Seen.Contains (Typ.Fully_Qualified_Name) then
             return;
          end if;
-         Already_Seen.Include (Typ.Name);
+         Already_Seen.Include (Typ.Fully_Qualified_Name);
       end if;
 
       --  Scalar types: we use clones
@@ -412,8 +408,7 @@ package body TGen.Marshalling is
                then Anonymous_Typ'Class (Comp_Ty).Named_Ancestor.Get
                else Comp_Ty);
             Comp_Prefix   : constant String :=
-              Prefix_For_Typ
-                (Langkit_Support.Text.Image (Named_Comp_Ty.Name.Text));
+              Prefix_For_Typ (Named_Comp_Ty.Type_Name);
             Assocs        : constant Translate_Table :=
               (1 => Assoc ("TY_NAME", Ty_Name),
                2 => Assoc ("TY_PREFIX", Ty_Prefix),
@@ -486,8 +481,7 @@ package body TGen.Marshalling is
    procedure Generate_Header_For_Typ
      (F_Spec, F_Body : File_Type; Typ : TGen.Types.Typ'Class)
    is
-      Ty_Name       : constant String := Langkit_Support.Text.Image
-        (Typ.Name.Text);
+      Ty_Name       : constant String := Typ.Type_Name;
       Ty_Prefix     : constant String :=
         Prefix_For_Typ (Ty_Name, For_Header => True);
 
@@ -528,8 +522,7 @@ package body TGen.Marshalling is
 
                declare
                   Index_Type : constant String :=
-                    Langkit_Support.Text.Image
-                      (U_Typ.Index_Types (I).Get.Name.Text);
+                    U_Typ.Index_Types (I).Get.Type_Name;
                   Type_Name  : constant String := Index_Type & "'Base";
                   Index_Pref : constant String :=
                     Prefix_For_Typ (Index_Type, For_Base => True);
@@ -572,12 +565,9 @@ package body TGen.Marshalling is
                --  Fill the association maps
 
                declare
-                  Comp_Name : constant String :=
-                    Langkit_Support.Text.Image
-                      (Component_Maps.Key (Cu).Text);
+                  Comp_Name : constant String := (+Component_Maps.Key (Cu));
                   Comp_Typ  : constant String :=
-                    Langkit_Support.Text.Image
-                      (Component_Maps.Element (Cu).Get.Name.Text);
+                    (Component_Maps.Element (Cu).Get.Type_Name);
                   Comp_Pref : constant String :=
                     Prefix_For_Typ (Comp_Typ);
                begin
@@ -618,8 +608,7 @@ package body TGen.Marshalling is
    procedure Generate_Marshalling_Functions_For_Typ
      (F_Spec, F_Body : File_Type; Typ : TGen.Types.Typ'Class)
    is
-      Ty_Name       : constant String := Langkit_Support.Text.Image
-        (Typ.Name.Text);
+      Ty_Name       : constant String := Typ.Type_Name;
       Ty_Prefix     : constant String := Prefix_For_Typ (Ty_Name);
       Header_Prefix : constant String :=
         Prefix_For_Typ (Ty_Name, For_Header => True);

@@ -79,7 +79,7 @@ package body TGen.Types.Int_Types is
       Write_Line
         (F_Body,
          "function Gen is new TGen.Types.Int_Types.Gen ("
-         & (+Self.Fully_Qualified_Name) & ");",
+         & Self.Fully_Qualified_Name & ");",
          Indent);
       Indent := @ - 3;
       Write_Line (F_Body, "begin", Indent);

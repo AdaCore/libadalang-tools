@@ -42,9 +42,9 @@ package body TGen.Types is
 
    function Image (Self : Typ) return String is
    begin
-      return (if Self.Name = No_Defining_Name
+      return (if Self.Name = Ada_Identifier_Vectors.Empty_Vector
               then "Anonymous"
-              else Text.Image (Self.Name.Text));
+              else Self.Type_Name);
    end Image;
 
    ------------------
@@ -53,7 +53,7 @@ package body TGen.Types is
 
    function Is_Anonymous (Self : Typ) return Boolean is
    begin
-      return Self.Name = No_Defining_Name;
+      return Self.Name = Ada_Identifier_Vectors.Empty_Vector;
    end Is_Anonymous;
 
    ----------
@@ -74,10 +74,10 @@ package body TGen.Types is
    ------------------
 
    function Package_Name (Self : Typ) return String is
-      Type_Parent_Package : constant Text_Type :=
-        Self.Name.P_Top_Level_Decl (Self.Name.Unit).P_Defining_Name.Text;
+      Parent_Package : Ada_Qualified_Name := Self.Name.Copy;
    begin
-      return Image (Type_Parent_Package);
+      Parent_Package.Delete_Last;
+      return To_Ada (Parent_Package);
    end Package_Name;
 
    -----------------------
@@ -139,7 +139,7 @@ package body TGen.Types is
       Pkg_Name : constant Unbounded_Text_Type :=
         +(String'("Type_Strategies"));
    begin
-      return Self.Parent_Package_Name
+      return Unbounded_Wide_Wide_String'(+Self.Parent_Package_Name)
         & Unbounded_Wide_Wide_String'(+String'("."))
         & Pkg_Name;
    end Generation_Package_For_Type;
@@ -161,10 +161,8 @@ package body TGen.Types is
         Generation_Package_For_Type (Self);
       Result.Precondition := +(String'(""));
 
-      Result.Return_Type_Fully_Qualified_Name :=
-        +Self.Fully_Qualified_Name;
-      Result.Return_Type_Parent_Package :=
-        +Self.Parent_Package_Fully_Qualified_Name;
+      Result.Return_Type_Fully_Qualified_Name := +Self.Fully_Qualified_Name;
+      Result.Return_Type_Parent_Package := +Self.Parent_Package_Name;
       return Result;
    end Random_Strategy_Function;
 
@@ -175,7 +173,7 @@ package body TGen.Types is
    function Slug (Self : Typ) return String is
    begin
       return Ada.Strings.Fixed.Translate
-        (Source => To_UTF8 (Self.Name.P_Fully_Qualified_Name),
+        (Source  => Self.Fully_Qualified_Name,
          Mapping => Dot_To_Underscore'Access);
    end Slug;
 

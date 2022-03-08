@@ -22,6 +22,8 @@
 ------------------------------------------------------------------------------
 
 with Ada.Containers.Hashed_Maps;
+with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
+with Ada.Strings.Wide_Wide_Unbounded.Wide_Wide_Hash;
 with Ada.Unchecked_Deallocation;
 
 with TGen.Context;              use TGen.Context;
@@ -60,7 +62,7 @@ package TGen.Types.Constraints is
             --  May be revisited.
 
          when Discriminant =>
-            Disc_Name : LAL.Defining_Name;
+            Disc_Name : Unbounded_Text_Type;
             --  The defining name of the discriminant that appears in this
             --  context.
 
@@ -161,10 +163,10 @@ package TGen.Types.Constraints is
        (Node.As_Ada_Node.Hash);
 
    package Discriminant_Constraint_Maps is new Ada.Containers.Hashed_Maps
-     (Key_Type        => LAL.Defining_Name,
+     (Key_Type        => Unbounded_Text_Type,
       Element_Type    => Discrete_Constraint_Value,
-      Hash            => Hash_Defining_Name,
-      Equivalent_Keys => LAL."=");
+      Hash            => Ada.Strings.Wide_Wide_Unbounded.Wide_Wide_Hash,
+      Equivalent_Keys => "=");
    subtype Discriminant_Constraint_Map is Discriminant_Constraint_Maps.Map;
    --  Maps to represent discriminant constraints. Each entry specifies the
    --  value given to the discriminant of which the defining name is used as

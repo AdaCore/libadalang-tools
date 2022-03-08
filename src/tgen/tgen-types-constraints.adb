@@ -39,7 +39,7 @@ package body TGen.Types.Constraints is
    function Image (Self : Discrete_Constraint_Value) return String is
      (case Self.Kind is
       when Static => Self.Int_Val.To_String,
-      when Discriminant => Text.Image (Self.Disc_Name.Text),
+      when Discriminant => (+Self.Disc_Name),
       when Non_Static => "Non static");
 
    function Image (Self : Real_Constraint_Value) return String is
@@ -99,8 +99,7 @@ package body TGen.Types.Constraints is
       Cur : Cursor := Self.Constraint_Map.First;
    begin
       while Has_Element (Cur) loop
-         Res := Res & Text.Image (Key (Cur).Text) & " => "
-                & Image (Element (Cur));
+         Res := Res & (+Key (Cur)) & " => " & Image (Element (Cur));
          Next (Cur);
          if Has_Element (Cur) then
             Res := Res & ", ";
@@ -125,7 +124,7 @@ package body TGen.Types.Constraints is
    ------------------
 
    function As_Named_Typ (Self : Anonymous_Typ) return SP.Ref is
-      Name : LAL.Defining_Name := Self.Named_Ancestor.Get.Name;
+      Name : Ada_Qualified_Name := Self.Named_Ancestor.Get.Name;
       Res : SP.Ref;
       Cst : Constraint'Class renames Self.Subtype_Constraints.all;
    begin

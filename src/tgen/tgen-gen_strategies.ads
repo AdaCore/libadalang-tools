@@ -109,7 +109,7 @@ package TGen.Gen_Strategies is
       F    : Subp_Spec;
       P    : Identifier) return String is
      ("function " & Get_Unique_Strat_Name (F, P) & " return "
-      & Image (Self.Name.P_Fully_Qualified_Name) & ";");
+      & Self.Fully_Qualified_Name & ";");
 
    function Get_Strategy_Spec
      (Self : Typ;

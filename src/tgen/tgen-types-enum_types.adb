@@ -114,14 +114,15 @@ package body TGen.Types.Enum_Types is
       return
         Typ (Self).Image & ": Enum"
         & (if Self.Is_Static
-           thenElement (Disc).Get " range " & Text.Image (Self.Literals.First_Element.Text)
-                & " .. " & Text.Image (Self.Literals.Last_Element.Text)
+           then " range "
+                & (+Self.Literals.First_Element)
+                & " .. " & (+Self.Literals.Last_Element)
            else " (non static)");
    end Image;
 
    function Lit_Image
      (Self : Other_Enum_Typ; Lit : Big_Integer) return String is
-      (Text.Image (Self.Literals.Element (Lit).Text));
+      (+Self.Literals.Element (Lit));
 
    function Low_Bound (Self : Other_Enum_Typ) return Big_Integer is
      (Self.Literals.First_Key);

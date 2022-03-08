@@ -22,6 +22,7 @@
 ------------------------------------------------------------------------------
 
 with Ada.Containers.Ordered_Maps;
+with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
 
 with TGen.Context;              use TGen.Context;
 with TGen.Strategies;           use TGen.Strategies;
@@ -74,7 +75,7 @@ package TGen.Types.Enum_Types is
 
    package Enum_Literal_Maps is new Ada.Containers.Ordered_Maps
      (Key_Type     => Big_Integer,
-      Element_Type => LAL.Defining_Name,
+      Element_Type => Unbounded_Text_Type,
        "<"         => Big_Int."<");
 
    type Other_Enum_Typ (Is_Static : Boolean) is new

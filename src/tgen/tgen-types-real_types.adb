@@ -87,7 +87,7 @@ package body TGen.Types.Real_Types is
       Write_Line
         (F_Body,
          "function Gen is new TGen.Types.Real_Types.Gen ("
-         & (+Self.Fully_Qualified_Name) & ");",
+         & Self.Fully_Qualified_Name & ");",
          Indent);
       Indent := @ - 3;
       Write_Line (F_Body, "begin", Indent);

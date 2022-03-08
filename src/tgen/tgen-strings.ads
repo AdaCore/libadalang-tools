@@ -132,4 +132,26 @@ package TGen.Strings is
    --  Indent the string by Span amount (replacing each line return with Span
    --  spaces + line return).
 
+   type Ada_Identifier is new Ada.Strings.Unbounded.Unbounded_String;
+   --  Simple Ada identifier
+
+   package Ada_Identifier_Vectors is new Ada.Containers.Vectors
+     (Positive, Ada_Identifier);
+
+   subtype Ada_Qualified_Name is Ada_Identifier_Vectors.Vector;
+   --  Sequence of ada identifiers, representing a qualified name. For
+   --  instance: Scope_A.Scope_B.Scope_C
+
+   function "&" (Left, Right : Ada_Qualified_Name) return Ada_Qualified_Name
+      renames Ada_Identifier_Vectors."&";
+
+   function To_Ada (Name : Ada_Qualified_Name) return String
+     with Pre => not Name.Is_Empty;
+   --  Turn the given qualified name into Ada syntax
+
+   function To_Qualified_Name
+     (Name : Libadalang.Analysis.Name) return Ada_Qualified_Name;
+   --  Return the qualified name corresponding to the given name from a parse
+   --  tree.
+
 end TGen.Strings;
