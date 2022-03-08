@@ -40,7 +40,8 @@ class BaseDriver(DiffTestDriver):
         "refactoring_safe_rename",
         "refactoring_extract_subprogram",
         "refactoring_pull_up_declaration",
-        "refactoring_suppress_separate",
+        "refactoring_suppress_separate"
+        "rejuvenate",
     } | WIP_TOOLS
 
     @property
