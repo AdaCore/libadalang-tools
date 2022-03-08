@@ -1,0 +1,1 @@
+rejuvenate --help
