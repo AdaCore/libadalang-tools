@@ -1,0 +1,13 @@
+usage: rejuvenate [--help|-h] tool [--verbose|-v] 
+
+Rejuvenate tools
+
+positional arguments:
+   tool  record_components
+         array_aggregates
+   
+optional arguments:
+   --help, -h     Show this help message
+   --verbose, -v  Verbose output
+   
+
