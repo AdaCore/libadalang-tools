@@ -29,8 +29,7 @@ package TGen.Engine is
    Invalid_Generation_Error : exception;
 
    procedure Test_Runner
-     (Strategies   : Strategy_Vectors.Vector;
-      Value_Stream : access Flushable_Stream'Class;
+     (Value_Stream : access Flushable_Stream'Class;
       Wrapped_Test : access procedure);
 
 end TGen.Engine;

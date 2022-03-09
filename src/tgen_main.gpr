@@ -1,0 +1,13 @@
+with "tgen";
+
+project TGen_Main is
+
+   for Source_Dirs use ("tgen");
+   for Source_Files use ("tgen_app.adb", "tgen_marshalling.adb");
+   for Object_Dir use "obj";
+
+   for Main use ("tgen_app.adb", "tgen_marshalling.adb");
+
+   package Compiler renames TGen.Compiler;
+   package Binder renames Tgen.Binder;
+end TGen_Main;

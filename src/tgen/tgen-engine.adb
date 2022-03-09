@@ -32,15 +32,11 @@ package body TGen.Engine is
    -----------------
 
    procedure Test_Runner
-     (Strategies   : Strategy_Vectors.Vector;
-      Value_Stream : access Flushable_Stream'Class;
+     (Value_Stream : access Flushable_Stream'Class;
       Wrapped_Test : access procedure)
    is
    begin
       for I in 1 .. MAX_TESTS loop
-         for Strat of Strategies loop
-            Strat.Gen (Value_Stream);
-         end loop;
          begin
             Wrapped_Test.all;
          exception
