@@ -130,6 +130,9 @@ package TGen.Types is
    --  An array type with indefinite bounds must be constrained, a discriminant
    --  record type must be constrained.
 
+   function Supports_Static_Gen (Self : Typ) return Boolean is (False);
+   --  Wether values for this Typ can be statically generated
+
    function Generate_Random_Strategy
      (Self    : Typ;
       Context : in out TGen.Context.Generation_Context)
@@ -175,7 +178,15 @@ package TGen.Types is
                 and then (not R.Is_Null)
                 and then L.Get.Name = R.Get.Name));
 
-   --  As_<Target>_Typ functions are useful to view a certain objetc of type
+   function Try_Generate_Static
+     (Self    : SP.Ref;
+      Context : in out TGen.Context.Generation_Context)
+      return TGen.Strategies.Static_Strategy_Type'Class;
+   --  Return a static strategy if the type supports it, otherwise return
+   --  a Commented_Out_Strategy or raise program error depending on the
+   --  behavior specified in the context.
+
+   --  As_<Target>_Typ functions are useful to view a certain object of type
    --  Typ'Class wrapped in a smart pointer as a <Target>_Typ, and thus be able
    --  to access the components and primitives defined for that particular
    --  type. The return value is the object encapsulated in the smart pointer,

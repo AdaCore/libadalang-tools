@@ -36,6 +36,9 @@ package TGen.Types.Enum_Types is
 
    type Char_Typ is new Enum_Typ with null record;
 
+   function Supports_Static_Gen (Self : Char_Typ) return Boolean is (True);
+   --  Wether values for this Typ can be statically generated
+
    function Image (Self : Char_Typ) return String;
 
    function Lit_Image (Self : Char_Typ; Lit : Big_Integer) return String;
@@ -57,6 +60,9 @@ package TGen.Types.Enum_Types is
    pragma Inline (As_Char_Typ);
 
    type Bool_Typ is new Enum_Typ with null record;
+
+   function Supports_Static_Gen (Self : Typ) return Boolean is (True);
+   --  Wether values for this Typ can be statically generated
 
    function Image (Self : Bool_Typ) return String;
 
@@ -87,6 +93,10 @@ package TGen.Types.Enum_Types is
             null;
       end case;
    end record;
+
+   function Supports_Static_Gen (Self : Other_Enum_Typ) return Boolean is
+     (Self.Is_Static);
+   --  Wether values for this Typ can be statically generated
 
    function Image (Self : Other_Enum_Typ) return String;
 

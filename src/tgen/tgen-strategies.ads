@@ -112,6 +112,17 @@ package TGen.Strategies is
    is
      (raise Program_Error with "Unimplemented static strategy");
 
+   type Commented_Out_Strategy_Type is new Static_Strategy_Type with
+     null record;
+   --  Strategy that generates comments stating that the user should fill in
+   --  a valid value.
+
+   overriding function Generate_Static_Value
+     (S : in out Commented_Out_Strategy_Type;
+      Disc_Context : Disc_Value_Map) return Static_Value'Class is
+     (Base_Static_Value'(Value => To_Unbounded_String
+        ("--  Replace this comment by a valid value")));
+
    type Basic_Static_Strategy_Type is new Static_Strategy_Type with record
       T : SP.Ref;
       F : access function (T : Typ'Class) return Static_Value'Class;

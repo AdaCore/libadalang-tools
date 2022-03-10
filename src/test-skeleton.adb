@@ -62,8 +62,10 @@ with Test.Mapping; use Test.Mapping;
 with Test.Stub;
 with Utils.Command_Lines; use Utils.Command_Lines;
 with Utils.Environment;
+with Utils_Debug; use Utils_Debug;
 
 with TGen.Gen_Strategies;
+with TGen.Context;
 
 package body Test.Skeleton is
    Me                : constant Trace_Handle :=
@@ -739,42 +741,49 @@ package body Test.Skeleton is
                      when Ada_Subp_Decl =>
                      TGen.Gen_Strategies.Generate_Test_Vectors
                      (TGen_Ctx,
-                        10,
+                        Test.Common.TGen_Num_Tests,
                         Element (Subp_Cur).Subp_Declaration.As_Subp_Decl,
                         Ada.Strings.Unbounded.To_Unbounded_String
                         (Element (Subp_Cur).Subp_Full_Hash.all));
                   when others =>
-                     Report_Std ("Warning: (TGen) "
-                                 & Base_Name (Data.Unit_File_Name.all)
-                                 & " : Could not generate test vectors for "
-                                 & Element (Subp_Cur).Subp_Text_Name.all
-                                 & " : " & ASCII.LF
-                                 & "Unsupported subprogram declaration kind: "
-                                 & Kind_Name
-                                    (Element (Subp_Cur).Subp_Declaration));
+                     if Debug_Flag_1 then
+                        Report_Std ("Warning: (TGen) "
+                                    & Base_Name (Data.Unit_File_Name.all)
+                                    & " : Could not generate test vectors for "
+                                    & Element (Subp_Cur).Subp_Text_Name.all
+                                    & " : " & ASCII.LF
+                                    & "Unsupported subprogram declaration kind"
+                                    & ": "
+                                    & Kind_Name
+                                       (Element (Subp_Cur).Subp_Declaration));
+                     end if;
                   end case;
                exception
                   when Exc : Program_Error =>
-                     Report_Std ("Warning: (TGen) "
-                                 & Base_Name (Data.Unit_File_Name.all)
-                                 & " : Unexpected error generating test"
-                                 & " vectors for "
-                                 & Element (Subp_Cur).Subp_Text_Name.all
-                                 & " : " & ASCII.LF
-                                 & Ada.Exceptions.Exception_Message (Exc));
+                     if Debug_Flag_1 then
+                        Report_Std ("Warning: (TGen) "
+                                    & Base_Name (Data.Unit_File_Name.all)
+                                    & " : Unexpected error generating test"
+                                    & " vectors for "
+                                    & Element (Subp_Cur).Subp_Text_Name.all
+                                    & " : " & ASCII.LF
+                                    & Ada.Exceptions.Exception_Message (Exc));
+                     end if;
                   when Exc : others =>
-                     Report_Std ("Warning: (TGen) "
-                                 & Base_Name (Data.Unit_File_Name.all)
-                                 & " : Unexpected error generating test"
-                                 & " vectors for "
-                                 & Element (Subp_Cur).Subp_Text_Name.all
-                                 & " : " & ASCII.LF
-                                 & Ada.Exceptions.Exception_Information (Exc));
+                     if Debug_Flag_1 then
+                        Report_Std ("Warning: (TGen) "
+                                    & Base_Name (Data.Unit_File_Name.all)
+                                    & " : Unexpected error generating test"
+                                    & " vectors for "
+                                    & Element (Subp_Cur).Subp_Text_Name.all
+                                    & " : " & ASCII.LF
+                                    & Ada.Exceptions.Exception_Information
+                                        (Exc));
+                     end if;
                end;
                Subp_Data_List.Next (Subp_Cur);
             end loop;
             TGen.Gen_Strategies.Generate_Artifacts (TGen_Ctx);
-            TGen_Ctx.Clear_Context;
          end if;
 
          declare
@@ -3712,7 +3721,8 @@ package body Test.Skeleton is
          Body_Declarations, -- /01/
          Body_Statements);  -- /02/
 
-      function Unparse_Test_Vectors (Subp : Subp_Info) return Boolean;
+      function Unparse_Test_Vectors
+        (Unit_Data : Data_Holder; Subp : Subp_Info) return Boolean;
       --  Lookup test vectors in JSON format and try to unparse them in the
       --  test wrappers. Returns false if there is no test vectors to unparse.
 
@@ -3728,17 +3738,23 @@ package body Test.Skeleton is
       --  Put with and use clauses for Stub_Data packages of units stubbed
       --  for current UUT.
 
-      function Unparse_Test_Vectors (Subp : Subp_Info) return Boolean is
+      function Unparse_Test_Vectors
+        (Unit_Data : Data_Holder;
+         Subp      : Subp_Info)
+         return Boolean is
          JSON_Unit_File : constant Virtual_File := GNATCOLL.VFS.Create
            (+(Test.Common.JSON_Test_Dir.all & Data.Unit_Full_Name.all
             & ".json"));
+
          Unit_File_Content : GNAT.Strings.String_Access;
+
          Unit_Content : JSON_Array;
          Subp_Content : JSON_Value := JSON_Null;
          Subp_Vectors : JSON_Array;
          Single_Vec   : JSON_Array;
          Test_Count   : Positive := 1;
          Is_Function  : Boolean;
+         Generation_Complete : Boolean := False;
       begin
 
          if not Is_Regular_File (JSON_Unit_File)
@@ -3774,63 +3790,95 @@ package body Test.Skeleton is
             return False;
          end if;
 
+         Generation_Complete := Subp_Content.Get ("generation_complete");
+
          Is_Function := Subp_Content.Has_Field ("return_type");
 
-         --  unparse each test vector
+         declare
+            Com : constant String :=
+              (if Generation_Complete then "" else "--  ");
+         begin
 
-         S_Put (6, "--  Autogenerated test vectors");
-         New_Line_Count;
-         New_Line_Count;
+            --  unparse each test vector
 
-         Subp_Vectors := Subp_Content.Get ("values").Get;
-
-         for Test_Vec of Subp_Vectors loop
-            Single_Vec := Test_Vec.Get;
-            S_Put (6, "Test_" & Trim (Test_Count'Image, Both) & ":");
+            S_Put (6, "--  Autogenerated test vectors");
             New_Line_Count;
-            S_Put (6, "declare");
             New_Line_Count;
-            for Param of Single_Vec loop
-               S_Put (8, Param.Get ("name") & " : " & Param.Get ("type_name")
-                 & (if Param.Get ("mode") in 0 | 1
-                    then " := " & Param.Get ("value") & ";"
-                    else ";"));
+
+            Subp_Vectors := Subp_Content.Get ("values").Get;
+
+            for Test_Vec of Subp_Vectors loop
+               Single_Vec := Test_Vec.Get;
+               S_Put (6, Com);
+               S_Put (0, "Test_" & Trim (Test_Count'Image, Both) & ":");
                New_Line_Count;
-            end loop;
-            if Is_Function then
-               S_Put (9, "Ret_Val : " & Subp_Content.Get ("return_type")
+               S_Put (6, Com);
+               S_Put (0, "declare");
+               New_Line_Count;
+               for Param of Single_Vec loop
+                  S_Put (6, Com);
+                  S_Put (3, Param.Get ("name") & " : "
+                            & Param.Get ("type_name")
+                            & (if Param.Get ("mode") in 0 | 1
+                               then " := " & Param.Get ("value") & ";"
+                               else ";"));
+                  New_Line_Count;
+               end loop;
+               if Is_Function then
+                  S_Put (6, Com);
+                  S_Put (3, Com & "Ret_Val : "
+                            & Subp_Content.Get ("return_type") & ";");
+                  New_Line_Count;
+               end if;
+               S_Put (6, Com);
+               S_Put (0, "begin");
+               New_Line_Count;
+               S_Put (6, Com);
+               S_Put (3, (if Is_Function then "Ret_Val := " else "")
+                         & Subp_Content.Get ("fully_qualified_name") & " (");
+               for Param_Id in Single_Vec loop
+                  S_Put (0, Array_Element (Single_Vec, Param_Id).Get ("name"));
+                  if Array_Has_Element (Single_Vec, Param_Id + 1) then
+                     S_Put (0, ", ");
+                  end if;
+               end loop;
+               S_Put (0, ");");
+               New_Line_Count;
+               S_Put (6, Com);
+               S_Put (0, "exception");
+               New_Line_Count;
+               S_Put (6, Com);
+               S_Put (3, "when Exc : others =>");
+               New_Line_Count;
+               S_Put (6, Com);
+               S_Put (6, "AUnit.Assertions.Assert");
+               New_Line_Count;
+               S_Put (6, Com);
+               S_Put (8, "(False,");
+               New_Line_Count;
+               S_Put (6, Com);
+               S_Put (9, """Test_" & Trim (Test_Count'Image, Both)
+                          & " crashed: "" & Ada.Exceptions.Exception_"
+                          & "Information (Exc));");
+               New_Line_Count;
+               S_Put (6, Com);
+               S_Put (0, "end Test_" & Trim (Test_Count'Image, Both)
                          & ";");
                New_Line_Count;
-            end if;
-            S_Put (6, "begin");
-            New_Line_Count;
-            S_Put (9, (if Is_Function then "Ret_Val := " else "")
-                      & Subp_Content.Get ("fully_qualified_name") & " (");
-            for Param_Id in Single_Vec loop
-               S_Put (0, Array_Element (Single_Vec, Param_Id).Get ("name"));
-               if Array_Has_Element (Single_Vec, Param_Id + 1) then
-                  S_Put (0, ", ");
-               end if;
+               New_Line_Count;
+               Test_Count := Test_Count + 1;
             end loop;
-            S_Put (0, ");");
+         end;
+
+         if not Generation_Complete then
+            S_Put (6, "AUnit.Assertions.Assert");
             New_Line_Count;
-            S_Put (6, "exception");
+            S_Put (9, "(False,");
             New_Line_Count;
-            S_Put (9, "when Exc : others =>");
+            S_Put (9, """Missing test values for " & Subp.Subp_Name_Image.all
+                      & ". Please fill out manually."");");
             New_Line_Count;
-            S_Put (12, "AUnit.Assertions.Assert");
-            New_Line_Count;
-            S_Put (14, "(False,");
-            New_Line_Count;
-            S_Put (15, """Test_" & Trim (Test_Count'Image, Both)
-                       & " crashed: "" & Ada.Exceptions.Exception_Information"
-                     & " (Exc));");
-            New_Line_Count;
-            S_Put (6, "end Test_" & Trim (Test_Count'Image, Both) & ";");
-            New_Line_Count;
-            New_Line_Count;
-            Test_Count := Test_Count + 1;
-         end loop;
+         end if;
 
          GNAT.Strings.Free (Unit_File_Content);
 
@@ -5440,7 +5488,7 @@ package body Test.Skeleton is
 
                         if Test.Common.Generate_Test_Vectors then
                            Unparse_Success := Unparse_Test_Vectors
-                             (Subp_Data_List.Element (Subp_Cur));
+                             (Data, Subp_Data_List.Element (Subp_Cur));
                         end if;
                         if not Unparse_Success then
                            if Test.Common.Generate_Test_Vectors
@@ -6629,7 +6677,7 @@ package body Test.Skeleton is
                              and then not Data.Is_Generic
                            then
                               Unparse_Success := Unparse_Test_Vectors
-                                (Current_Subp);
+                                (Data, Current_Subp);
                            end if;
                            if not Unparse_Success then
                               if Test.Common.Generate_Test_Vectors

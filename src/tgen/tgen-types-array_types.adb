@@ -268,6 +268,7 @@ package body TGen.Types.Array_Types is
 
    function Length
      (I_Constraint : TGen.Types.Constraints.Index_Constraint;
+      I_Type       : SP.Ref;
       Disc_Context : Disc_Value_Map) return Big_Integer;
    --  Returns the length of the array from its Index_Constraint
 
@@ -290,6 +291,7 @@ package body TGen.Types.Array_Types is
 
    function Length
      (I_Constraint : TGen.Types.Constraints.Index_Constraint;
+      I_Type       : SP.Ref;
       Disc_Context : Disc_Value_Map) return Big_Integer
 
    is
@@ -305,9 +307,16 @@ package body TGen.Types.Array_Types is
                  "Dynamic constraint unsupported for static generation");
 
       use type Big_Integer;
+      LB, HB : Big_Integer;
    begin
-      return Constraint_Value (I_Constraint.Discrete_Range.High_Bound) -
-        Constraint_Value (I_Constraint.Discrete_Range.Low_Bound) + 1;
+      if I_Constraint.Present then
+         HB := Constraint_Value (I_Constraint.Discrete_Range.High_Bound);
+         LB := Constraint_Value (I_Constraint.Discrete_Range.Low_Bound);
+      else
+         LB := As_Discrete_Typ (I_Type).Low_Bound;
+         HB := As_Discrete_Typ (I_Type).High_Bound;
+      end if;
+      return HB - LB + 1;
    end Length;
 
    ----------------------------
@@ -356,8 +365,10 @@ package body TGen.Types.Array_Types is
                  (Min_Size => Unconstrained_Array_Size_Min,
                   Max_Size => Unconstrained_Array_Size_Max)
             else
-               (Min_Size => +Length (Constraints (I), Disc_Context),
-                Max_Size => +Length (Constraints (I), Disc_Context))));
+               (Min_Size => +Length
+                 (Constraints (I), Self.Index_Types (I), Disc_Context),
+                Max_Size => +Length
+                  (Constraints (I), Self.Index_Types (I), Disc_Context))));
 
       Strat : Array_Strategy_Type := Array_Strategy (Sizes);
 

@@ -60,6 +60,8 @@ package TGen.Subprograms is
          Parent_Package       : Unbounded_Text_Type;
          Parameters_Data      : Parameters_Data_Vector;
          Precondition         : Unbounded_Text_Type;
+         Some_Param_Static    : Boolean := False;
+         All_Params_Static    : Boolean := False;
          case Kind is
             when Ada_Subp_Kind_Function =>
                Return_Type_Fully_Qualified_Name : Unbounded_Text_Type;

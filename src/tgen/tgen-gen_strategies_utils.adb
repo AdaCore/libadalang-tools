@@ -78,7 +78,8 @@ package body TGen.Gen_Strategies_Utils is
                     else ""),
                Return_Type_Parent_Package       =>
                   +Spec.P_Top_Level_Decl (Spec.Unit).P_Fully_Qualified_Name,
-               Precondition                     => Precondition);
+               Precondition                     => Precondition,
+               others                           => <>);
 
          when Ada_Subp_Kind_Procedure =>
             return
@@ -87,7 +88,8 @@ package body TGen.Gen_Strategies_Utils is
                Fully_Qualified_Name => +Fully_Qualified_Name,
                Parent_Package       => +Parent_Package,
                Parameters_Data      => Params_Data,
-               Precondition         => Precondition);
+               Precondition         => Precondition,
+               others               => <>);
       end case;
       return Result;
    end Extract_Subprogram_Data;
@@ -342,6 +344,7 @@ package body TGen.Gen_Strategies_Utils is
                           (Discriminated_Record_Typ'
                                (Constrained        => False,
                                 Name               => R.Name,
+                                Static_Gen         => R.Static_Gen,
                                 Component_Types    => V.Components,
                                 Mutable            => False,
                                 Discriminant_Types => Component_Maps.Empty_Map,

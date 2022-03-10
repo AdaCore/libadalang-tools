@@ -77,7 +77,7 @@ package body TGen.Gen_Strategies is
       for Package_Data of Context.Packages_Data loop
          null;
       end loop;
-      Generate_Type_Strategies (Context);
+      --  Generate_Type_Strategies (Context);
    end Generate_Artifacts;
 
    ----------------------------------
@@ -589,11 +589,6 @@ package body TGen.Gen_Strategies is
          declare
             File : constant Virtual_File :=
               Get_JSON_Name (Context, +Key (Unit_JSON_Cursor));
-            JSON_Unit_FD : constant GNAT.OS_Lib.File_Descriptor :=
-              GNAT.OS_Lib.Create_File
-                (+Full_Name (File), GNAT.OS_Lib.Text);
-            pragma Unreferenced (JSON_Unit_FD);
-
             JSON_Unit_Writable_File : Writable_File :=
               Write_File (File);
          begin
@@ -623,43 +618,60 @@ package body TGen.Gen_Strategies is
       Disc_Context : Disc_Value_Map;
    begin
       Collect_Type_Translations (Context, Subp);
+      Subp_Data.All_Params_Static := True;
       for Param of Subp_Data.Parameters_Data loop
-         declare
-            Param_Type : SP.Ref :=
-              Context.Type_Translations.Element
-                (Param.Type_Fully_Qualified_Name);
-         begin
-            if not Context.Type_And_Param_Strategies.Contains
-              (Param.Type_Fully_Qualified_Name)
-            then
-               Context.Type_And_Param_Strategies.Insert
-                 (Param.Type_Fully_Qualified_Name,
-                  Param_Type.Get.Generate_Static (Context));
-            end if;
-         end;
+         if Param.Mode in In_Mode | In_Out_Mode then
+            declare
+               Param_Type : SP.Ref :=
+               Context.Type_Translations.Element
+                  (Param.Type_Fully_Qualified_Name);
+            begin
+               Subp_Data.All_Params_Static :=
+                 Subp_Data.All_Params_Static
+                 and then Param_Type.Get.Supports_Static_Gen;
+               Subp_Data.Some_Param_Static :=
+                 Subp_Data.Some_Param_Static
+                 or else Param_Type.Get.Supports_Static_Gen;
+               if not Context.Type_And_Param_Strategies.Contains
+                 (Param.Type_Fully_Qualified_Name)
+               then
+                  Context.Type_And_Param_Strategies.Insert
+                  (Param.Type_Fully_Qualified_Name,
+                     Try_Generate_Static (Param_Type, Context));
+               end if;
+            end;
+         end if;
       end loop;
+
+      --  Do not generate any JSON if none of the types are supported.
+
+      if not Subp_Data.Some_Param_Static then
+         return;
+      end if;
 
       for J in 1 .. Nb_Tests loop
          Test_Vector_JSON := Empty_Array;
          for Param of Subp_Data.Parameters_Data loop
             declare
                Param_JSON : JSON_Value := Create_Object;
-
-               Strat : Static_Strategy_Type'Class :=
-                 Static_Strategy_Type
-                   (Context.Type_And_Param_Strategies.Element
-                      (Param.Type_Fully_Qualified_Name));
             begin
                Param_JSON.Set_Field ("name", Create (+Param.Name));
                Param_JSON.Set_Field ("type_name", Create (+Param.Type_Name));
                if Param.Mode in In_Mode | In_Out_Mode then
-                  Param_JSON.Set_Field
-                    ("value",
-                     Strat.Generate_Static_Value
-                       (Disc_Value_Maps.Empty_Map).To_String);
+                  declare
+                     Strat : Static_Strategy_Type'Class :=
+                        Static_Strategy_Type
+                          (Context.Type_And_Param_Strategies.Element
+                            (Param.Type_Fully_Qualified_Name));
+                  begin
+                     Param_JSON.Set_Field
+                     ("value",
+                        Strat.Generate_Static_Value
+                        (Disc_Value_Maps.Empty_Map).To_String);
+                  end;
                end if;
                Param_JSON.Set_Field
-                 ("mode", Create (Integer'(Parameter_Mode'Pos (Param.Mode))));
+               ("mode", Create (Integer'(Parameter_Mode'Pos (Param.Mode))));
                Append (Test_Vector_JSON, Param_JSON);
             end;
          end loop;
@@ -672,6 +684,8 @@ package body TGen.Gen_Strategies is
         ("fully_qualified_name", +Subp_Data.Fully_Qualified_Name);
       Function_JSON.Set_Field ("package_name", +Subp_Data.Parent_Package);
       Function_JSON.Set_Field ("UID", +Subp_UID);
+      Function_JSON.Set_Field
+        ("generation_complete", Create (Subp_Data.All_Params_Static));
       if Subp.Kind = Ada_Subp_Kind_Function then
          Function_JSON.Set_Field
            ("return_type",

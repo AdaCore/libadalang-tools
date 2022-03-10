@@ -62,10 +62,10 @@ package body TGen.Types.Translation is
    package Text renames Langkit_Support.Text;
 
    package Translation_Maps is new Ada.Containers.Hashed_Maps
-     (Key_Type        => Ada_Node,
+     (Key_Type        => Ada_Qualified_Name,
       Element_Type    => TGen.Types.SP.Ref,
-      Hash            => LAL.Hash,
-      Equivalent_Keys => LAL."=",
+      Hash            => TGen.Strings.Hash,
+      Equivalent_Keys => TGen.Strings.Ada_Identifier_Vectors."=",
       "="             => TGen.Types.SP."=");
 
    Translation_Cache : Translation_Maps.Map;
@@ -77,7 +77,7 @@ package body TGen.Types.Translation is
    begin
       while Has_Element (Cache_Cur) loop
          Put_Line
-           (Text.Image (Key (Cache_Cur).As_Base_Type_Decl.P_Defining_Name.Text)
+           (To_Ada (Key (Cache_Cur))
             & " => " & Element (Cache_Cur).Get.Image);
          Next (Cache_Cur);
       end loop;
@@ -244,6 +244,30 @@ package body TGen.Types.Translation is
    function Translate_Discriminant_Constraints
      (Node : LAL.Discriminant_Constraint)
      return TGen.Types.Constraints.Discriminant_Constraints;
+
+   function Variant_Support_Static_Gen (Var : Variant_Part_Acc) return Boolean;
+
+   function Var_Choice_Supports_Static_Gen
+     (Choice : Variant_Choice) return Boolean;
+
+   ------------------------------------
+   -- Var_Choice_Supports_Static_Gen --
+   ------------------------------------
+
+   function Var_Choice_Supports_Static_Gen
+     (Choice : Variant_Choice) return Boolean is
+     ((for all Comp_Ref of Choice.Components
+         => Comp_Ref.Get.Supports_Static_Gen)
+       and then Variant_Support_Static_Gen (Choice.Variant));
+
+   --------------------------------
+   -- Variant_Support_Static_Gen --
+   --------------------------------
+
+   function Variant_Support_Static_Gen (Var : Variant_Part_Acc) return Boolean
+   is (Var = null
+       or else (for all Choice of Var.all.Variant_Choices
+                   => Var_Choice_Supports_Static_Gen (Choice)));
 
    ----------------------
    -- New_Eval_As_Int --
@@ -1077,6 +1101,16 @@ package body TGen.Types.Translation is
 
             Res_Typ.Name := To_Qualified_Name (Type_Name.F_Name);
 
+            --  For constrained arrays, even if some index type is not
+            --  statically known, as long as the matching index constraints
+            --  are we should be able to generate values for this type.
+
+            Res_Typ.Static_Gen :=
+              Res_Typ.Component_Type.Get.Supports_Static_Gen
+              and then (for all Idx in 1 .. Res_Typ.Num_Dims
+                          => Static (Res_Typ.Index_Constraints (Idx)));
+
+
             return Res : Translation_Result (Success => True) do
                Res.Res.Set (Res_Typ);
             end return;
@@ -1134,6 +1168,12 @@ package body TGen.Types.Translation is
          end loop;
 
          Res_Typ.Name := To_Qualified_Name (Type_Name.F_Name);
+
+         Res_Typ.Static_Gen :=
+           Res_Typ.Component_Type.Get.Supports_Static_Gen
+           and then (for all Index_Ref of Res_Typ.Index_Types
+                       => Index_Ref.Get.Supports_Static_Gen);
+
          return Res : Translation_Result (Success => True) do
             Res.Res.Set (Res_Typ);
          end return;
@@ -2061,6 +2101,17 @@ package body TGen.Types.Translation is
 
             Trans_Res.Name := To_Qualified_Name (Type_Name.F_Name);
 
+            Trans_Res.Static_Gen :=
+              (for all Comp_Ref of Trans_Res.Component_Types
+                 => Comp_Ref.Get.Supports_Static_Gen)
+              and then (for all Disc_Ref of Trans_Res.Discriminant_Types
+                          => Disc_Ref.Get.Supports_Static_Gen)
+              and then
+                (not Trans_Res.Constrained
+                 or else (for all Const of Trans_Res.Discriminant_Constraint
+                            => Const.Kind in Static | Discriminant))
+              and then Variant_Support_Static_Gen (Trans_Res.Variant);
+
             --  Apply_Constraints can actually return a type that isn't
             --  discriminated or that isn't constrained, so lets try to
             --  convert Trans_Res to the correct kind depending on the
@@ -2084,7 +2135,8 @@ package body TGen.Types.Translation is
                   return Res : Translation_Result (Success => True) do
                      Res.Res.Set (Nondiscriminated_Record_Typ'
                        (Name            => Trans_Res.Name,
-                        Component_Types => Trans_Res.Component_Types));
+                        Component_Types => Trans_Res.Component_Types,
+                        Static_Gen      => Trans_Res.Static_Gen));
                   end return;
 
                else
@@ -2100,6 +2152,7 @@ package body TGen.Types.Translation is
                         Rec_Typ.Variant := Trans_Res.Variant;
                         Rec_Typ.Name := Trans_Res.Name;
                         Rec_Typ.Mutable := Trans_Res.Mutable;
+                        Rec_Typ.Static_Gen := Trans_Res.Static_Gen;
                         Res.Res.Set (Rec_Typ);
                      end;
                   end return;
@@ -2473,32 +2526,44 @@ package body TGen.Types.Translation is
       use Translation_Maps;
 
       Full_Decl : constant Base_Type_Decl := N.P_Full_View;
-      Cache_Cur : constant Cursor :=
-        Translation_Cache.Find (Full_Decl.As_Ada_Node);
    begin
-      --  If we still have the base_type_decl in the cache, return it
 
-      if Cache_Cur /= No_Element then
-         Cache_Hits := Cache_Hits + 1;
-         return Res : Translation_Result (Success => True) do
-            Res.Res := Element (Cache_Cur);
-         end return;
+      --  Do not memoize anonymous types
+
+      if Is_Null (Full_Decl.F_Name) then
+         return Translate_Internal (Full_Decl, Verbose);
       end if;
 
-      Cache_Miss := Cache_Miss + 1;
-
-      --  Otherwise, recompute it and store it in the cache
-
       declare
-         Trans_Res : constant Translation_Result :=
-           Translate_Internal (Full_Decl, Verbose);
+         Cache_Cur : constant Cursor :=
+           Translation_Cache.Find
+             (To_Qualified_Name (Full_Decl.F_Name.F_Name));
       begin
-         if Trans_Res.Success then
-            Translation_Cache.Insert (Full_Decl.As_Ada_Node, Trans_Res.Res);
-         end if;
-         return Trans_Res;
-      end;
+         --  If we have the type name in the cache, return it
 
+         if Cache_Cur /= No_Element then
+            Cache_Hits := Cache_Hits + 1;
+            return Res : Translation_Result (Success => True) do
+               Res.Res := Element (Cache_Cur);
+            end return;
+         end if;
+
+         Cache_Miss := Cache_Miss + 1;
+
+         --  Otherwise, compute the type tranlsation and store it in the cache
+
+         declare
+            Trans_Res : constant Translation_Result :=
+            Translate_Internal (Full_Decl, Verbose);
+         begin
+            if Trans_Res.Success then
+               Translation_Cache.Insert
+                 (To_Qualified_Name (Full_Decl.F_Name.F_Name), Trans_Res.Res);
+            end if;
+            return Trans_Res;
+         end;
+
+      end;
    end Translate;
 
    ------------------------
@@ -2524,9 +2589,20 @@ package body TGen.Types.Translation is
       Verbose_Diag := Verbose;
       Is_Static := Is_Static and then N.P_Is_Static_Decl;
 
-      if not Is_Null (Type_Name)
-        and then Text.Image (Type_Name.P_Fully_Qualified_Name)
-                 = "System.Address"
+
+      if Is_Null (Type_Name) then
+
+         --  Anonymous types at this level are either anonymous array
+         --  declarations or anonymous access types, both of which we don't
+         --  intend to support.
+
+         return Res : Translation_Result (Success => True) do
+            Res.Res.Set
+              (Unsupported_Typ'
+                (Name => TGen.Strings.Ada_Identifier_Vectors.To_Vector
+                           (To_Unbounded_String (N.Image), 1)));
+         end return;
+      elsif Text.Image (Type_Name.P_Fully_Qualified_Name) = "System.Address"
       then
 
          --  Special case for System.Address, which is actually defined as a

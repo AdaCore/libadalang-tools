@@ -81,24 +81,28 @@ package Test.Command_Lines is
       Passed_Tests,
       Exit_Status,
       Copy_Environment,
-      Reporter);
+      Reporter,
+      Gen_Test_Num,
+      Gen_Unsupported_Behavior);
 
    package Test_String_Switches is new String_Switches
      (Descriptor,
       Test_Strings);
 
    package Test_String_Syntax is new Test_String_Switches.Set_Syntax
-     ((Separate_Drivers => '?',
-       Harness_Dir      => '=',
-       Tests_Dir        => '=',
-       Tests_Root       => '=',
-       Stubs_Dir        => '=',
-       Additional_Tests => '=',
-       Skeleton_Default => '=',
-       Passed_Tests     => '=',
-       Exit_Status      => '=',
-       Copy_Environment => '=',
-       Reporter         => '='));
+     ((Separate_Drivers         => '?',
+       Harness_Dir              => '=',
+       Tests_Dir                => '=',
+       Tests_Root               => '=',
+       Stubs_Dir                => '=',
+       Additional_Tests         => '=',
+       Skeleton_Default         => '=',
+       Passed_Tests             => '=',
+       Exit_Status              => '=',
+       Copy_Environment         => '=',
+       Reporter                 => '=',
+       Gen_Test_Num             => '=',
+       Gen_Unsupported_Behavior => '='));
 
    type Test_String_Seqs is (Exclude_From_Stubbing);
 

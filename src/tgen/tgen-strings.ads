@@ -29,6 +29,7 @@ with Ada.Containers.Vectors;
 with Ada.Strings;           use Ada.Strings;
 with Ada.Strings.Equal_Case_Insensitive;
 with Ada.Strings.Fixed;     use Ada.Strings.Fixed;
+with Ada.Strings.Hash;
 with Ada.Strings.Less_Case_Insensitive;
 with Ada.Strings.Maps;      use Ada.Strings.Maps;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
@@ -153,5 +154,8 @@ package TGen.Strings is
      (Name : Libadalang.Analysis.Name) return Ada_Qualified_Name;
    --  Return the qualified name corresponding to the given name from a parse
    --  tree.
+
+   function Hash (Self : Ada_Qualified_Name) return Ada.Containers.Hash_Type is
+     (Ada.Strings.Hash (To_Ada (Self)));
 
 end TGen.Strings;

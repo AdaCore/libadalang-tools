@@ -55,6 +55,10 @@ package TGen.Types.Real_Types is
       end case;
    end record;
 
+   function Supports_Static_Gen (Self : Float_Typ) return Boolean is
+     (Self.Is_Static);
+   --  Wether values for this Typ can be statically generated
+
    function Low_Bound_Or_Default (Self : Float_Typ) return Long_Float
    with Pre => Self.Is_Static;
 
@@ -90,6 +94,10 @@ package TGen.Types.Real_Types is
       end case;
    end record;
 
+   function Supports_Static_Gen (Self : Ordinary_Fixed_Typ) return Boolean is
+     (Self.Is_Static);
+   --  Wether values for this Typ can be statically generated
+
    function Low_Bound_Or_Default (Self : Ordinary_Fixed_Typ) return Long_Float
    with Pre => Self.Is_Static;
 
@@ -123,6 +131,10 @@ package TGen.Types.Real_Types is
             null;
       end case;
    end record;
+
+   function Supports_Static_Gen (Self : Decimal_Fixed_Typ) return Boolean is
+     (Self.Is_Static);
+   --  Wether values for this Typ can be statically generated
 
    function Image (Self : Decimal_Fixed_Typ) return String;
 

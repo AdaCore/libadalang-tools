@@ -367,6 +367,9 @@ package Test.Common is
    --  Dir in which the test vector in json format should be stored / looked up
 
    TGen_Ctx : TGen.Context.Generation_Context;
-   --  Shared context for test vectors generation.
+   --  Shared context for test vectors generation
+
+   TGen_Num_Tests : Positive := 5;
+   --  Number of tests to be generated for each procedure
 
 end Test.Common;

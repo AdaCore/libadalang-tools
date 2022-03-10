@@ -83,6 +83,10 @@ package body TGen.Types.Record_Types is
    function Image (Self : Record_Typ) return String is
      (Image_Internal (Self, 0));
 
+   --------------------
+   -- Image_Internal --
+   --------------------
+
    function Image_Internal
      (Self : Record_Typ; Padding : Natural := 0) return String
    is
@@ -916,7 +920,8 @@ package body TGen.Types.Record_Types is
            Disc_Record.Components (Current_Context);
          R          : Record_Typ :=
            (Name            => Disc_Record.Name,
-            Component_Types => Components);
+            Component_Types => Components,
+            Static_Gen      => Disc_Record.Static_Gen);
       begin
          Append
            (Res,

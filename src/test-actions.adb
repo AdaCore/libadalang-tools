@@ -60,6 +60,7 @@ with Ada.Text_IO;
 with Ada.Strings.Fixed;
 with Ada.Strings.Unbounded;
 
+with TGen.Context;
 with TGen.Gen_Strategies;
 
 package body Test.Actions is
@@ -764,6 +765,35 @@ package body Test.Actions is
             Root_Prj,
             Ada.Strings.Unbounded.To_Unbounded_String
               (Test.Common.JSON_Test_Dir.all));
+
+         if Arg (Cmd, Gen_Test_Num) /= null then
+            begin
+               Test.Common.TGen_Num_Tests :=
+                 Positive'Value (Arg (Cmd, Gen_Test_Num).all);
+            exception
+               when others =>
+                  Cmd_Error_No_Help
+                    ("--gen-test-num should be a positive integer");
+            end;
+         end if;
+
+         if Arg (Cmd, Gen_Unsupported_Behavior) /= null then
+            if Arg (Cmd, Gen_Unsupported_Behavior).all = "no-test" then
+               Test.Common.TGen_Ctx.Unsupported_Type_Behavior :=
+                 TGen.Context.No_Test;
+            elsif Arg (Cmd, Gen_Unsupported_Behavior).all = "commented-out"
+            then
+               Test.Common.TGen_Ctx.Unsupported_Type_Behavior :=
+                 TGen.Context.Commented_Out;
+            else
+               Cmd_Error_No_Help
+                 ("--gen-unsupported-behavior must be one of ""no-test"" or"
+                  & " ""commented-out""");
+            end if;
+         else
+            Test.Common.TGen_Ctx.Unsupported_Type_Behavior :=
+              TGen.Context.No_Test;
+         end if;
       end if;
 
       if Common.Stub_Mode_ON then

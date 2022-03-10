@@ -73,7 +73,12 @@ package TGen.Types.Record_Types is
 
    type Record_Typ is new Composite_Typ with record
       Component_Types : Component_Maps.Map;
+      Static_Gen : Boolean := False;
    end record;
+
+   function Supports_Static_Gen (Self : Record_Typ) return Boolean is
+     (Self.Static_Gen);
+   --  Wether values for this Typ can be statically generated
 
    function Image (Self : Record_Typ) return String;
 

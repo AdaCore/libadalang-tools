@@ -69,6 +69,8 @@ package TGen.Context is
 
    subtype Type_Vectors_Map is Type_Vectors_Maps.Map;
 
+   type Unsupported_Behavior_Kind is (No_Test, Commented_Out);
+
    --  General purpose context for test value generation purposes
 
    type Generation_Context is new TGen.Templates.Context with record
@@ -96,8 +98,14 @@ package TGen.Context is
 
       Required_Type_Strategies : Type_Vectors_Map;
       --  Targeted types for generation
-   end record;
 
-   procedure Clear_Context (Self : in out Generation_Context);
+      Unsupported_Type_Behavior : Unsupported_Behavior_Kind := No_Test;
+      --  Behavior of the test generation when encountering an unsupported
+      --  type. No_Test means that no test will be generated for the concerned
+      --  subprogram, Commented_Out means that tests will be generated, but
+      --  commented out, and with some parameter values that will need to be
+      --  filed in by the user.
+
+   end record;
 
 end TGen.Context;

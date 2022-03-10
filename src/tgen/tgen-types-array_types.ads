@@ -38,7 +38,12 @@ package TGen.Types.Array_Types is
    type Array_Typ (Num_Dims : Positive) is new Composite_Typ with record
       Index_Types : Index_Typ_Arr (1 .. Num_Dims);
       Component_Type : TGen.Types.SP.Ref;
+      Static_Gen : Boolean := False;
    end record;
+
+   function Supports_Static_Gen (Self : Array_Typ) return Boolean is
+     (Self.Static_Gen);
+   --  Wether values for this Typ can be statically generated
 
    overriding function Generate_Static
      (Self    : Array_Typ;

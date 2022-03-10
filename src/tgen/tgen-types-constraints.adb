@@ -257,13 +257,16 @@ package body TGen.Types.Constraints is
             end if;
          when Array_Typ_Range =>
             Res.Set (Constrained_Array_Typ'
-              (Num_Dims =>
+              (Num_Dims          =>
                  As_Unconstrained_Array_Typ (Self.Named_Ancestor).Num_Dims,
-               Name => Name,
-               Component_Type =>
+               Name              => Name,
+               Static_Gen        =>
+                 (As_Unconstrained_Array_Typ (Self.Named_Ancestor).Static_Gen
+                 and then Self.Subtype_Constraints.Static),
+               Component_Type    =>
                  As_Unconstrained_Array_Typ
                    (Self.Named_Ancestor).Component_Type,
-               Index_Types =>
+               Index_Types       =>
                  As_Unconstrained_Array_Typ (Self.Named_Ancestor).Index_Types,
                Index_Constraints =>
                  Index_Constraints (Cst).Constraint_Array));
@@ -282,7 +285,10 @@ package body TGen.Types.Constraints is
                Variant            => Clone
                  (As_Discriminated_Record_Typ (Self.Named_Ancestor).Variant),
                Discriminant_Constraint =>
-                 Discriminant_Constraints (Cst).Constraint_Map.Copy));
+                 Discriminant_Constraints (Cst).Constraint_Map.Copy,
+               Static_Gen         =>
+                 As_Record_Typ (Self.Named_Ancestor).Static_Gen
+                 and then Self.Subtype_Constraints.Static));
          when others =>
             Res.Set (Unsupported_Typ'(Name => Self.Named_Ancestor.Get.Name));
       end case;

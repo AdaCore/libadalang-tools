@@ -99,6 +99,27 @@ package body TGen.Types is
       return raise Program_Error with "Static strategy not implemented";
    end Generate_Static;
 
+   -------------------------
+   -- Try_Generate_Static --
+   -------------------------
+
+   function Try_Generate_Static
+     (Self    : SP.Ref;
+      Context : in out TGen.Context.Generation_Context)
+      return TGen.Strategies.Static_Strategy_Type'Class
+   is
+   begin
+      if Self.Get.Supports_Static_Gen then
+         return Self.Get.Generate_Static (Context);
+      elsif Context.Unsupported_Type_Behavior = Commented_Out then
+         return TGen.Strategies.Commented_Out_Strategy_Type'(others => <>);
+      else
+         return raise Program_Error with
+           "Type " & To_Ada (Self.Get.Name)
+           & " does not support static generation";
+      end if;
+   end Try_Generate_Static;
+
    ------------------------------
    -- Generate_Random_Strategy --
    ------------------------------

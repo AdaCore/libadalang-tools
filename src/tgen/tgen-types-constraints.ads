@@ -205,6 +205,11 @@ package TGen.Types.Constraints is
    --  This operation performs lots of map copies for record types so it may be
    --  relatively slow.
 
+   function Supports_Static_Gen (Self : Anonymous_Typ) return Boolean is
+     (Self.Named_Ancestor.Get.Supports_Static_Gen
+      and then Self.Subtype_Constraints.Static);
+   --  Wether values for this Typ can be statically generated
+
    overriding function Generate_Static
      (Self    : Anonymous_Typ;
       Context : in out Generation_Context) return Static_Strategy_Type'Class;
