@@ -88,7 +88,6 @@ package TGen.Types.Constraints is
    end record;
    --  A constraint_Value for a real type
 
-
    type Discrete_Range_Constraint is new Constraint with record
       Low_Bound, High_Bound : Discrete_Constraint_Value;
    end record;

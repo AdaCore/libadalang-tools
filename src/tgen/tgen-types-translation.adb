@@ -1110,7 +1110,6 @@ package body TGen.Types.Translation is
               and then (for all Idx in 1 .. Res_Typ.Num_Dims
                           => Static (Res_Typ.Index_Constraints (Idx)));
 
-
             return Res : Translation_Result (Success => True) do
                Res.Res.Set (Res_Typ);
             end return;
@@ -2588,7 +2587,6 @@ package body TGen.Types.Translation is
    begin
       Verbose_Diag := Verbose;
       Is_Static := Is_Static and then N.P_Is_Static_Decl;
-
 
       if Is_Null (Type_Name) then
 

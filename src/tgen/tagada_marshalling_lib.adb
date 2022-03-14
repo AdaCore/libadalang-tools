@@ -123,7 +123,8 @@ package body TAGAda_Marshalling_Lib is
          declare
             Byte  : Unsigned_8;
          begin
-            Read_Remainder (Stream, Buffer, Offset, Size (Unsigned_8 (M)), Byte);
+            Read_Remainder
+              (Stream, Buffer, Offset, Size (Unsigned_8 (M)), Byte);
             Val := Val + Base * Long_Long_Long_Unsigned (Byte);
          end;
       end if;
@@ -156,7 +157,7 @@ package body TAGAda_Marshalling_Lib is
       --  value from the stream and add it at the end of V.
       if -Num < Offset then
          Unsigned_8'Read (Stream, Buffer);
-         V := V or Shift_Left (Buffer, Natural (- Offset));
+         V := V or Shift_Left (Buffer, Natural (-Offset));
       end if;
 
       --  Truncate V to its expected length

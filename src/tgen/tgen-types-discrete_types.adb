@@ -39,7 +39,6 @@ package body TGen.Types.Discrete_Types is
       return Intervals.First_Element.Min;
    end Draw;
 
-
    ---------------
    -- Lit_Image --
    ---------------

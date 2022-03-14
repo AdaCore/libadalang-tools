@@ -294,7 +294,6 @@ package body TGen.Gen_Strategies_Utils is
       end if;
    end Type_Strat_Package_Name;
 
-
    -----------
    -- Strip --
    -----------
