@@ -676,6 +676,16 @@ package body Pp.Actions is
             --  The above nodes are specific to synthetic predefined operators
             --  and will never appear in source code.
 
+           when Ada_Pp_Else_Directive
+              | Ada_Pp_Elsif_Directive
+              | Ada_Pp_End_If_Directive
+              | Ada_Pp_If_Directive
+              | Ada_Pp_Then_Kw => null,
+           --  These nodes are produced only by preprocessor-specific grammar
+           --  rules, so the parsing of compilation units (default grammar
+           --  rule) will never create them, and thus these nodes will never
+           --  show up here.
+
            when Ada_Iterated_Assoc => null,
            when Ada_Bracket_Aggregate => null,
            when Ada_Bracket_Delta_Aggregate => null,
