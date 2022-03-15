@@ -22,7 +22,6 @@
 ------------------------------------------------------------------------------
 
 with Ada.Directories;
-with Ada.Environment_Variables;
 
 with TGen.Context;   use TGen.Context;
 with TGen.Strings;   use TGen.Strings;

@@ -2,7 +2,7 @@
 --                                                                          --
 --                                  TGen                                    --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                      Copyright (C) 2021-2022, AdaCore                    --
 --                                                                          --
 -- TGen  is  free software; you can redistribute it and/or modify it  under --
 -- under  terms of  the  GNU General  Public License  as  published by  the --
@@ -22,19 +22,13 @@
 ------------------------------------------------------------------------------
 
 with Ada.Containers;               use Ada.Containers;
-with Ada.Containers.Hashed_Maps;
-with Ada.Containers.Hashed_Sets;
 with Ada.Containers.Indefinite_Hashed_Sets;
-with Ada.Containers.Indefinite_Vectors;
 with Ada.Numerics.Big_Numbers.Big_Integers;
 use  Ada.Numerics.Big_Numbers.Big_Integers;
 with Ada.Strings;                  use Ada.Strings;
 with Ada.Strings.Fixed;            use Ada.Strings.Fixed;
 with Ada.Strings.Hash;
 with Ada.Strings.Unbounded;        use Ada.Strings.Unbounded;
-with Ada.Text_IO;                  use Ada.Text_IO;
-
-with Libadalang.Analysis;
 
 with Templates_Parser;             use Templates_Parser;
 
@@ -43,13 +37,10 @@ with TGen.Types.Array_Types;       use TGen.Types.Array_Types;
 with TGen.Types.Constraints;       use TGen.Types.Constraints;
 with TGen.Types.Discrete_Types;    use TGen.Types.Discrete_Types;
 with TGen.Types.Enum_Types;        use TGen.Types.Enum_Types;
-with TGen.Types.Int_Types;         use TGen.Types.Int_Types;
 with TGen.Types.Real_Types;        use TGen.Types.Real_Types;
 with TGen.Types.Record_Types;      use TGen.Types.Record_Types;
-with TGen.Types;                   use TGen.Types;
 
 package body TGen.Marshalling is
-   package LAL renames Libadalang.Analysis;
 
    Global_Prefix  : constant String := "TAGAda_Marshalling";
 
@@ -88,10 +79,6 @@ package body TGen.Marshalling is
       & (if For_Header then "_Header" else ""));
    --  Construct a prefix that will be shared by all entities generated for a
    --  given type.
-
-   function Hash_Defining_Name
-     (Node : LAL.Defining_Name) return Ada.Containers.Hash_Type is
-       (Node.As_Ada_Node.Hash);
 
    package Name_Sets is new Ada.Containers.Indefinite_Hashed_Sets
      (Element_Type        => String,
@@ -155,8 +142,8 @@ package body TGen.Marshalling is
                Constraints_Tag := Constraints_Tag
                  & Translate
                  (Template     => Bound_Constraint_Tmplt,
-                  Translations => (1 => Assoc ("HEADER_NAME", Header_Name),
-                                   2 => Assoc ("DIM", I)));
+                  Translations => [1 => Assoc ("HEADER_NAME", Header_Name),
+                                   2 => Assoc ("DIM", I)]);
             end loop;
          end;
 
@@ -176,8 +163,8 @@ package body TGen.Marshalling is
                   Constraints_Tag := Constraints_Tag
                     & Translate
                     (Template     => Discr_Constraint_Tmplt,
-                     Translations => (1 => Assoc ("HEADER_NAME", Header_Name),
-                                      2 => Assoc ("COMP_NAME", Comp_Name)));
+                     Translations => [1 => Assoc ("HEADER_NAME", Header_Name),
+                                      2 => Assoc ("COMP_NAME", Comp_Name)]);
                end;
             end loop;
          end;
@@ -235,9 +222,6 @@ package body TGen.Marshalling is
 
    Base_Seen    : Name_Sets.Set;
    Already_Seen : Name_Sets.Set;
-
-   package String_Vectors is new
-     Ada.Containers.Indefinite_Vectors (Positive, String);
 
    procedure Generate_Base_Functions_For_Typ
      (F : File_Type; Typ : TGen.Types.Typ'Class; For_Base : Boolean := False)
@@ -341,15 +325,15 @@ package body TGen.Marshalling is
 
          declare
             Assocs       : constant Translate_Table :=
-              (1 => Assoc ("OBJECT_NAME", "@_OBJECT_NAME_@"),
+              [1 => Assoc ("OBJECT_NAME", "@_OBJECT_NAME_@"),
                2 => Assoc ("DISCR_NAME", Discr_Name),
                3 => Assoc ("GLOBAL_PREFIX", Global_Prefix),
                4 => Assoc ("CHOICES", Choices_Tag),
                5 => Assoc ("COMP_PREFIX", Comp_Pref_Tag),
                6 => Assoc ("COMP_NAME", Comp_Name_Tag),
                7 => Assoc ("VARIANT_PART", Variant_Part_Tag),
-               8 => Assoc ("SPACING", (1 .. Spacing => ' ')),
-               9 => Assoc ("ACTION", "@_ACTION_@"));
+               8 => Assoc ("SPACING", [1 .. Spacing => ' ']),
+               9 => Assoc ("ACTION", "@_ACTION_@")];
 
          begin
             return Parse (Variant_Part_Template, Assocs);
@@ -383,12 +367,12 @@ package body TGen.Marshalling is
                then "Read_Write_Ordinary_Fixed"
                else "Read_Write_Decimal_Fixed");
             Assocs       : constant Translate_Table :=
-              (1 => Assoc ("TY_NAME", Ty_Name),
+              [1 => Assoc ("TY_NAME", Ty_Name),
                2 => Assoc ("TY_PREFIX", Ty_Prefix),
                3 => Assoc ("GLOBAL_PREFIX", Global_Prefix),
                4 => Assoc ("GENERIC_PACK", Generic_Pack),
                5 => Assoc ("GENERIC_NAME", Generic_Name),
-               6 => Assoc ("IS_DISCRETE", Typ in Discrete_Typ'Class));
+               6 => Assoc ("IS_DISCRETE", Typ in Discrete_Typ'Class)];
 
          begin
             Put_Line (F, Parse (Scalar_Read_Write_Template, Assocs));
@@ -410,10 +394,10 @@ package body TGen.Marshalling is
             Comp_Prefix   : constant String :=
               Prefix_For_Typ (Named_Comp_Ty.Type_Name);
             Assocs        : constant Translate_Table :=
-              (1 => Assoc ("TY_NAME", Ty_Name),
+              [1 => Assoc ("TY_NAME", Ty_Name),
                2 => Assoc ("TY_PREFIX", Ty_Prefix),
                3 => Assoc ("GLOBAL_PREFIX", Global_Prefix),
-               4 => Assoc ("COMP_PREFIX", Comp_Prefix));
+               4 => Assoc ("COMP_PREFIX", Comp_Prefix)];
 
          begin
             --  Generate the base function of the component
@@ -451,20 +435,20 @@ package body TGen.Marshalling is
                      5));
                Variant_Read  : constant String :=
                  Translate (Variant_Part,
-                            (1 => Assoc ("OBJECT_NAME", Global_Prefix & "_V"),
-                             2 => Assoc ("ACTION", "Read")));
+                            [1 => Assoc ("OBJECT_NAME", Global_Prefix & "_V"),
+                             2 => Assoc ("ACTION", "Read")]);
                Variant_Write : constant String :=
                  Translate (Variant_Part,
-                            (1 => Assoc ("OBJECT_NAME", Global_Prefix & "_V"),
-                             2 => Assoc ("ACTION", "Write")));
+                            [1 => Assoc ("OBJECT_NAME", Global_Prefix & "_V"),
+                             2 => Assoc ("ACTION", "Write")]);
                Assocs        : constant Translate_Table :=
-                 (1 => Assoc ("TY_NAME", Ty_Name),
+                 [1 => Assoc ("TY_NAME", Ty_Name),
                   2 => Assoc ("TY_PREFIX", Ty_Prefix),
                   3 => Assoc ("GLOBAL_PREFIX", Global_Prefix),
                   4 => Assoc ("COMP_NAME", Comp_Name_Tag),
                   5 => Assoc ("COMP_PREFIX", Comp_Pref_Tag),
                   6 => Assoc ("VARIANT_READ", Variant_Read),
-                  7 => Assoc ("VARIANT_WRITE", Variant_Write));
+                  7 => Assoc ("VARIANT_WRITE", Variant_Write)];
 
             begin
                Put_Line (F, Parse (Record_Read_Write_Template, Assocs));
@@ -527,7 +511,7 @@ package body TGen.Marshalling is
                   Index_Pref : constant String :=
                     Prefix_For_Typ (Index_Type, For_Base => True);
                   Assocs     : constant Translate_Table :=
-                    (1 => Assoc ("DIM", I));
+                    [1 => Assoc ("DIM", I)];
                begin
                   if U_Typ.Num_Dims = 1 then
                      Ada_Comp_Or_Attr := Ada_Comp_Or_Attr & "'First";
@@ -584,13 +568,13 @@ package body TGen.Marshalling is
 
       declare
          Assocs : constant Translate_Table :=
-           (1 => Assoc ("TY_NAME", Ty_Name),
+           [1 => Assoc ("TY_NAME", Ty_Name),
             2 => Assoc ("TY_PREFIX", Ty_Prefix),
             3 => Assoc ("GLOBAL_PREFIX", Global_Prefix),
             4 => Assoc ("COMP_NAME", Comp_Name_Tag),
             5 => Assoc ("COMP_TYP", Comp_Typ_Tag),
             6 => Assoc ("COMP_PREFIX", Comp_Pref_Tag),
-            7 => Assoc ("ADA_COMP_OR_ATTR", Ada_Comp_Or_Attr));
+            7 => Assoc ("ADA_COMP_OR_ATTR", Ada_Comp_Or_Attr)];
 
       begin
          Put_Line (F_Spec, Parse (Header_Spec_Template, Assocs));
@@ -617,7 +601,7 @@ package body TGen.Marshalling is
       Header_Name   : constant String :=
         Global_Prefix & "_H";
       Assocs        : constant Translate_Table :=
-        (1 => Assoc ("TY_NAME", Ty_Name),
+        [1 => Assoc ("TY_NAME", Ty_Name),
          2 => Assoc ("TY_PREFIX", Ty_Prefix),
          3 => Assoc ("GENERIC_PACK", Generic_Pack),
          4 => Assoc ("GENERIC_NAME", Generic_Name),
@@ -626,7 +610,7 @@ package body TGen.Marshalling is
          7 => Assoc ("HEADER_PREFIX", Header_Prefix),
          8 => Assoc ("HEADER_NAME", Header_Name),
          9 => Assoc
-           ("CONSTRAINTS", Create_Tag_For_Constraints (Typ, Header_Name)));
+           ("CONSTRAINTS", Create_Tag_For_Constraints (Typ, Header_Name))];
 
    begin
       --  Generate the base functions for Typ

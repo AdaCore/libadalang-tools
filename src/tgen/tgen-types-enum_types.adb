@@ -21,14 +21,9 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Langkit_Support.Text;
-
-with TGen.Types.Int_Types; use TGen.Types.Int_Types;
-with TGen.Random;          use TGen.Random;
+with TGen.Random; use TGen.Random;
 
 package body TGen.Types.Enum_Types is
-
-   package Text renames Langkit_Support.Text;
 
    function Image (Self : Bool_Typ) return String is
    begin
@@ -53,15 +48,16 @@ package body TGen.Types.Enum_Types is
 
    function Lit_Image (Self : Char_Typ; Lit : Big_Integer) return String is
       Res : constant String :=
-        (1 => Character'Val (Long_Long_Integer'Value
-                               (Big_Int.To_String (Lit))));
+        [1 => Character'Val (Long_Long_Integer'Value
+                               (Big_Int.To_String (Lit)))];
       --  Wide_Wide_Character is 32 bits wide so we should be fine with
       --  Long_Long_Integer
    begin
       return "'" & Res & "'";
    end Lit_Image;
 
-   function High_Bound (Self : Char_Typ) return Big_Integer is
+   function High_Bound
+     (Self : Char_Typ with Unreferenced) return Big_Integer is
      (Big_Int.To_Big_Integer (Character'Pos (Character'Last)));
    --  Although Char_Typ represents Character, Wide_Character and
    --  Wide_Wide_Character, we'll conservatively use Character'Last as the high
@@ -77,7 +73,6 @@ package body TGen.Types.Enum_Types is
    function Generate_Static_Value_Char_Typ
      (Ty : Typ'Class) return Static_Value'Class
    is
-      Self   : Char_Typ := Char_Typ (Ty);
       Result : Discrete_Static_Value;
 
       --  Let's use only the standard characters in the ASCII table. Others
@@ -85,7 +80,7 @@ package body TGen.Types.Enum_Types is
 
       use Big_Int;
 
-      Lit : Integer :=
+      Lit : constant Integer :=
         Rand_Int (Min => 32, Max => 126);
    begin
       SP.From_Element (Result.T, Ty'Unrestricted_Access);

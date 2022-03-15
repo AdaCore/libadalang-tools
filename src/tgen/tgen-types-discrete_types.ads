@@ -22,6 +22,7 @@
 ------------------------------------------------------------------------------
 
 with Ada.Containers.Vectors;
+with Ada.Containers.Ordered_Sets;
 
 with TGen.Context;    use TGen.Context;
 with TGen.Strategies; use TGen.Strategies;

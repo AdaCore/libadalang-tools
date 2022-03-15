@@ -65,7 +65,6 @@ with Utils.Environment;
 with Utils_Debug; use Utils_Debug;
 
 with TGen.Gen_Strategies;
-with TGen.Context;
 
 package body Test.Skeleton is
    Me                : constant Trace_Handle :=
@@ -3741,7 +3740,9 @@ package body Test.Skeleton is
       function Unparse_Test_Vectors
         (Unit_Data : Data_Holder;
          Subp      : Subp_Info)
-         return Boolean is
+         return Boolean
+      is
+         pragma Unreferenced (Unit_Data);
          JSON_Unit_File : constant Virtual_File := GNATCOLL.VFS.Create
            (+(Test.Common.JSON_Test_Dir.all & Data.Unit_Full_Name.all
             & ".json"));

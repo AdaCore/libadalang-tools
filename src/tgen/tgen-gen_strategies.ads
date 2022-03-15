@@ -21,27 +21,21 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Containers.Ordered_Maps;
-with Ada.Containers.Ordered_Sets;
-with Ada.Containers.Vectors;
-with Ada.Finalization;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-with Ada.Strings.Wide_Wide_Unbounded;
 
 with GNATCOLL.JSON;     use GNATCOLL.JSON;
 with GNATCOLL.Projects; use GNATCOLL.Projects;
 with GNATCOLL.VFS;      use GNATCOLL.VFS;
 
-with Libadalang.Analysis; use Libadalang.Analysis;
-
 with Templates_Parser;
 
+with Langkit_Support.Text; use Langkit_Support.Text;
+with Libadalang.Analysis;  use Libadalang.Analysis;
+
 with TGen.Context;              use TGen.Context;
-with TGen.Gen_Strategies_Utils; use TGen.Gen_Strategies_Utils;
 with TGen.Strings;              use TGen.Strings;
 with TGen.Templates;            use TGen.Templates;
 with TGen.Types;                use TGen.Types;
-with TGen.Files;                use TGen.Files;
 with TGen.Subprograms;          use TGen.Subprograms;
 
 package TGen.Gen_Strategies is

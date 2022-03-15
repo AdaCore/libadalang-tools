@@ -22,16 +22,17 @@
 ------------------------------------------------------------------------------
 
 with Ada.Containers.Ordered_Maps;
-with Ada.Containers.Ordered_Sets;
-with Ada.Containers.Vectors;
 with Ada.Strings.Wide_Wide_Unbounded;
+
+with Libadalang.Analysis; use Libadalang.Analysis;
+with Libadalang.Common;
+with Langkit_Support.Text; use Langkit_Support.Text;
 
 with TGen.Context; use TGen.Context;
 with TGen.Strings; use TGen.Strings;
 with TGen.Subprograms; use TGen.Subprograms;
 with TGen.Types; use TGen.Types;
 
-with GNATCOLL.VFS;
 with GNATCOLL.Projects; use GNATCOLL.Projects;
 
 package TGen.Gen_Strategies_Utils is
@@ -59,8 +60,7 @@ package TGen.Gen_Strategies_Utils is
      (T : Typ'Class) return String is
       ("Gen_" & T.Type_Name);
 
-   function Strat_Param_Name
-     (Subp_Data : Subprogram_Data; Param : Parameter_Data) return String is
+   function Strat_Param_Name (Param : Parameter_Data) return String is
      ("Strat_" & (+Param.Name));
 
    function Param_Strat_Package_Name (Package_Name : String) return String is

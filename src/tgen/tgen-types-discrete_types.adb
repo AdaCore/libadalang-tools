@@ -23,7 +23,6 @@
 
 with GNAT.Random_Numbers;
 
-with TGen.Context;
 with TGen.Random;  use TGen.Random;
 
 package body TGen.Types.Discrete_Types is
@@ -66,8 +65,9 @@ package body TGen.Types.Discrete_Types is
    ---------------
 
    function To_String (Self : Discrete_Static_Value) return String is
-      T_Classwide : Typ'Class := Self.T.Get;
-      T_Discrete  : Discrete_Typ'Class := Discrete_Typ'Class (T_Classwide);
+      T_Classwide : constant Typ'Class := Self.T.Get;
+      T_Discrete  : constant Discrete_Typ'Class :=
+        Discrete_Typ'Class (T_Classwide);
    begin
       return T_Discrete.Lit_Image (Self.Value);
    end To_String;
@@ -84,10 +84,10 @@ package body TGen.Types.Discrete_Types is
       Disc_Context : Disc_Value_Map) return Static_Value'Class
    is
       Result        : Discrete_Static_Value;
-      Picked_Index  : Positive :=
+      Picked_Index  : constant Positive :=
         Positive (Rand_Int (1, Integer (S.Samples.Length)));
-      I             : Integer          := 1;
-      Picked_Sample : Alternatives_Set := S.Samples.Element (Picked_Index);
+      Picked_Sample : constant Alternatives_Set :=
+        S.Samples.Element (Picked_Index);
       T_Classwide : Typ'Class := S.T.Get;
    begin
       SP.From_Element (Result.T, T_Classwide'Unrestricted_Access);
@@ -137,7 +137,7 @@ package body TGen.Types.Discrete_Types is
    is
       Result : Discrete_Static_Value;
 
-      Self : Discrete_Typ'Class := Discrete_Typ'Class (Ty);
+      Self : constant Discrete_Typ'Class := Discrete_Typ'Class (Ty);
       package LLI_Conversions is
         new Big_Int.Signed_Conversions (Int => Long_Long_Integer);
 

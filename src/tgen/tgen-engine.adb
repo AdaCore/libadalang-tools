@@ -40,7 +40,7 @@ package body TGen.Engine is
          begin
             Wrapped_Test.all;
          exception
-            when E : Invalid_Generation_Error =>
+            when Invalid_Generation_Error =>
                Ada.Text_IO.Put_Line
                  ("Generated values do not respect the precondition. "
                   & "Regenerating...");

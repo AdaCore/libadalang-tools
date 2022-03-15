@@ -21,18 +21,11 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Libadalang.Analysis;
-with Langkit_Support.Text;
+with Libadalang.Analysis;  use Libadalang.Analysis;
+with Langkit_Support.Text; use Langkit_Support.Text;
 
-with Ada.Containers;
-with Ada.Containers.Indefinite_Hashed_Maps;
-with Ada.Containers.Hashed_Maps;
-with Ada.Containers.Ordered_Sets;
 with Ada.Numerics.Big_Numbers.Big_Integers;
 with Ada.Strings.Unbounded;           use Ada.Strings.Unbounded;
-with Ada.Strings.Wide_Wide_Hash;
-with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
-with Ada.Unchecked_Deallocation;
 
 with GNATCOLL.JSON;     use GNATCOLL.JSON;
 with GNATCOLL.Refcount; use GNATCOLL.Refcount;
@@ -41,11 +34,6 @@ limited with TGen.Context;
 limited with TGen.Strategies;
 with TGen.Subprograms; use TGen.Subprograms;
 with TGen.Numerics;    use TGen.Numerics;
-limited with Tgen.Types.Array_Types;
-limited with Tgen.Types.Enum_Types;
-limited with Tgen.Types.Int_Types;
-limited with TGen.Types.Real_Types;
-limited with Tgen.Types.Record_Types;
 with TGen.Strings; use TGen.Strings;
 
 package TGen.Types is
@@ -53,7 +41,6 @@ package TGen.Types is
    package LAL renames Libadalang.Analysis;
 
    use type Ada_Qualified_Name;
-   use type Ada.Containers.Count_Type;
 
    type Typ is tagged record
       Name : Ada_Qualified_Name;

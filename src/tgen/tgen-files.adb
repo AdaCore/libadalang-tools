@@ -22,6 +22,7 @@
 ------------------------------------------------------------------------------
 
 with Ada.Characters.Handling;
+with Ada.Environment_Variables;
 with Ada.Text_IO;
 
 package body TGen.Files is
@@ -58,7 +59,6 @@ package body TGen.Files is
    ------------------------
 
    function Project_Output_Dir (Project : Project_Type) return String is
-      use type GNATCOLL.VFS.Filesystem_String;
       Obj_Dir : constant String := +Project.Object_Dir.Full_Name;
    begin
       if Obj_Dir'Length = 0 then

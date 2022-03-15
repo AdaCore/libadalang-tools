@@ -30,7 +30,7 @@ library project TGen is
       case Build_Mode is
          when "dev" =>
             for Switches ("Ada") use
-              ("-gnatf", "-g", "-gnatyg0", "-gnat2022", "-gnatX",
+              ("-gnatf", "-g", "-gnatyg0", "-gnatwae", "-gnat2022", "-gnatX",
                "-gnata");
          when "prod" =>
             for Switches ("Ada") use

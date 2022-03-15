@@ -23,7 +23,6 @@
 
 with TGen.Context;    use TGen.Context;
 with TGen.Strategies; use TGen.Strategies;
-with TGen.Types;      use TGen.Types;
 
 package TGen.Types.Real_Types is
 

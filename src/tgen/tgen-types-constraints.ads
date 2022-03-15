@@ -22,13 +22,11 @@
 ------------------------------------------------------------------------------
 
 with Ada.Containers.Hashed_Maps;
-with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
 with Ada.Strings.Wide_Wide_Unbounded.Wide_Wide_Hash;
 with Ada.Unchecked_Deallocation;
 
-with TGen.Context;              use TGen.Context;
-with TGen.Types.Discrete_Types; use TGen.Types.Discrete_Types;
-with TGen.Strategies;           use TGen.Strategies;
+with TGen.Context;    use TGen.Context;
+with TGen.Strategies; use TGen.Strategies;
 
 package TGen.Types.Constraints is
 
@@ -194,7 +192,7 @@ package TGen.Types.Constraints is
      (Anonymous_Typ'Class (Self.Unchecked_Get.all)) with
      Pre => (not SP.Is_Null (Self))
             and then (Self.Get.Kind in Anonymous_Kind);
-   pragma Inline (As_Discrete_Typ);
+   pragma Inline (As_Anonymous_Typ);
 
    function Image (Self : Anonymous_Typ) return String;
 

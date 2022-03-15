@@ -27,10 +27,9 @@ with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 with Ada.Strings.Unbounded;   use Ada.Strings.Unbounded;
 with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
 
-with TGen.Strings;            use TGen.Strings;
-with TGen.Types;              use TGen.Types;
+with GNATCOLL.VFS;
+
 with TGen.Types.Record_Types; use TGen.Types.Record_Types;
-with TGen.Types.Translation;  use TGen.Types.Translation;
 
 package body TGen.Gen_Strategies_Utils is
 
@@ -59,7 +58,7 @@ package body TGen.Gen_Strategies_Utils is
       begin
          Precondition := +Subp.P_Get_Aspect_Spec_Expr (+String'("Pre")).Text;
       exception
-         when E : Property_Error =>
+         when Property_Error =>
             --  No precondition => generated values are always valid
 
             Precondition := +String'("True");
@@ -100,8 +99,6 @@ package body TGen.Gen_Strategies_Utils is
    is
       Subpackages : Package_Data_Vectors.Vector;
       Subprograms : Subprograms_Data_Vectors.Vector;
-
-      use type Package_Data_Vectors.Vector;
 
       function Visit (Node : Ada_Node'Class) return Visit_Status;
 
@@ -182,16 +179,7 @@ package body TGen.Gen_Strategies_Utils is
                  then ""
                  else Parameters_Type.P_Basic_Decl.P_Top_Level_Decl
                         (Parameters_Type.Unit).P_Defining_Name.F_Name.Text);
-
-            Translation_Res : Translation_Result :=
-              (if Param_Mode in In_Mode | In_Out_Mode
-               then Translate (Subp_Param_Spec.F_Type_Expr)
-               else (Success => True,
-                     Res     => SP.Null_Ref));
-            My_Typ : SP.Ref;
-
          begin
-
             for Parameter of Subp_Param_Spec.F_Ids loop
                declare
                   Name : constant Unbounded_Text_Type :=
@@ -319,7 +307,8 @@ package body TGen.Gen_Strategies_Utils is
             end loop;
          when Disc_Record_Kind =>
             declare
-               R : Discriminated_Record_Typ := Discriminated_Record_Typ (Self);
+               R : constant Discriminated_Record_Typ :=
+                 Discriminated_Record_Typ (Self);
             begin
 
                --  For now, we do not insert anonymous types. Left as a TODO
@@ -374,7 +363,7 @@ package body TGen.Gen_Strategies_Utils is
       case Self.Kind is
          when Disc_Record_Kind =>
             declare
-               Disc_Record : Discriminated_Record_Typ :=
+               Disc_Record : constant Discriminated_Record_Typ :=
                  Discriminated_Record_Typ (Self);
                F_Name : constant Unbounded_Text_Type :=
                  +(F_Prefix & Self.Gen_Random_Function_Name);
@@ -395,7 +384,7 @@ package body TGen.Gen_Strategies_Utils is
                      use Component_Maps;
 
                      D_Name : constant String := +Key (D);
-                     D_Type : SP.Ref := Element (D);
+                     D_Type : constant SP.Ref := Element (D);
                      P      : Parameter_Data;
                   begin
                      P.Name := +D_Name;

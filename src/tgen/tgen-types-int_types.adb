@@ -22,11 +22,9 @@
 ------------------------------------------------------------------------------
 
 with Ada.Containers.Vectors;
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with GNAT.Random_Numbers;
 
-with TGen.Context; use TGen.Context;
 with TGen.Numerics; use TGen.Numerics;
 with TGen.Strings; use TGen.Strings;
 with TGen.Random; use TGen.Random;
@@ -167,12 +165,9 @@ package body TGen.Types.Int_Types is
    function Get_Digits_Equivalence_Classes
      (R : Int_Range) return Interval_Vector
    is
-      use LLF_Functions;
-      use LLLI_Conversions;
       use type Big_Int.Big_Integer;
 
       Result : Interval_Vector;
-
    begin
 
       --  Positive intervals: for Integer -> [0, 9], [10, 99], ...
@@ -261,9 +256,10 @@ package body TGen.Types.Int_Types is
      (Self    : Signed_Int_Typ;
       Context : in out Generation_Context) return Static_Strategy_Type'Class
    is
-      Strat_Random : Static_Strategy_Type'Class :=
+      Strat_Random : constant Static_Strategy_Type'Class :=
         Generate_Static (Discrete_Typ (Self), Context);
-      Strat_Equivalence_Classes : Static_Strategy_Type'Class :=
+
+      Strat_Equivalence_Classes : constant Static_Strategy_Type'Class :=
         Generate_Equivalence_Class_Digit_Strategy (Self);
    begin
       return Make_Dispatching_Strat
@@ -284,7 +280,6 @@ package body TGen.Types.Int_Types is
 
       use Big_Int;
 
-      Picked_Size : Natural := 0;
       Elements    : Many_Type :=
         Many
           (0,
@@ -309,7 +304,7 @@ package body TGen.Types.Int_Types is
       case Self.Is_Static is
          when True =>
             declare
-               T : Static_Array_Constraint_Strategy_Type :=
+               T : constant Static_Array_Constraint_Strategy_Type :=
                  (T => Self, Avg_Size => 5);
             begin
                return T;

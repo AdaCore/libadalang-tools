@@ -21,18 +21,12 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Calendar;
 with Ada.Characters.Latin_9;
 with Ada.Characters;
-with Ada.Directories;
+with Ada.Containers.Ordered_Maps;
 with Ada.Strings.Fixed;
 with Ada.Strings.Maps;
 with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
-with Ada.Text_IO;
-with Ada.Wide_Wide_Text_IO;           use Ada.Wide_Wide_Text_IO;
-
-with GNAT.Calendar;
-with GNAT.OS_Lib; use GNAT.OS_Lib;
 
 with Libadalang.Common; use Libadalang.Common;
 
@@ -41,9 +35,8 @@ with Templates_Parser; use Templates_Parser;
 with TGen.Gen_Types_Value;   use TGen.Gen_Types_Value;
 with TGen.Files;             use TGen.Files;
 with TGen.Strategies;        use TGen.Strategies;
-with TGen.Strings;           use TGen.Strings;
+with TGen.Gen_Strategies_Utils; use TGen.Gen_Strategies_Utils;
 with TGen.Types.Translation; use TGen.Types.Translation;
-with TGen.Types;             use TGen.Types;
 
 package body TGen.Gen_Strategies is
 
@@ -120,8 +113,6 @@ package body TGen.Gen_Strategies is
 
    procedure Generate_Type_Strategies
      (Context : Generation_Context) is
-      use Type_Vectors_Maps;
-
       package Strategies_Per_Package_Maps is new Ada.Containers.Ordered_Maps
         (Key_Type     => Unbounded_Text_Type,
          Element_Type => Strategy_Set,
@@ -172,14 +163,12 @@ package body TGen.Gen_Strategies is
 
    package body Test_Generator is
 
-      Ctx : Generation_Context;
-
       function Generate_Source_Code
-        (Self    : Test_Generator;
-         Ctx : TGen.Templates.Context'Class) return Wide_Wide_String
+        (Self : Test_Generator;
+         Ctx  : TGen.Templates.Context'Class) return Wide_Wide_String
       is
+         pragma Unreferenced (Ctx);
          use type Ada.Containers.Count_Type;
-         use GNATCOLL.VFS;
 
          TS : aliased constant Test_Translator :=
            Create_Test_Translator (Self.Subp);
@@ -190,7 +179,7 @@ package body TGen.Gen_Strategies is
 
          Has_Params_Tag : constant String := "HAS_PARAMS";
 
-         Precondition_Tag : String := "PRECONDITION_EXPRESSION";
+         Precondition_Tag : constant String := "PRECONDITION_EXPRESSION";
 
          Table : Templates_Parser.Translate_Set;
 
@@ -253,25 +242,23 @@ package body TGen.Gen_Strategies is
         (Self  : Test_Translator;
          Table : in out Templates_Parser.Translate_Set)
       is
-         use type Templates_Parser.Vector_Tag;
-
-         Strategy_Name_Tag : String := "STRATEGY_NAME";
+         Strategy_Name_Tag : constant String := "STRATEGY_NAME";
          Strategy_Name_Vector_Tag : Templates_Parser.Vector_Tag;
 
-         Type_Name_Tag : String := "TYPE_NAME";
+         Type_Name_Tag : constant String := "TYPE_NAME";
          Type_Name_Vector_Tag : Templates_Parser.Vector_Tag;
 
-         Gen_Subp_Name_Tag : String := "GEN_SUBP_NAME";
+         Gen_Subp_Name_Tag : constant String := "GEN_SUBP_NAME";
          Gen_Subp_Name_Vector_Tag : Templates_Parser.Vector_Tag;
 
-         Param_Name_Tag : String := "PARAM_NAME";
+         Param_Name_Tag : constant String := "PARAM_NAME";
          Param_Name_Vector_Tag : Templates_Parser.Vector_Tag;
 
       begin
          for Param of Self.Subp.Parameters_Data loop
             Templates_Parser.Append
               (Strategy_Name_Vector_Tag,
-               Strat_Param_Name (Self.Subp, Param));
+               Strat_Param_Name (Param));
             Templates_Parser.Append
               (Type_Name_Vector_Tag,
                (+Param.Type_Fully_Qualified_Name));
@@ -331,8 +318,8 @@ package body TGen.Gen_Strategies is
    end Get_With_Clauses;
 
    function Indent (Amount : Natural; Str : String) return String is
-      Res : Unbounded_String;
-      Indent : String (1 .. Amount) := (others => ' ');
+      Res    : Unbounded_String;
+      Indent : constant String (1 .. Amount) := (others => ' ');
    begin
       Append (Res, Indent);
       for C of Str loop
@@ -385,7 +372,7 @@ package body TGen.Gen_Strategies is
                  then Parameters_Type.P_Basic_Decl.P_Fully_Qualified_Name
                  else "");
 
-            Typ_Translation_Res : Translation_Result :=
+            Typ_Translation_Res : constant Translation_Result :=
               Translate (Subp_Param_Spec.F_Type_Expr);
             Typ_Translation : SP.Ref;
          begin
@@ -411,11 +398,13 @@ package body TGen.Gen_Strategies is
       Nb_Tests : Positive;
       Subp     : Subp_Decl) return Generated_Body is
 
-      Pkg      : Package_Decl := Get_Parent_Package (Subp.As_Ada_Node);
+      Pkg      : constant Package_Decl :=
+        Get_Parent_Package (Subp.As_Ada_Node);
       Pkg_Data : Package_Data;
 
       Res : Generated_Body;
    begin
+      pragma Unreferenced (Nb_Tests);
       if Pkg.Is_Null then
          raise Program_Error with
            "Unable to find parent package of node "
@@ -432,7 +421,7 @@ package body TGen.Gen_Strategies is
       end if;
 
       declare
-         Subp_Data : Subprogram_Data :=
+         Subp_Data : constant Subprogram_Data :=
            Extract_Subprogram_Data (Subp);
 
       begin
@@ -449,7 +438,7 @@ package body TGen.Gen_Strategies is
          --  the needed with clauses.
 
          declare
-            Test_Gen : Test_Generator.Test_Generator :=
+            Test_Gen : constant Test_Generator.Test_Generator :=
               Test_Generator.Create
                 (Test_Template_File => Get_Template_Test_ADB,
                  Subp               => Subp_Data);
@@ -470,11 +459,11 @@ package body TGen.Gen_Strategies is
          for Param of Subp_Data.Parameters_Data loop
             declare
 
-               Param_Type : SP.Ref :=
+               Param_Type : constant SP.Ref :=
                  Context.Type_Translations.Element
                    (Param.Type_Fully_Qualified_Name);
-               Type_Depends : Typ_Set := Get_All_Types (Param_Type.Get);
-               Typ_Parent_Package : Unbounded_Text_Type :=
+
+               Typ_Parent_Package : constant Unbounded_Text_Type :=
                  To_Unbounded_Text
                    (+Param_Type.Get.Parent_Package_Name);
 
@@ -486,6 +475,7 @@ package body TGen.Gen_Strategies is
                  (Parent_Pkg_Name : Unbounded_Text_Type;
                   TS : in out Typ_Set)
                is
+                  pragma Unreferenced (Parent_Pkg_Name);
                begin
                   if not TS.Contains (Param_Type) then
                      TS.Insert (Param_Type);
@@ -514,7 +504,7 @@ package body TGen.Gen_Strategies is
          for Param of Subp_Data.Parameters_Data loop
             declare
 
-               Param_Type : SP.Ref :=
+               Param_Type : constant SP.Ref :=
                  Context.Type_Translations.Element
                    (Param.Type_Fully_Qualified_Name);
 
@@ -527,7 +517,7 @@ package body TGen.Gen_Strategies is
                      Param_Type.Get.Generate_Random_Strategy (Context));
                end if;
                declare
-                  Type_Strategy : Dynamic_Strategy_Type :=
+                  Type_Strategy : constant Dynamic_Strategy_Type :=
                     Dynamic_Strategy_Type
                       (Context.Type_And_Param_Strategies.Element
                          (Param.Type_Fully_Qualified_Name));
@@ -612,17 +602,16 @@ package body TGen.Gen_Strategies is
    is
       Subp_Data : Subprogram_Data :=
         Extract_Subprogram_Data (Subp);
-      Function_JSON     : JSON_Value := Create_Object;
+      Function_JSON     : constant JSON_Value := Create_Object;
       Test_Vectors_JSON : JSON_Array := Empty_Array;
       Test_Vector_JSON : JSON_Array;
-      Disc_Context : Disc_Value_Map;
    begin
       Collect_Type_Translations (Context, Subp);
       Subp_Data.All_Params_Static := True;
       for Param of Subp_Data.Parameters_Data loop
          if Param.Mode in In_Mode | In_Out_Mode then
             declare
-               Param_Type : SP.Ref :=
+               Param_Type : constant SP.Ref :=
                Context.Type_Translations.Element
                   (Param.Type_Fully_Qualified_Name);
             begin
@@ -653,7 +642,7 @@ package body TGen.Gen_Strategies is
          Test_Vector_JSON := Empty_Array;
          for Param of Subp_Data.Parameters_Data loop
             declare
-               Param_JSON : JSON_Value := Create_Object;
+               Param_JSON : constant JSON_Value := Create_Object;
             begin
                Param_JSON.Set_Field ("name", Create (+Param.Name));
                Param_JSON.Set_Field ("type_name", Create (+Param.Type_Name));
@@ -707,6 +696,7 @@ package body TGen.Gen_Strategies is
            (Unit_Name  : Unbounded_Text_Type;
             Unit_Tests : in out JSON_Array) is
          begin
+            pragma Unreferenced (Unit_Name);
             Append (Unit_Tests, Function_JSON);
          end Add_Function_Testing;
 

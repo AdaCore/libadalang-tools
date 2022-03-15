@@ -23,9 +23,7 @@
 
 with Ada.Containers.Indefinite_Ordered_Sets;
 with Ada.Containers.Ordered_Maps;
-with Ada.Containers.Ordered_Sets;
 with Ada.Containers.Vectors;
-
 with Ada.Strings;           use Ada.Strings;
 with Ada.Strings.Equal_Case_Insensitive;
 with Ada.Strings.Fixed;     use Ada.Strings.Fixed;
@@ -35,6 +33,9 @@ with Ada.Strings.Maps;      use Ada.Strings.Maps;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with GNATCOLL.Projects; use GNATCOLL.Projects;
+
+with Libadalang.Analysis;
+with Langkit_Support.Text; use Langkit_Support.Text;
 
 package TGen.Strings is
 

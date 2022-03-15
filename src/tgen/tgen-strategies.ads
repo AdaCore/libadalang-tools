@@ -24,12 +24,12 @@
 with Ada.Containers.Indefinite_Hashed_Maps;
 with Ada.Containers.Indefinite_Ordered_Sets;
 with Ada.Containers.Vectors;
-with Ada.Finalization;
-with Ada.Streams;           use Ada.Streams;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Strings.Wide_Wide_Hash;
 with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
 with Ada.Strings.Wide_Wide_Unbounded.Wide_Wide_Hash;
+
+with Langkit_Support.Text; use Langkit_Support.Text;
 
 with TGen.Numerics;    use TGen.Numerics;
 with TGen.Subprograms; use TGen.Subprograms;

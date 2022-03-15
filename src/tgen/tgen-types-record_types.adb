@@ -23,45 +23,24 @@
 
 with Ada.Characters.Latin_1;
 with Ada.Containers; use Ada.Containers;
-with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Indefinite_Hashed_Maps;
+with Ada.Unchecked_Deallocation;
 
 with Ada.Numerics.Big_Numbers.Big_Integers;
 with Ada.Strings;           use Ada.Strings;
-with Ada.Strings.Fixed;     use Ada.Strings.Fixed;
-with Ada.Strings.Maps;      use Ada.Strings.Maps;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-with Libadalang.Common;
-with Libadalang.Expr_Eval; use Libadalang.Expr_Eval;
-with Langkit_Support.Text;
-
-with GNATCOLL.GMP.Integers;
-
-with TGen.Context;              use TGen.Context;
 with TGen.Gen_Strategies_Utils; use TGen.Gen_Strategies_Utils;
-with TGen.Random;               use TGen.Random;
-with TGen.Strategies;           use TGen.Strategies;
-with TGen.Types.Enum_Types;     use TGen.Types.Enum_Types;
 
 package body TGen.Types.Record_Types is
 
-   package Text renames Langkit_Support.Text;
-
-   package Big_Int renames Ada.Numerics.Big_Numbers.Big_Integers;
-
-   LF : constant String := (1 => ASCII.LF);
+   LF : constant String := [1 => ASCII.LF];
 
    Pad : constant Unbounded_String := 3 * ' ';
 
    Debug_Variant_Set : constant Boolean := False;
    --  Display the alternatives as intervals instead of source text. For
    --  debug purposes
-
-   function Check_Others
-     (Designator : LAL.Others_Designator; Val : Big_Integer) return Boolean;
-   --  Check if Val Satisfies this "others" choice. This is done by
-   --  checking that Val staisfies all the other choices of the variant.
 
    function PP_Variant
      (Var : Variant_Part_Acc; Padding : Natural := 0) return Unbounded_String;
@@ -71,10 +50,6 @@ package body TGen.Types.Record_Types is
       Res  : in out Component_Maps.Map);
    --  Fill Res with the list of components in Self that are present given
    --  a map of discriminant constraints.
-
-   procedure Append_Value_For_Component
-     (Component_Name :        LAL.Defining_Name; Value : String;
-      Rec            : in out Unbounded_String);
 
    -----------
    -- Image --
@@ -120,66 +95,6 @@ package body TGen.Types.Record_Types is
       return To_String (Str);
    end Image_Internal;
 
-   --------------------------------
-   -- Append_Value_For_Component --
-   --------------------------------
-
-   procedure Append_Value_For_Component
-     (Component_Name :        LAL.Defining_Name; Value : String;
-      Rec            : in out Unbounded_String)
-   is
-   begin
-      Append (Rec, +Component_Name.F_Name.Text);
-      Append (Rec, " => ");
-      Append (Rec, Value);
-      Append (Rec, ", ");
-   end Append_Value_For_Component;
-
-   ---------------------
-   -- Generate_Static --
-   ---------------------
-
-   --  function Generate_Static
-   --    (Self         : Record_Typ;
-   --     Disc_Context : Disc_Value_Map) return String
-   --  is
-   --     use Component_Maps;
-   --     Result : Unbounded_String;
-   --  begin
-   --     for C in Self.Component_Types.Iterate loop
-   --        declare
-   --           Component_Name : LAL.Defining_Name := Key (C);
-   --           Component_Type : Typ'Class := Element (C).Get;
-   --        begin
-   --           Append_Value_For_Component
-   --             (Component_Name,
-   --              Component_Type.Generate_Static (Disc_Context),
-   --              Result);
-   --        end;
-   --     end loop;
-   --     return +Result;
-   --  end Generate_Static;
-
-   ---------------------
-   -- Generate_Static --
-   ---------------------
-
-   --  function Generate_Static
-   --    (Self         : Nondiscriminated_Record_Typ;
-   --     Disc_Context : Disc_Value_Map) return String
-   --  is
-   --     Result : Unbounded_String;
-   --     Generated_Value : String :=
-   --       Record_Typ (Self).Generate_Static (Disc_Context);
-   --  begin
-   --     Append (Result, "(");
-   --     Append (Result, Generated_Value);
-   --     Trim (Result, Right);
-   --     Trim (Result, Null_Set, To_Set (','));
-   --     Append (Result, ")");
-   --     return +Result;
-   --  end Generate_Static;
-
    ------------------
    -- Free_Variant --
    ------------------
@@ -201,16 +116,18 @@ package body TGen.Types.Record_Types is
             Free_Variant (Var_Choice.Variant);
          end if;
       end Destroy_Var_Choice;
-
-      Cur : Cursor := Var.Variant_Choices.First;
    begin
       if Var /= null then
-         while Has_Element (Cur) loop
-            Var.Variant_Choices.Update_Element
-              (Cur, Destroy_Var_Choice'Access);
-            Next (Cur);
-         end loop;
-         Free (Var);
+         declare
+            Cur : Cursor := Var.Variant_Choices.First;
+         begin
+            while Has_Element (Cur) loop
+               Var.Variant_Choices.Update_Element
+               (Cur, Destroy_Var_Choice'Access);
+               Next (Cur);
+            end loop;
+            Free (Var);
+         end;
       end if;
    end Free_Variant;
 
@@ -235,30 +152,6 @@ package body TGen.Types.Record_Types is
       end loop;
       return Res;
    end Clone;
-
-   ------------------
-   -- Check_Others --
-   ------------------
-
-   function Check_Others
-     (Designator : LAL.Others_Designator; Val : Big_Integer) return Boolean
-   is
-      use LAL;
-      use GNATCOLL.GMP.Integers;
-      Variant_Root : constant Variant_List :=
-        Designator.Parent.Parent.Parent.As_Variant_List;
-   begin
-      for Variant of Variant_Root loop
-         for Choice of Variant.As_Variant.F_Choices loop
-            if Choice /= Designator
-              and then Choice.P_Choice_Match (Make (Big_Int.To_String (Val)))
-            then
-               return False;
-            end if;
-         end loop;
-      end loop;
-      return True;
-   end Check_Others;
 
    ---------------------------
    -- Constraints_Respected --
@@ -356,9 +249,6 @@ package body TGen.Types.Record_Types is
       end loop;
    end Fill_Components;
 
-   function "+" (I : GNATCOLL.GMP.Integers.Big_Integer) return Big_Integer is
-     (Big_Int.From_String (GNATCOLL.GMP.Integers.Image (I)));
-
    ----------------
    -- PP_Variant --
    ----------------
@@ -433,7 +323,6 @@ package body TGen.Types.Record_Types is
      (Self : Discriminated_Record_Typ; Padding : Natural := 0) return String
    is
       use Component_Maps;
-      use Discriminant_Constraint_Maps;
       Str : Unbounded_String := To_Unbounded_String (Typ (Self).Image);
       Current_Component : Component_Maps.Cursor;
    begin
@@ -496,16 +385,11 @@ package body TGen.Types.Record_Types is
       end if;
    end Free_Content;
 
-   Has_Generated_Shapes : Boolean    := False;
-   Generated_Shapes     : String_Set;
-   Last_Generated_Shape : Count_Type := 0;
-
-   package Alternative_Constraint_Maps is new Ada.Containers.Ordered_Maps
-     (Key_Type => LAL.Defining_Name, Element_Type => Alternatives_Set,
-      "="      => Alternatives_Sets."=");
-   subtype Alternative_Constraint_Map is Alternative_Constraint_Maps.Map;
-
-   function "=" (L, R : Static_Strategy_Type'Class) return Boolean is (False);
+   function "="
+     (L : Static_Strategy_Type'Class with Unreferenced;
+      R : Static_Strategy_Type'Class with Unreferenced)
+      return Boolean is (False);
+   --  TODO: Implement this properly
 
    --  Static generation
 
@@ -539,7 +423,7 @@ package body TGen.Types.Record_Types is
      (S           : in out Record_Static_Strategy_Type;
       Disc_Values : Disc_Value_Map) return Static_Value'Class
    is
-      T : Typ'Class := S.T.Get;
+      T : constant Typ'Class := S.T.Get;
    begin
       return
         S.Generate (Record_Typ (T), S.Component_Strats, Disc_Values);
@@ -566,8 +450,9 @@ package body TGen.Types.Record_Types is
                for Comp_Cursor in Choice.Components.Iterate loop
                   declare
                      use Component_Maps;
-                     Comp_Name : Unbounded_Text_Type := Key (Comp_Cursor);
-                     Comp_Type : SP.Ref := Element (Comp_Cursor);
+                     Comp_Name : constant Unbounded_Text_Type :=
+                       Key (Comp_Cursor);
+                     Comp_Type : constant SP.Ref := Element (Comp_Cursor);
                   begin
                      Res.Insert (Comp_Name, Comp_Type);
                   end;
@@ -593,11 +478,10 @@ package body TGen.Types.Record_Types is
    is
       Res : Unbounded_String;
       use Component_Maps;
-      use Discriminant_Constraint_Maps;
    begin
       for Comp in Self.Component_Types.Iterate loop
          declare
-            Comp_Name : Unbounded_Text_Type := Key (Comp);
+            Comp_Name : constant Unbounded_Text_Type := Key (Comp);
 
             procedure Generate_Val
               (Comp_Name  : Unbounded_Text_Type;
@@ -607,6 +491,7 @@ package body TGen.Types.Record_Types is
               (Comp_Name  : Unbounded_Text_Type;
                Comp_Strat : in out Static_Strategy_Type'Class)
             is
+               pragma Unreferenced (Comp_Name);
             begin
                Append
                  (Res,
@@ -644,7 +529,7 @@ package body TGen.Types.Record_Types is
       Strat.Generate := Generate_Record_Typ'Access;
       for Component in Self.Component_Types.Iterate loop
          declare
-            Comp_Name : Unbounded_Text_Type := Key (Component);
+            Comp_Name : constant Unbounded_Text_Type := Key (Component);
          begin
             Strat.Component_Strats.Insert
               (Comp_Name, Element (Component).Get.Generate_Static (Context));
@@ -723,7 +608,7 @@ package body TGen.Types.Record_Types is
       Context   : in out Generation_Context)
       return Static_Strategy_Type'Class
    is
-      Default_Strategy : Static_Strategy_Type'Class :=
+      Default_Strategy : constant Static_Strategy_Type'Class :=
         Self.Discriminant_Types.Element (Disc_Name).Get.Generate_Static
         (Context);
       Samples : Alternatives_Set_Vector;
@@ -739,8 +624,6 @@ package body TGen.Types.Record_Types is
          declare
             Sample_Strat      : Static_Strategy_Acc;
             Dispatching_Strat : Dispatching_Static_Strategy_Type;
-
-            use Strategy_Sets;
          begin
             if Disc_Type in Discrete_Typ'Class then
                Sample_Strat :=
@@ -783,7 +666,7 @@ package body TGen.Types.Record_Types is
       Disc_Context : Disc_Value_Map) return Static_Value'Class
    is
       Res : Unbounded_String;
-      T : Typ'Class := S.T.Get;
+      T   : constant Typ'Class := S.T.Get;
    begin
       Append (Res, "(");
       Append
@@ -814,8 +697,9 @@ package body TGen.Types.Record_Types is
      (S            : in out Disc_Record_Static_Strategy_Type;
       Disc_Context : Disc_Value_Map) return Static_Value'Class
    is
-      T           : Typ'Class := S.T.Get;
-      Disc_Record : Discriminated_Record_Typ := Discriminated_Record_Typ (T);
+      T           : constant Typ'Class := S.T.Get;
+      Disc_Record : constant Discriminated_Record_Typ :=
+        Discriminated_Record_Typ (T);
 
       use Disc_Value_Maps;
 
@@ -837,11 +721,9 @@ package body TGen.Types.Record_Types is
             declare
                use Discriminant_Constraint_Maps;
 
-               Discriminant_Name : Unbounded_Text_Type :=
+               Discriminant_Name : constant Unbounded_Text_Type :=
                  Key (Constraint_Cursor);
-               Discriminant_Type : SP.Ref :=
-                 Disc_Record.Discriminant_Types.Element (Discriminant_Name);
-               Constraint : Discrete_Constraint_Value :=
+               Constraint        : constant Discrete_Constraint_Value :=
                  Element (Constraint_Cursor);
             begin
                pragma Assert (Constraint.Kind /= Non_Static);
@@ -868,8 +750,6 @@ package body TGen.Types.Record_Types is
             declare
                use Strategy_Maps;
 
-               Disc_Name : Unbounded_Text_Type := Key (D_Strat_Cursor);
-
                procedure Generate_Val
                  (Disc_Name  : Unbounded_Text_Type;
                   Disc_Strat : in out Static_Strategy_Type'Class);
@@ -878,7 +758,7 @@ package body TGen.Types.Record_Types is
                  (Disc_Name  : Unbounded_Text_Type;
                   Disc_Strat : in out Static_Strategy_Type'Class)
                is
-                  Val : Discrete_Static_Value'Class :=
+                  Val : constant Discrete_Static_Value'Class :=
                     Discrete_Static_Value'Class
                       (Disc_Strat.Generate_Static_Value (Disc_Context));
                begin
@@ -899,12 +779,14 @@ package body TGen.Types.Record_Types is
 
       for Disc_Cursor in Current_Context.Iterate loop
          declare
-            Disc_Name           : Unbounded_Text_Type := Key (Disc_Cursor);
-            Disc_Type_Classwide : Typ'Class :=
+            Disc_Name           : constant Unbounded_Text_Type :=
+              Key (Disc_Cursor);
+            Disc_Type_Classwide : constant Typ'Class :=
               Disc_Record.Discriminant_Types.Element (Disc_Name).Get;
-            Disc_Type           : Discrete_Typ'Class :=
+            Disc_Type           : constant Discrete_Typ'Class :=
               Discrete_Typ'Class (Disc_Type_Classwide);
-            Disc_Value          : Big_Integer := Element (Disc_Cursor);
+            Disc_Value          : constant Big_Integer :=
+              Element (Disc_Cursor);
          begin
             Append (Res, +Disc_Name);
             Append (Res, " => ");
@@ -916,9 +798,9 @@ package body TGen.Types.Record_Types is
       --  Now, generate values for the components
 
       declare
-         Components : Component_Map :=
+         Components : constant Component_Map :=
            Disc_Record.Components (Current_Context);
-         R          : Record_Typ :=
+         R          : constant Record_Typ :=
            (Name            => Disc_Record.Name,
             Component_Types => Components,
             Static_Gen      => Disc_Record.Static_Gen);
@@ -965,7 +847,7 @@ package body TGen.Types.Record_Types is
 
       for Disc in Self.Discriminant_Types.Iterate loop
          declare
-            Disc_Name : Unbounded_Text_Type := Key (Disc);
+            Disc_Name : constant Unbounded_Text_Type := Key (Disc);
          begin
             Strat.Disc_Strats.Insert
               (Disc_Name,
@@ -980,7 +862,7 @@ package body TGen.Types.Record_Types is
       Strat.Generate := Generate_Record_Typ'Access;
       for Component in Self.Get_All_Components.Iterate loop
          declare
-            Comp_Name : Unbounded_Text_Type := Key (Component);
+            Comp_Name : constant Unbounded_Text_Type := Key (Component);
          begin
             Strat.Component_Strats.Insert
               (Comp_Name, Element (Component).Get.Generate_Static (Context));
@@ -989,17 +871,6 @@ package body TGen.Types.Record_Types is
 
       return Strat;
    end Generate_Static;
-
-   function Generate_Value_In_Alternatives
-     (Alt_Set : Alternatives_Set) return Big_Integer;
-   --  Pulls a value from a list of sets. TODO: make it random
-
-   function Generate_Value_In_Alternatives
-     (Alt_Set : Alternatives_Set) return Big_Integer
-   is
-   begin
-      return Alt_Set.First_Element.Min;
-   end Generate_Value_In_Alternatives;
 
    --  Dynamic generation
 
@@ -1050,8 +921,9 @@ package body TGen.Types.Record_Types is
       begin
          for Component in Components.Iterate loop
             declare
-               Component_Name : Unbounded_Text_Type := Key (Component);
-               Component_Type : Typ'Class         := Element (Component).Get;
+               Component_Name : constant Unbounded_Text_Type :=
+                 Key (Component);
+               Component_Type : constant Typ'Class := Element (Component).Get;
             begin
                A ((+Component_Name) & " : ");
                A (To_Ada (Component_Type.Name) & " :=");
@@ -1074,7 +946,6 @@ package body TGen.Types.Record_Types is
          NL;
          for Choice of Variant.Variant_Choices loop
             declare
-               use Component_Maps;
                use Component_Vectors;
 
                New_Components : Component_Vector := Components.Copy;
@@ -1187,7 +1058,7 @@ package body TGen.Types.Record_Types is
 
       Indentation : Natural := 0;
 
-      Constrained_Function : Subprogram_Data :=
+      Constrained_Function : constant Subprogram_Data :=
         Gen_Constrained_Function (Self);
    begin
 
@@ -1208,7 +1079,7 @@ package body TGen.Types.Record_Types is
             use Component_Maps;
 
             Disc_Name : constant String := +Key (Disc_Cursor);
-            Disc_Type : Typ'Class       := Element (Disc_Cursor).Get;
+            Disc_Type : constant Typ'Class := Element (Disc_Cursor).Get;
 
             Suffix : constant String :=
               (if Next (Disc_Cursor) = No_Element then ");" else " ,");

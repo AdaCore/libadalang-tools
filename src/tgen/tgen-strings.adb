@@ -22,7 +22,6 @@
 ------------------------------------------------------------------------------
 
 with Ada.Characters.Latin_1;
-with Ada.Text_IO; use Ada.Text_IO;
 
 with Libadalang.Common; use Libadalang.Common;
 
@@ -47,7 +46,7 @@ package body TGen.Strings is
       Span : Natural)
    is
    begin
-      Append (Str, (for I in 1 .. Span => ' '));
+      Append (Str, [for I in 1 .. Span => ' ']);
       Append (Str, Add);
       New_Line (Str);
    end Write_Line;
@@ -62,7 +61,7 @@ package body TGen.Strings is
       Span : Natural)
    is
    begin
-      Append (Str, (for I in 1 .. Span => ' '));
+      Append (Str, [for I in 1 .. Span => ' ']);
       Append (Str, Add);
    end S_Write;
 
@@ -86,7 +85,7 @@ package body TGen.Strings is
      (Str  : in out Unbounded_String;
       Span : Natural)
    is
-      Indent_Str : String (1 .. Span) := (others => ' ');
+      Indent_Str : constant String (1 .. Span) := [others => ' '];
       Index : Natural := 1;
       Length : Natural := Str.Length;
    begin
@@ -124,7 +123,8 @@ package body TGen.Strings is
          case Ada_Name (Name.Kind) is
             when Ada_Dotted_Name =>
                declare
-                  DN     : constant Dotted_Name := Name.As_Dotted_Name;
+                  DN     : constant Libadalang.Analysis.Dotted_Name :=
+                    Name.As_Dotted_Name;
                   Suffix : constant Ada_Qualified_Name := To_Qualified_Name
                      (DN.F_Suffix.As_Name);
                begin

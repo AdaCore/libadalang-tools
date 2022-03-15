@@ -23,9 +23,7 @@
 
 with Ada.Exceptions;
 with Ada.Text_IO; use Ada.Text_IO;
-with Ada.Strings.Unbounded;
 with Ada.Containers.Hashed_Maps;
-with Ada.Containers.Multiway_Trees;
 
 with GNATCOLL.GMP.Integers;
 
@@ -43,7 +41,6 @@ with TGen.Types.Record_Types;   use TGen.Types.Record_Types;
 with TGen.Types.Constraints;    use TGen.Types.Constraints;
 
 package body TGen.Types.Translation is
-   use LAL;
 
    Translation_Error : exception;
 
@@ -748,7 +745,7 @@ package body TGen.Types.Translation is
       end if;
 
       declare
-         Real_Rng : Real_Range_Constraint :=
+         Real_Rng : constant Real_Range_Constraint :=
            Translate_Real_Range_Spec (Range_Spec_Val);
       begin
          pragma Assert (Real_Rng.Low_Bound.Kind = Static
@@ -962,7 +959,7 @@ package body TGen.Types.Translation is
          end loop;
 
          declare
-            Constraint_Nodes : Local_Ada_Node_Arr :=
+            Constraint_Nodes : constant Local_Ada_Node_Arr :=
               Gather_Index_Constraint_Nodes (Decl.As_Ada_Node, Num_Indices);
 
             Res_Typ : Constrained_Array_Typ (Num_Indices);
@@ -1318,10 +1315,6 @@ package body TGen.Types.Translation is
 
       procedure Filter_Variant_Choice (Var_Choice : in out Variant_Choice);
 
-      function Alt_List_Match
-        (List : Alternatives_List;
-         Val  : GNATCOLL.GMP.Integers.Big_Integer) return Boolean;
-
       procedure Delete_Nested_Variant (Var_Choice : in out Variant_Choice);
 
       ---------------------------
@@ -1338,25 +1331,6 @@ package body TGen.Types.Translation is
                Renaming);
          end if;
       end Filter_Variant_Choice;
-
-      --------------------
-      -- Alt_List_Match --
-      --------------------
-
-      function Alt_List_Match
-        (List : Alternatives_List;
-         Val  : GNATCOLL.GMP.Integers.Big_Integer) return Boolean
-      is
-         Current_Alt : Ada_Node := List.First_Child;
-      begin
-         while not Current_Alt.Is_Null loop
-            if Current_Alt.P_Choice_Match (Val) then
-               return True;
-            end if;
-            Current_Alt := Current_Alt.Next_Sibling;
-         end loop;
-         return False;
-      end Alt_List_Match;
 
       ---------------------------
       -- Delete_Nested_Variant --
@@ -1432,7 +1406,7 @@ package body TGen.Types.Translation is
                Next (Choice_Cur);
             end loop;
             declare
-               Match_Choice : Variant_Choice := Element (Match_Cur);
+               Match_Choice : constant Variant_Choice := Element (Match_Cur);
                Comp_Cur : Component_Maps.Cursor :=
                  Match_Choice.Components.First;
 
@@ -1677,22 +1651,22 @@ package body TGen.Types.Translation is
          One : constant Big_Integer := To_Big_Integer (1);
       begin
          if not Overlap (L, R) then
-            return (1 => L);
+            return [1 => L];
          elsif R.Min <= L.Min  and then L.Max <= R.Max then
-            return (1 .. 0 => <>);
+            return [1 .. 0 => <>];
          elsif L.Min < R.Min
               and then R.Min <= L.Max
               and then L.Max <= R.Max
          then
-            return (1 => (Min => L.Min, Max => R.Min - One));
+            return [1 => (Min => L.Min, Max => R.Min - One)];
          elsif R.Min <= L.Min
               and then L.Min <= R.Max
               and then R.Max < L.Max
          then
-            return (1 => (Min => R.Max + One, Max => L.Max));
+            return [1 => (Min => R.Max + One, Max => L.Max)];
          else
-            return (1 => (Min => L.Min, Max => R.Min - One),
-                    2 => (Min => R.Max + One, Max => L.Max));
+            return [1 => (Min => L.Min, Max => R.Min - One),
+                    2 => (Min => R.Max + One, Max => L.Max)];
          end if;
       end "-";
    begin
@@ -1810,7 +1784,6 @@ package body TGen.Types.Translation is
       Choice_Min : Big_Int.Big_Integer;
       Choice_Max : Big_Int.Big_Integer;
       Has_Others : Boolean := False;
-      Inserted   : Boolean := False;
    begin
       Res.Discr_Name := +Node.F_Discr_Name.P_Referenced_Defining_Name.Text;
 
@@ -2043,9 +2016,8 @@ package body TGen.Types.Translation is
             --  moment as we are supposed to be translating the full view of
             --  the type, will need to revisit this to double check.
 
-            Current_Type  : Translation_Result;
-            Cur_Discr_Val : Discriminant_Values;
-            Comp_Decl     : constant Component_List :=
+            Current_Type : Translation_Result;
+            Comp_Decl    : constant Component_List :=
               Actual_Decl.F_Type_Def.As_Record_Type_Def.F_Record_Def
               .F_Components;
          begin

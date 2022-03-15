@@ -24,17 +24,12 @@
 with Ada.Strings.Fixed;
 with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
 
-with Langkit_Support.Text;
-
 with Libadalang.Common; use Libadalang.Common;
 
 with TGen.Context; use TGen.Context;
 with TGen.Strategies; use TGen.Strategies;
 
 package body TGen.Types is
-
-   use LAL;
-   package Text renames Langkit_Support.Text;
 
    -----------
    -- Image --
@@ -112,7 +107,7 @@ package body TGen.Types is
       if Self.Get.Supports_Static_Gen then
          return Self.Get.Generate_Static (Context);
       elsif Context.Unsupported_Type_Behavior = Commented_Out then
-         return TGen.Strategies.Commented_Out_Strategy_Type'(others => <>);
+         return TGen.Strategies.Commented_Out_Strategy_Type'(null record);
       else
          return raise Program_Error with
            "Type " & To_Ada (Self.Get.Name)

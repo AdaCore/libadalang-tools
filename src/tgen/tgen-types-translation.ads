@@ -21,8 +21,6 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-
 package TGen.Types.Translation is
 
    type Translation_Result (Success : Boolean := False) is record

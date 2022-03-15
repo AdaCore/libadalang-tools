@@ -23,25 +23,17 @@
 
 with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Hashed_Maps;
-with Ada.Containers.Multiway_Trees;
 with Ada.Containers.Ordered_Maps;
-with Ada.Containers.Ordered_Sets;
 with Ada.Containers.Vectors;
-with Ada.Finalization;
-with Ada.Unchecked_Deallocation;
 
 with Libadalang.Analysis;
 
 with TGen.Context;              use TGen.Context;
 with TGen.Strategies;           use TGen.Strategies;
-with TGen.Types;                use TGen.Types;
 with TGen.Types.Discrete_Types; use TGen.Types.Discrete_Types;
-with TGen.Types.Int_Types;      use TGen.Types.Int_Types;
 with TGen.Types.Constraints;    use TGen.Types.Constraints;
 
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Strings.Wide_Wide_Unbounded.Wide_Wide_Hash;
-with Ada.Streams; use Ada.Streams;
 
 package TGen.Types.Record_Types is
 

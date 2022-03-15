@@ -30,7 +30,7 @@ with GNAT.Calendar;
 with GNATCOLL.Projects; use GNATCOLL.Projects;
 with GNATCOLL.VFS;      use GNATCOLL.VFS;
 
-with Templates_Parser; use Templates_Parser;
+with Langkit_Support.Text; use Langkit_Support.Text;
 
 with TGen.Files;                use TGen.Files;
 with TGen.Gen_Strategies_Utils; use TGen.Gen_Strategies_Utils;
@@ -50,8 +50,6 @@ package body TGen.Gen_Types_Value is
    function Type_Value_ADS_Text_Template
      (Self : Type_Value_Generator) return Text_Type
    is
-      use GNATCOLL.VFS;
-
       TS : aliased constant Type_Value_ADS_Translator :=
         Create_Type_Value_ADS_Translator (Self.Context, Self.Strategies);
 
@@ -90,8 +88,6 @@ package body TGen.Gen_Types_Value is
    function Type_Value_ADB_Text_Template
      (Self : Type_Value_Generator) return Text_Type
    is
-      use GNATCOLL.VFS;
-
       TS : aliased constant Type_Value_ADB_Translator :=
         Create_Type_Value_ADB_Translator (Self.Context, Self.Strategies);
 
@@ -213,8 +209,6 @@ package body TGen.Gen_Types_Value is
      (Self  : Type_Value_ADS_Translator;
       Table : in out Templates_Parser.Translate_Set)
    is
-      use type Templates_Parser.Vector_Tag;
-
       Type_Strategy_Tag : constant String := "TYPE_STRATEGY";
 
       Type_Strategy_Vector_Tag : Templates_Parser.Vector_Tag;
@@ -239,8 +233,6 @@ package body TGen.Gen_Types_Value is
      (Self  : Type_Value_ADB_Translator;
       Table : in out Templates_Parser.Translate_Set)
    is
-      use type Templates_Parser.Vector_Tag;
-
       Type_Strategy_Tag : constant String := "TYPE_STRATEGY";
 
       Type_Strategy_Vector_Tag : Templates_Parser.Vector_Tag;

@@ -21,8 +21,6 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with GNAT.Random_Numbers;
-
 with Ada.Numerics.Generic_Elementary_Functions;
 
 package body TGen.Random is
@@ -79,15 +77,15 @@ package body TGen.Random is
 
          while True loop
             declare
-               Falsey : Unsigned_64 :=
+               Falsey : constant Unsigned_64 :=
                  Unsigned_64 (Float'Floor (Float (Size) * (1.0 - P)));
                --  Number of Falsey parts
 
-               Truthy : Unsigned_64 :=
+               Truthy : constant Unsigned_64 :=
                  Unsigned_64 (Float'Floor (Float (Size) * P));
                --  Number of Truthy parts.
 
-               Remainder : Float :=
+               Remainder : constant Float :=
                  ((Float (Size) * P) - Float (Truthy));
 
                Partial : Boolean;
@@ -96,7 +94,7 @@ package body TGen.Random is
                --  again if this value if picked, using the Remainder as our
                --  new probability P to pick True.
 
-               Draw : Unsigned_64 := Draw_Bits (Bits);
+               Draw : constant Unsigned_64 := Draw_Bits (Bits);
             begin
                if Falsey + Truthy = Size then
                   Partial := False;
@@ -104,7 +102,7 @@ package body TGen.Random is
                   Partial := True;
                end if;
 
-               if Partial and then Draw = Unsigned_64 (Size - 1) then
+               if Partial and then Draw = (Size - 1) then
                   P := Remainder;
                   goto Continue;
                end if;

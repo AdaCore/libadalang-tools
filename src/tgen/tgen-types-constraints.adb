@@ -21,20 +21,13 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Strings.Unbounded;
-
-with Langkit_Support.Text;
-
 with TGen.Types.Int_Types;    use TGen.Types.Int_Types;
 with TGen.Types.Enum_Types;   use TGen.Types.Enum_Types;
 with TGen.Types.Real_Types;   use TGen.Types.Real_Types;
 with TGen.Types.Array_Types;  use TGen.Types.Array_Types;
 with TGen.Types.Record_Types; use TGen.Types.Record_Types;
-with Ada.Text_IO; use Ada.Text_IO;
 
 package body TGen.Types.Constraints is
-
-   package Text renames Langkit_Support.Text;
 
    function Image (Self : Discrete_Constraint_Value) return String is
      (case Self.Kind is
@@ -77,7 +70,6 @@ package body TGen.Types.Constraints is
    -----------
 
    function Image (Self : Index_Constraints) return String is
-      use Ada.Strings.Unbounded;
       Res : Unbounded_String := To_Unbounded_String ("(");
    begin
       for Index in 1 .. Self.Num_Dims loop
@@ -93,7 +85,6 @@ package body TGen.Types.Constraints is
    -----------
 
    function Image (Self : Discriminant_Constraints) return String is
-      use Ada.Strings.Unbounded;
       use Discriminant_Constraint_Maps;
       Res : Unbounded_String := To_Unbounded_String ("(");
       Cur : Cursor := Self.Constraint_Map.First;
@@ -124,7 +115,7 @@ package body TGen.Types.Constraints is
    ------------------
 
    function As_Named_Typ (Self : Anonymous_Typ) return SP.Ref is
-      Name : Ada_Qualified_Name := Self.Named_Ancestor.Get.Name;
+      Name : constant Ada_Qualified_Name := Self.Named_Ancestor.Get.Name;
       Res : SP.Ref;
       Cst : Constraint'Class renames Self.Subtype_Constraints.all;
    begin
@@ -159,12 +150,13 @@ package body TGen.Types.Constraints is
                   use Enum_Literal_Maps;
                   use Big_Int;
                   New_Lit_Set  : Enum_Literal_Maps.Map;
-                  Old_Enum_Cur : Cursor :=
+                  Old_Enum_Cur : constant Cursor :=
                     As_Other_Enum_Typ (Self.Named_Ancestor).Literals.First;
-                  Min : Big_Integer := Discrete_Range_Constraint (Cst)
-                                       .Low_Bound.Int_Val;
-                  Max : Big_Integer := Discrete_Range_Constraint (Cst)
-                                       .High_Bound.Int_Val;
+
+                  Min : constant Big_Integer :=
+                    Discrete_Range_Constraint (Cst).Low_Bound.Int_Val;
+                  Max : constant Big_Integer :=
+                    Discrete_Range_Constraint (Cst).High_Bound.Int_Val;
                begin
                   while Has_Element (Old_Enum_Cur) loop
                      if Min <= Key (Old_Enum_Cur)

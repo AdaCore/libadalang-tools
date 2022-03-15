@@ -41,9 +41,9 @@ package body TGen.Subprograms is
          declare
             use Parameters_Data_Vectors;
 
-            Param_Data : Parameter_Data := Element (Param_Cursor);
-            Param_Name : Unbounded_Text_Type := Param_Data.Name;
-            Param_Type : Unbounded_Text_Type :=
+            Param_Data : constant Parameter_Data := Element (Param_Cursor);
+            Param_Name : constant Unbounded_Text_Type := Param_Data.Name;
+            Param_Type : constant Unbounded_Text_Type :=
               Param_Data.Type_Fully_Qualified_Name;
          begin
             S_Write (Res, (+Param_Name) & " : ", I);

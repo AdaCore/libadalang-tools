@@ -25,9 +25,8 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with GNAT.Random_Numbers;
 
-with TGen.Context; use TGen.Context;
 with TGen.Strings; use TGen.Strings;
-with TGen.Random; use TGen.Random;
+with TGen.Random;  use TGen.Random;
 
 package body TGen.Types.Real_Types is
 
@@ -97,7 +96,6 @@ package body TGen.Types.Real_Types is
    is
       Res : Dynamic_Strategy_Type (Kind => Random_Kind, Constrained => False);
       F_Body : Unbounded_String;
-      F_Name : constant String := Self.Gen_Random_Function_Name;
       Indent : Natural := 0;
    begin
       Write_Line (F_Body, "declare", Indent);
@@ -127,7 +125,7 @@ package body TGen.Types.Real_Types is
 
    function Generate_Float_Typ (Ty : Typ'Class) return Static_Value'Class
    is
-      Self : Float_Typ := Float_Typ (Ty);
+      Self : constant Float_Typ := Float_Typ (Ty);
 
       type T is new Long_Float
         range Self.Low_Bound_Or_Default .. Self.High_Bound_Or_Default;

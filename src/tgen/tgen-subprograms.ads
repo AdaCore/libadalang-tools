@@ -21,15 +21,15 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Ordered_Sets;
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded;           use Ada.Strings.Unbounded;
-with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
-with Ada.Strings.Wide_Wide_Unbounded.Wide_Wide_Hash;
+
+with Libadalang.Analysis; use Libadalang.Analysis;
+with Libadalang.Common;
+with Langkit_Support.Text; use Langkit_Support.Text;
 
 with TGen.Strings; use TGen.Strings;
-with TGen.Templates;
 
 package TGen.Subprograms is
 

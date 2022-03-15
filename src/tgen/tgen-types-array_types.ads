@@ -23,7 +23,6 @@
 
 with TGen.Context;           use TGen.Context;
 with TGen.Strategies;        use TGen.Strategies;
-with TGen.Types;             use TGen.Types;
 with TGen.Types.Constraints; use TGen.Types.Constraints;
 
 package TGen.Types.Array_Types is

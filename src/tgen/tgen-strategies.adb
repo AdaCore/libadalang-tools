@@ -22,15 +22,11 @@
 ------------------------------------------------------------------------------
 
 with Ada.Containers; use Ada.Containers;
-with Ada.Numerics.Discrete_Random;
-with Ada.Numerics.Float_Random;
 with Ada.Tags;    use Ada.Tags;
-with Ada.Text_IO; use Ada.Text_IO;
 
 with Libadalang.Common; use Libadalang.Common;
+
 with TGen.Random;            use TGen.Random;
-with TGen.Strings;           use TGen.Strings;
-with TGen.Types.Translation;
 
 package body TGen.Strategies is
 
@@ -45,8 +41,6 @@ package body TGen.Strategies is
 
    function Function_Image_Spec (F : Subprogram_Data) return String
    is
-      use type Ada.Containers.Count_Type;
-
       Result : Unbounded_String;
       Indent : Natural := 0;
       Index  : Positive := 1;
@@ -120,8 +114,7 @@ package body TGen.Strategies is
    function Image_Spec (Strat : Dynamic_Strategy_Type) return String
    is
       Result : Unbounded_String;
-      Indent : Natural := 0;
-      Index : Positive := 1;
+      Indent : constant Natural := 0;
    begin
 
       if not Strat.Generated then
@@ -218,7 +211,7 @@ package body TGen.Strategies is
      (S            : in out Dispatching_Static_Strategy_Type;
       Disc_Context : Disc_Value_Map) return Static_Value'Class
    is
-      Rnd : Float := Rand_Float;
+      Rnd : constant Float := Rand_Float;
    begin
       if Rnd <= S.Bias then
          return S.S1.Generate_Static_Value (Disc_Context);
@@ -253,7 +246,7 @@ package body TGen.Strategies is
         (S            : in out Equivalence_Class_Strategy_Type;
          Disc_Context : Disc_Value_Map) return Static_Value'Class
       is
-         Idx : Integer := Rand_Int (1, Integer (S.Classes.Length));
+         Idx : constant Integer := Rand_Int (1, Integer (S.Classes.Length));
       begin
          return S.Draw (S.T, S.Classes.Element (Idx));
       end Generate_Static_Value;

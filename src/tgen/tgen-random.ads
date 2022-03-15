@@ -46,9 +46,7 @@ package TGen.Random is
    type Many_Type is tagged private;
 
    function Many
-     (Min_Size, Max_Size, Average_Size : Natural) return Many_Type
-     with Pre => Min_Size >= 0 and then Average_Size >= Min_Size and then
-     Max_Size >= Average_Size;
+     (Min_Size, Max_Size, Average_Size : Natural) return Many_Type;
 
    function Count (Elements : Many_Type) return Natural;
 

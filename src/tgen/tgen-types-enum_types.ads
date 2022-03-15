@@ -22,13 +22,10 @@
 ------------------------------------------------------------------------------
 
 with Ada.Containers.Ordered_Maps;
-with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
 
 with TGen.Context;              use TGen.Context;
 with TGen.Strategies;           use TGen.Strategies;
-with TGen.Types;                use TGen.Types;
 with TGen.Types.Discrete_Types; use TGen.Types.Discrete_Types;
-with TGen.Types.Int_Types;      use TGen.Types.Int_Types;
 
 package TGen.Types.Enum_Types is
 
@@ -61,7 +58,8 @@ package TGen.Types.Enum_Types is
 
    type Bool_Typ is new Enum_Typ with null record;
 
-   function Supports_Static_Gen (Self : Typ) return Boolean is (True);
+   function Supports_Static_Gen
+     (Self : Typ with Unreferenced) return Boolean is (True);
    --  Wether values for this Typ can be statically generated
 
    function Image (Self : Bool_Typ) return String;

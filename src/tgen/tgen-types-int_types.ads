@@ -21,12 +21,9 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Containers.Vectors;
-
-with TGen.Context;      use TGen.Context;
-with TGen.Types;        use TGen.Types;
+with TGen.Context;              use TGen.Context;
 with TGen.Types.Discrete_Types; use TGen.Types.Discrete_Types;
-with TGen.Strategies;   use TGen.Strategies;
+with TGen.Strategies;           use TGen.Strategies;
 
 package TGen.Types.Int_Types is
 

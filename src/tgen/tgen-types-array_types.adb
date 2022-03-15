@@ -21,11 +21,8 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Containers.Indefinite_Ordered_Maps;
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Tags; use Ada.Tags;
 
-with TGen.Context;              use TGen.Context;
 with TGen.Numerics;             use TGen.Numerics;
 with TGen.Random;               use TGen.Random;
 with TGen.Strings;              use TGen.Strings;
@@ -139,8 +136,8 @@ package body TGen.Types.Array_Types is
          Result.Size_Intervals := Size_Intervals;
          for I in Size_Intervals'Range loop
             declare
-               Min_Size : Natural := Size_Intervals (I).Min_Size;
-               Max_Size : Natural := Size_Intervals (I).Max_Size;
+               Min_Size : constant Natural := Size_Intervals (I).Min_Size;
+               Max_Size : constant Natural := Size_Intervals (I).Max_Size;
             begin
                Average_Sizes (I) :=
                  Natural'Min (Natural'Max (Min_Size * 2, Min_Size + 5),
@@ -162,7 +159,6 @@ package body TGen.Types.Array_Types is
 
          for I in 1 .. Self.Dimensions loop
             declare
-               Picked_Size : Natural := 0;
                Elements    : Many_Type :=
                  Many
                    (Self.Size_Intervals (I).Min_Size,
@@ -240,6 +236,8 @@ package body TGen.Types.Array_Types is
    function Reshape_2
      (Arr  : Array_Type;
       Dim1 : Positive) return Reshaped_Array_Type;
+
+   pragma Unreferenced (Reshape_2);
 
    ---------------
    -- Reshape_2 --
@@ -359,8 +357,10 @@ package body TGen.Types.Array_Types is
          Array_Type   => Array_Type,
          Reshaped_Array_Type => Expected_Array_Type);
 
-      Sizes : Size_Interval_Array :=
-        (for I in 1 .. Self.Num_Dims =>
+      pragma Unreferenced (Reshape);
+
+      Sizes : constant Size_Interval_Array :=
+        [for I in 1 .. Self.Num_Dims =>
             (if not Constrained then
                  (Min_Size => Unconstrained_Array_Size_Min,
                   Max_Size => Unconstrained_Array_Size_Max)
@@ -368,13 +368,13 @@ package body TGen.Types.Array_Types is
                (Min_Size => +Length
                  (Constraints (I), Self.Index_Types (I), Disc_Context),
                 Max_Size => +Length
-                  (Constraints (I), Self.Index_Types (I), Disc_Context))));
+                  (Constraints (I), Self.Index_Types (I), Disc_Context)))];
 
-      Strat : Array_Strategy_Type := Array_Strategy (Sizes);
+      Strat : constant Array_Strategy_Type := Array_Strategy (Sizes);
 
       Dimension_Sizes : Nat_Array (1 .. Self.Num_Dims);
 
-      Random_Arr : Array_Type := Strat.Draw (Data, Dimension_Sizes);
+      Random_Arr : constant Array_Type := Strat.Draw (Data, Dimension_Sizes);
 
       procedure Pp_Arr
         (Arr   : Array_Type;
@@ -448,13 +448,14 @@ package body TGen.Types.Array_Types is
      (S            : in out Array_Static_Strategy_Type;
       Disc_Context : Disc_Value_Map) return Static_Value'Class
    is
-      T_Classwide : Typ'Class := S.T.Get;
+      T_Classwide : constant Typ'Class := S.T.Get;
    begin
       --  TODO: refactor that code
 
       if T_Classwide'Tag = Constrained_Array_Typ'Tag then
          declare
-            T : Constrained_Array_Typ := Constrained_Array_Typ (T_Classwide);
+            T : constant Constrained_Array_Typ :=
+              Constrained_Array_Typ (T_Classwide);
          begin
             return S.F
               (T,
@@ -465,7 +466,7 @@ package body TGen.Types.Array_Types is
          end;
       elsif T_Classwide'Tag = Unconstrained_Array_Typ'Tag then
          declare
-            T : Unconstrained_Array_Typ :=
+            T : constant Unconstrained_Array_Typ :=
               Unconstrained_Array_Typ (T_Classwide);
             No_Constraints : Index_Constraint_Arr (2 .. 1);
          begin
@@ -493,7 +494,7 @@ package body TGen.Types.Array_Types is
       Context : in out Generation_Context) return Static_Strategy_Type'Class
    is
       Strat : Array_Static_Strategy_Type;
-      Element_Strategy : Static_Strategy_Type'Class :=
+      Element_Strategy : constant Static_Strategy_Type'Class :=
         Self.Component_Type.Get.Generate_Static (Context);
    begin
       Context.Strategies.Include (Element_Strategy);
