@@ -20,6 +20,9 @@
 -- the files COPYING3 and COPYING.RUNTIME respectively.  If not, see        --
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
+--
+--  Provides translation utilities for types represented by Libadalang nodes
+--  to TGen's internal type representation.
 
 package TGen.Types.Translation is
 
@@ -36,15 +39,20 @@ package TGen.Types.Translation is
    function Translate
      (N       : LAL.Type_Expr;
       Verbose : Boolean := False) return Translation_Result;
+   --  Translate N to TGen's internal type representation
 
    function Translate
      (N : LAL.Base_Type_Decl;
       Verbose : Boolean := False) return Translation_Result;
+   --  Translate N to TGen's internal type representation
 
    procedure Print_Cache_Stats;
+   --  Print translation cache statistics on the standard output
 
    procedure PP_Cache;
+   --  Print the content of the translation cache on the standard output
 
    procedure Clear_Cache;
+   --  Clear the translation cache
 
 end TGen.Types.Translation;

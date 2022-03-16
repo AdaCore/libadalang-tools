@@ -20,6 +20,8 @@
 -- the files COPYING3 and COPYING.RUNTIME respectively.  If not, see        --
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
+--
+--  Utility functions around random number generators
 
 with Interfaces; use Interfaces;
 
@@ -47,10 +49,15 @@ package TGen.Random is
 
    function Many
      (Min_Size, Max_Size, Average_Size : Natural) return Many_Type;
+   --  Create a Many_Type which after calls to More until it returns False
+   --  will have a value in range Min_Size .. Max_Size distributed according to
+   --  a Bernoulli law.
 
    function Count (Elements : Many_Type) return Natural;
+   --  Return the value associated with Elements
 
    function More (Self : in out Many_Type) return Boolean;
+   --  Returns whether another value can be drawn from Self
 
    function Rand_Float return Float;
    --  Return a random number between 0 and 1

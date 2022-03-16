@@ -20,6 +20,8 @@
 -- the files COPYING3 and COPYING.RUNTIME respectively.  If not, see        --
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
+--
+--  Type representation for enumerated types
 
 with Ada.Containers.Ordered_Maps;
 
@@ -39,6 +41,9 @@ package TGen.Types.Enum_Types is
    function Image (Self : Char_Typ) return String;
 
    function Lit_Image (Self : Char_Typ; Lit : Big_Integer) return String;
+   --  Return the litteral for Self which is in Lit position. This function
+   --  only returns values in Character'Range, even if Self is a
+   --  Wide(_Wide)_Character.
 
    function High_Bound (Self : Char_Typ) return Big_Integer with
      Pre => Self.Is_Static;
@@ -49,6 +54,7 @@ package TGen.Types.Enum_Types is
      (Self    : Char_Typ;
       Context : in out Generation_Context)
       return Static_Strategy_Type'Class;
+   --  Generate a strategy to statically generate (in one pass) values for Self
 
    function As_Char_Typ (Self : SP.Ref) return Char_Typ'Class is
      (Char_Typ'Class (Self.Unchecked_Get.all)) with

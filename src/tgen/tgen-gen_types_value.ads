@@ -20,6 +20,11 @@
 -- the files COPYING3 and COPYING.RUNTIME respectively.  If not, see        --
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
+--
+--  This unit provides functionnalities to generate source code to generate
+--  Ada values at runtime. Used when static generation is not available for
+--  a given type.
+--  TODO: this unit is still a work in progress
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 

@@ -20,6 +20,10 @@
 -- the files COPYING3 and COPYING.RUNTIME respectively.  If not, see        --
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
+--
+--  Main entry point of the value generation part of this library. Provides
+--  procedure to generate testing strategies and test values for subprograms
+--  given as Libadalang nodes.
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
@@ -44,16 +48,24 @@ package TGen.Gen_Strategies is
      (Context    : in out Generation_Context;
       Project    : Project_Type;
       Output_Dir : Unbounded_String);
+   --  Set the project and output dir of Context, and prepare output
+   --  directories. This does not clear the context.
 
    procedure Generate_Artifacts (Context : in out Generation_Context);
+   --  Emit all artifacts after test generation is done. This includes the
+   --  JSON statically (single pass) generated values and sources required to
+   --  perform dynamic (two-pass) generation.
 
    procedure Generate_Test_Vectors
      (Context  : in out Generation_Context;
       Nb_Tests : Positive;
       Subp     : Subp_Decl;
       Subp_UID : Unbounded_String := Null_Unbounded_String);
+   --  Generate values for all types that support static (single pass)
+   --  generation.
    --  TODO: Handle (or not) subprocedure renaming in the spec.
    --  This is not the case currently
+   --  TODO: Incorporate dynamic (two-pass) generation?
 
    type Generated_Body is
       record
@@ -99,19 +111,24 @@ package TGen.Gen_Strategies is
      (F : Subp_Spec;
       P : Identifier) return String is
      (Image (Text (F.F_Subp_Name)) & "_" & Image (Text (P)));
+   --  Return the unique name of the strategy generating values for a
+   --  Subprogram spec
 
    function Get_Strategy_Signature
      (Self : Typ'Class;
       F    : Subp_Spec;
       P    : Identifier) return String is
      ("function " & Get_Unique_Strat_Name (F, P) & " return "
-      & Self.Fully_Qualified_Name & ";");
+      & Self.Fully_Qualified_Name);
+   --  Return the profile of the generation function associated to Self in
+   --  the context of generating values for testing P.
 
    function Get_Strategy_Spec
      (Self : Typ;
       F    : Subp_Spec;
       P    : Identifier) return String is
      (Get_Strategy_Signature (Self, F, P) & ";");
+   --  Same as Get_Strategy_Signature but returns a valid Ada declaration
 
    package Test_Generator is
       type Test_Generator is new Source_Code_Generator with private;
@@ -158,8 +175,12 @@ package TGen.Gen_Strategies is
 
    procedure Generate_Type_Strategies
      (Context : Generation_Context);
+   --  Output the source code associated to the dynamic (two pass) generation
+   --  strategies in Context
 
    procedure Dump_JSON
      (Context : Generation_Context);
+   --  Output the results of the static (single pass) generation to the output
+   --  JSON files.
 
 end TGen.Gen_Strategies;

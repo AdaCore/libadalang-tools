@@ -91,6 +91,9 @@ package body TGen.Types.Int_Types is
       return Result;
    end Generate_Random_Strategy;
 
+   --  Code for dynamic generation. This is paused for the moment but we do not
+   --  want to throw away all the ideas in it so keep these comments for the
+   --  moment.
    ------------------------------
    -- Generate_Sample_Strategy --
    ------------------------------

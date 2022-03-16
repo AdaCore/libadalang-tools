@@ -20,6 +20,9 @@
 -- the files COPYING3 and COPYING.RUNTIME respectively.  If not, see        --
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
+--
+--  Type representation for type constraints and anonymous subtypes, along with
+--  generation strategies
 
 with Ada.Containers.Hashed_Maps;
 with Ada.Strings.Wide_Wide_Unbounded.Wide_Wide_Hash;
@@ -35,6 +38,7 @@ package TGen.Types.Constraints is
    function Image (Self : Constraint) return String is abstract;
 
    function Static (Self : Constraint) return Boolean is abstract;
+   --  Whether the constraints are suitable for static (single pass) generation
 
    type Constraint_Acc is access all Constraint'Class;
 

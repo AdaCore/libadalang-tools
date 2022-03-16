@@ -20,6 +20,8 @@
 -- the files COPYING3 and COPYING.RUNTIME respectively.  If not, see        --
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
+--
+--  This unit provides utilities needed to generate testing strategies
 
 with Ada.Containers.Ordered_Maps;
 with Ada.Strings.Wide_Wide_Unbounded;
@@ -42,6 +44,7 @@ package TGen.Gen_Strategies_Utils is
    function Extract_Package_Data
      (Pkg_Decl : Package_Decl)
       return Package_Data;
+   --  Extract unit information from Pkg_Decl
 
    function Extract_Subprogram_Data
      (Subp : Basic_Decl'Class)
@@ -59,9 +62,11 @@ package TGen.Gen_Strategies_Utils is
    function Gen_Random_Function_Name
      (T : Typ'Class) return String is
       ("Gen_" & T.Type_Name);
+   --  Return the name of the function generating random values for type T
 
    function Strat_Param_Name (Param : Parameter_Data) return String is
      ("Strat_" & (+Param.Name));
+   --  Return the name of the strategy generating values for Param
 
    function Param_Strat_Package_Name (Package_Name : String) return String is
      (Package_Name & ".Param_Strategies");
@@ -94,6 +99,7 @@ package TGen.Gen_Strategies_Utils is
      (Project   : Project_Type;
       Unit_Name : String;
       Part      : Unit_Parts) return String;
+   --  Return the filename associates to unit Unit_Name
 
    function Is_Subprogram (Decl : Basic_Decl'Class) return Boolean is
      (not Decl.Is_Null
@@ -129,5 +135,6 @@ package TGen.Gen_Strategies_Utils is
    --  Return the set of all types a type is composed of
 
    function Gen_Constrained_Function (Self : Typ'Class) return Subprogram_Data;
+   --  TODO unused today (ony for dynamic generation of constrained records)
 
 end TGen.Gen_Strategies_Utils;

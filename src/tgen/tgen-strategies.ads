@@ -20,6 +20,10 @@
 -- the files COPYING3 and COPYING.RUNTIME respectively.  If not, see        --
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
+--
+--  Random value generation strategies. For the moment this concerns only
+--  static generation strategies, but will also be applicable to dynamic
+--  generation later on.
 
 with Ada.Containers.Indefinite_Hashed_Maps;
 with Ada.Containers.Indefinite_Ordered_Sets;

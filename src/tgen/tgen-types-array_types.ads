@@ -20,6 +20,8 @@
 -- the files COPYING3 and COPYING.RUNTIME respectively.  If not, see        --
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
+--
+--  Type representation for arrays, and associated generation strategies
 
 with TGen.Context;           use TGen.Context;
 with TGen.Strategies;        use TGen.Strategies;
@@ -39,6 +41,7 @@ package TGen.Types.Array_Types is
       Component_Type : TGen.Types.SP.Ref;
       Static_Gen : Boolean := False;
    end record;
+   --  Represents an array type.
 
    function Supports_Static_Gen (Self : Array_Typ) return Boolean is
      (Self.Static_Gen);
@@ -47,6 +50,7 @@ package TGen.Types.Array_Types is
    overriding function Generate_Static
      (Self    : Array_Typ;
       Context : in out Generation_Context) return Static_Strategy_Type'Class;
+   --  Generate a stratgey for static (single pass) generation for an Array_Typ
 
    type Unconstrained_Array_Typ is new Array_Typ with null record;
 
@@ -66,6 +70,7 @@ package TGen.Types.Array_Types is
      Array_Typ (Num_Dims) with record
       Index_Constraints : Index_Constraint_Arr (1 .. Num_Dims);
    end record;
+   --  Represents a constrained array type
 
    function Image (Self : Constrained_Array_Typ) return String;
 

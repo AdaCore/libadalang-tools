@@ -614,6 +614,7 @@ package body TGen.Types.Translation is
       end Find_Delta;
 
    --  Start of processing for Translate_Ordinary_Fixed_Decl
+
    begin
       Translate_Float_Range (Decl, Has_Range, Min, Max);
       pragma Assert (Has_Range);

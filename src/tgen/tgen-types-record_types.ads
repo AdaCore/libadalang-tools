@@ -20,6 +20,8 @@
 -- the files COPYING3 and COPYING.RUNTIME respectively.  If not, see        --
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
+--
+--  Type representation for record types, and associated generation functions
 
 with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Hashed_Maps;
@@ -74,17 +76,15 @@ package TGen.Types.Record_Types is
 
    function Image (Self : Record_Typ) return String;
 
-   --  overriding function Generate_Static
-   --    (Self         : Record_Typ;
-   --     Disc_Context : Disc_Value_Map) return String;
-
    function Image_Internal
      (Self    : Record_Typ;
       Padding : Natural := 0) return String;
+   --  Image of Self but allows to specify an optional indentation
 
    overriding function Generate_Static
      (Self    : Record_Typ;
       Context : in out Generation_Context) return Static_Strategy_Type'Class;
+   --  Generate a strategy to statically generate (in one pass) values for Self
 
    function As_Record_Typ (Self : SP.Ref)
      return Record_Typ'Class is
@@ -101,6 +101,7 @@ package TGen.Types.Record_Types is
    overriding function Generate_Static
      (Self    : Nondiscriminated_Record_Typ;
       Context : in out Generation_Context) return Static_Strategy_Type'Class;
+   --  Generate a strategy to statically generate (in one pass) values for Self
 
    function As_Nondiscriminated_Record_Typ (Self : SP.Ref)
      return Nondiscriminated_Record_Typ'Class is
@@ -108,10 +109,6 @@ package TGen.Types.Record_Types is
      Pre => (not SP.Is_Null (Self))
             and then (Self.Get.Kind in Non_Disc_Record_Kind);
    pragma Inline (As_Nondiscriminated_Record_Typ);
-
-   --  overriding function Generate_Static
-   --    (Self         : Nondiscriminated_Record_Typ;
-   --     Disc_Context : Disc_Value_Map) return String;
 
    type Discriminant_Choice_Entry is record
       Defining_Name : Unbounded_Text_Type;
@@ -141,6 +138,8 @@ package TGen.Types.Record_Types is
    procedure Free_Variant (Var : in out Variant_Part_Acc);
 
    function Clone (Var : Variant_Part_Acc) return Variant_Part_Acc;
+   --  Duplicate Var, allocating new memory for the clones of Var and its
+   --  nested variant parts.
 
    package Variant_Choice_Lists is new Ada.Containers.Doubly_Linked_Lists
      (Element_Type => Variant_Choice);
@@ -206,14 +205,19 @@ package TGen.Types.Record_Types is
    overriding function Generate_Static
      (Self    : Discriminated_Record_Typ;
       Context : in out Generation_Context) return Static_Strategy_Type'Class;
+   --  Generate a strategy to statically generate (in one pass) values for Self
 
    overriding function Generate_Random_Strategy
      (Self    : Discriminated_Record_Typ;
       Context : in out Generation_Context) return Strategy_Type'Class;
+   --  Generate a strategy for dynamic (two pass) generation to generate
+   --  uniformly distributed values.
 
    overriding function Generate_Constrained_Random_Strategy
      (Self    : Discriminated_Record_Typ;
       Context : Generation_Context) return Strategy_Type'Class;
+   --  Generate a strategy for dynamic (two pass) generation to generate
+   --  uniformly distributed values.
 
    function Get_All_Components
      (Self : Discriminated_Record_Typ) return Component_Map;
@@ -228,10 +232,12 @@ package TGen.Types.Record_Types is
      (Disc_Record_Kind);
 
    procedure Free_Content (Self : in out Discriminated_Record_Typ);
+   --  Helper for shared pointers
 
    overriding function Is_Constrained
      (Self : Discriminated_Record_Typ) return Boolean
      is (True);
+   --  Whether Self has discriminants cosntraints
 
    function As_Discriminated_Record_Typ
      (Self : SP.Ref) return Discriminated_Record_Typ'Class is

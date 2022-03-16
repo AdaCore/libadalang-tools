@@ -38,10 +38,6 @@ package body TGen.Types.Record_Types is
 
    Pad : constant Unbounded_String := 3 * ' ';
 
-   Debug_Variant_Set : constant Boolean := False;
-   --  Display the alternatives as intervals instead of source text. For
-   --  debug purposes
-
    function PP_Variant
      (Var : Variant_Part_Acc; Padding : Natural := 0) return Unbounded_String;
 
@@ -262,25 +258,15 @@ package body TGen.Types.Record_Types is
       Res := Res & (+Var.Discr_Name) & " is" & LF;
       for Var_Choice of Var.Variant_Choices loop
          Res := Res & (Padding + 2) * Pad & "when ";
-         if Debug_Variant_Set then
-            Res := Res & "[";
-            for Rng of Var_Choice.Alt_Set loop
-               Res :=
-                 Res & "[" & Big_Int.To_String (Rng.Min) & ", " &
-                 Big_Int.To_String (Rng.Max) & "],";
-            end loop;
-            Res := Res & "] => " & LF;
-         else
-            for Alt of Var_Choice.Alt_Set loop
-               Res :=
-                 Res & Big_Int.To_String (Alt.Min) & " .. "
-                 & Big_Int.To_String (Alt.Max);
-               if Alt /= Var_Choice.Alt_Set.Last_Element then
-                  Res := Res & " | ";
-               end if;
-            end loop;
-            Res := Res & " => " & LF;
-         end if;
+         for Alt of Var_Choice.Alt_Set loop
+            Res :=
+               Res & Big_Int.To_String (Alt.Min) & " .. "
+               & Big_Int.To_String (Alt.Max);
+            if Alt /= Var_Choice.Alt_Set.Last_Element then
+               Res := Res & " | ";
+            end if;
+         end loop;
+         Res := Res & " => " & LF;
          Comp_Cur := Var_Choice.Components.First;
          while Component_Maps.Has_Element (Comp_Cur) loop
             Res :=

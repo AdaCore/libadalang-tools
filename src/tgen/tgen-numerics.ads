@@ -20,6 +20,8 @@
 -- the files COPYING3 and COPYING.RUNTIME respectively.  If not, see        --
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
+--
+--  Numeric utility functions for Big integers
 
 with Ada.Numerics.Big_Numbers.Big_Integers;
 with Ada.Numerics.Generic_Elementary_Functions;

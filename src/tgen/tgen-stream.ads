@@ -20,6 +20,9 @@
 -- the files COPYING3 and COPYING.RUNTIME respectively.  If not, see        --
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
+--
+--  Stream utilities to communicate between the value generation units and the
+--  test execution engine.
 
 with Ada.Streams; use Ada.Streams;
 
@@ -35,20 +38,23 @@ package TGen.Stream is
    type Buffer_Stream is new Flushable_Stream with private;
 
    procedure Initialize (Stream : out Buffer_Stream);
+   --  Allocate a buffer for the stream
 
-   --  Release the buffer.
    procedure Finalize (Object : in out Buffer_Stream);
+   --  Release the buffer.
 
    procedure Read
      (Stream : in out Buffer_Stream;
       Item   : out Stream_Element_Array;
       Last   : out Stream_Element_Offset);
+   --  Read the buffer array from the stream.
 
-   --  Write the buffer array to the output stream.
    procedure Write (Stream : in out Buffer_Stream;
                     Item : Ada.Streams.Stream_Element_Array);
+   --  Write the buffer array to the output stream.
 
    overriding procedure Flush (Stream : in out Buffer_Stream);
+   --  Flush the stream
 
 private
 

@@ -20,6 +20,9 @@
 -- the files COPYING3 and COPYING.RUNTIME respectively.  If not, see        --
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
+--
+--  Provides an execution engine for dynamically generated tests.
+--  TODO: this unit is still a work in progress
 
 with TGen.Strategies; use TGen.Strategies;
 with TGen.Stream; use TGen.Stream;
@@ -31,5 +34,7 @@ package TGen.Engine is
    procedure Test_Runner
      (Value_Stream : access Flushable_Stream'Class;
       Wrapped_Test : access procedure);
+   --  Run the Wrapped_Test until the stream is empty or the mx number of runs
+   --  per test is reached.
 
 end TGen.Engine;

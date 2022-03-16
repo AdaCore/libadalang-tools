@@ -20,6 +20,8 @@
 -- the files COPYING3 and COPYING.RUNTIME respectively.  If not, see        --
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
+--
+--  Type representation for integer types, and associated generation functions
 
 with TGen.Context;              use TGen.Context;
 with TGen.Types.Discrete_Types; use TGen.Types.Discrete_Types;
@@ -32,6 +34,8 @@ package TGen.Types.Int_Types is
    overriding function Generate_Random_Strategy
      (Self    : Int_Typ;
       Context : in out Generation_Context) return Strategy_Type'Class;
+   --  Generate a strategy for dynamic (two pass) generation to generate
+   --  uniformly distributed values.
 
    type Signed_Int_Typ (Is_Static : Boolean) is new
      Int_Typ (Is_Static => Is_Static) with record
@@ -98,6 +102,7 @@ package TGen.Types.Int_Types is
    overriding function Generate_Static
      (Self    : Signed_Int_Typ;
       Context : in out Generation_Context) return Static_Strategy_Type'Class;
+   --  Generate a strategy to statically generate (in one pass) values for Self
 
    type Static_Array_Constraint_Strategy_Type is new Static_Strategy_Type with
       record
@@ -112,5 +117,7 @@ package TGen.Types.Int_Types is
    function Generate_Array_Constraint_Strategy
      (Self : Signed_Int_Typ)
       return Static_Array_Constraint_Strategy_Type'Class;
+   --  Generate a strategy to statically generate (in a single pass) integer
+   --  values suitable for use in array index constraints, i.e. not too large.
 
 end TGen.Types.Int_Types;

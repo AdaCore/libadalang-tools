@@ -20,6 +20,8 @@
 -- the files COPYING3 and COPYING.RUNTIME respectively.  If not, see        --
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
+--
+--  Defines a global context type for value generation purposes
 
 with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Ordered_Sets;
@@ -67,8 +69,6 @@ package TGen.Context is
 
    type Unsupported_Behavior_Kind is (No_Test, Commented_Out);
 
-   --  General purpose context for test value generation purposes
-
    type Generation_Context is new TGen.Templates.Context with record
 
       Test_Vectors : Unit_To_JSON_Map;
@@ -103,5 +103,6 @@ package TGen.Context is
       --  filed in by the user.
 
    end record;
+   --  General purpose context for test value generation purposes
 
 end TGen.Context;

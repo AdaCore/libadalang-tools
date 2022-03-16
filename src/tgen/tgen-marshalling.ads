@@ -20,9 +20,12 @@
 -- the files COPYING3 and COPYING.RUNTIME respectively.  If not, see        --
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
+--
+--  This unit provides a procedure to generate a marshalling/un-marshalling
+--  function for a given Ada type.
 
-with Ada.Text_IO;                  use Ada.Text_IO;
-with TGen.Types;                   use TGen.Types;
+with Ada.Text_IO; use Ada.Text_IO;
+with TGen.Types;  use TGen.Types;
 
 package TGen.Marshalling is
 

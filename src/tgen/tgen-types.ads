@@ -20,6 +20,10 @@
 -- the files COPYING3 and COPYING.RUNTIME respectively.  If not, see        --
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
+--
+--  Internal type representation and associated generation functions.
+--  Specialized representations and generation functions are avalaible in the
+--  various TGen.Types.XXX_Type units.
 
 with Libadalang.Analysis;  use Libadalang.Analysis;
 with Langkit_Support.Text; use Langkit_Support.Text;
@@ -80,24 +84,32 @@ package TGen.Types is
    function Image (Self : Typ) return String;
 
    function Is_Anonymous (Self : Typ) return Boolean;
+   --  Whether Self represents an anonymous type
 
    function Fully_Qualified_Name (Self : Typ) return String is
      (To_Ada (Self.Name));
+   --  Return the FQN of Self
 
    function Parent_Package_Name (Self : Typ) return String is
      (raise Program_Error with "To implement");
+   --  Return the name of the package in which Self is defined
 
    function Type_Name (Self : Typ) return String is
      (if Ada_Identifier_Vectors.Is_Empty (Self.Name)
       then +Langkit_Support.Text.To_Text ("anonymous")
       else +Unbounded_String (Self.Name.Last_Element));
+   --  Return the name of Self
 
    function Gen_Random_Function_Name
      (Self : Typ) return String is
      ("Gen_" & To_Ada (Self.Name));
+   --  Return the name of the function generation random values for self in the
+   --  sources for dynamic (two pass) generation
 
    function Generation_Package_For_Type
      (Self : Typ'Class) return Unbounded_Text_Type;
+   --  Return the name of the package in which the generation code for Self
+   --  would be in dynamic (two pass) generation
 
    function Random_Strategy_Function
      (Self : Typ) return Subprogram_Data;
@@ -135,19 +147,20 @@ package TGen.Types is
      (Self    : Typ;
       Context : in out TGen.Context.Generation_Context)
       return TGen.Strategies.Static_Strategy_Type'Class;
-   --  Return a strategy generating elements of the given type
-
-   function Type_Image (Self : Typ) return String is ("");
+   --  Return a strategy statically generating (in a single pass) elements of
+   --  the given type
 
    function Kind (Self : Typ) return Typ_Kind;
 
    procedure Free_Content (Self : in out Typ) is null;
+   --  Helper for shared pointers
 
    type Scalar_Typ (Is_Static : Boolean) is new Typ with null record;
 
    type Composite_Typ is new Typ with null record;
 
    procedure Free_Content_Wide (Self : in out Typ'Class);
+   --  Helper for shared pointers
 
    package SP is new Shared_Pointers
      (Element_Type => Typ'Class, Release => Free_Content_Wide);

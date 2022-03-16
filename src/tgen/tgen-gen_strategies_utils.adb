@@ -93,6 +93,10 @@ package body TGen.Gen_Strategies_Utils is
       return Result;
    end Extract_Subprogram_Data;
 
+   --------------------------
+   -- Extract_Package_Data --
+   --------------------------
+
    function Extract_Package_Data
      (Pkg_Decl : Package_Decl)
       return Package_Data

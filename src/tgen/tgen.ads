@@ -20,7 +20,8 @@
 -- the files COPYING3 and COPYING.RUNTIME respectively.  If not, see        --
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
-
+--
+--  Library for value generation and marshalling of Ada types
 package TGen is
    Version : constant String := "0.0";
 end TGen;

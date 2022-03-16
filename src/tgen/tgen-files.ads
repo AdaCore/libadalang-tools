@@ -20,6 +20,8 @@
 -- the files COPYING3 and COPYING.RUNTIME respectively.  If not, see        --
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
+--
+--  This unit provides file managment utilities
 
 with Ada.Directories;
 
@@ -74,6 +76,8 @@ package TGen.Files is
      (Context   : TGen.Templates.Context'Class;
       Unit_Name : String) return Virtual_File
      is (Get_Output_Dir (Context) / Filesystem_String (Unit_Name & ".json"));
+   --  Return the name of the JSON file that will hold the generation results
+   --  for unit Unit_Name.
 
    function "/" (Dir, Name : String) return String is
      (Ada.Directories.Compose (Dir, Name));
@@ -81,11 +85,14 @@ package TGen.Files is
    --  checking that the path components are valid when not empty.
 
    procedure Prepare_Output_Dirs (Context : Generation_Context);
+   --  Create directories for the output if needed
 
    function Project_Output_Dir (Project : Project_Type) return String;
+   --  Return the path to the output dir of Project
 
    function Get_Strat_ADB (Ctx : Generation_Context) return Virtual_File is
      (Get_Output_Dir (Ctx) / Strat_ADB);
+   --  Return the name of the "strat file"
 
    function Gen_File
      (Ctx : TGen.Templates.Context'Class; File : String) return Virtual_File is

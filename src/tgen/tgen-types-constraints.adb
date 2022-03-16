@@ -29,11 +29,19 @@ with TGen.Types.Record_Types; use TGen.Types.Record_Types;
 
 package body TGen.Types.Constraints is
 
+   -----------
+   -- Image --
+   -----------
+
    function Image (Self : Discrete_Constraint_Value) return String is
      (case Self.Kind is
       when Static => Self.Int_Val.To_String,
       when Discriminant => (+Self.Disc_Name),
       when Non_Static => "Non static");
+
+   -----------
+   -- Image --
+   -----------
 
    function Image (Self : Real_Constraint_Value) return String is
      (case Self.Kind is

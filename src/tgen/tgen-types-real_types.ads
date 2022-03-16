@@ -20,6 +20,8 @@
 -- the files COPYING3 and COPYING.RUNTIME respectively.  If not, see        --
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
+--
+--  Type representation for real types, and associated generation functions
 
 with TGen.Context;    use TGen.Context;
 with TGen.Strategies; use TGen.Strategies;
@@ -34,9 +36,13 @@ package TGen.Types.Real_Types is
 
    function Low_Bound_Or_Default (Self : Real_Typ) return Long_Float is
      (Long_Float'First);
+   --  Return the low bound for Self if it has one explicitly defined, or
+   --  Long_Float'First otherwise.
 
    function High_Bound_Or_Default (Self : Real_Typ) return Long_Float is
      (Long_Float'Last);
+   --  Return the high bound for Self if it has one explicitly defined, or
+   --  Long_Float'Last otherwise.
 
    type Float_Typ (Is_Static, Has_Range : Boolean) is new
      Real_Typ (Is_Static => Is_Static) with record
@@ -60,9 +66,13 @@ package TGen.Types.Real_Types is
 
    function Low_Bound_Or_Default (Self : Float_Typ) return Long_Float
    with Pre => Self.Is_Static;
+   --  Return the low bound for Self if it has one explicitly defined, or
+   --  Long_Float'First otherwise.
 
    function High_Bound_Or_Default (Self : Float_Typ) return Long_Float
    with Pre => Self.Is_Static;
+   --  Return the high bound for Self if it has one explicitly defined, or
+   --  Long_Float'Last otherwise.
 
    function Image (Self : Float_Typ) return String;
 
@@ -71,10 +81,13 @@ package TGen.Types.Real_Types is
    overriding function Generate_Static
      (Self    : Float_Typ;
       Context : in out Generation_Context) return Static_Strategy_Type'Class;
+   --  Generate a strategy to statically generate (in one pass) values for Self
 
    overriding function Generate_Random_Strategy
      (Self    : Float_Typ;
       Context : in out Generation_Context) return Strategy_Type'Class;
+   --  Generate a strategy for dynamic (two pass) generation to generate
+   --  uniformly distributed values.
 
    function As_Float_Typ (Self : SP.Ref) return Float_Typ'Class is
      (Float_Typ'Class (Self.Unchecked_Get.all)) with
@@ -99,9 +112,13 @@ package TGen.Types.Real_Types is
 
    function Low_Bound_Or_Default (Self : Ordinary_Fixed_Typ) return Long_Float
    with Pre => Self.Is_Static;
+   --  Return the low bound for Self if it has one explicitly defined, or
+   --  Long_Float'First otherwise.
 
    function High_Bound_Or_Default (Self : Ordinary_Fixed_Typ) return Long_Float
    with Pre => Self.Is_Static;
+   --  Return the high bound for Self if it has one explicitly defined, or
+   --  Long_Float'Last otherwise.
 
    function Image (Self : Ordinary_Fixed_Typ) return String;
 
@@ -141,9 +158,13 @@ package TGen.Types.Real_Types is
 
    function Low_Bound_Or_Default (Self : Decimal_Fixed_Typ) return Long_Float
    with Pre => Self.Is_Static;
+   --  Return the low bound for Self if it has one explicitly defined, or
+   --  Long_Float'First otherwise.
 
    function High_Bound_Or_Default (Self : Decimal_Fixed_Typ) return Long_Float
    with Pre => Self.Is_Static;
+   --  Return the high bound for Self if it has one explicitly defined, or
+   --  Long_Float'Last otherwise.
 
    function As_Decimal_Fixed_Typ (Self : SP.Ref)
      return Decimal_Fixed_Typ'Class is
@@ -155,5 +176,6 @@ package TGen.Types.Real_Types is
    generic
       type T is digits <>;
    function Gen return T;
+   --  Generate a random value for T, between 0.0 and 1.0 for the moment
 
 end TGen.Types.Real_Types;
