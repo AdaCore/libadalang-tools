@@ -465,6 +465,7 @@ package body TGen.Types.Record_Types is
       Res : Unbounded_String;
       use Component_Maps;
    begin
+      Append (Res, "(");
       for Comp in Self.Component_Types.Iterate loop
          declare
             Comp_Name : constant Unbounded_Text_Type := Key (Comp);
@@ -496,6 +497,7 @@ package body TGen.Types.Record_Types is
          end;
       end loop;
       Res := Remove_Trailing_Comma_And_Spaces (Res);
+      Append (Res, ")");
       return Base_Static_Value'(Value => Res);
    end Generate_Record_Typ;
 

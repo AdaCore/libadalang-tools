@@ -499,8 +499,8 @@ package body TGen.Types.Array_Types is
    begin
       Context.Strategies.Include (Element_Strategy);
       Strat.Generate_Element_Strategy :=
-        new Basic_Static_Strategy_Type'
-          (Basic_Static_Strategy_Type
+        new Static_Strategy_Type'Class'
+          (Static_Strategy_Type'Class
              (Strategy_Sets.Element
                 (Context.Strategies.Find (Element_Strategy))));
       SP.From_Element (Strat.T, Self'Unrestricted_Access);

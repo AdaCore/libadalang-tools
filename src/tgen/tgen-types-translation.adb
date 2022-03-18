@@ -1990,6 +1990,10 @@ package body TGen.Types.Translation is
             if Failure_Reason = Null_Unbounded_String then
                Trans_Res.Name := To_Qualified_Name (Type_Name.F_Name);
 
+               Trans_Res.Static_Gen :=
+                 (for all Comp_Ref of Trans_Res.Component_Types
+                    => Comp_Ref.Get.Supports_Static_Gen);
+
                return Res : Translation_Result (Success => True) do
                   Res.Res.Set (Trans_Res);
                end return;
