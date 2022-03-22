@@ -2881,7 +2881,41 @@ package body Pp.Formatting is
                      null;
 
                   else
-                     Cur_Indentation := Indentation;
+                     if Kind (New_Tok) = Ident
+                       and then Kind (Prev (New_Tok)) = '('
+                     then
+                        --  Handling the situation where EOL comment follows '('
+                        --  (i.e., the situations like
+                        --      function X
+                        --        (-- some EOL comment here
+                        --         V1,
+                        --         ...) return Boolean
+                        --
+                        --  Taking the last LB position for the indentation
+                        --  level for the parameters and adjust '(' position in
+                        --  Paren_Stack if needed
+                        declare
+                           Crt_Indent : Integer := LB.Indentation + 1;
+                        begin
+
+                           if Arg (Cmd, Par_Threshold) = 0 then
+                              Crt_Indent := Crt_Indent - 1;
+                           end if;
+
+                           Cur_Indentation := Crt_Indent;
+
+                           if L_Paren_Indentation_For_Preserve /= Crt_Indent
+                           then
+                              Update_L_Paren_Indent_For_Preserve
+                                (Crt_Indent - 2);
+                           end if;
+                        end;
+
+                     else
+                        --  Allign on the previous LB indentation level
+                        Cur_Indentation := Indentation;
+                     end if;
+
                      if not Arg (Cmd, Source_Line_Breaks) then
                         Append_Temp_Line_Break
                           (Lines_Data_P,
@@ -3039,7 +3073,8 @@ package body Pp.Formatting is
 
             function Next_Is_End (Tok : Tokn_Cursor) return Boolean is
               (not After_Last (Next (Tok)) and then
-               Kind (Next (Tok)) = Res_End);
+               (Kind (Next (Tok)) = Res_End
+               or else Kind (Next_ss (Tok)) = Res_End));
 
             function Next_Is_Inside_Case (Tok : Tokn_Cursor) return Boolean
             is
@@ -3230,11 +3265,19 @@ package body Pp.Formatting is
 
                      end;
 
+                     --  Preserve the following type indentation level when
+                     --  the current ';' is followed by an action
+                  elsif Prev_Indentation_Affect_Comments and then
+                    Kind (Src_Tok) = Other_Whole_Line_Comment and then
+                    Kind (New_Tok) = Enabled_LB_Token and then
+                    Kind (Prev (New_Tok)) = ';' and then
+                    Next_Is_Action (New_Tok)
+                  then
+                     Indentation := After_Indentation;
                   else
                      Indentation := Natural'Max (Indentation,
                                                  Before_Indentation);
                   end if;
-
                end if;
             end if;
 
@@ -3674,6 +3717,7 @@ package body Pp.Formatting is
                New_To_Newer;
 
             else
+
                --  Check for "end;" --> "end Some_Name;" case
                if Kind (Src_Tok) = ';'
                  and then
@@ -4015,6 +4059,7 @@ package body Pp.Formatting is
                                  Kind (Prev (Prev (Prev_ss (Src_Tok)))) =
                                    End_Of_Line_Comment))))
                   then
+
                      declare
                         P : constant Tokn_Cursor := Prev (Prev (New_Tok));
                         LB : Line_Break renames
@@ -4024,6 +4069,7 @@ package body Pp.Formatting is
                         LB.Affects_Comments := True;
 
                         if not Is_Empty (Paren_Stack) then
+
                            --  Nothing to do here since these situations
                            --  are handled by other means
                            if Arg (Cmd, Comments_Unchanged)
@@ -4045,6 +4091,7 @@ package body Pp.Formatting is
                            else
                               LB.Indentation :=
                                 L_Paren_Indentation_For_Preserve + 1;
+
                               Cur_Indentation := LB.Indentation;
                            end if;
                         end if;

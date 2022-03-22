@@ -12,7 +12,7 @@ package wrong_indent is
       C
       -- Member C.
       );
-      -- Some enumeration.
+   -- Some enumeration.
 
    procedure Foo
      (S         : in Natural;
