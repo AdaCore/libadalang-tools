@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -100,7 +100,7 @@ package body Laltools.Call_Hierarchy is
       --  through all the childreen looking for function calls.
 
       for B of Bodies loop
-         for C of B.P_Basic_Decl.Children loop
+         for C of B.P_Basic_Decl.Children when not C.Is_Null loop
             C.Traverse (Process_Body_Children'Access);
          end loop;
       end loop;
