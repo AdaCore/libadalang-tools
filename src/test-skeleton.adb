@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2011-2021, AdaCore                    --
+--                      Copyright (C) 2011-2022, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -6940,7 +6940,9 @@ package body Test.Skeleton is
 
       if Subp.Kind = Ada_Expr_Function then
          Traverse (Subp.As_Expr_Function.F_Expr, Get_Callees'Access);
-      elsif Subp.Kind = Ada_Subp_Decl then
+      elsif Subp.Kind = Ada_Subp_Decl
+        and then not Subp.As_Subp_Decl.P_Body_Part.Is_Null
+      then
          Traverse (Subp.As_Subp_Decl.P_Body_Part, Get_Callees'Access);
       end if;
 
