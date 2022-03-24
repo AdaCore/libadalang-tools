@@ -1,0 +1,6 @@
+main.adb
+4:1-4:1 type My_Natural is new Natural range 0 .. 20; --  Some comments
+
+
+7:87-8:1 
+

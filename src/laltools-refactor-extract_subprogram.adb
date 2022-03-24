@@ -42,11 +42,6 @@ package body Laltools.Refactor.Extract_Subprogram is
    --  Assuming that Reference will be passed as a subprogram argument,
    --  computes its mode by checking if Reference is being read or written.
 
-   function Get_Nearest_Declarative_Part
-     (Node : Ada_Node'Class)
-         return Declarative_Part;
-   --  Finds Node's nearest declarative part
-
    function Get_Statements_To_Extract
      (Start_Stmt : Stmt;
       End_Stmt   : Stmt)
@@ -334,40 +329,6 @@ package body Laltools.Refactor.Extract_Subprogram is
       end if;
    end Update_Parameter_Mode;
 
-   ----------------------------------
-   -- Get_Nearest_Declarative_Part --
-   ----------------------------------
-
-   function Get_Nearest_Declarative_Part
-     (Node : Ada_Node'Class)
-         return Declarative_Part
-   is
-      Nearest_Declarative_Part : Declarative_Part :=
-        No_Declarative_Part;
-
-      procedure Set_Declarative_Part
-        (Parent : Ada_Node;
-         Stop   : in out Boolean);
-      --  Sets Nearest_Declarative_Part to the declarative part of Parent.
-      --  Sets Stop to True to stop the search.
-
-      procedure Set_Declarative_Part
-        (Parent : Ada_Node;
-         Stop   : in out Boolean) is
-      begin
-         Nearest_Declarative_Part := Get_Declarative_Part (Parent);
-         Stop := True;
-      end Set_Declarative_Part;
-
-   begin
-      Find_Matching_Parents
-        (Node,
-         Is_Declarative_Part_Owner'Access,
-         Set_Declarative_Part'Access);
-
-      return Nearest_Declarative_Part;
-   end Get_Nearest_Declarative_Part;
-
    ---------------
    -- To_String --
    ---------------
@@ -417,14 +378,14 @@ package body Laltools.Refactor.Extract_Subprogram is
       Extracted_Subprogram_Statements : constant String_Vector :=
         Self.Build_Extracted_Subprogram_Statements;
 
-      Nearest_Declarative_Part : constant Declarative_Part :=
-        Get_Nearest_Declarative_Part (Self.Start_Stmt);
+      Enclosing_Declarative_Part : constant Declarative_Part :=
+        Get_Enclosing_Declarative_Part (Self.Start_Stmt);
 
       Extracted_Subprogram : constant String :=
         Self.Build_Extracted_Subprogram
           (Extracted_Subprogram_Parameters,
            Extracted_Subprogram_Statements,
-           Natural (Nearest_Declarative_Part.Sloc_Range.End_Column) - 1);
+           Natural (Enclosing_Declarative_Part.Sloc_Range.End_Column) - 1);
 
       Extracted_Subprogram_Arguments : constant String_Vector :=
         To_String_Vector (Parameters_To_Extract);
@@ -435,9 +396,8 @@ package body Laltools.Refactor.Extract_Subprogram is
            Extracted_Subprogram_Arguments);
 
       Insertion_Point : constant Source_Location_Range :=
-      --   Self.Compute_Insertion_Point (Nearest_Declarative_Part);
-        (Nearest_Declarative_Part.Sloc_Range.End_Line,
-         Nearest_Declarative_Part.Sloc_Range.End_Line,
+        (Enclosing_Declarative_Part.Sloc_Range.End_Line,
+         Enclosing_Declarative_Part.Sloc_Range.End_Line,
          1,
          1);
 
@@ -2013,7 +1973,7 @@ package body Laltools.Refactor.Extract_Subprogram is
       Node                     : constant Ada_Node :=
         Unit.Root.Lookup (Location);
       Nearest_Declarative_Part : constant Declarative_Part :=
-        Get_Nearest_Declarative_Part (Node);
+        Get_Enclosing_Declarative_Part (Node);
 
       function Hash (US : Unbounded_String) return Hash_Type is
         (Ada.Strings.Hash_Case_Insensitive (To_String (US)));

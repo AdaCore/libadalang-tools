@@ -1,0 +1,5 @@
+title: pull_up_type_from_canonical_part
+
+description: pull_up_declaration tool test
+
+driver: shell_script

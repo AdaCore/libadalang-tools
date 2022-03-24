@@ -1,0 +1,41 @@
+main.adb
+4:1-4:1 
+   type My_Natural_Range;
+
+   --  Some comments
+   --  A very natural range
+   type My_Natural_Range is range 0 .. 10;
+   --  A very natural Natural
+
+   --  Some comments
+   type My_Natural is new Natural range 0 .. 20; --  Some comments
+   --  A very natural array of very natural Naturals
+   type My_Natural_Array is array (My_Natural_Range) of My_Natural;
+   --  A very natural array of very natural Naturals
+
+   type Dummy_Type is new Float;
+
+   procedure A_Natural_Procedure (Dummy : Dummy_Type;
+                                  Natural_Array_2 : out My_Natural_Array);
+   --  A_Natural_Procedure
+
+   -------------------------
+   -- A_Natural_Procedure --
+   -------------------------
+
+   procedure A_Natural_Procedure (Dummy : Dummy_Type;
+                                  Natural_Array_2 : out My_Natural_Array) is
+   begin
+      Cant_Be_Pulled_Up := 0;
+      Natural_Array_2 := (others => 0);
+   end A_Natural_Procedure;
+
+8:1-20:1 
+28:1-29:1 
+33:1-35:1 
+43:34-43:34 ,
+                              Natural_Array_2
+46:1-55:1 
+59:31-59:31 ,
+                           Natural_Array_2
+

@@ -23,7 +23,8 @@ TESTSUITE_PROJECTS = \
    testsuite/ada_drivers/move_parameter/move_parameter.gpr \
    testsuite/ada_drivers/change_parameter_mode/change_parameter_mode.gpr \
    testsuite/ada_drivers/suppress_separate/suppress_separate.gpr \
-   testsuite/ada_drivers/refactoring_extract_subprogram/extract_subprogram.gpr
+   testsuite/ada_drivers/refactoring_extract_subprogram/extract_subprogram.gpr \
+   testsuite/ada_drivers/refactoring_pull_up_declaration/pull_up_declaration.gpr
 
 ALL_PROJECTS = \
    $(LIB_PROJECTS) $(TESTSUITE_PROJECTS)

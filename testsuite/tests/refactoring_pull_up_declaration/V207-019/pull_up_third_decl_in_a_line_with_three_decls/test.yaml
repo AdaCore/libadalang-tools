@@ -1,0 +1,5 @@
+title: pull_up_third_decl_in_a_line_with_three_decls
+
+description: pull_up_declaration tool test
+
+driver: shell_script

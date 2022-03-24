@@ -1,0 +1,5 @@
+title: pull_up_object_decl_with_dependencies
+
+description: pull_up_declaration tool test
+
+driver: shell_script

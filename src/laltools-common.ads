@@ -516,6 +516,11 @@ package Laltools.Common is
    --  Wrapper around P_Enclosing_Defining_Name that returns No_Defining_Name
    --  if Name_Node is No_Name or not a Defining_Name.
 
+   function Get_Enclosing_Declarative_Part
+     (Node : Ada_Node'Class)
+      return Declarative_Part;
+   --  Finds Node's nearest visible declarative part
+
    function Get_Node_As_Name (Node : Ada_Node) return Name;
    --  Wrapper around As_Name that returns No_Name if Node is not a Name.
 

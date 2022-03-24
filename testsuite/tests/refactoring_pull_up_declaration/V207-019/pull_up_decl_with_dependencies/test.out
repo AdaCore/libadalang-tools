@@ -1,0 +1,17 @@
+main.adb
+4:1-4:1    type My_Natural_Range;
+
+   --  Some comments
+   --  A very natural range
+   type My_Natural_Range is range 0 .. 10;
+   --  A very natural Natural
+
+type My_Natural is new Natural range 0 .. 20; --  Some comments
+   --  A very natural array of very natural Naturals
+   type My_Natural_Array is array (My_Natural_Range) of My_Natural;
+   --  A very natural array of very natural Naturals
+
+
+8:1-14:1 
+16:45-20:1 
+

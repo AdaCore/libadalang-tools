@@ -1513,6 +1513,40 @@ package body Laltools.Common is
       return Name_Node.P_Enclosing_Defining_Name;
    end Get_Name_As_Defining;
 
+   ----------------------------------
+   -- Get_Enclosing_Declarative_Part --
+   ----------------------------------
+
+   function Get_Enclosing_Declarative_Part
+     (Node : Ada_Node'Class)
+      return Declarative_Part
+   is
+      Nearest_Declarative_Part : Declarative_Part :=
+        No_Declarative_Part;
+
+      procedure Set_Declarative_Part
+        (Parent : Ada_Node;
+         Stop   : in out Boolean);
+      --  Sets Nearest_Declarative_Part to the declarative part of Parent.
+      --  Sets Stop to True to stop the search.
+
+      procedure Set_Declarative_Part
+        (Parent : Ada_Node;
+         Stop   : in out Boolean) is
+      begin
+         Nearest_Declarative_Part := Get_Declarative_Part (Parent);
+         Stop := True;
+      end Set_Declarative_Part;
+
+   begin
+      Find_Matching_Parents
+        (Node,
+         Is_Declarative_Part_Owner'Access,
+         Set_Declarative_Part'Access);
+
+      return Nearest_Declarative_Part;
+   end Get_Enclosing_Declarative_Part;
+
    ----------------------
    -- Get_Node_As_Name --
    ----------------------

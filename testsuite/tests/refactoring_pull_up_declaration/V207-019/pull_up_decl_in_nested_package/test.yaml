@@ -1,0 +1,5 @@
+title: pull_up_decl_in_nested_package
+
+description: pull_up_declaration tool test
+
+driver: shell_script

@@ -1,0 +1,5 @@
+title: pull_up_top_level_decl
+
+description: pull_up_declaration tool test
+
+driver: shell_script
