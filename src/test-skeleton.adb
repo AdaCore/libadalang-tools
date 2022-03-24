@@ -3786,7 +3786,7 @@ package body Test.Skeleton is
          end loop;
 
          if Subp_Content = JSON_Null
-           or else Subp_Content.Get ("values").Get = Empty_Array
+           or else Subp_Content.Get ("values") = Empty_Array
          then
             return False;
          end if;
@@ -3806,7 +3806,7 @@ package body Test.Skeleton is
             New_Line_Count;
             New_Line_Count;
 
-            Subp_Vectors := Subp_Content.Get ("values").Get;
+            Subp_Vectors := Subp_Content.Get ("values");
 
             for Test_Vec of Subp_Vectors loop
                Single_Vec := Test_Vec.Get;
