@@ -22,25 +22,24 @@
 ------------------------------------------------------------------------------
 
 with Ada.Text_IO; use Ada.Text_IO;
-with Langkit_Support.Slocs;
-use Langkit_Support.Slocs;
 with Langkit_Support.Text;
 with Libadalang.Common;
 with Ada.Containers; use Ada.Containers;
-with Ada.Containers.Vectors;
-with Ada.Containers.Hashed_Sets;
 with Libadalang.Project_Provider;
 with GNATCOLL.Projects; use GNATCOLL.Projects;
 with GNATCOLL.VFS;
 with Ada.Assertions;
-with Ada.Containers.Indefinite_Hashed_Maps;
+with VSS.Stream_Element_Vectors.Conversions;
+with VSS.Text_Streams.Memory_UTF8_Output;
+with Output;
 
 pragma Unreferenced (Langkit_Support.Text);
 pragma Unreferenced (Ada.Assertions);
+with Ada.Containers.Vectors;
+with Ada.Containers.Hashed_Sets;
 
 package body Tools.Record_Components_Tool is
    package LALCO renames Libadalang.Common;
-   package Slocs renames Langkit_Support.Slocs;
    package Text renames Langkit_Support.Text;
    package LAL_GPR renames Libadalang.Project_Provider;
    use type LALCO.Ada_Node_Kind_Type;
@@ -58,40 +57,11 @@ package body Tools.Record_Components_Tool is
    --  Del_Part: Part of the record can be deleted
    --  Del_None: the whole record should de preserved
 
-   package Body_Node_Vectors is new
-      Ada.Containers.Vectors
-       (Index_Type   => Natural,
-        Element_Type => LAL.Body_Node,
-        "="          => LAL."=");
-
-   package Decl_Vectors is new
-      Ada.Containers.Vectors
-      (Index_Type   => Natural,
-       Element_Type => LAL.Declarative_Part,
-       "="          => LAL."=");
-
-   package Basic_Decl_Vectors is new
-      Ada.Containers.Vectors
-      (Index_Type   => Natural,
-       Element_Type => LAL.Basic_Decl,
-       "="          => LAL."=");
-
    package Record_Vectors is new
       Ada.Containers.Vectors
       (Index_Type   => Natural,
        Element_Type => LAL.Record_Def,
        "="          => LAL."=");
-
-   function Defining_Name_Hash (Element : LAL.Defining_Name)
-                                return Ada.Containers.Hash_Type is
-   (LAL.Hash (Element.As_Ada_Node));
-
-   package Defining_Name_Hashed_Sets is new
-   Ada.Containers.Hashed_Sets
-    (Element_Type        => LAL.Defining_Name,
-     Hash                => Defining_Name_Hash,
-     Equivalent_Elements => LAL."=",
-     "="                 => LAL."=");
 
    package Record_Hashed_Maps is new
    Ada.Containers.Indefinite_Hashed_Maps
@@ -112,55 +82,74 @@ package body Tools.Record_Components_Tool is
      Equivalent_Elements => LAL."=",
      "="                 => LAL."=");
 
-   PBV : Body_Node_Vectors.Vector;
+   function "<" (L, R : LAL.Record_Def) return Boolean
+   is
+   begin
+      if L.Unit.Get_Filename < R.Unit.Get_Filename then
+         return True;
+      else
+         if L.Unit.Get_Filename > R.Unit.Get_Filename then
+            return False;
+         else
+            return (Slocs.Start_Sloc (LAL.Sloc_Range (L)) <
+                      Slocs.Start_Sloc (LAL.Sloc_Range (R)));
+         end if;
+      end if;
+   end "<";
 
-   --  Body Nodes which contain the deletable components
+   ---------------------
+   -- Get_Record_Name --
+   ---------------------
 
-   DV : Decl_Vectors.Vector;
-
-   --  Declaration Nodes which contain the deletable components
-
-   BDV : Basic_Decl_Vectors.Vector;
-
-   --  Basic_Declaration Nodes which contain the deletable components
-
-   RV : Record_Vectors.Vector;
-
-   --  Record Nodes which contain the deletable components
-
-   Deletable_Names : Defining_Name_Hashed_Sets.Set;
-
-   --  Set of Deletable Defining Names
-
-   Deletable_Components : Component_Hashed_Sets.Set;
-
-   --  Set of Completed Deletable Component
-
-   Texts_Edit : ReFac.Text_Edit_Ordered_Maps.Map;
-
-   --  The texts we want to edit.
-
-   Records_Deletability : Record_Hashed_Maps.Map;
-
-   --  The Hash Map which stores the deletability of Records
+   function Get_Record_Name (Node : LAL.Record_Def'Class)
+                            return LAL.Defining_Name
+   is
+      Type_Decl_Node : constant LAL.Ada_Node := Node.Parent.Parent;
+   begin
+      return Type_Decl_Node.As_Type_Decl.P_Defining_Name;
+   end Get_Record_Name;
 
    ----------------------------
    -- Find_Unused_Components --
    ----------------------------
 
    function Find_Unused_Components (Unit_Array : LAL.Analysis_Unit_Array)
-     return ReFac.Text_Edit_Ordered_Maps.Map is
+                                    return Delete_Infos is
       -- spec of procedure and functions --
 
-      function Find_Body_Node (Node : LAL.Ada_Node'Class)
+      Record_Texts_Map : Record_Text_Edits;
+
+      --  The hashmap use record as key with text_edit infomations
+      --  related to this record.
+
+      RV : Record_Vectors.Vector;
+
+      --  Record Nodes which contain the deletable components
+
+      Deletable_Names : Defining_Name_Ordered_Sets.Set;
+
+      --  Set of Deletable Defining Names
+
+      Deletable_Components : Component_Hashed_Sets.Set;
+
+      --  Set of Completed Deletable Component
+
+      Texts_Edit : ReFac.Text_Edit_Ordered_Maps.Map;
+
+      --  The texts we want to edit.
+
+      Records_Deletability : Record_Hashed_Maps.Map;
+
+      --  The Hash Map which stores the deletability of Records
+
+      Record_Deletable_Name : Deletable_Record_Componenets;
+
+      --  The Hash Map Use Record name as key stores its deletable
+      --  Components' Defining names.
+
+      function Find_Record_Node (Node : LAL.Ada_Node'Class)
                              return LALCO.Visit_Status;
-      --  Find All the Body Node in AST
-
-      procedure Process_Decl_Part (Node_List : LAL.Declarative_Part'Class);
-      --  Find all the declaration part in the body node
-
-      procedure Find_Records (Base_Node : LAL.Basic_Decl'Class);
-      --  Find all the Record part in the declaration.
+      --  Find All the Record_Def Node in AST
 
       procedure Count_Reference (Node : LAL.Record_Def'Class);
       --  Count how many times one defining name is referenced.
@@ -170,11 +159,6 @@ package body Tools.Record_Components_Tool is
       --  Print method for deletable message, only for debug.
 
       pragma Unreferenced (Print_Deletable);
-
-      function Record_Name (Node : LAL.Record_Def'Class)
-                            return LAL.Defining_Name;
-
-      --  Return the defining name of the given record node.
 
       function Delete_Position (Name : LAL.Ada_Node'Class;
                             Position : Positions)
@@ -376,7 +360,7 @@ package body Tools.Record_Components_Tool is
       procedure Delete_Record_Reference (Node : LAL.Record_Def'Class)
       is
          Record_Defining_Name : constant LAL.Defining_Name
-           := Record_Name (Node);
+           := Get_Record_Name (Node);
          Deletable_Range : Slocs.Source_Location_Range;
          Assoc_List : LAL.Assoc_List;
          Parent_node : LAL.Ada_Node;
@@ -641,75 +625,19 @@ package body Tools.Record_Components_Tool is
          end if;
       end Delete_Names_in_List;
 
-      -----------------
-      -- Record_Name --
-      -----------------
-
-      function Record_Name (Node : LAL.Record_Def'Class)
-                            return LAL.Defining_Name
-      is
-         Type_decl_node : constant LAL.Ada_Node := Node.Parent.Parent;
-      begin
-         return Type_decl_node.As_Type_Decl.P_Defining_Name;
-      end Record_Name;
-
       --------------------
       -- Find_Body_Node --
       --------------------
 
-      function Find_Body_Node (Node : LAL.Ada_Node'Class)
+      function Find_Record_Node (Node : LAL.Ada_Node'Class)
                              return LALCO.Visit_Status
       is
       begin
-         if Node.Kind in LALCO.Ada_Body_Node then
-            PBV.Append (Node.As_Body_Node);
+         if Node.Kind in LALCO.Ada_Record_Def then
+            RV.Append (Node.As_Record_Def);
          end if;
          return LALCO.Into;
-      end Find_Body_Node;
-
-      -----------------------
-      -- Process_Decl_Part --
-      -----------------------
-
-      procedure Process_Decl_Part (Node_List : LAL.Declarative_Part'Class)
-      is
-      begin
-         for Node of LAL.F_Decls (Node_List) loop
-            if Node.Kind in LALCO.Ada_Basic_Decl then
-               BDV.Append (Node.As_Basic_Decl);
-            end if;
-
-         end loop;
-      end Process_Decl_Part;
-
-      ------------------
-      -- Find_Records --
-      ------------------
-
-      procedure Find_Records (Base_Node : LAL.Basic_Decl'Class)
-      is
-         function Check_Derived_Type (Node : LAL.Ada_Node'Class)
-                                      return LALCO.Visit_Status;
-
-         --  traverse the tree to find the deletable record.
-
-         ------------------------
-         -- Check_Derived_Type --
-         ------------------------
-
-         function Check_Derived_Type (Node : LAL.Ada_Node'Class)
-                                      return LALCO.Visit_Status
-         is
-         begin
-            if Node.Kind = LALCO.Ada_Record_Def then
-               RV.Append (Node.As_Record_Def);
-               return LALCO.Stop;
-            end if;
-            return LALCO.Into;
-         end Check_Derived_Type;
-      begin
-         LAL.Traverse (Base_Node.As_Ada_Node, Check_Derived_Type'Access);
-      end Find_Records;
+      end Find_Record_Node;
 
       ---------------------
       -- Print_deletable --
@@ -869,7 +797,8 @@ package body Tools.Record_Components_Tool is
                   for Name_Node of Component_node.As_Defining_Name_List loop
                      Deletable := Process_name (Name_Node);
                      if Deletable then
-                        Records_Deletability (Record_Name (Node)) := Del_Part;
+                        Records_Deletability (Get_Record_Name (Node))
+                          := Del_Part;
                         Deletable_Names.Insert (Name_Node.As_Defining_Name);
                      else
                         Component_Deletable := False;
@@ -877,7 +806,7 @@ package body Tools.Record_Components_Tool is
                   end loop;
                end if;
                if Component_Deletable then
-                  Records_Deletability (Record_Name (Node)) := Del_Part;
+                  Records_Deletability (Get_Record_Name (Node)) := Del_Part;
                   Deletable_Components.Insert
                     (Component_node.As_Defining_Name_List);
                else
@@ -919,7 +848,7 @@ package body Tools.Record_Components_Tool is
                           find_all_defining_name'Access);
          end loop;
          if Record_Deletable then
-            Records_Deletability (Record_Name (Node)) := Del_All;
+            Records_Deletability (Get_Record_Name (Node)) := Del_All;
             Deletable_Range := LAL.Sloc_Range (Node);
             Delete_Range (Deletable_Range => Deletable_Range,
                           Filename => Node.Unit.Get_Filename,
@@ -935,45 +864,29 @@ package body Tools.Record_Components_Tool is
 
    begin
       for Unit of Unit_Array loop
-         Unit.Root.Traverse (Find_Body_Node'Access);
-      end loop;
-
-      for Body_Node of PBV loop
-         declare
-            Decls : LAL.Declarative_Part;
-         begin
-            case Body_Node.Kind is
-            when LALCO.Ada_Package_Body =>
-               Decls := Body_Node.As_Package_Body.F_Decls;
-            when LALCO.Ada_Subp_Body =>
-               Decls := Body_Node.As_Subp_Body.F_Decls;
-            when others =>
-               null;
-            end case;
-            if not LAL.Is_Null (Decls) then
-               DV.Append (Decls);
-            end if;
-         end;
-
-      end loop;
-
-      for Decl_Part_Node of DV loop
-         Process_Decl_Part (Decl_Part_Node);
-      end loop;
-
-      for Basic_Decl_Node of BDV loop
-         if Basic_Decl_Node.Kind in LALCO.Ada_Base_Type_Decl then
-            Find_Records (Basic_Decl_Node);
-         end if;
+         Unit.Root.Traverse (Find_Record_Node'Access);
       end loop;
 
       for Record_Node of RV loop
-         Records_Deletability.Include (Record_Name (Record_Node), Del_None);
+         Records_Deletability.Include (Get_Record_Name (Record_Node),
+                                       Del_None);
          Count_Reference (Record_Node);
-         Delete_Record_Reference (Record_Node);
+         if Records_Deletability (Get_Record_Name (Record_Node)) /= Del_None
+         then
+            Record_Deletable_Name.Include (Get_Record_Name (Record_Node),
+                                       Deletable_Names);
+            Delete_Record_Reference (Record_Node);
+            Record_Texts_Map.Include (Record_Node, Texts_Edit);
+            Texts_Edit.Clear;
+            Deletable_Names.Clear;
+         end if;
       end loop;
-      return Texts_Edit;
+      return (Record_Deletable_Name, Record_Texts_Map);
    end Find_Unused_Components;
+
+   ---------
+   -- Run --
+   ---------
 
    procedure Run is
       package Project_Tree renames Project;
@@ -989,7 +902,7 @@ package body Tools.Record_Components_Tool is
         := Ada.Strings.Unbounded.To_String (Project_Tree.Get);
       My_Project_File     : constant GNATCOLL.VFS.Virtual_File :=
         GNATCOLL.VFS.Create (+Project_Filename);
-      Texts_Edit : ReFac.Text_Edit_Ordered_Maps.Map;
+      Edit_Info : Delete_Infos;
    begin
       --  Ada.Text_IO.Put_Line ("Record_Components");
       --  Ada.Text_IO.Put_Line (Ada.Strings.Unbounded.To_String (Project.Get));
@@ -1006,10 +919,12 @@ package body Tools.Record_Components_Tool is
       declare
          Source_Files : constant
            Libadalang.Project_Provider.Filename_Vectors.Vector
-           := Libadalang.Project_Provider.Source_Files (Project.all);
+             := Libadalang.Project_Provider.Source_Files
+               (Project.all, Libadalang.Project_Provider.Root_Project);
          AUA : LAL.Analysis_Unit_Array (Source_Files.First_Index
                                         .. Source_Files.Last_Index);
-
+         Stream : aliased VSS.Text_Streams.Memory_UTF8_Output.
+        Memory_UTF8_Output_Stream;
       begin
          for I in Source_Files.First_Index .. Source_Files.Last_Index loop
             declare
@@ -1028,9 +943,11 @@ package body Tools.Record_Components_Tool is
                end if;
             end;
          end loop;
-         Texts_Edit := Find_Unused_Components (AUA);
+         Edit_Info := Find_Unused_Components (AUA);
+         Output.JSON_Serialize (Edit_Info, Stream);
+         Put_Line (VSS.Stream_Element_Vectors.Conversions.Unchecked_To_String
+           (Stream.Buffer));
       end;
-      ReFac.Print (Texts_Edit);
    end Run;
 
 end Tools.Record_Components_Tool;

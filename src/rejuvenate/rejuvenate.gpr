@@ -1,6 +1,8 @@
 with "libadalang.gpr";
 with "lal_tools.gpr";
 with "lal_tools_common.gpr";
+with "vss_text";
+with "vss_json";
 
 project Rejuvenate is
    for Source_Dirs use ("src");
