@@ -54,9 +54,14 @@ package body TGen.Gen_Strategies_Utils is
       Precondition         : Unbounded_Text_Type;
 
       Result : Subprogram_Data (Kind);
+
+      Pre_Expr : constant Expr :=
+        Subp.P_Get_Aspect_Spec_Expr (+String'("Pre"));
    begin
       begin
-         Precondition := +Subp.P_Get_Aspect_Spec_Expr (+String'("Pre")).Text;
+         Precondition := +(if Is_Null (Pre_Expr)
+                          then To_Text ("True")
+                          else Pre_Expr.Text);
       exception
          when Property_Error =>
             --  No precondition => generated values are always valid
