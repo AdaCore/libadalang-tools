@@ -1,7 +1,1 @@
-foo.adb
-4:7-6:17 null record
-7:47-7:58 others => <>
-11:26-11:37 others => <>
-11:45-11:56 others => <>
-14:12-14:30 ;
-
+[{"children":[],[{"fixits":{"next":{"column":17,"file":"/example1/src/foo.adb","line":6},"start":{"column":7,"file":"/example1/src/foo.adb","line":4},"string":"null record"},{"next":{"column":58,"file":"/example1/src/foo.adb","line":7},"start":{"column":47,"file":"/example1/src/foo.adb","line":7},"string":"others => <>"},{"next":{"column":37,"file":"/example1/src/foo.adb","line":11},"start":{"column":26,"file":"/example1/src/foo.adb","line":11},"string":"others => <>"},{"next":{"column":56,"file":"/example1/src/foo.adb","line":11},"start":{"column":45,"file":"/example1/src/foo.adb","line":11},"string":"others => <>"},{"next":{"column":30,"file":"/example1/src/foo.adb","line":14},"start":{"column":12,"file":"/example1/src/foo.adb","line":14},"string":";"}}],"kind":"warning","locations":[{"caret":{"column":9,"file":"/example1/src/foo.adb","line":3},"finish":{"column":12,"file":"/example1/src/foo.adb","line":3}}],"message":"The component(s) 'Grault' in the record 'Fred' can be remove"}]

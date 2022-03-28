@@ -1,5 +1,1 @@
-foo.adb
-4:8-4:14 
-9:29-9:37 , 
-10:34-10:52 , 
-
+[{"children":[],[{"fixits":{"next":{"column":14,"file":"/example1/src/foo.adb","line":4},"start":{"column":8,"file":"/example1/src/foo.adb","line":4},"string":""},{"next":{"column":37,"file":"/example1/src/foo.adb","line":9},"start":{"column":29,"file":"/example1/src/foo.adb","line":9},"string":", "},{"next":{"column":52,"file":"/example1/src/foo.adb","line":10},"start":{"column":34,"file":"/example1/src/foo.adb","line":10},"string":", "}}],"kind":"warning","locations":[{"caret":{"column":9,"file":"/example1/src/foo.adb","line":3},"finish":{"column":11,"file":"/example1/src/foo.adb","line":3}}],"message":"The component(s) 'C' 'Z' in the record 'Baz' can be remove"}]

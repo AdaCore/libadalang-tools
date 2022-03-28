@@ -1,12 +1,1 @@
-foo.adb
-4:7-4:13 
-4:14-4:19 , 
-10:18-10:24 
-10:25-10:30 , 
-12:18-12:24 
-12:25-12:30 , 
-17:28-17:34 
-17:35-17:40 , 
-18:28-18:44 
-18:50-18:60 , 
-
+[{"children":[],[{"fixits":{"next":{"column":13,"file":"/example1/src/foo.adb","line":4},"start":{"column":7,"file":"/example1/src/foo.adb","line":4},"string":""},{"next":{"column":19,"file":"/example1/src/foo.adb","line":4},"start":{"column":14,"file":"/example1/src/foo.adb","line":4},"string":", "},{"next":{"column":24,"file":"/example1/src/foo.adb","line":10},"start":{"column":18,"file":"/example1/src/foo.adb","line":10},"string":""},{"next":{"column":30,"file":"/example1/src/foo.adb","line":10},"start":{"column":25,"file":"/example1/src/foo.adb","line":10},"string":", "},{"next":{"column":24,"file":"/example1/src/foo.adb","line":12},"start":{"column":18,"file":"/example1/src/foo.adb","line":12},"string":""},{"next":{"column":30,"file":"/example1/src/foo.adb","line":12},"start":{"column":25,"file":"/example1/src/foo.adb","line":12},"string":", "},{"next":{"column":34,"file":"/example1/src/foo.adb","line":17},"start":{"column":28,"file":"/example1/src/foo.adb","line":17},"string":""},{"next":{"column":40,"file":"/example1/src/foo.adb","line":17},"start":{"column":35,"file":"/example1/src/foo.adb","line":17},"string":", "},{"next":{"column":44,"file":"/example1/src/foo.adb","line":18},"start":{"column":28,"file":"/example1/src/foo.adb","line":18},"string":""},{"next":{"column":60,"file":"/example1/src/foo.adb","line":18},"start":{"column":50,"file":"/example1/src/foo.adb","line":18},"string":", "}}],"kind":"warning","locations":[{"caret":{"column":9,"file":"/example1/src/foo.adb","line":3},"finish":{"column":11,"file":"/example1/src/foo.adb","line":3}}],"message":"The component(s) 'A' 'C' 'B' in the record 'Baz' can be remove"}]
