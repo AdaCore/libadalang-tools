@@ -58,6 +58,10 @@ with GNAT.Directory_Operations;
 with Ada.Characters.Handling; use Ada.Characters.Handling;
 with Ada.Text_IO;
 with Ada.Strings.Fixed;
+with Ada.Strings.Unbounded;
+
+with TGen.Context;
+with TGen.Gen_Strategies;
 
 package body Test.Actions is
 
@@ -732,6 +736,65 @@ package body Test.Actions is
          when Root_Mode   =>
             Check_Separate_Root;
       end case;
+
+      --  Test vectors
+
+      if Arg (Cmd, Gen_Test_Vectors) then
+         Test.Common.Generate_Test_Vectors := True;
+         Test.Common.JSON_Test_Dir := new String'
+           (Test.Common.Harness_Dir_Str.all & "JSON_tests"
+            & GNAT.OS_Lib.Directory_Separator);
+         if Debug_Flag_1 then
+            Put ("Requested test vectors generation at \1\n",
+                 Test.Common.JSON_Test_Dir.all);
+         end if;
+
+         declare
+            Dir : File_Array_Access;
+         begin
+            Append
+              (Dir, GNATCOLL.VFS.Create (+Test.Common.JSON_Test_Dir.all));
+            Test.Common.Create_Dirs (Dir);
+         exception
+            when GNAT.Directory_Operations.Directory_Error =>
+               Cmd_Error_No_Help ("cannot create JSON test directory");
+         end;
+
+         TGen.Gen_Strategies.Initialize
+           (Test.Common.TGen_Ctx,
+            Root_Prj,
+            Ada.Strings.Unbounded.To_Unbounded_String
+              (Test.Common.JSON_Test_Dir.all));
+
+         if Arg (Cmd, Gen_Test_Num) /= null then
+            begin
+               Test.Common.TGen_Num_Tests :=
+                 Positive'Value (Arg (Cmd, Gen_Test_Num).all);
+            exception
+               when others =>
+                  Cmd_Error_No_Help
+                    ("--gen-test-num should be a positive integer");
+            end;
+         end if;
+
+         if Arg (Cmd, Gen_Unsupported_Behavior) /= null then
+            if Arg (Cmd, Gen_Unsupported_Behavior).all = "no-test" then
+               Test.Common.TGen_Ctx.Unsupported_Type_Behavior :=
+                 TGen.Context.No_Test;
+            elsif Arg (Cmd, Gen_Unsupported_Behavior).all = "commented-out"
+            then
+               Test.Common.TGen_Ctx.Unsupported_Type_Behavior :=
+                 TGen.Context.Commented_Out;
+            else
+               Cmd_Error_No_Help
+                 ("--gen-unsupported-behavior must be one of ""no-test"" or"
+                  & " ""commented-out""");
+            end if;
+         else
+            Test.Common.TGen_Ctx.Unsupported_Type_Behavior :=
+              TGen.Context.No_Test;
+         end if;
+      end if;
 
       if Common.Stub_Mode_ON then
          Check_Stub;

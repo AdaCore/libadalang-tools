@@ -1,0 +1,19 @@
+@_SPACING_@case @_OBJECT_NAME_@.@_DISCR_NAME_@ is
+@@TABLE@@
+@_SPACING_@   when @_CHOICES_@ =>
+@@IF@@ (@_COMP_PREFIX_@ = "") and (@_VARIANT_PART_@ = "")
+@_SPACING_@     null;
+@@ELSE@@
+@@TABLE@@
+@@IF@@ @_COMP_PREFIX_@ /= ""
+@_SPACING_@     @_COMP_PREFIX_@_@_ACTION_@
+@_SPACING_@       (@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer,
+@_SPACING_@        @_GLOBAL_PREFIX_@_Offset, @_GLOBAL_PREFIX_@_V.@_COMP_NAME_@);
+@@END_IF@@
+@@END_TABLE@@
+@@IF@@ @_VARIANT_PART_@ /= ""
+@_VARIANT_PART_@
+@@END_IF@@
+@@END_IF@@
+@@END_TABLE@@
+@_SPACING_@end case;

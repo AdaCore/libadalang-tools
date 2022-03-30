@@ -1,0 +1,46 @@
+with "libadalang.gpr";
+with "langkit_support.gpr";
+with "gnatcoll.gpr";
+with "templates_parser.gpr";
+
+library project TGen is
+
+   type Build_Mode_Type is ("dev", "prod");
+   Build_Mode : Build_Mode_Type := external ("BUILD_MODE", "dev");
+
+   type Library_Type_Type is ("static", "static-pic", "relocatable");
+   Library_Type : Library_Type_Type := external ("LIBRARY_TYPE", "static");
+
+   for Source_Dirs use ("tgen", "tgen/templates", "tgen/marshalling_templates");
+   for Excluded_Source_Files use ("tgen_app.adb", "tgen_marshalling.adb");
+   for Library_Name use "tgen";
+
+   for Library_Kind use Library_Type;
+   for Library_Dir use "lib-tgen-." & Library_Type;
+   for Object_Dir use "obj-tgen." & Library_Type;
+
+   for Languages use ("Ada", "Templates");
+
+   package Naming is
+      for Implementation_Suffix ("Templates") use ".tmpl";
+   end Naming;
+
+   package Compiler is
+      for Driver ("Templates") use "";
+      case Build_Mode is
+         when "dev" =>
+            for Switches ("Ada") use
+              ("-gnatf", "-g", "-gnatyg0", "-gnatwae", "-gnat2022", "-gnatX",
+               "-gnata");
+         when "prod" =>
+            for Switches ("Ada") use
+              ("-gnatf", "-gnatwa", "-O2", "-gnaty", "-gnat2022", "-gnatX",
+               "-gnata");
+      end case;
+   end Compiler;
+
+   package Binder is
+      for Default_Switches ("Ada") use ("-Es");
+   end Binder;
+
+end TGen;

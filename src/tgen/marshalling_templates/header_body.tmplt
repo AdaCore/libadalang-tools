@@ -1,0 +1,43 @@
+   --  Input and Output functions for headers of type @_TY_NAME_@
+
+   function @_TY_PREFIX_@_Input
+     (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class)
+     return @_TY_PREFIX_@_Type
+   is
+      @_GLOBAL_PREFIX_@_Buffer : Unsigned_8 := 0;
+      @_GLOBAL_PREFIX_@_Offset : Offset_Type := 0;
+      @_GLOBAL_PREFIX_@_H      : @_TY_PREFIX_@_Type;
+   begin
+@@TABLE@@
+      @_COMP_PREFIX_@_Read
+        (@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer,
+         @_GLOBAL_PREFIX_@_Offset, @_GLOBAL_PREFIX_@_H.@_COMP_NAME_@);
+@@END_TABLE@@
+      return @_GLOBAL_PREFIX_@_H;
+   end @_TY_PREFIX_@_Input;
+
+   procedure @_TY_PREFIX_@_Output
+     (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class;
+      @_GLOBAL_PREFIX_@_V      : @_TY_NAME_@)
+   is
+      @_GLOBAL_PREFIX_@_Buffer : Unsigned_8 := 0;
+      @_GLOBAL_PREFIX_@_Offset : Offset_Type := 0;
+   begin
+@@TABLE@@
+      @_COMP_PREFIX_@_Write
+        (@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer,
+         @_GLOBAL_PREFIX_@_Offset, @_GLOBAL_PREFIX_@_V@_ADA_COMP_OR_ATTR_@);
+@@END_TABLE@@
+      if @_GLOBAL_PREFIX_@_Offset /= 0 then
+         Unsigned_8'Write (@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer);
+      end if;
+   end @_TY_PREFIX_@_Output;
+
+   function @_TY_PREFIX_@_Size return Natural is
+      Nb_Bits : Natural := 0;
+   begin
+@@TABLE@@
+      Nb_Bits := Nb_Bits + @_COMP_PREFIX_@_Size;
+@@END_TABLE@@
+      return (Nb_Bits + 7) / 8;
+   end @_TY_PREFIX_@_Size;

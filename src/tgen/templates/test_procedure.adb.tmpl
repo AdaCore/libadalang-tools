@@ -1,0 +1,64 @@
+declare
+   Value_Stream : aliased TGen.Stream.Buffer_Stream;
+ @@TABLE@@
+   package @_STRATEGY_NAME_@ is new TGen.Strategies.Random_Strategy_Generic
+      (T => @_TYPE_NAME_@, Gen => @_GEN_SUBP_NAME_@);
+   @@END_TABLE@@
+   package Strategy is new TGen.Strategies.Random_Strategy_Generic_With_State
+   (
+
+   @@IF@@ @_HAS_PARAMS_@
+   @_PROC_NAME_@_Strategies : TGen.Strategies.Strategy_Vector :=
+      @@INLINE(         [)(,)(];)@@
+      @@TABLE@@
+      @_STRATEGY_NAME_@.Strat'Unchecked_Access
+      @@END_TABLE@@
+      @@END_INLINE@@
+
+   @@ELSE@@
+      @_PROC_NAME_@_Strategies : TGen.Strategies.Strategy_Vector;
+   @@END_IF@@
+
+   function Is_Valid
+   @@INLINE(         \()(,)(\))@@
+   @@TABLE@@
+   @_PARAM_NAME_@ : @_TYPE_NAME_@
+   @@END_TABLE@@
+   @@END_INLINE@@
+      return Boolean
+   is (@_PRECONDITION_EXPRESSION_@);
+
+   procedure @_PROC_NAME_@_Wrapper is
+      @@TABLE@@
+      @_PARAM_NAME_@ : @_TYPE_NAME_@ := @_TYPE_NAME_@'Input (Value_Stream'Unchecked_Access);
+      @@END_TABLE@@
+   begin
+
+      --  Check that the generated values make the precondition hold. If that's
+      --  not the case, notify the engine that it needs to regenerate values.
+
+      if not Is_Valid
+      @@INLINE(         \()(,)(\))@@
+      @@TABLE@@
+      @_PARAM_NAME_@
+      @@END_TABLE@@
+      @@END_INLINE@@
+      then
+         raise TGen.Engine.Invalid_Generation_Error;
+      end if;
+      @@IF@@ @_HAS_PARAMS_@
+      @_PROC_QUALIFIED_NAME_@
+      @@INLINE(         \()(,)(\);)@@
+      @@TABLE@@
+      @_PARAM_NAME_@
+      @@END_TABLE@@
+      @@END_INLINE@@
+      @@ELSE@@
+      @_PROC_QUALIFIED_NAME_@;
+      @@END_IF@@
+   end @_PROC_NAME_@_Wrapper;
+begin
+   Value_Stream.Initialize;
+   TGen.Engine.Test_Runner (@_PROC_NAME_@_Strategies, Value_Stream'Access, @_PROC_NAME_@_Wrapper'Access);
+   Value_Stream.Finalize;
+end;

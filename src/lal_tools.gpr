@@ -1,5 +1,6 @@
 with "libadalang.gpr";
 with "lal_tools_common.gpr";
+with "tgen.gpr";
 library project LAL_Tools is
 
    type Library_Type_Type is ("static", "static-pic", "relocatable");
