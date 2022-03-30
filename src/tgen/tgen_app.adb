@@ -115,7 +115,9 @@ procedure TGen_App is
       Param_Number : Positive := 1;
 
    begin
-      if Kind (Node) in Ada_Subp_Spec_Range then
+      if Kind (Node) in Ada_Subp_Spec_Range
+        and then Kind (Parent (Node)) in Ada_Subp_Decl_Range
+      then
          Put_Line ("Found subprogram spec :");
          Put_Line
            ("Subprogram Name : " &

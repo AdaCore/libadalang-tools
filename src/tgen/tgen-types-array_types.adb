@@ -141,7 +141,7 @@ package body TGen.Types.Array_Types is
             begin
                Average_Sizes (I) :=
                  Natural'Min (Natural'Max (Min_Size * 2, Min_Size + 5),
-                              Natural (0.5 * Float (Min_Size + Max_Size)));
+                              Min_Size + ((Max_Size - Min_Size) / 2));
             end;
          end loop;
          Result.Average_Sizes := Average_Sizes;

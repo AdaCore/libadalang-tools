@@ -225,13 +225,37 @@ package body TGen.Types.Int_Types is
 
       use LLLI_Conversions;
 
+      function Draw (T : SP.Ref; R : Int_Range) return Static_Value'Class;
+
+   end Equivalence_Classes_Strategy_Int_Typ;
+
+   package body Equivalence_Classes_Strategy_Int_Typ is
       function Draw (T : SP.Ref; R : Int_Range) return Static_Value'Class is
-        (Discrete_Static_Value'
-           (T     => T,
-            Value =>
-               LLLI_Conversions.To_Big_Integer
-              (Rand_LLLI (From_Big_Integer (R.Min),
-               From_Big_Integer (R.Max)))));
+         use Big_Int;
+
+         --  Constrain the range of possible values to
+         --  LLI'First + 1 .. LLI'Last - 1 until V307-012 is fixed.
+
+         First_LLI : constant Big_Integer :=
+           LLLI_Conversions.To_Big_Integer
+             (Long_Long_Long_Integer (Long_Long_Integer'First + 1));
+         Last_LLI  : constant Big_Integer :=
+           LLLI_Conversions.To_Big_Integer
+             (Long_Long_Long_Integer (Long_Long_Integer'Last - 1));
+      begin
+         return (Discrete_Static_Value'
+                   (T     => T,
+                    Value =>
+                      LLLI_Conversions.To_Big_Integer
+                        (Rand_LLLI
+                          (From_Big_Integer (if R.Min <= First_LLI
+                                             then First_LLI
+                                             else R.Min),
+                           From_Big_Integer (if R.Max >= Last_LLI
+                                             then Last_LLI
+                                             else R.Max)))));
+      end Draw;
+
    end Equivalence_Classes_Strategy_Int_Typ;
 
    function Generate_Equivalence_Class_Digit_Strategy
