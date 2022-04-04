@@ -206,9 +206,9 @@ package Laltools.Refactor.Subprogram_Signature is
    Default_Configuration : Signature_Changer_Configuration_Type :=
      [Include_Parents .. Include_Children  => True];
 
-   type Signature_Changer is limited interface and Refactoring_Tool;
+   type Subprogram_Signature_Changer is limited interface and Refactoring_Tool;
 
-   type Parameter_Remover is new Signature_Changer with private;
+   type Parameter_Remover is new Subprogram_Signature_Changer with private;
 
    function Create
      (Target                  : Basic_Decl;
@@ -227,7 +227,7 @@ package Laltools.Refactor.Subprogram_Signature is
    --  Returns an Edit_Map with all the refactoring edits needed to remove
    --  a parameter.
 
-   type Parameter_Adder is new Signature_Changer with private;
+   type Parameter_Adder is new Subprogram_Signature_Changer with private;
 
    function Create
      (Unit          : Analysis_Unit;
@@ -247,7 +247,7 @@ package Laltools.Refactor.Subprogram_Signature is
    --  Returns an Edit_Map with all the refactoring edits needed to add
    --  a parameter.
 
-   type Mode_Changer is new Signature_Changer with private;
+   type Mode_Changer is new Subprogram_Signature_Changer with private;
 
    function Create
      (Target          : Basic_Decl;
@@ -279,7 +279,7 @@ package Laltools.Refactor.Subprogram_Signature is
    --  Returns an Edit_Map with all the refactoring edits needed to change
    --  a parameter mode.
 
-   type Parameter_Mover is interface and Signature_Changer;
+   type Parameter_Mover is interface and Subprogram_Signature_Changer;
 
    type Backward_Mover is new Parameter_Mover with private;
 
@@ -329,7 +329,7 @@ private
          Index : Positive;
       end record;
 
-   type Parameter_Adder is new Signature_Changer with
+   type Parameter_Adder is new Subprogram_Signature_Changer with
       record
          Spec               : Subp_Spec;
          New_Parameter      : Unbounded_String;
@@ -355,7 +355,7 @@ private
    --  Adds a parameter or a list of parameters (Self.New_Parameter) to Target.
    --  Must only be used if Self.Full_Specification is False.
 
-   type Mode_Changer is new Signature_Changer with
+   type Mode_Changer is new Subprogram_Signature_Changer with
       record
          Subp                    : Basic_Decl;
          Parameter_Indices_Range : Parameter_Indices_Range_Type;
@@ -375,7 +375,7 @@ private
          Mover : Backward_Mover;
       end record;
 
-   type Parameter_Remover is new Signature_Changer with
+   type Parameter_Remover is new Subprogram_Signature_Changer with
       record
          Subp                    : Basic_Decl;
          Parameter_Indices_Range : Parameter_Indices_Range_Type;

@@ -34,6 +34,7 @@ class BaseDriver(DiffTestDriver):
         "laltools",
         "refactoring_add_parameter",
         "refactoring_remove_parameter",
+        "refactoring_change_parameters_type",
         "refactoring_safe_rename",
         "refactoring_extract_subprogram",
         "refactoring_pull_up_declaration",

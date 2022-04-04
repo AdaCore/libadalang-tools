@@ -1,0 +1,5 @@
+title: change_all_parameters_in_only_one_param_spec
+
+description: refactoring change_parameters_type test
+
+driver: shell_script

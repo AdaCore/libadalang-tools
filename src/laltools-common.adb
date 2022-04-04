@@ -2497,25 +2497,26 @@ package body Laltools.Common is
    ---------------------
 
    function Validate_Syntax
-     (Value : Ada.Strings.Unbounded.Unbounded_String;
-      Rule  : Grammar_Rule)
+     (Source : Ada.Strings.Unbounded.Unbounded_String;
+      Rule   : Grammar_Rule)
       return Boolean
    is
       Unit : constant Analysis_Unit :=
         Create_Context.Get_From_Buffer
-          (Filename => "", Buffer => Value, Rule => Rule);
+          (Filename => "", Buffer => Source, Rule => Rule);
 
    begin
-      if Unit.Has_Diagnostics then
-         return False;
-      else
-
-         return True;
-      end if;
-
-   exception
-      when others =>
-         return False;
+      return not Unit.Has_Diagnostics;
    end Validate_Syntax;
+
+   ---------------------
+   -- Validate_Syntax --
+   ---------------------
+
+   function Validate_Syntax
+     (Source : Ada.Strings.Unbounded.Unbounded_String;
+      Rules  : Grammar_Rule_Vector)
+      return Boolean
+   is ((for some Rule of Rules => Validate_Syntax (Source, Rule)));
 
 end Laltools.Common;

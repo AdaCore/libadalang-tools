@@ -765,9 +765,21 @@ package Laltools.Common is
    --  Return the definition node (canonical part) of the given name.
 
    function Validate_Syntax
-     (Value : Ada.Strings.Unbounded.Unbounded_String;
-      Rule  : Grammar_Rule)
+     (Source : Ada.Strings.Unbounded.Unbounded_String;
+      Rule   : Grammar_Rule)
       return Boolean;
-   --  True if Value has a valid syntax according to Rule
+   --  True if Source has a valid syntax according to Rule
+
+   package Grammar_Rule_Vectors is new Ada.Containers.Vectors
+     (Index_Type   => Positive,
+      Element_Type => Grammar_Rule);
+
+   subtype Grammar_Rule_Vector is Grammar_Rule_Vectors.Vector;
+
+   function Validate_Syntax
+     (Source : Ada.Strings.Unbounded.Unbounded_String;
+      Rules  : Grammar_Rule_Vector)
+      return Boolean;
+   --  True if Source has a valid syntax according to any rule of Rules
 
 end Laltools.Common;
