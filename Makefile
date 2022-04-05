@@ -9,7 +9,8 @@ PROCESSORS ?= 0
 ALL_LIBRARY_TYPES = static static-pic relocatable
 
 LIB_PROJECTS = \
-   src/lal_tools.gpr
+   src/lal_tools.gpr \
+   src/tgen.gpr
 
 BIN_PROJECTS = \
    src/build.gpr
