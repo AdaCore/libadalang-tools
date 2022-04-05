@@ -87,14 +87,13 @@ package body TGen.Strings is
    is
       Indent_Str : constant String (1 .. Span) := [others => ' '];
       Index : Natural := 1;
-      Length : Natural := Str.Length;
    begin
-      if Indent_String.Length = 0 then
+      if Length (Str) = 0 then
          return;
       end if;
-      Str.Replace_Slice (1, 1, Indent_Str & Str.Element (1));
+      Replace_Slice (Str, 1, 1, Indent_Str & Element (Str, 1));
 
-      while Index <= Str.Length loop
+      while Index <= Length (Str) loop
          Index :=
            Ada.Strings.Unbounded.Index
              (Str,
@@ -107,7 +106,6 @@ package body TGen.Strings is
          Ada.Strings.Unbounded.Replace_Slice
            (Str, Index, Index, Ada.Characters.Latin_1.LF & Indent_Str);
          Index := @ + Span;
-         Length := Str.Length;
       end loop;
    end Indent_String;
 

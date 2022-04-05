@@ -372,9 +372,20 @@ package body TGen.Types.Record_Types is
    end Free_Content;
 
    function "="
-     (L : Static_Strategy_Type'Class with Unreferenced;
-      R : Static_Strategy_Type'Class with Unreferenced)
-      return Boolean is (False);
+     (L : Static_Strategy_Type'Class;
+      R : Static_Strategy_Type'Class)
+      return Boolean;
+
+   function "="
+     (L : Static_Strategy_Type'Class;
+      R : Static_Strategy_Type'Class)
+      return Boolean
+   is
+      pragma Unreferenced (L);
+      pragma Unreferenced (R);
+   begin
+      return False;
+   end "=";
    --  TODO: Implement this properly
 
    --  Static generation

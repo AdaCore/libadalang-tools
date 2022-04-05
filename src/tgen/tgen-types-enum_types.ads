@@ -64,8 +64,7 @@ package TGen.Types.Enum_Types is
 
    type Bool_Typ is new Enum_Typ with null record;
 
-   function Supports_Static_Gen
-     (Self : Typ with Unreferenced) return Boolean is (True);
+   function Supports_Static_Gen (Self : Typ) return Boolean;
    --  Wether values for this Typ can be statically generated
 
    function Image (Self : Bool_Typ) return String;

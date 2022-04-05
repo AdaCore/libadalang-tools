@@ -41,6 +41,12 @@ package body TGen.Types.Enum_Types is
    --  1 is the value representing True for boolean in the LAL static
    --  expression evaluator so use this value for now.
 
+   function Supports_Static_Gen (Self : Typ) return Boolean is
+      pragma Unreferenced (Self);
+   begin
+      return True;
+   end Supports_Static_Gen;
+
    function Image (Self : Char_Typ) return String is
    begin
       return Typ (Self).Image & ": Char";
@@ -56,9 +62,11 @@ package body TGen.Types.Enum_Types is
       return "'" & Res & "'";
    end Lit_Image;
 
-   function High_Bound
-     (Self : Char_Typ with Unreferenced) return Big_Integer is
-     (Big_Int.To_Big_Integer (Character'Pos (Character'Last)));
+   function High_Bound (Self : Char_Typ) return Big_Integer is
+      pragma Unreferenced (Self);
+   begin
+      return (Big_Int.To_Big_Integer (Character'Pos (Character'Last)));
+   end High_Bound;
    --  Although Char_Typ represents Character, Wide_Character and
    --  Wide_Wide_Character, we'll conservatively use Character'Last as the high
    --  bound.

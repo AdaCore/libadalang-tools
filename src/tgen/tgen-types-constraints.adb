@@ -35,7 +35,7 @@ package body TGen.Types.Constraints is
 
    function Image (Self : Discrete_Constraint_Value) return String is
      (case Self.Kind is
-      when Static => Self.Int_Val.To_String,
+      when Static => Big_Int.To_String (Self.Int_Val),
       when Discriminant => (+Self.Disc_Name),
       when Non_Static => "Non static");
 

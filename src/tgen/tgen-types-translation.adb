@@ -2162,54 +2162,55 @@ package body TGen.Types.Translation is
      (Rng : Discrete_Range)
       return TGen.Types.Constraints.Discrete_Range_Constraint
    is
-      Low_Bound  : Discrete_Constraint_Value;
-      High_Bound : Discrete_Constraint_Value;
+      Low_Bnd  : Discrete_Constraint_Value;
+      High_Bnd : Discrete_Constraint_Value;
    begin
       begin
-         if Rng.Low_Bound.P_Is_Static_Expr then
-            Low_Bound :=
+         if Low_Bound (Rng).P_Is_Static_Expr then
+            Low_Bnd :=
             (Kind    => Static,
                Int_Val =>
-               Big_Int.From_String (New_Eval_As_Int (Rng.Low_Bound).Image));
-         elsif Kind (Rng.Low_Bound) in Ada_Name
+               Big_Int.From_String (New_Eval_As_Int (Low_Bound (Rng)).Image));
+         elsif Low_Bound (Rng).Kind in Ada_Name
             and then not Is_Null
-                           (Rng.Low_Bound.As_Name.P_Referenced_Defining_Name)
-            and then Kind (Rng.Low_Bound.As_Name.P_Referenced_Defining_Name
+                           (Low_Bound (Rng).As_Name.P_Referenced_Defining_Name)
+            and then Kind (Low_Bound (Rng).As_Name.P_Referenced_Defining_Name
                            .Parent.Parent) in Ada_Discriminant_Spec_Range
          then
-            Low_Bound :=
+            Low_Bnd :=
             (Kind      => Discriminant,
-             Disc_Name => +Rng.Low_Bound.As_Name.P_Referenced_Defining_Name
+             Disc_Name => +Low_Bound (Rng).As_Name.P_Referenced_Defining_Name
                           .Text);
          end if;
       exception
          when Non_Static_Error =>
-            Low_Bound := (Kind => Non_Static);
+            Low_Bnd := (Kind => Non_Static);
       end;
 
       begin
-         if Rng.High_Bound.P_Is_Static_Expr then
-            High_Bound :=
+         if High_Bound (Rng).P_Is_Static_Expr then
+            High_Bnd :=
             (Kind    => Static,
                Int_Val =>
-               Big_Int.From_String (New_Eval_As_Int (Rng.High_Bound).Image));
-         elsif Kind (Rng.High_Bound) in Ada_Name
+               Big_Int.From_String (New_Eval_As_Int (High_Bound (Rng)).Image));
+         elsif High_Bound (Rng).Kind in Ada_Name
             and then not Is_Null
-                           (Rng.High_Bound.As_Name.P_Referenced_Defining_Name)
-            and then Kind (Rng.High_Bound.As_Name.P_Referenced_Defining_Name
+                           (High_Bound (Rng).As_Name
+                            .P_Referenced_Defining_Name)
+            and then Kind (High_Bound (Rng).As_Name.P_Referenced_Defining_Name
                            .Parent.Parent) in Ada_Discriminant_Spec_Range
          then
-            High_Bound :=
+            High_Bnd :=
             (Kind      => Discriminant,
-             Disc_Name => +Rng.High_Bound.As_Name.P_Referenced_Defining_Name
+             Disc_Name => +High_Bound (Rng).As_Name.P_Referenced_Defining_Name
                           .Text);
          end if;
       exception
          when Non_Static_Error =>
-            High_Bound := (Kind => Non_Static);
+            High_Bnd := (Kind => Non_Static);
       end;
 
-      return (Low_Bound, High_Bound);
+      return (Low_Bnd, High_Bnd);
    end Eval_Discrete_Range;
 
    -----------------------------------------
@@ -2225,10 +2226,12 @@ package body TGen.Types.Translation is
          when Ada_Attribute_Ref_Range =>
             pragma Assert (Node.F_Range.F_Range.As_Attribute_Ref.F_Prefix
                            .P_Name_Designated_Type.P_Is_Discrete_Type);
-            Min := Node.F_Range.F_Range.As_Attribute_Ref.F_Prefix
-                   .P_Name_Designated_Type.P_Discrete_Range.Low_Bound.As_Expr;
-            Max := Node.F_Range.F_Range.As_Attribute_Ref.F_Prefix
-                   .P_Name_Designated_Type.P_Discrete_Range.High_Bound.As_Expr;
+            Min :=
+              Low_Bound (Node.F_Range.F_Range.As_Attribute_Ref.F_Prefix
+                         .P_Name_Designated_Type.P_Discrete_Range).As_Expr;
+            Max :=
+              High_Bound (Node.F_Range.F_Range.As_Attribute_Ref.F_Prefix
+                          .P_Name_Designated_Type.P_Discrete_Range).As_Expr;
          when Ada_Bin_Op_Range =>
             pragma Assert (Node.F_Range.F_Range.As_Bin_Op.F_Op
                            in Ada_Op_Double_Dot_Range);

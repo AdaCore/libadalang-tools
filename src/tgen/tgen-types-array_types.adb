@@ -330,9 +330,15 @@ package body TGen.Types.Array_Types is
       return Static_Value'Class
    is
       function Generate_Component_Wrapper
-        (Data : Data_Type with Unreferenced) return Unbounded_String is
-          (+Generate_Element_Strat.Generate_Static_Value
-             (Disc_Context).To_String);
+        (Data : Data_Type) return Unbounded_String;
+
+      function Generate_Component_Wrapper
+        (Data : Data_Type) return Unbounded_String is
+         pragma Unreferenced (Data);
+      begin
+         return (+Generate_Element_Strat.Generate_Static_Value
+                    (Disc_Context).To_String);
+      end Generate_Component_Wrapper;
 
       Res : Unbounded_String;
 
