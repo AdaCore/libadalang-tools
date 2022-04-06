@@ -81,11 +81,6 @@ package TGen.Types.Record_Types is
       Padding : Natural := 0) return String;
    --  Image of Self but allows to specify an optional indentation
 
-   overriding function Generate_Static
-     (Self    : Record_Typ;
-      Context : in out Generation_Context) return Static_Strategy_Type'Class;
-   --  Generate a strategy to statically generate (in one pass) values for Self
-
    function As_Record_Typ (Self : SP.Ref)
      return Record_Typ'Class is
      (Record_Typ'Class (Self.Unchecked_Get.all)) with
