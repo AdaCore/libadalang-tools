@@ -33,6 +33,7 @@ with Ada.Strings.Hash;
 with Ada.Strings.Less_Case_Insensitive;
 with Ada.Strings.Maps;      use Ada.Strings.Maps;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with Ada.Strings.Wide_Wide_Unbounded;
 
 with GNATCOLL.Projects; use GNATCOLL.Projects;
 
@@ -62,8 +63,13 @@ package TGen.Strings is
        (Element_Type        => String,
         "<"                 => "<",
         "="                 => "=");
-
    subtype String_Ordered_Set is String_Ordered_Sets.Set;
+
+   package UTT_Maps is new Ada.Containers.Ordered_Maps
+     (Key_Type     => Unbounded_Text_Type,
+      Element_Type => Unbounded_Text_Type,
+      "<"          => Ada.Strings.Wide_Wide_Unbounded."<");
+   subtype UTT_Map is UTT_Maps.Map;
 
    function "+"
      (S : String)

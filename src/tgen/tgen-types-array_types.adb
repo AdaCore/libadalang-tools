@@ -91,6 +91,90 @@ package body TGen.Types.Array_Types is
       return To_String (Res);
    end Image;
 
+   procedure Callback_On_Constraint
+     (Self     : Constrained_Array_Typ;
+      Var_Name : Unbounded_Text_Type;
+      Callback : access procedure
+        (T          : Discrete_Typ'Class;
+         Constraint : TGen.Types.Constraints.Index_Constraint));
+   --  Call callback whenever an indexing constraint referencing Var_Name is
+   --  found. If the variable constrains several indexing constraints, then
+   --  callback will be called multiple times.
+
+   ---------------------------
+   -- Callback_On_Constrain --
+   ---------------------------
+
+   procedure Callback_On_Constraint
+     (Self     : Constrained_Array_Typ;
+      Var_Name : Unbounded_Text_Type;
+      Callback : access procedure
+        (T          : Discrete_Typ'Class;
+         Constraint : TGen.Types.Constraints.Index_Constraint))
+   is
+   begin
+      for I in Self.Index_Constraints'Range loop
+         declare
+            Index_Constraint : TGen.Types.Constraints.Index_Constraint
+              renames Self.Index_Constraints (I);
+            Index_Type_Classwide : constant Typ'Class :=
+              Self.Index_Types (I).Get;
+            Index_Type : constant Discrete_Typ'Class :=
+              Discrete_Typ'Class (Index_Type_Classwide);
+         begin
+            if Index_Constraint.Present then
+               declare
+                  ILB : constant Discrete_Constraint_Value :=
+                    Index_Constraint.Discrete_Range.Low_Bound;
+                  IHB : constant Discrete_Constraint_Value :=
+                    Index_Constraint.Discrete_Range.High_Bound;
+               begin
+                  if ILB.Kind = Discriminant and then ILB.Disc_Name = Var_Name
+                  then
+                     Callback (Index_Type, Index_Constraint);
+                  end if;
+                  if IHB.Kind = Discriminant and then IHB.Disc_Name = Var_Name
+                  then
+                     Callback (Index_Type, Index_Constraint);
+                  end if;
+               end;
+            end if;
+         end;
+      end loop;
+   end Callback_On_Constraint;
+
+   --------------------------------
+   -- Is_Constrained_By_Variable --
+   --------------------------------
+
+   procedure Is_Constrained_By_Variable
+     (Self       : Constrained_Array_Typ;
+      Var_Name   : Unbounded_Text_Type;
+      Found      : out Boolean;
+      Constraint : out TGen.Types.Constraints.Index_Constraint)
+   is
+
+      procedure Callback
+        (T   : Discrete_Typ'Class;
+         Cst : TGen.Types.Constraints.Index_Constraint);
+
+      --------------
+      -- Callback --
+      --------------
+
+      procedure Callback
+        (T    : Discrete_Typ'Class with Unreferenced;
+         Cst : TGen.Types.Constraints.Index_Constraint)
+      is
+      begin
+         Found := True;
+         Constraint := Cst;
+      end Callback;
+
+   begin
+      Callback_On_Constraint (Self, Var_Name, Callback'Access);
+   end Is_Constrained_By_Variable;
+
    type Data_Type is null record;
 
    type Size_Interval is record
@@ -204,7 +288,7 @@ package body TGen.Types.Array_Types is
         of Element_Type;
 
    function Reshape_1
-     (Arr : Array_Type) return Reshaped_Array_Type;
+     (Arr : Array_Type) return Reshaped_Array_Type with Unreferenced;
 
    ---------------
    -- Reshape_1 --
@@ -267,21 +351,42 @@ package body TGen.Types.Array_Types is
    function Length
      (I_Constraint : TGen.Types.Constraints.Index_Constraint;
       I_Type       : SP.Ref;
-      Disc_Context : Disc_Value_Map) return Big_Integer;
+      Disc_Context : Disc_Value_Map) return Big_Integer with Unreferenced;
    --  Returns the length of the array from its Index_Constraint
 
+   type Index_Value is record
+      Low_Bound, High_Bound : Big_Integer;
+   end record;
+
+   type Index_Values_Array is array (Positive range <>) of Index_Value;
+
+   type Index_Strategies_Type is
+      record
+         Low_Bound_Strat, High_Bound_Strat : Static_Strategy_Acc;
+      end record;
+
+   type Index_Static_Strategy_Array is array (Positive range <>)
+     of Index_Strategies_Type;
+
+   type Array_Static_Strategy_Type (Num_Dims : Positive) is
+     new Static_Strategy_Type with
+      record
+         T                         : SP.Ref;
+         Generate_Element_Strategy : Static_Strategy_Acc;
+         Generate_Index_Strategies : Index_Static_Strategy_Array
+           (1 .. Num_Dims);
+      end record;
+
+   overriding function Generate_Static_Value
+     (S            : in out Array_Static_Strategy_Type;
+      Disc_Context : Disc_Value_Map) return Static_Value'Class;
+
    function Generate_Static_Common
-     (Self         : Array_Typ'Class;
-      Disc_Context : Disc_Value_Map;
-      Constrained  : Boolean;
-      Constraints  : Index_Constraint_Arr;
-      Generate_Element_Strat : in out Static_Strategy_Type'Class)
+     (Self                   : Array_Typ'Class;
+      Disc_Context           : Disc_Value_Map;
+      Generate_Element_Strat : in out Static_Strategy_Type'Class;
+      Generate_Index_Strat   : in out Index_Static_Strategy_Array)
       return Static_Value'Class;
-
-   package Big_Integer_Conversion is new Big_Int.Signed_Conversions (Natural);
-
-   function "+" (BI : Big_Integer) return Natural renames
-     Big_Integer_Conversion.From_Big_Integer;
 
    ------------
    -- Length --
@@ -322,13 +427,15 @@ package body TGen.Types.Array_Types is
    ----------------------------
 
    function Generate_Static_Common
-     (Self         : Array_Typ'Class;
-      Disc_Context : Disc_Value_Map;
-      Constrained  : Boolean;
-      Constraints  : Index_Constraint_Arr;
-      Generate_Element_Strat : in out Static_Strategy_Type'Class)
+     (Self                   : Array_Typ'Class;
+      Disc_Context           : Disc_Value_Map;
+      Generate_Element_Strat : in out Static_Strategy_Type'Class;
+      Generate_Index_Strat   : in out Index_Static_Strategy_Array)
       return Static_Value'Class
    is
+      use Nat_Conversions;
+      use type Big_Int.Big_Integer;
+
       function Generate_Component_Wrapper
         (Data : Data_Type) return Unbounded_String;
 
@@ -355,32 +462,13 @@ package body TGen.Types.Array_Types is
 
       use Array_Generation_Static;
 
-      type Expected_Array_Type is array (Natural range <>) of Unbounded_String;
+      Sizes : Size_Interval_Array (1 .. Self.Num_Dims);
 
-      function Reshape is new Reshape_1
-        (Element_Type => Unbounded_String,
-         Index_Type_1 => Natural,
-         Array_Type   => Array_Type,
-         Reshaped_Array_Type => Expected_Array_Type);
+      Index_Values : Index_Values_Array (1 .. Self.Num_Dims);
 
-      pragma Unreferenced (Reshape);
-
-      Sizes : constant Size_Interval_Array :=
-        [for I in 1 .. Self.Num_Dims =>
-            (if not Constrained then
-                 (Min_Size => Unconstrained_Array_Size_Min,
-                  Max_Size => Unconstrained_Array_Size_Max)
-            else
-               (Min_Size => +Length
-                 (Constraints (I), Self.Index_Types (I), Disc_Context),
-                Max_Size => +Length
-                  (Constraints (I), Self.Index_Types (I), Disc_Context)))];
-
-      Strat : constant Array_Strategy_Type := Array_Strategy (Sizes);
+      Strat : Array_Strategy_Type (Self.Num_Dims);
 
       Dimension_Sizes : Nat_Array (1 .. Self.Num_Dims);
-
-      Random_Arr : constant Array_Type := Strat.Draw (Data, Dimension_Sizes);
 
       procedure Pp_Arr
         (Arr   : Array_Type;
@@ -417,78 +505,100 @@ package body TGen.Types.Array_Types is
 
       procedure Pp_Arr_Wrapper (Arr : Array_Type; Sizes : Nat_Array);
 
+      --------------------
+      -- Pp_Arr_Wrapper --
+      --------------------
+
       procedure Pp_Arr_Wrapper (Arr : Array_Type; Sizes : Nat_Array) is
          Ignore : Positive := 1;
       begin
          Pp_Arr (Arr, Ignore, Sizes);
       end Pp_Arr_Wrapper;
 
+      Disc_Context_With_Low_Bound : Disc_Value_Map := Disc_Context.Copy;
    begin
       if Self.Num_Dims > 2 then
          raise Program_Error with "Dimension not supported";
       end if;
 
-      Pp_Arr_Wrapper (Random_Arr, Dimension_Sizes);
+      --  Draw indexes values. If the array is constrained, we already know
+      --  them; it is the LB and the UB of each constraint. Otherwise, we need
+      --  to draw them.
+
+      for I in 1 .. Self.Num_Dims loop
+         declare
+            Index_Strat : constant Index_Strategies_Type :=
+              Generate_Index_Strat (I);
+
+            Low_Bound : constant Discrete_Static_Value :=
+              Discrete_Static_Value
+                (Index_Strat.Low_Bound_Strat.Generate_Static_Value
+                   (Disc_Context));
+            High_Bound : Discrete_Static_Value;
+         begin
+            Index_Values (I).Low_Bound := Low_Bound.Value;
+
+            --  After having generated the low bound, we insert it in the
+            --  discriminant map. This is a hack to generate index values for
+            --  unconstrained array type. TODO: refactor.
+
+            Disc_Context_With_Low_Bound.Include
+              (Low_Bound_Disc_Name, Low_Bound.Value);
+
+            High_Bound :=
+              Discrete_Static_Value
+                (Index_Strat.High_Bound_Strat.Generate_Static_Value
+                   (Disc_Context_With_Low_Bound));
+
+            Index_Values (I).High_Bound := High_Bound.Value;
+         end;
+      end loop;
+
+      --  Now that we have generated both index values, let's compute the sizes
+
+      Sizes :=
+        [for I in 1 .. Self.Num_Dims =>
+        (Min_Size =>
+           From_Big_Integer
+             (Index_Values (I).High_Bound - Index_Values (I).Low_Bound + 1),
+         Max_Size =>
+           From_Big_Integer
+             (Index_Values (I).High_Bound - Index_Values (I).Low_Bound + 1)
+        )];
+
+      --  Ready to generate our array. Yay! \o/
+
+      Strat := Array_Strategy (Sizes);
+
+      declare
+         Random_Arr : constant Array_Type :=
+           Strat.Draw (Data, Dimension_Sizes);
+
+      begin
+      --  Let's pretty print it. TODO??? we should also print the generated
+      --  index values, and not directly an array literal.
+
+         Pp_Arr_Wrapper (Random_Arr, Dimension_Sizes);
+      end;
 
       return Base_Static_Value'(Value => Res);
    end Generate_Static_Common;
 
-   type Array_Static_Strategy_Type is new Static_Strategy_Type with
-      record
-         T : SP.Ref;
-         Generate_Element_Strategy : Static_Strategy_Acc;
-         F : access function
-           (Self         : Array_Typ'Class;
-            Disc_Context : Disc_Value_Map;
-            Constrained  : Boolean;
-            Constraints  : Index_Constraint_Arr;
-            Generate_Element_Strat : in out Static_Strategy_Type'Class)
-         return Static_Value'Class;
-      end record;
-
-   overriding function Generate_Static_Value
-     (S            : in out Array_Static_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return Static_Value'Class;
+   ---------------------------
+   -- Generate_Static_Value --
+   ---------------------------
 
    function Generate_Static_Value
      (S            : in out Array_Static_Strategy_Type;
       Disc_Context : Disc_Value_Map) return Static_Value'Class
    is
-      T_Classwide : constant Typ'Class := S.T.Get;
+      T : constant Array_Typ'Class := As_Array_Typ (S.T);
    begin
-      --  TODO: refactor that code
-
-      if T_Classwide'Tag = Constrained_Array_Typ'Tag then
-         declare
-            T : constant Constrained_Array_Typ :=
-              Constrained_Array_Typ (T_Classwide);
-         begin
-            return S.F
-              (T,
-               Disc_Context,
-               True,
-               T.Index_Constraints,
-               S.Generate_Element_Strategy.all);
-         end;
-      elsif T_Classwide'Tag = Unconstrained_Array_Typ'Tag then
-         declare
-            T : constant Unconstrained_Array_Typ :=
-              Unconstrained_Array_Typ (T_Classwide);
-            No_Constraints : Index_Constraint_Arr (2 .. 1);
-         begin
-            return S.F
-              (T,
-               Disc_Context,
-               False,
-               No_Constraints,
-               S.Generate_Element_Strategy.all);
-         end;
-      else
-         return raise Program_Error with
-           "Expecting an array type but got a "
-           & Expanded_Name (T_Classwide'Tag);
-      end if;
-
+      return Generate_Static_Common
+        (T,
+         Disc_Context,
+         S.Generate_Element_Strategy.all,
+         S.Generate_Index_Strategies);
    end Generate_Static_Value;
 
    ---------------------
@@ -496,21 +606,115 @@ package body TGen.Types.Array_Types is
    ---------------------
 
    function Generate_Static
-     (Self    : Array_Typ;
+     (Self    : Constrained_Array_Typ;
       Context : in out Generation_Context) return Static_Strategy_Type'Class
    is
-      Strat : Array_Static_Strategy_Type;
+      Strat            : Array_Static_Strategy_Type (Self.Num_Dims);
       Element_Strategy : constant Static_Strategy_Type'Class :=
         Self.Component_Type.Get.Generate_Static (Context);
    begin
-      Context.Strategies.Include (Element_Strategy);
       Strat.Generate_Element_Strategy :=
-        new Static_Strategy_Type'Class'
-          (Static_Strategy_Type'Class
-             (Strategy_Sets.Element
-                (Context.Strategies.Find (Element_Strategy))));
+        new Static_Strategy_Type'Class'(Element_Strategy);
       SP.From_Element (Strat.T, Self'Unrestricted_Access);
-      Strat.F := Generate_Static_Common'Access;
+
+      for I in Self.Index_Types'Range loop
+         declare
+            Index_Type : constant Discrete_Typ'Class :=
+              As_Discrete_Typ (Self.Index_Types (I));
+
+            Index_Constraint : constant Discrete_Range_Constraint :=
+              (if Self.Index_Constraints (I).Present
+               then Self.Index_Constraints (I).Discrete_Range
+               else Discrete_Range_Constraint'
+                 (Discrete_Constraint_Value'
+                    (Kind => Static, Int_Val => Index_Type.Low_Bound),
+                  Discrete_Constraint_Value'
+                    (Kind => Static, Int_Val => Index_Type.High_Bound)));
+         begin
+
+            --  For the sake of consistency with unconstrained arrays, we will
+            --  generate dumb strategies: they will just return the value of
+            --  the constraint, be it a discriminant or a literal constraint.
+
+            --  This one is for the lower bound of the array
+
+            Strat.Generate_Index_Strategies (I).Low_Bound_Strat :=
+              new Static_Strategy_Type'Class'
+                (Discrete_Typ'Class
+                   (Self.Index_Types (I).Unchecked_Get.all).
+                     Generate_Identity_Constraint_Strategy
+                       (Index_Constraint.Low_Bound));
+
+            --  This one is for the upper bound
+
+            Strat.Generate_Index_Strategies (I).High_Bound_Strat :=
+              new Static_Strategy_Type'Class'
+                (Discrete_Typ'Class
+                   (Self.Index_Types (I).Unchecked_Get.all).
+                     Generate_Identity_Constraint_Strategy
+                       (Index_Constraint.High_Bound));
+         end;
+      end loop;
+      return Strat;
+   end Generate_Static;
+
+   ---------------------
+   -- Generate_Static --
+   ---------------------
+
+   function Generate_Static
+     (Self : Unconstrained_Array_Typ;
+      Context : in out Generation_Context) return Static_Strategy_Type'Class
+   is
+      Strat : Array_Static_Strategy_Type (Self.Num_Dims);
+      Element_Strategy : constant Static_Strategy_Type'Class :=
+        Self.Component_Type.Get.Generate_Static (Context);
+   begin
+      Strat.Generate_Element_Strategy :=
+        new Static_Strategy_Type'Class'(Element_Strategy);
+      SP.From_Element (Strat.T, Self'Unrestricted_Access);
+
+      for I in Self.Index_Types'Range loop
+
+         Strat.Generate_Index_Strategies (I).Low_Bound_Strat :=
+           new Static_Strategy_Type'Class'
+             (Discrete_Typ'Class (Self.Index_Types (I).Unchecked_Get.all).
+                Generate_Static (Context));
+
+         declare
+            --  HACK: we generate an artificial discrete constraint so that
+            --  we can rely on our generic mechanism for generation of
+            --  arrays: we assume that the generated value for the low bound
+            --  of each index will be stored as Low_Bound_Disc_Name in
+            --  the discriminant context. We will thus generate the
+            --  High_Bound from that.
+
+            Artificial_Constraint :
+            constant TGen.Types.Constraints.Index_Constraint :=
+              TGen.Types.Constraints.Index_Constraint'
+                (Present => True,
+                 Discrete_Range =>
+                   Discrete_Range_Constraint'
+                     (Low_Bound =>
+                            Discrete_Constraint_Value'
+                        (Kind => Discriminant,
+                         Disc_Name => Low_Bound_Disc_Name),
+                      High_Bound =>
+                        Discrete_Constraint_Value'
+                          (Kind => Discriminant,
+                           Disc_Name => High_Bound_Disc_Name)));
+         begin
+
+            Strat.Generate_Index_Strategies (I).High_Bound_Strat :=
+              new Static_Strategy_Type'Class'
+                (Discrete_Typ'Class
+                   (Self.Index_Types (I).Unchecked_Get.all).
+                     Generate_Array_Index_Constraint_Strategy
+                      (Var_Name   => High_Bound_Disc_Name,
+                       Constraint => Artificial_Constraint,
+                       Context    => Context));
+         end;
+      end loop;
       return Strat;
    end Generate_Static;
 

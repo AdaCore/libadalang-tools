@@ -34,6 +34,11 @@ package TGen.Types.Array_Types is
    --  Min / max size of generated unconstrained arrays. Hardcoded at the
    --  moment.
 
+   Low_Bound_Disc_Name : constant Unbounded_Text_Type :=
+     +String'("Magic_TGen_Low_Bound");
+   High_Bound_Disc_Name : constant Unbounded_Text_Type :=
+     +String'("Magic_TGen_High_Bound");
+
    type Index_Typ_Arr is array (Positive range <>) of TGen.Types.SP.Ref;
 
    type Array_Typ (Num_Dims : Positive) is new Composite_Typ with record
@@ -47,10 +52,13 @@ package TGen.Types.Array_Types is
      (Self.Static_Gen);
    --  Wether values for this Typ can be statically generated
 
-   overriding function Generate_Static
-     (Self    : Array_Typ;
-      Context : in out Generation_Context) return Static_Strategy_Type'Class;
-   --  Generate a stratgey for static (single pass) generation for an Array_Typ
+   function As_Array_Typ (Self : SP.Ref)
+     return Array_Typ'Class is
+     (Array_Typ'Class (Self.Unchecked_Get.all)) with
+     Pre => (not SP.Is_Null (Self))
+       and then
+         (Self.Get.Kind in Unconstrained_Array_Kind .. Constrained_Array_Kind);
+   pragma Inline (As_Array_Typ);
 
    type Unconstrained_Array_Typ is new Array_Typ with null record;
 
@@ -58,6 +66,12 @@ package TGen.Types.Array_Types is
 
    function Kind (Self : Unconstrained_Array_Typ) return Typ_Kind is
      (Unconstrained_Array_Kind);
+
+   function Generate_Static
+     (Self    : Unconstrained_Array_Typ;
+      Context : in out Generation_Context) return Static_Strategy_Type'Class;
+   --  Generate a strategy for static (single pass) generation for an
+   --  Unconstrained_Array_Typ
 
    function As_Unconstrained_Array_Typ (Self : SP.Ref)
      return Unconstrained_Array_Typ'Class is
@@ -76,6 +90,23 @@ package TGen.Types.Array_Types is
 
    function Kind (Self : Constrained_Array_Typ) return Typ_Kind is
      (Constrained_Array_Kind);
+
+   overriding function Generate_Static
+     (Self    : Constrained_Array_Typ;
+      Context : in out Generation_Context) return Static_Strategy_Type'Class;
+   --  Generate a strategy for static (single pass) generation for a
+   --  Constrained_Array_Typ
+
+   procedure Is_Constrained_By_Variable
+     (Self       : Constrained_Array_Typ;
+      Var_Name   : Unbounded_Text_Type;
+      Found      : out Boolean;
+      Constraint : out TGen.Types.Constraints.Index_Constraint);
+   --  Return whether the type is constrained by the variable named Var_Name.
+   --  For instance:
+   --
+   --  I : Integer := 1;
+   --  type A is array (1 .. I) of Integer; --  A is constrained by I
 
    function As_Constrained_Array_Typ (Self : SP.Ref)
      return Constrained_Array_Typ'Class is

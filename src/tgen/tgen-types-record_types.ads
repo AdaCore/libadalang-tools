@@ -237,7 +237,15 @@ package TGen.Types.Record_Types is
    overriding function Is_Constrained
      (Self : Discriminated_Record_Typ) return Boolean
      is (True);
-   --  Whether Self has discriminants cosntraints
+   --  Whether Self has discriminants constraints
+
+   procedure Disc_Constrains_Array
+     (Self       : Discriminated_Record_Typ;
+      Disc_Name  : Unbounded_Text_Type;
+      Found      : out Boolean;
+      Constraint : out TGen.Types.Constraints.Index_Constraint);
+   --  Whether the discriminant Disc_Name constrains an array inside the
+   --  record. Return the first occurrence found.
 
    function As_Discriminated_Record_Typ
      (Self : SP.Ref) return Discriminated_Record_Typ'Class is

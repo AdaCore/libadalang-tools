@@ -28,6 +28,7 @@ with Ada.Containers.Ordered_Sets;
 
 with TGen.Context;    use TGen.Context;
 with TGen.Strategies; use TGen.Strategies;
+with TGen.Types.Constraints; use TGen.Types.Constraints;
 
 package TGen.Types.Discrete_Types is
 
@@ -84,6 +85,11 @@ package TGen.Types.Discrete_Types is
       Context : in out Generation_Context) return Static_Strategy_Type'Class;
    --  Generate a strategy to statically generate (in one pass) values for Self
 
+   function Generate_Static_Common
+     (Self    : Discrete_Typ'Class;
+      Context : in out Generation_Context) return Static_Strategy_Type'Class;
+   --  Generate a strategy to statically generate (in one pass) values for Self
+
    type Discrete_Static_Value is new Static_Value with record
       T     : SP.Ref;
       Value : Big_Integer;
@@ -107,10 +113,63 @@ package TGen.Types.Discrete_Types is
       Samples : Alternatives_Set_Vector) return Static_Strategy_Type'Class;
    --  Generate a static (single pass generation) sampling strategy for Self
 
+   type Index_Kind is (Start_Index, End_Index);
+
+   type Array_Index_Strategy_Type is new Static_Strategy_Type with
+      record
+         T : SP.Ref;
+         Average_Size, Min_Size, Max_Size : Natural;
+         Index : Index_Kind;
+         Other_Index_Constraint : Discrete_Constraint_Value;
+         Fallback_Strategy : Static_Strategy_Acc;
+      end record;
+
+   overriding function Generate_Static_Value
+     (S            : in out Array_Index_Strategy_Type;
+      Disc_Context : Disc_Value_Map) return Static_Value'Class;
+
+   type Identity_Constraint_Strategy_Type is new Static_Strategy_Type with
+      record
+         T          : SP.Ref;
+         Constraint : Discrete_Constraint_Value;
+      end record;
+   --  A strategy that simply generates the value of a constraint (if it is a
+   --  discriminant constraint, return the value of the discriminant, if it is
+   --  a literal constraint, return the literal).
+
+   overriding function Generate_Static_Value
+     (S            : in out Identity_Constraint_Strategy_Type;
+      Disc_Context : Disc_Value_Map) return Static_Value'Class;
+
+   function Generate_Array_Index_Constraint_Strategy
+     (Self       : Discrete_Typ'Class;
+      Var_Name   : Unbounded_Text_Type;
+      Constraint : TGen.Types.Constraints.Index_Constraint;
+      Context    : in out Generation_Context)
+      return Static_Strategy_Type'Class;
+   --  When the type appear as an array index constraint, we need to have a
+   --  special strategy, as it will control the size of the array. We don't
+   --  want to be generating huge array.
+   --
+   --  Note that the other index constraint may not be bound at the strategy
+   --  generation time, in which case we will fallback on a random strategy
+   --  generation. The size will be coerced when generating a value for the
+   --  other index constraint.
+   --
+   --  TODO: we may revisit this, suppose that we will always generate the
+   --  Start_Index first (assuming both index constraints are discriminants),
+   --  and that we should always generate a Self.Low_Bound for it. This will
+   --  relax a bit the constraints when generating the higher bound (we may not
+   --  be able to generate an array of the picked size, if the generated random
+   --  value for the Start_Index is too high).
+
+   function Generate_Identity_Constraint_Strategy
+     (Self       : Discrete_Typ'Class;
+      Constraint : Discrete_Constraint_Value)
+      return Static_Strategy_Type'Class;
+
    function As_Discrete_Typ (Self : SP.Ref) return Discrete_Typ'Class is
-     (Discrete_Typ'Class (Self.Unchecked_Get.all)) with
-     Pre => (not SP.Is_Null (Self))
-            and then (Self.Get.Kind in Discrete_Typ_Range);
-   pragma Inline (As_Discrete_Typ);
+     (Discrete_Typ'Class (Self.Unchecked_Get.all));
+   pragma Inline_Always (As_Discrete_Typ);
 
 end TGen.Types.Discrete_Types;

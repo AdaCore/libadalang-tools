@@ -36,6 +36,9 @@ package TGen.Numerics is
    package LLLI_Conversions is
      new Big_Int.Signed_Conversions (Long_Long_Long_Integer);
 
+   package Nat_Conversions is
+      new Big_Int.Signed_Conversions (Natural);
+
    function Log
      (N    : Big_Int.Big_Integer;
       Base : Long_Long_Float) return Integer is

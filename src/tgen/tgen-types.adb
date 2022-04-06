@@ -51,6 +51,16 @@ package body TGen.Types is
       return Self.Name = Ada_Identifier_Vectors.Empty_Vector;
    end Is_Anonymous;
 
+   -----------------------------------
+   -- Generate_Constrained_Strategy --
+   -----------------------------------
+
+   function Generate_Constrained_Strategy
+     (Self     : Typ;
+      Var_Name : Unbounded_Text_Type)
+      return Static_Strategy_Type'Class
+     is (Unimplemented_Static_Strategy_Type'(null record));
+
    ----------
    -- Kind --
    ----------

@@ -150,6 +150,17 @@ package TGen.Types is
    --  Return a strategy statically generating (in a single pass) elements of
    --  the given type
 
+   function Generate_Constrained_Strategy
+     (Self     : Typ;
+      Var_Name : Unbounded_Text_Type)
+      return TGen.Strategies.Static_Strategy_Type'Class;
+   --  If the type is constrained by a strategy
+   --  (Self.Is_Constrained_By_Variable returns True for the given Var_Name),
+   --  let it generate a strategy for the variable values. This is used when
+   --  discriminants control the size of an array, being present as array
+   --  index constraints. In that case, we'll let the array type drive the
+   --  value generation of the discriminant.
+
    function Kind (Self : Typ) return Typ_Kind;
 
    procedure Free_Content (Self : in out Typ) is null;

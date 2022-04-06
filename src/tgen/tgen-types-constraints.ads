@@ -140,7 +140,7 @@ package TGen.Types.Constraints is
       end case;
    end record;
    --  Constraints for one index of an array. If the constraints are static
-   --  then these containt the discrete range that constrain this index.
+   --  then these contains the discrete range that constrain this index.
    --  If absent is true, this means that the index is constrained on the whole
    --  range of the index type.
 
@@ -175,7 +175,7 @@ package TGen.Types.Constraints is
    --  of the corresponding literal.
 
    type Discriminant_Constraints is new Constraint with record
-      Constraint_Map : Discriminant_Constraint_Maps.Map;
+      Constraint_Map : Discriminant_Constraint_Map;
    end record;
    --  Constraints for a discriminated record type, maps from discriminant
    --  defining name to the value of the discriminant.
@@ -186,7 +186,7 @@ package TGen.Types.Constraints is
      (for all Val of Self.Constraint_Map => Val.Kind in Static | Discriminant);
 
    type Anonymous_Typ is new Typ with record
-      Named_Ancestor : SP.Ref;
+      Named_Ancestor      : SP.Ref;
       Subtype_Constraints : Constraint_Acc;
    end record;
 

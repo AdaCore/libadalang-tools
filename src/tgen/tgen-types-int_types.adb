@@ -284,13 +284,13 @@ package body TGen.Types.Int_Types is
       Context : in out Generation_Context) return Static_Strategy_Type'Class
    is
       Strat_Random : constant Static_Strategy_Type'Class :=
-        Generate_Static (Discrete_Typ (Self), Context);
+        Generate_Static_Common (Discrete_Typ'Class (Self), Context);
 
       Strat_Equivalence_Classes : constant Static_Strategy_Type'Class :=
         Generate_Equivalence_Class_Digit_Strategy (Self);
    begin
       return Make_Dispatching_Strat
-        (Strat_Random, Strat_Equivalence_Classes, 0.25);
+        (Strat_Random, Strat_Equivalence_Classes, 0.5);
    end Generate_Static;
 
    ---------------------------
@@ -307,7 +307,7 @@ package body TGen.Types.Int_Types is
 
       use Big_Int;
 
-      Elements    : Many_Type :=
+      Elements : Many_Type :=
         Many
           (0,
            From_Big_Integer

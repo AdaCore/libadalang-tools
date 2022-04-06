@@ -31,6 +31,7 @@ with Ada.Strings;           use Ada.Strings;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with TGen.Gen_Strategies_Utils; use TGen.Gen_Strategies_Utils;
+with TGen.Types.Array_Types;    use TGen.Types.Array_Types;
 
 package body TGen.Types.Record_Types is
 
@@ -403,7 +404,7 @@ package body TGen.Types.Record_Types is
          T : SP.Ref;
          Component_Strats : Strategy_Map;
          Generate : access function
-           (T                : Record_Typ;
+           (T                : Record_Typ'Class;
             Component_Strats : in out Strategy_Map;
             Disc_Values      : Disc_Value_Map) return Static_Value'Class;
       end record;
@@ -464,12 +465,12 @@ package body TGen.Types.Record_Types is
    end Get_All_Components;
 
    function Generate_Record_Typ
-     (Self        : Record_Typ;
+     (Self        : Record_Typ'Class;
       Comp_Strats : in out Strategy_Map;
       Disc_Values : Disc_Value_Map) return Static_Value'Class;
 
    function Generate_Record_Typ
-     (Self        : Record_Typ;
+     (Self        : Record_Typ'Class;
       Comp_Strats : in out Strategy_Map;
       Disc_Values : Disc_Value_Map) return Static_Value'Class
    is
@@ -591,7 +592,7 @@ package body TGen.Types.Record_Types is
    function Pick_Strat_For_Disc
      (Self      : Discriminated_Record_Typ;
       Disc_Name : Unbounded_Text_Type;
-      Disc_Type : Typ'Class;
+      Disc_Type : Discrete_Typ'Class;
       Context   : in out Generation_Context)
       return Static_Strategy_Type'Class;
    --  Return a generation strategy for the given discriminant
@@ -603,17 +604,32 @@ package body TGen.Types.Record_Types is
    function Pick_Strat_For_Disc
      (Self      : Discriminated_Record_Typ;
       Disc_Name : Unbounded_Text_Type;
-      Disc_Type : Typ'Class;
+      Disc_Type : Discrete_Typ'Class;
       Context   : in out Generation_Context)
       return Static_Strategy_Type'Class
    is
       Default_Strategy : constant Static_Strategy_Type'Class :=
         Self.Discriminant_Types.Element (Disc_Name).Get.Generate_Static
         (Context);
-      Samples : Alternatives_Set_Vector;
+      Samples          : Alternatives_Set_Vector;
    begin
 
       Context.Strategies.Include (Default_Strategy);
+
+      --  TODO: special strategies when discriminant also is an array index
+      --  constraint, as we don't want to be purely random there, otherwise
+      --  we would end up generating arrays that are too big.
+
+      declare
+         Found      : Boolean;
+         Constraint : TGen.Types.Constraints.Index_Constraint;
+      begin
+         Self.Disc_Constrains_Array (Disc_Name, Found, Constraint);
+         if Found then
+            return Disc_Type.Generate_Array_Index_Constraint_Strategy
+              (Disc_Name, Constraint, Context);
+         end if;
+      end;
 
       Samples := Pick_Samples_For_Disc (Self.Variant, Disc_Name);
 
@@ -627,8 +643,7 @@ package body TGen.Types.Record_Types is
             if Disc_Type in Discrete_Typ'Class then
                Sample_Strat :=
                  new Static_Strategy_Type'Class'
-                   (Discrete_Typ'Class (Disc_Type)
-                    .Generate_Sampling_Strategy (Samples));
+                   (Disc_Type.Generate_Sampling_Strategy (Samples));
             else
                raise Program_Error
                  with "Unsupported discriminant type";
@@ -640,10 +655,6 @@ package body TGen.Types.Record_Types is
             return Dispatching_Strat;
          end;
       end if;
-
-      --  TODO: special strategies when discriminant also is an array index
-      --  constraint, as we don't want to be purely random there, otherwise
-      --  we would end up generating arrays that are too big.
 
       return Default_Strategy;
    end Pick_Strat_For_Disc;
@@ -665,13 +676,12 @@ package body TGen.Types.Record_Types is
       Disc_Context : Disc_Value_Map) return Static_Value'Class
    is
       Res : Unbounded_String;
-      T   : constant Typ'Class := S.T.Get;
    begin
       Append (Res, "(");
       Append
         (Res,
          S.Generate
-           (Record_Typ (T), S.Component_Strats, Disc_Context)
+           (As_Record_Typ (S.T), S.Component_Strats, Disc_Context)
          .To_String);
       Append (Res, ")");
       return Base_Static_Value'(Value => Res);
@@ -759,7 +769,7 @@ package body TGen.Types.Record_Types is
                is
                   Val : constant Discrete_Static_Value'Class :=
                     Discrete_Static_Value'Class
-                      (Disc_Strat.Generate_Static_Value (Disc_Context));
+                      (Disc_Strat.Generate_Static_Value (Current_Context));
                begin
                   Current_Context.Insert (Disc_Name, Val.Value);
                end Generate_Val;
@@ -851,7 +861,9 @@ package body TGen.Types.Record_Types is
             Strat.Disc_Strats.Insert
               (Disc_Name,
                Self.Pick_Strat_For_Disc
-                 (Disc_Name, Element (Disc).Get, Context));
+                 (Disc_Name, Discrete_Typ'Class
+                      (Element (Disc).Unchecked_Get.all),
+                  Context));
          end;
       end loop;
 
@@ -1111,5 +1123,219 @@ package body TGen.Types.Record_Types is
 
       return Result;
    end Generate_Random_Strategy;
+
+   procedure Disc_Constrains_Array
+     (Component_Types     : Component_Map;
+      Variant             : Variant_Part_Acc;
+      Disc_Name           : Unbounded_Text_Type;
+      Disc_Correspondence : UTT_Map;
+      Found               : out Boolean;
+      Constraint          : out TGen.Types.Constraints.Index_Constraint);
+   --  Internal for the spec-declared Disc_Constrains_Array procedure.
+   --  Component_Types are the currently analyzed component types, Variant is
+   --  the currently analyzed variant, and Disc_Correspondence gives the
+   --  current correspondence from sub-record discriminant names to top-level
+   --  record discriminant names.
+
+   ---------------------------
+   -- Disc_Constrains_Array --
+   ---------------------------
+
+   procedure Disc_Constrains_Array
+     (Component_Types     : Component_Map;
+      Variant             : Variant_Part_Acc;
+      Disc_Name           : Unbounded_Text_Type;
+      Disc_Correspondence : UTT_Map;
+      Found               : out Boolean;
+      Constraint          : out TGen.Types.Constraints.Index_Constraint)
+   is
+      T_Ref           : SP.Ref;
+      Constraints     : Constraint_Acc;
+      Has_Constraints : Boolean;
+   begin
+
+      --  Check the components of the record
+
+      for Component_Type of Component_Types loop
+
+         Has_Constraints := False;
+         T_Ref := Component_Type;
+
+         if Component_Type.Get.Kind in Anonymous_Kind then
+            Has_Constraints := True;
+            Constraints :=
+              As_Anonymous_Typ
+                (Component_Type).Subtype_Constraints;
+            T_Ref := As_Named_Typ (As_Anonymous_Typ (Component_Type));
+         end if;
+
+         if T_Ref.Get.Kind in Constrained_Array_Kind then
+            declare
+               T : constant Constrained_Array_Typ'Class :=
+                 As_Constrained_Array_Typ (T_Ref);
+            begin
+               T.Is_Constrained_By_Variable (Disc_Name, Found, Constraint);
+
+               if Found then
+
+                  --  We got the constraint, but we still must translate it
+                  --  according to the discriminant correspondence. The
+                  --  constraint must be expressed in the terms of the
+                  --  top-level record.
+
+                  if Constraint.Present then
+                     declare
+                        CLB : constant Discrete_Constraint_Value :=
+                          Constraint.Discrete_Range.Low_Bound;
+                        CHB : constant Discrete_Constraint_Value :=
+                          Constraint.Discrete_Range.High_Bound;
+                     begin
+                        if CLB.Kind = Discriminant then
+                           Constraint.Discrete_Range.Low_Bound.Disc_Name :=
+                             Disc_Correspondence.Element (CLB.Disc_Name);
+                        end if;
+                        if CHB.Kind = Discriminant then
+                           Constraint.Discrete_Range.High_Bound.Disc_Name :=
+                             Disc_Correspondence.Element (CHB.Disc_Name);
+                        end if;
+                     end;
+                  end if;
+
+                  --  The discriminant could constrain several arrays, but
+                  --  there is no point taking them all into account. So stop
+                  --  as soon as we found a match.
+
+                  return;
+               end if;
+            end;
+         end if;
+
+         if T_Ref.Get.Kind in Disc_Record_Kind then
+
+            --  If there are constraints, they are necessarily discriminant
+            --  constraints. Records the discriminant correspondence to have
+            --  an index constraint that can be applied to the top-level record
+            --  at the end.
+
+            if Has_Constraints then
+               declare
+                  Disc_Constraints : constant Discriminant_Constraint_Map :=
+                    Discriminant_Constraints (Constraints.all).Constraint_Map;
+
+                  New_Disc_Correspondence : UTT_Map;
+
+                  Sub_Record : constant Discriminated_Record_Typ'Class :=
+                    As_Discriminated_Record_Typ (T_Ref);
+
+                  Inspect_Subrecord       : Boolean := False;
+                  Correspondent_Disc_Name : Unbounded_Text_Type;
+                  --  Whether the discriminant Disc_Name can affect the sub-
+                  --  record, i.e. if it is propagated through a discriminant
+                  --  constraint. If it is the case, Correspondent_Disc_Name
+                  --  will hold the name of the discriminant that corresponds
+                  --  to the original Disc_Name, in the nested sub-record.
+
+               begin
+                  for Constraint_Cursor in Disc_Constraints.Iterate loop
+                     declare
+                        Disc_Constrained : constant Unbounded_Text_Type :=
+                          Discriminant_Constraint_Maps.Key (Constraint_Cursor);
+
+                        Constraint : constant Discrete_Constraint_Value :=
+                          Discriminant_Constraint_Maps.Element
+                            (Constraint_Cursor);
+                     begin
+
+                        --  If the constraint is a discriminant constraint,
+                        --  then we have a new correspondence.
+
+                        if Constraint.Kind = Discriminant then
+                           declare
+                              Orig_Disc : constant Unbounded_Text_Type :=
+                                Disc_Correspondence.Element
+                                  (Constraint.Disc_Name);
+                           begin
+                              Inspect_Subrecord := True;
+                              Correspondent_Disc_Name := Disc_Constrained;
+                              New_Disc_Correspondence.Insert
+                                (Disc_Constrained,
+                                 Orig_Disc);
+                           end;
+                        end if;
+                     end;
+                  end loop;
+
+                  if Inspect_Subrecord then
+                     Disc_Constrains_Array
+                       (Sub_Record.Component_Types,
+                        Sub_Record.Variant,
+                        Correspondent_Disc_Name,
+                        New_Disc_Correspondence,
+                        Found,
+                        Constraint);
+                  end if;
+               end;
+
+            else
+               --  If we don't have any constraint, then we just drop it all,
+               --  as none of the discriminant in the top level record will
+               --  affect the types of a sub-record. Note that this is the case
+               --  where the sub-record is mutable (i.e. has default values for
+               --  discriminants), as we can't have an unconstrained value as
+               --  a component of a record.
+
+               null;
+            end if;
+
+         end if;
+      end loop;
+
+      --  Check the variant part
+
+      if Variant /= null then
+         for Variant_Choice of Variant.Variant_Choices loop
+            Disc_Constrains_Array
+              (Variant_Choice.Components,
+               Variant_Choice.Variant,
+               Disc_Name,
+               Disc_Correspondence,
+               Found,
+               Constraint);
+            if Found then
+               return;
+            end if;
+         end loop;
+      end if;
+   end Disc_Constrains_Array;
+
+   ---------------------------
+   -- Disc_Constrains_Array --
+   ---------------------------
+
+   procedure Disc_Constrains_Array
+     (Self       : Discriminated_Record_Typ;
+      Disc_Name  : Unbounded_Text_Type;
+      Found      : out Boolean;
+      Constraint : out TGen.Types.Constraints.Index_Constraint)
+   is
+      Disc_Correspondence : UTT_Map;
+   begin
+      for Disc_Cursor in Self.Discriminant_Types.Iterate loop
+         declare
+            Disc_Name : constant Unbounded_Text_Type :=
+              Component_Maps.Key (Disc_Cursor);
+         begin
+            Disc_Correspondence.Insert (Disc_Name, Disc_Name);
+         end;
+      end loop;
+
+      Disc_Constrains_Array
+        (Self.Component_Types,
+         Self.Variant,
+         Disc_Name,
+         Disc_Correspondence,
+         Found,
+         Constraint);
+   end Disc_Constrains_Array;
 
 end TGen.Types.Record_Types;
