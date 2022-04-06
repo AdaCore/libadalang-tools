@@ -433,7 +433,6 @@ package body TGen.Types.Array_Types is
       Generate_Index_Strat   : in out Index_Static_Strategy_Array)
       return Static_Value'Class
    is
-      use Nat_Conversions;
       use type Big_Int.Big_Integer;
 
       function Generate_Component_Wrapper
@@ -471,48 +470,89 @@ package body TGen.Types.Array_Types is
       Dimension_Sizes : Nat_Array (1 .. Self.Num_Dims);
 
       procedure Pp_Arr
-        (Arr   : Array_Type;
-         Index : in out Positive;
-         Sizes : Nat_Array);
+        (Arr           : Array_Type;
+         Current_Index : in out Positive;
+         Indexes       : Index_Values_Array);
 
       ------------
       -- Pp_Arr --
       ------------
 
       procedure Pp_Arr
-        (Arr   : Array_Type;
-         Index : in out Positive;
-         Sizes : Nat_Array)
+        (Arr           : Array_Type;
+         Current_Index : in out Positive;
+         Indexes       : Index_Values_Array)
       is
+         use Big_Int;
       begin
-         if Sizes'Length = 0 then
+         if Indexes'Length = 0 then
             raise Program_Error with "Array dimension can't be 0";
          end if;
 
-         Append (Res, "[");
-         for I in 1 .. Sizes (Sizes'First) loop
-            if Sizes'Length = 1 then
-               Append (Res, +Arr (Index));
-               Index := @ + 1;
-            else
-               Pp_Arr (Arr, Index, Sizes (Sizes'First + 1 .. Sizes'Last));
+         declare
+            Index_Constraint : constant Index_Value :=
+              Indexes (Indexes'First);
+         begin
+            Append (Res, "(");
+
+            if Index_Constraint.High_Bound - Index_Constraint.Low_Bound < 0
+            then
+               --  1st special case: array is of size 0. We have to generate
+               --  an empty aggregate.
+
+               Append (Res, Big_Int.To_String (Index_Constraint.Low_Bound)
+                       & " .. "
+                       & Big_Int.To_String (Index_Constraint.High_Bound)
+                       & " => <>");
             end if;
-            Append (Res, ", ");
-         end loop;
+
+            for I in 0 .. Big_Int.To_Integer
+              (Index_Constraint.High_Bound - Index_Constraint.Low_Bound)
+            loop
+
+               if Indexes'Length = 1 then
+               --  We have reached leafs of a possible multi-dimensional array
+               --  type. Time to print values \o/.
+
+                  Append (Res,
+                          Big_Int.To_String
+                            (Index_Constraint.Low_Bound
+                             + Big_Int.To_Big_Integer (I))
+                          & " => " & (+Arr (Current_Index)));
+                  Current_Index := @ + 1;
+
+               else
+                  --  Otherwise, generate the nested array recursively
+
+                  Pp_Arr
+                    (Arr,
+                     Current_Index,
+                     Indexes (Indexes'First + 1 .. Indexes'Last));
+               end if;
+
+               Append (Res, ", ");
+            end loop;
+         end;
+
          Res := Remove_Trailing_Comma_And_Spaces (Res);
-         Append (Res, "]");
+         Append (Res, ")");
       end Pp_Arr;
 
-      procedure Pp_Arr_Wrapper (Arr : Array_Type; Sizes : Nat_Array);
+      procedure Pp_Arr_Wrapper
+        (Arr     : Array_Type;
+         Indexes : Index_Values_Array);
 
       --------------------
       -- Pp_Arr_Wrapper --
       --------------------
 
-      procedure Pp_Arr_Wrapper (Arr : Array_Type; Sizes : Nat_Array) is
+      procedure Pp_Arr_Wrapper
+        (Arr     : Array_Type;
+         Indexes : Index_Values_Array)
+      is
          Ignore : Positive := 1;
       begin
-         Pp_Arr (Arr, Ignore, Sizes);
+         Pp_Arr (Arr, Ignore, Indexes);
       end Pp_Arr_Wrapper;
 
       Disc_Context_With_Low_Bound : Disc_Value_Map := Disc_Context.Copy;
@@ -555,10 +595,10 @@ package body TGen.Types.Array_Types is
       Sizes :=
         [for I in 1 .. Self.Num_Dims =>
         (Min_Size =>
-           From_Big_Integer
+           Nat_Conversions.From_Big_Integer
              (Index_Values (I).High_Bound - Index_Values (I).Low_Bound + 1),
          Max_Size =>
-           From_Big_Integer
+           Nat_Conversions.From_Big_Integer
              (Index_Values (I).High_Bound - Index_Values (I).Low_Bound + 1)
         )];
 
@@ -574,7 +614,7 @@ package body TGen.Types.Array_Types is
       --  Let's pretty print it. TODO??? we should also print the generated
       --  index values, and not directly an array literal.
 
-         Pp_Arr_Wrapper (Random_Arr, Dimension_Sizes);
+         Pp_Arr_Wrapper (Random_Arr, Index_Values);
       end;
 
       return Base_Static_Value'(Value => Res);
