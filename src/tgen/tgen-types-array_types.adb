@@ -517,10 +517,6 @@ package body TGen.Types.Array_Types is
 
       Disc_Context_With_Low_Bound : Disc_Value_Map := Disc_Context.Copy;
    begin
-      if Self.Num_Dims > 2 then
-         raise Program_Error with "Dimension not supported";
-      end if;
-
       --  Draw indexes values. If the array is constrained, we already know
       --  them; it is the LB and the UB of each constraint. Otherwise, we need
       --  to draw them.
