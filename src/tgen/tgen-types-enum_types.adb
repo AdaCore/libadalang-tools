@@ -41,7 +41,7 @@ package body TGen.Types.Enum_Types is
    --  1 is the value representing True for boolean in the LAL static
    --  expression evaluator so use this value for now.
 
-   function Supports_Static_Gen (Self : Typ) return Boolean is
+   function Supports_Static_Gen (Self : Bool_Typ) return Boolean is
       pragma Unreferenced (Self);
    begin
       return True;
