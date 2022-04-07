@@ -477,7 +477,7 @@ package body Stub.Actions is
                   Paren_D_Scope : constant Basic_Decl :=
                     N.P_Declarative_Scope.P_Parent_Basic_Decl;
                   Paren_B_Scope : constant Basic_Decl :=
-                    N.As_Basic_Subp_Decl.P_Body_Part_For_Decl.
+                    N.As_Basic_Subp_Decl.P_Next_Part_For_Decl.
                       P_Declarative_Scope.P_Parent_Basic_Decl;
 
                   pragma Assert (Paren_D_Scope.Kind = Ada_Package_Decl);
