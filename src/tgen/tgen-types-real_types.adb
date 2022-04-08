@@ -59,10 +59,14 @@ package body TGen.Types.Real_Types is
          else " (non static)"));
 
    function Low_Bound_Or_Default (Self : Float_Typ) return Long_Float is
-     (if Self.Has_Range then Self.Range_Value.Min else Long_Float'First);
+     (if Self.Has_Range and then Self.Range_Value.Min'Valid
+      then Self.Range_Value.Min
+      else Long_Float'First);
 
    function High_Bound_Or_Default (Self : Float_Typ) return Long_Float is
-     (if Self.Has_Range then Self.Range_Value.Max else Long_Float'Last);
+     (if Self.Has_Range and then Self.Range_Value.Max'Valid
+      then Self.Range_Value.Max
+      else Long_Float'Last);
 
    function Low_Bound_Or_Default (Self : Ordinary_Fixed_Typ) return Long_Float
    is (Self.Range_Value.Min);

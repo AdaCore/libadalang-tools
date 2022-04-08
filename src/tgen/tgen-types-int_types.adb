@@ -171,6 +171,13 @@ package body TGen.Types.Int_Types is
       use type Big_Int.Big_Integer;
 
       Result : Interval_Vector;
+
+      LLI_Last : constant Big_Integer :=
+        LLLI_Conversions.To_Big_Integer
+          (Long_Long_Long_Integer (Long_Long_Integer'Last - 1));
+      LLI_First : constant Big_Integer :=
+        LLLI_Conversions.To_Big_Integer
+          (Long_Long_Long_Integer (Long_Long_Integer'First + 1));
    begin
 
       --  Positive intervals: for Integer -> [0, 9], [10, 99], ...
@@ -183,9 +190,14 @@ package body TGen.Types.Int_Types is
          High_Bound       : Big_Integer :=
            Big_Int.Min
              (10 ** Number_Of_Digits - 1, R.Max);
-
       begin
-         while Low_Bound < R.Max loop
+
+         --  While LLLI_Conversions do not actually support values outside of
+         --  Long_Long_Integer'Range, we must limit the equivalence classes
+         --  that we create to not have empty ranges.
+         --  TODO: Remove when V307-012 is closed
+
+         while Low_Bound < LLI_Last and then Low_Bound < R.Max loop
             Result.Append (Int_Range'(Min => Low_Bound, Max => High_Bound));
             Low_Bound := High_Bound + 1;
             Number_Of_Digits := Number_Of_Digits + 1;
@@ -202,7 +214,7 @@ package body TGen.Types.Int_Types is
          Low_Bound        : Big_Integer :=
            Big_Int.Max (-10 ** Number_Of_Digits + 1, R.Min);
       begin
-         while High_Bound > R.Min loop
+         while High_Bound > LLI_First and then High_Bound > R.Min loop
             Result.Append (Int_Range'(Min => Low_Bound, Max => High_Bound));
             High_Bound := Low_Bound - 1;
             Number_Of_Digits := Number_Of_Digits + 1;
