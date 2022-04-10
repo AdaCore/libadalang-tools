@@ -1,0 +1,7 @@
+library project Test is
+    for Languages use ("Ada");
+    for Library_Name use "Test";
+    for Source_Dirs use ("src");
+    for Library_Dir use "lib";
+    for Library_Kind use "Static";
+end Test;

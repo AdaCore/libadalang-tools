@@ -25,7 +25,8 @@ TESTSUITE_PROJECTS = \
    testsuite/ada_drivers/suppress_separate/suppress_separate.gpr \
    testsuite/ada_drivers/refactoring_extract_subprogram/extract_subprogram.gpr \
    testsuite/ada_drivers/refactoring_pull_up_declaration/pull_up_declaration.gpr \
-   testsuite/ada_drivers/refactoring_change_parameters_type/change_parameters_type.gpr
+   testsuite/ada_drivers/refactoring_change_parameters_type/change_parameters_type.gpr \
+   testsuite/ada_drivers/refactoring_change_parameters_default_value/change_parameters_default_value.gpr
 
 ALL_PROJECTS = \
    $(LIB_PROJECTS) $(TESTSUITE_PROJECTS)

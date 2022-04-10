@@ -1,0 +1,7 @@
+my_lib.adb
+2:35-2:40 
+3:22-3:24  : Integer; 
+my_lib.ads
+2:35-2:40 
+3:22-3:24  : Integer; 
+
