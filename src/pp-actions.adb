@@ -4916,7 +4916,9 @@ package body Pp.Actions is
                --  Search through the defining names of the declaration to find
                --  one with the same name.
                --  ???Use Xref instead (see metrics-actions.adb)?
-               for Def_Name of Decl.P_Defining_Names loop
+               for Def_Name of Decl.P_Defining_Names
+                 when not Def_Name.Is_Synthetic
+               loop
                   if L_Name (Def_Name.P_Relative_Name) = L_Name (Id) then
                      return Def_Name.P_Relative_Name.As_Base_Id;
                   end if;
