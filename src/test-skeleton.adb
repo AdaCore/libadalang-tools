@@ -5494,6 +5494,14 @@ package body Test.Skeleton is
                         if not Unparse_Success then
                            if Test.Common.Generate_Test_Vectors
                              and then not Data.Is_Generic
+                             and then not Is_Null
+                                  (Subp_Data_List.Element (Subp_Cur)
+                                   .Subp_Declaration.As_Basic_Decl
+                                   .P_Subp_Spec_Or_Null)
+                             and then Subp_Data_List.Element (Subp_Cur)
+                                      .Subp_Declaration
+                                      .As_Basic_Decl.P_Subp_Spec_Or_Null
+                                      .P_Params'Length /= 0
                            then
                               Report_Std
                                 ("Warning: (TGen) "
@@ -6683,6 +6691,12 @@ package body Test.Skeleton is
                            if not Unparse_Success then
                               if Test.Common.Generate_Test_Vectors
                                 and then not Data.Is_Generic
+                                and then not Is_Null
+                                  (Current_Subp.Subp_Declaration.As_Basic_Decl
+                                   .P_Subp_Spec_Or_Null)
+                                and then Current_Subp.Subp_Declaration
+                                         .As_Basic_Decl.P_Subp_Spec_Or_Null
+                                         .P_Params'Length /= 0
                               then
                                  Report_Std
                                    ("Warning: (TGen) "

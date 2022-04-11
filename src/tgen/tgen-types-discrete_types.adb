@@ -207,6 +207,7 @@ package body TGen.Types.Discrete_Types is
 
          Min_Size : Natural := S.Min_Size;
          Max_Size : Natural := S.Max_Size;
+         Avg_Size : Natural := S.Average_Size;
 
          Other_Index_Value : constant Big_Integer :=
            (if S.Other_Index_Constraint.Kind =
@@ -258,9 +259,51 @@ package body TGen.Types.Discrete_Types is
             Min_Size := Natural'Min (Min_Size, Max_Size);
          end if;
 
+         --  We cannot generate a zero length array if the lower index
+         --  constraint is already equal to the low bound of the index type, or
+         --  if the higher index constraint is equal to the high bound of the
+         --  index type.
+         --
+         --  For instance, if we have:
+         --
+         --     type Arr is array (Positive range <>) of Integer;
+         --
+         --     type Rec (I : Positive) is record
+         --        Comp : Arr (1 .. I);
+         --     end record;
+         --
+         --  The generating an array length of 0 is impossible, because we
+         --  would need to have I equal to 0, which would raise a
+         --  Constraint_Error. We must then constrain the length to be at
+         --  least one.
+
+         if S.Index = End_Index
+           and then Other_Index_Value = T_Discrete.Low_Bound
+           and then Min_Size = 0
+         then
+            Min_Size := 1;
+            Max_Size := Natural'Max (Min_Size, Max_Size);
+         end if;
+
+         if S.Index = Start_Index
+           and then Other_Index_Value = T_Discrete.High_Bound
+           and then Min_Size = 0
+         then
+            Min_Size := 1;
+            Max_Size := Natural'Max (Min_Size, Max_Size);
+         end if;
+
+         --  Recompute the average size if it no longer fits in between
+         --  Min_Size and Max_Size.
+
+         if Avg_Size < Min_Size or else Avg_Size > Max_Size then
+            Avg_Size := Natural'Min (Natural'Max (Min_Size * 2, Min_Size + 5),
+                                     Min_Size + ((Max_Size - Min_Size) / 2));
+         end if;
+
          --  Then, we can safely generate our size
 
-         Elements := Many (S.Min_Size, S.Max_Size, S.Average_Size);
+         Elements := Many (Min_Size, Max_Size, Avg_Size);
 
          while Elements.More loop
             null;

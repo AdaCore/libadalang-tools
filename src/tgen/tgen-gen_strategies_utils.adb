@@ -77,7 +77,7 @@ package body TGen.Gen_Strategies_Utils is
                Parent_Package                   => +Parent_Package,
                Parameters_Data                  => Params_Data,
                Return_Type_Fully_Qualified_Name =>
-                  +(if Is_Null (Spec.P_Return_Type)
+                  +(if not Is_Null (Spec.P_Return_Type)
                     then Spec.P_Return_Type.P_Fully_Qualified_Name
                     else ""),
                Return_Type_Parent_Package       =>

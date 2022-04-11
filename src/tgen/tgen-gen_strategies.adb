@@ -675,7 +675,7 @@ package body TGen.Gen_Strategies is
       Function_JSON.Set_Field ("UID", +Subp_UID);
       Function_JSON.Set_Field
         ("generation_complete", Create (Subp_Data.All_Params_Static));
-      if Subp.Kind = Ada_Subp_Kind_Function then
+      if not Is_Null (Subp.F_Subp_Spec.P_Returns) then
          Function_JSON.Set_Field
            ("return_type",
             Create (+Subp_Data.Return_Type_Fully_Qualified_Name));
