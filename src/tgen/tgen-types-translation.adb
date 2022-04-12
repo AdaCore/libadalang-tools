@@ -1082,7 +1082,7 @@ package body TGen.Types.Translation is
                elsif not Constraints_Static then
                   Res_Typ.Index_Constraints (Current_Index) :=
                   (Present        => True,
-                     Discrete_range =>
+                     Discrete_Range =>
                      (Low_Bound  => (Kind => Non_Static),
                         High_Bound => (Kind => Non_Static)));
                else
@@ -1807,23 +1807,22 @@ package body TGen.Types.Translation is
             end if;
             for Alt of Var_Choice.F_Choices loop
                case Alt.Kind is
-                  when Ada_Bin_Op =>
-                     if Alt.As_Bin_Op.F_Op.Kind in Ada_Op_Double_Dot then
-                        Choice_Min := Big_Int.From_String
-                          (New_Eval_As_Int (Alt.As_Bin_Op.F_Left).Image);
-                        Choice_Max := Big_Int.From_String
-                          (New_Eval_As_Int (Alt.As_Bin_Op.F_Right).Image);
-                        Choice_Trans.Alt_Set.Insert
-                          ((Min => Choice_Min, Max => Choice_Max));
-                     else
-                        Choice_Min := Big_Int.From_String
-                          (New_Eval_As_Int (Alt.As_Expr).Image);
-                        Choice_Trans.Alt_Set.Insert
-                          ((Min => Choice_Min, Max => Choice_Min));
-                     end if;
-                  when Ada_Expr'First .. Ada_Null_Record_Aggregate
-                      | Ada_Relation_Op .. Ada_Un_Op =>
-                     if Alt.Kind in Ada_Name
+                  when Ada_Expr =>
+                     if Alt.Kind in Ada_Bin_Op then
+                        if Alt.As_Bin_Op.F_Op.Kind in Ada_Op_Double_Dot then
+                           Choice_Min := Big_Int.From_String
+                             (New_Eval_As_Int (Alt.As_Bin_Op.F_Left).Image);
+                           Choice_Max := Big_Int.From_String
+                             (New_Eval_As_Int (Alt.As_Bin_Op.F_Right).Image);
+                           Choice_Trans.Alt_Set.Insert
+                             ((Min => Choice_Min, Max => Choice_Max));
+                        else
+                           Choice_Min := Big_Int.From_String
+                             (New_Eval_As_Int (Alt.As_Expr).Image);
+                           Choice_Trans.Alt_Set.Insert
+                             ((Min => Choice_Min, Max => Choice_Min));
+                        end if;
+                     elsif Alt.Kind in Ada_Name
                        and then not Is_Null
                          (Alt.As_Name.P_Name_Designated_Type)
                      then

@@ -56,8 +56,7 @@ package TGen.Types.Array_Types is
      return Array_Typ'Class is
      (Array_Typ'Class (Self.Unchecked_Get.all)) with
      Pre => (not SP.Is_Null (Self))
-       and then
-         (Self.Get.Kind in Unconstrained_Array_Kind .. Constrained_Array_Kind);
+       and then (Self.Get.Kind in Array_Typ_Range);
    pragma Inline (As_Array_Typ);
 
    type Unconstrained_Array_Typ is new Array_Typ with null record;
