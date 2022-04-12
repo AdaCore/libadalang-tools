@@ -897,7 +897,8 @@ package body Pp.Formatting is
       procedure Enable_Line_Breaks_For_EOL_Comments
         (Src_Buf : in out Buffer;
          Lines_Data_P : Lines_Data_Ptr;
-         Cmd : Command_Line);
+         Cmd : Command_Line;
+         Partial_Gnatpp : Boolean := False);
       --  For all end-of-line comments that occur at a soft line break, enable
       --  the line break. Note that this does not modify the output.
 
@@ -932,7 +933,8 @@ package body Pp.Formatting is
       Messages : out Scanner.Source_Message_Vector;
       Src_Buf : in out Buffer;
       Cmd : Command_Line;
-      Partial : Boolean)
+      Partial : Boolean;
+      Partial_Gnatpp : Boolean := False)
    is
       Lines_Data : Lines_Data_Rec renames Lines_Data_P.all;
       All_LB : Line_Break_Vector renames Lines_Data.All_LB;
@@ -948,7 +950,7 @@ package body Pp.Formatting is
    begin
       --  ????We probably want to do more, but this is for gnatstub
       --  for now.
-      if Partial then
+      if Partial and then not Partial_Gnatpp then
          Clear (All_LB);
          Clear (All_LBI);
          Clear (Lines_Data.Tabs);
@@ -956,31 +958,54 @@ package body Pp.Formatting is
          return;
       end if;
 
-      Tok_Phases.Split_Lines
-        (Lines_Data_P, Cmd,
-         First_Time => True);
-      Tok_Phases.Enable_Line_Breaks_For_EOL_Comments
-        (Src_Buf, Lines_Data_P, Cmd);
-      Tok_Phases.Insert_Comments_And_Blank_Lines
-        (Src_Buf, Messages, Lines_Data_P,
-         Cmd, Pp_Off_Present);
-      Tok_Phases.Split_Lines
-        (Lines_Data_P, Cmd,
-         First_Time => False);
-      Tok_Phases.Insert_Indentation (Lines_Data_P, Cmd);
-      Tok_Phases.Insert_Alignment (Lines_Data_P, Cmd);
+      if not Partial_Gnatpp then
+         Tok_Phases.Split_Lines
+           (Lines_Data_P, Cmd,
+            First_Time => True);
+         Tok_Phases.Enable_Line_Breaks_For_EOL_Comments
+           (Src_Buf, Lines_Data_P, Cmd);
+         Tok_Phases.Insert_Comments_And_Blank_Lines
+           (Src_Buf, Messages, Lines_Data_P,
+            Cmd, Pp_Off_Present);
+         Tok_Phases.Split_Lines
+           (Lines_Data_P, Cmd,
+            First_Time => False);
+         Tok_Phases.Insert_Indentation (Lines_Data_P, Cmd);
+         Tok_Phases.Insert_Alignment (Lines_Data_P, Cmd);
 
-      Tokns_To_Buffer (Lines_Data.Out_Buf, Lines_Data.New_Tokns, Cmd);
+         Tokns_To_Buffer (Lines_Data.Out_Buf, Lines_Data.New_Tokns, Cmd);
 
-      Keyword_Casing (Lines_Data_P, Cmd);
-      Insert_Form_Feeds (Lines_Data_P, Cmd);
-      Copy_Pp_Off_Regions (Src_Buf, Lines_Data_P, Pp_Off_Present, Cmd);
+         Keyword_Casing (Lines_Data_P, Cmd);
+         Insert_Form_Feeds (Lines_Data_P, Cmd);
+         Copy_Pp_Off_Regions (Src_Buf, Lines_Data_P, Pp_Off_Present, Cmd);
 
-      --  The following pass doesn't modify anything; it just checks that the
-      --  sequence of tokens we have constructed matches the original source
-      --  code (with some allowed exceptions).
+         --  The following pass doesn't modify anything; it just checks that
+         --  the sequence of tokens we have constructed matches the original
+         --  source code (with some allowed exceptions).
 
-      Final_Check (Lines_Data_P, Src_Buf, Cmd);
+         Final_Check (Lines_Data_P, Src_Buf, Cmd);
+
+      else
+         --  Actions only in partial gnatpp mode. Final_Check is omitted
+         --  since applying for the entire file for now.
+
+         Tok_Phases.Split_Lines (Lines_Data_P, Cmd, First_Time => True);
+
+         Tok_Phases.Enable_Line_Breaks_For_EOL_Comments
+           (Src_Buf, Lines_Data_P, Cmd, Partial_Gnatpp);
+
+         Tok_Phases.Insert_Comments_And_Blank_Lines
+           (Src_Buf, Messages, Lines_Data_P, Cmd, Pp_Off_Present);
+
+         Tok_Phases.Split_Lines (Lines_Data_P, Cmd, First_Time => False);
+
+         Tok_Phases.Insert_Indentation (Lines_Data_P, Cmd);
+         --  Tok_Phases.Insert_Alignment (Lines_Data_P, Cmd);
+
+         Tokns_To_Buffer (Lines_Data.Out_Buf, Lines_Data.New_Tokns, Cmd);
+
+         Keyword_Casing (Lines_Data_P, Cmd);
+      end if;
 
    exception
       when Post_Tree_Phases_Done => null;
@@ -2025,7 +2050,8 @@ package body Pp.Formatting is
       procedure Enable_Line_Breaks_For_EOL_Comments
         (Src_Buf : in out Buffer;
          Lines_Data_P : Lines_Data_Ptr;
-         Cmd : Command_Line)
+         Cmd : Command_Line;
+         Partial_Gnatpp : Boolean := False)
       is
          Lines_Data : Lines_Data_Rec renames Lines_Data_P.all;
          All_LB : Line_Break_Vector renames Lines_Data.All_LB;
@@ -2318,8 +2344,18 @@ package body Pp.Formatting is
                      goto Done;
                   end if;
                else
-                  Raise_Token_Mismatch
-                    ("eol_comments", Lines_Data, Src_Buf, Src_Tok, New_Tok);
+                  if Partial_Gnatpp then
+                     if Kind (Src_Tok) = ';'
+                       and then Kind (Prev (Src_Tok)) in Res_End | Res_Record
+                       and then Kind (New_Tok) = End_Of_Input
+                     then
+                        Next_ss (Src_Tok);
+                     end if;
+                  else
+                     Raise_Token_Mismatch
+                       ("eol_comments", Lines_Data, Src_Buf, Src_Tok, New_Tok);
+                  end if;
+
                end if;
             end if;
          end loop;
@@ -3693,6 +3729,7 @@ package body Pp.Formatting is
 
          loop
             pragma Assert (Kind (New_Tok) not in Comment_Kind);
+
             Manage_Paren_Stack;
 
             --  The order of the if/elsif's below is important in some
@@ -3717,13 +3754,13 @@ package body Pp.Formatting is
                New_To_Newer;
 
             else
-
                --  Check for "end;" --> "end Some_Name;" case
                if Kind (Src_Tok) = ';'
                  and then
                    Kind (Prev_Lexeme (Src_Tok)) = Res_End
                  and then Sname_83 (New_Tok)
                then
+
                   loop -- could be "end A.B.C;"
                      New_To_Newer;
 
@@ -3746,6 +3783,7 @@ package body Pp.Formatting is
                    Kind (Prev_Lexeme (New_Tok)) = Res_End
                  and then Kind (Src_Tok) in Ident | String_Lit
                then
+
                   Append_Tokn (New_Tokns, Spaces, Name_Space);
                   loop -- could be "end A.B.C;"
                      Append_Tokn (New_Tokns, Src_Tok);
@@ -3950,6 +3988,7 @@ package body Pp.Formatting is
                      end;
 
                   elsif Arg (Cmd, Source_Line_Breaks) then
+
                      if Kind (New_Tok) in Line_Break_Token then
                         declare
                            LB : Line_Break renames
@@ -4141,6 +4180,7 @@ package body Pp.Formatting is
          pragma Assert (Cur_Indentation = Arg (Cmd, Initial_Indentation));
 
          pragma Assert (At_Last (Src_Tok));
+
          Append_Tokn (New_Tokns, End_Of_Input);
          Erase_LB_Toks (All_LB);
          Clear (Saved_New_Tokns);
@@ -4155,7 +4195,6 @@ package body Pp.Formatting is
          Clear (Lines_Data.All_LBI);
          Clear (Enabled_LBI);
          Clear (Syntax_LBI);
-
       end Insert_Comments_And_Blank_Lines;
 
       procedure Insert_Indentation (Lines_Data_P : Lines_Data_Ptr;

@@ -430,7 +430,8 @@ package body Pp.Actions is
    procedure Tree_To_Ada_2
      (Root      : Ada_Node;
       Cmd       : Utils.Command_Lines.Command_Line;
-      Partial   : Boolean);
+      Partial   : Boolean;
+      Partial_Gnatpp : Boolean := False);
    --  Partial is True if we are not processing an entire file.
 
    --  Hard and soft line breaks:
@@ -2525,7 +2526,8 @@ package body Pp.Actions is
    procedure Tree_To_Ada_2
      (Root      : Ada_Node;
       Cmd       : Utils.Command_Lines.Command_Line;
-      Partial   : Boolean)
+      Partial   : Boolean;
+      Partial_Gnatpp : Boolean := False)
    is
       function Id_With_Casing
         (Id          : W_Str;
@@ -3738,9 +3740,13 @@ package body Pp.Actions is
                   declare
                      Parent : constant Ada_Tree := Parent_Tree;
                   begin
-                     if Parent.Kind in Ada_Ada_List then
-                        if Subtree (Parent, 1) /= Tree then
-                           Insert_Blank_Line_Before := True;
+                     if Partial_Gnatpp then
+                        null; --  Insert_Blank_Line_Before := True;
+                     else
+                        if Parent.Kind in Ada_Ada_List then
+                           if Subtree (Parent, 1) /= Tree then
+                              Insert_Blank_Line_Before := True;
+                           end if;
                         end if;
                      end if;
                   end;
@@ -3963,6 +3969,11 @@ package body Pp.Actions is
 
          procedure Do_Handled_Stmts is
          begin
+            if Parent_Tree = No_Ada_Node then
+               --   We are not supposed to get here even in partial gnatpp mode
+               raise Program_Error;
+            end if;
+
             case Parent_Tree.Kind is
                when Ada_Entry_Body |
                  Ada_Package_Body |
@@ -5115,11 +5126,24 @@ package body Pp.Actions is
 
          Subtree_To_Ada (Tree, Cur_Level => 1, Index_In_Parent => 1);
 
+         --  In Partial Gnatpp mode when the input node Ada_Decl_Block
+         --  or Ada_Decl_Type the last ';' is not generated so should be added.
+
+         if Partial_Gnatpp
+           and then Kind (Tree) in Ada_Decl_Block | Ada_Type_Decl
+         then
+            if Kind (Last (New_Tokns'Access)) not in ';' then
+               Append_And_Put (New_Tokns, ';');
+            end if;
+         end if;
+
          --  In Partial mode, we might need to add a line break. Same for
          --  Source_Line_Breaks.
 
          if Partial or else Arg (Cmd, Source_Line_Breaks) then
-            if Kind (Last (New_Tokns'Access)) not in Line_Break_Token then
+            if Kind (Last (New_Tokns'Access)) not in Line_Break_Token
+              and then not Partial_Gnatpp
+            then
                Append_Line_Break
                  (Hard     => True,
                   Affects_Comments => True,
@@ -5167,14 +5191,10 @@ package body Pp.Actions is
      (Cmd : Command_Line;
       Input : Char_Vector;
       Node : Ada_Node;
-      In_Range : Char_Subrange;
       Output : out Char_Vector;
-      Out_Range : out Char_Subrange;
-      Messages : out Pp.Scanner.Source_Message_Vector)
+      Messages : out Pp.Scanner.Source_Message_Vector;
+      Partial_Gnatpp : Boolean := False)
    is
-      pragma Unreferenced (In_Range, Out_Range);
-      --  ???These are not yet implemented.
-
       Partial : constant Boolean := Is_Empty (Input);
 
       Src_Buf : Buffer;
@@ -5228,9 +5248,9 @@ package body Pp.Actions is
             --  Otherwise, convert the tree to text, and then run all the
             --  text-based passes.
 
-            Tree_To_Ada_2 (Node, Cmd, Partial);
+            Tree_To_Ada_2 (Node, Cmd, Partial, Partial_Gnatpp);
             Post_Tree_Phases
-              (Lines_Data'Access, Messages, Src_Buf, Cmd, Partial);
+              (Lines_Data'Access, Messages, Src_Buf, Cmd, Partial, Partial_Gnatpp);
          end if;
       end Tree_To_Ada;
 
@@ -5763,13 +5783,9 @@ package body Pp.Actions is
          Messages : Scanner.Source_Message_Vector;
          use Scanner.Source_Message_Vectors;
          use type Ada.Containers.Count_Type;
-         In_Range : constant Char_Subrange :=
-           Utils.Char_Vectors.Char_Vectors.Full_Range (In_Vec);
-         Ignored_Out_Range : Char_Subrange;
       begin
          Format_Vector
-           (Cmd, In_Vec, Root (Unit), In_Range,
-            Out_Vec, Ignored_Out_Range, Messages);
+           (Cmd, In_Vec, Root (Unit), Out_Vec, Messages);
 --        (CU, Cmd, Output_Name, Form_String,
 --         Do_Diff, Output_Written, To_Ada => True);
 --      --  We have to flush the cache here, because Unit_Id's get reused between

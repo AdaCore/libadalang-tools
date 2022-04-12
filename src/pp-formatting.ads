@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2001-2021, AdaCore                    --
+--                      Copyright (C) 2001-2022, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -283,7 +283,8 @@ package Pp.Formatting is
       Messages : out Scanner.Source_Message_Vector;
       Src_Buf : in out Buffer;
       Cmd : Utils.Command_Lines.Command_Line;
-      Partial : Boolean);
+      Partial : Boolean;
+      Partial_Gnatpp : Boolean := False);
    --  The first pretty-printing pass walks the tree and produces text,
    --  along with various tables. This performs the remaining passes, which
    --  do not make use of the tree.

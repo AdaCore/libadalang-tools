@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                       Copyright (C) 2021-2022, AdaCore                   --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -36,10 +36,9 @@ package Pp.Actions is
      (Cmd : Command_Line;
       Input : Char_Vector;
       Node : Ada_Node;
-      In_Range : Char_Subrange;
       Output : out Char_Vector;
-      Out_Range : out Char_Subrange;
-      Messages : out Pp.Scanner.Source_Message_Vector) with
+      Messages : out Pp.Scanner.Source_Message_Vector;
+      Partial_Gnatpp : Boolean := False) with
      Pre => Pp.Scanner.Source_Message_Vectors.Is_Empty (Messages);
    --  This pretty prints the given source. Parameters:
    --
@@ -62,6 +61,9 @@ package Pp.Actions is
    --
    --     Messages -- Error messages.
    --
+   --     Partial_Gnatpp -- Boolean parameterset when Format_Vector is called
+   --     in a context of code snippet reformatting (from partial-gnatpp).
+   --
    --  If Messages is not empty, then the client should notify the user
    --  somehow, and avoid updating the user's source code. In addition, if
    --  Format_Vector raises an exception, that is a bug, and the client
@@ -73,7 +75,7 @@ package Pp.Actions is
    --
    --  Note that the gnatpp program does not call this directly; it calls
    --  Per_File_Action. Format_Vector is for calling from text editors and
-   --  the like. Format_Vector is called from lalstub.
+   --  the like. Format_Vector is called from lalstub and partial-gnatpp.
 
 private
 

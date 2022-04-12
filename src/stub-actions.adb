@@ -748,9 +748,7 @@ package body Stub.Actions is
            (Pp_Cmd,
             Input => Empty_Vec,
             Node => Ada_Node (Spec),
-            In_Range => (1, 0),
             Output => Pp_Out_Vec,
-            Out_Range => Tool.Ignored_Out_Range,
             Messages => Tool.Ignored_Messages);
          pragma Assert (Is_Empty (Tool.Ignored_Messages));
          Put (" \1\2 is",
@@ -778,9 +776,7 @@ package body Stub.Actions is
               (Pp_Cmd,
                Input => Empty_Vec,
                Node => Ada_Node (Parms),
-               In_Range => (1, 0),
                Output => Pp_Out_Vec,
-               Out_Range => Tool.Ignored_Out_Range,
                Messages => Tool.Ignored_Messages);
             pragma Assert (Is_Empty (Tool.Ignored_Messages));
             Put ("\1entry \2 \3 when Standard.True is\n",
@@ -1074,9 +1070,7 @@ package body Stub.Actions is
            (Pp_Cmd,
             Input => Out_Vec,
             Node => Root (Out_Unit),
-            In_Range => (1, 0),
             Output => Pp_Out_Vec,
-            Out_Range => Tool.Ignored_Out_Range,
             Messages => Tool.Ignored_Messages);
          pragma Assert (Is_Empty (Tool.Ignored_Messages));
       end Format;
