@@ -26,14 +26,19 @@
 with Libadalang.Analysis;
 with Tools.Record_Components_Tool;
 use Tools.Record_Components_Tool;
+with Tools.Array_Aggregates_Tool;
+use Tools.Array_Aggregates_Tool;
 with VSS.Text_Streams;
-with VSS.Text_Streams.Memory_UTF8_Output;
 
 package Output is
    package LAL renames Libadalang.Analysis;
 
    procedure JSON_Serialize (Edits_Info : Delete_Infos;
-                    Stream : in out VSS.Text_Streams.
-                      Memory_UTF8_Output.Memory_UTF8_Output_Stream);
+                                 Stream : in out
+                               VSS.Text_Streams.Output_Text_Stream'Class);
+
+   procedure JSON_Serialize (Edits_Info : Aggregates_To_Edit_Text.Map;
+                                 Stream : in out
+                               VSS.Text_Streams.Output_Text_Stream'Class);
 
 end Output;
