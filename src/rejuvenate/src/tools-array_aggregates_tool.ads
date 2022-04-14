@@ -24,13 +24,19 @@
 --  Rejuvenate array aggregates tool
 
 with Ada.Strings.Unbounded;
+with Libadalang.Analysis;
+with Laltools.Refactor;
+with Ada.Containers.Indefinite_Ordered_Maps;
 
 with GNATCOLL.Opt_Parse; use GNATCOLL.Opt_Parse;
 
 package Tools.Array_Aggregates_Tool is
-
+   package LAL renames Libadalang.Analysis;
+   package ReFac renames Laltools.Refactor;
    Parser : Argument_Parser :=
      Create_Argument_Parser (Help => "Array Aggregates");
+
+   function "<" (L, R : LAL.Aggregate) return Boolean;
 
    package Project is new Parse_Option
      (Parser      => Parser,
@@ -49,6 +55,17 @@ package Tools.Array_Aggregates_Tool is
       Arg_Type    => Ada.Strings.Unbounded.Unbounded_String,
       Convert     => Ada.Strings.Unbounded.To_Unbounded_String,
       Default_Val => Ada.Strings.Unbounded.Null_Unbounded_String);
+
+   package Aggregates_To_Edit_Text is new
+     Ada.Containers.Indefinite_Ordered_Maps
+       (Key_Type            => LAL.Aggregate,
+        Element_Type        => ReFac.Text_Edit_Ordered_Set,
+        "<"                 => "<",
+        "="                 => ReFac.Text_Edit_Ordered_Sets."="
+       );
+
+   function Find_Arrays_To_Aggregate (Unit_Array : LAL.Analysis_Unit_Array)
+                                      return Aggregates_To_Edit_Text.Map;
 
    procedure Run;
    --  Array_Aggregates_Tool main procedure

@@ -31,8 +31,7 @@ use Ada.Characters.Conversions;
 with VSS.Strings.Conversions;
 use VSS.Strings.Conversions;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-with Laltools.Refactor;
-use Laltools.Refactor;
+with Laltools.Refactor; use Laltools.Refactor;
 with VSS.JSON.Content_Handlers;
 with VSS.JSON.Push_Writers;
 
@@ -43,7 +42,7 @@ package body Output is
       Item      : Source_Location;
       File_Name : String;
       Success   : in out Boolean);
-   --  write the location information using source_location with
+   --  Write the location information using source_location with
    --  column excluded.
 
    procedure Write_Include
@@ -51,49 +50,73 @@ package body Output is
       Item      : Source_Location;
       File_Name : String;
       Success   : in out Boolean);
-   --  write the location information using source_location with
+   --  Write the location information using source_location with
    --  column included.
 
-   procedure Write_Record
+   procedure Write_Node
      (Writer  : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
-      Item    : LAL.Defining_Name'Class;
+      Item    : LAL.Ada_Node'Class;
       Success : in out Boolean);
-   --  write the record location information
+   --  Write the record location information
 
    procedure Write_Warning
      (Writer  : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
       Success : in out Boolean);
-   --  write the warning information
+   --  Write the warning information
 
    procedure Write_Fixit
      (Writer  : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
       Item    : Text_Edit_Map;
       Success : in out Boolean);
-   --  write the fixits information
+   --  Write the fixits information for array_aggregate
 
-   procedure Write_Delete
+   procedure Write_Fixit
+     (Writer   : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+      Filename : String;
+      Item     : Text_Edit_Ordered_Set;
+      Success  : in out Boolean);
+   --  Write the fixits information for array_aggregate
+
+   procedure Write_Edit
      (Writer    : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
       File_Name : String;
       Item      : Text_Edit;
       Success   : in out Boolean);
-   --  write the delete locations
+   --  Write the delete locations
 
    procedure Write_Message
-     (Writer      : in out VSS.JSON.Content_Handlers.
+     (Writer       : in out VSS.JSON.Content_Handlers.
                            JSON_Content_Handler'Class;
-      Record_Name : LAL.Defining_Name'Class;
+      Record_Name  : LAL.Defining_Name'Class;
       Delete_Names : Defining_Name_Ordered_Sets.Set;
-      Success     : in out Boolean);
+      Success      : in out Boolean);
    --  Write the error/warning messages.
    --  Attention this one only works for the record_componenet_tool
 
-   procedure Write
-     (Writer      : in out VSS.JSON.Content_Handlers.
+   procedure Write_Message
+     (Writer         : in out VSS.JSON.Content_Handlers.
                            JSON_Content_Handler'Class;
-      Record_Name : LAL.Defining_Name'Class;
+      Aggregate_Node : LAL.Aggregate'Class;
+      Success        : in out Boolean);
+   --  Write the error/warning messages.
+   --  For Array_Aggregate
+
+   procedure Write
+     (Writer       : in out VSS.JSON.Content_Handlers.
+                           JSON_Content_Handler'Class;
+      Record_Name  : LAL.Defining_Name'Class;
       Delete_Names : Defining_Name_Ordered_Sets.Set;
-      Item        : Text_Edit_Map;
-      Success     : in out Boolean);
+      Item         : Text_Edit_Map;
+      Success      : in out Boolean);
+   --  Write for record_component
+
+   procedure Write
+     (Writer         : in out VSS.JSON.Content_Handlers.
+                           JSON_Content_Handler'Class;
+      Aggregate_Node : LAL.Aggregate;
+      Item           : Text_Edit_Ordered_Set;
+      Success        : in out Boolean);
+   --  Write for array_aggregate
 
    -----------
    -- Write --
@@ -139,7 +162,7 @@ package body Output is
       Writer.Key_Name ("file", Success);
       Writer.String_Value (VSS.Strings.To_Virtual_String
                            (To_Wide_Wide_String (File_Name)),
-                          Success);
+                           Success);
 
       Writer.Key_Name ("line", Success);
       Writer.Integer_Value (Interfaces.Integer_64 (Item.Line), Success);
@@ -163,11 +186,36 @@ package body Output is
       for File_Name in Item.Iterate loop
 
          for Text_To_Edit of Item (File_Name) loop
-            Write_Delete (Writer,
-                          File_Name.Key,
-                          Text_To_Edit,
-                          Success);
+            Write_Edit (Writer,
+                        File_Name.Key,
+                        Text_To_Edit,
+                        Success);
          end loop;
+      end loop;
+
+      Writer.End_Object (Success);
+      Writer.End_Array (Success);
+   end Write_Fixit;
+
+   -----------------
+   -- Write_Fixit --
+   -----------------
+
+   procedure Write_Fixit
+     (Writer   : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
+      Filename : String;
+      Item     : Text_Edit_Ordered_Set;
+      Success  : in out Boolean) is
+   begin
+      Writer.Start_Array (Success);
+      Writer.Start_Object (Success);
+
+      Writer.Key_Name ("fixits", Success);
+      for Text_To_Edit of Item loop
+         Write_Edit (Writer,
+                     Filename,
+                     Text_To_Edit,
+                     Success);
       end loop;
 
       Writer.End_Object (Success);
@@ -178,7 +226,7 @@ package body Output is
    -- Write_Delete --
    ------------------
 
-   procedure Write_Delete
+   procedure Write_Edit
      (Writer    : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
       File_Name : String;
       Item      : Text_Edit;
@@ -193,23 +241,24 @@ package body Output is
       Write (Writer, Start_Sloc (Item.Location), File_Name, Success);
 
       Writer.Key_Name ("string", Success);
-      Writer.String_Value (VSS.Strings.Conversions.
-                             To_Virtual_String (Item.Text),
+      Writer.String_Value (VSS.Strings.Conversions
+                           .To_Virtual_String (Item.Text),
                            Success);
 
       Writer.End_Object (Success);
-   end Write_Delete;
+   end Write_Edit;
 
    ------------------
    -- Write_Record --
    ------------------
 
-   procedure Write_Record
-     (Writer  : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
-      Item    : LAL.Defining_Name'Class;
-      Success : in out Boolean) is
+   procedure Write_Node
+     (Writer         : in out VSS.JSON.Content_Handlers
+                       .JSON_Content_Handler'Class;
+      Item           : LAL.Ada_Node'Class;
+      Success        : in out Boolean) is
       Location_Range : constant Source_Location_Range := LAL.Sloc_Range (Item);
-      File_Name : constant String := Item.Unit.Get_Filename;
+      File_Name      : constant String := Item.Unit.Get_Filename;
    begin
       Writer.Start_Array (Success);
       Writer.Start_Object (Success);
@@ -222,7 +271,7 @@ package body Output is
 
       Writer.End_Object (Success);
       Writer.End_Array (Success);
-   end Write_Record;
+   end Write_Node;
 
    -------------------
    -- Write_Warning --
@@ -236,16 +285,16 @@ package body Output is
       Writer.String_Value ("warning", Success);
    end Write_Warning;
 
-   -----------
-   -- Write --
-   -----------
+   -------------------
+   -- Write_Message --
+   -------------------
 
    procedure Write_Message
-     (Writer      : in out VSS.JSON.Content_Handlers.
+     (Writer       : in out VSS.JSON.Content_Handlers.
                            JSON_Content_Handler'Class;
-      Record_Name : LAL.Defining_Name'Class;
+      Record_Name  : LAL.Defining_Name'Class;
       Delete_Names : Defining_Name_Ordered_Sets.Set;
-      Success     : in out Boolean) is
+      Success      : in out Boolean) is
       Words : Unbounded_String := Null_Unbounded_String;
    begin
       Writer.Key_Name ("message", Success);
@@ -259,17 +308,35 @@ package body Output is
       Writer.String_Value (To_Virtual_String (Words), Success);
    end Write_Message;
 
+   -------------------
+   -- Write_Message --
+   -------------------
+
+   procedure Write_Message
+     (Writer         : in out VSS.JSON.Content_Handlers.
+                           JSON_Content_Handler'Class;
+      Aggregate_Node : LAL.Aggregate'Class;
+      Success        : in out Boolean) is
+      Words : Unbounded_String := Null_Unbounded_String;
+   begin
+      Writer.Key_Name ("message", Success);
+      Words := Words & "The Aggregate ";
+      Words := Words & Text.Image (Aggregate_Node.Text) &
+        " Array aggregate using () is an obsolescent syntax, use [] instead.";
+      Writer.String_Value (To_Virtual_String (Words), Success);
+   end Write_Message;
+
    -----------
    -- Write --
    -----------
 
    procedure Write
-     (Writer      : in out VSS.JSON.Content_Handlers.
+     (Writer       : in out VSS.JSON.Content_Handlers.
                            JSON_Content_Handler'Class;
-      Record_Name : LAL.Defining_Name'Class;
+      Record_Name  : LAL.Defining_Name'Class;
       Delete_Names : Defining_Name_Ordered_Sets.Set;
-      Item        : Text_Edit_Map;
-      Success     : in out Boolean) is
+      Item         : Text_Edit_Map;
+      Success      : in out Boolean) is
    begin
       Writer.Start_Object (Success);
 
@@ -282,9 +349,38 @@ package body Output is
       Write_Warning (Writer, Success);
       Writer.Key_Name ("locations", Success);
 
-      Write_Record (Writer, Record_Name, Success);
+      Write_Node (Writer, Record_Name.As_Ada_Node, Success);
 
       Write_Message (Writer, Record_Name, Delete_Names, Success);
+
+      Writer.End_Object (Success);
+   end Write;
+
+   -----------
+   -- Write --
+   -----------
+
+   procedure Write
+     (Writer         : in out VSS.JSON.Content_Handlers.
+                           JSON_Content_Handler'Class;
+      Aggregate_Node : LAL.Aggregate;
+      Item           : Text_Edit_Ordered_Set;
+      Success        : in out Boolean) is
+   begin
+      Writer.Start_Object (Success);
+
+      Writer.Key_Name ("children", Success);
+      Writer.Start_Array (Success);
+      Writer.End_Array (Success);
+
+      Write_Fixit (Writer, Aggregate_Node.Unit.Get_Filename, Item, Success);
+
+      Write_Warning (Writer, Success);
+      Writer.Key_Name ("locations", Success);
+
+      Write_Node (Writer, Aggregate_Node.As_Ada_Node, Success);
+
+      Write_Message (Writer, Aggregate_Node, Success);
 
       Writer.End_Object (Success);
    end Write;
@@ -293,9 +389,9 @@ package body Output is
    -- JSON_Serialize --
    --------------------
 
-   procedure JSON_Serialize (Edits_Info : Delete_Infos;
-                    Stream : in out VSS.Text_Streams.
-                      Memory_UTF8_Output.Memory_UTF8_Output_Stream) is
+   procedure JSON_Serialize
+     (Edits_Info : Delete_Infos;
+      Stream     : in out VSS.Text_Streams.Output_Text_Stream'Class) is
       Writer  : VSS.JSON.Push_Writers.JSON_Simple_Push_Writer;
       Success : Boolean := True;
    begin
@@ -304,12 +400,35 @@ package body Output is
       Writer.Start_Document (Success);
       Writer.Start_Array (Success);
       for Record_Node in Edits_Info.Texts_Edit.Iterate loop
-         Output.Write (Writer,
-                       Get_Record_Name (Record_Node.Key),
-                       Edits_Info.Deletable_Names (Get_Record_Name
-                         (Record_Node.Key)),
-                       Edits_Info.Texts_Edit (Record_Node),
-                       Success);
+         Write (Writer,
+                Get_Record_Name (Record_Node.Key),
+                Edits_Info.Deletable_Names (Get_Record_Name (Record_Node.Key)),
+                Edits_Info.Texts_Edit (Record_Node),
+                Success);
+      end loop;
+      Writer.End_Array (Success);
+      Writer.End_Document (Success);
+   end JSON_Serialize;
+
+   --------------------
+   -- JSON_Serialize --
+   --------------------
+
+   procedure JSON_Serialize
+     (Edits_Info : Aggregates_To_Edit_Text.Map;
+      Stream     : in out VSS.Text_Streams.Output_Text_Stream'Class) is
+      Writer  : VSS.JSON.Push_Writers.JSON_Simple_Push_Writer;
+      Success : Boolean := True;
+   begin
+      Writer.Set_Stream (Stream'Unchecked_Access);
+
+      Writer.Start_Document (Success);
+      Writer.Start_Array (Success);
+      for Aggregate_Node in Edits_Info.Iterate loop
+         Write (Writer,
+                Aggregate_Node.Key,
+                Edits_Info (Aggregate_Node),
+                Success);
       end loop;
       Writer.End_Array (Success);
       Writer.End_Document (Success);

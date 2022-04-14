@@ -1,0 +1,6 @@
+title: edit_one_element_aggregate
+
+description: edit aggregate with only one element, i.e. (xxx => v) => [v] or (v) => [v]
+
+driver: shell_script
+
