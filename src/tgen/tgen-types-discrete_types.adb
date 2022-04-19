@@ -90,9 +90,8 @@ package body TGen.Types.Discrete_Types is
         Positive (Rand_Int (1, Integer (S.Samples.Length)));
       Picked_Sample : constant Alternatives_Set :=
         S.Samples.Element (Picked_Index);
-      T_Classwide : Typ'Class := S.T.Get;
    begin
-      SP.From_Element (Result.T, T_Classwide'Unrestricted_Access);
+      Result.T := S.T;
       Result.Value := Draw (Picked_Sample);
       return Result;
    end Generate_Static_Value;
