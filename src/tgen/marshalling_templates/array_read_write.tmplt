@@ -7,7 +7,7 @@
    begin
       for @_GLOBAL_PREFIX_@_E of @_GLOBAL_PREFIX_@_V loop
          @_COMP_PREFIX_@_Write
-           (@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer,
+           (@_SCALAR_BOUNDS_@@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer,
             @_GLOBAL_PREFIX_@_Offset, @_GLOBAL_PREFIX_@_E);
       end loop;
    end @_TY_PREFIX_@_Write;
@@ -21,7 +21,7 @@
    begin
       for @_GLOBAL_PREFIX_@_E of @_GLOBAL_PREFIX_@_V loop
          @_COMP_PREFIX_@_Read
-           (@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer,
+           (@_SCALAR_BOUNDS_@@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer,
             @_GLOBAL_PREFIX_@_Offset, @_GLOBAL_PREFIX_@_E);
       end loop;
 

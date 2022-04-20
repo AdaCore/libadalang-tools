@@ -242,18 +242,19 @@ package body TAGAda_Marshalling_Lib is
       -- Local Subprograms --
       -----------------------
 
-      function Norm (V : T) return Long_Long_Long_Unsigned is
-        (Long_Long_Long_Unsigned'Val (T'Pos (V) - T'Pos (T'First)));
+      function Norm (V : T; F : T) return Long_Long_Long_Unsigned is
+        (Long_Long_Long_Unsigned'Val (T'Pos (V) - T'Pos (F)));
 
-      function Denorm (V : Long_Long_Long_Unsigned) return T'Base is
-        (T'Val (T'Pos (T'First) + Long_Long_Long_Unsigned'Pos (V)));
+      function Denorm (V : Long_Long_Long_Unsigned; F : T) return T'Base is
+        (T'Val (T'Pos (F) + Long_Long_Long_Unsigned'Pos (V)));
 
       -----------
       -- Size --
       -----------
 
-      function Size return Natural is
-         Max : Long_Long_Long_Unsigned := Norm (T'Last);
+      function Size return Natural
+      is
+         Max : Long_Long_Long_Unsigned := Norm (T'Last, T'First);
       begin
          for I in 0 .. 128 loop
             if Max = 0 then
@@ -269,15 +270,27 @@ package body TAGAda_Marshalling_Lib is
       -----------
 
       procedure Write
+        (First  : T;
+         Last   : T;
+         Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+         Buffer : in out Unsigned_8;
+         Offset : in out Offset_Type;
+         V      : T)
+      is
+         Max : constant Long_Long_Long_Unsigned := Norm (Last, First);
+         Val : constant Long_Long_Long_Unsigned := Norm (V, First);
+      begin
+         Write (Stream, Buffer, Offset, Max, Val);
+      end Write;
+
+      procedure Write
         (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
          V      : T)
       is
-         Max : constant Long_Long_Long_Unsigned := Norm (T'Last);
-         Val : constant Long_Long_Long_Unsigned := Norm (V);
       begin
-         Write (Stream, Buffer, Offset, Max, Val);
+         Write (T'First, T'Last, Stream, Buffer, Offset, V);
       end Write;
 
       ----------
@@ -285,22 +298,34 @@ package body TAGAda_Marshalling_Lib is
       ----------
 
       procedure Read
-        (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+        (First  : T;
+         Last   : T;
+         Stream : not null access Ada.Streams.Root_Stream_Type'Class;
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
          V      : out T)
       is
-         Max : constant Long_Long_Long_Unsigned := Norm (T'Last);
+         Max : constant Long_Long_Long_Unsigned := Norm (Last, First);
          Val : Long_Long_Long_Unsigned;
          R   : T'Base;
       begin
          Read (Stream, Buffer, Offset, Max, Val);
-         R := Denorm (Val);
+         R := Denorm (Val, First);
          if R not in T then
             raise Invalid_Value;
          else
             V := R;
          end if;
+      end Read;
+
+      procedure Read
+        (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+         Buffer : in out Unsigned_8;
+         Offset : in out Offset_Type;
+         V      : out T)
+      is
+      begin
+         Read (T'First, T'Last, Stream, Buffer, Offset, V);
       end Read;
 
    end Read_Write_Discrete;
@@ -316,18 +341,26 @@ package body TAGAda_Marshalling_Lib is
       --  'Fixed_Value. Use the longest possible integer in the architecture
       --  as a target (Long_Long_Long_Integer).
 
-      Int_First : constant Long_Long_Long_Integer :=
-        Long_Long_Long_Integer'Integer_Value (T'First);
-      Int_Last  : constant Long_Long_Long_Integer :=
-        Long_Long_Long_Integer'Integer_Value (T'Last);
-      subtype Integer_Value_Type is Long_Long_Long_Integer
-      range Int_First .. Int_Last;
-
-      package Impl is new Read_Write_Discrete (Integer_Value_Type);
+      package Impl is new Read_Write_Discrete (Long_Long_Long_Integer);
 
       -----------
       -- Write --
       -----------
+
+      procedure Write
+        (First  : T;
+         Last   : T;
+         Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+         Buffer : in out Unsigned_8;
+         Offset : in out Offset_Type;
+         V      : T)
+      is
+      begin
+         Impl.Write
+           (Long_Long_Long_Integer'Integer_Value (First),
+            Long_Long_Long_Integer'Integer_Value (Last),
+            Stream, Buffer, Offset, Long_Long_Long_Integer'Integer_Value (V));
+      end Write;
 
       procedure Write
         (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
@@ -336,8 +369,7 @@ package body TAGAda_Marshalling_Lib is
          V      : T)
       is
       begin
-         Impl.Write
-           (Stream, Buffer, Offset, Long_Long_Long_Integer'Integer_Value (V));
+         Write (T'First, T'Last, Stream, Buffer, Offset, V);
       end Write;
 
       ----------
@@ -345,19 +377,34 @@ package body TAGAda_Marshalling_Lib is
       ----------
 
       procedure Read
-        (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+        (First  : T;
+         Last   : T;
+         Stream : not null access Ada.Streams.Root_Stream_Type'Class;
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
          V      : out T)
       is
          R : Long_Long_Long_Integer;
       begin
-         Impl.Read (Stream, Buffer, Offset, R);
+         Impl.Read
+           (Long_Long_Long_Integer'Integer_Value (First),
+            Long_Long_Long_Integer'Integer_Value (Last),
+            Stream, Buffer, Offset, R);
          if T'Base'Fixed_Value (R) not in T then
             raise Invalid_Value;
          else
             V := T'Base'Fixed_Value (R);
          end if;
+      end Read;
+
+      procedure Read
+        (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+         Buffer : in out Unsigned_8;
+         Offset : in out Offset_Type;
+         V      : out T)
+      is
+      begin
+         Read (T'First, T'Last, Stream, Buffer, Offset, V);
       end Read;
 
    end Read_Write_Decimal_Fixed;
@@ -373,18 +420,26 @@ package body TAGAda_Marshalling_Lib is
       --  'Fixed_Value. Use the longest possible integer in the architecture
       --  as a target (Long_Long_Long_Integer).
 
-      Int_First : constant Long_Long_Long_Integer :=
-        Long_Long_Long_Integer'Integer_Value (T'First);
-      Int_Last  : constant Long_Long_Long_Integer :=
-        Long_Long_Long_Integer'Integer_Value (T'Last);
-      subtype Integer_Value_Type is Long_Long_Long_Integer
-      range Int_First .. Int_Last;
-
-      package Impl is new Read_Write_Discrete (Integer_Value_Type);
+      package Impl is new Read_Write_Discrete (Long_Long_Long_Integer);
 
       -----------
       -- Write --
       -----------
+
+      procedure Write
+        (First  : T;
+         Last   : T;
+         Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+         Buffer : in out Unsigned_8;
+         Offset : in out Offset_Type;
+         V      : T)
+      is
+      begin
+         Impl.Write
+           (Long_Long_Long_Integer'Integer_Value (First),
+            Long_Long_Long_Integer'Integer_Value (Last),
+            Stream, Buffer, Offset, Long_Long_Long_Integer'Integer_Value (V));
+      end Write;
 
       procedure Write
         (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
@@ -393,8 +448,7 @@ package body TAGAda_Marshalling_Lib is
          V      : T)
       is
       begin
-         Impl.Write
-           (Stream, Buffer, Offset, Long_Long_Long_Integer'Integer_Value (V));
+         Write (T'First, T'Last, Stream, Buffer, Offset, V);
       end Write;
 
       ----------
@@ -402,19 +456,34 @@ package body TAGAda_Marshalling_Lib is
       ----------
 
       procedure Read
-        (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+        (First  : T;
+         Last   : T;
+         Stream : not null access Ada.Streams.Root_Stream_Type'Class;
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
          V      : out T)
       is
          R : Long_Long_Long_Integer;
       begin
-         Impl.Read (Stream, Buffer, Offset, R);
+         Impl.Read
+           (Long_Long_Long_Integer'Integer_Value (First),
+            Long_Long_Long_Integer'Integer_Value (Last),
+            Stream, Buffer, Offset, R);
          if T'Base'Fixed_Value (R) not in T then
             raise Invalid_Value;
          else
             V := T'Base'Fixed_Value (R);
          end if;
+      end Read;
+
+      procedure Read
+        (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+         Buffer : in out Unsigned_8;
+         Offset : in out Offset_Type;
+         V      : out T)
+      is
+      begin
+         Read (T'First, T'Last, Stream, Buffer, Offset, V);
       end Read;
 
    end Read_Write_Ordinary_Fixed;
@@ -440,12 +509,21 @@ package body TAGAda_Marshalling_Lib is
             when 64     => Extended,
             when others => raise Program_Error);
 
+      -----------
+      -- Write --
+      -----------
+
       procedure Write
-        (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+        (First  : T;
+         Last   : T;
+         Stream : not null access Ada.Streams.Root_Stream_Type'Class;
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
          V      : T)
       is
+         pragma Unreferenced (First, Last);
+         --  Bounds cannot easily be taken into account for floating point
+         --  types. They are ignored.
       begin
          case Get_Precision is
             when Single =>
@@ -489,12 +567,30 @@ package body TAGAda_Marshalling_Lib is
          end case;
       end Write;
 
-      procedure Read
+      procedure Write
         (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+         Buffer : in out Unsigned_8;
+         Offset : in out Offset_Type;
+         V      : T)
+      is
+      begin
+         Write (T'First, T'Last, Stream, Buffer, Offset, V);
+      end Write;
+
+      ----------
+      -- Read --
+      ----------
+
+      procedure Read
+        (First  : T;
+         Last   : T;
+         Stream : not null access Ada.Streams.Root_Stream_Type'Class;
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
          V      : out T)
       is
+         --  Bounds cannot easily be taken into account for floating point
+         --  types. We use saturation to get valid values.
       begin
          case Get_Precision is
             when Single =>
@@ -505,13 +601,32 @@ package body TAGAda_Marshalling_Lib is
                     Long_Long_Long_Unsigned (Unsigned_32'Last);
                   Bits : Long_Long_Long_Unsigned;
                   V_F  : Float;
+                  V_B  : T'Base;
+
                begin
                   Read (Stream, Buffer, Offset, Max, Bits);
                   V_F := From_Bits (Unsigned_32 (Bits));
-                  if not V_F'Valid or else T'Base (V_F) not in T then
+
+                  --  Reject invalid floating point values (Nan and infinities)
+                  --  ??? Do we want to support them?
+
+                  if not V_F'Valid then
+                     raise Invalid_Value;
+
+                  --  Check for out-of-bounds values and apply saturation
+
+                  elsif  V_F < Float (First) then
+                     V_B := First;
+                  elsif V_F > Float (Last) then
+                     V_B := Last;
+                  else
+                     V_B := T'Base (V_F);
+                  end if;
+
+                  if V_B not in T then
                      raise Invalid_Value;
                   else
-                     V := T'Base (V_F);
+                     V := V_B;
                   end if;
                end;
 
@@ -523,13 +638,32 @@ package body TAGAda_Marshalling_Lib is
                     Long_Long_Long_Unsigned (Unsigned_64'Last);
                   Bits : Long_Long_Long_Unsigned;
                   V_F  : Long_Float;
+                  V_B  : T'Base;
+
                begin
                   Read (Stream, Buffer, Offset, Max, Bits);
                   V_F := From_Bits (Unsigned_64 (Bits));
-                  if not V_F'Valid or else T'Base (V_F) not in T then
+
+                  --  Reject invalid floating point values (Nan and infinities)
+                  --  ??? Do we want to support them?
+
+                  if not V_F'Valid then
+                     raise Invalid_Value;
+
+                  --  Check for out-of-bounds values and apply saturation
+
+                  elsif  V_F < Long_Float (First) then
+                     V_B := First;
+                  elsif V_F > Long_Float (Last) then
+                     V_B := Last;
+                  else
+                     V_B := T'Base (V_F);
+                  end if;
+
+                  if V_B not in T then
                      raise Invalid_Value;
                   else
-                     V := T'Base (V_F);
+                     V := V_B;
                   end if;
                end;
 
@@ -541,16 +675,45 @@ package body TAGAda_Marshalling_Lib is
                     Long_Long_Long_Unsigned (Unsigned_128'Last);
                   Bits : Long_Long_Long_Unsigned;
                   V_F  : Long_Long_Float;
+                  V_B  : T'Base;
+
                begin
                   Read (Stream, Buffer, Offset, Max, Bits);
                   V_F := From_Bits (Unsigned_128 (Bits));
-                  if not V_F'Valid or else T'Base (V_F) not in T then
+
+                  --  Reject invalid floating point values (Nan and infinities)
+                  --  ??? Do we want to support them?
+
+                  if not V_F'Valid then
+                     raise Invalid_Value;
+
+                  --  Check for out-of-bounds values and apply saturation
+
+                  elsif  V_F < Long_Long_Float (First) then
+                     V_B := First;
+                  elsif V_F > Long_Long_Float (Last) then
+                     V_B := Last;
+                  else
+                     V_B := T'Base (V_F);
+                  end if;
+
+                  if V_B not in T then
                      raise Invalid_Value;
                   else
-                     V := T'Base (V_F);
+                     V := V_B;
                   end if;
                end;
          end case;
+      end Read;
+
+      procedure Read
+        (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+         Buffer : in out Unsigned_8;
+         Offset : in out Offset_Type;
+         V      : out T)
+      is
+      begin
+         Read (T'First, T'Last, Stream, Buffer, Offset, V);
       end Read;
 
    end Read_Write_Float;

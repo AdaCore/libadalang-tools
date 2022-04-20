@@ -30,6 +30,8 @@ with Ada.Strings.Fixed;            use Ada.Strings.Fixed;
 with Ada.Strings.Hash;
 with Ada.Strings.Unbounded;        use Ada.Strings.Unbounded;
 
+with Langkit_Support.Text;         use Langkit_Support.Text;
+
 with Templates_Parser;             use Templates_Parser;
 
 with TGen.Strings;                 use TGen.Strings;
@@ -91,7 +93,12 @@ package body TGen.Marshalling is
    --  unconstrained arrays, and discriminants of unconstrained types with
    --  immutable discriminants).
 
-   function Create_Tag_For_Constraints
+   function Create_Tag_For_Component_Bounds
+     (Comp_Ty   : TGen.Types.Typ'Class; Type_Name : String) return String;
+   --  Create a string containing the additional parameters for the first and
+   --  last bounds of constrained anonymous scalar component types.
+
+   function Create_Tag_For_Header
      (Typ : TGen.Types.Typ'Class; Header_Name : String) return Tag;
    --  Return as a tag the constraints from the header Header_Name for type
    --  Typ.
@@ -114,11 +121,60 @@ package body TGen.Marshalling is
    --  to avoid generating them twice.
    --  If For_Base is True, generate the functions for Typ'Base.
 
-   --------------------------------
-   -- Create_Tag_For_Constraints --
-   --------------------------------
+   -------------------------------------
+   -- Create_Tag_For_Component_Bounds --
+   -------------------------------------
 
-   function Create_Tag_For_Constraints
+   function Create_Tag_For_Component_Bounds
+     (Comp_Ty   : TGen.Types.Typ'Class; Type_Name : String) return String
+   is
+      Constraint : Constraint_Acc;
+   begin
+      --  Nothing to do for named types and anonymous composite types
+
+      if Comp_Ty not in Anonymous_Typ'Class
+        or else Anonymous_Typ'Class (Comp_Ty).Named_Ancestor.Get in
+        Composite_Typ'Class
+      then
+         return "";
+      end if;
+
+      Constraint := Anonymous_Typ'Class (Comp_Ty).Subtype_Constraints;
+
+      if Constraint = null then
+         return "";
+      elsif Constraint.all in Discrete_Range_Constraint'Class then
+         declare
+            D_Constr : constant Discrete_Range_Constraint'Class :=
+              Discrete_Range_Constraint'Class (Constraint.all);
+
+            function Bound_To_String
+              (C     : Discrete_Constraint_Value;
+               Bound : String) return String
+            is
+              (case C.Kind is
+                  when Static       => Trim (To_String (C.Int_Val), Left),
+                  when Discriminant => raise Program_Error,
+                  --  Discriminant cannot constrain scalar type
+                  when Non_Static   => Type_Name & "'" & Bound);
+                  --  For now, use the bounds of the type for non-static
+                  --  constraints. We can do better when non-static constraints
+                  --  are stored in some way during the type translation.
+
+         begin
+            return Bound_To_String (D_Constr.Low_Bound, "First") & ", "
+              & Bound_To_String (D_Constr.High_Bound, "Last")  & ", ";
+         end;
+      else
+         raise Program_Error;
+      end if;
+   end Create_Tag_For_Component_Bounds;
+
+   ---------------------------
+   -- Create_Tag_For_Header --
+   ---------------------------
+
+   function Create_Tag_For_Header
      (Typ : TGen.Types.Typ'Class; Header_Name : String) return Tag
    is
       Constraints_Tag : Tag;
@@ -173,7 +229,7 @@ package body TGen.Marshalling is
       end if;
 
       return Constraints_Tag;
-   end Create_Tag_For_Constraints;
+   end Create_Tag_For_Header;
 
    ------------------------------
    -- Create_Tag_For_Intervals --
@@ -230,11 +286,13 @@ package body TGen.Marshalling is
         (if For_Base then B_Name & "'Base" else B_Name);
 
       procedure Collect_Info_For_Components
-        (Components    : Component_Maps.Map;
-         Comp_Name_Tag : in out Vector_Tag;
-         Comp_Pref_Tag : in out Vector_Tag);
+        (Components      : Component_Maps.Map;
+         Comp_Name_Tag   : in out Vector_Tag;
+         Comp_Pref_Tag   : in out Vector_Tag;
+         Comp_Bounds_Tag : in out Vector_Tag);
          --  Go over the components in Components and fill the associations for
-         --  the components names and prefixes in the tags given as parameters.
+         --  the components names, prefixes, and potentially scalar constraints
+         --  in the tags given as parameters.
          --  Along the way, generate base functions for the component types.
 
       function Variant_Part_To_String
@@ -249,9 +307,10 @@ package body TGen.Marshalling is
       ---------------------------------
 
       procedure Collect_Info_For_Components
-        (Components    : Component_Maps.Map;
-         Comp_Name_Tag : in out Vector_Tag;
-         Comp_Pref_Tag : in out Vector_Tag)
+        (Components      : Component_Maps.Map;
+         Comp_Name_Tag   : in out Vector_Tag;
+         Comp_Pref_Tag   : in out Vector_Tag;
+         Comp_Bounds_Tag : in out Vector_Tag)
       is
       begin
          --  Go over the record component to fill the associations
@@ -267,10 +326,14 @@ package body TGen.Marshalling is
                Comp_Name     : constant String := +Component_Maps.Key (Cu);
                Comp_Prefix   : constant String :=
                  Prefix_For_Typ (Named_Comp_Ty.Type_Name);
+               Comp_Bounds   : constant String :=
+                 Create_Tag_For_Component_Bounds
+                   (Comp_Ty, Named_Comp_Ty.Type_Name);
             begin
                Generate_Base_Functions_For_Typ (F, Named_Comp_Ty);
                Comp_Name_Tag := Comp_Name_Tag & Comp_Name;
                Comp_Pref_Tag := Comp_Pref_Tag & Comp_Prefix;
+               Comp_Bounds_Tag := Comp_Bounds_Tag & Comp_Bounds;
             end;
          end loop;
       end Collect_Info_For_Components;
@@ -291,6 +354,7 @@ package body TGen.Marshalling is
          Choices_Tag      : Matrix_Tag;
          Comp_Pref_Tag    : Matrix_Tag;
          Comp_Name_Tag    : Matrix_Tag;
+         Comp_Bounds_Tag  : Matrix_Tag;
          Variant_Part_Tag : Vector_Tag;
       begin
          for V_Choice of V.Variant_Choices loop
@@ -299,13 +363,15 @@ package body TGen.Marshalling is
                 (V_Choice.Alt_Set, Discr_Typ);
 
             declare
-               Prefs : Tag;
-               Names : Tag;
+               Prefs  : Tag;
+               Names  : Tag;
+               Bounds : Tag;
             begin
                Collect_Info_For_Components
-                 (V_Choice.Components, Names, Prefs);
+                 (V_Choice.Components, Names, Prefs, Bounds);
                Comp_Pref_Tag := Comp_Pref_Tag & Prefs;
                Comp_Name_Tag := Comp_Name_Tag & Names;
+               Comp_Bounds_Tag := Comp_Bounds_Tag & Bounds;
             end;
 
             if V_Choice.Variant = null then
@@ -323,15 +389,16 @@ package body TGen.Marshalling is
 
          declare
             Assocs       : constant Translate_Table :=
-              [1 => Assoc ("OBJECT_NAME", "@_OBJECT_NAME_@"),
-               2 => Assoc ("DISCR_NAME", Discr_Name),
-               3 => Assoc ("GLOBAL_PREFIX", Global_Prefix),
-               4 => Assoc ("CHOICES", Choices_Tag),
-               5 => Assoc ("COMP_PREFIX", Comp_Pref_Tag),
-               6 => Assoc ("COMP_NAME", Comp_Name_Tag),
-               7 => Assoc ("VARIANT_PART", Variant_Part_Tag),
-               8 => Assoc ("SPACING", [1 .. Spacing => ' ']),
-               9 => Assoc ("ACTION", "@_ACTION_@")];
+              [1  => Assoc ("OBJECT_NAME", "@_OBJECT_NAME_@"),
+               2  => Assoc ("DISCR_NAME", Discr_Name),
+               3  => Assoc ("GLOBAL_PREFIX", Global_Prefix),
+               4  => Assoc ("CHOICES", Choices_Tag),
+               5  => Assoc ("COMP_PREFIX", Comp_Pref_Tag),
+               6  => Assoc ("COMP_NAME", Comp_Name_Tag),
+               7  => Assoc ("SCALAR_BOUNDS", Comp_Bounds_Tag),
+               8  => Assoc ("VARIANT_PART", Variant_Part_Tag),
+               9  => Assoc ("SPACING", [1 .. Spacing => ' ']),
+               10 => Assoc ("ACTION", "@_ACTION_@")];
 
          begin
             return Parse (Variant_Part_Template, Assocs);
@@ -391,11 +458,15 @@ package body TGen.Marshalling is
                else Comp_Ty);
             Comp_Prefix   : constant String :=
               Prefix_For_Typ (Named_Comp_Ty.Type_Name);
+            Comp_Bounds   : constant String :=
+              Create_Tag_For_Component_Bounds
+                (Comp_Ty, Named_Comp_Ty.Type_Name);
             Assocs        : constant Translate_Table :=
               [1 => Assoc ("TY_NAME", Ty_Name),
                2 => Assoc ("TY_PREFIX", Ty_Prefix),
                3 => Assoc ("GLOBAL_PREFIX", Global_Prefix),
-               4 => Assoc ("COMP_PREFIX", Comp_Prefix)];
+               4 => Assoc ("COMP_PREFIX", Comp_Prefix),
+               5 => Assoc ("SCALAR_BOUNDS", Comp_Bounds)];
 
          begin
             --  Generate the base function of the component
@@ -412,14 +483,16 @@ package body TGen.Marshalling is
          pragma Assert (Typ in Record_Typ'Class);
 
          declare
-            Comp_Name_Tag : Tag;
-            Comp_Pref_Tag : Tag;
+            Comp_Name_Tag   : Tag;
+            Comp_Pref_Tag   : Tag;
+            Comp_Bounds_Tag : Tag;
 
          begin
             Collect_Info_For_Components
               (Record_Typ'Class (Typ).Component_Types,
                Comp_Name_Tag,
-               Comp_Pref_Tag);
+               Comp_Pref_Tag,
+               Comp_Bounds_Tag);
 
             declare
                Variant_Part  : constant String :=
@@ -445,8 +518,9 @@ package body TGen.Marshalling is
                   3 => Assoc ("GLOBAL_PREFIX", Global_Prefix),
                   4 => Assoc ("COMP_NAME", Comp_Name_Tag),
                   5 => Assoc ("COMP_PREFIX", Comp_Pref_Tag),
-                  6 => Assoc ("VARIANT_READ", Variant_Read),
-                  7 => Assoc ("VARIANT_WRITE", Variant_Write)];
+                  6 => Assoc ("SCALAR_BOUNDS", Comp_Bounds_Tag),
+                  7 => Assoc ("VARIANT_READ", Variant_Read),
+                  8 => Assoc ("VARIANT_WRITE", Variant_Write)];
 
             begin
                Put_Line (F, Parse (Record_Read_Write_Template, Assocs));
@@ -608,7 +682,7 @@ package body TGen.Marshalling is
          7 => Assoc ("HEADER_PREFIX", Header_Prefix),
          8 => Assoc ("HEADER_NAME", Header_Name),
          9 => Assoc
-           ("CONSTRAINTS", Create_Tag_For_Constraints (Typ, Header_Name))];
+           ("CONSTRAINTS", Create_Tag_For_Header (Typ, Header_Name))];
 
    begin
       --  Generate the base functions for Typ
@@ -729,15 +803,18 @@ package body TGen.Marshalling is
 
          return True;
       elsif Typ in Anonymous_Typ'Class then
-         if Anonymous_Typ'Class (Typ).Named_Ancestor.Get not in
-           Composite_Typ'Class
-         then
-            Ada.Text_IO.Put_Line ("scalar constraints");
+
+         --  We don't support real constraints yet, as they are (incorrectly)
+         --  handled using Long_Float by libadalang.
+
+         if Anonymous_Typ'Class (Typ).Named_Ancestor.Get in Real_Typ'Class then
+            Ada.Text_IO.Put_Line ("real constraints");
             return False;
          else
             return Is_Supported_Type
               (Anonymous_Typ'Class (Typ).Named_Ancestor.Get);
          end if;
+
       else
          Ada.Text_IO.Put_Line (Typ.Image);
          Ada.Text_IO.Put_Line (Kind (Typ)'Image);

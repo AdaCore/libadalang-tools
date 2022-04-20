@@ -7,7 +7,7 @@
 @@TABLE@@
 @@IF@@ @_COMP_PREFIX_@ /= ""
 @_SPACING_@     @_COMP_PREFIX_@_@_ACTION_@
-@_SPACING_@       (@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer,
+@_SPACING_@       (@_SCALAR_BOUNDS_@@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer,
 @_SPACING_@        @_GLOBAL_PREFIX_@_Offset, @_GLOBAL_PREFIX_@_V.@_COMP_NAME_@);
 @@END_IF@@
 @@END_TABLE@@

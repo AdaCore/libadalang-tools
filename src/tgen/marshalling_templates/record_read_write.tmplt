@@ -7,7 +7,7 @@
    begin
 @@TABLE@@
       @_COMP_PREFIX_@_Write
-        (@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer,
+        (@_SCALAR_BOUNDS_@@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer,
          @_GLOBAL_PREFIX_@_Offset, @_GLOBAL_PREFIX_@_V.@_COMP_NAME_@);
 @@END_TABLE@@
 @@IF@@ @_VARIANT_WRITE_@ /= ""
@@ -24,7 +24,7 @@
    begin
 @@TABLE@@
       @_COMP_PREFIX_@_Read
-        (@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer,
+        (@_SCALAR_BOUNDS_@@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer,
          @_GLOBAL_PREFIX_@_Offset, @_GLOBAL_PREFIX_@_V.@_COMP_NAME_@);
 @@END_TABLE@@
 @@IF@@ @_VARIANT_READ_@ /= ""
