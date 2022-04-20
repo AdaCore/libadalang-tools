@@ -147,7 +147,9 @@ package body TGen.Marshalling is
             end loop;
          end;
 
-      --  Discriminants are not supported yet
+      --  For discriminants we generate:
+      --
+      --    (Discr_Name => Header_Name.Discr_Name, ..)
 
       else
          declare
@@ -180,7 +182,6 @@ package body TGen.Marshalling is
    function Create_Tag_For_Intervals
      (Intervals : Alternatives_Set; Typ : TGen.Types.Typ'Class) return Tag
    is
-      Ty_Name : constant String := Typ.Type_Name;
 
       function String_Value (V : TGen.Types.Big_Integer) return String;
       --  Get a string for the value at position V in Typ
@@ -191,11 +192,8 @@ package body TGen.Marshalling is
 
       function String_Value (V : TGen.Types.Big_Integer) return String is
       begin
-         --  For now, generate Typ'Val (V) for enumerations. We might be able
-         --  to use Lit_Image when it is more reliable.
-
          if Typ in Enum_Typ'Class then
-            return Ty_Name & "'Val (" & Trim (To_String (V), Left) & ")";
+            return Lit_Image (Enum_Typ'Class (Typ), V);
          else
             return Trim (To_String (V), Left);
          end if;
