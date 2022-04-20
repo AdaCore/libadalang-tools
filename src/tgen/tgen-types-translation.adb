@@ -653,16 +653,117 @@ package body TGen.Types.Translation is
      (Decl      : Base_Type_Decl;
       Type_Name : Defining_Name) return Translation_Result
    is
+      Delta_Val  : Long_Float;
+      Digits_Val : Natural;
+      Has_Range  : Boolean;
+
+      Range_Min, Range_Max : Long_Float;
+
+      procedure Find_Digits (Decl : Base_Type_Decl; Digits_Val : out Natural);
+
+      procedure Find_Delta (Decl : Base_Type_Decl; Delta_Val : out Long_Float);
+
+      -----------------
+      -- Find_Digits --
+      -----------------
+
+      procedure Find_Digits (Decl : Base_Type_Decl; Digits_Val : out Natural)
+      is
+         Parent_Subtype : Subtype_Indication;
+      begin
+         case Kind (Decl) is
+            when Ada_Type_Decl_Range =>
+               if Kind (Decl.As_Type_Decl.F_Type_Def)
+                    in Ada_Decimal_Fixed_Point_Def_Range
+               then
+                  --  Simply translate the Digits value
+                  Digits_Val := Natural'Value
+                    (New_Eval_As_Int
+                       (Decl.As_Type_Decl.F_Type_Def.As_Decimal_Fixed_Point_Def
+                        .F_Digits).Image);
+                  return;
+               elsif Kind (Decl.As_Type_Decl.F_Type_Def)
+                       in Ada_Derived_Type_Def_Range
+               then
+                  Parent_Subtype :=
+                     Decl.As_Type_Decl.F_Type_Def.As_Derived_Type_Def
+                     .F_Subtype_Indication;
+               else
+                  raise Translation_Error with
+                    "Unexpected kind for a type def translating a decimal"
+                    & " fixed point type: "
+                    & Kind_Name (Decl.As_Type_Decl.F_Type_Def);
+               end if;
+            when Ada_Subtype_Decl_Range =>
+               Parent_Subtype := Decl.As_Subtype_Decl.F_Subtype;
+            when others =>
+               raise Translation_Error with
+                 "unexpected kind for a decimal fixed point declaration:"
+                 & Kind_Name (Decl);
+         end case;
+         if Is_Null (Parent_Subtype.F_Constraint)
+           or else not (Kind (Parent_Subtype.F_Constraint)
+                          in Ada_Digits_Constraint_Range)
+         then
+            Find_Digits (Parent_Subtype.P_Designated_Type_Decl, Digits_Val);
+            return;
+         end if;
+
+         --  Constraints are a digits contraint from this point on
+         Digits_Val := Natural'Value
+           (New_Eval_As_Int
+              (Parent_Subtype.F_Constraint.As_Digits_Constraint.F_Digits)
+              .Image);
+      end Find_Digits;
+
+      ----------------
+      -- Find_Delta --
+      ----------------
+
+      procedure Find_Delta (Decl : Base_Type_Decl; Delta_Val : out Long_Float)
+      is
+         --  There can be no delta constraints on a decimal fixed point type
+         --  as per RM J.3 (5) so lets work on the type definition directly.
+
+         Root_Typ : constant Type_Decl := Decl.P_Root_Type.As_Type_Decl;
+         Eval_Res : constant Eval_Result :=
+           Expr_Eval (Root_Typ.F_Type_Def.As_Decimal_Fixed_Point_Def.F_Delta);
+      begin
+         if Eval_Res.Kind /= Real then
+            raise Translation_Error with
+              "Evalutation of delta value for a decimal fixed point did not"
+              & " return a real type";
+         end if;
+         Delta_Val := Eval_Res.Real_Result;
+      end Find_Delta;
+
    begin
-      --  ??? Actually implement this, should be similar to Ordinary
-      --  fixed points
-      return Res : Translation_Result (Success => True) do
-         Res.Res.Set
-           (Decimal_Fixed_Typ'(Is_Static => False,
-                               Has_Range => False,
-                               Name      =>
-                                 To_Qualified_Name (Type_Name.F_Name)));
-      end return;
+      Find_Delta (Decl, Delta_Val);
+      Find_Digits (Decl, Digits_Val);
+      Translate_Float_Range (Decl, Has_Range, Range_Min, Range_Max);
+      if Has_Range then
+         return Res : Translation_Result (Success => True) do
+            Res.Res.Set
+            (Decimal_Fixed_Typ'(Is_Static    => True,
+                                Has_Range    => True,
+                                Digits_Value => Digits_Val,
+                                Delta_Value  => Delta_Val,
+                                Range_Value  =>
+                                  (Min => Range_Min, Max => Range_Max),
+                                Name         =>
+                                  To_Qualified_Name (Type_Name.F_Name)));
+         end return;
+      else
+         return Res : Translation_Result (Success => True) do
+            Res.Res.Set
+            (Decimal_Fixed_Typ'(Is_Static    => True,
+                                Has_Range    => False,
+                                Digits_Value => Digits_Val,
+                                Delta_Value  => Delta_Val,
+                                Name         =>
+                                  To_Qualified_Name (Type_Name.F_Name)));
+         end return;
+      end if;
    end Translate_Decimal_Fixed_Decl;
 
    ---------------------------
@@ -688,6 +789,10 @@ package body TGen.Types.Translation is
             when Ada_Ordinary_Fixed_Point_Def_Range =>
                Range_Spec_Val :=
                  Decl.As_Type_Decl.F_Type_Def.As_Ordinary_Fixed_Point_Def
+                   .F_Range;
+            when Ada_Decimal_Fixed_Point_Def_Range =>
+               Range_Spec_Val :=
+                 Decl.As_Type_Decl.F_Type_Def.As_Decimal_Fixed_Point_Def
                    .F_Range;
             when others =>
                raise Translation_Error

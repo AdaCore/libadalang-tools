@@ -161,4 +161,95 @@ package body TGen.Types.Real_Types is
       return Strat;
    end Generate_Static;
 
+   function LLI_Gen is new GNAT.Random_Numbers.Random_Discrete
+     (Long_Long_Integer, 1);
+
+   function Generate_Ordinary_Fixed_Typ
+     (Ty : Typ'Class) return Static_Value'Class;
+
+   function Generate_Decimal_Fixed_Typ
+     (Ty : Typ'Class) return Static_Value'Class;
+
+   ---------------------------------
+   -- Generate_Ordinary_Fixed_Typ --
+   ---------------------------------
+
+   function Generate_Ordinary_Fixed_Typ
+     (Ty : Typ'Class) return Static_Value'Class
+   is
+      Self : constant Ordinary_Fixed_Typ := Ordinary_Fixed_Typ (Ty);
+      High_Bound : constant Long_Long_Integer :=
+        Long_Long_Integer (Self.Range_Value.Max / Self.Delta_Value);
+      Low_Bound  : constant Long_Long_Integer :=
+        Long_Long_Integer (Self.Range_Value.Min / Self.Delta_Value);
+
+      Rand_Val : constant Long_Long_Integer :=
+        LLI_Gen (Generator_Instance, Low_Bound, High_Bound);
+   begin
+      return Base_Static_Value'
+        (Value => +(
+           Long_Float'Image (Self.Delta_Value)
+           & " * "
+           & (if Rand_Val >= 0
+              then Rand_Val'Image
+              else "(" & Rand_Val'Image & ")")));
+   end Generate_Ordinary_Fixed_Typ;
+
+   --------------------------------
+   -- Generate_Decimal_Fixed_Typ --
+   --------------------------------
+
+   function Generate_Decimal_Fixed_Typ
+     (Ty : Typ'Class) return Static_Value'Class
+   is
+      Self : constant Decimal_Fixed_Typ := Decimal_Fixed_Typ (Ty);
+
+      --  TODO: Using High/Low_Bound_Or_Default ignores the digits value, which
+      --  may not play nice with the digits value if it is too low. We may need
+      --  to generate some "sparse" integer ranges to ensure we do not go
+      --  beyond the specified precision.
+
+      High_Bound : constant Long_Long_Integer :=
+        Long_Long_Integer (Self.High_Bound_Or_Default / Self.Delta_Value);
+      Low_Bound  : constant Long_Long_Integer :=
+        Long_Long_Integer (Self.Low_Bound_Or_Default / Self.Delta_Value);
+
+      Rand_Val : constant Long_Long_Integer :=
+        LLI_Gen (Generator_Instance, Low_Bound, High_Bound);
+   begin
+      return Base_Static_Value'
+        (Value => +(
+           Long_Float'Image (Self.Delta_Value)
+           & " * "
+           & (if Rand_Val >= 0
+              then Rand_Val'Image
+              else "(" & Rand_Val'Image & ")")));
+   end Generate_Decimal_Fixed_Typ;
+
+   overriding function Generate_Static
+     (Self    : Ordinary_Fixed_Typ;
+      Context : in out Generation_Context) return Static_Strategy_Type'Class
+   is
+      Type_Ref : SP.Ref;
+      Strat    : Basic_Static_Strategy_Type;
+   begin
+      SP.From_Element (Type_Ref, Self'Unrestricted_Access);
+      Strat.T := Type_Ref;
+      Strat.F := Generate_Ordinary_Fixed_Typ'Access;
+      return Strat;
+   end Generate_Static;
+
+   overriding function Generate_Static
+     (Self    : Decimal_Fixed_Typ;
+      Context : in out Generation_Context) return Static_Strategy_Type'Class
+   is
+      Type_Ref : SP.Ref;
+      Strat    : Basic_Static_Strategy_Type;
+   begin
+      SP.From_Element (Type_Ref, Self'Unrestricted_Access);
+      Strat.T := Type_Ref;
+      Strat.F := Generate_Decimal_Fixed_Typ'Access;
+      return Strat;
+   end Generate_Static;
+
 end TGen.Types.Real_Types;

@@ -110,6 +110,11 @@ package TGen.Types.Real_Types is
      (Self.Is_Static);
    --  Wether values for this Typ can be statically generated
 
+   overriding function Generate_Static
+     (Self    : Ordinary_Fixed_Typ;
+      Context : in out Generation_Context) return Static_Strategy_Type'Class;
+   --  Generate a strategy to statically generate (in one pass) values for Self
+
    function Low_Bound_Or_Default (Self : Ordinary_Fixed_Typ) return Long_Float
    with Pre => Self.Is_Static;
    --  Return the low bound for Self if it has one explicitly defined, or
@@ -151,6 +156,10 @@ package TGen.Types.Real_Types is
    function Supports_Static_Gen (Self : Decimal_Fixed_Typ) return Boolean is
      (Self.Is_Static);
    --  Wether values for this Typ can be statically generated
+
+   overriding function Generate_Static
+     (Self    : Decimal_Fixed_Typ;
+      Context : in out Generation_Context) return Static_Strategy_Type'Class;
 
    function Image (Self : Decimal_Fixed_Typ) return String;
 
