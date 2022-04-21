@@ -4,12 +4,12 @@ test.adb
 with Ada.Numerics.Elementary_Functions;
 
 2:45-2:58 
-is
-use Ada.Numerics.Elementary_Functions;
+   is
+      use Ada.Numerics.Elementary_Functions;
 
-begin
-   return Ada.Numerics.Elementary_Functions.Log (10.0) > 5.0;
-end Baz;
+   begin
+      return Ada.Numerics.Elementary_Functions.Log (10.0) > 5.0;
+   end Baz;
 
 
 test-baz.adb

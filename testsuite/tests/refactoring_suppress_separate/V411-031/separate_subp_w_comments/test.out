@@ -3,8 +3,12 @@ a.adb
 1:1-1:1 
 
 2:15-2:28 
-   is begin
+   is
+      --  comment
+   begin
+      --  comment
       null;
+      --  comment
    end;
 
 

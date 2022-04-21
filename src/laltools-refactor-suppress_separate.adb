@@ -173,6 +173,8 @@ package body Laltools.Refactor.Suppress_Separate is
       Separate_Body      : Basic_Decl := No_Basic_Decl;
       Separate_Stub_Spec : Subp_Spec  := No_Subp_Spec;
 
+      Indentation : Natural := 0;
+
       Missing_With_Clauses : Compilation_Unit_Set;
       Missing_Used_Clauses : Compilation_Unit_Set;
 
@@ -312,34 +314,107 @@ package body Laltools.Refactor.Suppress_Separate is
       New_Text_Slocs.End_Line     := Separate_Stub.Sloc_Range.End_Line;
       New_Text_Slocs.End_Column   := Separate_Stub.Sloc_Range.End_Column;
 
+      Indentation := Natural (Separate_Stub_Spec.Sloc_Range.Start_Column - 1);
+
       --  Declarative Part
       New_Text := Null_Unbounded_Wide_Wide_String;
       Append (New_Text, Chars.LF);
-      Append (New_Text, "is");
-      Append (New_Text, Chars.LF);
+      Append (New_Text, Indentation * " " & "is");
+      if not Missing_Used_Clauses.Is_Empty then
+         Append (New_Text, Chars.LF);
+      end if;
       for C_Unit of Missing_Used_Clauses loop
-         Append (New_Text, "use ");
+         Append (New_Text, 2 * Indentation * " " & "use ");
          Append
            (New_Text,
             C_Unit.P_Top_Level_Decl (C_Unit.Unit).P_Fully_Qualified_Name);
          Append (New_Text, ";");
          Append (New_Text, Chars.LF);
       end loop;
-      Append (New_Text, Separate_Body.As_Subp_Body.F_Decls.Text);
-      Append (New_Text, Chars.LF);
 
-      --  Statements
-      Append (New_Text, "begin");
-      Append (New_Text, Chars.LF);
-      Append (New_Text, "   ");
-      Append (New_Text, Separate_Body.As_Subp_Body.F_Stmts.Text);
-      Append (New_Text, Chars.LF);
+      declare
+         Subp_Body_Sloc_Range : constant Source_Location_Range :=
+           Separate_Body.As_Subp_Body.Sloc_Range;
+         Decls_Sloc_Range     : constant Source_Location_Range :=
+           Separate_Body.As_Subp_Body.F_Decls.Sloc_Range;
 
-      Append (New_Text, "end ");
-      Append (New_Text,
-              Separate_Body.As_Subp_Body.F_Subp_Spec.F_Subp_Name.Text);
-      Append (New_Text, ";");
-      Append (New_Text, Chars.LF);
+      begin
+         if Decls_Sloc_Range.Start_Line = Subp_Body_Sloc_Range.End_Line then
+            declare
+               Line  : constant Text_Type :=
+                 Separate_Body.Unit.Get_Line
+                   (Positive (Decls_Sloc_Range.Start_Line));
+               Slice : constant Text_Type :=
+                 Line (Line'First
+                         + Positive (Decls_Sloc_Range.Start_Column) - 1
+                       .. Line'First
+                            + Positive (Subp_Body_Sloc_Range.End_Column) - 2);
+
+            begin
+               Append (New_Text, Indentation * " " & Slice & Chars.LF);
+            end;
+
+         elsif Subp_Body_Sloc_Range.End_Line =
+                 Decls_Sloc_Range.Start_Line + 1
+         then
+            declare
+               Start_Line  : constant Text_Type :=
+                 Separate_Body.Unit.Get_Line
+                   (Positive (Decls_Sloc_Range.Start_Line));
+               Start_Slice : constant Text_Type :=
+                 Start_Line (Start_Line'First
+                             + Positive (Decls_Sloc_Range.Start_Column) - 1 ..
+                             Start_Line'Last);
+               End_Line    : constant Text_Type :=
+                 Separate_Body.Unit.Get_Line
+                   (Positive (Decls_Sloc_Range.Start_Line));
+               End_Slice   : constant Text_Type :=
+                 End_Line (End_Line'First ..
+                           End_Line'First
+                           + Positive (Subp_Body_Sloc_Range.End_Column) - 2);
+
+            begin
+               Append (New_Text, Indentation * " " & Start_Slice & Chars.LF);
+               Append (New_Text, Indentation * " " & End_Slice & Chars.LF);
+            end;
+
+         else
+            declare
+               Line  : constant Text_Type :=
+                 Separate_Body.Unit.Get_Line
+                   (Positive (Decls_Sloc_Range.Start_Line));
+               Slice : constant Text_Type :=
+                 Line (Line'First +
+                         Positive (Decls_Sloc_Range.Start_Column) - 1 ..
+                           Line'Last);
+            begin
+               Append (New_Text, Slice & Chars.LF);
+            end;
+            for Line_Number in
+              Decls_Sloc_Range.Start_Line + 1 ..
+                Subp_Body_Sloc_Range.End_Line - 1
+            loop
+               declare
+                  Line : constant Text_Type :=
+                    Separate_Body.Unit.Get_Line (Positive (Line_Number));
+
+               begin
+                  Append (New_Text, Indentation * " " & Line & Chars.LF);
+               end;
+            end loop;
+            declare
+               Line  : constant Text_Type :=
+                 Separate_Body.Unit.Get_Line
+                   (Positive (Subp_Body_Sloc_Range.End_Line));
+               Slice : constant Text_Type :=
+                 Line (Line'First ..
+                         Line'First +
+                           Positive (Subp_Body_Sloc_Range.End_Column) - 2);
+            begin
+               Append (New_Text, Indentation * " " & Slice & Chars.LF);
+            end;
+         end if;
+      end;
 
       Safe_Insert
         (Edits.Text_Edits,
