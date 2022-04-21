@@ -1,0 +1,16 @@
+Suppressing <SubpBody ["Baz"] test-baz.adb:5:1-8:9>
+test.adb
+1:1-1:1 
+with Ada.Numerics.Elementary_Functions;
+
+2:45-2:58 
+is
+use Ada.Numerics.Elementary_Functions;
+
+begin
+   return Ada.Numerics.Elementary_Functions.Log (10.0) > 5.0;
+end Baz;
+
+
+test-baz.adb
+

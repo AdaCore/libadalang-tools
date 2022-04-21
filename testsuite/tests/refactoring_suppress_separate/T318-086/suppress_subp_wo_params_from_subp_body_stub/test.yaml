@@ -1,0 +1,4 @@
+description: |+
+    This test covers the Suppress Separate tool for a simple use case.
+
+driver: shell_script
