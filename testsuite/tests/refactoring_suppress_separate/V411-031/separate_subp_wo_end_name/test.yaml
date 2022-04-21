@@ -1,0 +1,5 @@
+title: separate_subp_wo_end_name
+
+description: suppress_subprogram tool test
+
+driver: shell_script

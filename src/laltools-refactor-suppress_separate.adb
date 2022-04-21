@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -336,7 +336,8 @@ package body Laltools.Refactor.Suppress_Separate is
       Append (New_Text, Chars.LF);
 
       Append (New_Text, "end ");
-      Append (New_Text, Separate_Body.As_Subp_Body.F_End_Name.Text);
+      Append (New_Text,
+              Separate_Body.As_Subp_Body.F_Subp_Spec.F_Subp_Name.Text);
       Append (New_Text, ";");
       Append (New_Text, Chars.LF);
 
