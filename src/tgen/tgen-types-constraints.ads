@@ -59,9 +59,8 @@ package TGen.Types.Constraints is
             --  The Static integer value of the constraint
 
          when Non_Static =>
-            null;
-            --  We don't have any useful info that we can provide here.
-            --  May be revisited.
+            Text : Unbounded_Text_Type;
+            --  The textual representation of the constraint
 
          when Discriminant =>
             Disc_Name : Unbounded_Text_Type;
@@ -83,8 +82,8 @@ package TGen.Types.Constraints is
             --  The static real value of the constraint
 
          when Non_Static =>
-            null;
-            --  nothing to say here, may be revisited if need be
+            Text : Unbounded_Text_Type;
+            --  Textual representation of the constraint
 
       end case;
    end record;
@@ -93,6 +92,12 @@ package TGen.Types.Constraints is
    type Discrete_Range_Constraint is new Constraint with record
       Low_Bound, High_Bound : Discrete_Constraint_Value;
    end record;
+   --  A discrete range constraint. In case the range is not static, and the
+   --  range expression is not in the form Low_Bound .. High_Bound
+   --  (for instance a range attribute reference), then the low bound text is
+   --  left empty and the high bound text contains the text for the whole range
+   --  constraint. This is to avoid including text that is not present in
+   --  in the declaration of the type, which could be unuseable.
 
    function Image (Self : Discrete_Range_Constraint) return String;
 
@@ -105,6 +110,12 @@ package TGen.Types.Constraints is
    type Real_Range_Constraint is new Constraint with record
       Low_Bound, High_Bound : Real_Constraint_Value;
    end record;
+   --  A Real range constraint. In case the range is not static, and the
+   --  range expression is not in the form Low_Bound .. High_Bound
+   --  (for instance a range attribute reference), then the low bound text is
+   --  left empty and the high bound text contains the text for the whole range
+   --  constraint. This is to avoid including text that is not present in
+   --  in the declaration of the type, which could be unuseable.
 
    function Image (Self : Real_Range_Constraint) return String;
 
@@ -116,20 +127,18 @@ package TGen.Types.Constraints is
       Digits_Value : Discrete_Constraint_Value;
       case Has_Range is
          when True =>
-            Low_Bound, High_Bound : Real_Constraint_Value;
+            Range_Value : Real_Range_Constraint;
          when False =>
             null;
       end case;
    end record;
-   --  Digits constraints for a real type. The range is optionnal.
+   --  Digits constraints for a real type. The range is optional.
 
    function Image (Self : Digits_Constraint) return String;
 
    function Static (Self : Digits_Constraint) return Boolean is
      (Self.Digits_Value.Kind = Static
-      and then (if Self.Has_Range
-                then Self.Low_Bound.Kind = Static
-                    and then Self.High_Bound.Kind = Static));
+      and then (if Self.Has_Range then Self.Range_Value.Static));
 
    type Index_Constraint (Present : Boolean := False) is record
       case Present is

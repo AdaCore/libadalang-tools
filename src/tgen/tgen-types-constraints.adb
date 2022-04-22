@@ -68,10 +68,7 @@ package body TGen.Types.Constraints is
 
    function Image (Self : Digits_Constraint) return String is
      ("digits " & Image (Self.Digits_Value)
-      & (if Self.Has_Range
-         then " range " & Image (Self.Low_Bound) & " .. "
-              & Image (Self.High_Bound)
-         else ""));
+      & (if Self.Has_Range then Self.Range_Value.Image else ""));
 
    -----------
    -- Image --
@@ -205,9 +202,9 @@ package body TGen.Types.Constraints is
                         Digits_Value => Big_Int.To_Integer
                           (Digits_Constraint (Cst).Digits_Value.Int_Val),
                         Range_Value  =>
-                          (Min => Digits_Constraint (Cst)
+                          (Min => Digits_Constraint (Cst).Range_Value
                                   .Low_Bound.Real_Val,
-                           Max => Digits_Constraint (Cst)
+                           Max => Digits_Constraint (Cst).Range_Value
                                   .High_Bound.Real_Val)));
                   else
                      if As_Float_Typ (Self.Named_Ancestor).Is_Static

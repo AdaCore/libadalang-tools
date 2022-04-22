@@ -884,6 +884,7 @@ package body TGen.Types.Translation is
      (Node : LAL.Range_Spec) return Real_Range_Constraint
    is
       Min, Max : Long_Float;
+      Min_Text, Max_Text : Unbounded_Text_Type;
       Has_Range : Boolean;
       Min_Static, Max_Static : Boolean;
    begin
@@ -907,6 +908,7 @@ package body TGen.Types.Translation is
                Min_Static := True;
                Max_Static := True;
             else
+               Max_Text := +Node.Text;
                Min_Static := False;
                Max_Static := False;
             end if;
@@ -924,6 +926,9 @@ package body TGen.Types.Translation is
                   Min := Min_Eval.Real_Result;
                   Min_Static := True;
                end;
+            else
+               Min_Text := +Node.F_Range.As_Bin_Op.F_Left.Text;
+               Min_Static := False;
             end if;
             if Node.F_Range.As_Bin_Op.F_Right.P_Is_Static_Expr then
                declare
@@ -937,6 +942,9 @@ package body TGen.Types.Translation is
                   Max := Max_Eval.Real_Result;
                   Max_Static := True;
                end;
+            else
+               Max_Text := +Node.F_Range.As_Bin_Op.F_Right.Text;
+               Max_Static := False;
             end if;
 
          when others =>
@@ -952,15 +960,15 @@ package body TGen.Types.Translation is
       elsif Min_Static then
          return Real_Range_Constraint'
            (Low_Bound  => (Kind => Static, Real_Val => Min),
-            High_Bound => (Kind => Non_Static));
+            High_Bound => (Kind => Non_Static, Text => Max_Text));
       elsif Max_Static then
          return Real_Range_Constraint'
-           (Low_Bound  => (Kind => Non_Static),
+           (Low_Bound  => (Kind => Non_Static, Text => Min_Text),
             High_Bound => (Kind => Static, Real_Val => Max));
       else
          return Real_Range_Constraint'
-           (Low_Bound  => (Kind => Non_Static),
-            High_Bound => (Kind => Non_Static));
+           (Low_Bound  => (Kind => Non_Static, Text => Min_Text),
+            High_Bound => (Kind => Non_Static, Text => Max_Text));
       end if;
 
    end Translate_Real_Range_Spec;
@@ -1077,9 +1085,10 @@ package body TGen.Types.Translation is
 
             Index_Typ                      : Base_Type_Decl;
             Has_Constraints                : Boolean;
-            Constraints_Static             : Boolean;
             Range_Exp                      : Expr;
             Constraint_Min, Constraint_Max : Big_Integer;
+            Min_Text, Max_Text             : Unbounded_Text_Type;
+            Min_Static, Max_Static         : Boolean;
 
             Current_Index : Positive := 1;
 
@@ -1101,12 +1110,6 @@ package body TGen.Types.Translation is
                            (Constraint.As_Subtype_Indication.F_Constraint)
                      then
                         Has_Constraints := False;
-                     elsif not Constraint.As_Subtype_Indication.F_Constraint
-                              .As_Range_Constraint.F_Range.F_Range
-                              .P_Is_Static_Expr
-                     then
-                        Has_Constraints := True;
-                        Constraints_Static := False;
                      elsif Kind
                               (Constraint.As_Subtype_Indication.F_Constraint
                               .As_Range_Constraint.F_Range.F_Range)
@@ -1117,26 +1120,13 @@ package body TGen.Types.Translation is
                                     .As_Range_Constraint.F_Range.F_Range;
 
                         Has_Constraints := True;
-                        Constraints_Static := True;
-
                      end if;
                   when Ada_Bin_Op_Range =>
                      Has_Constraints := True;
-                     if Constraint.As_Expr.P_Is_Static_Expr then
-                        Constraints_Static := True;
-                        Range_Exp := Constraint.As_Expr;
-                     else
-                        Constraints_Static := False;
-                     end if;
-
+                     Range_Exp := Constraint.As_Expr;
                   when Ada_Attribute_Ref_Range =>
                      Has_Constraints := True;
-                     if Constraint.As_Expr.P_Is_Static_Expr then
-                        Constraints_Static := True;
-                        Range_Exp := Constraint.As_Expr;
-                     else
-                        Constraints_Static := False;
-                     end if;
+                     Range_Exp := Constraint.As_Expr;
                   when others =>
                      Has_Constraints := False;
                end case;
@@ -1154,42 +1144,84 @@ package body TGen.Types.Translation is
                   Res_Typ.Index_Types (Current_Index) := Index_Trans.Res;
                end;
 
-               if Has_Constraints and then Constraints_Static then
+               if Has_Constraints then
                   --  We should only encouter either a Bin Op (A .. B) or a
                   --  range attribute reference according to RM 3.5 (2).
                   begin
                      if Kind (Range_Exp) in Ada_Bin_Op_Range then
-                        Constraint_Min := Big_Int.From_String
-                        (New_Eval_As_Int (Range_Exp.As_Bin_Op.F_Left).Image);
-                        Constraint_Max := Big_Int.From_String
-                        (New_Eval_As_Int (Range_Exp.As_Bin_Op.F_Right).Image);
+                        if Range_Exp.As_Bin_Op.F_Left.P_Is_Static_Expr then
+                           Constraint_Min :=
+                             Big_Int.From_String
+                               (New_Eval_As_Int (Range_Exp.As_Bin_Op.F_Left)
+                                .Image);
+                           Min_Static := True;
+                        else
+                           Min_Static := False;
+                           Min_Text := +Range_Exp.As_Bin_Op.F_Left.Text;
+                        end if;
+                        if Range_Exp.As_Bin_Op.F_Right.P_Is_Static_Expr then
+                           Constraint_Max :=
+                             Big_Int.From_String
+                               (New_Eval_As_Int (Range_Exp.As_Bin_Op.F_Right)
+                                .Image);
+                           Max_Static := True;
+                        else
+                           Max_Static := False;
+                           Max_Text := +Range_Exp.As_Bin_Op.F_Right.Text;
+                        end if;
                      else
-                        Constraint_Min := Big_Int.From_String
-                        (New_Eval_As_Int
-                           (Low_Bound (Range_Exp.As_Attribute_Ref.F_Prefix
-                           .P_Name_Designated_Type.P_Discrete_Range))
-                           .Image);
-                        Constraint_Max := Big_Int.From_String
-                        (New_Eval_As_Int
-                           (High_Bound (Range_Exp.As_Attribute_Ref.F_Prefix
-                           .P_Name_Designated_Type.P_Discrete_Range))
-                           .Image);
+                        if Range_Exp.As_Attribute_Ref.F_Prefix
+                           .P_Name_Designated_Type.P_Is_Static_Decl
+                        then
+                           Constraint_Min := Big_Int.From_String
+                           (New_Eval_As_Int
+                              (Low_Bound (Range_Exp.As_Attribute_Ref.F_Prefix
+                              .P_Name_Designated_Type.P_Discrete_Range))
+                              .Image);
+                           Constraint_Max := Big_Int.From_String
+                           (New_Eval_As_Int
+                              (High_Bound (Range_Exp.As_Attribute_Ref.F_Prefix
+                              .P_Name_Designated_Type.P_Discrete_Range))
+                              .Image);
+                           Min_Static := True;
+                           Max_Static := True;
+                        else
+                           Min_Static := False;
+                           Max_Static := False;
+                           Max_Text := +Range_Exp.Text;
+                        end if;
                      end if;
                   exception
                      when Non_Static_Error =>
-                        Constraints_Static := False;
+                        Min_Static := False;
+                        Max_Static := False;
+                        Max_Text := +Range_Exp.Text;
                   end;
                end if;
 
                if not Has_Constraints then
                   Res_Typ.Index_Constraints (Current_Index) :=
                   (Present => False);
-               elsif not Constraints_Static then
+               elsif Max_Static and then not Min_Static then
                   Res_Typ.Index_Constraints (Current_Index) :=
                   (Present        => True,
                      Discrete_Range =>
-                     (Low_Bound  => (Kind => Non_Static),
-                        High_Bound => (Kind => Non_Static)));
+                     (Low_Bound  => (Kind => Non_Static, Text => Min_Text),
+                      High_Bound => (Kind    => Static,
+                                     Int_Val => Constraint_Min)));
+               elsif Min_Static and not Max_Static then
+                  Res_Typ.Index_Constraints (Current_Index) :=
+                  (Present        => True,
+                     Discrete_Range =>
+                     (High_Bound  => (Kind => Non_Static, Text => Max_Text),
+                      Low_Bound   => (Kind    => Static,
+                                      Int_Val => Constraint_Max)));
+               elsif not (Max_Static and then Min_Static) then
+                  Res_Typ.Index_Constraints (Current_Index) :=
+                  (Present        => True,
+                     Discrete_Range =>
+                     (High_Bound  => (Kind => Non_Static, Text => Max_Text),
+                      Low_Bound   => (Kind => Non_Static, Text => Min_Text)));
                else
                   Res_Typ.Index_Constraints (Current_Index) :=
                   (Present        => True,
@@ -1636,14 +1668,16 @@ package body TGen.Types.Translation is
                   when Non_Static_Error =>
                      Constraints_Map.Insert
                        (Key      => +Param (Pair).As_Defining_Name.Text,
-                        New_Item => (Kind => Non_Static));
+                        New_Item => (Kind => Non_Static,
+                                     Text => +Actual (Pair).Text));
                end;
             else
                --  Non static value
 
                Constraints_Map.Insert
                  (Key      => +Param (Pair).As_Defining_Name.Text,
-                  New_Item => (Kind => Non_Static));
+                  New_Item => (Kind => Non_Static,
+                               Text => +Actual (Pair).Text));
             end if;
          end loop;
 
@@ -2288,7 +2322,7 @@ package body TGen.Types.Translation is
          end if;
       exception
          when Non_Static_Error =>
-            Low_Bnd := (Kind => Non_Static);
+            Low_Bnd := (Kind => Non_Static, Text => +Low_Bound (Rng).Text);
       end;
 
       begin
@@ -2311,7 +2345,7 @@ package body TGen.Types.Translation is
          end if;
       exception
          when Non_Static_Error =>
-            High_Bnd := (Kind => Non_Static);
+            High_Bnd := (Kind => Non_Static, Text => +High_Bound (Rng).Text);
       end;
 
       return (Low_Bnd, High_Bnd);
@@ -2380,8 +2414,7 @@ package body TGen.Types.Translation is
                         (Has_Range    => True,
                          Digits_Value => (Kind    => Static,
                                           Int_Val => Digits_Val),
-                           Low_Bound  => Rnge.Low_Bound,
-                           High_Bound => Rnge.High_Bound);
+                         Range_Value => Rnge);
                      else
                         return TGen.Types.Constraints.Digits_Constraint'
                         (Has_Range   => False,
@@ -2391,20 +2424,28 @@ package body TGen.Types.Translation is
                   end;
                exception
                   when Non_Static_Error =>
-                     null;
+                     if not Is_Null (Range_Spc) then
+                        return TGen.Types.Constraints.Digits_Constraint'
+                        (Has_Range    => True,
+                         Digits_Value => (Kind => Non_Static,
+                                          Text => +Node.As_Digits_Constraint
+                                                   .F_Digits.Text),
+                         Range_Value => Rnge);
+                     else
+                        return TGen.Types.Constraints.Digits_Constraint'
+                        (Has_Range   => False,
+                         Digits_Value => (Kind    => Non_Static,
+                                          Text    => +Node.As_Digits_Constraint
+                                                      .F_Digits.Text));
+                     end if;
                end;
             end if;
-            if not Is_Null (Range_Spc) then
-               return TGen.Types.Constraints.Digits_Constraint'
-                  (Has_Range    => True,
-                   Digits_Value => (Kind => Non_Static),
-                   Low_Bound    => Rnge.Low_Bound,
-                   High_Bound   => Rnge.High_Bound);
-            else
-               return TGen.Types.Constraints.Digits_Constraint'
-                  (Has_Range    => False,
-                   Digits_Value => (Kind => Non_Static));
-            end if;
+
+            --  Case of a non static digit value. This is not possible
+            --  according to RM 3.5.9 (5/4).
+
+            raise Translation_Error with
+              "Non static digits constraints are forbiden:" & Node.Image;
 
          when Ada_Delta_Constraint_Range =>
             raise Translation_Error with
@@ -2425,7 +2466,8 @@ package body TGen.Types.Translation is
         Gather_Index_Constraint_Nodes (Node, Num_Dims);
       Current_Index : Positive := 1;
 
-      Discr_Range : Discrete_Range;
+      Discr_Range     : Discrete_Range;
+      Referenced_Type : Base_Type_Decl;
    begin
       return Res : Index_Constraints (Num_Dims) do
          for Cst of Constraint_List loop
@@ -2440,6 +2482,8 @@ package body TGen.Types.Translation is
                              .As_Range_Constraint));
                      goto Skip_Range_Translation;
                   else
+                     Referenced_Type := Cst.As_Subtype_Indication.F_Name
+                                        .P_Name_Designated_Type;
                      Discr_Range := Cst.As_Subtype_Indication.F_Name
                                     .P_Name_Designated_Type.P_Discrete_Range;
                   end if;
@@ -2451,10 +2495,26 @@ package body TGen.Types.Translation is
                when Ada_Attribute_Ref_Range =>
                   Discr_Range := Cst.As_Attribute_Ref.F_Prefix
                                  .P_Name_Designated_Type.P_Discrete_Range;
+                  Referenced_Type := Cst.As_Attribute_Ref.F_Prefix
+                                     .P_Name_Designated_Type;
                when others =>
                   Discr_Range :=
                     Cst.As_Name.P_Name_Designated_Type.P_Discrete_Range;
+                  Referenced_Type :=  Cst.As_Name.P_Name_Designated_Type;
             end case;
+
+            if not (Is_Null (Referenced_Type)
+                    or else Referenced_Type.P_Is_Static_Decl)
+            then
+               Res.Constraint_Array (Current_Index) :=
+                  TGen.Types.Constraints.Index_Constraint'
+                    (Present        => True,
+                     Discrete_Range =>
+                        (Low_Bound  => (Kind => Non_Static, others => <>),
+                         High_Bound => (Kind => Non_Static,
+                                        Text => +Cst.Text)));
+               goto Skip_Range_Translation;
+            end if;
 
             Res.Constraint_Array (Current_Index) :=
             TGen.Types.Constraints.Index_Constraint'
@@ -2475,7 +2535,7 @@ package body TGen.Types.Translation is
    begin
       return Res : TGen.Types.Constraints.Discriminant_Constraints do
          for Pair of Node.F_Constraints.P_Zip_With_Params loop
-            New_Item := (Kind => Non_Static);
+            New_Item := (Kind => Non_Static, others => <>);
             begin
                if Actual (Pair).P_Is_Static_Expr then
                   New_Item :=
@@ -2494,11 +2554,13 @@ package body TGen.Types.Translation is
                      Disc_Name => +Actual (Pair).As_Name
                                   .P_Referenced_Defining_Name.Text);
                else
-                  New_Item := (Kind => Non_Static);
+                  New_Item := (Kind => Non_Static,
+                               Text => +Actual (Pair).Text);
                end if;
                exception
                   when Non_Static_Error =>
-                     New_Item := (Kind => Non_Static);
+                     New_Item := (Kind => Non_Static,
+                                  Text => +Actual (Pair).Text);
             end;
             Res.Constraint_Map.Insert
               (Key      => +Param (Pair).Text,
