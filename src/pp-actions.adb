@@ -1002,8 +1002,10 @@ package body Pp.Actions is
              L ("when[ ?~ ^|# ~~] ^=>$", "!"),
            when Ada_Case_Stmt_Alternative =>
              L ("when[ ?~ ^|# ~~] ^=>$", "{?~;$~;$~}"),
-           when Ada_Case_Stmt | Ada_Variant_Part =>
+           when Ada_Variant_Part =>
              L ("case !# is$", "{!}", "end case"),
+           when Ada_Case_Stmt =>
+             L ("case !# is$", "{?~~;$~!}", "end case"),
            when Ada_Extended_Return_Stmt =>
              L ("return[# !]",
                 "!",

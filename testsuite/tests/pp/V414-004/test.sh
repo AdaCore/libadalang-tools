@@ -1,0 +1,1 @@
+gnatpp -pipe test.adb
