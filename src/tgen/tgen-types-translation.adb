@@ -2319,6 +2319,10 @@ package body TGen.Types.Translation is
             (Kind      => Discriminant,
              Disc_Name => +Low_Bound (Rng).As_Name.P_Referenced_Defining_Name
                           .Text);
+         else
+            Low_Bnd :=
+              (Kind => Non_Static,
+               Text => +Low_Bound (Rng).Text);
          end if;
       exception
          when Non_Static_Error =>
@@ -2342,6 +2346,10 @@ package body TGen.Types.Translation is
             (Kind      => Discriminant,
              Disc_Name => +High_Bound (Rng).As_Name.P_Referenced_Defining_Name
                           .Text);
+         else
+            High_Bnd :=
+              (Kind => Non_Static,
+               Text => +High_Bound (Rng).Text);
          end if;
       exception
          when Non_Static_Error =>
