@@ -28,17 +28,23 @@ with Tools.Record_Components_Tool;
 use Tools.Record_Components_Tool;
 with Tools.Array_Aggregates_Tool;
 use Tools.Array_Aggregates_Tool;
+with Tools.Suppress_Dead_Params_Tool;
 with VSS.Text_Streams;
 
 package Output is
    package LAL renames Libadalang.Analysis;
 
    procedure JSON_Serialize (Edits_Info : Delete_Infos;
-                                 Stream : in out
-                               VSS.Text_Streams.Output_Text_Stream'Class);
+                             Stream     : in out VSS.Text_Streams.
+                                          Output_Text_Stream'Class);
 
    procedure JSON_Serialize (Edits_Info : Aggregates_To_Edit_Text.Map;
-                                 Stream : in out
-                               VSS.Text_Streams.Output_Text_Stream'Class);
+                             Stream     : in out VSS.Text_Streams.
+                                          Output_Text_Stream'Class);
+
+   procedure JSON_Serialize (Edits_Info : Tools.Suppress_Dead_Params_Tool.
+                                          Edit_Infos;
+                             Stream     : in out VSS.Text_Streams.
+                                          Output_Text_Stream'Class);
 
 end Output;

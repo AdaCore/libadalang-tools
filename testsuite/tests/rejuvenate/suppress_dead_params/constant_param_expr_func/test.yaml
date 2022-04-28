@@ -1,0 +1,5 @@
+title: default_param
+
+description: suppress the subprogram that always use default value as input.
+
+driver: shell_script
