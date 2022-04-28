@@ -1553,8 +1553,11 @@ package body Pp.Actions is
          Extended_Return_Stmt_Short_Vertical_Agg_Alt,
          Extended_Return_Stmt_Vertical_Agg_Alt,
          Vertical_Agg_Alt,
+         Vertical_Bracket_Agg_Alt,
          Nonvertical_Agg_Alt,
+         Nonvertical_Bracket_Agg_Alt,
          Enum_Rep_Nonvertical_Agg_Alt,
+         Enum_Rep_Nonvertical_Bracket_Agg_Alt,
          Obj_Decl_Alt,
          Obj_Decl_Vertical_Agg_Alt,
          Comp_Decl_Vertical_Agg_Alt,
@@ -1745,8 +1748,11 @@ package body Pp.Actions is
                   From => "return[# !]", To => "return[$!]")),
             Param_Spec_Alt => L (" ^: "),
             Vertical_Agg_Alt => L ("(?~~ with #~?~,$~~)"),
+            Vertical_Bracket_Agg_Alt => L ("?~~ with #~?~,$~~"),
             Nonvertical_Agg_Alt => L ("#(?~~ with #~?~,# ~~)"),
+            Nonvertical_Bracket_Agg_Alt => L ("#?~~ with #~?~,# ~~"),
             Enum_Rep_Nonvertical_Agg_Alt => L ("#(?~~ with #~?~,#1 ~~)"),
+            Enum_Rep_Nonvertical_Bracket_Agg_Alt => L ("#?~~ with #~?~,#1 ~~"),
             Obj_Decl_Alt =>
               L (Replace_One
                 (Ada_Object_Decl, From => ":[#1? ~~~? ~~~? ~~~ !]?",
@@ -3771,6 +3777,7 @@ package body Pp.Actions is
          --  fully covered by Str_Template_Table:
 
          procedure Do_Aggregate;
+         procedure Do_Bracket_Aggregate;
          procedure Do_Compilation_Unit;
          procedure Do_Component_Clause;
          procedure Do_Handled_Stmts;
@@ -3841,7 +3848,9 @@ package body Pp.Actions is
                            declare
                               Outer_Agg : constant Ada_Tree :=
                                 X.Parent.Parent.Parent;
-                              pragma Assert (Outer_Agg.Kind = Ada_Aggregate);
+                              pragma Assert
+                                (Outer_Agg.Kind in
+                                   Ada_Aggregate | Ada_Bracket_Aggregate);
                            begin
                               if Is_Vertical_Aggregate (Outer_Agg) then
                                  Result := True;
@@ -3849,11 +3858,10 @@ package body Pp.Actions is
                            end;
 
                         --  Outermost aggregate case
-
                         else
                            declare
                               Assocs : constant Assoc_List :=
-                                F_Assocs (X.As_Aggregate);
+                                    F_Assocs (X.As_Aggregate);
                               All_Named : constant Boolean :=
                                 (Present (Subtree (Subtree (Assocs, 1), 1)));
                               --  True if all component associations are
@@ -3868,13 +3876,67 @@ package body Pp.Actions is
 
                               One_Agg_Assoc : constant Boolean :=
                                 One_Assoc and then All_Named and then
-                                Subtree (Subtree (Assocs, 1), 2).Kind =
-                                  Ada_Aggregate;
+                                Subtree (Subtree (Assocs, 1), 2).Kind in
+                                  Ada_Aggregate | Ada_Bracket_Aggregate;
                               --  Exactly one named association whose
                               --  expression is a subaggregate.
 
                            begin
                               if All_Named
+                                and then (One_Agg_Assoc or not One_Assoc)
+                              then
+                                 Result := True;
+                              end if;
+                           end;
+                        end if;
+
+                     when Ada_Bracket_Aggregate =>
+                        if X.Parent.Kind = Ada_Aggregate_Assoc then
+                           declare
+                              Outer_Agg : constant Ada_Tree :=
+                                X.Parent.Parent.Parent;
+                              pragma Assert
+                                (Outer_Agg.Kind in
+                                   Ada_Aggregate | Ada_Bracket_Aggregate);
+                           begin
+                              if Is_Vertical_Aggregate (Outer_Agg) then
+                                 Result := True;
+                              end if;
+                           end;
+
+                           --  Outermost aggregate case
+                           --  Here we can have the empty array situation
+                           --  that should be handled
+                           --  (i.e. Empty_Matrix : constant Matrix := [];)
+                           --  In this case Subtree_Count (Assocs) = 0.
+                        else
+                           declare
+                              Assocs : constant Assoc_List :=
+                                F_Assocs (X.As_Bracket_Aggregate);
+
+                              All_Named : constant Boolean :=
+                                (if Subtree_Count (Assocs) /= 0 then
+                                   (Present (Subtree (Subtree (Assocs, 1), 1)))
+                                 else False);
+                              --  True if all component associations are
+                              --  named. Checking only need the first one,
+                              --  since due of the restriction in Ada
+                              --  positional associations can't follow named
+                              --  ones.
+
+                              One_Assoc : constant Boolean :=
+                                Subtree_Count (Assocs) = 1;
+                              --  Having only one association
+
+                              One_Agg_Assoc : constant Boolean :=
+                                One_Assoc and then All_Named and then
+                                Subtree (Subtree (Assocs, 1), 2).Kind in
+                                  Ada_Aggregate | Ada_Bracket_Aggregate;
+                              --  One named association whose
+                              --  expression is a subaggregate.
+                           begin
+                              if Subtree_Count (Assocs) /= 0
+                                and then All_Named
                                 and then (One_Agg_Assoc or not One_Assoc)
                               then
                                  Result := True;
@@ -3912,6 +3974,19 @@ package body Pp.Actions is
                Interpret_Alt_Template (Nonvertical_Agg_Alt);
             end if;
          end Do_Aggregate;
+
+         procedure Do_Bracket_Aggregate is
+         begin
+            Append_And_Put (New_Tokns, '[');
+            if Is_Vertical_Aggregate (Tree) then
+               Interpret_Alt_Template (Vertical_Bracket_Agg_Alt);
+            elsif Tree.Parent.Kind = Ada_Enum_Rep_Clause then
+               Interpret_Alt_Template (Enum_Rep_Nonvertical_Bracket_Agg_Alt);
+            else
+               Interpret_Alt_Template (Nonvertical_Bracket_Agg_Alt);
+            end if;
+            Append_And_Put (New_Tokns, ']');
+         end Do_Bracket_Aggregate;
 
          procedure Do_Compilation_Unit is
          begin
@@ -5042,6 +5117,9 @@ package body Pp.Actions is
 
             when Ada_Aggregate =>
                Do_Aggregate;
+
+            when Ada_Bracket_Aggregate =>
+               Do_Bracket_Aggregate;
 
             when Ada_Subtype_Indication =>
                Do_Subtype_Indication;
