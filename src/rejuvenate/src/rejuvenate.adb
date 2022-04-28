@@ -33,6 +33,7 @@ with Command_Line;
 with Tools;
 with Tools.Record_Components_Tool;
 with Tools.Array_Aggregates_Tool;
+with Tools.Suppress_Dead_Params_Tool;
 
 procedure Rejuvenate is
 
@@ -78,6 +79,10 @@ begin
             when Tools.Array_Aggregates =>
                if Tools.Array_Aggregates_Tool.Parser.Parse (Tool_Args) then
                   Tools.Array_Aggregates_Tool.Run;
+               end if;
+            when Tools.Suppress_Dead_Params =>
+               if Tools.Suppress_Dead_Params_Tool.Parser.Parse (Tool_Args) then
+                  Tools.Suppress_Dead_Params_Tool.Run;
                end if;
          end case;
       end;
