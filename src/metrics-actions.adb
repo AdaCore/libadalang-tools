@@ -4102,8 +4102,9 @@ package body METRICS.Actions is
                   Inc (Global_M.Num_With_Complexity);
                end if;
                if M.Knd = Function_Body_Knd then
-                  pragma Assert (M.Vals (Extra_Exit_Points) >= 1);
-                  Dec (M.Vals (Extra_Exit_Points));
+                  if M.Vals (Extra_Exit_Points) >= 1 then
+                     Dec (M.Vals (Extra_Exit_Points));
+                  end if;
                end if;
                Validate (M.all);
                M.Node := No_Ada_Node;
