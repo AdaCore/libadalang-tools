@@ -27,7 +27,6 @@
 ---     - Add Parameter
 ---     - Change Parameter Mode
 ---     - Move Parameter Left/Right
----     - Remove Parameter
 
 with Libadalang.Common; use Libadalang.Common;
 
@@ -105,31 +104,6 @@ package Laltools.Refactor.Subprogram_Signature is
    --  have the necessary data to create a Parameter_Mover object or to call
    --  'Move_Left'/'Move_Right'.
 
-   function Is_Remove_Parameter_Available
-     (Node                    : Ada_Node'Class;
-      Subp                    : out Basic_Decl;
-      Parameter_Indices_Range : out Parameter_Indices_Range_Type)
-      return Boolean
-     with Pre  => not Node.Is_Null,
-          Post => (if Is_Remove_Parameter_Available'Result then
-                     Is_Subprogram (Subp));
-   --  Checks if from 'Node' we can unambiguously identify a parameter. If so,
-   --  then returns True.
-   --  Example 1:
-   --  procedure Foo (A, B : Integer);
-   --
-   --  Is_Remove_Parameter_Available only returns True if Node refers to
-   --  the Identifier nodes A and B. Otherwise, it's not possible to
-   --  unambiguously identify which parameter Node might refer to.
-   --
-   --  Example 2:
-   --  procedure Bar (A : Integer);
-   --
-   --  Is_Remove_Parameter_Available returns True if any node in of the
-   --  Params node, inclusive, i.e., any node of "(A : Integer)".
-   --  This is because since there is only one paremeter, we can unambigously
-   --  identify it as long as Node refers to a Params node or any child of it.
-
    function Change_Mode
      (Subp                    : Basic_Decl;
       Parameter_Indices_Range : Parameter_Indices_Range_Type;
@@ -161,43 +135,6 @@ package Laltools.Refactor.Subprogram_Signature is
    --  parameter is moved forward in the entire subprogram hierarchy, as
    --  well as, all renames hierarchy.
 
-   function Remove_Parameter
-     (Subp            : Basic_Decl;
-      Parameter_Index : Positive;
-      Units           : Analysis_Unit_Array)
-      return Text_Edit_Map
-     with Pre => Is_Subprogram (Subp);
-   --  Removes the parameter defined by Parameter_Index. The parameter is
-   --  removed in the entire subprogram hierarchy, as well as, all renames
-   --  hierarchy.
-
-   function Remove_Parameters
-     (Subp              : Basic_Decl;
-      Parameter_Indices : Parameter_Indices_Type;
-      Units             : Analysis_Unit_Array)
-      return Text_Edit_Map;
-   --  Removes the parameters defined by 'Parameter_Indices'. The parameter is
-   --  removed in the entire subprogram hierarchy, as well as, all renames
-   --  hierarchy.
-
-   function Remove_Parameters
-     (Subp                     : Basic_Decl;
-      Parameter_Indices_Ranges : Parameter_Indices_Ranges_Type;
-      Units                    : Analysis_Unit_Array)
-      return Text_Edit_Map
-     with Pre => Is_Subprogram (Subp);
-   --  Removes the parameters defined by 'Parameter_Indices_Ranges'. The
-   --  parameter is removed in the entire subprogram hierarchy, as well as, all
-   --  renames hierarchy.
-
-   function Remove_All_Parameters
-     (Subp                    : Basic_Decl'Class;
-      Units                   : Analysis_Unit_Array)
-      return Text_Edit_Map
-     with Pre => Is_Subprogram (Subp);
-   --  Removes all parameters os 'Subp'. The parameters are removed in the
-   --  entire subprogram hierarchy, as well as, all renames hierarchy.
-
    type Signature_Changer_Option_Type is (Include_Parents, Include_Children);
 
    type Signature_Changer_Configuration_Type is
@@ -207,25 +144,6 @@ package Laltools.Refactor.Subprogram_Signature is
      [Include_Parents .. Include_Children  => True];
 
    type Subprogram_Signature_Changer is limited interface and Refactoring_Tool;
-
-   type Parameter_Remover is new Subprogram_Signature_Changer with private;
-
-   function Create
-     (Target                  : Basic_Decl;
-      Parameter_Indices_Range : Parameter_Indices_Range_Type;
-      Configuration           : Signature_Changer_Configuration_Type :=
-        Default_Configuration)
-      return Parameter_Remover;
-   --  Creates a signature changer that removes parameters, defined by
-   --  'Parameter_Indices_Range'.
-
-   overriding
-   function Refactor
-     (Self           : Parameter_Remover;
-      Analysis_Units : access function return Analysis_Unit_Array)
-      return Refactoring_Edits;
-   --  Returns an Edit_Map with all the refactoring edits needed to remove
-   --  a parameter.
 
    type Parameter_Adder is new Subprogram_Signature_Changer with private;
 
@@ -321,6 +239,65 @@ package Laltools.Refactor.Subprogram_Signature is
 
 private
 
+   type Extended_Argument_Indicies_Type is
+     array (Positive range <>) of Natural;
+
+   function Arguments_SLOC
+     (Call              : Call_Expr;
+      Parameter_Indices : Parameter_Indices_Type)
+      return Source_Location_Range_Set
+     with Pre => not Call.Is_Null and then Parameter_Indices'Length > 0;
+   --  Returns a set of source location ranges of the arguments associated to
+   --  'Parameter_Indices'.
+   --  Duplicate values of 'Parameter_Indices' are ignored.
+   --  And Assertion_Error exception is raised if 'Parameter_Indices' contains
+   --  an element that is greater than the number of arguments 'Call' has.
+
+   function Map_Parameters_To_Arguments
+     (Parameters : Params'Class;
+      Call       : Call_Expr'Class)
+      return Extended_Argument_Indicies_Type;
+   --  Maps the index of each parameter of 'Parameters' to the actual parameter
+   --  on 'Call'. This function assumes that both 'Parameters' and 'Call' refer
+   --  to the same subprogram.
+   --  The indices of the returned array represent the parameteres, and the
+   --  the values represent the index of the corresponding actual parameter on
+   --  subprogram call. A value of 0 means that there is no correspondent
+   --  actual parameter (for instance, the paramter has a default value).
+
+   function Params_SLOC
+     (Subp : Basic_Decl'Class)
+      return Source_Location_Range
+   is (Get_Subp_Params (Subp).Sloc_Range)
+     with Pre => Is_Subprogram (Subp);
+   --  If 'Subp' has a Params node, then returns its source location range.
+   --  Otherwise returns No_Source_Location_Range.
+
+   function Parameters_SLOC
+     (Subp                     : Basic_Decl'Class;
+      Parameter_Indices_Ranges : Parameter_Indices_Ranges_Type)
+      return Source_Location_Range_Set
+     with Pre => Is_Subprogram (Subp)
+                 and then Parameter_Indices_Ranges'Length > 0;
+   --  Returns a set with the source location range of the parameters with
+   --  indices given by 'Parameter_Indices_Ranges'.
+
+   function To_Unique_Ranges
+     (Parameter_Indices : Parameter_Indices_Type)
+      return Parameter_Indices_Ranges_Type;
+   --  Creates an array of ranges based on 'Parameter_Indices' values.
+   --  Duplicate values in 'Parameter_Indices' are ignored.
+   --  Example: If 'Parameter_Indices' is [1, 3, 5, 6], the returned array is
+   --  [{1, 1}, {3, 3}, {5, 6}].
+
+   generic
+      type Index_Type is (<>);
+      type Element_Type is private;
+      type Array_Type is array (Index_Type range <>) of Element_Type;
+      with function "<" (Left, Right : Element_Type) return Boolean is <>;
+   function Generic_Array_Unique (Container : Array_Type) return Array_Type;
+   --  Returns a sorted Array_Type with the unique elements of 'Container'
+
    type Relative_Position_Type is (Before, After);
 
    type Parameter_Relative_Position_Type is
@@ -373,13 +350,6 @@ private
    type Forward_Mover is new Parameter_Mover with
       record
          Mover : Backward_Mover;
-      end record;
-
-   type Parameter_Remover is new Subprogram_Signature_Changer with
-      record
-         Subp                    : Basic_Decl;
-         Parameter_Indices_Range : Parameter_Indices_Range_Type;
-         Configuration           : Signature_Changer_Configuration_Type;
       end record;
 
 end Laltools.Refactor.Subprogram_Signature;
