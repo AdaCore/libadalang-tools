@@ -37,6 +37,7 @@ with Langkit_Support.Slocs; use Langkit_Support;
 with Pp.Command_Lines; use Pp.Command_Lines;
 with Pp.Error_Slocs; use Pp.Error_Slocs;
 with Pp.Scanner.Lines;
+with Pp.Actions;
 
 package body Pp.Formatting is
    use Utils.Command_Lines;
@@ -919,7 +920,8 @@ package body Pp.Formatting is
       --  are in the proper sequence, and it sets the Pp_Off_Present flag.
 
       procedure Insert_Indentation (Lines_Data_P : Lines_Data_Ptr;
-                                    Cmd : Command_Line);
+                                    Cmd : Command_Line;
+                                    Partial_Gnatpp : Boolean := False);
 
       procedure Insert_Alignment
         (Lines_Data_P : Lines_Data_Ptr;
@@ -999,7 +1001,7 @@ package body Pp.Formatting is
 
          Tok_Phases.Split_Lines (Lines_Data_P, Cmd, First_Time => False);
 
-         Tok_Phases.Insert_Indentation (Lines_Data_P, Cmd);
+         Tok_Phases.Insert_Indentation (Lines_Data_P, Cmd, Partial_Gnatpp);
          --  Tok_Phases.Insert_Alignment (Lines_Data_P, Cmd);
 
          Tokns_To_Buffer (Lines_Data.Out_Buf, Lines_Data.New_Tokns, Cmd);
@@ -4198,7 +4200,8 @@ package body Pp.Formatting is
       end Insert_Comments_And_Blank_Lines;
 
       procedure Insert_Indentation (Lines_Data_P : Lines_Data_Ptr;
-                                    Cmd : Command_Line)
+                                    Cmd : Command_Line;
+                                    Partial_Gnatpp : Boolean := False)
       is
          function Is_Action_Call_Parameter (Tok : Tokn_Cursor) return Boolean;
          --  Returns true if the line break token is part of an action call
@@ -4631,9 +4634,24 @@ package body Pp.Formatting is
                      Adjust_Indentation_After_Comma (New_Tok);
                   end if;
 
+                  --  If partial formatting (called from partial_gnatpp) then
+                  --  use an offset picked from the previous/next sibling of
+                  --  the reformatted node to add spaces at the begining of
+                  --  each line.
                   if Kind (Next (New_Tok)) not in Line_Break_Token then
-                     Append_Spaces (New_Tokns, LB.Indentation);
+                     declare
+                        Offset     : constant Natural :=
+                          Pp.Actions.Get_Partial_Gnatpp_Offset;
+                        Crt_Indent : constant Natural :=
+                          (if Partial_Gnatpp then (LB.Indentation + Offset)
+                           else LB.Indentation);
+                     begin
+                        --  Append_Spaces (New_Tokns, LB.Indentation);
+
+                        Append_Spaces (New_Tokns, Crt_Indent);
+                     end;
                   end if;
+
                end;
             end if;
 

@@ -134,7 +134,22 @@ package body Pp.Actions is
    --  ???We need a special value
 
    function Mimic_gcc (Cmd : Command_Line) return Boolean is
-      (Arg (Cmd, Outer_Dir) /= null);
+     (Arg (Cmd, Outer_Dir) /= null);
+
+   Partial_Gnatpp_Offset : Natural := 0;
+   --  This global variable defines an offset for partial-gnatpp based on the
+   --  offsets of previous/next sibling of the formatted node.
+   --  This value is set in partial formatting mode by partial_gnatpp by
+   --  get/set accessors defined in the public part of this package and used
+   --  later by the indentation pass of the formatting phases.
+
+   procedure Set_Partial_Gnatpp_Offset (Val : Natural) is
+   begin
+      Partial_Gnatpp_Offset := Val;
+   end Set_Partial_Gnatpp_Offset;
+
+   function Get_Partial_Gnatpp_Offset return Natural is
+     (Partial_Gnatpp_Offset);
 
    ----------
    -- Init --

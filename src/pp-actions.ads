@@ -77,6 +77,12 @@ package Pp.Actions is
    --  Per_File_Action. Format_Vector is for calling from text editors and
    --  the like. Format_Vector is called from lalstub and partial-gnatpp.
 
+   procedure Set_Partial_Gnatpp_Offset (Val : Natural);
+   function Get_Partial_Gnatpp_Offset return Natural;
+   --  These two accessors are used by partial_gnatpp to write/read
+   --  global Partial_Gnatpp_Offset variable value. They are used exclusively
+   --  for the partial formatting of the code.
+
 private
 
    overriding procedure Init

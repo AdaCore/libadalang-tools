@@ -295,4 +295,26 @@ package body Laltools.Partial_GNATPP is
       end if;
    end Get_Selected_Region_Enclosing_Node;
 
+   ----------------------------
+   --  Get_Previous_Sibling  --
+   ----------------------------
+
+   function Get_Previous_Sibling (Node : Ada_Node) return Ada_Node
+   is
+   begin
+      pragma Assert (Node /= No_Ada_Node);
+      return Node.Previous_Sibling.As_Ada_Node;
+   end Get_Previous_Sibling;
+
+   ------------------------
+   --  Get_Next_Sibling  --
+   ------------------------
+
+   function Get_Next_Sibling (Node : Ada_Node) return Ada_Node
+   is
+   begin
+      pragma Assert (Node /= No_Ada_Node);
+      return Node.Next_Sibling.As_Ada_Node;
+   end Get_Next_Sibling;
+
 end Laltools.Partial_GNATPP;

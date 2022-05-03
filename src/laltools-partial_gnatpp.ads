@@ -56,4 +56,10 @@ package Laltools.Partial_GNATPP is
    --  end node when these are identical and the first common parent when
    --  these are different.
 
+   function Get_Previous_Sibling (Node : Ada_Node) return Ada_Node;
+   --  Returns the node's previous sibling or No_Ada_Node if no sibling found
+
+   function Get_Next_Sibling (Node : Ada_Node) return Ada_Node;
+   --  Returns the node's next sibling or No_Ada_Node if no sibling found
+
 end Laltools.Partial_GNATPP;

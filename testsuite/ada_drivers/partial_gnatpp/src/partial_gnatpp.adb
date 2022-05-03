@@ -136,11 +136,7 @@ procedure Partial_GNATpp is
       Selection  : Utils.Char_Vectors.Char_Vector;
       S          : GNAT.Strings.String_Access;
    begin
-      Ada.Text_IO.Put_Line ("MKU Get_Selection Node = "
-                            & Kind (Node)'Img);
-
       S := new String'(To_UTF8 (Node.Text));
-      Ada.Text_IO.Put_Line ("MKU Get_Selection before " & S.all);
       Selection.Append (S.all);
       GNAT.Strings.Free (S);
 
@@ -170,7 +166,7 @@ procedure Partial_GNATpp is
       Enclosing_Node       : Ada_Node;
 
    begin
-      Ada.Text_IO.Put_Line ("MKU Source_File = " & Source_File);
+      --  Ada.Text_IO.Put_Line ("MKU Source_File = " & Source_File);
       Main_Unit := Jobs (1).Analysis_Ctx.Get_From_File (Source_File);
 
       declare
@@ -205,26 +201,62 @@ procedure Partial_GNATpp is
                                              End_Node,
                                              Enclosing_Node);
 
-         Ada.Text_IO.Put_Line ("MKU Enclosing_Node = " & Enclosing_Node.Image);
-         Ada.Text_IO.Put_Line ("MKU Enclosing_Node START SLOC = ("
-                               & Enclosing_Node.Sloc_Range.Start_Line'Img & ","
-                               & Enclosing_Node.Sloc_Range.Start_Column'Img
-                               & ")");
-         Ada.Text_IO.Put_Line ("MKU Enclosing_Node END SLOC = ("
-                               & Enclosing_Node.Sloc_Range.End_Line'Img & ","
-                               & Enclosing_Node.Sloc_Range.End_Column'Img
-                               & ")");
+         --  Ada.Text_IO.Put_Line
+         --    ("MKU Enclosing_Node = " & Enclosing_Node.Image);
+         --
+         --  Ada.Text_IO.Put_Line
+         --    ("MKU Enclosing_Node START SLOC = ("
+         --     & Enclosing_Node.Sloc_Range.Start_Line'Img & ","
+         --     & Enclosing_Node.Sloc_Range.Start_Column'Img
+         --     & ")");
+         --
+         --  Ada.Text_IO.Put_Line
+         --    ("MKU Enclosing_Node END SLOC = ("
+         --     & Enclosing_Node.Sloc_Range.End_Line'Img & ","
+         --     & Enclosing_Node.Sloc_Range.End_Column'Img
+         --     & ")");
 
          pragma Assert (Enclosing_Node /= No_Ada_Node);
          Input := Get_Selection (Enclosing_Node);
+
+         --  Determine the offset for the indentation of the enclosing node
+         --  based on the previous or next sibling starting column position
+         --  and set this value for further usage by Insert_Indentation in the
+         --  post phases processing of the tree.
+         declare
+            Prev_Sibling : constant Ada_Node :=
+              Get_Previous_Sibling (Enclosing_Node);
+            Next_Sibling : constant Ada_Node :=
+              Get_Next_Sibling (Enclosing_Node);
+            Offset       : Natural := 0;
+         begin
+
+            if Prev_Sibling /= No_Ada_Node
+              and then Next_Sibling /= No_Ada_Node
+              and then Prev_Sibling.Sloc_Range.Start_Column =
+                Next_Sibling.Sloc_Range.Start_Column
+            then
+               Offset := Natural (Prev_Sibling.Sloc_Range.Start_Column);
+            elsif Prev_Sibling /= No_Ada_Node then
+               Offset := Natural (Prev_Sibling.Sloc_Range.Start_Column);
+            elsif Prev_Sibling /= No_Ada_Node then
+               Offset := Natural (Next_Sibling.Sloc_Range.Start_Column);
+            end if;
+
+            if Offset /= 0 then
+               Set_Partial_Gnatpp_Offset (Offset - 1);
+            end if;
+
+         end;
 
          declare
             Input_Str : constant String :=
               Char_Vectors.Elems (Input)
               (1 .. Char_Vectors.Last_Index (Input));
+            pragma Unreferenced (Input_Str);
 
          begin
-            Ada.Text_IO.Put_Line (Input_Str);
+            --  Ada.Text_IO.Put_Line (Input_Str);
             null;
          end;
 
