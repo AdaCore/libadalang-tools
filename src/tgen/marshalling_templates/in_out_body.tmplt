@@ -1,36 +1,69 @@
+@@--  Template for the bodies of the Input and Output subprograms.
+@@--  @_GLOBAL_PREFIX_@ Prefix used to prefix all entities local to the unit.
+@@--  @_TY_PREFIX_@ Prefix used to prefix all entities for the current type.
+@@--  @_TY_NAME_@ Name of the current type.
+@@--  @_NEEDS_HEADER_@ True if the current type needs a header.
+@@--  @_IS_SCALAR_@ True if the current type is a scalar type.
+@@--  @_MARSHALLING_LIB_@ Name of the libary file for the marshalling
+@@--       functions.
+@@--  @_GENERIC_NAME_@ Name of the generic package for the Input and Output
+@@--       functions.
+@@--
    --  Input and Output functions for @_TY_NAME_@
 
+@@IF@@ @_IS_SCALAR_@
+   procedure @_TY_PREFIX_@_Read_No_Param
+     (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class;
+      @_GLOBAL_PREFIX_@_Buffer : in out Unsigned_8;
+      @_GLOBAL_PREFIX_@_Offset : in out Offset_Type;
+      @_GLOBAL_PREFIX_@_V      : out @_TY_NAME_@)
+   is
+   begin
+     @_TY_PREFIX_@_Read
+       (@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer,
+        @_GLOBAL_PREFIX_@_Offset, @_GLOBAL_PREFIX_@_V);
+   end @_TY_PREFIX_@_Read_No_Param;
+
+   procedure @_TY_PREFIX_@_Write_No_Param
+     (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class;
+      @_GLOBAL_PREFIX_@_Buffer : in out Unsigned_8;
+      @_GLOBAL_PREFIX_@_Offset : in out Offset_Type;
+      @_GLOBAL_PREFIX_@_V      : @_TY_NAME_@)
+   is
+   begin
+     @_TY_PREFIX_@_Write
+       (@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer,
+        @_GLOBAL_PREFIX_@_Offset, @_GLOBAL_PREFIX_@_V);
+   end @_TY_PREFIX_@_Write_No_Param;
+
    package @_TY_PREFIX_@_In_Out is
-     new @_GENERIC_PACK_@.@_GENERIC_NAME_@
+     new @_MARSHALLING_LIB_@.@_GENERIC_NAME_@
        (T     => @_TY_NAME_@,
-        Read  => @_TY_PREFIX_@_Read,
-        Write => @_TY_PREFIX_@_Write);
+        Read  => @_TY_PREFIX_@_Read_No_Param,
+        Write => @_TY_PREFIX_@_Write_No_Param);
+@@ELSE@@
+   package @_TY_PREFIX_@_In_Out is
+     new @_MARSHALLING_LIB_@.@_GENERIC_NAME_@
+       (T      => @_TY_NAME_@,
+@@IF@@ @_NEEDS_HEADER_@
+        Header => @_TY_PREFIX_@_Header_Type,
+        Init   => @_TY_PREFIX_@_Init_From_Header,
+@@END_IF@@
+        Read   => @_TY_PREFIX_@_Read,
+        Write  => @_TY_PREFIX_@_Write);
+@@END_IF@@
 
    procedure @_TY_PREFIX_@_Output
      (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class;
       @_GLOBAL_PREFIX_@_V      : @_TY_NAME_@)
-      renames @_TY_PREFIX_@_In_Out.Output;
+     renames @_TY_PREFIX_@_In_Out.Output;
 
    function @_TY_PREFIX_@_Input
 @@IF@@ @_NEEDS_HEADER_@
      (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class;
-      @_HEADER_NAME_@      : @_HEADER_PREFIX_@_Type)
-      return @_TY_NAME_@
-   is
-      @_GLOBAL_PREFIX_@_V : @_TY_NAME_@
-@@INLINE(        \()(,\n         )(\);)@@
-   @@TABLE@@
-     @_CONSTRAINTS_@
-   @@END_TABLE@@
-@@END_INLINE@@
+      @_GLOBAL_PREFIX_@_H      : @_TY_PREFIX_@_Header_Type)
 @@ELSE@@
      (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class)
-      return @_TY_NAME_@
-   is
-      @_GLOBAL_PREFIX_@_V : @_TY_NAME_@;
 @@END_IF@@
-   begin
-      @_TY_PREFIX_@_In_Out.Input
-        (@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_V);
-      return @_GLOBAL_PREFIX_@_V;
-   end @_TY_PREFIX_@_Input;
+      return @_TY_NAME_@
+     renames @_TY_PREFIX_@_In_Out.Input;

@@ -1,0 +1,37 @@
+@@--  Template for the body of the Size function for an array type.
+@@--  @_GLOBAL_PREFIX_@ Prefix used to prefix all entities local to the unit.
+@@--  @_TY_PREFIX_@ Prefix used to prefix all entities for the current type.
+@@--  @_TY_NAME_@ Name of the current type.
+@@--  @_COMP_TY_@ Name of the component type.
+@@--  @_ADA_DIM_@ Vector of the suffixes for the array attributes of the
+@@--       dimensions of the current type.
+@@--  @_COMPONENT_SIZE_@ Call to Size for the component type on
+@@--       @_GLOBAL_PREFIX_@_E.
+@@--
+   function @_TY_PREFIX_@_Size
+     (@_GLOBAL_PREFIX_@_V : @_TY_NAME_@)
+     return Natural
+   is
+     @_GLOBAL_PREFIX_@_Length : constant Natural :=
+@@INLINE(        )( * )(;)@@
+@@TABLE@@
+@_GLOBAL_PREFIX_@_V'Length@_ADA_DIM_@
+@@END_TABLE@@
+@@END_INLINE@@
+   begin
+      if @_GLOBAL_PREFIX_@_Length = 0 then
+         return 0;
+      end if;
+      declare
+         @_GLOBAL_PREFIX_@_E : @_COMP_TYP_@ renames
+           @_GLOBAL_PREFIX_@_V
+@@INLINE(             \()(, )(\);)@@
+@@TABLE@@
+@_GLOBAL_PREFIX_@_V'First@_ADA_DIM_@
+@@END_TABLE@@
+@@END_INLINE@@
+      begin
+         return @_GLOBAL_PREFIX_@_Length *
+@_COMPONENT_SIZE_@
+      end;
+   end @_TY_PREFIX_@_Size;

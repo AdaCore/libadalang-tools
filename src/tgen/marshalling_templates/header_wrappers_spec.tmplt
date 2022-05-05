@@ -1,0 +1,19 @@
+@@--  Template for the spec part of the wrappers marhsalling both the
+@@--  values and the headers.
+@@--  @_GLOBAL_PREFIX_@ Prefix used to prefix all entities local to the unit.
+@@--  @_TY_PREFIX_@ Prefix used to prefix all entities for the current type.
+@@--  @_TY_NAME_@ Name of the current type.
+@@--
+   procedure @_TY_PREFIX_@_Write_All
+     (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class;
+      @_GLOBAL_PREFIX_@_Buffer : in out Unsigned_8;
+      @_GLOBAL_PREFIX_@_Offset : in out Offset_Type;
+      @_GLOBAL_PREFIX_@_V      : @_TY_NAME_@);
+
+   procedure @_TY_PREFIX_@_Read_All
+     (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class;
+      @_GLOBAL_PREFIX_@_Buffer : in out Unsigned_8;
+      @_GLOBAL_PREFIX_@_Offset : in out Offset_Type;
+      @_GLOBAL_PREFIX_@_V      : out @_TY_NAME_@);
+
+   function @_TY_PREFIX_@_Size_Max_All return Natural;

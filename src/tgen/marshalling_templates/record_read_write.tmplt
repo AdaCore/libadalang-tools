@@ -1,3 +1,17 @@
+@@--  Template for the bodies of the Write and Read procedures for a record
+@@--  type.
+@@--  @_GLOBAL_PREFIX_@ Prefix used to prefix all entities local to the unit.
+@@--  @_TY_PREFIX_@ Prefix used to prefix all entities for the current type.
+@@--  @_TY_NAME_@ Name of the current type.
+@@--  @_COMPONENT_WRITE_@ Calls to Write for the component type on all
+@@--       components of @_GLOBAL_PREFIX_@_V.
+@@--  @_COMPONENT_READ_@ Calls to Read for the component type on all components
+@@--       of @_GLOBAL_PREFIX_@_V.
+@@--  @_VARIANT_WRITE_@ Calls to Write for the components from the variant
+@@--       part of @_GLOBAL_PREFIX_@_V.
+@@--  @_VARIANT_READ_@ Calls to Read for the components from the variant part
+@@--       of @_GLOBAL_PREFIX_@_V.
+@@--
    procedure @_TY_PREFIX_@_Write
      (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class;
       @_GLOBAL_PREFIX_@_Buffer : in out Unsigned_8;
@@ -6,9 +20,7 @@
    is
    begin
 @@TABLE@@
-      @_COMP_PREFIX_@_Write
-        (@_SCALAR_BOUNDS_@@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer,
-         @_GLOBAL_PREFIX_@_Offset, @_GLOBAL_PREFIX_@_V.@_COMP_NAME_@);
+@_COMPONENT_WRITE_@
 @@END_TABLE@@
 @@IF@@ @_VARIANT_WRITE_@ /= ""
 @_VARIANT_WRITE_@
@@ -23,9 +35,7 @@
    is
    begin
 @@TABLE@@
-      @_COMP_PREFIX_@_Read
-        (@_SCALAR_BOUNDS_@@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer,
-         @_GLOBAL_PREFIX_@_Offset, @_GLOBAL_PREFIX_@_V.@_COMP_NAME_@);
+@_COMPONENT_READ_@
 @@END_TABLE@@
 @@IF@@ @_VARIANT_READ_@ /= ""
 @_VARIANT_READ_@

@@ -1,0 +1,34 @@
+@@--  Template for the body of the Size_Max function for a record type.
+@@--  @_GLOBAL_PREFIX_@ Prefix used to prefix all entities local to the unit.
+@@--  @_TY_PREFIX_@ Prefix used to prefix all entities for the current type.
+@@--  @_TY_NAME_@ Name of the current type.
+@@--  @_DISCR_NAME_@ Names of the discriminants of the current type.
+@@--  @_DISCR_TYP_@ Types of the discriminants of the current type.
+@@--  @_COMPONENT_SIZE_MAX_@ Vector of calls to Size_Max for all the
+@@--       components of the current type.
+@@--  @_VARIANT_SIZE_MAX_@ Computation of in NB_Bits of the maximum of the
+@@--       Size_Max of all the components in each choice value from the variant
+@@--       part of the current type.
+@@--
+@@INCLUDE@@ util.tmplt
+   function @_TY_PREFIX_@_Size_Max
+@@TABLE'ALIGN_ON(":", ":=")@@
+     @_LPAR()_@@_GLOBAL_PREFIX_@_@_DISCR_NAME_@_D_Min : @_DISCR_TYP_@ := @_DISCR_TYP_@'First;
+      @_GLOBAL_PREFIX_@_@_DISCR_NAME_@_D_Max : @_DISCR_TYP_@ := @_DISCR_TYP_@'Last@_RPAR()_@
+@@END_TABLE@@
+     return Natural
+   is
+   begin
+      return @_GLOBAL_PREFIX_@_Nb_Bits : Natural := 0 do
+@@TABLE@@
+         @_GLOBAL_PREFIX_@_Nb_Bits := @_GLOBAL_PREFIX_@_Nb_Bits +
+@_COMPONENT_SIZE_MAX_@
+@@END_TABLE@@
+@@IF@@ @_VARIANT_SIZE_MAX_@ /= ""
+@_VARIANT_SIZE_MAX_@
+@@END_IF@@
+      end return;
+   exception
+      when Constraint_Error =>
+         raise Program_Error with "type @_TY_NAME_@ can be too big";
+   end @_TY_PREFIX_@_Size_Max;

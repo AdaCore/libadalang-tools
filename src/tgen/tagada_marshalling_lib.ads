@@ -30,42 +30,42 @@ package TAGAda_Marshalling_Lib is
 
    type Offset_Type is mod 8;
 
+   procedure Write_Padding
+     (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+      Buffer : in out Unsigned_8;
+      Offset : in out Offset_Type;
+      Size   : Natural);
+
+   procedure Read_Padding
+     (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+      Buffer : in out Unsigned_8;
+      Offset : in out Offset_Type;
+      Size   : Natural);
+
    generic
       type T is (<>);
    package Read_Write_Discrete is
 
-      function Size return Natural;
+      function Size
+        (First : T := T'First;
+         Last  : T := T'Last) return Natural;
       --  Return the number of bits used for values of the type
 
       procedure Write
-        (First  : T;
-         Last   : T;
-         Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-         Buffer : in out Unsigned_8;
-         Offset : in out Offset_Type;
-         V      : T);
-
-      procedure Read
-        (First  : T;
-         Last   : T;
-         Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-         Buffer : in out Unsigned_8;
-         Offset : in out Offset_Type;
-         V      : out T);
-
-      --  Same as above but with F = F'First and L = L'Last
-
-      procedure Write
         (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
-         V      : T);
+         V      : T;
+         First  : T := T'First;
+         Last   : T := T'Last);
 
       procedure Read
         (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
-         V      : out T);
+         V      : out T;
+         First  : T := T'First;
+         Last   : T := T'Last);
 
    end Read_Write_Discrete;
 
@@ -73,35 +73,26 @@ package TAGAda_Marshalling_Lib is
       type T is delta <> digits <>;
    package Read_Write_Decimal_Fixed is
 
-      procedure Write
-        (First  : T;
-         Last   : T;
-         Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-         Buffer : in out Unsigned_8;
-         Offset : in out Offset_Type;
-         V      : T);
-
-      procedure Read
-        (First  : T;
-         Last   : T;
-         Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-         Buffer : in out Unsigned_8;
-         Offset : in out Offset_Type;
-         V      : out T);
-
-      --  Same as above but with F = F'First and L = L'Last
+      function Size
+        (First : T := T'First;
+         Last  : T := T'Last) return Natural;
+      --  Return the number of bits used for values of the type
 
       procedure Write
         (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
-         V      : T);
+         V      : T;
+         First  : T := T'First;
+         Last   : T := T'Last);
 
       procedure Read
         (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
-         V      : out T);
+         V      : out T;
+         First  : T := T'First;
+         Last   : T := T'Last);
 
    end Read_Write_Decimal_Fixed;
 
@@ -109,35 +100,26 @@ package TAGAda_Marshalling_Lib is
       type T is delta <>;
    package Read_Write_Ordinary_Fixed is
 
-      procedure Write
-        (First  : T;
-         Last   : T;
-         Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-         Buffer : in out Unsigned_8;
-         Offset : in out Offset_Type;
-         V      : T);
-
-      procedure Read
-        (First  : T;
-         Last   : T;
-         Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-         Buffer : in out Unsigned_8;
-         Offset : in out Offset_Type;
-         V      : out T);
-
-      --  Same as above but with F = F'First and L = L'Last
+      function Size
+        (First : T := T'First;
+         Last  : T := T'Last) return Natural;
+      --  Return the number of bits used for values of the type
 
       procedure Write
         (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
-         V      : T);
+         V      : T;
+         First  : T := T'First;
+         Last   : T := T'Last);
 
       procedure Read
         (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
-         V      : out T);
+         V      : out T;
+         First  : T := T'First;
+         Last   : T := T'Last);
 
    end Read_Write_Ordinary_Fixed;
 
@@ -155,40 +137,31 @@ package TAGAda_Marshalling_Lib is
       --  We only support standard floating point formats in targets that
       --  support them.
 
-      procedure Write
-        (First  : T;
-         Last   : T;
-         Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-         Buffer : in out Unsigned_8;
-         Offset : in out Offset_Type;
-         V      : T);
-
-      procedure Read
-        (First  : T;
-         Last   : T;
-         Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-         Buffer : in out Unsigned_8;
-         Offset : in out Offset_Type;
-         V      : out T);
-
-      --  Same as above but with F = F'First and L = L'Last
+      function Size
+        (First : T := T'First;
+         Last  : T := T'Last) return Natural;
+      --  Return the number of bits used for values of the type
 
       procedure Write
         (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
-         V      : T);
+         V      : T;
+         First  : T := T'First;
+         Last   : T := T'Last);
 
       procedure Read
         (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
-         V      : out T);
+         V      : out T;
+         First  : T := T'First;
+         Last   : T := T'Last);
 
    end Read_Write_Float;
 
    generic
-      type T (<>) is private;
+      type T is private;
 
       with procedure Write
         (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
@@ -204,14 +177,45 @@ package TAGAda_Marshalling_Lib is
 
    package In_Out is
 
-      procedure Input
-        (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-         V      : out T);
+      function Input
+        (Stream : not null access Ada.Streams.Root_Stream_Type'Class)
+        return T;
 
       procedure Output
         (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
          V      : T);
 
    end In_Out;
+
+   generic
+      type T (<>) is private;
+      type Header is private;
+
+      with function Init (H : Header) return T;
+
+      with procedure Write
+        (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+         Buffer : in out Unsigned_8;
+         Offset : in out Offset_Type;
+         V      : T);
+
+      with procedure Read
+        (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+         Buffer : in out Unsigned_8;
+         Offset : in out Offset_Type;
+         V      : out T);
+
+   package In_Out_Unconstrained is
+
+      function Input
+        (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+         H      : Header)
+        return T;
+
+      procedure Output
+        (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+         V      : T);
+
+   end In_Out_Unconstrained;
 
 end TAGAda_Marshalling_Lib;

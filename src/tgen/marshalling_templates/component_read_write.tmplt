@@ -1,0 +1,26 @@
+@@--  Template for a call to Read or Write.
+@@--  @_GLOBAL_PREFIX_@ Prefix used to prefix all entities local to the unit.
+@@--  @_COMP_PREFIX_@ Prefix used to prefix all entities for the component
+@@--       type.
+@@--  @_COMPONENT_@ Name of the selected component on which the call is made.
+@@--  @_ACTION_@ Either Read or Write.
+@@--  @_COMP_SCALAR_@ True iff the component type is a scalar type.
+@@--  @_NEEDS_HEADER_@ True iff the component type needs a header.
+@@--  @_CONSTRAINTS_@ Constraints for anonymous component types. They are only
+@@--       used for scalar types.
+@@--  @_SPACING_@ Sequence of spaces used for indentation.
+@@--
+@@IF@@ @_COMP_PREFIX_@ /= ""
+@@IF@@ @_NEEDS_HEADER_@ and @_CONSTRAINTS_@ = ""
+@_SPACING_@@_COMP_PREFIX_@_@_ACTION_@_All
+@@ELSE@@
+@_SPACING_@@_COMP_PREFIX_@_@_ACTION_@
+@@END_IF@@
+@_SPACING_@  (@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer,
+@@IF@@ COMP_SCALAR and @_CONSTRAINTS_@ /= ""
+@_SPACING_@   @_GLOBAL_PREFIX_@_Offset, @_COMPONENT_@,
+@_SPACING_@   @_CONSTRAINTS_@);
+@@ELSE@@
+@_SPACING_@   @_GLOBAL_PREFIX_@_Offset, @_COMPONENT_@);
+@@END_IF@@
+@@END_IF@@

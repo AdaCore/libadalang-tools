@@ -1,0 +1,24 @@
+@@--  Template for the body of the Size function for a record type.
+@@--  @_GLOBAL_PREFIX_@ Prefix used to prefix all entities local to the unit.
+@@--  @_TY_PREFIX_@ Prefix used to prefix all entities for the current type.
+@@--  @_TY_NAME_@ Name of the current type.
+@@--  @_COMPONENT_SIZE_@ Vector of calls to Size for all the components of
+@@--       @_GLOBAL_PREFIX_@_V.
+@@--  @_VARIANT_SIZE_@ Increments of NB_Bits by the Size of all the components
+@@--       from the variant part of @_GLOBAL_PREFIX_@_V.
+@@--
+   function @_TY_PREFIX_@_Size
+     (@_GLOBAL_PREFIX_@_V : @_TY_NAME_@)
+     return Natural
+   is
+   begin
+      return @_GLOBAL_PREFIX_@_Nb_Bits : Natural := 0 do
+@@TABLE@@
+         @_GLOBAL_PREFIX_@_Nb_Bits := @_GLOBAL_PREFIX_@_Nb_Bits +
+@_COMPONENT_SIZE_@
+@@END_TABLE@@
+@@IF@@ @_VARIANT_SIZE_@ /= ""
+@_VARIANT_SIZE_@
+@@END_IF@@
+      end return;
+   end @_TY_PREFIX_@_Size;

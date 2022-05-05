@@ -1,0 +1,44 @@
+@@--  Template for the specification of the base subprograms for composite
+@@--  types.
+@@--  @_GLOBAL_PREFIX_@ Prefix used to prefix all entities local to the unit.
+@@--  @_TY_PREFIX_@ Prefix used to prefix all entities for the current type.
+@@--  @_TY_NAME_@ Name of the current type.
+@@--  @_FIRST_NAME_@ Names of the components for the 'First attributes. Only
+@@--       set if the current type is an array.
+@@--  @_LAST_NAME_@ Same as above for the 'Last attributes.
+@@--  @_DISCR_NAME_@ Same as above for the discriminants of records.
+@@--  @_COMP_TYP_@ Index types for arrays, and types of the discriminants for
+@@--       records.
+@@--
+@@INCLUDE@@ util.tmplt
+   --  Base operations for @_TY_NAME_@
+
+   procedure @_TY_PREFIX_@_Write
+     (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class;
+      @_GLOBAL_PREFIX_@_Buffer : in out Unsigned_8;
+      @_GLOBAL_PREFIX_@_Offset : in out Offset_Type;
+      @_GLOBAL_PREFIX_@_V      : @_TY_NAME_@);
+
+   procedure @_TY_PREFIX_@_Read
+     (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class;
+      @_GLOBAL_PREFIX_@_Buffer : in out Unsigned_8;
+      @_GLOBAL_PREFIX_@_Offset : in out Offset_Type;
+      @_GLOBAL_PREFIX_@_V      : out @_TY_NAME_@);
+
+   function @_TY_PREFIX_@_Size
+     (@_GLOBAL_PREFIX_@_V : @_TY_NAME_@)
+     return Natural;
+
+   function @_TY_PREFIX_@_Size_Max
+@@IF@@ @_DISCR_NAME_@ /= ""
+@@TABLE'ALIGN_ON(":", ":=")@@
+     @_LPAR()_@@_GLOBAL_PREFIX_@_@_DISCR_NAME_@_D_Min : @_COMP_TYP_@ := @_COMP_TYP_@'First;
+      @_GLOBAL_PREFIX_@_@_DISCR_NAME_@_D_Max : @_COMP_TYP_@ := @_COMP_TYP_@'Last@_RPAR()_@
+@@END_TABLE@@
+@@ELSIF@@ @_FIRST_NAME_@ /= ""
+@@TABLE'ALIGN_ON(":", ":=")@@
+     @_LPAR()_@@_GLOBAL_PREFIX_@_@_FIRST_NAME_@ : @_COMP_TYP_@'Base := @_COMP_TYP_@'First;
+      @_GLOBAL_PREFIX_@_@_LAST_NAME_@ : @_COMP_TYP_@'Base := @_COMP_TYP_@'Last@_RPAR()_@
+@@END_TABLE@@
+@@END_IF@@
+     return Natural;

@@ -1,0 +1,45 @@
+@@--  Template for the variant part of the Size_Max function for record types.
+@@--  For each choice in the variant part, we compute the maximum value of
+@@--  the sum of the Size_Max of all the components in the variant part. We
+@@--  store the maximum of these values in Nb_Bits. To optimize, we do not
+@@--  consider a choice if the corresponding discriminant has a known value
+@@--  (the  corresponding Min and Max values are the same) and this value
+@@--  does not correspond to the choice.
+@@--  @_GLOBAL_PREFIX_@ Prefix used to prefix all entities local to the unit.
+@@--  @_TY_PREFIX_@ Prefix used to prefix all entities for the current type.
+@@--  @_TY_NAME_@ Name of the current type.
+@@--  @_DISCR_NAME_@ Names of the discriminants of the current type.
+@@--  @_CHOICES_@ Vector of choices for the variant part.
+@@--  @_COMPONENT_SIZE_MAX_@ Vector of calls to Size_Max for all the
+@@--       components of the current type.
+@@--  @_VARIANT_SIZE_MAX_@ Computation of in NB_Bits of the maximum of the
+@@--       Size_Max of all the components in each choice value from the variant
+@@--       part of the current type.
+@@--
+@_SPACING_@declare
+@_SPACING_@   @_GLOBAL_PREFIX_@_Init    : constant Natural := @_GLOBAL_PREFIX_@_Nb_Bits;
+@_SPACING_@   @_GLOBAL_PREFIX_@_Upper   : Natural renames @_GLOBAL_PREFIX_@_Nb_Bits;
+@_SPACING_@   @_GLOBAL_PREFIX_@_Nb_Bits : Natural;
+@_SPACING_@begin
+@@TABLE@@
+@@IF@@ (@_COMPONENT_SIZE_MAX_@ = "") and (@_VARIANT_PART_@ = "")
+@_SPACING_@   null;
+@@ELSE@@
+@_SPACING_@   if @_GLOBAL_PREFIX_@_@_DISCR_NAME_@_D_Max /= @_GLOBAL_PREFIX_@_@_DISCR_NAME_@_D_Min
+@_SPACING_@     or else @_GLOBAL_PREFIX_@_@_DISCR_NAME_@_D_Min in @_CHOICES_@
+@_SPACING_@   then
+@_SPACING_@      @_GLOBAL_PREFIX_@_Nb_Bits := @_GLOBAL_PREFIX_@_Init;
+@@TABLE'TERSE@@
+@_SPACING_@      @_GLOBAL_PREFIX_@_Nb_Bits := @_GLOBAL_PREFIX_@_Nb_Bits +
+@_COMPONENT_SIZE_MAX_@
+@@END_TABLE@@
+@@IF@@ @_VARIANT_PART_@ /= ""
+@_VARIANT_PART_@
+@@END_IF@@
+@_SPACING_@      if @_GLOBAL_PREFIX_@_Nb_Bits > @_GLOBAL_PREFIX_@_Upper then
+@_SPACING_@         @_GLOBAL_PREFIX_@_Upper := @_GLOBAL_PREFIX_@_Nb_Bits;
+@_SPACING_@      end if;
+@_SPACING_@   end if;
+@@END_IF@@
+@@END_TABLE@@
+@_SPACING_@end;

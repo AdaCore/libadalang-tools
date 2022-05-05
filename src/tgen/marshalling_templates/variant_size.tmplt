@@ -1,0 +1,33 @@
+@@--  Template for the variant part of the Write and Read procedures for record
+@@--  types.
+@@--  @_GLOBAL_PREFIX_@ Prefix used to prefix all entities local to the unit.
+@@--  @_OBJECT_NAME_@ Name of the object that we are reading or writing. It is
+@@--       not a problem if it is not initialized, we are only reading the
+@@--       discriminants.
+@@--  @_DISCR_NAME_@ Name of the discriminant for the variant part.
+@@--  @_CHOICES_@ Vector of choices for the variant part.
+@@--  @_COMPONENT_SIZE_@ Matrix of calls to Size on all the components of all
+@@--       the choices of the variant part.
+@@--  @_VARIANT_PART_@ Vector of increments of NB_Bits by the Size of all the
+@@--       components from the variant part of all the choices of the variant
+@@--       part.
+@@--  @_SPACING_@ Sequence of spaces used for indentation.
+@@--
+@_SPACING_@case @_OBJECT_NAME_@.@_DISCR_NAME_@ is
+@@TABLE@@
+@_SPACING_@   when @_CHOICES_@ =>
+@@IF@@ (@_COMPONENT_SIZE_@ = "") and (@_VARIANT_PART_@ = "")
+@_SPACING_@      null;
+@@ELSE@@
+@@TABLE@@
+@@IF@@ @_COMPONENT_SIZE_@ /= ""
+@_SPACING_@      @_GLOBAL_PREFIX_@_Nb_Bits := @_GLOBAL_PREFIX_@_Nb_Bits +
+@_COMPONENT_SIZE_@
+@@END_IF@@
+@@END_TABLE@@
+@@IF@@ @_VARIANT_PART_@ /= ""
+@_VARIANT_PART_@
+@@END_IF@@
+@@END_IF@@
+@@END_TABLE@@
+@_SPACING_@end case;

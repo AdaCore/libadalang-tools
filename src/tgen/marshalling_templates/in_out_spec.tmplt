@@ -1,3 +1,9 @@
+@@--  Template for the spec of the Input and Output subprograms.
+@@--  @_GLOBAL_PREFIX_@ Prefix used to prefix all entities local to the unit.
+@@--  @_TY_PREFIX_@ Prefix used to prefix all entities for the current type.
+@@--  @_TY_NAME_@ Name of the current type.
+@@--  @_NEEDS_HEADER_@ True if the current type needs a header.
+@@--
    --  Input and Output functions for @_TY_NAME_@
 
    procedure @_TY_PREFIX_@_Output
@@ -7,7 +13,7 @@
    function @_TY_PREFIX_@_Input
 @@IF@@ @_NEEDS_HEADER_@
      (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class;
-      @_HEADER_NAME_@      : @_HEADER_PREFIX_@_Type)
+      @_GLOBAL_PREFIX_@_H      : @_TY_PREFIX_@_Header_Type)
 @@ELSE@@
      (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class)
 @@END_IF@@

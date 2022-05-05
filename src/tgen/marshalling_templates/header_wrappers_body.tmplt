@@ -1,0 +1,59 @@
+@@--  Template for the body part of the wrappers marhsalling both the
+@@--  values and the headers.
+@@--  @_GLOBAL_PREFIX_@ Prefix used to prefix all entities local to the unit.
+@@--  @_TY_PREFIX_@ Prefix used to prefix all entities for the current type.
+@@--  @_TY_NAME_@ Name of the current type.
+@@--
+@@INCLUDE@@ util.tmplt
+   @_TY_PREFIX_@_Size_Max_All_Const : constant Natural :=
+      @_TY_PREFIX_@_Size_Max;
+
+   procedure @_TY_PREFIX_@_Write_All
+     (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class;
+      @_GLOBAL_PREFIX_@_Buffer : in out Unsigned_8;
+      @_GLOBAL_PREFIX_@_Offset : in out Offset_Type;
+      @_GLOBAL_PREFIX_@_V      : @_TY_NAME_@)
+   is
+   begin
+      @_TY_PREFIX_@_Write_Header
+        (@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer,
+         @_GLOBAL_PREFIX_@_Offset, @_GLOBAL_PREFIX_@_V);
+      @_TY_PREFIX_@_Write
+        (@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer,
+         @_GLOBAL_PREFIX_@_Offset, @_GLOBAL_PREFIX_@_V);
+      Write_Padding
+        (@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer,
+         @_GLOBAL_PREFIX_@_Offset,
+         Size => @_TY_PREFIX_@_Size_Max_All_Const -
+            @_TY_PREFIX_@_Size (@_GLOBAL_PREFIX_@_V));
+   end @_TY_PREFIX_@_Write_All;
+
+   procedure @_TY_PREFIX_@_Read_All
+     (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class;
+      @_GLOBAL_PREFIX_@_Buffer : in out Unsigned_8;
+      @_GLOBAL_PREFIX_@_Offset : in out Offset_Type;
+      @_GLOBAL_PREFIX_@_V      : out @_TY_NAME_@)
+   is
+      @_GLOBAL_PREFIX_@_H : @_TY_PREFIX_@_Header_Type;
+   begin
+      @_TY_PREFIX_@_Read_Header
+        (@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer,
+         @_GLOBAL_PREFIX_@_Offset, @_GLOBAL_PREFIX_@_H);
+      @_GLOBAL_PREFIX_@_V :=
+        @_TY_PREFIX_@_Init_From_Header (@_GLOBAL_PREFIX_@_H);
+      @_TY_PREFIX_@_Read
+        (@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer,
+         @_GLOBAL_PREFIX_@_Offset, @_GLOBAL_PREFIX_@_V);
+      Read_Padding
+        (@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer,
+         @_GLOBAL_PREFIX_@_Offset,
+         Size => @_TY_PREFIX_@_Size_Max_All_Const -
+            @_TY_PREFIX_@_Size (@_GLOBAL_PREFIX_@_V));
+
+      if @_GLOBAL_PREFIX_@_V not in @_TY_NAME_@ then
+        raise Invalid_Value;
+      end if;
+   end @_TY_PREFIX_@_Read_All;
+
+   function @_TY_PREFIX_@_Size_Max_All return Natural is
+      (@_TY_PREFIX_@_Size_Max_All_Const + @_TY_PREFIX_@_Bit_Size_Header);

@@ -1,0 +1,30 @@
+@@--  Template for the specification of the base subprograms for scalar types.
+@@--  @_GLOBAL_PREFIX_@ Prefix used to prefix all entities local to the unit.
+@@--  @_TY_PREFIX_@ Prefix used to prefix all entities for the current type.
+@@--  @_TY_NAME_@ Name of the current type or of its base type if we are
+@@--       doing the generation for the base type.
+@@--  @_FOR_BASE_@ True if we are doing the generation for the base type.
+@@--
+@@INCLUDE@@ util.tmplt
+   --  Base operations for @_TY_NAME_@
+
+   procedure @_TY_PREFIX_@_Write@_BASE_SUFFIX()_@
+     (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class;
+      @_GLOBAL_PREFIX_@_Buffer : in out Unsigned_8;
+      @_GLOBAL_PREFIX_@_Offset : in out Offset_Type;
+      @_GLOBAL_PREFIX_@_V      : @_TY_NAME_@;
+      @_GLOBAL_PREFIX_@_First  : @_TY_NAME_@ := @_TY_NAME_@'First;
+      @_GLOBAL_PREFIX_@_Last   : @_TY_NAME_@ := @_TY_NAME_@'Last);
+
+   procedure @_TY_PREFIX_@_Read@_BASE_SUFFIX()_@
+     (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class;
+      @_GLOBAL_PREFIX_@_Buffer : in out Unsigned_8;
+      @_GLOBAL_PREFIX_@_Offset : in out Offset_Type;
+      @_GLOBAL_PREFIX_@_V      : out @_TY_NAME_@;
+      @_GLOBAL_PREFIX_@_First  : @_TY_NAME_@ := @_TY_NAME_@'First;
+      @_GLOBAL_PREFIX_@_Last   : @_TY_NAME_@ := @_TY_NAME_@'Last);
+
+   function @_TY_PREFIX_@_Size@_BASE_SUFFIX()_@
+     (@_GLOBAL_PREFIX_@_First  : @_TY_NAME_@ := @_TY_NAME_@'First;
+      @_GLOBAL_PREFIX_@_Last   : @_TY_NAME_@ := @_TY_NAME_@'Last)
+      return Natural;

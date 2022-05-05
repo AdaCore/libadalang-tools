@@ -1,0 +1,22 @@
+@@--  Template for a call to Size.
+@@--  @_COMP_PREFIX_@ Prefix used to prefix all entities for the component
+@@--       type.
+@@--  @_COMPONENT_@ Name of the selected component on which the call is made.
+@@--  @_COMP_SCALAR_@ True iff the component type is a scalar type.
+@@--  @_NEEDS_HEADER_@ True iff the component type needs a header.
+@@--  @_CONSTRAINTS_@ Constraints for anonymous component types. They are only
+@@--       used for scalar types.
+@@--  @_SPACING_@ Sequence of spaces used for indentation.
+@@--
+@@IF@@ @_COMP_SCALAR_@
+@@IF@@ @_CONSTRAINTS_@ /= ""
+@_SPACING_@  @_COMP_PREFIX_@_Size
+@_SPACING_@    (@_CONSTRAINTS_@);
+@@ELSE@@
+@_SPACING_@  @_COMP_PREFIX_@_Size;
+@@END_IF@@
+@@ELSIF@@ @_NEEDS_HEADER_@ and @_CONSTRAINTS_@ = ""
+@_SPACING_@  @_COMP_PREFIX_@_Size_Max_All;
+@@ELSE@@
+@_SPACING_@  @_COMP_PREFIX_@_Size (@_COMPONENT_@);
+@@END_IF@@

@@ -1,0 +1,44 @@
+@@--  Template for the body of the Size_Max function for an array type.
+@@--  @_GLOBAL_PREFIX_@ Prefix used to prefix all entities local to the unit.
+@@--  @_TY_PREFIX_@ Prefix used to prefix all entities for the current type.
+@@--  @_TY_NAME_@ Name of the current type.
+@@--  @_ADA_DIM_@ Vector of the suffixes for the array attributes of the
+@@--       dimensions of the current type.
+@@--  @_FIRST_NAME_@ Vector of the names used for the parameters standing for
+@@--       the 'First attribute for all dimensions of the current type.
+@@--  @_LAST_NAME_@ Vector of the names used for the parameters standing for
+@@--       the 'Last attribute for all dimensions of the current type.
+@@--  @_BOUND_TYP_@ Vector of all the index types of the current type.
+@@--  @_COMPONENT_SIZE_MAX_@ Call to Size_Max for the component type on
+@@--       @_GLOBAL_PREFIX_@_E.
+@@--
+@@INCLUDE@@ util.tmplt
+   function @_TY_PREFIX_@_Size_Max
+@@TABLE'ALIGN_ON(":", ":=")@@
+     @_LPAR()_@@_GLOBAL_PREFIX_@_@_FIRST_NAME_@ : @_BOUND_TYP_@'Base := @_BOUND_TYP_@'First;
+      @_GLOBAL_PREFIX_@_@_LAST_NAME_@ : @_BOUND_TYP_@'Base := @_BOUND_TYP_@'Last@_RPAR()_@
+@@END_TABLE@@
+     return Natural
+   is
+@@IF@@ @_BOUND_NAME_@ = ""
+      @_GLOBAL_PREFIX_@_Length : Natural := 1;
+@@ELSE@@
+      @_GLOBAL_PREFIX_@_Length : constant Natural :=
+@@INLINE(        )( * )(;)@@
+@@TABLE@@
+@_TY_NAME_@'Length@_ADA_DIM_@
+@@END_TABLE@@
+@@END_INLINE@@
+@@END_IF@@
+   begin
+@@TABLE@@
+      @_GLOBAL_PREFIX_@_Length := @_GLOBAL_PREFIX_@_Length *
+        Natural'Max (0, @_BOUND_TYP_@'Pos (@_GLOBAL_PREFIX_@_@_LAST_NAME_@)
+                     - @_BOUND_TYP_@'Pos (@_GLOBAL_PREFIX_@_@_FIRST_NAME_@) + 1);
+@@END_TABLE@@
+      return @_GLOBAL_PREFIX_@_Length *
+@_COMPONENT_SIZE_MAX_@
+   exception
+      when Constraint_Error =>
+         raise Program_Error with "type @_TY_NAME_@ can be too big";
+   end @_TY_PREFIX_@_Size_Max;

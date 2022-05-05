@@ -1,43 +1,136 @@
-   --  Input and Output functions for headers of type @_TY_NAME_@
+@@--  Template for the body part of the header handling.
+@@--  @_GLOBAL_PREFIX_@ Prefix used to prefix all entities local to the unit.
+@@--  @_TY_PREFIX_@ Prefix used to prefix all entities for the current type.
+@@--  @_TY_NAME_@ Name of the current type.
+@@--  @_FIRST_NAME_@ Names of the components for the 'First attributes. Only
+@@--       set if the current type is an array.
+@@--  @_LAST_NAME_@ Same as above for the 'Last attributes.
+@@--  @_ADA_DIM_@ Suffixes of the array attributes for each dimension.
+@@--  @_DISCR_NAME_@ Same as above for the discriminants of records.
+@@--  @_COMP_PREFIX_@ Prefixes used for all entity of the index types
+@@--       for arrays, and of the discriminants for records.
+@@--
+@@INCLUDE@@ util.tmplt
+   --  Input and Output subprograms for headers of type @_TY_NAME_@
 
-   function @_TY_PREFIX_@_Input
-     (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class)
-     return @_TY_PREFIX_@_Type
+   procedure @_TY_PREFIX_@_Read_Header
+     (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class;
+      @_GLOBAL_PREFIX_@_Buffer : in out Unsigned_8;
+      @_GLOBAL_PREFIX_@_Offset : in out Offset_Type;
+      @_GLOBAL_PREFIX_@_V      : out @_TY_PREFIX_@_Header_Type)
    is
-      @_GLOBAL_PREFIX_@_Buffer : Unsigned_8 := 0;
-      @_GLOBAL_PREFIX_@_Offset : Offset_Type := 0;
-      @_GLOBAL_PREFIX_@_H      : @_TY_PREFIX_@_Type;
    begin
+@@IF@@ @_FIRST_NAME_@ /= ""
+@@TABLE@@
+      @_COMP_PREFIX_@_Read_Base
+        (@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer,
+         @_GLOBAL_PREFIX_@_Offset, @_GLOBAL_PREFIX_@_V.@_FIRST_NAME_@);
+      @_COMP_PREFIX_@_Read_Base
+        (@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer,
+         @_GLOBAL_PREFIX_@_Offset, @_GLOBAL_PREFIX_@_V.@_LAST_NAME_@);
+@@END_TABLE@@
+@@ELSE@@
 @@TABLE@@
       @_COMP_PREFIX_@_Read
         (@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer,
-         @_GLOBAL_PREFIX_@_Offset, @_GLOBAL_PREFIX_@_H.@_COMP_NAME_@);
+         @_GLOBAL_PREFIX_@_Offset, @_GLOBAL_PREFIX_@_V.@_DISCR_NAME_@);
 @@END_TABLE@@
-      return @_GLOBAL_PREFIX_@_H;
-   end @_TY_PREFIX_@_Input;
+@@END_IF@@
+   end @_TY_PREFIX_@_Read_Header;
 
-   procedure @_TY_PREFIX_@_Output
+   procedure @_TY_PREFIX_@_Write_Header
+     (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class;
+      @_GLOBAL_PREFIX_@_Buffer : in out Unsigned_8;
+      @_GLOBAL_PREFIX_@_Offset : in out Offset_Type;
+      @_GLOBAL_PREFIX_@_V      : @_TY_NAME_@)
+   is
+   begin
+@@IF@@ @_FIRST_NAME_@ /= ""
+@@TABLE@@
+      @_COMP_PREFIX_@_Write_Base
+        (@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer,
+         @_GLOBAL_PREFIX_@_Offset, @_GLOBAL_PREFIX_@_V'First@_ADA_DIM_@);
+      @_COMP_PREFIX_@_Write_Base
+        (@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer,
+         @_GLOBAL_PREFIX_@_Offset, @_GLOBAL_PREFIX_@_V'Last@_ADA_DIM_@);
+@@END_TABLE@@
+@@ELSE@@
+@@TABLE@@
+      @_COMP_PREFIX_@_Write
+        (@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer,
+         @_GLOBAL_PREFIX_@_Offset, @_GLOBAL_PREFIX_@_V.@_DISCR_NAME_@);
+@@END_TABLE@@
+@@END_IF@@
+   end @_TY_PREFIX_@_Write_Header;
+
+   function @_TY_PREFIX_@_Init_From_Header
+     (@_GLOBAL_PREFIX_@_H : @_TY_PREFIX_@_Header_Type)
+      return @_TY_NAME_@
+   is
+   begin
+      pragma Warnings (Off, "variable ""@_GLOBAL_PREFIX_@_V"" is read but never assigned");
+      return @_GLOBAL_PREFIX_@_V : @_TY_NAME_@
+@@IF@@ @_FIRST_NAME_@ /= ""
+@@TABLE'ALIGN_ON("..")@@
+            @_LPAR()_@@_GLOBAL_PREFIX_@_H.@_FIRST_NAME_@ .. @_GLOBAL_PREFIX_@_H.@_LAST_NAME_@@_RVPAR()_@
+@@END_TABLE@@
+@@ELSE@@
+@@TABLE'ALIGN_ON("=>")@@
+            @_LPAR()_@@_DISCR_NAME_@ => @_GLOBAL_PREFIX_@_H.@_DISCR_NAME_@@_RVPAR()_@
+@@END_TABLE@@
+@@END_IF@@
+      do
+         null;
+      end return;
+      pragma Warnings (On, "variable ""@_GLOBAL_PREFIX_@_V"" is read but never assigned");
+   end @_TY_PREFIX_@_Init_From_Header;
+
+   function @_TY_PREFIX_@_Input_Header
+     (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class)
+     return @_TY_PREFIX_@_Header_Type
+   is
+      @_GLOBAL_PREFIX_@_Buffer : Unsigned_8 := 0;
+      @_GLOBAL_PREFIX_@_Offset : Offset_Type := 0;
+   begin
+      return @_GLOBAL_PREFIX_@_V : @_TY_PREFIX_@_Header_Type do
+        @_TY_PREFIX_@_Read_Header
+           (@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer,
+            @_GLOBAL_PREFIX_@_Offset, @_GLOBAL_PREFIX_@_V);
+      end return;
+   end @_TY_PREFIX_@_Input_Header;
+
+   procedure @_TY_PREFIX_@_Output_Header
      (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class;
       @_GLOBAL_PREFIX_@_V      : @_TY_NAME_@)
    is
       @_GLOBAL_PREFIX_@_Buffer : Unsigned_8 := 0;
       @_GLOBAL_PREFIX_@_Offset : Offset_Type := 0;
    begin
-@@TABLE@@
-      @_COMP_PREFIX_@_Write
-        (@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer,
-         @_GLOBAL_PREFIX_@_Offset, @_GLOBAL_PREFIX_@_V@_ADA_COMP_OR_ATTR_@);
-@@END_TABLE@@
+      @_TY_PREFIX_@_Write_Header
+         (@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer,
+          @_GLOBAL_PREFIX_@_Offset, @_GLOBAL_PREFIX_@_V);
       if @_GLOBAL_PREFIX_@_Offset /= 0 then
          Unsigned_8'Write (@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer);
       end if;
-   end @_TY_PREFIX_@_Output;
+   end @_TY_PREFIX_@_Output_Header;
 
-   function @_TY_PREFIX_@_Size return Natural is
-      Nb_Bits : Natural := 0;
+   function @_TY_PREFIX_@_Bit_Size_Header return Natural is
    begin
+      return @_GLOBAL_PREFIX_@_Nb_Bits : Natural := 0 do
+@@IF@@ @_FIRST_NAME_@ /= ""
 @@TABLE@@
-      Nb_Bits := Nb_Bits + @_COMP_PREFIX_@_Size;
+         @_GLOBAL_PREFIX_@_Nb_Bits := @_GLOBAL_PREFIX_@_Nb_Bits + @_COMP_PREFIX_@_Size_Base;
 @@END_TABLE@@
-      return (Nb_Bits + 7) / 8;
-   end @_TY_PREFIX_@_Size;
+         @_GLOBAL_PREFIX_@_Nb_Bits := @_GLOBAL_PREFIX_@_Nb_Bits * 2;
+@@ELSE@@
+@@TABLE@@
+         @_GLOBAL_PREFIX_@_Nb_Bits := @_GLOBAL_PREFIX_@_Nb_Bits + @_COMP_PREFIX_@_Size;
+@@END_TABLE@@
+@@END_IF@@
+      end return;
+   end @_TY_PREFIX_@_Bit_Size_Header;
+
+   function @_TY_PREFIX_@_Byte_Size_Header return Natural is
+   begin
+      return (@_TY_PREFIX_@_Bit_Size_Header + 7) / 8;
+   end @_TY_PREFIX_@_Byte_Size_Header;
