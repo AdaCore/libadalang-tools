@@ -1039,6 +1039,7 @@ package body Laltools.Refactor.Pull_Up_Declaration is
       Calls_References  : constant Ref_Result_Array :=
         P_Find_All_Calls (Subp.P_Defining_Name, Analysis_Units);
       Call              : Call_Stmt;
+      Call_Expr         : Libadalang.Analysis.Call_Expr;
       Call_Kind         : Ada_Node_Kind_Type;
       Param_Assoc_List  : Assoc_List;
       First_Param_Assoc : Param_Assoc;
@@ -1093,12 +1094,12 @@ package body Laltools.Refactor.Pull_Up_Declaration is
                Actual_Parameters);
 
          elsif Ref (Call_Reference).Parent.Kind in Ada_Call_Expr then
-            Call := Ref (Call_Reference).Parent.Parent.As_Call_Stmt;
-            Call_Kind := Call.F_Call.As_Call_Expr.F_Suffix.Kind;
+            Call_Expr := Ref (Call_Reference).Parent.As_Call_Expr;
+            Call_Kind := Call_Expr.F_Suffix.Kind;
             case Call_Kind is
                when Ada_Assoc_List_Range =>
                   Param_Assoc_List :=
-                    Call.F_Call.As_Call_Expr.F_Suffix.As_Assoc_List;
+                    Call_Expr.F_Suffix.As_Assoc_List;
                   for Param_Assoc of Param_Assoc_List loop
                      First_Param_Assoc := Param_Assoc.As_Param_Assoc;
                      Has_Designators :=
