@@ -419,20 +419,39 @@ package body Laltools.Refactor.Subprogram_Signature.Remove_Parameter is
       is
          pragma Unreferenced (Kind, Cancel);
 
-         Arguments : constant Assoc_List :=
-           (if Call_Identifier.Parent.Kind /= Ada_Call_Expr then
+         --  Call_Identifier might refer to a dotted name subprogram call.
+         --  If so, the Call_Expr is always the .Parent.Parent, even when
+         --  there are multiple dotted names.
+         --  If it's not a dotted name call, then the Call_Expr is .Parent.
+         --  If this call does not have actual parameter, then Call_Expr does
+         --  not exist.
+         Call_Expr : constant Libadalang.Analysis.Call_Expr :=
+           (if Call_Identifier.Parent.Kind in Ada_Call_Expr_Range then
+              Call_Identifier.Parent.As_Call_Expr
+            elsif Call_Identifier.Parent.Parent.Kind in
+                    Ada_Call_Expr_Range
+            then
+              Call_Identifier.Parent.Parent.As_Call_Expr
+            else
+              No_Call_Expr);
+
+         Actual_Params : constant Assoc_List :=
+           (if Call_Expr.Is_Null
+              or else Call_Expr.F_Suffix.Is_Null
+              or else Call_Expr.F_Suffix.Kind not in Ada_Assoc_List_Range
+            then
                No_Assoc_List
             else
-               Call_Identifier.Parent.As_Call_Expr.F_Suffix.As_Assoc_List);
+               Call_Expr.F_Suffix.As_Assoc_List);
+
       begin
-         if Arguments.Is_Null then
+         if Actual_Params.Is_Null then
             return;
          end if;
 
          declare
             Aux_Argument_Indices : constant Extended_Argument_Indicies_Type :=
-              Map_Parameters_To_Arguments
-                (Parameters, Call_Identifier.Parent.As_Call_Expr);
+              Map_Parameters_To_Arguments (Parameters, Call_Expr);
             Argument_Indices : Parameter_Indices_Type
               (Aux_Argument_Indices'First .. Aux_Argument_Indices'Last);
             Index : Positive := Aux_Argument_Indices'First;
@@ -447,7 +466,7 @@ package body Laltools.Refactor.Subprogram_Signature.Remove_Parameter is
 
             for SLOC of
               Arguments_SLOC
-                (Call_Identifier.Parent.As_Call_Expr,
+                (Call_Expr,
                  Unique
                    (Argument_Indices
                       (Aux_Argument_Indices'First .. Index - 1)))
