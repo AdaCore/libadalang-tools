@@ -1,0 +1,32 @@
+Extracting as a ADA_SUBP_KIND_FUNCTION:
+my_package.adb
+10:1-10:1 
+      function Foo
+        (J : Integer)
+         return Integer;
+
+      function Foo
+        (J : Integer)
+         return Integer is
+      begin
+         return J * J;
+      end Foo;
+
+
+13:10-13:29 J_Squared := Foo (J);
+
+Extracting as a ADA_SUBP_KIND_PROCEDURE:
+my_package.adb
+10:1-10:1 
+      procedure Foo
+        (J : Integer);
+
+      procedure Foo
+        (J : Integer) is
+      begin
+         J_Squared := J * J;
+      end Foo;
+
+
+13:10-13:29 Foo (J);
+

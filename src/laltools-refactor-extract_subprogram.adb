@@ -153,7 +153,7 @@ package body Laltools.Refactor.Extract_Subprogram is
          end if;
 
       elsif Reference.Parent.Parent.Kind in Ada_Assign_Stmt_Range then
-         if Reference.Parent = Reference.Parent.As_Assign_Stmt.F_Dest
+         if Reference.Parent = Reference.Parent.Parent.As_Assign_Stmt.F_Dest
            and then Reference.Parent =
                       Reference.Parent.Parent.As_Assign_Stmt.F_Expr
          then
