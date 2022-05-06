@@ -1,0 +1,1 @@
+extract_subprogram -P default.gpr -S my_package.adb -SL 9 -SC 10 -EL 10 -EC 10 -N Foo

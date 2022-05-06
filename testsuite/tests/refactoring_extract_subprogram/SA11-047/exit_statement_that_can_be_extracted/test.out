@@ -1,0 +1,23 @@
+Extracting as a ADA_SUBP_KIND_PROCEDURE:
+my_package.adb
+7:1-7:1 
+      procedure Foo;
+
+      procedure Foo is
+      begin
+         for J in Start_Index .. End_Index loop
+            null;
+            exit when J = Start_Index + 2;
+            declare
+               Dummy : Integer;
+            begin
+               for K in Start_Index .. End_Index loop
+                  exit when J = Start_Index + 2;
+               end loop;
+            end;
+         end loop;
+      end Foo;
+
+
+8:7-18:16 Foo;
+

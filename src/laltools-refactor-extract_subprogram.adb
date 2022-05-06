@@ -25,6 +25,7 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Characters.Latin_1;
 
 with Ada.Containers.Hashed_Sets;
+with Ada.Containers.Indefinite_Hashed_Sets;
 
 with Ada.Strings;
 with Ada.Strings.Fixed;
@@ -1864,6 +1865,8 @@ package body Laltools.Refactor.Extract_Subprogram is
 
       Start_Stmt : Stmt := No_Stmt;
       End_Stmt   : Stmt := No_Stmt;
+      It_Stmt    : Stmt := No_Stmt;
+      --  Used to iterate from Start_Stmt to End_Stmt
 
       Aux : Ada_Node := No_Ada_Node;
 
@@ -1938,6 +1941,123 @@ package body Laltools.Refactor.Extract_Subprogram is
          return False;
       end if;
 
+      --  Check for exit statements that cannot be extracted
+      It_Stmt := Start_Stmt;
+      loop
+         if It_Stmt.Kind in Ada_Exit_Stmt then
+            --  If any sibling node from Start_Stmt to End_Stmt is an Exit_Stmt
+            --  node we can immediately conclude that its correspondent
+            --  loop statement will not be extracted, therefore, neither does
+            --  this exit statement.
+            Available_Subprogram_Kinds := [others => False];
+            return False;
+
+         else
+            declare
+               Found_Forbidden_Exit_Stmt : Boolean := False;
+               --  Flag to be filled by the Look_Up_Forbidden_Exit_Stmts
+               --  traverse function.
+
+               package Defining_Name_Indefinite_Hashed_Sets is new
+                 Ada.Containers.Indefinite_Hashed_Sets
+                   (Element_Type        => Defining_Name'Class,
+                    Hash                => Defining_Name_Hash,
+                    Equivalent_Elements => "=",
+                    "="                 => "=");
+
+               subtype Named_Loop_Indefinite_Hashed_Set is
+                 Defining_Name_Indefinite_Hashed_Sets.Set;
+
+               Found_Loop : Boolean := It_Stmt.Kind in Ada_Base_Loop_Stmt;
+               --  This variable will state if a loop node was found. If True
+               --  before finding an unnamed exit statement, then the exit
+               --  statement is allowed to be removed.
+               --  This is not applicable for named exit statements since
+               --  the correspondent named loop needs to be analysed.
+
+               Named_Loop_Stmts : Named_Loop_Indefinite_Hashed_Set;
+               --  A named exit statement can only be extracted iff its
+               --  corresponding named loop statement was found first. This set
+               --  will hold all the named loop statement that are to be
+               --  extracted.
+
+               function Look_Up_Forbidden_Exit_Stmts
+                 (Node : Ada_Node'Class)
+                  return Visit_Status;
+               --  Traverse function that looks for exit statments that
+               --  cannot be extracted.
+               --  An exit statement can only be extract iff it's correspondent
+               --  loop statement is also extracted.
+
+               ----------------------------------
+               -- Look_Up_Forbidden_Exit_Stmts --
+               ----------------------------------
+
+               function Look_Up_Forbidden_Exit_Stmts
+                 (Node : Ada_Node'Class)
+                  return Visit_Status
+               is
+                  Loop_Name                     : Name := No_Name;
+                  Loop_Referenced_Defining_Name : Defining_Name :=
+                    No_Defining_Name;
+
+               begin
+                  if Node.Kind in Ada_Base_Loop_Stmt then
+                     Found_Loop := True;
+
+                     if Node.Parent.Kind in Ada_Named_Stmt_Range then
+                        Named_Loop_Stmts.Include
+                          (Node.Parent.As_Named_Stmt.F_Decl.F_Name);
+                     end if;
+
+                  elsif Node.Kind in Ada_Exit_Stmt then
+                     --  Determine if it's a named exit statement or not
+                     Loop_Name := Node.As_Exit_Stmt.F_Loop_Name;
+                     Loop_Referenced_Defining_Name :=
+                       (if not Loop_Name.Is_Null then
+                          Loop_Name.P_Referenced_Defining_Name
+                        else
+                          No_Defining_Name);
+
+                     --  If no loop was found yet, then it does not matter
+                     --  if it's a named exit statement or not - it cannot
+                     --  be extracted.
+                     --  Othewise, check if it's named and if its
+                     --  corresponding named loop is going to be extracted too.
+                     if not Found_Loop
+                       or else (not Loop_Referenced_Defining_Name.Is_Null
+                                and then not Named_Loop_Stmts.Contains
+                                               (Loop_Referenced_Defining_Name))
+                     then
+                        Found_Forbidden_Exit_Stmt := True;
+                        return Stop;
+                     end if;
+                  end if;
+                  return Into;
+               end Look_Up_Forbidden_Exit_Stmts;
+
+            begin
+               if It_Stmt.Kind in Ada_Base_Loop_Stmt
+                 and then It_Stmt.Parent.Kind in Ada_Named_Stmt_Range
+               then
+                  Named_Loop_Stmts.Include
+                    (It_Stmt.Parent.As_Named_Stmt.F_Decl.F_Name);
+               end if;
+
+               It_Stmt.Traverse (Look_Up_Forbidden_Exit_Stmts'Access);
+
+               if Found_Forbidden_Exit_Stmt then
+                  Available_Subprogram_Kinds := [others => False];
+                  return False;
+               end if;
+            end;
+         end if;
+
+         exit when It_Stmt = End_Stmt;
+         It_Stmt := It_Stmt.Next_Sibling.As_Stmt;
+      end loop;
+
+      --  Check what kind of subprograms can be extracted
       if End_Stmt.Kind in Ada_Return_Stmt_Range then
          Available_Subprogram_Kinds :=
            [Ada_Subp_Kind_Function  => True,
