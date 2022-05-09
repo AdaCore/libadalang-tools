@@ -20,6 +20,7 @@
 -- the files COPYING3 and COPYING.RUNTIME respectively.  If not, see        --
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
+
 with Libadalang.Common; use Libadalang.Common;
 with Laltools.Subprogram_Hierarchy; use Laltools.Subprogram_Hierarchy;
 
@@ -402,7 +403,10 @@ package body Laltools.Refactor.Subprogram_Signature.Remove_Parameter is
         (Call_Identifier : Base_Id'Class;
          Kind            : Ref_Result_Kind;
          Cancel          : in out Boolean);
-      --  Callback to remove the actual parameters of a subprogram call
+      --  Callback to remove the actual parameters of a subprogram call.
+      --  TODO: This procedure was originally written when Libadalang did
+      --  not have the P_Zip_With_Params property. Consider rewriting this
+      --  procedure using that property.
 
       procedure Decl_Callback
         (Relative_Subp : Basic_Decl'Class);
@@ -450,32 +454,52 @@ package body Laltools.Refactor.Subprogram_Signature.Remove_Parameter is
          end if;
 
          declare
-            Aux_Argument_Indices : constant Extended_Argument_Indicies_Type :=
-              Map_Parameters_To_Arguments (Parameters, Call_Expr);
-            Argument_Indices : Parameter_Indices_Type
-              (Aux_Argument_Indices'First .. Aux_Argument_Indices'Last);
-            Index : Positive := Aux_Argument_Indices'First;
+            Actual_Params_Map          :
+              constant Extended_Argument_Indicies_Type :=
+                Map_Parameters_To_Arguments (Parameters, Call_Expr);
+            Filtered_Actual_Params_Map :
+              Parameter_Indices_Type
+                (Actual_Params_Map'First .. Actual_Params_Map'Last);
+
+            Filtered_Actual_Params_Map_Index : Natural := 0;
+            --  This will hold the last valid index of
+            --  Filtered_Actual_Arguments.
 
          begin
+            --  Actual_Arguments has elements with value 0 which represent
+            --  arguments that are not present in the call. Filter these out.
+
             for Indices_Range of Parameter_Indices_Ranges loop
-               for J in Indices_Range.First .. Indices_Range.Last loop
-                  Argument_Indices (Index) := Aux_Argument_Indices (J);
-                  Index := Index + 1;
+               for Formal_Parameter_Index in
+                 Indices_Range.First .. Indices_Range.Last
+               loop
+                  if Actual_Params_Map (Formal_Parameter_Index) /= 0 then
+                     Filtered_Actual_Params_Map_Index := @ + 1;
+                     Filtered_Actual_Params_Map
+                       (Filtered_Actual_Params_Map_Index) :=
+                         Actual_Params_Map (Formal_Parameter_Index);
+                  end if;
                end loop;
             end loop;
 
-            for SLOC of
-              Arguments_SLOC
-                (Call_Expr,
-                 Unique
-                   (Argument_Indices
-                      (Aux_Argument_Indices'First .. Index - 1)))
-            loop
-               Safe_Insert
-                 (Edits     => Edits,
-                  File_Name => Call_Identifier.Unit.Get_Filename,
-                  Edit      => Text_Edit'(SLOC, Null_Unbounded_String));
-            end loop;
+            if Filtered_Actual_Params_Map_Index > 0 then
+               --  There is at least one Filtered_Actual_Arguments_Index to
+               --  remove.
+
+               for SLOC of
+                 Arguments_SLOC
+                   (Call_Expr,
+                    Unique
+                      (Filtered_Actual_Params_Map
+                         (Filtered_Actual_Params_Map'First ..
+                            Filtered_Actual_Params_Map_Index)))
+               loop
+                  Safe_Insert
+                    (Edits     => Edits,
+                     File_Name => Call_Identifier.Unit.Get_Filename,
+                     Edit      => Text_Edit'(SLOC, Null_Unbounded_String));
+               end loop;
+            end if;
          end;
 
       end Calls_Callback;

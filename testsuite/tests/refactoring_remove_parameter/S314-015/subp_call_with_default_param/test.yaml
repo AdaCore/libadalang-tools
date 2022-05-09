@@ -1,0 +1,5 @@
+driver: shell_script
+
+title: subp_call_with_default_param
+
+description: refactoring remove parameter tool test
