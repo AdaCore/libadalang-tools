@@ -1,0 +1,22 @@
+Extracting as a ADA_SUBP_KIND_PROCEDURE:
+my_package.adb
+5:1-5:1 
+      procedure Foo;
+
+      procedure Foo is
+      begin
+         if I = 1 then
+            declare
+               function My_Nested_Function return Boolean is
+               begin
+                  return True;
+               end My_Nested_Function;
+            begin
+               B := My_Nested_Function;
+            end;
+         end if;
+      end Foo;
+
+
+6:7-15:14 Foo;
+

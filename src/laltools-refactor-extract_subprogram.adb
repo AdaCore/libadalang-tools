@@ -1941,6 +1941,81 @@ package body Laltools.Refactor.Extract_Subprogram is
          return False;
       end if;
 
+      --  Check for return statements that cannot be extracted.
+      --  A return statement can only be extracted iff it is in a nested
+      --  function body.
+      --  End_Stmt is allowed to be a return statement since we can extract
+      --  a function.
+
+      if End_Stmt.Kind not in Ada_Return_Stmt_Range then
+         It_Stmt := Start_Stmt;
+         loop
+            if It_Stmt.Kind in Ada_Return_Stmt_Range then
+               --  From the if statement before this one, we know that if
+               --  It_Stmt = End_Stmt => It_Stmt.Kind not in
+               --                          Ada_Return_Stmt_Range.
+               --
+               --  If any sibling node in [Start_Stmt, End_Stmt[ is a return
+               --  statement node, we can immediately conclude that we cannot
+               --  extract.
+
+               Available_Subprogram_Kinds := [others => False];
+               return False;
+
+            else
+               declare
+                  Found_Forbidden_Return_Stmt : Boolean := False;
+                  --  Flag to be filled by the Look_Up_Forbidden_Return_Stmts
+                  --  traverse function.
+
+                  function Look_Up_Forbidden_Return_Stmts
+                    (Node : Ada_Node'Class)
+                     return Visit_Status;
+                  --  Traverse function that looks for return statements that
+                  --  cannot be extracted. A return statement can only be
+                  --  extracted iff it is in a nested function body.
+
+                  ------------------------------------
+                  -- Look_Up_Forbidden_Return_Stmts --
+                  ------------------------------------
+
+                  function Look_Up_Forbidden_Return_Stmts
+                    (Node : Ada_Node'Class)
+                     return Visit_Status is
+                  begin
+                     if Node.Kind in Ada_Return_Stmt_Range then
+                        Found_Forbidden_Return_Stmt := True;
+                        return Stop;
+
+                     elsif Node.Kind in Ada_Subp_Body_Range
+                       and then Node.As_Subp_Body.F_Subp_Spec.F_Subp_Kind in
+                         Ada_Subp_Kind_Function_Range
+                     then
+                        --  Ignore any child return statements of this
+                        --  function body since they are safe to be
+                        --  extracted.
+                        return Over;
+
+                     else
+                        return Into;
+                     end if;
+                  end Look_Up_Forbidden_Return_Stmts;
+
+               begin
+                  It_Stmt.Traverse (Look_Up_Forbidden_Return_Stmts'Access);
+
+                  if Found_Forbidden_Return_Stmt then
+                     Available_Subprogram_Kinds := [others => False];
+                     return False;
+                  end if;
+               end;
+            end if;
+
+            exit when It_Stmt = End_Stmt;
+            It_Stmt := It_Stmt.Next_Sibling.As_Stmt;
+         end loop;
+      end if;
+
       --  Check for exit statements that cannot be extracted
       It_Stmt := Start_Stmt;
       loop
