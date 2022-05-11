@@ -539,8 +539,8 @@ package body Laltools.Refactor.Extract_Subprogram is
          case Parameter.P_Basic_Decl.Kind is
             when Ada_For_Loop_Var_Decl_Range =>
                Parameter_Base_Type_Decl :=
-                 Parameter.P_Basic_Decl.Parent.As_For_Loop_Spec.
-                   F_Iter_Expr.As_Expr.P_Expression_Type.As_Basic_Decl;
+                 Parameter.P_Basic_Decl.As_For_Loop_Var_Decl.P_Defining_Name.
+                   P_Expression_Type.As_Basic_Decl;
 
             when Ada_Exception_Handler =>
                Parameter_Base_Type_Decl := No_Exception_Handler.As_Basic_Decl;

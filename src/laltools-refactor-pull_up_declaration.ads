@@ -39,9 +39,11 @@ package Laltools.Refactor.Pull_Up_Declaration is
    type Declaration_Extractor is new Refactoring_Tool with private;
 
    function Create_Declaration_Pull_Upper
-     (Unit             : Analysis_Unit;
-      Declaration_SLOC : Source_Location;
-      Indentation      : Natural := 3)
+     (Unit                     : Analysis_Unit;
+      Declaration_SLOC         : Source_Location;
+      Indentation              : Natural := 3;
+      Only_Dependencies        : Boolean := False;
+      Try_Subp_Insertion_Point : Boolean := False)
       return Declaration_Extractor
      with Pre => Is_Pull_Up_Declaration_Available (Unit, Declaration_SLOC);
    --  Declaration_Extractor constructor.
@@ -62,8 +64,10 @@ private
 
    type Declaration_Extractor is new Refactoring_Tool with
       record
-         Declaration : Basic_Decl;
-         Indentation : Natural := 3;
+         Declaration              : Basic_Decl;
+         Indentation              : Natural := 3;
+         Only_Dependencies        : Boolean := False;
+         Try_Subp_Insertion_Point : Boolean := False;
       end record
      with Dynamic_Predicate => not Declaration.Is_Null;
 

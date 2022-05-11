@@ -24,6 +24,7 @@
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers; use Ada.Containers;
 with Ada.Exceptions;
+with Ada.Strings.Fixed;
 with Ada.Strings.Wide_Wide_Fixed;
 with Ada.Wide_Wide_Characters.Handling;
 
@@ -185,6 +186,145 @@ package body Laltools.Common is
          end if;
       end return;
    end Count_Subp_Parameters;
+
+   -----------------------
+   -- Expand_SLOC_Range --
+   -----------------------
+
+   function Expand_SLOC_Range
+     (Node : Ada_Node'Class)
+      return Source_Location_Range
+   is (Expand_SLOC_Range (Node.Unit, Node.Sloc_Range));
+
+   -----------------------
+   -- Expand_SLOC_Range --
+   -----------------------
+
+   function Expand_SLOC_Range
+     (Unit       : Analysis_Unit;
+      SLOC_Range : Source_Location_Range)
+      return Source_Location_Range
+   is
+      use Ada.Strings.Wide_Wide_Fixed;
+
+      Max_Line : constant Natural :=
+        (if Unit.Root.Is_Null then 0
+         else Natural (Unit.Root.Sloc_Range.End_Line) + 1);
+
+      First_Line                 : constant Text_Type :=
+        Unit.Get_Line (Positive (SLOC_Range.Start_Line));
+      First_Line_First_Non_Blank : constant Natural :=
+        Index_Non_Blank (First_Line) + 1 - Natural (First_Line'First);
+
+      Last_Line         : constant Text_Type :=
+        Unit.Get_Line (Positive (SLOC_Range.End_Line));
+      Rest_Of_Last_Line : constant Text_Type :=
+        Last_Line (Last_Line'First
+                   + Natural (SLOC_Range.End_Column)
+                   - 1
+                   .. Last_Line'Last);
+      First_Rest_Of_Last_Line_Non_Blank : constant Natural :=
+        (if Rest_Of_Last_Line'Length = 0 then
+            0
+         else
+            Index_Non_Blank (Rest_Of_Last_Line)
+         + 1
+         - Natural (Rest_Of_Last_Line'First));
+
+      Next_Line_Number : Natural := Natural (SLOC_Range.End_Line) + 1;
+
+   begin
+      return Expanded_SLOC_Range : Source_Location_Range := SLOC_Range do
+         --  Add leading whitespaces
+         if First_Line_First_Non_Blank =
+              Natural (SLOC_Range.Start_Column)
+         then
+            Expanded_SLOC_Range.Start_Column := 1;
+         end if;
+
+         if Rest_Of_Last_Line'Length /= 0 then
+            --  There might be trailing whitespaces
+            if First_Rest_Of_Last_Line_Non_Blank = 0 then
+               --  Add trailing whitespaces
+               Expanded_SLOC_Range.End_Column :=
+                 Langkit_Support.Slocs.Column_Number (Last_Line'Length)
+                 + 1;
+               --  Add any blank lines after that
+               loop
+                  exit when Next_Line_Number = Max_Line;
+                  declare
+                     Next_Line                 : constant Text_Type :=
+                       Unit.Get_Line (Next_Line_Number);
+                     Next_Line_First_Non_Blank : constant Natural :=
+                       (if Next_Line'Length /= 0 then
+                          Index_Non_Blank (Next_Line)
+                        else
+                          0);
+                  begin
+                     exit when Next_Line'Length /= 0
+                       and then Next_Line_First_Non_Blank /= 0;
+                     Expanded_SLOC_Range.End_Line :=
+                       Langkit_Support.Slocs.Line_Number
+                         (Next_Line_Number);
+                     Expanded_SLOC_Range.End_Column :=
+                       Langkit_Support.Slocs.Column_Number
+                         (Next_Line'Length)
+                       + 1;
+                  end;
+                  Next_Line_Number := Next_Line_Number + 1;
+               end loop;
+            end if;
+
+         else
+            --  There are no trailing whitespaces nor non whitespace
+            --  tokens, so simply add any blank lines that follow.
+            loop
+               exit when Next_Line_Number = Max_Line;
+               declare
+                  Next_Line                 : constant Text_Type :=
+                    Unit.Get_Line (Next_Line_Number);
+                  Next_Line_First_Non_Blank : constant Natural :=
+                    (if Next_Line'Length /= 0 then
+                       Index_Non_Blank (Next_Line)
+                     else
+                       0);
+               begin
+                  exit when Next_Line'Length /= 0
+                    and then Next_Line_First_Non_Blank /= 0;
+                  Expanded_SLOC_Range.End_Line :=
+                    Langkit_Support.Slocs.Line_Number
+                      (Next_Line_Number);
+                  Expanded_SLOC_Range.End_Column :=
+                    Langkit_Support.Slocs.Column_Number
+                      (Next_Line'Length)
+                    + 1;
+               end;
+               Next_Line_Number := Next_Line_Number + 1;
+            end loop;
+         end if;
+      end return;
+   end Expand_SLOC_Range;
+
+   ------------------------
+   -- Expand_SLOC_Ranges --
+   ------------------------
+
+   function Expand_SLOC_Ranges
+     (Unit        : Analysis_Unit;
+      SLOC_Ranges : Source_Location_Range_Ordered_Set)
+      return Source_Location_Range_Ordered_Set is
+   begin
+      if Unit.Root.Is_Null then
+         return SLOC_Ranges;
+      end if;
+
+      return Expanded_SLOC_Ranges : Source_Location_Range_Ordered_Set do
+         for SLOC_Range of SLOC_Ranges loop
+            Expanded_SLOC_Ranges.Include
+              (Expand_SLOC_Range (Unit, SLOC_Range));
+         end loop;
+      end return;
+   end Expand_SLOC_Ranges;
 
    -------------------------
    -- Find_All_References --
@@ -484,6 +624,46 @@ package body Laltools.Common is
          return Parent_Basic_Decl_Other_Part_Params.F_Params;
       end;
    end Find_Other_Part;
+
+   ------------------------------
+   -- Find_First_Common_Parent --
+   ------------------------------
+
+   function Find_First_Common_Parent
+     (Start_Node : Ada_Node'Class;
+      End_Node   : Ada_Node'Class;
+      With_Self  : Boolean := True)
+      return Ada_Node is
+   begin
+      --  Return quickly if Start_Node and End_Node are not in the same
+      --  Analysis_Unit.
+      if Start_Node.Unit /= End_Node.Unit then
+         return No_Ada_Node;
+      end if;
+
+      declare
+         Start_Node_Parents : constant Ada_Node_Array :=
+           Start_Node.Parents (With_Self);
+         End_Node_Parents   : constant Ada_Node_Array :=
+           End_Node.Parents (With_Self);
+         Parents_Max_Length : constant Integer :=
+           Integer'Min (Start_Node_Parents'Length, End_Node_Parents'Length);
+
+         Enclosing_Common_Parent : Ada_Node := No_Ada_Node;
+
+      begin
+         for Parent_Index in Positive'First .. Parents_Max_Length loop
+            exit when Start_Node_Parents
+                        (Start_Node_Parents'Last - Parent_Index + 1) /=
+                        End_Node_Parents
+                          (End_Node_Parents'Last - Parent_Index + 1);
+            Enclosing_Common_Parent :=
+              Start_Node_Parents (Start_Node_Parents'Last - Parent_Index + 1);
+         end loop;
+
+         return Enclosing_Common_Parent;
+      end;
+   end Find_First_Common_Parent;
 
    procedure Include_If_Not_Null
      (Set     : in out Ada_List_Hashed_Set;
@@ -1115,6 +1295,106 @@ package body Laltools.Common is
       end case;
    end Find_Subp_Body;
 
+   --------------------------------------
+   -- Get_Basic_Decl_Header_SLOC_Range --
+   --------------------------------------
+
+   function Get_Basic_Decl_Header_SLOC_Range
+     (Decl : Basic_Decl'Class)
+      return Source_Location_Range
+   is
+      use Ada.Strings;
+      use Ada.Strings.Fixed;
+
+      --  ---------------------  -> This is a header edge
+      --  -- Subprogram_Name --  -> This is the header body
+      --  ---------------------  -> This is a header edge
+
+      function Is_Header_Edge
+        (Token           : Token_Reference;
+         Subprogram_Name : String)
+         return Boolean
+      is (Trim (To_UTF8 (Text (Token)), Both) =
+            String'((Subprogram_Name'Length + 6) * "-"));
+      --  Checks if Token is the header edge
+
+      function Is_Header_Body
+        (Token           : Token_Reference;
+         Subprogram_Name : String)
+         return Boolean
+      is (Trim (To_UTF8 (Text (Token)), Both) =
+            "-- " & Subprogram_Name & " --");
+      --  Checks if Token is the header body
+
+   begin
+      --  Do not try to recognize headers on declaration without Defining_Name
+      --  nodes or declarations with multiple Defining_Name nodes.
+      if Decl.Is_Null
+        or else Decl.P_Defining_Name.Is_Null
+        or else Decl.P_Defining_Names'Length > 1
+      then
+         return No_Source_Location_Range;
+      end if;
+
+      declare
+         Decl_Name : constant String := To_UTF8 (Decl.P_Defining_Name.Text);
+
+         Decl_Start_Token : constant Token_Reference := Decl.Token_Start;
+         Aux_Token        : Token_Reference := Decl_Start_Token;
+
+         Header_Start_Token  : Token_Reference;
+         Header_End_Token    : Token_Reference;
+
+      begin
+         loop
+            Aux_Token := Previous (Aux_Token);
+            exit when Aux_Token = No_Token
+                      or else Kind (Data (Aux_Token)) not in Ada_Whitespace;
+         end loop;
+         if not Is_Whole_Line_Comment (Aux_Token)
+           or else not Is_Header_Edge (Aux_Token, Decl_Name)
+         then
+            return No_Source_Location_Range;
+         end if;
+         Header_End_Token := Aux_Token;
+
+         loop
+            Aux_Token := Previous (Aux_Token);
+            exit when Aux_Token = No_Token
+              or else Kind (Data (Aux_Token)) not in Ada_Whitespace;
+         end loop;
+         if not Is_Whole_Line_Comment (Aux_Token)
+           or else not Is_Header_Body (Aux_Token, Decl_Name)
+         then
+            return No_Source_Location_Range;
+         end if;
+
+         loop
+            Aux_Token := Previous (Aux_Token);
+            exit when Aux_Token = No_Token
+              or else Kind (Data (Aux_Token)) not in Ada_Whitespace;
+         end loop;
+         if not Is_Whole_Line_Comment (Aux_Token)
+           or else not Is_Header_Edge (Aux_Token, Decl_Name)
+         then
+            return No_Source_Location_Range;
+         end if;
+         Header_Start_Token := Aux_Token;
+
+         if Sloc_Range (Data (Header_Start_Token)).Start_Column > 1 then
+            Aux_Token := Previous (Header_Start_Token);
+            if Kind (Data (Aux_Token)) in Ada_Whitespace then
+               Header_Start_Token := Aux_Token;
+            end if;
+         end if;
+
+         return
+           Make_Range
+             (Start_Sloc (Sloc_Range (Data (Header_Start_Token))),
+              End_Sloc (Sloc_Range (Data (Header_End_Token))));
+      end;
+   end Get_Basic_Decl_Header_SLOC_Range;
+
    --------------------------
    -- Get_Compilation_Unit --
    --------------------------
@@ -1466,6 +1746,78 @@ package body Laltools.Common is
             raise Program_Error;
       end case;
    end Get_Defining_Name_Id;
+
+   --------------------------------
+   -- Get_Dotted_Name_First_Name --
+   --------------------------------
+
+   function Get_Dotted_Name_First_Name
+     (Dotted_Name : Libadalang.Analysis.Dotted_Name'Class)
+      return Name is
+   begin
+      if Dotted_Name.Is_Null then
+         return No_Name;
+      end if;
+
+      declare
+         Prefix : Name := Dotted_Name.F_Prefix;
+
+      begin
+         while Prefix.Kind in Ada_Dotted_Name loop
+            Prefix := Prefix.As_Dotted_Name.F_Prefix;
+         end loop;
+
+         return Prefix;
+      end;
+   end Get_Dotted_Name_First_Name;
+
+   ---------------------------------
+   -- Get_Dotted_Name_Definitions --
+   ---------------------------------
+
+   function Get_Dotted_Name_Definitions
+     (Dotted_Name : Libadalang.Analysis.Dotted_Name'Class)
+      return Defining_Name_Array
+   is
+   begin
+      if Dotted_Name.Is_Null then
+         return [];
+      end if;
+
+      declare
+         Prefix      : Name;
+         Names_Count : Natural := 2;
+
+      begin
+         --  Do a first pass to count how many names there are. This is very
+         --  quick since only syntax queries are done.
+         Prefix := Dotted_Name.F_Prefix;
+         while Prefix.Kind in Ada_Dotted_Name loop
+            Names_Count := @ + 1;
+            Prefix := Prefix.As_Dotted_Name.F_Prefix;
+         end loop;
+
+         --  Do a second pass where we get the defining name of each name
+         declare
+            Index : Positive := 1;
+            Defining_Names : Defining_Name_Array (1 .. Names_Count);
+         begin
+            Defining_Names (Index) :=
+              Dotted_Name.F_Suffix.P_Referenced_Defining_Name;
+            Prefix := Dotted_Name.F_Prefix;
+            Index := @ + 1;
+            while Prefix.Kind in Ada_Dotted_Name loop
+               Defining_Names (Index) :=
+                 Prefix.As_Dotted_Name.F_Prefix.P_Referenced_Defining_Name;
+               Index := @ + 1;
+               Prefix := Prefix.As_Dotted_Name.F_Prefix;
+            end loop;
+            Defining_Names (Index) :=
+              Dotted_Name.F_Prefix.P_Referenced_Defining_Name;
+            return Defining_Names;
+         end;
+      end;
+   end Get_Dotted_Name_Definitions;
 
    --------------------------------------------
    --  Get_First_Identifier_From_Declaration --
@@ -2160,6 +2512,38 @@ package body Laltools.Common is
                            Ada_Entry_Decl_Range
                              | Ada_Accept_Stmt_Range
                              | Ada_Entry_Body_Range));
+
+   ---------------------------
+   -- Is_Whole_Line_Comment --
+   ---------------------------
+
+   function Is_Whole_Line_Comment
+     (Token : Token_Reference)
+      return Boolean is
+   begin
+      if Token /= No_Token
+        and then Kind (Data (Token)) in Ada_Comment
+        and then Sloc_Range (Data (Token)).Start_Line > 0
+      then
+         declare
+            use Ada.Strings.Wide_Wide_Fixed;
+
+            Token_Line_Number   : constant Positive :=
+              Positive (Sloc_Range (Data (Token)).Start_Line);
+            Token_Column_Number : constant Positive :=
+              Positive (Sloc_Range (Data (Token)).Start_Column);
+            Token_Line          : constant Text_Type :=
+              Unit (Token).Get_Line (Token_Line_Number);
+
+            First_Non_Blank_Character_Index : constant Positive :=
+              Index_Non_Blank (Token_Line) - Token_Line'First + 1;
+         begin
+            return First_Non_Blank_Character_Index = Token_Column_Number;
+         end;
+      else
+         return False;
+      end if;
+   end Is_Whole_Line_Comment;
 
    ---------------------------------------------------
    -- Is_Definition_Without_Separate_Implementation --

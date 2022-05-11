@@ -1,0 +1,5 @@
+title: introduce_from_dotted_name_expression_with_nested_declarative_part
+
+description: introduce_parameter tool test
+
+driver: shell_script

@@ -29,7 +29,6 @@ with Ada.Containers; use Ada.Containers;
 with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Ordered_Sets;
 with Ada.Strings.Fixed;
-with Ada.Strings.Wide_Wide_Fixed;
 
 with GNAT.String_Split;
 
@@ -54,11 +53,7 @@ package body Laltools.Refactor.Pull_Up_Declaration is
       return String
       renames To_String;
 
-   ---------
-   -- "<" --
-   ---------
-
-   function "<" (L, R : Basic_Decl) return Boolean is
+   function "<" (L, R : Ada_Node) return Boolean is
      (if L = R then
         False
       else
@@ -66,15 +61,32 @@ package body Laltools.Refactor.Pull_Up_Declaration is
            Compare (L.Sloc_Range, Start_Sloc (R.Sloc_Range)) in Inside | After
          else
            L.Unit.Get_Filename < R.Unit.Get_Filename));
-   --  Compares two Basic_Decl, first by their Unit filename, and then by
-   --  their Source Location.
+   --  Compares two Ada_Node, first by their Unit filename, and then by their
+   --  Source_Location_Range.
+
+   function "<" (L, R : Basic_Decl) return Boolean is
+     (L.As_Ada_Node < R.As_Ada_Node);
+   --  Compares two Basic_Decl, first by their Unit filename, and then by their
+   --  Source_Location_Range.
 
    package Basic_Decl_Ordered_Sets is new Ada.Containers.Ordered_Sets
-     (Element_Type        => Basic_Decl,
-      "<"                 => "<",
-      "="                 => "=");
+     (Element_Type => Basic_Decl,
+      "<"          => "<",
+      "="          => "=");
 
    subtype Basic_Decl_Ordered_Set is Basic_Decl_Ordered_Sets.Set;
+
+   function "<" (L, R : Defining_Name) return Boolean is
+     (L.As_Ada_Node < R.As_Ada_Node);
+   --  Compares two Defining_Name, first by their Unit filename, and then by
+   --  their Source_Location_Range.
+
+   package Defining_Name_Ordered_Sets is new Ada.Containers.Ordered_Sets
+     (Element_Type => Defining_Name,
+      "<"          => "<",
+      "="          => "=");
+
+   subtype Defining_Name_Ordered_Set is Defining_Name_Ordered_Sets.Set;
 
    function Get_Local_Declarations
      (Decl : Basic_Decl'Class)
@@ -82,17 +94,21 @@ package body Laltools.Refactor.Pull_Up_Declaration is
    --  Gets all Basic_Decl nodes on the same Declarative_Part as Decl
 
    function Get_Dependencies
-     (Decl      : Basic_Decl'Class;
-      Recursive : Boolean := True)
-      return Basic_Decl_Ordered_Set;
-   --  Gets all Basic_Decl nodes needed to correctly define Decl
+     (Definition : Libadalang.Analysis.Defining_Name'Class;
+      Recursive  : Boolean := True)
+      return Defining_Name_Ordered_Set;
+   --  Get the canonical part of all the Defining_Name nodes needed to
+   --  correctly define Definition.
+   --  If Recursive, then also returns dependencies of the dependencies.
 
    function Get_Local_Dependencies
-     (Decl      : Basic_Decl'Class;
-      Recursive : Boolean := True)
-      return Basic_Decl_Ordered_Set;
-   --  Gets all Basic_Decl nodes needed to correctly define Decl that are also
-   --  declared in the same Declarative_Part as Decl.
+     (Definition : Libadalang.Analysis.Defining_Name'Class;
+      Recursive  : Boolean := True)
+      return Defining_Name_Ordered_Set;
+   --  Gets the canonical part of all Defining_Name nodes needed to correctly
+   --  define Definition, that are also declared in the same Declarative_Part
+   --  as Definition.
+   --  If Recursive, then also returns local dependencies of the dependencies.
 
    type Comments_Position_Type is (Before, After, Both);
 
@@ -101,40 +117,29 @@ package body Laltools.Refactor.Pull_Up_Declaration is
       Comments_Position : Comments_Position_Type := Both)
       return Source_Location_Range;
    --  Gets the Sloc_Range of Decl including any adjacent comments.
-   --  Which adjacent comments are included is controlled by
-   --  Comments_Position.
+   --  Which adjacent comments are included is controlled by Comments_Position.
+
+   type Insertion_Point_Type is
+      record
+         Filename : Unbounded_String;
+         Location : Source_Location;
+      end record;
 
    function Get_Insertion_Point
-     (Decl : Basic_Decl'Class)
-      return Source_Location;
+     (Decl                     : Basic_Decl'Class;
+      Try_Subp_Insertion_Point : Boolean := False)
+      return Insertion_Point_Type;
    --  Assuming that Decl is the Basic_Decl that will be pulled up, computes
-   --  the Source_Location where the pulled up declarations should be
-   --  inserted.
-
-   function Is_Whole_Line_Comment
-     (Token : Token_Reference)
-      return Boolean;
-   --  Checks if Token is a whole line Ada_Comment
+   --  the Insertion_Point_Type where the pulled up declarations should be
+   --  inserted. If Try_Subp_Insertion_Point is True, and if Decl is
+   --  begin pulled up from a subprogram body, then Decl and its dependencies
+   --  are inserted above the subprogram's canonical part.
 
    function Line_Distance
      (From, To : Token_Reference)
       return Integer
      with Pre => From /= No_Token and then To /= No_Token;
    --  Calculates the difference between From's and To's Start_Line
-
-   package Source_Location_Range_Ordered_Sets is
-     new Ada.Containers.Ordered_Sets
-       (Element_Type => Source_Location_Range);
-
-   subtype Source_Location_Range_Ordered_Set is
-     Source_Location_Range_Ordered_Sets.Set;
-
-   function Expand_SLOC_Ranges
-     (Unit        : Analysis_Unit;
-      SLOC_Ranges : Source_Location_Range_Ordered_Set)
-      return Source_Location_Range_Ordered_Set;
-   --  For each Source_Location_Range of SLOC_Range, expands it by including
-   --  leading and trailing whitespaces, and empty lines immediately after.
 
    function Merge_Intersecting_SLOC_Ranges
      (Unit        : Analysis_Unit;
@@ -225,14 +230,41 @@ package body Laltools.Refactor.Pull_Up_Declaration is
      (Decl : Basic_Decl'Class)
       return Basic_Decl_Ordered_Set
    is
-      Enclosing_Declarative_Part : constant Declarative_Part :=
-        Get_Enclosing_Declarative_Part (Decl);
+      Enclosing_Declarative_Part : Declarative_Part;
 
    begin
-      return Local_Declarations : Basic_Decl_Ordered_Set do
-         for Node of Enclosing_Declarative_Part.F_Decls loop
-            if Node.Kind in Ada_Basic_Decl then
-               Local_Declarations.Insert (Node.As_Basic_Decl);
+      return Local_Basic_Decls : Basic_Decl_Ordered_Set do
+         for Decl_Part of Decl.P_All_Parts loop
+            Enclosing_Declarative_Part :=
+              Get_Enclosing_Declarative_Part (Decl_Part);
+
+            for Node of Enclosing_Declarative_Part.F_Decls loop
+               if Node.Kind in Ada_Basic_Decl
+                 and then Node.As_Basic_Decl.P_Canonical_Part /=
+                   Decl.P_Canonical_Part
+               then
+                  Local_Basic_Decls.Include
+                    (Node.As_Basic_Decl.P_Canonical_Part);
+               end if;
+            end loop;
+
+            if Enclosing_Declarative_Part.Parent.Kind in
+                 Ada_Subp_Body_Range
+            then
+               declare
+                  Parent_Subp_Body : constant Basic_Decl :=
+                    Enclosing_Declarative_Part.Parent.As_Subp_Body.
+                      P_Canonical_Part;
+                  Subp_Params      : constant Params :=
+                    Get_Subp_Params (Parent_Subp_Body);
+
+               begin
+                  if not Subp_Params.Is_Null then
+                     for Param_Spec of Subp_Params.F_Params loop
+                        Local_Basic_Decls.Include (Param_Spec.As_Basic_Decl);
+                     end loop;
+                  end if;
+               end;
             end if;
          end loop;
       end return;
@@ -243,19 +275,19 @@ package body Laltools.Refactor.Pull_Up_Declaration is
    -----------------------
 
    function Get_Dependencies
-     (Decl      : Basic_Decl'Class;
-      Recursive : Boolean := True)
-      return Basic_Decl_Ordered_Set
+     (Definition : Libadalang.Analysis.Defining_Name'Class;
+      Recursive  : Boolean := True)
+      return Defining_Name_Ordered_Set
    is
-      Dependencies : Basic_Decl_Ordered_Set;
+      Dependencies : Defining_Name_Ordered_Set;
 
       function Get_Dependencies_Recursive_Helper
         (Node : Ada_Node'Class)
          return Visit_Status;
       --  Checks if Node is a Name. If so, tries to resolve it precisely and
-      --  and adds the referenced declaration to Dependencies.
+      --  and adds the referenced Defining_Name to Dependencies.
       --  Then, recursively calls Get_Dependencies on this added referenced
-      --  declaration.
+      --  Defining_Name.
 
       ---------------------------------------
       -- Get_Dependencies_Recursive_Helper --
@@ -265,20 +297,25 @@ package body Laltools.Refactor.Pull_Up_Declaration is
         (Node : Ada_Node'Class)
          return Visit_Status
       is
-         Referenced_Decl : Basic_Decl;
+         Referenced_Defining_Name : Libadalang.Analysis.Defining_Name;
 
       begin
          if Node.Kind in Ada_Name then
-            Referenced_Decl := Node.As_Name.P_Referenced_Decl;
+            Referenced_Defining_Name :=
+              Node.As_Name.P_Referenced_Defining_Name;
 
-            if not Referenced_Decl.Is_Null
-              and then not Referenced_Decl.Is_Synthetic
-              and then Referenced_Decl /= Decl
+            if not Referenced_Defining_Name.Is_Null
+              and then not Referenced_Defining_Name.Is_Synthetic
+              and then Referenced_Defining_Name /= Definition
             then
-               Dependencies.Include (Referenced_Decl);
+               Dependencies.Include (Referenced_Defining_Name);
+
                if Recursive then
-                  Dependencies.Union (Get_Dependencies (Referenced_Decl));
+                  Dependencies.Union
+                    (Get_Dependencies (Referenced_Defining_Name));
                end if;
+
+               return Over;
             end if;
          end if;
 
@@ -286,7 +323,9 @@ package body Laltools.Refactor.Pull_Up_Declaration is
       end Get_Dependencies_Recursive_Helper;
 
    begin
-      Decl.Traverse (Get_Dependencies_Recursive_Helper'Access);
+      Definition.P_Basic_Decl.Traverse
+        (Get_Dependencies_Recursive_Helper'Access);
+
       return Dependencies;
    end Get_Dependencies;
 
@@ -295,22 +334,41 @@ package body Laltools.Refactor.Pull_Up_Declaration is
    -----------------------------
 
    function Get_Local_Dependencies
-     (Decl      : Basic_Decl'Class;
-      Recursive : Boolean := True)
-      return Basic_Decl_Ordered_Set
+     (Definition : Libadalang.Analysis.Defining_Name'Class;
+      Recursive  : Boolean := True)
+      return Defining_Name_Ordered_Set
    is
-      use Basic_Decl_Ordered_Sets;
+      use Defining_Name_Ordered_Sets;
+      Local_Declarations : constant Basic_Decl_Ordered_Set :=
+        Get_Local_Declarations (Definition.P_Basic_Decl);
+
+      All_Parts_Local_Dependencies : Defining_Name_Ordered_Set;
 
    begin
-      return All_Parts_Local_Dependencies : Basic_Decl_Ordered_Set do
-         for Decl_Part of Decl.P_All_Parts loop
-            Union
-              (All_Parts_Local_Dependencies,
-               Intersection
-                 (Get_Dependencies (Decl_Part, Recursive),
-                  Get_Local_Declarations (Decl_Part)));
+      for Local_Declaration of Local_Declarations loop
+         for Local_Defining_Name of Local_Declaration.P_Defining_Names loop
+            for Defining_Name_Decl_Part of
+                  Definition.P_Basic_Decl.P_All_Parts
+            loop
+               if Local_Defining_Name.P_Find_Refs
+                    (Defining_Name_Decl_Part)'Length > 0
+               then
+                  All_Parts_Local_Dependencies.Include
+                    (Local_Defining_Name.P_Canonical_Part);
+
+                  if Local_Declaration.Kind not in Ada_Param_Spec
+                    and then Recursive
+                  then
+                     Union
+                       (All_Parts_Local_Dependencies,
+                        Get_Local_Dependencies (Local_Defining_Name));
+                  end if;
+               end if;
+            end loop;
          end loop;
-      end return;
+      end loop;
+
+      return All_Parts_Local_Dependencies;
    end Get_Local_Dependencies;
 
    ----------------------------------------------
@@ -448,8 +506,9 @@ package body Laltools.Refactor.Pull_Up_Declaration is
    -------------------------
 
    function Get_Insertion_Point
-     (Decl : Basic_Decl'Class)
-      return Source_Location
+     (Decl                     : Basic_Decl'Class;
+      Try_Subp_Insertion_Point : Boolean := False)
+      return Insertion_Point_Type
    is
       First_Enclosing_Declarative_Part : constant Declarative_Part :=
         Get_Enclosing_Declarative_Part (Decl);
@@ -464,49 +523,75 @@ package body Laltools.Refactor.Pull_Up_Declaration is
          else
            No_Declarative_Part);
 
+      Header_SLOC_Range_IGNORE : constant Source_Location_Range :=
+        Get_Basic_Decl_Header_SLOC_Range
+          (First_Enclosing_Declarative_Part.P_Parent_Basic_Decl);
+
    begin
+      if Try_Subp_Insertion_Point then
+         declare
+            Subp_Body : Libadalang.Analysis.Subp_Body := No_Subp_Body;
+
+         begin
+            for Parent of Decl.Parents (With_Self => False) loop
+               if Parent.Kind in Ada_Subp_Body then
+                  Subp_Body := Parent.As_Subp_Body;
+                  exit;
+               end if;
+            end loop;
+
+            declare
+               Subp_Body_Canonical_Part : constant Basic_Decl :=
+                 (if Subp_Body.Is_Null then No_Basic_Decl
+                  else Subp_Body.P_Canonical_Part);
+               Subp_Header_SLOC_Range   : constant Source_Location_Range :=
+                 (if Subp_Body_Canonical_Part.Is_Null then
+                    No_Source_Location_Range
+                  else
+                    Get_Basic_Decl_Header_SLOC_Range
+                      (Subp_Body_Canonical_Part));
+
+            begin
+               if Subp_Header_SLOC_Range /= No_Source_Location_Range then
+                  --  A Subp_Body was found and it's canonical part is
+                  --  itself. It also has a header.
+                  return
+                    Insertion_Point_Type'
+                      (To_Unbounded_String
+                         (Subp_Body_Canonical_Part.Unit.Get_Filename),
+                       Start_Sloc (Subp_Header_SLOC_Range));
+               elsif not Subp_Body_Canonical_Part.Is_Null then
+                  --  A Subp_Body was found but it does not have a header
+                  return
+                    Insertion_Point_Type'
+                      (To_Unbounded_String
+                         (Subp_Body_Canonical_Part.Unit.Get_Filename),
+                       (Subp_Body_Canonical_Part.Sloc_Range.Start_Line, 1));
+               end if;
+            end;
+         end;
+      end if;
+
+      --  If Try_Subp_Insertion_Point is True and this line was reached, then
+      --  we failed to attempt to compute an insertion point right before a
+      --  subprogram. Therefore, proced with the default strategy.
+
       return
         (if Owner_Is_Decl_Block then
-           Source_Location'
-             (Second_Enclosing_Declarative_Part.Sloc_Range.End_Line, 1)
+            Insertion_Point_Type'
+              (To_Unbounded_String
+                 (Second_Enclosing_Declarative_Part.Unit.Get_Filename),
+               Source_Location'
+                 (Second_Enclosing_Declarative_Part.Sloc_Range.End_Line, 1))
          else
-           Source_Location'
-             (First_Enclosing_Declarative_Part.P_Parent_Basic_Decl.
-                P_Canonical_Part.Sloc_Range.Start_Line,
-              1));
+           Insertion_Point_Type'
+              (To_Unbounded_String
+                 (First_Enclosing_Declarative_Part.Unit.Get_Filename),
+               Source_Location'
+                 (First_Enclosing_Declarative_Part.P_Parent_Basic_Decl.
+                    P_Canonical_Part.Sloc_Range.Start_Line,
+                  1)));
    end Get_Insertion_Point;
-
-   ---------------------------
-   -- Is_Whole_Line_Comment --
-   ---------------------------
-
-   function Is_Whole_Line_Comment
-     (Token : Token_Reference)
-      return Boolean is
-   begin
-      if  Token /= No_Token
-        and then Kind (Data (Token)) in Ada_Comment
-        and then Sloc_Range (Data (Token)).Start_Line > 0
-      then
-         declare
-            use Ada.Strings.Wide_Wide_Fixed;
-
-            Token_Line_Number   : constant Positive :=
-              Positive (Sloc_Range (Data (Token)).Start_Line);
-            Token_Column_Number : constant Positive :=
-              Positive (Sloc_Range (Data (Token)).Start_Column);
-            Token_Line          : constant Text_Type :=
-              Unit (Token).Get_Line (Token_Line_Number);
-
-            First_Non_Blank_Character_Index : constant Positive :=
-              Index_Non_Blank (Token_Line) - Token_Line'First + 1;
-         begin
-            return First_Non_Blank_Character_Index = Token_Column_Number;
-         end;
-      else
-         return False;
-      end if;
-   end Is_Whole_Line_Comment;
 
    -------------------
    -- Line_Distance --
@@ -517,128 +602,6 @@ package body Laltools.Refactor.Pull_Up_Declaration is
       return Integer
    is (Integer (Sloc_Range (Data (From)).Start_Line)
        - Integer (Sloc_Range (Data (To)).Start_Line));
-
-   ------------------------
-   -- Expand_SLOC_Ranges --
-   ------------------------
-
-   function Expand_SLOC_Ranges
-     (Unit        : Analysis_Unit;
-      SLOC_Ranges : Source_Location_Range_Ordered_Set)
-         return Source_Location_Range_Ordered_Set
-   is
-      use Ada.Strings.Wide_Wide_Fixed;
-
-      Max_Line            : constant Natural :=
-        (if Unit.Root.Is_Null then 0
-         else Natural (Unit.Root.Sloc_Range.End_Line) + 1);
-      Expanded_SLOC_Range : Source_Location_Range;
-
-   begin
-      if Unit.Root.Is_Null then
-         return SLOC_Ranges;
-      end if;
-
-      return Expanded_SLOC_Ranges : Source_Location_Range_Ordered_Set do
-         for SLOC_Range of SLOC_Ranges loop
-            Expanded_SLOC_Range := SLOC_Range;
-
-            declare
-               First_Line                 : constant Text_Type :=
-                 Unit.Get_Line (Positive (SLOC_Range.Start_Line));
-               First_Line_First_Non_Blank : constant Natural :=
-                 Index_Non_Blank (First_Line) + 1 - Natural (First_Line'First);
-
-               Last_Line                         : constant Text_Type :=
-                 Unit.Get_Line (Positive (SLOC_Range.End_Line));
-               Rest_Of_Last_Line                 : constant Text_Type :=
-                 Last_Line (Last_Line'First
-                              + Natural (SLOC_Range.End_Column)
-                              - 1
-                            .. Last_Line'Last);
-               First_Rest_Of_Last_Line_Non_Blank : constant Natural :=
-                 (if Rest_Of_Last_Line'Length = 0 then
-                    0
-                  else
-                    Index_Non_Blank (Rest_Of_Last_Line)
-                      + 1
-                      - Natural (Rest_Of_Last_Line'First));
-
-               Next_Line_Number : Natural := Natural (SLOC_Range.End_Line) + 1;
-
-            begin
-               --  Add leading whitespaces
-               if First_Line_First_Non_Blank =
-                 Natural (SLOC_Range.Start_Column)
-               then
-                  Expanded_SLOC_Range.Start_Column := 1;
-               end if;
-
-               if Rest_Of_Last_Line'Length /= 0 then
-                  --  There might be trailing whitespaces
-                  if First_Rest_Of_Last_Line_Non_Blank = 0 then
-                     --  Add trailing whitespaces
-                     Expanded_SLOC_Range.End_Column :=
-                       Langkit_Support.Slocs.Column_Number (Last_Line'Length)
-                         + 1;
-                     --  Add any blank lines after that
-                     loop
-                        exit when Next_Line_Number = Max_Line;
-                        declare
-                           Next_Line                 : constant Text_Type :=
-                             Unit.Get_Line (Next_Line_Number);
-                           Next_Line_First_Non_Blank : constant Natural :=
-                             (if Next_Line'Length /= 0 then
-                                Index_Non_Blank (Next_Line)
-                              else
-                                0);
-                        begin
-                           exit when Next_Line'Length /= 0
-                                       and then Next_Line_First_Non_Blank /= 0;
-                           Expanded_SLOC_Range.End_Line :=
-                             Langkit_Support.Slocs.Line_Number
-                               (Next_Line_Number);
-                           Expanded_SLOC_Range.End_Column :=
-                             Langkit_Support.Slocs.Column_Number
-                               (Next_Line'Length)
-                               + 1;
-                        end;
-                        Next_Line_Number := Next_Line_Number + 1;
-                     end loop;
-                  end if;
-
-               else
-                  --  There are no trailing whitespaces nor non whitespace
-                  --  tokens, so simply add any blank lines that follow.
-                  loop
-                     exit when Next_Line_Number = Max_Line;
-                     declare
-                        Next_Line                 : constant Text_Type :=
-                          Unit.Get_Line (Next_Line_Number);
-                        Next_Line_First_Non_Blank : constant Natural :=
-                          (if Next_Line'Length /= 0 then
-                              Index_Non_Blank (Next_Line)
-                           else
-                              0);
-                     begin
-                        exit when Next_Line'Length /= 0
-                          and then Next_Line_First_Non_Blank /= 0;
-                        Expanded_SLOC_Range.End_Line :=
-                          Langkit_Support.Slocs.Line_Number
-                            (Next_Line_Number);
-                        Expanded_SLOC_Range.End_Column :=
-                          Langkit_Support.Slocs.Column_Number
-                            (Next_Line'Length)
-                            + 1;
-                     end;
-                     Next_Line_Number := Next_Line_Number + 1;
-                  end loop;
-               end if;
-            end;
-            Expanded_SLOC_Ranges.Insert (Expanded_SLOC_Range);
-         end loop;
-      end return;
-   end Expand_SLOC_Ranges;
 
    ------------------------------------
    -- Merge_Intersecting_SLOC_Ranges --
@@ -652,7 +615,7 @@ package body Laltools.Refactor.Pull_Up_Declaration is
       use Source_Location_Range_Ordered_Sets;
 
       Reduced_SLOC_Ranges : Source_Location_Range_Ordered_Set;
-      SLOC_Ranges_Cursor : Cursor := SLOC_Ranges.First;
+      SLOC_Ranges_Cursor  : Cursor := SLOC_Ranges.First;
 
    begin
       if Has_Element (SLOC_Ranges_Cursor) then
@@ -722,10 +685,15 @@ package body Laltools.Refactor.Pull_Up_Declaration is
       Final_Object_Decl_Dependencies : Basic_Decl_Ordered_Set;
 
    begin
-      Declarations_To_Pull_Up := Get_Local_Dependencies (Subp);
+      for Local_Dependency of
+            Get_Local_Dependencies (Subp.P_Defining_Name)
+      loop
+         Declarations_To_Pull_Up.Include
+           (Local_Dependency.P_Basic_Decl);
+      end loop;
 
       for Declaration of Declarations_To_Pull_Up loop
-         if Declaration.Kind in Ada_Object_Decl then
+         if Declaration.Kind in Ada_Object_Decl | Ada_Param_Spec then
             Object_Decl_Dependencies.Include (Declaration);
          end if;
       end loop;
@@ -734,13 +702,14 @@ package body Laltools.Refactor.Pull_Up_Declaration is
          if Is_Subprogram (Declaration) then
             declare
                Dependencies_Of_Subp_Dependency :
-                 constant Basic_Decl_Ordered_Set :=
-                   Get_Local_Dependencies (Declaration);
+                 constant Defining_Name_Ordered_Set :=
+                   Get_Local_Dependencies (Declaration.P_Defining_Name);
 
             begin
-               for Declaration of Dependencies_Of_Subp_Dependency loop
-                  if Declaration.Kind in Ada_Object_Decl then
-                     Final_Object_Decl_Dependencies.Include (Declaration);
+               for Dependency of Dependencies_Of_Subp_Dependency loop
+                  if Dependency.P_Basic_Decl.Kind in Ada_Object_Decl then
+                     Final_Object_Decl_Dependencies.Include
+                       (Dependency.P_Basic_Decl);
                   end if;
                end loop;
             end;
@@ -752,7 +721,6 @@ package body Laltools.Refactor.Pull_Up_Declaration is
 
       Declarations_To_Pull_Up.Union (Final_Object_Decl_Dependencies);
       Declarations_To_Pull_Up.Difference (Parameters_To_Pull_Up);
-      Declarations_To_Pull_Up.Include (Subp);
    end Compute_Subp_Dependencies_To_Pull_Up;
 
    -----------------------------
@@ -956,7 +924,7 @@ package body Laltools.Refactor.Pull_Up_Declaration is
                   Parameter_Definition :=
                     Parameter_Declaration.P_Defining_Name;
                   Parameter_Type :=
-                    Parameter_Declaration.As_Object_Decl.F_Type_Expr;
+                    Parameter_Declaration.P_Type_Expression;
                   Append (New_Parameters, ";" & LF);
                   Append (New_Parameters, Indentation * " ");
                   Append
@@ -983,7 +951,7 @@ package body Laltools.Refactor.Pull_Up_Declaration is
                Parameter_Definition :=
                  Parameter_Declaration.P_Defining_Name;
                Parameter_Type :=
-                 Parameter_Declaration.As_Object_Decl.F_Type_Expr;
+                 Parameter_Declaration.P_Type_Expression;
                Append
                  (New_Parameters,
                   (+Parameter_Definition.Text)
@@ -999,7 +967,7 @@ package body Laltools.Refactor.Pull_Up_Declaration is
                   Parameter_Definition :=
                     Parameter_Declaration.P_Defining_Name;
                   Parameter_Type :=
-                    Parameter_Declaration.As_Object_Decl.F_Type_Expr;
+                    Parameter_Declaration.P_Type_Expression;
                   Append (New_Parameters, ";" & LF);
                   Append (New_Parameters, Indentation * " ");
                   Append
@@ -1067,11 +1035,17 @@ package body Laltools.Refactor.Pull_Up_Declaration is
             Append (Actual_Parameters, " (");
             Append
               (Actual_Parameters,
-               +Object_Decl.As_Object_Decl.F_Ids.Text);
+               (if Object_Decl.Kind in Ada_Object_Decl then
+                  +Object_Decl.As_Object_Decl.F_Ids.Text
+                else
+                  +Object_Decl.As_Param_Spec.F_Ids.Text));
             Append (Actual_Parameters, " => ");
             Append
               (Actual_Parameters,
-               +Object_Decl.As_Object_Decl.F_Ids.Text);
+               (if Object_Decl.Kind in Ada_Object_Decl then
+                  +Object_Decl.As_Object_Decl.F_Ids.Text
+                else
+                  +Object_Decl.As_Param_Spec.F_Ids.Text));
             Next (Parameters_Cursor);
             while Has_Element (Parameters_Cursor) loop
                Object_Decl := Key (Parameters_Cursor);
@@ -1129,7 +1103,10 @@ package body Laltools.Refactor.Pull_Up_Declaration is
                         Append (Actual_Parameters, Indentation * " ");
                         Append
                           (Actual_Parameters,
-                           +Object_Decl.As_Object_Decl.F_Ids.Text);
+                           (if Object_Decl.Kind in Ada_Object_Decl then
+                              +Object_Decl.As_Object_Decl.F_Ids.Text
+                            else
+                              +Object_Decl.As_Param_Spec.F_Ids.Text));
                         Next (Parameters_Cursor);
                      end loop;
                   end if;
@@ -1517,14 +1494,18 @@ package body Laltools.Refactor.Pull_Up_Declaration is
    -----------------------------------
 
    function Create_Declaration_Pull_Upper
-     (Unit             : Analysis_Unit;
-      Declaration_SLOC : Source_Location;
-      Indentation      : Natural := 3)
+     (Unit              : Analysis_Unit;
+      Declaration_SLOC  : Source_Location;
+      Indentation       : Natural := 3;
+      Only_Dependencies : Boolean := False;
+      Try_Subp_Insertion_Point : Boolean := False)
       return Declaration_Extractor
-   is ((Declaration =>
+   is ((Declaration                     =>
           (Unit.Root.Lookup (Declaration_SLOC).As_Name.
              P_Enclosing_Defining_Name.P_Basic_Decl.P_Canonical_Part),
-        Indentation => Indentation));
+        Indentation                     => Indentation,
+        Only_Dependencies               => Only_Dependencies,
+        Try_Subp_Insertion_Point => Try_Subp_Insertion_Point));
 
    --------------
    -- Refactor --
@@ -1538,8 +1519,9 @@ package body Laltools.Refactor.Pull_Up_Declaration is
    is
       Unit : constant Analysis_Unit := Self.Declaration.Unit;
 
-      Insertion_Point : constant Source_Location :=
-        Get_Insertion_Point (Self.Declaration);
+      Insertion_Point : constant Insertion_Point_Type :=
+        Get_Insertion_Point
+          (Self.Declaration, Self.Try_Subp_Insertion_Point);
 
       Declarations_To_Pull_Up : Unbounded_String;
 
@@ -1648,19 +1630,23 @@ package body Laltools.Refactor.Pull_Up_Declaration is
 
       begin
          for Local_Dependency of
-           Get_Local_Dependencies (Self.Declaration)
+           Get_Local_Dependencies (Self.Declaration.P_Defining_Name)
          loop
-            for Local_Dependency_Part of Local_Dependency.P_All_Parts loop
+            for Local_Dependency_Part of
+                  Local_Dependency.P_Basic_Decl.P_All_Parts
+            loop
                SLOC_Ranges_To_Pull_Up.Include
                  (Get_Declaration_SLOC_Range_With_Comments
                     (Local_Dependency_Part));
             end loop;
          end loop;
 
-         for Declaration_Part of Self.Declaration.P_All_Parts loop
-            SLOC_Ranges_To_Pull_Up.Include
-              (Get_Declaration_SLOC_Range_With_Comments (Declaration_Part));
-         end loop;
+         if not Self.Only_Dependencies then
+            for Declaration_Part of Self.Declaration.P_All_Parts loop
+               SLOC_Ranges_To_Pull_Up.Include
+                 (Get_Declaration_SLOC_Range_With_Comments (Declaration_Part));
+            end loop;
+         end if;
 
          SLOC_Ranges_To_Pull_Up :=
            Expand_SLOC_Ranges (Unit, SLOC_Ranges_To_Pull_Up);
@@ -1680,10 +1666,12 @@ package body Laltools.Refactor.Pull_Up_Declaration is
 
          Safe_Insert
            (Edits     => Text_Edits,
-            File_Name => Self.Declaration.Unit.Get_Filename,
+            File_Name => To_String (Insertion_Point.Filename),
             Edit      =>
               Text_Edit'
-                (Make_Range (Insertion_Point, Insertion_Point),
+                (Make_Range
+                   (Insertion_Point.Location,
+                    Insertion_Point.Location),
                  Declarations_To_Pull_Up));
       end Process_Non_Subprogram;
 
@@ -1711,6 +1699,10 @@ package body Laltools.Refactor.Pull_Up_Declaration is
            (Subp                    => Self.Declaration,
             Declarations_To_Pull_Up => Declarations_To_Pull_Up,
             Parameters_To_Pull_Up   => Parameters_To_Pull_Up);
+
+         if not Self.Only_Dependencies then
+            Declarations_To_Pull_Up.Include (Self.Declaration);
+         end if;
 
          --  For any dependency in Declarations_To_Pull_Up that is a
          --  subprogram, including Self.Declaration, find their headers.
@@ -1782,10 +1774,12 @@ package body Laltools.Refactor.Pull_Up_Declaration is
          --  Insert the pulled up declarations in the parent Declarative_Part
          Safe_Insert
            (Edits     => Text_Edits,
-            File_Name => Self.Declaration.Unit.Get_Filename,
+            File_Name => To_String (Insertion_Point.Filename),
             Edit      =>
                Text_Edit'
-                 (Make_Range (Insertion_Point, Insertion_Point),
+                 (Make_Range
+                    (Insertion_Point.Location,
+                     Insertion_Point.Location),
                   Declarations_To_Pull_Up_Text));
 
          --  Insert the actual parameters in Self.Declaration's calls

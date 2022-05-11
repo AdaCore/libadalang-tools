@@ -187,6 +187,33 @@ package Laltools.Common is
    function Count_Subp_Parameters (Subp_Params : Params'Class) return Natural;
    --  Returns the amount of parameters 'Subp_Params' has.
 
+   function Expand_SLOC_Range
+     (Node : Ada_Node'Class)
+      return Source_Location_Range;
+   --  Expand Node's Source_Location_Range by including leading and trailing
+   --  whitespaces, and empty lines immediately after.
+
+   function Expand_SLOC_Range
+     (Unit       : Analysis_Unit;
+      SLOC_Range : Source_Location_Range)
+      return Source_Location_Range;
+   --  Expand SLOC_Range it by including leading and trailing whitespaces,
+   --  and empty lines immediately after.
+
+   package Source_Location_Range_Ordered_Sets is
+     new Ada.Containers.Ordered_Sets
+       (Element_Type => Source_Location_Range);
+
+   subtype Source_Location_Range_Ordered_Set is
+     Source_Location_Range_Ordered_Sets.Set;
+
+   function Expand_SLOC_Ranges
+     (Unit        : Analysis_Unit;
+      SLOC_Ranges : Source_Location_Range_Ordered_Set)
+      return Source_Location_Range_Ordered_Set;
+   --  For each Source_Location_Range of SLOC_Range, expands it by including
+   --  leading and trailing whitespaces, and empty lines immediately after.
+
    procedure Find_All_References
      (Node     : Defining_Name'Class;
       Units    : Analysis_Unit_Array;
@@ -267,6 +294,17 @@ package Laltools.Common is
       return Param_Spec_List;
    --  If List's parent declaration has another part, finds its
    --  Param_Spec_List.
+
+   function Find_First_Common_Parent
+     (Start_Node : Ada_Node'Class;
+      End_Node   : Ada_Node'Class;
+      With_Self  : Boolean := True)
+      return Ada_Node
+     with Post => (if Start_Node.Unit = End_Node.Unit then
+                     not Find_First_Common_Parent'Result.Is_Null);
+   --  Finds the first common parent of Start_Node and End_Node.
+   --  Returns No_Ada_Node if Start_Node and End_Node don't have common
+   --  parents.
 
    function Find_Enclosing_Declarative_Parts
      (Node : Ada_Node'Class)
@@ -424,6 +462,12 @@ package Laltools.Common is
    --  If Subp is of kind Ada_Subp_Decl or Ada_Generic_Subp_Decl then
    --  returns its body part, if is exists. Otherwise return No_Base_Subp_Body.
 
+   function Get_Basic_Decl_Header_SLOC_Range
+     (Decl : Basic_Decl'Class)
+      return Source_Location_Range;
+   --  Returns the Source_Location_Range of Decl's header or
+   --  No_Source_Location_Range if it does not exist.
+
    function Get_Compilation_Unit
      (Node : Ada_Node'Class)
       return Compilation_Unit;
@@ -452,10 +496,25 @@ package Laltools.Common is
 
    function Get_Decl_Block_Declarative_Part (Decl_B : Decl_Block)
                                              return Declarative_Part;
-   --  Gets the Declarative_Part of a Decl_Block.
+   --  Gets the Declarative_Part of a Decl_Block
 
    function Get_Decl_Block_Decls (Decl_B : Decl_Block) return Ada_Node_List;
-   --  Gets the Ada_Node_List of a Declarative_Part associated to a Decl_Block.
+   --  Gets the Ada_Node_List of a Declarative_Part associated to a Decl_Block
+
+   function Get_Dotted_Name_First_Name
+     (Dotted_Name : Libadalang.Analysis.Dotted_Name'Class)
+      return Name;
+   pragma Unreferenced (Get_Dotted_Name_First_Name);
+   --  Gets Dotted_Name first name.
+   --  Example: For a Dotted_Name Foo.Bar, return the name Foo.
+
+   function Get_Dotted_Name_Definitions
+     (Dotted_Name : Libadalang.Analysis.Dotted_Name'Class)
+      return Defining_Name_Array;
+   --  Gets a Defining_Name_Array with the Defining_Name of each name of
+   --  Dotted_Name, in the reverse order.
+   --  Example: For a Dotted_Name Foo.Bar.Baz, returns a Defining_Name_Array
+   --  with Baz's, Bar's and Foo's Defining_Name.
 
    function Is_Declarative_Part_Owner
      (Node : Ada_Node'Class)
@@ -473,6 +532,11 @@ package Laltools.Common is
      (Node : Ada_Node'Class)
       return Boolean;
    --  Checks if Node can have a Params child
+
+   function Is_Whole_Line_Comment
+     (Token : Token_Reference)
+      return Boolean;
+   --  Checks if Token is a whole line Ada_Comment
 
    function Get_Declarative_Part
      (Node         : Ada_Node'Class;
