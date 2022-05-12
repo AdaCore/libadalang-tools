@@ -149,7 +149,9 @@ package body Pp.Actions is
    end Set_Partial_Gnatpp_Offset;
 
    function Get_Partial_Gnatpp_Offset return Natural is
-     (Partial_Gnatpp_Offset);
+   begin
+      return Partial_Gnatpp_Offset;
+   end Get_Partial_Gnatpp_Offset;
 
    ----------
    -- Init --
@@ -5222,8 +5224,9 @@ package body Pp.Actions is
          --  In Partial Gnatpp mode when the input node Ada_Decl_Block
          --  or Ada_Decl_Type the last ';' is not generated so should be added.
 
-         if Partial_Gnatpp
-           and then Kind (Tree) in Ada_Decl_Block | Ada_Type_Decl
+         if Partial_Gnatpp and then
+           Kind (Tree) in Ada_Decl_Block | Ada_Type_Decl
+           | Ada_Subp_Body | Ada_Package_Decl | Ada_Package_Body
          then
             if Kind (Last (New_Tokns'Access)) not in ';' then
                Append_And_Put (New_Tokns, ';');

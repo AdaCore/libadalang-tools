@@ -164,6 +164,10 @@ procedure Partial_GNATpp is
 
       Start_Node, End_Node : Ada_Node;
       Enclosing_Node       : Ada_Node;
+      Offset               : Natural := 0;
+
+      Gnatpp_Indentation         : Natural := 0;
+      Gnatpp_Indent_Continuation : Natural := 0;
 
    begin
       --  Ada.Text_IO.Put_Line ("MKU Source_File = " & Source_File);
@@ -171,6 +175,7 @@ procedure Partial_GNATpp is
 
       declare
          use Pp.Actions;
+         use Pp.Command_Lines;
          use Utils.Char_Vectors;
          use Utils.Command_Lines;
          use Laltools.Partial_GNATPP;
@@ -217,37 +222,24 @@ procedure Partial_GNATpp is
          --     & ")");
 
          pragma Assert (Enclosing_Node /= No_Ada_Node);
+
          Input := Get_Selection (Enclosing_Node);
 
          --  Determine the offset for the indentation of the enclosing node
          --  based on the previous or next sibling starting column position
-         --  and set this value for further usage by Insert_Indentation in the
-         --  post phases processing of the tree.
-         declare
-            Prev_Sibling : constant Ada_Node :=
-              Get_Previous_Sibling (Enclosing_Node);
-            Next_Sibling : constant Ada_Node :=
-              Get_Next_Sibling (Enclosing_Node);
-            Offset       : Natural := 0;
-         begin
+         --  and set this value for further usage by Insert_Indentation in
+         --  the post phases processing of the tree.
 
-            if Prev_Sibling /= No_Ada_Node
-              and then Next_Sibling /= No_Ada_Node
-              and then Prev_Sibling.Sloc_Range.Start_Column =
-                Next_Sibling.Sloc_Range.Start_Column
-            then
-               Offset := Natural (Prev_Sibling.Sloc_Range.Start_Column);
-            elsif Prev_Sibling /= No_Ada_Node then
-               Offset := Natural (Prev_Sibling.Sloc_Range.Start_Column);
-            elsif Prev_Sibling /= No_Ada_Node then
-               Offset := Natural (Next_Sibling.Sloc_Range.Start_Column);
-            end if;
+         Gnatpp_Indentation := PP_Indentation (PP_Options);
+         Gnatpp_Indent_Continuation := PP_Indent_Continuation (PP_Options);
 
-            if Offset /= 0 then
-               Set_Partial_Gnatpp_Offset (Offset - 1);
-            end if;
-
-         end;
+         Offset := Get_Starting_Offset (Enclosing_Node,
+                                        Gnatpp_Indentation,
+                                        Gnatpp_Indent_Continuation);
+         if Offset /= 0 then
+            Ada.Text_IO.Put_Line (" MKU   Offset = " & Offset'Img);
+            Set_Partial_Gnatpp_Offset (Offset - 1);
+         end if;
 
          declare
             Input_Str : constant String :=
@@ -288,8 +280,8 @@ procedure Partial_GNATpp is
                Node => Enclosing_Node,
                Edit => Text_Edit'
                  (Location => New_Sel_Range,
-                  Text     =>
-                    Ada.Strings.Unbounded.To_Unbounded_String (Output_Str)));
+                  Text     => Ada.Strings.Unbounded.To_Unbounded_String
+                    (Output_Str)));
             Print (Edits);
          end;
       end;

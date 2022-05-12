@@ -62,4 +62,11 @@ package Laltools.Partial_GNATPP is
    function Get_Next_Sibling (Node : Ada_Node) return Ada_Node;
    --  Returns the node's next sibling or No_Ada_Node if no sibling found
 
+   function Get_Starting_Offset
+     (Node : Ada_Node;
+      PP_Indent              : Natural;
+      PP_Indent_Continuation : Natural) return Natural;
+   --  Returns the starting offset that needs to be used for the selected Node
+   --  formatting
+
 end Laltools.Partial_GNATPP;

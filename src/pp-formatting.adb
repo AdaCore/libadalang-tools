@@ -908,7 +908,8 @@ package body Pp.Formatting is
          Messages : out Scanner.Source_Message_Vector;
          Lines_Data_P : Lines_Data_Ptr;
          Cmd : Command_Line;
-         Pp_Off_Present : in out Boolean);
+         Pp_Off_Present : in out Boolean;
+         Partial_Gnatpp : Boolean := False);
       --  New_Tokns doesn't contain any comments; they are inserted into the
       --  output from Src_Tokns. Blank lines are also copied from Src_Tokns to
       --  New_Tokns. The output is also patched up in miscellaneous other ways,
@@ -997,7 +998,9 @@ package body Pp.Formatting is
            (Src_Buf, Lines_Data_P, Cmd, Partial_Gnatpp);
 
          Tok_Phases.Insert_Comments_And_Blank_Lines
-           (Src_Buf, Messages, Lines_Data_P, Cmd, Pp_Off_Present);
+           (Src_Buf, Messages, Lines_Data_P, Cmd,
+            Pp_Off_Present,
+            Partial_Gnatpp);
 
          Tok_Phases.Split_Lines (Lines_Data_P, Cmd, First_Time => False);
 
@@ -1959,6 +1962,7 @@ package body Pp.Formatting is
             loop -- through levels
                L   := Next_Enabled (Lines_Data, F);
                Len := Line_Len (All_LB, All_LBI (F), All_LBI (L));
+
                exit when Len <= Arg (Cmd, Max_Line_Length); -- short enough
                exit when not More_Levels; -- no more line breaks to enable
 
@@ -2027,6 +2031,7 @@ package body Pp.Formatting is
 
                         FF := LL;
                      end if;
+
                   end loop; -- through line breaks at current level
                end;
 
@@ -2348,7 +2353,8 @@ package body Pp.Formatting is
                else
                   if Partial_Gnatpp then
                      if Kind (Src_Tok) = ';'
-                       and then Kind (Prev (Src_Tok)) in Res_End | Res_Record
+                       and then Kind (Prev (Src_Tok)) in
+                         Res_End | Res_Record | Ident
                        and then Kind (New_Tok) = End_Of_Input
                      then
                         Next_ss (Src_Tok);
@@ -2376,7 +2382,8 @@ package body Pp.Formatting is
          Messages : out Scanner.Source_Message_Vector;
          Lines_Data_P : Lines_Data_Ptr;
          Cmd : Command_Line;
-         Pp_Off_Present : in out Boolean)
+         Pp_Off_Present : in out Boolean;
+         Partial_Gnatpp : Boolean := False)
       is
          pragma Assert (not Pp_Off_Present); -- initialized by caller
          Lines_Data : Lines_Data_Rec renames Lines_Data_P.all;
@@ -3667,6 +3674,7 @@ package body Pp.Formatting is
       --  Start of processing for Insert_Comments_And_Blank_Lines
 
       begin
+
          pragma Debug
            (Format_Debug_Output
               (Lines_Data, "before Insert_Comments_And_Blank_Lines"));
@@ -3762,7 +3770,6 @@ package body Pp.Formatting is
                    Kind (Prev_Lexeme (Src_Tok)) = Res_End
                  and then Sname_83 (New_Tok)
                then
-
                   loop -- could be "end A.B.C;"
                      New_To_Newer;
 
@@ -3785,7 +3792,6 @@ package body Pp.Formatting is
                    Kind (Prev_Lexeme (New_Tok)) = Res_End
                  and then Kind (Src_Tok) in Ident | String_Lit
                then
-
                   Append_Tokn (New_Tokns, Spaces, Name_Space);
                   loop -- could be "end A.B.C;"
                      Append_Tokn (New_Tokns, Src_Tok);
@@ -4161,8 +4167,18 @@ package body Pp.Formatting is
                      goto Done;
                   end if;
                else
-                  Raise_Token_Mismatch
-                    ("Inserting", Lines_Data, Src_Buf, Src_Tok, New_Tok);
+                  if Partial_Gnatpp then
+                     if Kind (Src_Tok) = ';'
+                       and then Kind (Prev (Src_Tok)) in
+                         Res_End | Res_Record | Ident
+                       and then Kind (New_Tok) = End_Of_Input
+                     then
+                        Next_ss (Src_Tok);
+                     end if;
+                  else
+                     Raise_Token_Mismatch
+                       ("Inserting", Lines_Data, Src_Buf, Src_Tok, New_Tok);
+                  end if;
                end if;
             end if;
 
@@ -4197,6 +4213,7 @@ package body Pp.Formatting is
          Clear (Lines_Data.All_LBI);
          Clear (Enabled_LBI);
          Clear (Syntax_LBI);
+
       end Insert_Comments_And_Blank_Lines;
 
       procedure Insert_Indentation (Lines_Data_P : Lines_Data_Ptr;
@@ -4646,8 +4663,6 @@ package body Pp.Formatting is
                           (if Partial_Gnatpp then (LB.Indentation + Offset)
                            else LB.Indentation);
                      begin
-                        --  Append_Spaces (New_Tokns, LB.Indentation);
-
                         Append_Spaces (New_Tokns, Crt_Indent);
                      end;
                   end if;

@@ -155,11 +155,16 @@ package body Laltools.Partial_GNATPP is
       function Is_Relevant_Parent_Kind (Kind : Ada_Node_Kind_Type)
                                         return Boolean
       is
-        (Kind in Ada_Decl_Block | Ada_Entry_Body |
-         Ada_Package_Body | Ada_Subp_Body | Ada_Task_Body |
-         Ada_Begin_Block | Ada_Extended_Return_Stmt |
+        (Kind in Ada_Decl_Block |
+         Ada_Entry_Body |
+         Ada_Package_Body | Ada_Package_Decl |
+         Ada_Subp_Body |
+         Ada_Task_Body |
+         Ada_Begin_Block |
+         Ada_Extended_Return_Stmt |
          Ada_Accept_Stmt_With_Stmts |
-         Ada_Type_Decl | Ada_Compilation_Unit);
+         Ada_Type_Decl |
+         Ada_Compilation_Unit);
 
       function Is_Relevant_Parent_Node
         (Node : Ada_Node'Class) return Boolean is
@@ -302,8 +307,8 @@ package body Laltools.Partial_GNATPP is
    function Get_Previous_Sibling (Node : Ada_Node) return Ada_Node
    is
    begin
-      pragma Assert (Node /= No_Ada_Node);
-      return Node.Previous_Sibling.As_Ada_Node;
+      return (if Node /= No_Ada_Node then Node.Previous_Sibling.As_Ada_Node
+              else No_Ada_Node);
    end Get_Previous_Sibling;
 
    ------------------------
@@ -313,8 +318,107 @@ package body Laltools.Partial_GNATPP is
    function Get_Next_Sibling (Node : Ada_Node) return Ada_Node
    is
    begin
-      pragma Assert (Node /= No_Ada_Node);
-      return Node.Next_Sibling.As_Ada_Node;
+      return (if Node /= No_Ada_Node then Node.Next_Sibling.As_Ada_Node
+              else No_Ada_Node);
    end Get_Next_Sibling;
+
+   ---------------------------
+   --  Get_Starting_Offset  --
+   ---------------------------
+
+   function Get_Starting_Offset
+     (Node                   : Ada_Node;
+      PP_Indent              : Natural;
+      PP_Indent_Continuation : Natural) return Natural
+   is
+      pragma Unreferenced (PP_Indent_Continuation);
+      Parent_Node : Ada_Node := No_Ada_Node;
+
+      function Is_Expected_Parent_Kind (Kind : Ada_Node_Kind_Type)
+                                        return Boolean
+      is
+        (Kind in Ada_Package_Body | Ada_Package_Decl |
+         Ada_Library_Item | Ada_Subp_Body);
+
+         --  Ada_Task_Body |
+         --  Ada_Begin_Block |
+         --  Ada_Extended_Return_Stmt |
+         --  Ada_Accept_Stmt_With_Stmts |
+         --  Ada_Type_Decl |
+         --  Ada_Compilation_Unit);
+
+      function Is_Expected_Parent_Node
+        (Node : Ada_Node'Class) return Boolean is
+        (not Node.Is_Null and then Is_Expected_Parent_Kind (Node.Kind));
+
+      procedure Is_Expected_Parent_Node_Callback
+        (Parent : Ada_Node; Stop : in out Boolean);
+      --  When Parent is a relevant node stop the search and set Parent_Node
+
+      --------------------------------------
+      -- Is_Expected_Parent_Node_Callback --
+      --------------------------------------
+
+      procedure Is_Expected_Parent_Node_Callback
+        (Parent : Ada_Node; Stop : in out Boolean)
+      is
+      begin
+         Stop        := True;
+         Parent_Node := Parent;
+      end Is_Expected_Parent_Node_Callback;
+
+      Prev_Sibling : constant Ada_Node := Get_Previous_Sibling (Node);
+      Next_Sibling : constant Ada_Node := Get_Next_Sibling (Node);
+      Offset       : Natural := 0;
+   begin
+
+      if Prev_Sibling /= No_Ada_Node and then Next_Sibling /= No_Ada_Node
+        and then Prev_Sibling.Sloc_Range.Start_Column =
+          Next_Sibling.Sloc_Range.Start_Column
+      then
+         Offset := Natural (Prev_Sibling.Sloc_Range.Start_Column);
+
+      elsif Prev_Sibling /= No_Ada_Node then
+         if Kind (Node) in Ada_Subp_Body | Ada_Package_Body then
+            if Prev_Sibling /= No_Ada_Node
+              and then Kind (Prev_Sibling) = Ada_Private_Absent
+              and then Next_Sibling = No_Ada_Node
+            then
+               --  Get the parent node which should be a Library_Item which
+               --  will give us the offset to use for the reformatting
+               Offset :=
+                 Natural (Node.Parent.As_Ada_Node.Sloc_Range.Start_Column);
+            end if;
+         else
+
+            Offset := Natural (Prev_Sibling.Sloc_Range.Start_Column);
+         end if;
+
+      elsif Next_Sibling /= No_Ada_Node then
+         Offset := Natural (Next_Sibling.Sloc_Range.Start_Column);
+
+      elsif Prev_Sibling = No_Ada_Node and then Next_Sibling = No_Ada_Node
+      then
+         --  We should look backward for the Node parent to find the offset
+         --  of the parent and compute the one related to the reformatted node
+         --  based on gnatpp indentation and indent continuation parameters
+         Parent_Node := Node;
+         Find_Matching_Parents
+           (Node, Is_Expected_Parent_Node'Access,
+            Is_Expected_Parent_Node_Callback'Access);
+
+         Offset := Natural (Parent_Node.Sloc_Range.Start_Column);
+
+         case Kind (Parent_Node) is
+            when Ada_Package_Body =>
+               Offset := Offset + PP_Indent;
+
+            when others => null;
+         end case;
+
+      end if;
+
+      return Offset;
+   end Get_Starting_Offset;
 
 end Laltools.Partial_GNATPP;
