@@ -133,7 +133,7 @@ package body TGen.Gen_Strategies is
 
    procedure Collect_Type_Translations
      (Context : in out Generation_Context;
-      Subp    : Subp_Decl);
+      Subp    : Basic_Decl'Class);
 
    -------------------------------
    -- Collect_Type_Translations --
@@ -141,7 +141,7 @@ package body TGen.Gen_Strategies is
 
    procedure Collect_Type_Translations
      (Context : in out Generation_Context;
-      Subp    : Subp_Decl)
+      Subp    : Basic_Decl'Class)
    is
       Subp_Params : constant Params := Get_Subp_Params (Subp);
    begin
@@ -203,7 +203,7 @@ package body TGen.Gen_Strategies is
    procedure Generate_Test_Vectors
      (Context  : in out Generation_Context;
       Nb_Tests : Positive;
-      Subp     : Subp_Decl;
+      Subp     : Basic_Decl'Class;
       Subp_UID : Unbounded_String := Null_Unbounded_String)
    is
       Subp_Data : Subprogram_Data :=
@@ -282,7 +282,7 @@ package body TGen.Gen_Strategies is
       Function_JSON.Set_Field ("UID", +Subp_UID);
       Function_JSON.Set_Field
         ("generation_complete", Create (Subp_Data.All_Params_Static));
-      if not Is_Null (Subp.F_Subp_Spec.P_Returns) then
+      if not Is_Null (Subp.P_Subp_Spec_Or_Null.P_Returns) then
          Function_JSON.Set_Field
            ("return_type",
             Create (+Subp_Data.Return_Type_Fully_Qualified_Name));

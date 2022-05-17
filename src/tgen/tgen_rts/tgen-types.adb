@@ -71,6 +71,13 @@ package body TGen.Types is
       return To_Ada (Parent_Package);
    end Package_Name;
 
+   function Package_Name (Self : Typ) return Ada_Qualified_Name is
+      Pack_Name : Ada_Qualified_Name := Self.Name.Copy;
+   begin
+      Pack_Name.Delete_Last;
+      return Pack_Name;
+   end Package_Name;
+
    -----------------------
    -- Dot_To_Underscore --
    -----------------------

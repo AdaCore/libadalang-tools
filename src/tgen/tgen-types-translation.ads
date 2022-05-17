@@ -24,6 +24,8 @@
 --  Provides translation utilities for types represented by Libadalang nodes
 --  to TGen's internal type representation.
 
+with Ada.Containers.Hashed_Maps;
+
 with Libadalang.Analysis;
 
 package TGen.Types.Translation is
@@ -55,6 +57,16 @@ package TGen.Types.Translation is
 
    procedure PP_Cache;
    --  Print the content of the translation cache on the standard output
+
+   package Translation_Maps is new Ada.Containers.Hashed_Maps
+     (Key_Type        => Ada_Qualified_Name,
+      Element_Type    => TGen.Types.SP.Ref,
+      Hash            => TGen.Strings.Hash2,
+      Equivalent_Keys => TGen.Strings.Ada_Identifier_Vectors."=",
+      "="             => TGen.Types.SP."=");
+
+   Translation_Cache : Translation_Maps.Map;
+   --  Cache used for the memoization of Translate.
 
    procedure Clear_Cache;
    --  Clear the translation cache

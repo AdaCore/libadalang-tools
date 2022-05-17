@@ -37,7 +37,9 @@ package TGen.Marshalling is
    --  array types, and discriminants of unconstrained record types).
 
    procedure Generate_Marshalling_Functions_For_Typ
-     (F_Spec, F_Body : File_Type; Typ : TGen.Types.Typ'Class)
+     (F_Spec, F_Body     : File_Type;
+      Typ                : TGen.Types.Typ'Class;
+      Templates_Root_Dir : String)
    with Pre => Is_Supported_Type (Typ);
    --  Generate marshalling and unmarshalling functions for Typ.
    --  If the type does not need a header, we generate:
@@ -74,5 +76,8 @@ package TGen.Marshalling is
    --    (TAGAda_Marshalling_Stream : not null access Root_Stream_Type'Class;
    --     TAGAda_Marshalling_H      : TAGAda_Marshalling_Typ_Header_Type)
    --    return Typ;
+   --
+   --  Templates_Root_Dir should be the path to the root directory in which all
+   --  TGen templates are stored.
 
 end TGen.Marshalling;

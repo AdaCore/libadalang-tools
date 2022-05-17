@@ -1,0 +1,4 @@
+description:
+    basic test for marshalling lib
+
+driver: shell_script

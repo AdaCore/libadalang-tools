@@ -29,7 +29,7 @@ with Ada.Numerics.Big_Numbers.Big_Integers;
 with Ada.Strings;           use Ada.Strings;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-with TGen.Types.Array_Types;    use TGen.Types.Array_Types;
+with TGen.Types.Array_Types; use TGen.Types.Array_Types;
 
 package body TGen.Types.Record_Types is
 

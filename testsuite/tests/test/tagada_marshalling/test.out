@@ -1,0 +1,5 @@
+Size of String headers in bytes: 8
+Size of Matrix headers in bytes: 10
+Size of Shape headers in bytes: 1
+Size used by the compiler for Small_Shape_Array (Small_Shape_Array'Size): 44832
+Maximal size computed (Small_Shape_Array_Max_All): 37607

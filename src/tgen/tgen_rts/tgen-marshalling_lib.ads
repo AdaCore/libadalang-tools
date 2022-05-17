@@ -24,7 +24,7 @@
 with Ada.Streams;
 with Interfaces; use Interfaces;
 
-package TAGAda_Marshalling_Lib is
+package TGen.Marshalling_Lib is
 
    Invalid_Value : exception;
 
@@ -218,4 +218,4 @@ package TAGAda_Marshalling_Lib is
 
    end In_Out_Unconstrained;
 
-end TAGAda_Marshalling_Lib;
+end TGen.Marshalling_Lib;

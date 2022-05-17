@@ -23,7 +23,6 @@
 
 with Ada.Exceptions;
 with Ada.Text_IO; use Ada.Text_IO;
-with Ada.Containers.Hashed_Maps;
 
 with GNATCOLL.GMP.Integers;
 
@@ -60,16 +59,6 @@ package body TGen.Types.Translation is
 
    Verbose_Diag : Boolean := False;
    package Text renames Langkit_Support.Text;
-
-   package Translation_Maps is new Ada.Containers.Hashed_Maps
-     (Key_Type        => Ada_Qualified_Name,
-      Element_Type    => TGen.Types.SP.Ref,
-      Hash            => TGen.Strings.Hash2,
-      Equivalent_Keys => TGen.Strings.Ada_Identifier_Vectors."=",
-      "="             => TGen.Types.SP."=");
-
-   Translation_Cache : Translation_Maps.Map;
-   --  Cache used for the memoization of Translate.
 
    procedure PP_Cache is
       use Translation_Maps;

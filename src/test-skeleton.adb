@@ -737,11 +737,11 @@ package body Test.Skeleton is
             while Subp_Cur /= Subp_Data_List.No_Element loop
                begin
                   case Kind (Element (Subp_Cur).Subp_Declaration) is
-                     when Ada_Subp_Decl =>
+                     when Ada_Basic_Decl =>
                      TGen.Gen_Strategies.Generate_Test_Vectors
                      (TGen_Ctx,
                         Test.Common.TGen_Num_Tests,
-                        Element (Subp_Cur).Subp_Declaration.As_Subp_Decl,
+                        Element (Subp_Cur).Subp_Declaration.As_Basic_Decl,
                         Ada.Strings.Unbounded.To_Unbounded_String
                         (Element (Subp_Cur).Subp_Full_Hash.all));
                   when others =>

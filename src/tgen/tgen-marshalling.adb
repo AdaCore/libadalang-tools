@@ -21,14 +21,13 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Containers;               use Ada.Containers;
-with Ada.Containers.Indefinite_Hashed_Sets;
 with Ada.Numerics.Big_Numbers.Big_Integers;
 use  Ada.Numerics.Big_Numbers.Big_Integers;
 with Ada.Strings;                  use Ada.Strings;
 with Ada.Strings.Fixed;            use Ada.Strings.Fixed;
-with Ada.Strings.Hash;
 with Ada.Strings.Unbounded;        use Ada.Strings.Unbounded;
+
+with GNAT.OS_Lib;
 
 with Templates_Parser;             use Templates_Parser;
 
@@ -42,8 +41,8 @@ with TGen.Types.Record_Types;      use TGen.Types.Record_Types;
 
 package body TGen.Marshalling is
 
-   Global_Prefix   : constant String := "TAGAda_Marshalling";
-   Marshalling_Lib : constant String := "TAGAda_Marshalling_Lib";
+   Global_Prefix   : constant String := "TGen_Marshalling";
+   Marshalling_Lib : constant String := "TGen.Marshalling_Lib";
 
    --------------------
    -- Template Files --
@@ -103,12 +102,6 @@ package body TGen.Marshalling is
    --  Construct a prefix that will be shared by all entities generated for a
    --  given type.
 
-   package Name_Sets is new Ada.Containers.Indefinite_Hashed_Sets
-     (Element_Type        => String,
-      Hash                => Ada.Strings.Hash,
-      Equivalent_Elements => "=",
-      "="                 => "=");
-
    function Needs_Wrappers (Typ : TGen.Types.Typ'Class) return Boolean;
    --  Return True for types with headers when they can occur nested in the
    --  data-structure (not at the top level).
@@ -145,15 +138,17 @@ package body TGen.Marshalling is
    --  Return as a tag the choices represented by a set of intervals
 
    procedure Generate_Base_Functions_For_Typ
-     (F_Spec   : File_Type;
-      F_Body   : File_Type;
-      Typ      : TGen.Types.Typ'Class;
-      For_Base : Boolean := False)
+     (F_Spec             : File_Type;
+      F_Body             : File_Type;
+      Typ                : TGen.Types.Typ'Class;
+      Templates_Root_Dir : String;
+      For_Base           : Boolean := False)
    with Pre => (if For_Base then Typ in Scalar_Typ'Class)
      and then Typ not in Anonymous_Typ'Class;
-   --  Generate base marshalling and unmarshalling functions for Typ. Store
-   --  types for which the base generating function have already been generated
-   --  to avoid generating them twice.
+   --  Generate base marshalling and unmarshalling functions for Typ. Note that
+   --  this function will not operate recursively. It will thus have to be
+   --  called for each of the component type of a record for instance.
+   --
    --  If For_Base is True, generate the functions for Typ'Base.
    --
    --  For scalars, we generate:
@@ -207,7 +202,7 @@ package body TGen.Marshalling is
    --  contains component with dynamic bounds which we do not handle well
    --  currently.
    --
-   --  For composite types with with headers, we generate:
+   --  For composite types with headers, we generate:
    --
    --  type TAGAda_Marshalling_Typ_Header_Type is record
    --     < Typ's array bound or record discriminants >
@@ -591,15 +586,16 @@ package body TGen.Marshalling is
    -- Generate_Base_Functions_For_Typ --
    -------------------------------------
 
-   Base_Seen    : Name_Sets.Set;
-   Already_Seen : Name_Sets.Set;
-
    procedure Generate_Base_Functions_For_Typ
-     (F_Spec   : File_Type;
-      F_Body   : File_Type;
-      Typ      : TGen.Types.Typ'Class;
-      For_Base : Boolean := False)
+     (F_Spec             : File_Type;
+      F_Body             : File_Type;
+      Typ                : TGen.Types.Typ'Class;
+      Templates_Root_Dir : String;
+      For_Base           : Boolean := False)
    is
+      TRD : constant String :=
+        Templates_Root_Dir & GNAT.OS_Lib.Directory_Separator;
+
       B_Name         : constant String := Typ.Type_Name;
       Ty_Prefix      : constant String := Prefix_For_Typ (B_Name);
       Ty_Name        : constant String :=
@@ -667,9 +663,8 @@ package body TGen.Marshalling is
          Size_Max_Tag  : out Vector_Tag;
          Spacing       : Natural;
          Object_Name   : String);
-      --  Recursive function which instanciates the variant part templates to
-      --  create strings for the operations Read, Write, Size, and Size_Max on
-      --  a variant part V.
+      --  Instanciate the variant part templates to create strings for the
+      --  operations Read, Write, Size, and Size_Max on a variant part V.
       --  Spacing is used to tabulate the generated code Object_Name is the
       --  name of the object we are traversing.
 
@@ -704,23 +699,22 @@ package body TGen.Marshalling is
             5 => Assoc ("COMP_SCALAR", Comp_Scalar),
             6 => Assoc ("NEEDS_HEADER", Needs_Header (Named_Comp_Ty))];
       begin
-         Generate_Base_Functions_For_Typ (F_Spec, F_Body, Named_Comp_Ty);
 
          Read_Tag := Parse
-           (Component_Read_Write_Template,
+           (TRD & Component_Read_Write_Template,
             Assocs &
             [1 => Assoc ("SPACING", RW_Spacing (Spacing)),
              2 => Assoc ("ACTION", "Read")]);
          Write_Tag := Parse
-           (Component_Read_Write_Template,
+           (TRD & Component_Read_Write_Template,
             Assocs &
             [1 => Assoc ("SPACING", RW_Spacing (Spacing)),
              2 => Assoc ("ACTION", "Write")]);
          Size_Tag := Parse
-           (Component_Size_Template,
+           (TRD & Component_Size_Template,
             Assocs & Assoc ("SPACING", Size_Spacing (Spacing)));
          Size_Max_Tag := Parse
-           (Component_Size_Max_Template,
+           (TRD & Component_Size_Max_Template,
             Assocs & Assoc ("SPACING", Max_Spacing (Spacing)));
       end Collect_Info_For_Component;
 
@@ -856,22 +850,22 @@ package body TGen.Marshalling is
 
          begin
             Read_Tag := +String'
-              (Parse (Variant_Read_Write_Template, Assocs &
+              (Parse (TRD & Variant_Read_Write_Template, Assocs &
                       [1 => Assoc ("COMPONENT_ACTION", Comp_Read_Tag),
                        2 => Assoc ("VARIANT_PART", Variant_Read_Tag),
                        3 => Assoc ("SPACING", RW_Spacing (Spacing))]));
             Write_Tag := +String'
-              (Parse (Variant_Read_Write_Template, Assocs &
+              (Parse (TRD & Variant_Read_Write_Template, Assocs &
                       [1 => Assoc ("COMPONENT_ACTION", Comp_Write_Tag),
                        2 => Assoc ("VARIANT_PART", Variant_Write_Tag),
                        3 => Assoc ("SPACING", RW_Spacing (Spacing))]));
             Size_Tag := +String'
-              (Parse (Variant_Size_Template, Assocs &
+              (Parse (TRD & Variant_Size_Template, Assocs &
                       [1 => Assoc ("COMPONENT_SIZE", Comp_Size_Tag),
                        2 => Assoc ("VARIANT_PART", Variant_Size_Tag),
                        3 => Assoc ("SPACING", Size_Spacing (Spacing))]));
             Size_Max_Tag := +String'
-              (Parse (Variant_Size_Max_Template, Assocs &
+              (Parse (TRD & Variant_Size_Max_Template, Assocs &
                       [1 => Assoc ("COMPONENT_SIZE_MAX", Comp_Size_Max_Tag),
                        2 => Assoc ("VARIANT_PART", Variant_Size_Max_Tag),
                        3 => Assoc ("SPACING", Max_Spacing (Spacing))]));
@@ -892,22 +886,7 @@ package body TGen.Marshalling is
          else +"");
 
    begin
-      --  1. Check for inclusion in the general map or in the map for base
-      --     types.
-
-      if For_Base then
-         if Base_Seen.Contains (Typ.Fully_Qualified_Name) then
-            return;
-         end if;
-         Base_Seen.Include (Typ.Fully_Qualified_Name);
-      else
-         if Already_Seen.Contains (Typ.Fully_Qualified_Name) then
-            return;
-         end if;
-         Already_Seen.Include (Typ.Fully_Qualified_Name);
-      end if;
-
-      --  2. Generate operations for the header if needed
+      --  1. Generate operations for the header if needed
 
       if Needs_Header (Typ) then
 
@@ -920,14 +899,6 @@ package body TGen.Marshalling is
                  Unconstrained_Array_Typ'Class (Typ);
 
             begin
-               --  Generate base functions for the base type of the index types
-
-               for I in U_Typ.Index_Types'Range loop
-                  Generate_Base_Functions_For_Typ
-                    (F_Spec, F_Body, U_Typ.Index_Types (I).Get,
-                     For_Base => True);
-               end loop;
-
                --  Fill the association maps
 
                Create_Tags_For_Array_Bounds
@@ -943,10 +914,10 @@ package body TGen.Marshalling is
             begin
                --  Generate base functions for the discriminant types
 
-               for Cu in D_Typ.Discriminant_Types.Iterate loop
-                  Generate_Base_Functions_For_Typ
-                    (F_Spec, F_Body, Component_Maps.Element (Cu).Get);
-               end loop;
+               --  for Cu in D_Typ.Discriminant_Types.Iterate loop
+               --     Generate_Base_Functions_For_Typ
+               --       (F_Spec, F_Body, Component_Maps.Element (Cu).Get);
+               --  end loop;
 
                --  Fill the association maps
 
@@ -970,15 +941,15 @@ package body TGen.Marshalling is
                9  => Assoc ("ADA_DIM", Ada_Dim_Tag)];
 
          begin
-            Put_Line (F_Spec, Parse (Header_Spec_Template, Assocs));
+            Put_Line (F_Spec, Parse (TRD & Header_Spec_Template, Assocs));
             New_Line (F_Spec);
 
-            Put_Line (F_Body, Parse (Header_Body_Template, Assocs));
+            Put_Line (F_Body, Parse (TRD & Header_Body_Template, Assocs));
             New_Line (F_Body);
          end;
       end if;
 
-      --  3. Generate the specifications of the base operations
+      --  2. Generate the specifications of the base operations
 
       declare
          Spec_Template : constant String :=
@@ -997,12 +968,12 @@ package body TGen.Marshalling is
             10 => Assoc ("FOR_BASE", For_Base)];
 
       begin
-         Put_Line (F_Spec, Parse (Spec_Template, Assocs));
+         Put_Line (F_Spec, Parse (TRD & Spec_Template, Assocs));
          New_Line (F_Spec);
       end;
 
-      --  4. Generate the body of the base operations
-      --  4.1. For scalar types, we generate clones. We need to provide the
+      --  3. Generate the body of the base operations
+      --  3.1. For scalar types, we generate clones. We need to provide the
       --       name of the appropriate generic unit depending on the scalar
       --       kind (Discrete, Fixed, or Float).
 
@@ -1024,11 +995,12 @@ package body TGen.Marshalling is
                7 => Assoc ("FOR_BASE", For_Base)];
 
          begin
-            Put_Line (F_Body, Parse (Scalar_Read_Write_Template, Assocs));
+            Put_Line
+              (F_Body, Parse (TRD & Scalar_Read_Write_Template, Assocs));
             New_Line (F_Body);
          end;
 
-      --  4.2 For array types, we generate the calls for the components and we
+      --  3.2 For array types, we generate the calls for the components and we
       --      instanciate the appropriate patterns.
 
       elsif Typ in Array_Typ'Class then
@@ -1069,16 +1041,18 @@ package body TGen.Marshalling is
                   12 => Assoc ("BOUND_TYP", Comp_Typ_Tag)];
 
             begin
-               Put_Line (F_Body, Parse (Array_Read_Write_Template, Assocs));
+               Put_Line
+                 (F_Body, Parse (TRD & Array_Read_Write_Template, Assocs));
                New_Line (F_Body);
-               Put_Line (F_Body, Parse (Array_Size_Template, Assocs));
+               Put_Line (F_Body, Parse (TRD & Array_Size_Template, Assocs));
                New_Line (F_Body);
-               Put_Line (F_Body, Parse (Array_Size_Max_Template, Assocs));
+               Put_Line
+                 (F_Body, Parse (TRD & Array_Size_Max_Template, Assocs));
                New_Line (F_Body);
             end;
          end;
 
-      --  4.3 For record types, we generate the calls for the components and
+      --  3.3 For record types, we generate the calls for the components and
       --      the variant part and instanciate the appropriate patterns.
 
       --  Record types: generate a call per component
@@ -1145,11 +1119,14 @@ package body TGen.Marshalling is
                   13 => Assoc ("DISCR_TYP", Comp_Typ_Tag)];
 
             begin
-               Put_Line (F_Body, Parse (Record_Read_Write_Template, Assocs));
+               Put_Line
+                 (F_Body, Parse (TRD & Record_Read_Write_Template, Assocs));
                New_Line (F_Body);
-               Put_Line (F_Body, Parse (Record_Size_Template, Assocs));
+               Put_Line
+                 (F_Body, Parse (TRD & Record_Size_Template, Assocs));
                New_Line (F_Body);
-               Put_Line (F_Body, Parse (Record_Size_Max_Template, Assocs));
+               Put_Line
+                 (F_Body, Parse (TRD & Record_Size_Max_Template, Assocs));
                New_Line (F_Body);
             end;
          end;
@@ -1169,9 +1146,11 @@ package body TGen.Marshalling is
                6 => Assoc ("DISCR_PREFIX", Comp_Pref_Tag)];
 
          begin
-            Put_Line (F_Spec, Parse (Header_Wrappers_Spec_Template, Assocs));
+            Put_Line
+              (F_Spec, Parse (TRD & Header_Wrappers_Spec_Template, Assocs));
             New_Line (F_Spec);
-            Put_Line (F_Body, Parse (Header_Wrappers_Body_Template, Assocs));
+            Put_Line
+              (F_Body, Parse (TRD & Header_Wrappers_Body_Template, Assocs));
             New_Line (F_Body);
          end;
       end if;
@@ -1182,7 +1161,9 @@ package body TGen.Marshalling is
    --------------------------------------------
 
    procedure Generate_Marshalling_Functions_For_Typ
-     (F_Spec, F_Body : File_Type; Typ : TGen.Types.Typ'Class)
+     (F_Spec, F_Body     : File_Type;
+      Typ                : TGen.Types.Typ'Class;
+      Templates_Root_Dir : String)
    is
       Ty_Name       : constant String := Typ.Type_Name;
       Ty_Prefix     : constant String := Prefix_For_Typ (Ty_Name);
@@ -1200,14 +1181,32 @@ package body TGen.Marshalling is
    begin
       --  Generate the base functions for Typ
 
-      Generate_Base_Functions_For_Typ (F_Spec, F_Body, Typ);
+      Generate_Base_Functions_For_Typ
+        (F_Spec, F_Body, Typ, Templates_Root_Dir);
+
+      --  If the type can be used as an array index constraint, also generate
+      --  the functions for Typ'Base. TODO: we probably should do that iff
+      --  the type actually constrains an array.
+
+      if Typ in Scalar_Typ'Class then
+         Generate_Base_Functions_For_Typ
+           (F_Spec, F_Body, Typ, Templates_Root_Dir, For_Base => True);
+      end if;
 
       --  Generate the Input and Output subprograms
 
-      Put_Line (F_Spec, Parse (In_Out_Spec_Template, Assocs));
+      Put_Line
+        (F_Spec,
+         Parse
+           (Templates_Root_Dir & GNAT.OS_Lib.Directory_Separator
+            & In_Out_Spec_Template, Assocs));
       New_Line (F_Spec);
 
-      Put_Line (F_Body, Parse (In_Out_Body_Template, Assocs));
+      Put_Line
+        (F_Body,
+         Parse
+           (Templates_Root_Dir & GNAT.OS_Lib.Directory_Separator
+            & In_Out_Body_Template, Assocs));
       New_Line (F_Body);
    end Generate_Marshalling_Functions_For_Typ;
 

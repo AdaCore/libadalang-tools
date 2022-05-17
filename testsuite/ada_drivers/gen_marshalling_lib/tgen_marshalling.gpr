@@ -1,0 +1,15 @@
+with "../../../src/tgen/tgen_rts/tgen_rts.gpr";
+with "../../../src/lal_tools.gpr";
+with "libadalang.gpr";
+
+
+project TGen_Marshalling is
+    
+   for Source_Dirs use ("src");
+   for Object_Dir use "obj";
+   for Exec_Dir use "../bin/";
+   for Main use ("tgen_marshalling.adb");
+
+   package Compiler renames LAL_Tools.Compiler;
+
+end TGen_Marshalling;

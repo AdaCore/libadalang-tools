@@ -24,7 +24,7 @@
 with Ada.Unchecked_Conversion;
 with System.Unsigned_Types; use System.Unsigned_Types;
 
-package body TAGAda_Marshalling_Lib is
+package body TGen.Marshalling_Lib is
 
    function Size (V : Unsigned_8) return Offset_Type is
      (case V is
@@ -857,4 +857,4 @@ package body TAGAda_Marshalling_Lib is
 
    end In_Out_Unconstrained;
 
-end TAGAda_Marshalling_Lib;
+end TGen.Marshalling_Lib;

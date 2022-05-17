@@ -138,6 +138,9 @@ package body TGen.Strings is
 
    function To_Ada (Name : Ada_Qualified_Name) return String is
    begin
+      if Name.Is_Empty then
+         return "";
+      end if;
       return To_Symbol (Name, Sep => '.');
    end To_Ada;
 

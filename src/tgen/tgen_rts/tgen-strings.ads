@@ -25,6 +25,7 @@
 
 with Ada.Containers.Indefinite_Ordered_Sets;
 with Ada.Containers.Ordered_Maps;
+with Ada.Containers.Ordered_Sets;
 with Ada.Containers.Vectors;
 with Ada.Strings;           use Ada.Strings;
 with Ada.Strings.Equal_Case_Insensitive;
@@ -33,6 +34,7 @@ with Ada.Strings.Hash;
 with Ada.Strings.Less_Case_Insensitive;
 with Ada.Strings.Maps;      use Ada.Strings.Maps;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with Ada.Strings.Unbounded.Equal_Case_Insensitive;
 
 with GNATCOLL.Projects; use GNATCOLL.Projects;
 
@@ -120,6 +122,10 @@ package TGen.Strings is
    type Ada_Identifier is new Ada.Strings.Unbounded.Unbounded_String;
    --  Simple Ada identifier
 
+   function "=" (L, R : Ada_Identifier) return Boolean is
+     (Ada.Strings.Unbounded.Equal_Case_Insensitive
+        (Unbounded_String (L), Unbounded_String (R)));
+
    package Ada_Identifier_Vectors is new Ada.Containers.Vectors
      (Positive, Ada_Identifier);
 
@@ -130,8 +136,7 @@ package TGen.Strings is
    function "&" (Left, Right : Ada_Qualified_Name) return Ada_Qualified_Name
       renames Ada_Identifier_Vectors."&";
 
-   function To_Ada (Name : Ada_Qualified_Name) return String
-     with Pre => not Name.Is_Empty;
+   function To_Ada (Name : Ada_Qualified_Name) return String;
    --  Turn the given qualified name into Ada syntax
 
    function To_Filename (Name : Ada_Qualified_Name) return String
@@ -141,7 +146,15 @@ package TGen.Strings is
    function To_Qualified_Name (Name : String) return Ada_Qualified_Name;
    --  Turn the given string into our internal qualified name structure
 
+   function "<" (L, R : Ada_Qualified_Name) return Boolean is
+     (Ada.Strings.Less_Case_Insensitive (To_Ada (L), To_Ada (R)));
+
    function Hash2 (Self : Ada_Qualified_Name) return Ada.Containers.Hash_Type
    is (Ada.Strings.Hash (To_Ada (Self)));
+
+   package Ada_Qualified_Name_Sets is new Ada.Containers.Ordered_Sets
+     (Element_Type => Ada_Qualified_Name,
+      "="          => Ada_Identifier_Vectors."=");
+   subtype Ada_Qualified_Name_Set is Ada_Qualified_Name_Sets.Set;
 
 end TGen.Strings;

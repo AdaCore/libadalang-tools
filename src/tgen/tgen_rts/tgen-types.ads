@@ -106,6 +106,7 @@ package TGen.Types is
    --  Return a unique identifier for the type
 
    function Package_Name (Self : Typ) return String;
+   function Package_Name (Self : Typ) return Ada_Qualified_Name;
    --  Return the package name this type belongs to
 
    function Is_Constrained (Self : Typ) return Boolean is (False);

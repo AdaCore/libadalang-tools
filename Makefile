@@ -29,7 +29,8 @@ TESTSUITE_PROJECTS = \
    testsuite/ada_drivers/refactoring_pull_up_declaration/pull_up_declaration.gpr \
    testsuite/ada_drivers/refactoring_change_parameters_type/change_parameters_type.gpr \
    testsuite/ada_drivers/refactoring_change_parameters_default_value/change_parameters_default_value.gpr \
-   testsuite/ada_drivers/refactoring_introduce_parameter/introduce_parameter.gpr
+   testsuite/ada_drivers/refactoring_introduce_parameter/introduce_parameter.gpr \
+   testsuite/ada_drivers/gen_marshalling_lib/tgen_marshalling.gpr
 
 ALL_PROJECTS = \
    $(BIN_PROJECTS) $(LIB_PROJECTS) $(TESTSUITE_PROJECTS)
@@ -113,6 +114,10 @@ install-bin-strip:
 	# Don't strip debug builds
 	test "$(BUILD_MODE)" = dev || strip "$(DESTDIR)/bin/"*
 
+install-tgen:
+	mkdir -p "$(DESTDIR)/share/tgen"
+	cp -r src/tgen/tgen_rts "$(DESTDIR)/share/tgen/"
+	cp -r src/tgen/templates "$(DESTDIR)/share/tgen/"
 
 .PHONY: clean
 clean:
