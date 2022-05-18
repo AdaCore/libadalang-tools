@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                    Copyright (C) 2020-2022, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -250,11 +250,31 @@ package body Laltools.Refactor_Imports is
       end if;
 
       if not Pkg_Decl.F_Public_Part.Is_Null then
-         Explore_Declarative_Part (Pkg_Decl.F_Public_Part.F_Decls);
+         begin
+            Explore_Declarative_Part (Pkg_Decl.F_Public_Part.F_Decls);
+
+         exception
+            --  Ignore Constraint_Error thrown by F_Decls due to invalid code.
+            --  Continue execution since Pkg_Decl.F_Private_Part.F_Decls might
+            --  not have the same issue.
+            --  This has been seen in V516-059.
+            when Constraint_Error =>
+               null;
+         end;
       end if;
 
       if Incl_Private and then not Pkg_Decl.F_Private_Part.Is_Null then
-         Explore_Declarative_Part (Pkg_Decl.F_Private_Part.F_Decls);
+         begin
+            Explore_Declarative_Part (Pkg_Decl.F_Private_Part.F_Decls);
+
+         exception
+            --  Ignore Constraint_Error thrown by F_Decls due to invalid code.
+            --  Continue execution since Pkg_Decl.F_Public_Part.F_Decls might
+            --  have executed correctly.
+            --  This has been seen in V516-059.
+            when Constraint_Error =>
+               null;
+         end;
       end if;
 
       return All_Decls;
