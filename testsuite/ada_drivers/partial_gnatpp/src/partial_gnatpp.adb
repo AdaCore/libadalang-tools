@@ -166,9 +166,6 @@ procedure Partial_GNATpp is
       Enclosing_Node       : Ada_Node;
       Offset               : Natural := 0;
 
-      Gnatpp_Indentation         : Natural := 0;
-      Gnatpp_Indent_Continuation : Natural := 0;
-
    begin
       --  Ada.Text_IO.Put_Line ("MKU Source_File = " & Source_File);
       Main_Unit := Jobs (1).Analysis_Ctx.Get_From_File (Source_File);
@@ -230,14 +227,11 @@ procedure Partial_GNATpp is
          --  and set this value for further usage by Insert_Indentation in
          --  the post phases processing of the tree.
 
-         Gnatpp_Indentation := PP_Indentation (PP_Options);
-         Gnatpp_Indent_Continuation := PP_Indent_Continuation (PP_Options);
-
          Offset := Get_Starting_Offset (Enclosing_Node,
-                                        Gnatpp_Indentation,
-                                        Gnatpp_Indent_Continuation);
+                                        PP_Indentation (PP_Options),
+                                        PP_Indent_Continuation (PP_Options));
          if Offset /= 0 then
-            Ada.Text_IO.Put_Line (" MKU   Offset = " & Offset'Img);
+            --  Ada.Text_IO.Put_Line (" MKU   Offset = " & Offset'Img);
             Set_Partial_Gnatpp_Offset (Offset - 1);
          end if;
 

@@ -156,14 +156,14 @@ package body Laltools.Partial_GNATPP is
                                         return Boolean
       is
         (Kind in Ada_Decl_Block |
-         Ada_Entry_Body |
          Ada_Package_Body | Ada_Package_Decl |
          Ada_Subp_Body |
-         Ada_Task_Body |
-         Ada_Begin_Block |
-         Ada_Extended_Return_Stmt |
-         Ada_Accept_Stmt_With_Stmts |
          Ada_Type_Decl |
+         --  Ada_Entry_Body |
+         --  Ada_Task_Body |
+         --  Ada_Begin_Block |
+         --  Ada_Extended_Return_Stmt |
+         --  Ada_Accept_Stmt_With_Stmts |
          Ada_Compilation_Unit);
 
       function Is_Relevant_Parent_Node
@@ -388,9 +388,10 @@ package body Laltools.Partial_GNATPP is
                --  will give us the offset to use for the reformatting
                Offset :=
                  Natural (Node.Parent.As_Ada_Node.Sloc_Range.Start_Column);
+            else
+               Offset := Natural (Prev_Sibling.Sloc_Range.Start_Column);
             end if;
          else
-
             Offset := Natural (Prev_Sibling.Sloc_Range.Start_Column);
          end if;
 

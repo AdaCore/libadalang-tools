@@ -212,9 +212,14 @@ package body Pp.Formatting is
       while not Last.Enabled loop
          Result := Result + 1;
          Last   := All_LB (All_LBI (Result));
+
+         --  In some situation when partial formatting is performed no line
+         --  break is enabled after the 1st one. Adding this exit condition
+         --  to cover this situation.
+         exit when Result = Last_Index (All_LBI);
       end loop;
 
---???      pragma Assert (First.Level = Last.Level);
+      --???      pragma Assert (First.Level = Last.Level);
       return Result;
    end Next_Enabled;
 
@@ -891,7 +896,8 @@ package body Pp.Formatting is
       procedure Split_Lines
         (Lines_Data_P : Lines_Data_Ptr;
          Cmd : Command_Line;
-         First_Time : Boolean);
+         First_Time : Boolean;
+         Partial_Gnatpp : Boolean := False);
       --  Enable soft line breaks as necessary to prevent too-long lines.
       --  First_Time is for debugging.
 
@@ -992,7 +998,10 @@ package body Pp.Formatting is
          --  Actions only in partial gnatpp mode. Final_Check is omitted
          --  since applying for the entire file for now.
 
-         Tok_Phases.Split_Lines (Lines_Data_P, Cmd, First_Time => True);
+         Tok_Phases.Split_Lines
+           (Lines_Data_P, Cmd,
+            First_Time => True,
+            Partial_Gnatpp => Partial_Gnatpp);
 
          Tok_Phases.Enable_Line_Breaks_For_EOL_Comments
            (Src_Buf, Lines_Data_P, Cmd, Partial_Gnatpp);
@@ -1002,9 +1011,14 @@ package body Pp.Formatting is
             Pp_Off_Present,
             Partial_Gnatpp);
 
-         Tok_Phases.Split_Lines (Lines_Data_P, Cmd, First_Time => False);
+         Tok_Phases.Split_Lines
+           (Lines_Data_P, Cmd,
+            First_Time => False,
+            Partial_Gnatpp => Partial_Gnatpp);
 
          Tok_Phases.Insert_Indentation (Lines_Data_P, Cmd, Partial_Gnatpp);
+
+         --  KEEP commented for now
          --  Tok_Phases.Insert_Alignment (Lines_Data_P, Cmd);
 
          Tokns_To_Buffer (Lines_Data.Out_Buf, Lines_Data.New_Tokns, Cmd);
@@ -1848,7 +1862,8 @@ package body Pp.Formatting is
       procedure Split_Lines
         (Lines_Data_P : Lines_Data_Ptr;
          Cmd : Command_Line;
-         First_Time : Boolean)
+         First_Time : Boolean;
+         Partial_Gnatpp : Boolean := False)
       is
          Lines_Data : Lines_Data_Rec renames Lines_Data_P.all;
          All_LB : Line_Break_Vector renames Lines_Data.All_LB;
@@ -1989,6 +2004,7 @@ package body Pp.Formatting is
                   --  Loop through line breaks at current level
 
                   for X in 1 .. Last_Index (LB) - 1 loop
+
                      LL := LB (X);
                      Prev_LL := LL;
                      pragma Assert (All_LB (LL).Level = Level);
@@ -2051,7 +2067,13 @@ package body Pp.Formatting is
          pragma Debug
            (Format_Debug_Output
               (Lines_Data, "after Split_Lines " & Again));
-         pragma Debug (Assertions);
+
+         --  In case of partial reformatting of an enum type makes that the
+         --  last LB is not always enabled. This is why this assertion will
+         --  fail.
+         if not Partial_Gnatpp then
+            pragma Debug (Assertions);
+         end if;
       end Split_Lines;
 
       procedure Enable_Line_Breaks_For_EOL_Comments
@@ -2354,7 +2376,7 @@ package body Pp.Formatting is
                   if Partial_Gnatpp then
                      if Kind (Src_Tok) = ';'
                        and then Kind (Prev (Src_Tok)) in
-                         Res_End | Res_Record | Ident
+                         Res_End | Res_Record | Ident | ')'
                        and then Kind (New_Tok) = End_Of_Input
                      then
                         Next_ss (Src_Tok);
@@ -2633,22 +2655,26 @@ package body Pp.Formatting is
 
             if Kind (New_Tok) = '(' then
                if Is_Empty (Paren_Stack) then
-                  declare
-                     LB : Line_Break renames
-                       All_LB (Enabled_LBI (Enabled_Cur_Line - 1));
-                     New_Enabled_Line_Start : constant Positive :=
-                       Sloc_First (LB_Tok (LB)) + 1;
-                     New_This_Line_Start : constant Positive :=
-                       Sloc_First (New_Line_Start_Out);
-                  begin
-                     if New_Enabled_Line_Start = New_This_Line_Start then
-                        Extra_Indent_For_Preserved_Line := False;
-                     end if;
-                  end;
+                  if Partial_Gnatpp and then Enabled_Cur_Line = 1 then
+                     Extra_Indent_For_Preserved_Line := False;
+                  else
+                     declare
+                        LB : Line_Break renames
+                          All_LB (Enabled_LBI (Enabled_Cur_Line - 1));
+                        New_Enabled_Line_Start : constant Positive :=
+                          Sloc_First (LB_Tok (LB)) + 1;
+                        New_This_Line_Start : constant Positive :=
+                          Sloc_First (New_Line_Start_Out);
+                     begin
+                        if New_Enabled_Line_Start = New_This_Line_Start then
+                           Extra_Indent_For_Preserved_Line := False;
+                        end if;
+                     end;
+                  end if;
                end if;
 
                --  Add 2 extra spaces to indent at the first character position
-               --  inside the paranthesis
+               --  inside the parenthesis
                Crt_Indent :=
                  Sloc (New_Tok).First - Sloc (New_Line_Start_Out).First + 2;
                Push (Paren_Stack, (Indent => Crt_Indent));
@@ -3674,7 +3700,6 @@ package body Pp.Formatting is
       --  Start of processing for Insert_Comments_And_Blank_Lines
 
       begin
-
          pragma Debug
            (Format_Debug_Output
               (Lines_Data, "before Insert_Comments_And_Blank_Lines"));
@@ -4075,7 +4100,6 @@ package body Pp.Formatting is
                   end if;
 
                elsif Kind (Src_Tok) in Whole_Line_Comment then
-
                   --  In the context of call parameters or aggregate association
                   --  having a whole line comment inserted in between the
                   --  elements the present Disabled_LB_Token should be enabled
@@ -4145,7 +4169,6 @@ package body Pp.Formatting is
                      end;
 
                   end if;
-
                   Insert_Whole_Line_Comment;
 
                elsif Kind (Src_Tok) = Preprocessor_Directive then
@@ -4170,7 +4193,7 @@ package body Pp.Formatting is
                   if Partial_Gnatpp then
                      if Kind (Src_Tok) = ';'
                        and then Kind (Prev (Src_Tok)) in
-                         Res_End | Res_Record | Ident
+                         Res_End | Res_Record | Ident | ')'
                        and then Kind (New_Tok) = End_Of_Input
                      then
                         Next_ss (Src_Tok);
@@ -4194,16 +4217,17 @@ package body Pp.Formatting is
          end if;
 
          pragma Assert (Is_Empty (Paren_Stack));
-
          pragma Assert (Cur_Indentation = Arg (Cmd, Initial_Indentation));
-
          pragma Assert (At_Last (Src_Tok));
 
          Append_Tokn (New_Tokns, End_Of_Input);
          Erase_LB_Toks (All_LB);
          Clear (Saved_New_Tokns);
          pragma Assert (Syntax_Cur_Line = Last_Index (Syntax_LBI) + 1);
-         pragma Assert (Enabled_Cur_Line = Last_Index (Enabled_LBI));
+
+         if not Partial_Gnatpp then
+            pragma Assert (Enabled_Cur_Line = Last_Index (Enabled_LBI));
+         end if;
 
          <<Done>> null;
 
@@ -4213,7 +4237,6 @@ package body Pp.Formatting is
          Clear (Lines_Data.All_LBI);
          Clear (Enabled_LBI);
          Clear (Syntax_LBI);
-
       end Insert_Comments_And_Blank_Lines;
 
       procedure Insert_Indentation (Lines_Data_P : Lines_Data_Ptr;
@@ -4568,7 +4591,6 @@ package body Pp.Formatting is
                        Line_Break_Token_Index (New_Tok);
                      LB : Line_Break renames All_LB (Index);
                   begin
-
                      --  If a Disabled_LB_Token is found and the switch
                      --  --preserve-line-breaks is used then we do not want
                      --  to change it in Enabled_LB_Token even is if it is
