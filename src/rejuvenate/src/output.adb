@@ -68,14 +68,14 @@ package body Output is
      (Writer  : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
       Item    : Text_Edit_Map;
       Success : in out Boolean);
-   --  Write the fixits information for array_aggregate
+   --  Write the fixits information for Text_Edit_Maps
 
    procedure Write_Fixit
      (Writer   : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
       Filename : String;
       Item     : Text_Edit_Ordered_Set;
       Success  : in out Boolean);
-   --  Write the fixits information for array_aggregate
+   --  Write the fixits information for Text_Edit_Ordered_Sets
 
    procedure Write_Edit
      (Writer    : in out VSS.JSON.Content_Handlers.JSON_Content_Handler'Class;
@@ -179,10 +179,8 @@ package body Output is
       Item    : Text_Edit_Map;
       Success : in out Boolean) is
    begin
-      Writer.Start_Array (Success);
-      Writer.Start_Object (Success);
-
       Writer.Key_Name ("fixits", Success);
+      Writer.Start_Array (Success);
       for File_Name in Item.Iterate loop
 
          for Text_To_Edit of Item (File_Name) loop
@@ -193,7 +191,6 @@ package body Output is
          end loop;
       end loop;
 
-      Writer.End_Object (Success);
       Writer.End_Array (Success);
    end Write_Fixit;
 
@@ -207,18 +204,14 @@ package body Output is
       Item     : Text_Edit_Ordered_Set;
       Success  : in out Boolean) is
    begin
-      Writer.Start_Array (Success);
-      Writer.Start_Object (Success);
-
       Writer.Key_Name ("fixits", Success);
+      Writer.Start_Array (Success);
       for Text_To_Edit of Item loop
          Write_Edit (Writer,
                      Filename,
                      Text_To_Edit,
                      Success);
       end loop;
-
-      Writer.End_Object (Success);
       Writer.End_Array (Success);
    end Write_Fixit;
 
