@@ -25,9 +25,14 @@
 
 with Ada.Text_IO;
 with Ada.Strings.Unbounded;
+with Ada.Strings.Wide_Wide_Fixed;
+with Ada.Characters.Latin_1;
+
+with GNAT.Strings;
 
 with Libadalang.Common; use Libadalang.Common;
 with Laltools.Common;   use Laltools.Common;
+with Langkit_Support.Text; use Langkit_Support.Text;
 
 package body Laltools.Partial_GNATPP is
 
@@ -55,9 +60,24 @@ package body Laltools.Partial_GNATPP is
    --  returned. Returns No_Ada_Node if no node is found or if
    --  Token = No_Token.
 
+   function Next_Non_Whitespace
+     (Token  : Token_Reference;
+      Search : Search_Direction)
+      return Token_Reference;
+   --  Finds the next non white Token_Reference relative to Token. Search
+   --  controls the lookup direction. Returns No_Token if no whitespace
+   --  is found or if Token = No_Token.
+
+   function Get_Selection
+     (Unit : Analysis_Unit; Node : Ada_Node;
+      Start_Tok, End_Tok : Token_Reference)
+      return Utils.Char_Vectors.Char_Vector;
+   --  The returned value represents the text selection that will be passed
+   --  as Input parameter of Format_Vector to be reformatted
+
    function Get_Common_Enclosing_Parent_Node
      (Start_Node : Ada_Node; End_Node : Ada_Node) return Ada_Node;
-   --  Starting from 2 given nodes, get the first enclosing common parent node.
+   --  Starting from 2 given nodes, get the first enclosing common parent node
 
    ----------------------------------------
    --  Get_Common_Enclosing_Parent_Node  --
@@ -105,7 +125,6 @@ package body Laltools.Partial_GNATPP is
    begin
       --  Nothing to do if Aux_Token <=> Token is a No_Token or already
       --  belongs to an Ada_Node.
-
       while not (Crt_Token = No_Token)
         and then Crt_Token_Kind in Ada_Comment | Ada_Whitespace
       loop
@@ -123,10 +142,218 @@ package body Laltools.Partial_GNATPP is
          return No_Ada_Node;
       end if;
 
-      return
-        Unit.Root.Lookup (Start_Sloc (Sloc_Range (Data (Crt_Token))))
-          .As_Ada_Node;
+      return  Unit.Root.Lookup
+        (Start_Sloc (Sloc_Range (Data (Crt_Token)))).As_Ada_Node;
    end Lookup;
+
+   -------------------------
+   -- Next_Non_Whitespace --
+   -------------------------
+
+   function Next_Non_Whitespace
+     (Token  : Token_Reference;
+      Search : Search_Direction)
+      return Token_Reference
+   is
+      Crt_Tok : Token_Reference := Token;
+   begin
+      while Crt_Tok /= No_Token loop
+         case Search is
+            when Forward  => Crt_Tok := Next (Crt_Tok);
+            when Backward => Crt_Tok := Previous (Crt_Tok);
+         end case;
+         exit when Kind (Data (Crt_Tok)) /= Ada_Whitespace;
+      end loop;
+
+      if Crt_Tok /= No_Token and then Kind (Data (Crt_Tok)) /= Ada_Whitespace
+      then
+         return Crt_Tok;
+      end if;
+
+      return No_Token;
+   end Next_Non_Whitespace;
+
+   ---------------------
+   --  Get_Selection  --
+   ---------------------
+
+   function Get_Selection
+     (Unit : Analysis_Unit; Node : Ada_Node;
+      Start_Tok, End_Tok : Token_Reference)
+      return Utils.Char_Vectors.Char_Vector
+   is
+      use Ada.Strings.Wide_Wide_Fixed;
+      use Ada.Characters.Latin_1;
+
+      function Get_Minimum_Indentation_Level
+        (Unit       : Analysis_Unit;
+         Start_Line : Line_Number;
+         Start_Tok  : Token_Reference)
+         return Natural;
+      --  Computes the indentation level of the least indented node or comment
+      --  that will be used as an offset to format the selection
+
+      -------------------------------------
+      --  Get_Minimum_Indentation_Level  --
+      -------------------------------------
+
+      function Get_Minimum_Indentation_Level
+        (Unit       : Analysis_Unit;
+         Start_Line : Line_Number;
+         Start_Tok  : Token_Reference)
+         return Natural
+      is
+         SL_First_Non_Blank : constant Positive :=
+           Index_Non_Blank (Unit.Get_Line (Positive (Start_Line)));
+         Include_SL : constant Boolean :=
+           (SL_First_Non_Blank = Text (Start_Tok)'First);
+         Crt_Indent : Natural;
+         Min_Indent : Natural := Natural'Last;
+      begin
+         for Line_Nb in
+           (if Include_SL then Start_Line else Start_Line + 1)
+           .. Node.Sloc_Range.Start_Line
+         loop
+            declare
+               L : constant Text_Type := Unit.Get_Line (Positive (Line_Nb));
+            begin
+               if L /= "" then
+                  Crt_Indent := Index_Non_Blank (L) - L'First;
+                  if Crt_Indent < Min_Indent then
+                     Min_Indent := Crt_Indent;
+                  end if;
+               end if;
+            end;
+         end loop;
+         return Min_Indent;
+      end Get_Minimum_Indentation_Level;
+
+      Selection  : Utils.Char_Vectors.Char_Vector;
+      --  variable to store the initial selected text as Char_Vector
+
+      Start_Line : constant Line_Number :=
+        Line_Number'Min (Sloc_Range (Data (Start_Tok)).Start_Line,
+                         Node.Sloc_Range.Start_Line);
+      Start_Col  : constant Column_Number :=
+        Column_Number'Min (Sloc_Range (Data (Start_Tok)).Start_Column,
+                           Node.Sloc_Range.Start_Column);
+      --  Start_Line/Start_Col stores the starting line/column information for
+      --  the current selection. The computation of these values are based
+      --  on the provided Start_Line/Start_Column associated with the Start_Tok
+      --  input and the Node SLOC, Node that represents the Ada_Node to be
+      --  rewritten.
+      --  In order to make sure that the selection is complete, the minimal
+      --  value of the SLOCs will be used as selection starting point.
+
+      End_Line   : constant Line_Number :=
+        Line_Number'Max (Sloc_Range (Data (End_Tok)).End_Line,
+                         Node.Sloc_Range.End_Line);
+      End_Col    : constant Column_Number :=
+        Column_Number'Max (Sloc_Range (Data (End_Tok)).End_Column,
+                           Node.Sloc_Range.End_Column) - 1;
+      --  End_Line/End_Col stores the ending line/column information for
+      --  the current selection. The computation of these values are based
+      --  on the provided End_Line/End_Column associated with the Start_Tok
+      --  input and the Node SLOC, Node that represents the Ada_Node to be
+      --  rewritten.
+      --  In order to make sure that the selection is complete, the maximal
+      --  value of the SLOCs will be used as selection ending point.
+
+      Real_Start_Tok : constant Token_Reference :=
+        Unit.Lookup_Token (Source_Location'(Start_Line, Start_Col));
+      Real_End_Tok   : constant Token_Reference :=
+        Unit.Lookup_Token (Source_Location'(End_Line, End_Col));
+      --  In case of partial selection of the line, the values stored by the
+      --  Real_Start_Tok/Real_End_Tok variables will determine the real tokens
+      --  to be used for the text selection computation.
+
+      Lines_Number : constant Positive :=
+        1 + Positive (End_Line) - Positive (Start_Line);
+      --  Stores the number of lines contained by the selection.
+
+      SL_First_Non_Blank_Idx : constant Positive :=
+        Index_Non_Blank (Unit.Get_Line (Positive (Start_Line)));
+      --  Stores the Start_Line first index which is not a whitespace.
+
+      Include_SL : constant Boolean :=
+        (SL_First_Non_Blank_Idx = Text (Real_Start_Tok)'First);
+      --  Stores the decision about if start line should be or not included
+      --  in the selection.
+
+      Sel_Strt_Idx : array (Start_Line .. End_Line) of Natural :=
+        [others => 0];
+      --  For each line stores the corresponding start index of the line
+      Sel_End_Idx  : array (Start_Line .. End_Line) of Natural :=
+        [others => 0];
+      --  For each line stores the corresponding end index of the line
+
+      Indent       : Natural := 0;
+      --  Indentation value that is computed in order to be used in the
+      --  selection formatting, being considered as an offset for the returned
+      --  selection formatting.
+
+   begin
+      if Lines_Number = 1 then
+         --  If the selection contains one line store the selected line
+         --  starting end ending index
+         Sel_Strt_Idx (Start_Line) := Text (Real_Start_Tok)'First;
+         Sel_End_Idx (Start_Line) := Text (Real_End_Tok)'Last;
+      else
+         --  If multiple line selection then compute the indentation offset
+         --  and fill the start/end selection index arrays
+         Indent := Get_Minimum_Indentation_Level
+           (Unit, Start_Line, Real_Start_Tok);
+
+         --  Handle selection first line
+         if Include_SL then
+            Sel_Strt_Idx (Start_Line) :=
+              Unit.Get_Line (Integer (Start_Line))'First + Indent;
+            Sel_End_Idx (Start_Line) :=
+              Unit.Get_Line (Integer (Start_Line))'Last;
+         else
+            Sel_Strt_Idx (Start_Line) := Text (Real_Start_Tok)'First;
+            Sel_End_Idx (Start_Line) :=
+              Unit.Get_Line (Integer (Start_Line))'Last;
+         end if;
+
+         --  Loop through the selection lines and fill the arrays containing
+         --  corresponding line start and end indexes between the first and
+         --  the last line. The Indent value is used as an offset for the
+         --  start index computation.
+         for Line_Nb in Start_Line + 1 .. End_Line - 1 loop
+            Sel_Strt_Idx (Line_Nb) :=
+              Unit.Get_Line (Integer (Line_Nb))'First + Indent;
+            Sel_End_Idx (Line_Nb) := Unit.Get_Line (Integer (Line_Nb))'Last;
+         end loop;
+
+         --  Handle selection end line
+         Sel_Strt_Idx (End_Line) :=
+           Unit.Get_Line (Integer (End_Line))'First + Indent;
+         Sel_End_Idx (End_Line) := Text (Real_End_Tok)'Last;
+      end if;
+
+      --  Create the returned Selection based on the selection start and end
+      --  index arrays
+      for L_Nb in Start_Line .. End_Line loop
+         declare
+            S : GNAT.Strings.String_Access :=
+              new String'(To_UTF8
+                          (Unit.Get_Line (Integer (L_Nb))
+                             (Sel_Strt_Idx (L_Nb) .. Sel_End_Idx (L_Nb))));
+         begin
+            --  Add a LF for each line of the selection except for the last one
+            if L_Nb /= End_Line then
+               Selection.Append (S.all & LF);
+            else
+               Selection.Append (S.all);
+            end if;
+
+            GNAT.Strings.Free (S);
+         end;
+      end loop;
+
+      return Selection;
+   end Get_Selection;
 
    ------------------------------------------
    --  Get_Selected_Region_Enclosing_Node  --
@@ -135,7 +362,9 @@ package body Laltools.Partial_GNATPP is
    procedure Get_Selected_Region_Enclosing_Node
      (Unit           :     Analysis_Unit; SL_Range : Source_Location_Range;
       Start_Node     : out Ada_Node; End_Node : out Ada_Node;
-      Enclosing_Node : out Ada_Node)
+      Enclosing_Node : out Ada_Node;
+      Input_Sel      : out Utils.Char_Vectors.Char_Vector)
+
    is
       Crt_Start_Tok : constant Token_Reference :=
         Unit.Lookup_Token
@@ -241,11 +470,13 @@ package body Laltools.Partial_GNATPP is
 
          return No_Ada_Node;
       end Get_Overlapping_Node;
+
       --  Start of Get_Selected_Region_Enclosing_Node
    begin
       Enclosing_Node := No_Ada_Node;
       Parent_Node    := Crt_Start_Node;
 
+      --  Find the first relevant parent of Crt_Start_Node
       if not Is_Relevant_Parent_Kind (Kind (Crt_Start_Node)) then
          Find_Matching_Parents
            (Crt_Start_Node, Is_Relevant_Parent_Node'Access,
@@ -253,11 +484,8 @@ package body Laltools.Partial_GNATPP is
       end if;
       Start_Node := Parent_Node.As_Ada_Node;
 
-      --  ??? We might want to get the relevant syntactic parent of Start_Node
-      --  in some situations
-
       --  Find the first relevant parent of Crt_End_Node
-      Parent_Node := Crt_End_Node;
+      Parent_Node := Crt_End_Node.As_Ada_Node;
 
       if not Is_Relevant_Parent_Kind (Kind (Crt_End_Node)) then
          Find_Matching_Parents
@@ -266,14 +494,9 @@ package body Laltools.Partial_GNATPP is
       end if;
       End_Node := Parent_Node.As_Ada_Node;
 
-      --  ??? We might want to get the relevant syntactic parent of End_Node
-      --  in some situations
-
-      --  This case could be when the selection contains different parts of
-      --  different nodes. In this situation we need to find the first
-      --  encolsing parent node, otherwise the Enclosing_Node will be equal to
-      --  Start_Node or End_Node in some situations.
-
+      --  When the selection contains different parts of different nodes,
+      --  find the first encolsing parent node, otherwise the Enclosing_Node
+      --  will be equal to Start_Node or End_Node in some situations.
       if Start_Node /= End_Node then
          if Are_Overlapping_Nodes (Start_Node, End_Node) then
             Enclosing_Node := Get_Overlapping_Node (Start_Node, End_Node);
@@ -298,6 +521,57 @@ package body Laltools.Partial_GNATPP is
       else
          Enclosing_Node := Start_Node;
       end if;
+
+      ---------------------------------------------------------------------
+      --  Compute the input selection to be reformatted:
+      --  * find true start and end token to define selection margins
+      --  * get the selected region
+
+      pragma Assert (Enclosing_Node /= No_Ada_Node);
+
+      declare
+         --  If Crt_Start_Token is an Ada_Whitespace, then find the next token
+         --  not an Ada_Whitespace. That will be the first guess for the
+         --  True_Start_Token.
+         --  Same fo Crt_End_Token
+         True_Start_Tok : Token_Reference :=
+           (if Kind (Data (Crt_Start_Tok)) = Ada_Whitespace then
+               Next_Non_Whitespace (Crt_Start_Tok, Forward)
+            else Crt_Start_Tok);
+
+         True_End_Tok : Token_Reference :=
+           (if Kind (Data (Crt_End_Tok)) = Ada_Whitespace then
+               Next_Non_Whitespace (Crt_End_Tok, Backward)
+            else Crt_End_Tok);
+      begin
+
+         --  If True_Start_Tok comes after the first token of Enclosing_Node
+         --  then update it.
+         True_Start_Tok :=
+           (if Enclosing_Node.Compare
+              (Start_Sloc (Sloc_Range (Data (True_Start_Tok)))) = Before
+            then True_Start_Tok
+            else Unit.Lookup_Token
+              (Source_Location'
+                   (Enclosing_Node.Sloc_Range.Start_Line,
+                    Enclosing_Node.Sloc_Range.Start_Column)));
+
+         --  If True_End_Tok comes before the last token of Enclosing_Node
+         --  then update it.
+         True_End_Tok :=
+           (if Enclosing_Node.Compare
+              (End_Sloc (Sloc_Range (Data (True_End_Tok)))) = After
+            then True_End_Tok
+            else Unit.Lookup_Token
+              (Source_Location'
+                   (Enclosing_Node.Sloc_Range.End_Line,
+                    Enclosing_Node.Sloc_Range.End_Column - 1)));
+
+         Input_Sel := Get_Selection (Unit,
+                                     Enclosing_Node,
+                                     True_Start_Tok, True_End_Tok);
+      end;
+
    end Get_Selected_Region_Enclosing_Node;
 
    ----------------------------

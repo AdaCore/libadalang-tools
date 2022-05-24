@@ -27,6 +27,8 @@ with Langkit_Support.Slocs;
 with Libadalang.Analysis;
 with Laltools.Refactor;
 
+with Utils.Char_Vectors;
+
 package Laltools.Partial_GNATPP is
    use Langkit_Support.Slocs;
    use Libadalang.Analysis;
@@ -44,17 +46,19 @@ package Laltools.Partial_GNATPP is
    --  Print an E in an human readable format to the standard output
 
    procedure Get_Selected_Region_Enclosing_Node
-     (Unit           : Analysis_Unit;
+     (Unit           :     Analysis_Unit;
       SL_Range       : Source_Location_Range;
       Start_Node     : out Ada_Node;
       End_Node       : out Ada_Node;
-      Enclosing_Node : out Ada_Node);
+      Enclosing_Node : out Ada_Node;
+      Input_Sel      : out Utils.Char_Vectors.Char_Vector);
    --  Retrieves the first and the last Ada node of a given selection range.
    --  These might be the same relevant node or different nodes depending on
    --  the initial text selection.
    --  The closest enclosing parent is also computed. It will be the start or
    --  end node when these are identical and the first common parent when
    --  these are different.
+   --  Input_Sel will contain the selected region of the file to be rewritten.
 
    function Get_Previous_Sibling (Node : Ada_Node) return Ada_Node;
    --  Returns the node's previous sibling or No_Ada_Node if no sibling found

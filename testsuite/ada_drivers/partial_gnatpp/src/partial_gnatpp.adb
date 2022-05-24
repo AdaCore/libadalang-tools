@@ -27,7 +27,6 @@ with Ada.Text_IO; use Ada.Text_IO;
 with GNATCOLL.Opt_Parse; use GNATCOLL.Opt_Parse;
 
 with Langkit_Support.Slocs; use Langkit_Support.Slocs;
-with Langkit_Support.Text; use Langkit_Support.Text;
 
 with Libadalang.Analysis; use Libadalang.Analysis;
 with Libadalang.Helpers; use Libadalang.Helpers;
@@ -120,29 +119,6 @@ procedure Partial_GNATpp is
          Enabled     => True);
    end Args;
 
-   function Get_Selection (Node : Ada_Node)
-                           return Utils.Char_Vectors.Char_Vector;
-   --  The returned value represents the text selection that will be passed
-   --  as Input parameter of Format_Vector to be reformatted.
-
-   -------------------
-   -- Get_Selection --
-   -------------------
-
-   function Get_Selection
-     (Node : Ada_Node)
-      return Utils.Char_Vectors.Char_Vector
-   is
-      Selection  : Utils.Char_Vectors.Char_Vector;
-      S          : GNAT.Strings.String_Access;
-   begin
-      S := new String'(To_UTF8 (Node.Text));
-      Selection.Append (S.all);
-      GNAT.Strings.Free (S);
-
-      return Selection;
-   end Get_Selection;
-
    --------------------------------
    --  Partial_GNATpp_App_Setup  --
    --------------------------------
@@ -178,7 +154,7 @@ procedure Partial_GNATpp is
          use Laltools.Partial_GNATPP;
 
          PP_Options : Command_Line (Pp.Command_Lines.Descriptor'Access);
-         Input      : Char_Vector;
+         Input_Sel  : Char_Vector;
          Output     : Char_Vector;
          Messages   : Pp.Scanner.Source_Message_Vector;
 
@@ -201,7 +177,8 @@ procedure Partial_GNATpp is
                                              Selection_Range,
                                              Start_Node,
                                              End_Node,
-                                             Enclosing_Node);
+                                             Enclosing_Node,
+                                             Input_Sel);
 
          --  Ada.Text_IO.Put_Line
          --    ("MKU Enclosing_Node = " & Enclosing_Node.Image);
@@ -220,8 +197,6 @@ procedure Partial_GNATpp is
 
          pragma Assert (Enclosing_Node /= No_Ada_Node);
 
-         Input := Get_Selection (Enclosing_Node);
-
          --  Determine the offset for the indentation of the enclosing node
          --  based on the previous or next sibling starting column position
          --  and set this value for further usage by Insert_Indentation in
@@ -236,19 +211,19 @@ procedure Partial_GNATpp is
          end if;
 
          declare
-            Input_Str : constant String :=
-              Char_Vectors.Elems (Input)
-              (1 .. Char_Vectors.Last_Index (Input));
-            pragma Unreferenced (Input_Str);
+            Input_Sel_Str : constant String :=
+              Char_Vectors.Elems (Input_Sel)
+              (1 .. Char_Vectors.Last_Index (Input_Sel));
+            pragma Unreferenced (Input_Sel_Str);
 
          begin
-            --  Ada.Text_IO.Put_Line (Input_Str);
+            --  Ada.Text_IO.Put_Line (Input_Sel_Str);
             null;
          end;
 
          Format_Vector
            (Cmd       => PP_Options,
-            Input     => Input,
+            Input     => Input_Sel,
             Node      => Enclosing_Node,
             Output    => Output,
             Messages  => Messages,

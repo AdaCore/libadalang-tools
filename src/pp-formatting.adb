@@ -96,9 +96,9 @@ package body Pp.Formatting is
       use Scanner;
    begin
       Next (Cur);
-
       if Kind (Cur) = Spaces then
          Next (Cur);
+
          pragma Assert
            (Kind (Cur) not in Enabled_LB_Token | EOL_Token | Spaces);
       end if;
@@ -3209,7 +3209,14 @@ package body Pp.Formatting is
             --  comment, which is followed by "else").
 
             else
-               Indentation := After_Indentation;
+               if Partial_Gnatpp
+                 and then Kind (New_Tok) = End_Of_Input
+                 and then Kind (Src_Tok) = Other_Whole_Line_Comment
+               then
+                  Indentation := 0;
+               else
+                  Indentation := After_Indentation;
+               end if;
 
                if Look_Before then
 
@@ -3227,6 +3234,7 @@ package body Pp.Formatting is
                         Kind (Prev (New_Tok)) = ';'))
 
                   then
+
                      null;
 
                      --  Handling the case where a new comment is added after
@@ -3265,6 +3273,7 @@ package body Pp.Formatting is
                     Kind (Prev (New_Tok)) = ';' and then
                     Next_Is_Type (Next_ss (New_Tok))
                   then
+
                      Indentation := After_Indentation;
 
                      --  This is for the situation where no Enabled_LB_Token
@@ -3354,6 +3363,7 @@ package body Pp.Formatting is
 
             --  Make sure Indentation is a multiple of PP_Indentation; otherwise
             --  style checking complains "(style) bad column".
+
             Indentation := Good_Column (PP_Indentation (Cmd), Indentation);
             pragma Assert ((Indentation mod PP_Indentation (Cmd)) = 0);
 
@@ -3432,6 +3442,7 @@ package body Pp.Formatting is
                   Enabled_Cur_Line := Enabled_Cur_Line + 1;
                end loop;
             end if;
+
             declare
                LB : Line_Break renames All_LB (Enabled_LBI (Enabled_Cur_Line));
                pragma Assert (if Kind (New_Tok) = Enabled_LB_Token then
@@ -3440,11 +3451,11 @@ package body Pp.Formatting is
                  (if LB_Tok (LB) = New_Tok then
                     Kind (New_Tok) = Enabled_LB_Token);
                pragma Assert
-                 (if LB_Tok (LB) = Prev (New_Tok) then
-                    (if not Arg (Cmd, Source_Line_Breaks) then
-                       Kind (Prev (New_Tok)) = Disabled_LB_Token));
+                 (if not Partial_Gnatpp then
+                    (if LB_Tok (LB) = Prev (New_Tok) then
+                         (if not Arg (Cmd, Source_Line_Breaks) then
+                                 Kind (Prev (New_Tok)) = Disabled_LB_Token)));
             begin
-
                if LB.Tok = New_Tok then
 
                   --  The inserted LB.Indentation is set to 0 when the LB is
@@ -3487,7 +3498,6 @@ package body Pp.Formatting is
                  and then Kind (Prev (Prev (Prev (New_Tok)))) in ',' | ';'
                  and then Kind (Prev (Prev (New_Tok))) in Disabled_LB_Token
                then
-
                   --  V111-001
                   --  Avoid adding an empty line after a whole line comment
                   --  between two parameters
@@ -3595,12 +3605,23 @@ package body Pp.Formatting is
 
                else
                   Cur_Indentation := Indentation;
-                  Append_Temp_Line_Break
-                    (Lines_Data_P,
-                     Org => "Append_Temp_ in Insert_Whole_Line_Comment 3");
+
+                  if Partial_Gnatpp
+                    and then Kind (New_Tok) = End_Of_Input
+                    and then Kind (Src_Tok) = End_Of_Input
+                  then
+                     --  For partial formatting no need to add an additional
+                     --  line break after comment.
+
+                     null;
+                  else
+                     Append_Temp_Line_Break
+                       (Lines_Data_P,
+                        Org => "Append_Temp_ in Insert_Whole_Line_Comment 3");
+                  end if;
+
                end if;
             end;
-
             Reset_Indentation;
          end Insert_Whole_Line_Comment;
 
@@ -3764,7 +3785,6 @@ package body Pp.Formatting is
 
          loop
             pragma Assert (Kind (New_Tok) not in Comment_Kind);
-
             Manage_Paren_Stack;
 
             --  The order of the if/elsif's below is important in some
@@ -5135,8 +5155,8 @@ package body Pp.Formatting is
    --               Put_Tab_In_Line_Vector ("Cur", Cur_Line_Tabs);
 
                   Next_ss (New_Tok);
-                  --  Consume the newline
 
+                  --  Consume the newline
                   if Is_Empty (Cur_Line_Tabs) then
    --                  Dbg_Out.Put ("Flush_Para -- no tabs\n");
                      Flush_Para;
