@@ -1117,7 +1117,7 @@ package body Pp.Actions is
            when Ada_Unknown_Discriminant_Part =>
              L (" #(<>)"),
            when Ada_Access_To_Subp_Def =>
-             L ("?~~ ~access? ~~~ !", Aspects),
+              L ("?~~ ~access? ~~~ !"),
            when Ada_Anonymous_Type_Decl =>
              L ("//!", Aspects),
            when Ada_Synth_Anonymous_Type_Decl => null,
