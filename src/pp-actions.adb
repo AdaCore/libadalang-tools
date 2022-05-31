@@ -5225,8 +5225,9 @@ package body Pp.Actions is
          --  or Ada_Decl_Type the last ';' is not generated so should be added.
 
          if Partial_Gnatpp and then
-           Kind (Tree) in Ada_Decl_Block | Ada_Type_Decl
-           | Ada_Subp_Body | Ada_Package_Decl | Ada_Package_Body
+           Kind (Tree) in Ada_Decl_Block | Ada_Type_Decl | Ada_Object_Decl
+             | Ada_Subp_Body | Ada_Subp_Decl
+             | Ada_Package_Decl | Ada_Package_Body | Ada_Stmt
          then
             if Kind (Last (New_Tokns'Access)) not in ';' then
                Append_And_Put (New_Tokns, ';');

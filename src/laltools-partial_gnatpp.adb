@@ -280,6 +280,15 @@ package body Laltools.Partial_GNATPP is
       --  Stores the decision about if start line should be or not included
       --  in the selection.
 
+      EL_First_Non_Blank_Idx : constant Positive :=
+        Index_Non_Blank (Unit.Get_Line (Positive (End_Line)));
+      --  Stores the End_Line first index which is not a whitespace.
+
+      Include_EL : constant Boolean :=
+        (EL_First_Non_Blank_Idx = Text (Real_End_Tok)'First);
+      --  Stores the decision about if end line should be or not included
+      --  in the selection.
+
       Sel_Strt_Idx : array (Start_Line .. End_Line) of Natural :=
         [others => 0];
       --  For each line stores the corresponding start index of the line
@@ -328,17 +337,21 @@ package body Laltools.Partial_GNATPP is
 
          --  Handle selection end line
          Sel_Strt_Idx (End_Line) :=
-           Unit.Get_Line (Integer (End_Line))'First + Indent;
-         Sel_End_Idx (End_Line) := Text (Real_End_Tok)'Last;
+              Unit.Get_Line (Integer (End_Line))'First + Indent;
+         Sel_End_Idx (End_Line) :=
+           (if Include_EL then Text (Real_End_Tok)'Last
+            else Unit.Get_Line (Integer (End_Line))'Last);
       end if;
 
       --  Create the returned Selection based on the selection start and end
       --  index arrays
       for L_Nb in Start_Line .. End_Line loop
+
          declare
+            Crt_Line : constant Text_Type := Unit.Get_Line (Integer (L_Nb));
             S : GNAT.Strings.String_Access :=
               new String'(To_UTF8
-                          (Unit.Get_Line (Integer (L_Nb))
+                          (Crt_Line
                              (Sel_Strt_Idx (L_Nb) .. Sel_End_Idx (L_Nb))));
          begin
             --  Add a LF for each line of the selection except for the last one
@@ -386,14 +399,14 @@ package body Laltools.Partial_GNATPP is
       is
         (Kind in Ada_Decl_Block |
          Ada_Package_Body | Ada_Package_Decl |
-         Ada_Subp_Body |
+         Ada_Subp_Body | Ada_Subp_Decl |
          Ada_Type_Decl |
+         Ada_Object_Decl |
          --  Ada_Entry_Body |
          --  Ada_Task_Body |
          --  Ada_Begin_Block |
-         --  Ada_Extended_Return_Stmt |
-         --  Ada_Accept_Stmt_With_Stmts |
-         Ada_Compilation_Unit);
+         Ada_Compilation_Unit |
+         Ada_Stmt);
 
       function Is_Relevant_Parent_Node
         (Node : Ada_Node'Class) return Boolean is

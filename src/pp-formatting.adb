@@ -210,8 +210,12 @@ package body Pp.Formatting is
       Last   : Line_Break := All_LB (All_LBI (Result));
    begin
       while not Last.Enabled loop
-         Result := Result + 1;
-         Last   := All_LB (All_LBI (Result));
+         --  Add this verification to prevent, in case of partial formatting
+         --  mode of gnatpp, to get an exceeding value for the table index.
+         if Result /= Last_Index (All_LBI) then
+            Result := Result + 1;
+            Last   := All_LB (All_LBI (Result));
+         end if;
 
          --  In some situation when partial formatting is performed no line
          --  break is enabled after the 1st one. Adding this exit condition
@@ -2376,11 +2380,12 @@ package body Pp.Formatting is
                   if Partial_Gnatpp then
                      if Kind (Src_Tok) = ';'
                        and then Kind (Prev (Src_Tok)) in
-                         Res_End | Res_Record | Ident | ')'
+                         Res_End | Res_Record | Res_Loop | Ident | ')'
                        and then Kind (New_Tok) = End_Of_Input
                      then
                         Next_ss (Src_Tok);
                      end if;
+
                   else
                      Raise_Token_Mismatch
                        ("eol_comments", Lines_Data, Src_Buf, Src_Tok, New_Tok);
@@ -3053,7 +3058,8 @@ package body Pp.Formatting is
             if X <= Last_Index (Syntax_LBI) then
                return All_LB (Syntax_LBI (X)).Indentation;
             else
-               pragma Assert (Arg (Cmd, Source_Line_Breaks));
+               pragma Assert (Arg (Cmd, Source_Line_Breaks)
+                              or else Partial_Gnatpp);
                return 0;
             end if;
          end After_Indentation;
@@ -3209,14 +3215,7 @@ package body Pp.Formatting is
             --  comment, which is followed by "else").
 
             else
-               if Partial_Gnatpp
-                 and then Kind (New_Tok) = End_Of_Input
-                 and then Kind (Src_Tok) = Other_Whole_Line_Comment
-               then
-                  Indentation := 0;
-               else
-                  Indentation := After_Indentation;
-               end if;
+               Indentation := After_Indentation;
 
                if Look_Before then
 
@@ -4213,7 +4212,7 @@ package body Pp.Formatting is
                   if Partial_Gnatpp then
                      if Kind (Src_Tok) = ';'
                        and then Kind (Prev (Src_Tok)) in
-                         Res_End | Res_Record | Ident | ')'
+                         Res_End | Res_Record | Res_Loop | Ident | ')'
                        and then Kind (New_Tok) = End_Of_Input
                      then
                         Next_ss (Src_Tok);
