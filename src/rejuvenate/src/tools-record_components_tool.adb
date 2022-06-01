@@ -32,7 +32,6 @@ with Ada.Assertions;
 with VSS.Stream_Element_Vectors.Conversions;
 with VSS.Text_Streams.Memory_UTF8_Output;
 with Output;
-
 pragma Unreferenced (Langkit_Support.Text);
 pragma Unreferenced (Ada.Assertions);
 with Ada.Containers.Vectors;

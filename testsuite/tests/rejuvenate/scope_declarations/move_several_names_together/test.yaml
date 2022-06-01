@@ -1,0 +1,5 @@
+title: move_several_names_together
+
+description: scope the declaration with several defining names together
+
+driver: shell_script

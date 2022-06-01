@@ -28,7 +28,8 @@ package Tools is
    type Tool is
      (Record_Components,
       Array_Aggregates,
-      Suppress_Dead_Params);
+      Suppress_Dead_Params,
+      Scope_Declarations);
 
    function Convert (Arg : String) return Tool;
    --  Returns Tool'Value of Arg. Raises Parse_Tool_Exception is Arg is

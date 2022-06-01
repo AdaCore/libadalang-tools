@@ -108,6 +108,18 @@ package body Output is
       Delete_Names : Tools.Suppress_Dead_Params_Tool.
                      Defining_Name_Ordered_Sets.Set;
       Success      : in out Boolean);
+   --  Write the error/warning messages.
+   --  For Suppress_Params
+
+   procedure Write_Message
+     (Writer       : in out VSS.JSON.Content_Handlers.
+                           JSON_Content_Handler'Class;
+      Obj_Decl     : LAL.Object_Decl;
+      Modify_Names : Tools.Scope_Declarations_Tool
+                     .Defining_Name_Ordered_Sets.Set;
+      Success      : in out Boolean);
+   --  Write the error/warning messages.
+   --  For Scope_Declarations
 
    procedure Write
      (Writer       : in out VSS.JSON.Content_Handlers.
@@ -134,6 +146,17 @@ package body Output is
       Params        : Tools.Suppress_Dead_Params_Tool
                       .Defining_Name_Ordered_Sets.Set;
       Success       : in out Boolean);
+   --  Write for suppress_params
+
+   procedure Write
+     (Writer        : in out VSS.JSON.Content_Handlers.
+                           JSON_Content_Handler'Class;
+      Obj_Decl_Name : LAL.Object_Decl;
+      Item          : Text_Edit_Map;
+      Names         : Tools.Scope_Declarations_Tool
+                      .Defining_Name_Ordered_Sets.Set;
+      Success       : in out Boolean);
+   --  Write for scope_declarations
 
    -----------
    -- Write --
@@ -263,9 +286,9 @@ package body Output is
       Writer.End_Object (Success);
    end Write_Edit;
 
-   ------------------
-   -- Write_Record --
-   ------------------
+   ----------------
+   -- Write_Node --
+   ----------------
 
    procedure Write_Node
      (Writer         : in out VSS.JSON.Content_Handlers.
@@ -324,13 +347,18 @@ package body Output is
       Writer.String_Value (To_Virtual_String (Words), Success);
    end Write_Message;
 
+   -------------------
+   -- Write_Message --
+   -------------------
+
    procedure Write_Message
      (Writer       : in out VSS.JSON.Content_Handlers.
                      JSON_Content_Handler'Class;
       Func_Name    : LAL.Defining_Name'Class;
       Delete_Names : Tools.Suppress_Dead_Params_Tool.
                      Defining_Name_Ordered_Sets.Set;
-      Success      : in out Boolean) is
+      Success      : in out Boolean)
+   is
       Words : Unbounded_String := Null_Unbounded_String;
    begin
       Writer.Key_Name ("message", Success);
@@ -359,6 +387,26 @@ package body Output is
       Words := Words & "The Aggregate ";
       Words := Words & Text.Image (Aggregate_Node.Text) &
         " Array aggregate using () is an obsolescent syntax, use [] instead.";
+      Writer.String_Value (To_Virtual_String (Words), Success);
+   end Write_Message;
+
+   procedure Write_Message
+     (Writer       : in out VSS.JSON.Content_Handlers.
+                           JSON_Content_Handler'Class;
+      Obj_Decl     : LAL.Object_Decl;
+      Modify_Names : Tools.Scope_Declarations_Tool
+                     .Defining_Name_Ordered_Sets.Set;
+      Success      : in out Boolean) is
+      Words : Unbounded_String := Null_Unbounded_String;
+   begin
+      Writer.Key_Name ("message", Success);
+      Words := Words & "The variable(s) ";
+      for Name of Modify_Names loop
+         Words := Words & "'" & Text.Image (Name.Text) & "' ";
+      end loop;
+      Words := Words & "in the declaration '"
+        & Text.Image (Obj_Decl.Text) &
+        "' can be scoped more narrowly";
       Writer.String_Value (To_Virtual_String (Words), Success);
    end Write_Message;
 
@@ -451,6 +499,33 @@ package body Output is
       Writer.End_Object (Success);
    end Write;
 
+   procedure Write
+     (Writer        : in out VSS.JSON.Content_Handlers.
+                           JSON_Content_Handler'Class;
+      Obj_Decl_Name : LAL.Object_Decl;
+      Item          : Text_Edit_Map;
+      Names         : Tools.Scope_Declarations_Tool
+                      .Defining_Name_Ordered_Sets.Set;
+      Success       : in out Boolean) is
+   begin
+      Writer.Start_Object (Success);
+
+      Writer.Key_Name ("children", Success);
+      Writer.Start_Array (Success);
+      Writer.End_Array (Success);
+
+      Write_Fixit (Writer, Item, Success);
+
+      Write_Warning (Writer, Success);
+      Writer.Key_Name ("locations", Success);
+
+      Write_Node (Writer, Obj_Decl_Name.As_Ada_Node, Success);
+
+      Write_Message (Writer, Obj_Decl_Name, Names, Success);
+
+      Writer.End_Object (Success);
+   end Write;
+
    --------------------
    -- JSON_Serialize --
    --------------------
@@ -503,6 +578,10 @@ package body Output is
       Writer.End_Document (Success);
    end JSON_Serialize;
 
+   --------------------
+   -- JSON_Serialize --
+   --------------------
+
    procedure JSON_Serialize
      (Edits_Info : Tools.Suppress_Dead_Params_Tool.Edit_Infos;
       Stream     : in out VSS.Text_Streams.Output_Text_Stream'Class)
@@ -522,6 +601,31 @@ package body Output is
                    Params        => Edits_Info.Removable_Params (Func_Name),
                    Success       => Success);
          end if;
+      end loop;
+      Writer.End_Array (Success);
+      Writer.End_Document (Success);
+   end JSON_Serialize;
+
+   --------------------
+   -- JSON_Serialize --
+   --------------------
+
+   procedure JSON_Serialize
+     (Edits_Info : Tools.Scope_Declarations_Tool.Modify_Info;
+      Stream     : in out VSS.Text_Streams.Output_Text_Stream'Class) is
+      Writer     : VSS.JSON.Push_Writers.JSON_Simple_Push_Writer;
+      Success    : Boolean := True;
+   begin
+      Writer.Set_Stream (Stream'Unchecked_Access);
+
+      Writer.Start_Document (Success);
+      Writer.Start_Array (Success);
+      for Obj in Edits_Info.Edit_Info.Iterate loop
+         Write (Writer        => Writer,
+                Obj_Decl_Name => Obj.Key,
+                Item          => Edits_Info.Edit_Info (Obj),
+                Names         => Edits_Info.Object_To_Decl (Obj.Key),
+                Success       => Success);
       end loop;
       Writer.End_Array (Success);
       Writer.End_Document (Success);
