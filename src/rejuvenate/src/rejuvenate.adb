@@ -34,6 +34,7 @@ with Tools;
 with Tools.Record_Components_Tool;
 with Tools.Array_Aggregates_Tool;
 with Tools.Suppress_Dead_Params_Tool;
+with Tools.Scope_Declarations_Tool;
 
 procedure Rejuvenate is
 
@@ -83,6 +84,10 @@ begin
             when Tools.Suppress_Dead_Params =>
                if Tools.Suppress_Dead_Params_Tool.Parser.Parse (Tool_Args) then
                   Tools.Suppress_Dead_Params_Tool.Run;
+               end if;
+            when Tools.Scope_Declarations =>
+               if Tools.Scope_Declarations_Tool.Parser.Parse (Tool_Args) then
+                  Tools.Scope_Declarations_Tool.Run;
                end if;
          end case;
       end;

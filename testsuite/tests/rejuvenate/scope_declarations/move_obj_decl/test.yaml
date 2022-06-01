@@ -1,0 +1,5 @@
+title: move_obj_decl
+
+description: scope the declaration with only one defining name
+
+driver: shell_script
