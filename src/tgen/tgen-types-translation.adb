@@ -239,7 +239,7 @@ package body TGen.Types.Translation is
       return TGen.Types.Constraints.Index_Constraints;
 
    function Translate_Discriminant_Constraints
-     (Node : LAL.Discriminant_Constraint)
+     (Node : LAL.Composite_Constraint)
      return TGen.Types.Constraints.Discriminant_Constraints;
 
    function Variant_Support_Static_Gen (Var : Variant_Part_Acc) return Boolean;
@@ -1017,16 +1017,10 @@ package body TGen.Types.Translation is
       end case;
 
       case Kind (Constraints) is
-         when Ada_Index_Constraint_Range =>
-            for Node of Constraints.As_Index_Constraint.F_Constraints loop
-               Res (Current_Index) := Node.As_Ada_Node;
-               Current_Index := Current_Index + 1;
-            end loop;
-         when Ada_Discriminant_Constraint_Range =>
-            for Node of Constraints.As_Discriminant_Constraint.F_Constraints
-            loop
+         when Ada_Composite_Constraint_Range =>
+            for Node of Constraints.As_Composite_Constraint.F_Constraints loop
                Res (Current_Index) :=
-                 Node.As_Discriminant_Assoc.F_Discr_Expr.As_Ada_Node;
+                 Node.As_Composite_Constraint_Assoc.F_Constraint_Expr;
                Current_Index := Current_Index + 1;
             end loop;
          when others =>
@@ -1409,8 +1403,11 @@ package body TGen.Types.Translation is
          return Record_Constrained
             (Ancestor_Type.P_Designated_Type_Decl, Root);
       else
-         pragma Assert (Kind (Ancestor_Type.F_Constraint)
-                        in Ada_Discriminant_Constraint_Range);
+         pragma Assert ((Kind (Ancestor_Type.F_Constraint)
+                           in Ada_Composite_Constraint_Range) and
+                          (Ancestor_Type.F_Constraint
+                               .As_Composite_Constraint
+                               .P_Is_Discriminant_Constraint));
          return True;
       end if;
    end Record_Constrained;
@@ -1431,7 +1428,7 @@ package body TGen.Types.Translation is
       declare
          Const : TGen.Types.Constraints.Discriminant_Constraints :=
            Translate_Discriminant_Constraints
-             (Decl.F_Constraint.As_Discriminant_Constraint);
+             (Decl.F_Constraint.As_Composite_Constraint);
       begin
          Res.Discriminant_Constraint.Move (Const.Constraint_Map);
       end;
@@ -1636,7 +1633,7 @@ package body TGen.Types.Translation is
 
          for Pair of Decl.F_Type_Def.As_Derived_Type_Def
                         .F_Subtype_Indication.F_Constraint
-                        .As_Discriminant_Constraint.F_Constraints
+                        .As_Composite_Constraint.F_Constraints
                         .P_Zip_With_Params
          loop
             if Kind (Actual (Pair)) in Ada_Name
@@ -2536,7 +2533,7 @@ package body TGen.Types.Translation is
    end Translate_Index_Constraints;
 
    function Translate_Discriminant_Constraints
-     (Node : LAL.Discriminant_Constraint)
+     (Node : LAL.Composite_Constraint)
      return TGen.Types.Constraints.Discriminant_Constraints
    is
       New_Item : Discrete_Constraint_Value;
@@ -2644,15 +2641,18 @@ package body TGen.Types.Translation is
             end return;
          when Record_Typ_Range =>
             return Res : Translation_Result (Success => True) do
-               pragma Assert (Kind (N.As_Subtype_Indication.F_Constraint)
-                              in Ada_Discriminant_Constraint_Range);
+               pragma Assert ((Kind (N.As_Subtype_Indication.F_Constraint)
+                                 in Ada_Composite_Constraint_Range) and
+                                (N.As_Subtype_Indication.F_Constraint
+                                     .As_Composite_Constraint
+                                     .P_Is_Discriminant_Constraint));
                Res.Res.Set (Anonymous_Typ'
                  (Name                => Ada_Identifier_Vectors.Empty_Vector,
                   Named_Ancestor      => Intermediate_Result.Res,
                   Subtype_Constraints => new Discriminant_Constraints'
                     (Translate_Discriminant_Constraints
                       (N.As_Subtype_Indication.F_Constraint
-                       .As_Discriminant_Constraint))));
+                       .As_Composite_Constraint))));
             end return;
          when others =>
             return Intermediate_Result;
