@@ -745,8 +745,8 @@ package body Test.Actions is
            (Test.Common.Harness_Dir_Str.all & "JSON_tests"
             & GNAT.OS_Lib.Directory_Separator);
          if Debug_Flag_1 then
-            Put ("Requested test vectors generation at \1\n",
-                 Test.Common.JSON_Test_Dir.all);
+            Put ("Requested test vectors generation at"
+                 & " <harness_dir>/JSON_tests\n");
          end if;
 
          declare
