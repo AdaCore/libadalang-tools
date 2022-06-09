@@ -75,10 +75,14 @@ package body TGen.Types.Real_Types is
    is (Self.Range_Value.Max);
 
    function Low_Bound_Or_Default (Self : Decimal_Fixed_Typ) return Long_Float
-   is (if Self.Has_Range then Self.Range_Value.Min else Long_Float'First);
+   is (if Self.Has_Range
+       then Self.Range_Value.Min
+       else -10.0 ** Self.Digits_Value * Self.Delta_Value);
 
    function High_Bound_Or_Default (Self : Decimal_Fixed_Typ) return Long_Float
-   is (if Self.Has_Range then Self.Range_Value.Max else Long_Float'Last);
+   is (if Self.Has_Range
+       then Self.Range_Value.Max
+       else 10.0 ** Self.Digits_Value * Self.Delta_Value);
 
    function Gen return T is
       function Rand is new GNAT.Random_Numbers.Random_Float (T);
