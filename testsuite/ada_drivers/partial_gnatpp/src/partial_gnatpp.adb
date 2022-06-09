@@ -205,8 +205,9 @@ procedure Partial_GNATpp is
          Offset := Get_Starting_Offset (Enclosing_Node,
                                         PP_Indentation (PP_Options),
                                         PP_Indent_Continuation (PP_Options));
+         --  Ada.Text_IO.Put_Line (" MKU   Offset = " & Offset'Img);
+
          if Offset /= 0 then
-            --  Ada.Text_IO.Put_Line (" MKU   Offset = " & Offset'Img);
             Set_Partial_Gnatpp_Offset (Offset - 1);
          end if;
 
@@ -221,13 +222,19 @@ procedure Partial_GNATpp is
             null;
          end;
 
-         Format_Vector
-           (Cmd       => PP_Options,
-            Input     => Input_Sel,
-            Node      => Enclosing_Node,
-            Output    => Output,
-            Messages  => Messages,
-            Partial_Gnatpp => True);
+         begin
+            Format_Vector
+              (Cmd       => PP_Options,
+               Input     => Input_Sel,
+               Node      => Enclosing_Node,
+               Output    => Output,
+               Messages  => Messages,
+               Partial_Gnatpp => True);
+         exception
+            when others =>
+               --  Ada.Text_IO.Put_Line ("Partial_Gnatpp: Unknown error");
+               Output := Input_Sel;
+         end;
 
          declare
             Output_Str : constant String :=

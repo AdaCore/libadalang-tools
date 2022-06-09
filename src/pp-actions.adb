@@ -5221,12 +5221,13 @@ package body Pp.Actions is
 
          Subtree_To_Ada (Tree, Cur_Level => 1, Index_In_Parent => 1);
 
-         --  In Partial Gnatpp mode when the input node Ada_Decl_Block
-         --  or Ada_Decl_Type the last ';' is not generated so should be added.
+         --  In Partial Gnatpp mode when the input node is in the list below
+         --  the last ';' is not generated and should be added here.
 
          if Partial_Gnatpp and then
            Kind (Tree) in Ada_Decl_Block | Ada_Type_Decl | Ada_Object_Decl
              | Ada_Subp_Body | Ada_Subp_Decl
+             | Ada_Task_Body | Ada_Entry_Decl | Ada_Single_Task_Decl
              | Ada_Package_Decl | Ada_Package_Body | Ada_Stmt
          then
             if Kind (Last (New_Tokns'Access)) not in ';' then
