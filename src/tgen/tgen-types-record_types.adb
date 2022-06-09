@@ -1145,6 +1145,9 @@ package body TGen.Types.Record_Types is
       Has_Constraints : Boolean;
    begin
 
+      Found := False;
+      Constraint := (Present => False);
+
       --  Check the components of the record
 
       for Component_Type of Component_Types loop
