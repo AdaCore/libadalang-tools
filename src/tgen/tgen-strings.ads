@@ -164,6 +164,10 @@ package TGen.Strings is
    --  Return the qualified name corresponding to the given name from a parse
    --  tree.
 
+   function Convert_Qualified_Name
+     (Text_QN : Libadalang.Analysis.Unbounded_Text_Type_Array)
+      return Ada_Qualified_Name;
+
    function Hash (Self : Ada_Qualified_Name) return Ada.Containers.Hash_Type is
      (Ada.Strings.Hash (To_Ada (Self)));
 

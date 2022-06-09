@@ -2690,7 +2690,8 @@ package body TGen.Types.Translation is
       declare
          Cache_Cur : constant Cursor :=
            Translation_Cache.Find
-             (To_Qualified_Name (Full_Decl.F_Name.F_Name));
+             (Convert_Qualified_Name
+                (Full_Decl.P_Fully_Qualified_Name_Array));
       begin
          --  If we have the type name in the cache, return it
 
@@ -2711,7 +2712,8 @@ package body TGen.Types.Translation is
          begin
             if Trans_Res.Success then
                Translation_Cache.Insert
-                 (To_Qualified_Name (Full_Decl.F_Name.F_Name), Trans_Res.Res);
+                 (Convert_Qualified_Name
+                   (Full_Decl.P_Fully_Qualified_Name_Array), Trans_Res.Res);
             end if;
             return Trans_Res;
          end;

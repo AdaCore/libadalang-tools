@@ -151,6 +151,22 @@ package body TGen.Strings is
       end return;
    end To_Qualified_Name;
 
+   ----------------------------
+   -- Convert_Qualified_Name --
+   ----------------------------
+
+   function Convert_Qualified_Name
+     (Text_QN : Libadalang.Analysis.Unbounded_Text_Type_Array)
+      return Ada_Qualified_Name
+   is
+      Res : Ada_Qualified_Name;
+   begin
+      for Ident of Text_QN loop
+         Res.Append (To_Unbounded_String (Image (To_Text (Ident))));
+      end loop;
+      return Res;
+   end Convert_Qualified_Name;
+
    ------------
    -- To_Ada --
    ------------
