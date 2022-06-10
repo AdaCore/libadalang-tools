@@ -23,7 +23,7 @@
 
 with Ada.Finalization;
 with Ada.Strings.Unbounded;
-with Text_IO;
+with Ada.Text_IO;
 
 with GNATCOLL.Paragraph_Filling;
 

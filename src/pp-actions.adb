@@ -30,7 +30,6 @@ with Ada.Strings.UTF_Encoding;
 with Ada.Text_IO;
 with System.WCh_Cnv;
 with System.WCh_Con;
-with Text_IO;
 with Pp.Buffers; use Pp.Buffers;
 with Pp.Command_Lines; use Pp.Command_Lines;
 with Pp.Error_Slocs; use Pp.Error_Slocs;
@@ -40,7 +39,7 @@ with Pp.Scanner.Lines; use Pp.Scanner.Lines;
 
 with Ada.Directories; use Ada.Directories;
 with Interfaces; use type Interfaces.Unsigned_16;
-with Unchecked_Deallocation;
+with Ada.Unchecked_Deallocation;
 
 with GNAT.Lock_Files;
 with GNAT.OS_Lib; use GNAT.OS_Lib;
@@ -306,7 +305,7 @@ package body Pp.Actions is
       --  processes that were writing to the File_Name_File have finished.
 
       pragma Unreferenced (Tool);
-      use Text_IO;
+      use Ada.Text_IO;
       File_Name_File : File_Type;
       Ignored : Boolean;
       Count : Natural := 0; -- number of files moved
@@ -1516,7 +1515,7 @@ package body Pp.Actions is
       end return;
    end Replacements;
 
-   procedure Free is new Unchecked_Deallocation
+   procedure Free is new Ada.Unchecked_Deallocation
      (Str_Template, Str_Template_Ptr);
 
    function Replace_One

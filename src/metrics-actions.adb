@@ -21,14 +21,14 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Text_IO;
+with Ada.Text_IO;
 
 with Ada.Containers; use type Ada.Containers.Count_Type;
 with Ada.Directories;
 with Ada.Strings.Unbounded; use Ada;
 with Ada.Characters.Handling;
 with Interfaces; use type Interfaces.Unsigned_16;
-with Unchecked_Deallocation;
+with Ada.Unchecked_Deallocation;
 
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 
@@ -1725,7 +1725,7 @@ package body METRICS.Actions is
         (if Arg (Cmd, Output_Suffix) = null
            then ".metrix"
            else Arg (Cmd, Output_Suffix).all);
-      use Text_IO;
+      use Ada.Text_IO;
       Text : File_Type;
       File_Name : String renames File_M.Source_File_Name.all;
       Text_File_Name : constant String :=
@@ -1773,7 +1773,7 @@ package body METRICS.Actions is
    end Print_File_Metrics;
 
    procedure Destroy (M : in out Metrix_Ref) is
-      procedure Free is new Unchecked_Deallocation (Metrix, Metrix_Ref);
+      procedure Free is new Ada.Unchecked_Deallocation (Metrix, Metrix_Ref);
    begin
       for Index in 1 .. Last_Index (M.Submetrix) loop
          declare

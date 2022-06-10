@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                       Copyright (C) 2022, AdaCore                        --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -112,7 +112,7 @@ package body Utils.Projects.Aggregate is
       begin
          for Prj_Name of Aggregated_Projects loop
             if Arg (Cmd, Verbose) then
-               Text_IO.Put_Line ("Processing aggregated project " &
+               Ada.Text_IO.Put_Line ("Processing aggregated project " &
                      Prj_Name.all);
             end if;
 

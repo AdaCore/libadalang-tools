@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2004-2021, AdaCore                    --
+--                      Copyright (C) 2004-2022, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -25,7 +25,7 @@
 
 pragma Warnings (Off); -- imported for children
 with Utils_Debug; use Utils_Debug;
-with Text_IO;
+with Ada.Text_IO;
 pragma Warnings (On);
 
 package Utils is

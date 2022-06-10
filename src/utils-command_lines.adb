@@ -28,7 +28,7 @@ with Ada.Exceptions;
 with Ada.Strings;             use Ada.Strings;
 with Ada.Strings.Fixed;       use Ada.Strings.Fixed;
 use Ada;
-with Unchecked_Deallocation;
+with Ada.Unchecked_Deallocation;
 
 with GNAT.Command_Line;
 --  We don't use most of the facilities of GNAT.Command_Line.
@@ -39,11 +39,11 @@ with Utils.Strings; use Utils.Strings;
 with Utils.String_Utilities;
 
 package body Utils.Command_Lines is
-   use Text_IO;
+   use Ada.Text_IO;
 
-   procedure Free is new Unchecked_Deallocation (String, String_Ref);
+   procedure Free is new Ada.Unchecked_Deallocation (String, String_Ref);
 
-   procedure Free is new Unchecked_Deallocation
+   procedure Free is new Ada.Unchecked_Deallocation
      (Dynamically_Typed_Switches, Dynamically_Typed_Switches_Access);
 
    procedure Raise_Cmd_Error (Message : String) is

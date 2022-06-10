@@ -21,8 +21,8 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Unchecked_Conversion;
-with Text_IO;
+with Ada.Unchecked_Conversion;
+with Ada.Text_IO;
 with Utils.Predefined_Symbols; use Utils.Predefined_Symbols;
 with Pp.Error_Slocs; use Pp.Error_Slocs;
 
@@ -194,7 +194,7 @@ package body Pp.Scanner is
       --  also would be illegal. So we cheat, using an unchecked conversion.
       --  The alternative would be an annoyingly-long, error-prone case
       --  statement.
-      function Cast is new Unchecked_Conversion (No_Discrim_Token, Token);
+      function Cast is new Ada.Unchecked_Conversion (No_Discrim_Token, Token);
    begin
       Tok := Cast (No_Discrim_Token'(Kind => New_Kind, Sloc => Tok.Sloc));
    end Poke_Kind;

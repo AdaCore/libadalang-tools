@@ -51,7 +51,7 @@ with Utils.Tool_Names; use Utils.Tool_Names;
 with Utils.Versions;
 
 package body Utils.Projects is
-   use Text_IO;
+   use Ada.Text_IO;
 
    use Common_Flag_Switches, Common_String_Switches,
      Common_String_Seq_Switches, Source_Selection_Switches;

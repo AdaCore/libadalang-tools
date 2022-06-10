@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2012-2021, AdaCore                    --
+--                      Copyright (C) 2012-2022, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -21,7 +21,7 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Unchecked_Deallocation;
+with Ada.Unchecked_Deallocation;
 with Ada.Containers.Hashed_Maps;
 with Ada.Containers.Ordered_Sets;
 with Ada.Containers.Indefinite_Ordered_Sets;
@@ -39,7 +39,7 @@ package Utils.String_Utilities is
    subtype W_Char is Wide_Character;
    subtype W_Str is Wide_String;
    type W_Str_Access is access all W_Str;
-   procedure Free is new Unchecked_Deallocation (W_Str, W_Str_Access);
+   procedure Free is new Ada.Unchecked_Deallocation (W_Str, W_Str_Access);
 
    W_NUL : constant W_Char := W_Char'Val (Character'Pos (ASCII.NUL));
    W_LF  : constant W_Char := W_Char'Val (Character'Pos (ASCII.LF));

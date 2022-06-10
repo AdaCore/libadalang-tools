@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2012-2021, AdaCore                    --
+--                      Copyright (C) 2012-2022, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -21,7 +21,7 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Text_IO;
+with Ada.Text_IO;
 
 package body Pp.Scanner.Lines is
 

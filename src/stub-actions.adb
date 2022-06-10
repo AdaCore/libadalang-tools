@@ -21,7 +21,7 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Text_IO;
+with Ada.Text_IO;
 with Ada.Characters.Handling; use Ada.Characters.Handling;
 with Ada.Strings.UTF_Encoding;
 with System.WCh_Con;
