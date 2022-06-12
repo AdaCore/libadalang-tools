@@ -1,0 +1,7 @@
+project simple is
+
+   package Compiler is
+      for Default_Switches ("ada") use ("-gnat95");
+   end Compiler;
+
+end simple;

@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2014-2021, AdaCore                    --
+--                      Copyright (C) 2014-2022, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -290,7 +290,8 @@ package body Test.Stub is
 
    procedure Put_Import_Section
      (Markered_Data : in out Markered_Data_Maps.Map;
-      Add_Import    :        Boolean := False);
+      Add_Import    :        Boolean := False;
+      Add_Pragma_05 :        Boolean := False);
    --  Puts or regenerates markered section for with clauses
 
    procedure Put_Lines (MD : Markered_Data_Type; Comment_Out : Boolean);
@@ -791,7 +792,8 @@ package body Test.Stub is
 
    procedure Put_Import_Section
      (Markered_Data : in out Markered_Data_Maps.Map;
-      Add_Import    :        Boolean := False)
+      Add_Import    :        Boolean := False;
+      Add_Pragma_05 :        Boolean := False)
    is
       ID : constant Markered_Data_Id :=
         (Import_MD,
@@ -825,6 +827,11 @@ package body Test.Stub is
       S_Put (0, GT_Marker_End);
 
       New_Line_Count;
+
+      if Add_Pragma_05 then
+         New_Line_Count;
+         S_Put (0, "pragma Ada_2005;");
+      end if;
 
       if Markered_Data.Contains (ID) then
          --  Extract importing MD
@@ -3554,7 +3561,7 @@ package body Test.Stub is
       Create (Tmp_File_Name);
       Reset_Line_Counter;
 
-      Put_Import_Section (Markered_Subp_Data);
+      Put_Import_Section (Markered_Subp_Data, Add_Pragma_05 => True);
 
       S_Put
         (0,
