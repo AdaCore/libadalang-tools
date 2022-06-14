@@ -5302,6 +5302,10 @@ package body Pp.Actions is
 
       In_File_Format : Scanner.Optional_EOL_Formats;
 
+      procedure Clear_Lines_Data;
+      --  When processing multiple files or doing multiple partial formats,
+      --  gnatpp internal state must be cleared after each use.
+
       function Get_End_Of_Line return Scanner.Optional_EOL_Formats;
       --  Returns the end-of-line convention specified by the --eol switch, or
       --  Nil.
@@ -5311,6 +5315,27 @@ package body Pp.Actions is
       --  the --eol switch, and defaulting to the same as the input.
 
       procedure Tree_To_Ada;
+
+      ----------------------
+      -- Clear_Lines_Data --
+      ----------------------
+
+      procedure Clear_Lines_Data
+      is
+         use Scanner;
+
+      begin
+         Clear (Lines_Data.Out_Buf);
+         Clear (Lines_Data.Src_Tokns);
+         Clear (Lines_Data.Out_Tokns);
+         Clear (Lines_Data.New_Tokns);
+         Clear (Lines_Data.Saved_New_Tokns);
+         Lines_Data := (others => <>);
+      end Clear_Lines_Data;
+
+      -----------------
+      -- Tree_To_Ada --
+      -----------------
 
       procedure Tree_To_Ada is
       begin
@@ -5620,6 +5645,7 @@ package body Pp.Actions is
             end;
          end if;
       end if;
+      Clear_Lines_Data;
    end Format_Vector;
 
    procedure Per_File_Action
