@@ -160,6 +160,7 @@ procedure Partial_GNATpp is
 
          Validated  : GNAT.Strings.String_List_Access :=
            new GNAT.Strings.String_List (1 .. 0);
+         Output_Sel_Range : Source_Location_Range;
       begin
 
          Parse
@@ -178,7 +179,8 @@ procedure Partial_GNATpp is
                                              Start_Node,
                                              End_Node,
                                              Enclosing_Node,
-                                             Input_Sel);
+                                             Input_Sel,
+                                             Output_Sel_Range);
 
          --  Ada.Text_IO.Put_Line
          --    ("MKU Enclosing_Node = " & Enclosing_Node.Image);
@@ -241,12 +243,6 @@ procedure Partial_GNATpp is
               Char_Vectors.Elems (Output)
               (1 .. Char_Vectors.Last_Index (Output));
 
-            New_Sel_Range : constant Source_Location_Range :=
-              (Enclosing_Node.Sloc_Range.Start_Line,
-               Enclosing_Node.Sloc_Range.End_Line,
-               Enclosing_Node.Sloc_Range.Start_Column,
-               Enclosing_Node.Sloc_Range.End_Column);
-
             Edits : Partial_Select_Edits;
 
             use Laltools.Refactor;
@@ -255,7 +251,7 @@ procedure Partial_GNATpp is
               (Unit => Main_Unit,
                Node => Enclosing_Node,
                Edit => Text_Edit'
-                 (Location => New_Sel_Range,
+                 (Location => Output_Sel_Range,
                   Text     => Ada.Strings.Unbounded.To_Unbounded_String
                     (Output_Str)));
             Print (Edits);

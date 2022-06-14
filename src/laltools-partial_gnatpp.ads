@@ -46,12 +46,13 @@ package Laltools.Partial_GNATPP is
    --  Print an E in an human readable format to the standard output
 
    procedure Get_Selected_Region_Enclosing_Node
-     (Unit           :     Analysis_Unit;
-      SL_Range       : Source_Location_Range;
-      Start_Node     : out Ada_Node;
-      End_Node       : out Ada_Node;
-      Enclosing_Node : out Ada_Node;
-      Input_Sel      : out Utils.Char_Vectors.Char_Vector);
+     (Unit             :     Analysis_Unit;
+      SL_Range         : Source_Location_Range;
+      Start_Node       : out Ada_Node;
+      End_Node         : out Ada_Node;
+      Enclosing_Node   : out Ada_Node;
+      Input_Sel        : out Utils.Char_Vectors.Char_Vector;
+      Output_Sel_Range : out Source_Location_Range);
    --  Retrieves the first and the last Ada node of a given selection range.
    --  These might be the same relevant node or different nodes depending on
    --  the initial text selection.
@@ -59,6 +60,7 @@ package Laltools.Partial_GNATPP is
    --  end node when these are identical and the first common parent when
    --  these are different.
    --  Input_Sel will contain the selected region of the file to be rewritten.
+   --  Output_Sel_Range contains the Source_Location_Range to be rewritten.
 
    function Get_Previous_Sibling (Node : Ada_Node) return Ada_Node;
    --  Returns the node's previous sibling or No_Ada_Node if no sibling found
