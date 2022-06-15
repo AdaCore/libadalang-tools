@@ -232,9 +232,40 @@ package body Laltools.Partial_GNATPP is
       --  variable to store the initial selected text as Char_Vector
 
       Start_Line : constant Line_Number :=
-        Sloc_Range (Data (Start_Tok)).Start_Line;
+        Line_Number'Min (Sloc_Range (Data (Start_Tok)).Start_Line,
+                         Node.Sloc_Range.Start_Line);
+      Start_Col  : constant Column_Number :=
+        Column_Number'Min (Sloc_Range (Data (Start_Tok)).Start_Column,
+                           Node.Sloc_Range.Start_Column);
+      --  Start_Line/Start_Col stores the starting line/column information for
+      --  the current selection. The computation of these values are based
+      --  on the provided Start_Line/Start_Column associated with the Start_Tok
+      --  input and the Node SLOC, Node that represents the Ada_Node to be
+      --  rewritten.
+      --  In order to make sure that the selection is complete, the minimal
+      --  value of the SLOCs will be used as selection starting point.
+
       End_Line   : constant Line_Number :=
-        Sloc_Range (Data (End_Tok)).End_Line;
+        Line_Number'Max (Sloc_Range (Data (End_Tok)).End_Line,
+                         Node.Sloc_Range.End_Line);
+      End_Col    : constant Column_Number :=
+        Column_Number'Max (Sloc_Range (Data (End_Tok)).End_Column,
+                           Node.Sloc_Range.End_Column) - 1;
+      --  End_Line/End_Col stores the ending line/column information for
+      --  the current selection. The computation of these values are based
+      --  on the provided End_Line/End_Column associated with the Start_Tok
+      --  input and the Node SLOC, Node that represents the Ada_Node to be
+      --  rewritten.
+      --  In order to make sure that the selection is complete, the maximal
+      --  value of the SLOCs will be used as selection ending point.
+
+      Real_Start_Tok : constant Token_Reference :=
+        Unit.Lookup_Token (Source_Location'(Start_Line, Start_Col));
+      Real_End_Tok   : constant Token_Reference :=
+        Unit.Lookup_Token (Source_Location'(End_Line, End_Col));
+      --  In case of partial selection of the line, the values stored by the
+      --  Real_Start_Tok/Real_End_Tok variables will determine the real tokens
+      --  to be used for the text selection computation.
 
       Lines_Number : constant Positive :=
         1 + Positive (End_Line) - Positive (Start_Line);
@@ -245,7 +276,7 @@ package body Laltools.Partial_GNATPP is
       --  Stores the Start_Line first index which is not a whitespace.
 
       Include_SL : constant Boolean :=
-        (SL_First_Non_Blank_Idx = Text (Start_Tok)'First);
+        (SL_First_Non_Blank_Idx = Text (Real_Start_Tok)'First);
       --  Stores the decision about if start line should be or not included
       --  in the selection.
 
@@ -254,7 +285,7 @@ package body Laltools.Partial_GNATPP is
       --  Stores the End_Line first index which is not a whitespace.
 
       Include_EL : constant Boolean :=
-        (EL_First_Non_Blank_Idx = Text (End_Tok)'First);
+        (EL_First_Non_Blank_Idx = Text (Real_End_Tok)'First);
       --  Stores the decision about if end line should be or not included
       --  in the selection.
 
@@ -274,13 +305,13 @@ package body Laltools.Partial_GNATPP is
       if Lines_Number = 1 then
          --  If the selection contains one line store the selected line
          --  starting end ending index
-         Sel_Strt_Idx (Start_Line) := Text (Start_Tok)'First;
-         Sel_End_Idx (Start_Line) := Text (End_Tok)'Last;
+         Sel_Strt_Idx (Start_Line) := Text (Real_Start_Tok)'First;
+         Sel_End_Idx (Start_Line) := Text (Real_End_Tok)'Last;
       else
          --  If multiple line selection then compute the indentation offset
          --  and fill the start/end selection index arrays
          Indent := Get_Minimum_Indentation_Level
-           (Unit, Start_Line, Start_Tok);
+           (Unit, Start_Line, Real_Start_Tok);
 
          --  Handle selection first line
          if Include_SL then
@@ -289,7 +320,7 @@ package body Laltools.Partial_GNATPP is
             Sel_End_Idx (Start_Line) :=
               Unit.Get_Line (Integer (Start_Line))'Last;
          else
-            Sel_Strt_Idx (Start_Line) := Text (Start_Tok)'First;
+            Sel_Strt_Idx (Start_Line) := Text (Real_Start_Tok)'First;
             Sel_End_Idx (Start_Line) :=
               Unit.Get_Line (Integer (Start_Line))'Last;
          end if;
@@ -308,7 +339,7 @@ package body Laltools.Partial_GNATPP is
          Sel_Strt_Idx (End_Line) :=
               Unit.Get_Line (Integer (End_Line))'First + Indent;
          Sel_End_Idx (End_Line) :=
-           (if Include_EL then Text (End_Tok)'Last
+           (if Include_EL then Text (Real_End_Tok)'Last
             else Unit.Get_Line (Integer (End_Line))'Last);
       end if;
 
@@ -342,12 +373,10 @@ package body Laltools.Partial_GNATPP is
    ------------------------------------------
 
    procedure Get_Selected_Region_Enclosing_Node
-     (Unit             :     Analysis_Unit;
-      SL_Range         : Source_Location_Range;
-      Start_Node       : out Ada_Node; End_Node : out Ada_Node;
-      Enclosing_Node   : out Ada_Node;
-      Input_Sel        : out Utils.Char_Vectors.Char_Vector;
-      Output_Sel_Range : out Source_Location_Range)
+     (Unit           :     Analysis_Unit; SL_Range : Source_Location_Range;
+      Start_Node     : out Ada_Node; End_Node : out Ada_Node;
+      Enclosing_Node : out Ada_Node;
+      Input_Sel      : out Utils.Char_Vectors.Char_Vector)
 
    is
       Crt_Start_Tok : constant Token_Reference :=
@@ -525,9 +554,6 @@ package body Laltools.Partial_GNATPP is
            (if Kind (Data (Crt_End_Tok)) = Ada_Whitespace then
                Next_Non_Whitespace (Crt_End_Tok, Backward)
             else Crt_End_Tok);
-
-         Start_Line, End_Line : Line_Number;
-         Start_Col, End_Col   : Column_Number;
       begin
 
          --  If True_Start_Tok comes after the first token of Enclosing_Node
@@ -555,21 +581,6 @@ package body Laltools.Partial_GNATPP is
          Input_Sel := Get_Selection (Unit,
                                      Enclosing_Node,
                                      True_Start_Tok, True_End_Tok);
-
-         --  Start_Line/Start_Col stores the starting line/column information
-         --  for the current selection.
-
-         Start_Line := Sloc_Range (Data (True_Start_Tok)).Start_Line;
-         Start_Col  := Sloc_Range (Data (True_Start_Tok)).Start_Column;
-
-         --  End_Line/End_Col stores the ending line/column information for
-         --  the current selection.
-         End_Line := Sloc_Range (Data (True_End_Tok)).End_Line;
-         End_Col := Sloc_Range (Data (True_End_Tok)).End_Column;
-
-         --  The selection real margins to be rewritten
-         Output_Sel_Range := Source_Location_Range'
-           (Start_Line, End_Line, Start_Col, End_Col);
       end;
 
    end Get_Selected_Region_Enclosing_Node;
