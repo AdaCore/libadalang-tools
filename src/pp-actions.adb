@@ -690,6 +690,7 @@ package body Pp.Actions is
            when Ada_Synthetic_Defining_Name => null,
            when Ada_Synthetic_Identifier => null,
            when Ada_Synthetic_Type_Expr => null,
+           when Ada_Synthetic_Char_Enum_Lit => null,
             --  The above nodes are specific to synthetic predefined operators
             --  and will never appear in source code.
 
