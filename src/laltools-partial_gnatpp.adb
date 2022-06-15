@@ -558,9 +558,34 @@ package body Laltools.Partial_GNATPP is
 
          --  Start_Line/Start_Col stores the starting line/column information
          --  for the current selection.
-
          Start_Line := Sloc_Range (Data (True_Start_Tok)).Start_Line;
-         Start_Col  := Sloc_Range (Data (True_Start_Tok)).Start_Column;
+         --  Indentation is added by the formatting, so include indentation of
+         --  the first line (if any) in the selected region. This only affects
+         --  the range which is replaced by IDEs with the formatted code.
+         declare
+            use Ada.Strings.Wide_Wide_Fixed;
+
+            Line : constant Text_Type :=
+              Unit.Get_Line (Positive (Start_Line));
+            First_Non_Blank_Index  : constant Natural :=
+              Index_Non_Blank (Line);
+            First_Non_Blank_Column : constant Natural :=
+              (if First_Non_Blank_Index = 0 then
+                 0
+               else
+                 Index_Non_Blank (Line) - Line'First + 1);
+
+         begin
+            Start_Col :=
+              (if First_Non_Blank_Column /= 0
+                 and then First_Non_Blank_Column =
+                            Integer
+                              (Sloc_Range (Data (True_Start_Tok)).Start_Column)
+               then
+                 1
+               else
+                 Sloc_Range (Data (True_Start_Tok)).Start_Column);
+         end;
 
          --  End_Line/End_Col stores the ending line/column information for
          --  the current selection.
