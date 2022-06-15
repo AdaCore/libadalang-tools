@@ -1240,7 +1240,18 @@ package body Pp.Actions is
              L ("until"),
            when Ada_With_Private_Absent => null,
            when Ada_With_Private_Present =>
-             L ("with private")
+             L ("with private"),
+
+           when Ada_Reduce_Attribute_Ref => null,
+           when Ada_Value_Sequence => null
+           --  ??? Those 2 nodes have been introduced to support the Ada 2022
+           --  'Reduce attribute. Ada_Reduce_Attribute_Ref is a new node
+           --  derived from Ada_Name and is used to parse `Expr'Reduce
+           --  (Reducer, InitValue)`, where both Reducer` and `InitValue` are
+           --  expressions. Ada_Value_Sequence is a new node, derived from
+           --  Ada_Node and is used to hold a reduction expression. See Ada
+           --  2022, RM 4.5.10.
+
         ); -- end case
    end Template_For_Kind;
 
