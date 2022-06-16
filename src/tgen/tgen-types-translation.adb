@@ -609,7 +609,7 @@ package body TGen.Types.Translation is
             if Delta_Eval.Kind /= Real then
                raise Translation_Error with "wrong eval type for delta value";
             end if;
-            Delta_Value := Delta_Eval.Real_Result;
+            Delta_Value := Long_Float (Delta_Eval.Real_Result.To_Double);
          end;
       end Find_Delta;
 
@@ -734,7 +734,7 @@ package body TGen.Types.Translation is
               "Evalutation of delta value for a decimal fixed point did not"
               & " return a real type";
          end if;
-         Delta_Val := Eval_Res.Real_Result;
+         Delta_Val := Long_Float (Eval_Res.Real_Result.To_Double);
       end Find_Delta;
 
    begin
@@ -923,7 +923,7 @@ package body TGen.Types.Translation is
                      raise Translation_Error with
                      "Wrong type of static eval for real range constraint.";
                   end if;
-                  Min := Min_Eval.Real_Result;
+                  Min := Long_Float (Min_Eval.Real_Result.To_Double);
                   Min_Static := True;
                end;
             else
@@ -939,7 +939,7 @@ package body TGen.Types.Translation is
                      raise Translation_Error with
                      "Wrong type of static eval for real range constraint.";
                   end if;
-                  Max := Max_Eval.Real_Result;
+                  Max := Long_Float (Max_Eval.Real_Result.To_Double);
                   Max_Static := True;
                end;
             else
