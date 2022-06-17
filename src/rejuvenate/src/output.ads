@@ -30,6 +30,7 @@ with Tools.Array_Aggregates_Tool;
 use Tools.Array_Aggregates_Tool;
 with Tools.Suppress_Dead_Params_Tool;
 with Tools.Scope_Declarations_Tool;
+with Tools.Relocate_Decls_Tool;
 with VSS.Text_Streams;
 
 package Output is
@@ -49,6 +50,11 @@ package Output is
                                           Output_Text_Stream'Class);
 
    procedure JSON_Serialize (Edits_Info : Tools.Scope_Declarations_Tool
+                                          .Modify_Info;
+                             Stream     : in out VSS.Text_Streams.
+                                          Output_Text_Stream'Class);
+
+   procedure JSON_Serialize (Edits_Info : Tools.Relocate_Decls_Tool
                                           .Modify_Info;
                              Stream     : in out VSS.Text_Streams.
                                           Output_Text_Stream'Class);

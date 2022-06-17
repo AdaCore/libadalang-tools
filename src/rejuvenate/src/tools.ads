@@ -29,7 +29,8 @@ package Tools is
      (Record_Components,
       Array_Aggregates,
       Suppress_Dead_Params,
-      Scope_Declarations);
+      Scope_Declarations,
+      Relocate_Decls);
 
    function Convert (Arg : String) return Tool;
    --  Returns Tool'Value of Arg. Raises Parse_Tool_Exception is Arg is
