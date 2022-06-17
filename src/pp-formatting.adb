@@ -3541,6 +3541,7 @@ package body Pp.Formatting is
                   null;
 
                elsif Arg (Cmd, Source_Line_Breaks)
+                 and then not Partial_Gnatpp
                  and then
                    ((Kind (Src_Tok) = True_End_Of_Line
                      and then Kind (Prev (Src_Tok)) = True_End_Of_Line

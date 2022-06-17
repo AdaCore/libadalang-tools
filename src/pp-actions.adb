@@ -5515,10 +5515,13 @@ package body Pp.Actions is
                  --  newline, delete the last LF from the output to match the
                  --  input.
 
-               pragma Assert (Last_Element (Result) = W_LF);
-               if Last_Element (Input) /= ASCII.LF then
-                  Delete_Last (Result);
+               if not Partial_Gnatpp then
+                  pragma Assert (Last_Element (Result) = W_LF);
+                  if Last_Element (Input) /= ASCII.LF then
+                     Delete_Last (Result);
+                  end if;
                end if;
+
             end if;
 
          else

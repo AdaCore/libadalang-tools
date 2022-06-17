@@ -117,6 +117,12 @@ procedure Partial_GNATpp is
          Convert     => Natural'Value,
          Default_Val => 1,
          Enabled     => True);
+
+      package Keep_Source_LB is new GNATCOLL.Opt_Parse.Parse_Flag
+        (Parser      => Partial_GNATpp_App.Args.Parser,
+         Long        => "--source-line-breaks",
+         Help        => "Take line breaks only from source",
+         Enabled     => True);
    end Args;
 
    --------------------------------
@@ -142,6 +148,8 @@ procedure Partial_GNATpp is
       Enclosing_Node       : Ada_Node;
       Offset               : Natural := 0;
 
+      Partial_Gnatpp_SLB   : constant Boolean := Args.Keep_Source_LB.Get;
+
    begin
       --  Ada.Text_IO.Put_Line ("MKU Source_File = " & Source_File);
       Main_Unit := Jobs (1).Analysis_Ctx.Get_From_File (Source_File);
@@ -152,6 +160,52 @@ procedure Partial_GNATpp is
          use Utils.Char_Vectors;
          use Utils.Command_Lines;
          use Laltools.Partial_GNATPP;
+
+         procedure Set_Args (PP_Options : in out Command_Line; Opt : Boolean);
+         --  pragma Unreferenced (Set_Args);
+         --  This procedure will updates the gnatpp command line switches
+         --  if the flag --source-line-breaks is passed to patial_gnatpp.
+         --  The gnatpp command line will get --source-line-breaks switch and
+         --  order gnatpp switches, that might be used and potentially
+         --  incompatibles with this one, in order to get the expected gnatpp
+         --  behavior.
+
+         procedure Set_Args (PP_Options : in out Command_Line; Opt : Boolean)
+         is
+            use Pp.Command_Lines.Pp_Boolean_Switches;
+            use Pp.Command_Lines.Pp_Flag_Switches;
+            use Pp.Command_Lines.Pp_Nat_Switches;
+         begin
+            if not Opt then
+               return;
+            end if;
+
+            Set_Arg (PP_Options, Source_Line_Breaks, True);
+            Set_Arg (PP_Options, Comments_Fill, False);
+            Set_Arg (PP_Options, Separate_Loop_Then, False);
+            Set_Arg (PP_Options, Separate_Then, False);
+            Set_Arg (PP_Options, Separate_Loop, False);
+            Set_Arg (PP_Options, No_Separate_Loop, False);
+            Set_Arg (PP_Options, No_Separate_Then, False);
+            Set_Arg (PP_Options, No_Separate_Loop_Then, False);
+            Set_Arg (PP_Options, Separate_Label, False);
+            Set_Arg (PP_Options, Separate_Stmt_Name, False);
+            Set_Arg (PP_Options, Separate_Is, False);
+            Set_Arg (PP_Options, Use_On_New_Line, False);
+            Set_Arg (PP_Options, Split_Line_Before_Op, False);
+            Set_Arg (PP_Options, Split_Line_Before_Record, False);
+            Set_Arg (PP_Options, Insert_Blank_Lines, False);
+            Set_Arg (PP_Options, Preserve_Blank_Lines, False);
+            Set_Arg (PP_Options, Preserve_Line_Breaks, False);
+            Set_Arg (PP_Options, Vertical_Enum_Types, False);
+            Set_Arg (PP_Options, Vertical_Array_Types, False);
+            Set_Arg (PP_Options, Vertical_Named_Aggregates, False);
+            Set_Arg (PP_Options, Vertical_Case_Alternatives, False);
+            Set_Arg (PP_Options, Call_Threshold, Natural'Last);
+            Set_Arg (PP_Options, Par_Threshold, Natural'Last);
+            Set_Arg (PP_Options, Case_Threshold, Natural'Last);
+
+         end Set_Args;
 
          PP_Options : Command_Line (Pp.Command_Lines.Descriptor'Access);
          Input_Sel  : Char_Vector;
@@ -171,6 +225,11 @@ procedure Partial_GNATpp is
             Collect_File_Names => False,
             Ignore_Errors      => True);
          GNAT.Strings.Free (Validated);
+
+         --  Pass --source-line-breaks to gnatpp and update other potentially
+         --  used switches if this is needed based on the partial gnatpp
+         --  command line flag
+         Set_Args (PP_Options, Partial_Gnatpp_SLB);
 
          --  Find the corresponding Start_Node and End_Node given the initial
          --  selection range
@@ -213,17 +272,6 @@ procedure Partial_GNATpp is
             Set_Partial_Gnatpp_Offset (Offset - 1);
          end if;
 
-         declare
-            Input_Sel_Str : constant String :=
-              Char_Vectors.Elems (Input_Sel)
-              (1 .. Char_Vectors.Last_Index (Input_Sel));
-            pragma Unreferenced (Input_Sel_Str);
-
-         begin
-            --  Ada.Text_IO.Put_Line (Input_Sel_Str);
-            null;
-         end;
-
          begin
             Format_Vector
               (Cmd       => PP_Options,
@@ -234,7 +282,19 @@ procedure Partial_GNATpp is
                Partial_Gnatpp => True);
          exception
             when others =>
-               --  Ada.Text_IO.Put_Line ("Partial_Gnatpp: Unknown error");
+               Ada.Text_IO.Put_Line
+                 ("Partial_Gnatpp: Unknown error!"
+                  & " Keep the initial input selection without formatting ");
+
+               declare
+                  Input_Sel_Str : constant String :=
+                    Char_Vectors.Elems (Input_Sel)
+                    (1 .. Char_Vectors.Last_Index (Input_Sel));
+                  --  pragma Unreferenced (Input_Sel_Str);
+               begin
+                  Ada.Text_IO.Put_Line (Input_Sel_Str);
+               end;
+
                Output := Input_Sel;
          end;
 
