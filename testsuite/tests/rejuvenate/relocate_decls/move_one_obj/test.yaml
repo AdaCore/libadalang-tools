@@ -1,0 +1,5 @@
+title: move_one_obj
+
+description: move the decls to private and body part with only one defining name
+
+driver: shell_script

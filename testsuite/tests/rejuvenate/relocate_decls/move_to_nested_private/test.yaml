@@ -1,0 +1,5 @@
+title: move_to_nested_private
+
+description: move the decls to nested private part
+
+driver: shell_script

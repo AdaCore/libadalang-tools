@@ -1,0 +1,5 @@
+title: move_to_nested_public
+
+description: move the decls to nested packages public declaration part
+
+driver: shell_script

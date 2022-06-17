@@ -158,6 +158,40 @@ package body Output is
       Success       : in out Boolean);
    --  Write for scope_declarations
 
+   procedure Write
+     (Writer        : in out VSS.JSON.Content_Handlers.
+                           JSON_Content_Handler'Class;
+      Obj_Decl_Name : LAL.Object_Decl;
+      Item          : Text_Edit_Map;
+      Names         : Tools.Relocate_Decls_Tool
+                      .Defining_Name_Ordered_Sets.Set;
+      Success       : in out Boolean);
+   --  Write for relocate_decls object decl part
+
+   procedure Write_Message_Private
+     (Writer       : in out VSS.JSON.Content_Handlers.
+                           JSON_Content_Handler'Class;
+      Obj_Decl     : LAL.Object_Decl;
+      Modify_Names : Tools.Relocate_Decls_Tool
+                     .Defining_Name_Ordered_Sets.Set;
+      Success      : in out Boolean);
+   --  Create message for the relocate_decls for the obj decls part
+
+   procedure Write_Message_Private
+     (Writer    : in out VSS.JSON.Content_Handlers.
+                           JSON_Content_Handler'Class;
+      Decl_Name : LAL.Defining_Name;
+      Success   : in out Boolean);
+   --  Create message for the relocate_decls for the other decls part
+
+   procedure Write
+     (Writer    : in out VSS.JSON.Content_Handlers.
+                  JSON_Content_Handler'Class;
+      Decl_Name : LAL.Defining_Name;
+      Item      : Text_Edit_Map;
+      Success   : in out Boolean);
+   --  Write for relocate_decls other decls part
+
    -----------
    -- Write --
    -----------
@@ -390,6 +424,10 @@ package body Output is
       Writer.String_Value (To_Virtual_String (Words), Success);
    end Write_Message;
 
+   -------------------
+   -- Write_Message --
+   -------------------
+
    procedure Write_Message
      (Writer       : in out VSS.JSON.Content_Handlers.
                            JSON_Content_Handler'Class;
@@ -409,6 +447,47 @@ package body Output is
         "' can be scoped more narrowly";
       Writer.String_Value (To_Virtual_String (Words), Success);
    end Write_Message;
+
+   ---------------------------
+   -- Write_Message_Private --
+   ---------------------------
+
+   procedure Write_Message_Private
+     (Writer       : in out VSS.JSON.Content_Handlers.
+                           JSON_Content_Handler'Class;
+      Obj_Decl     : LAL.Object_Decl;
+      Modify_Names : Tools.Relocate_Decls_Tool
+                     .Defining_Name_Ordered_Sets.Set;
+      Success      : in out Boolean) is
+      Words : Unbounded_String := Null_Unbounded_String;
+   begin
+      Writer.Key_Name ("message", Success);
+      Words := Words & "The variable(s) ";
+      for Name of Modify_Names loop
+         Words := Words & "'" & Text.Image (Name.Text) & "' ";
+      end loop;
+      Words := Words & "in the declaration '"
+        & Text.Image (Obj_Decl.Text) &
+        "' can be relocated to better place";
+      Writer.String_Value (To_Virtual_String (Words), Success);
+   end Write_Message_Private;
+
+   ---------------------------
+   -- Write_Message_Private --
+   ---------------------------
+
+   procedure Write_Message_Private
+     (Writer    : in out VSS.JSON.Content_Handlers.
+                           JSON_Content_Handler'Class;
+      Decl_Name : LAL.Defining_Name;
+      Success   : in out Boolean) is
+      Words : Unbounded_String := Null_Unbounded_String;
+   begin
+      Writer.Key_Name ("message", Success);
+      Words := Words & "The Declaration of '" & Text.Image (Decl_Name.Text)
+               & "' can be relocated to better place";
+      Writer.String_Value (To_Virtual_String (Words), Success);
+   end Write_Message_Private;
 
    -----------
    -- Write --
@@ -471,6 +550,10 @@ package body Output is
       Writer.End_Object (Success);
    end Write;
 
+   -----------
+   -- Write --
+   -----------
+
    procedure Write
      (Writer        : in out VSS.JSON.Content_Handlers.
                       JSON_Content_Handler'Class;
@@ -499,6 +582,10 @@ package body Output is
       Writer.End_Object (Success);
    end Write;
 
+   -----------
+   -- Write --
+   -----------
+
    procedure Write
      (Writer        : in out VSS.JSON.Content_Handlers.
                            JSON_Content_Handler'Class;
@@ -522,6 +609,66 @@ package body Output is
       Write_Node (Writer, Obj_Decl_Name.As_Ada_Node, Success);
 
       Write_Message (Writer, Obj_Decl_Name, Names, Success);
+
+      Writer.End_Object (Success);
+   end Write;
+
+   -----------
+   -- Write --
+   -----------
+
+   procedure Write
+     (Writer        : in out VSS.JSON.Content_Handlers.
+                           JSON_Content_Handler'Class;
+      Obj_Decl_Name : LAL.Object_Decl;
+      Item          : Text_Edit_Map;
+      Names         : Tools.Relocate_Decls_Tool
+                      .Defining_Name_Ordered_Sets.Set;
+      Success       : in out Boolean) is
+   begin
+      Writer.Start_Object (Success);
+
+      Writer.Key_Name ("children", Success);
+      Writer.Start_Array (Success);
+      Writer.End_Array (Success);
+
+      Write_Fixit (Writer, Item, Success);
+
+      Write_Warning (Writer, Success);
+      Writer.Key_Name ("locations", Success);
+
+      Write_Node (Writer, Obj_Decl_Name.As_Ada_Node, Success);
+
+      Write_Message_Private (Writer, Obj_Decl_Name, Names, Success);
+
+      Writer.End_Object (Success);
+   end Write;
+
+   -----------
+   -- Write --
+   -----------
+
+   procedure Write
+     (Writer    : in out VSS.JSON.Content_Handlers.
+                  JSON_Content_Handler'Class;
+      Decl_Name : LAL.Defining_Name;
+      Item      : Text_Edit_Map;
+      Success   : in out Boolean) is
+   begin
+      Writer.Start_Object (Success);
+
+      Writer.Key_Name ("children", Success);
+      Writer.Start_Array (Success);
+      Writer.End_Array (Success);
+
+      Write_Fixit (Writer, Item, Success);
+
+      Write_Warning (Writer, Success);
+      Writer.Key_Name ("locations", Success);
+
+      Write_Node (Writer, Decl_Name.As_Ada_Node, Success);
+
+      Write_Message_Private (Writer, Decl_Name, Success);
 
       Writer.End_Object (Success);
    end Write;
@@ -631,4 +778,34 @@ package body Output is
       Writer.End_Document (Success);
    end JSON_Serialize;
 
+   --------------------
+   -- JSON_Serialize --
+   --------------------
+
+   procedure JSON_Serialize
+     (Edits_Info : Tools.Relocate_Decls_Tool.Modify_Info;
+      Stream     : in out VSS.Text_Streams.Output_Text_Stream'Class) is
+      Writer     : VSS.JSON.Push_Writers.JSON_Simple_Push_Writer;
+      Success    : Boolean := True;
+   begin
+      Writer.Set_Stream (Stream'Unchecked_Access);
+
+      Writer.Start_Document (Success);
+      Writer.Start_Array (Success);
+      for Obj in Edits_Info.Edit_Of_Obj_Decl.Iterate loop
+         Write (Writer        => Writer,
+                Obj_Decl_Name => Obj.Key,
+                Item          => Edits_Info.Edit_Of_Obj_Decl (Obj),
+                Names         => Edits_Info.Object_To_Names (Obj.Key),
+                Success       => Success);
+      end loop;
+      for Decl in Edits_Info.Edit_Of_Other_Decl.Iterate loop
+         Write (Writer    => Writer,
+                Decl_Name => Decl.Key,
+                Item      => Edits_Info.Edit_Of_Other_Decl (Decl),
+                Success   => Success);
+      end loop;
+      Writer.End_Array (Success);
+      Writer.End_Document (Success);
+   end JSON_Serialize;
 end Output;
