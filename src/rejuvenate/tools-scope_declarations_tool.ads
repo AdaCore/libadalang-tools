@@ -23,13 +23,12 @@
 --
 --  Rejuvenate scope_declarations tool
 
-with Ada.Strings.Unbounded;
 with Libadalang.Analysis;
 with Laltools.Refactor;
 with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Containers.Indefinite_Ordered_Sets;
 with GNATCOLL.Opt_Parse; use GNATCOLL.Opt_Parse;
-with VSS.Text_Streams.Memory_UTF8_Output;
+with VSS.Text_Streams;
 
 package Tools.Scope_Declarations_Tool is
    package LAL renames Libadalang.Analysis;

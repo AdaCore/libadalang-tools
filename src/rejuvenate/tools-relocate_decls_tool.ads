@@ -21,51 +21,29 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 --
---  Rejuvenate suppress_dead_params tool
+--  Rejuvenate make_type_private tool
 
 with Ada.Strings.Unbounded;
 with Libadalang.Analysis;
 with Laltools.Refactor;
 with Ada.Containers.Indefinite_Ordered_Maps;
-with Ada.Containers.Hashed_Maps;
-with Ada.Containers.Ordered_Sets;
-with Ada.Containers.Indefinite_Hashed_Maps;
+with Ada.Containers.Indefinite_Ordered_Sets;
 with GNATCOLL.Opt_Parse; use GNATCOLL.Opt_Parse;
-with VSS.Text_Streams.Memory_UTF8_Output;
+with VSS.Text_Streams;
 
-package Tools.Suppress_Dead_Params_Tool is
+package Tools.Relocate_Decls_Tool is
    package LAL renames Libadalang.Analysis;
    package ReFac renames Laltools.Refactor;
    Parser : Argument_Parser :=
-     Create_Argument_Parser (Help => "Suppress Dead Params");
+     Create_Argument_Parser (Help => "Suppress Params");
 
-   function "<" (L, R : LAL.Defining_Name) return Boolean;
+   function "<" (L, R : LAL.Ada_Node) return Boolean;
 
-   function "<" (L, R : LAL.Subp_Spec) return Boolean
-      is (L.F_Subp_Name < R.F_Subp_Name);
+   function "<" (L, R : LAL.Defining_Name) return Boolean
+   is (L.As_Ada_Node < R.As_Ada_Node);
 
-   type Value (Fixed : Boolean := False) is record
-      case Fixed is
-         when True  => V : LAL.Enum_Literal_Decl;
-         when False => null;
-      end case;
-   end record;
-
-   function Hash (N : LAL.Defining_Name) return Ada.Containers.Hash_Type is
-     (N.As_Ada_Node.Hash);
-
-   function Hash (N : LAL.Subp_Spec) return Ada.Containers.Hash_Type is
-     (N.As_Ada_Node.Hash);
-
-   package Values is new Ada.Containers.Hashed_Maps
-     (Key_Type        => LAL.Defining_Name,
-      Element_Type    => Value,
-      Hash            => Hash,
-      Equivalent_Keys => LAL."=");
-   use Values;
-   --  Global mapping from parameters to their fixed enumeration value if
-   --  any, or Any_Value if it has been detected that there is no such fixed
-   --  enumeration value.
+   function "<" (L, R : LAL.Object_Decl) return Boolean
+   is (L.As_Ada_Node < R.As_Ada_Node);
 
    package Project is new Parse_Option
      (Parser      => Parser,
@@ -85,37 +63,44 @@ package Tools.Suppress_Dead_Params_Tool is
       Convert     => Ada.Strings.Unbounded.To_Unbounded_String,
       Default_Val => Ada.Strings.Unbounded.Null_Unbounded_String);
 
-   package Defining_Name_Ordered_Sets is new Ada.Containers.Ordered_Sets
-     (Element_Type => LAL.Defining_Name,
-      "<"          => "<",
-      "="          => LAL."=");
-
-   package Subp_Spec_To_Edit_Text is new
-     Ada.Containers.Indefinite_Ordered_Maps
-       (Key_Type            => LAL.Subp_Spec,
+   package Decl_Name_To_Edit_Map is
+     new Ada.Containers.Indefinite_Ordered_Maps
+       (Key_Type            => LAL.Defining_Name,
         Element_Type        => ReFac.Text_Edit_Map,
         "<"                 => "<",
         "="                 => ReFac.Text_Edit_Ordered_Maps."=");
 
-   package Subp_Spec_To_Defining_Names_Set is
-      new Ada.Containers.Indefinite_Hashed_Maps
-       (Key_Type        => LAL.Subp_Spec,
-        Element_Type    => Defining_Name_Ordered_Sets.Set,
-        Hash            => Hash,
-        Equivalent_Keys => LAL."=",
-        "="             => Defining_Name_Ordered_Sets."=");
+   package Obj_Decl_To_Edit_Map is
+     new Ada.Containers.Indefinite_Ordered_Maps
+       (Key_Type            => LAL.Object_Decl,
+        Element_Type        => ReFac.Text_Edit_Map,
+        "<"                 => "<",
+        "="                 => ReFac.Text_Edit_Ordered_Maps."=");
 
-   type Edit_Infos is record
-      Text_Info        : Subp_Spec_To_Edit_Text.Map;
-      Removable_Params : Subp_Spec_To_Defining_Names_Set.Map;
+   package Defining_Name_Ordered_Sets is
+     new Ada.Containers.Indefinite_Ordered_Sets
+       (Element_Type => LAL.Defining_Name,
+        "<"          => "<",
+        "="          => LAL."=");
+
+   package Obj_Decl_To_Defining_Name is
+      new Ada.Containers.Indefinite_Ordered_Maps
+       (Key_Type            => LAL.Object_Decl,
+        Element_Type        => Defining_Name_Ordered_Sets.Set,
+        "<"                 => "<",
+        "="                 => Defining_Name_Ordered_Sets."=");
+
+   type Modify_Info is record
+      Object_To_Names : Obj_Decl_To_Defining_Name.Map;
+      Edit_Of_Obj_Decl : Obj_Decl_To_Edit_Map.Map;
+      Edit_Of_Other_Decl : Decl_Name_To_Edit_Map.Map;
    end record;
 
-   function Find_Dead_Param (Unit_Array : LAL.Analysis_Unit_Array)
-                                      return Edit_Infos;
+   function Find_Decl_Private (Unit_Array : LAL.Analysis_Unit_Array)
+                               return Modify_Info;
 
    procedure Run (Unit_Array : LAL.Analysis_Unit_Array;
                   Stream     : in out
                                VSS.Text_Streams.Output_Text_Stream'Class);
-   --  Suppress_Params_Tool main procedure
 
-end Tools.Suppress_Dead_Params_Tool;
+end Tools.Relocate_Decls_Tool;

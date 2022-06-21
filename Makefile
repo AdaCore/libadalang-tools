@@ -13,8 +13,7 @@ LIB_PROJECTS = \
    src/lal_tools.gpr
 
 BIN_PROJECTS = \
-   src/build.gpr \
-   src/rejuvenate/rejuvenate.gpr
+   src/build.gpr
 
 TESTSUITE_PROJECTS = \
    testsuite/ada_drivers/partial_gnatpp/partial_gnatpp.gpr \
@@ -47,7 +46,7 @@ lib:
 	    rm -f obj/lib/*.lexch; \
 	    gprbuild -v -k \
 	      -XLIBRARY_TYPE=$$kind \
-	      -XBUILD_MODE=$(BUILD_MODE) \
+	      -XLALTOOLS_BUILD_MODE=$(BUILD_MODE) \
 	      -P $$proj -p -j$(PROCESSORS) ; \
 	  done ; \
 	done
@@ -60,7 +59,7 @@ bin:
           gprbuild -v -k \
 	   -XLIBRARY_TYPE=$(LIBRARY_TYPE) \
 	   -XXMLADA_BUILD=$(LIBRARY_TYPE) \
-	   -XBUILD_MODE=$(BUILD_MODE) \
+	   -XLALTOOLS_BUILD_MODE=$(BUILD_MODE) \
 	   -XLALTOOLS_SET=$(LALTOOLS_SET) \
 	   -P $$proj -p -j$(PROCESSORS) ; \
         done
@@ -73,7 +72,7 @@ testsuite_drivers:
           gprbuild -v -k \
 	   -XLIBRARY_TYPE=$(LIBRARY_TYPE) \
 	   -XXMLADA_BUILD=$(LIBRARY_TYPE) \
-	   -XBUILD_MODE=$(BUILD_MODE) \
+	   -XLALTOOLS_BUILD_MODE=$(BUILD_MODE) \
 	   -XLALTOOLS_SET=$(LALTOOLS_SET) \
 	   -P $$proj -p -j$(PROCESSORS) ; \
         done
@@ -86,7 +85,7 @@ all:
           gprbuild -v -k \
 	   -XLIBRARY_TYPE=$(LIBRARY_TYPE) \
 	   -XXMLADA_BUILD=$(LIBRARY_TYPE) \
-	   -XBUILD_MODE=$(BUILD_MODE) \
+	   -XLALTOOLS_BUILD_MODE=$(BUILD_MODE) \
 	   -XLALTOOLS_SET=$(LALTOOLS_SET) \
 	   -P $$proj -p -j$(PROCESSORS) ; \
         done
@@ -102,7 +101,7 @@ install-lib:
 	  for kind in $(ALL_LIBRARY_TYPES) ; do \
 	    gprinstall \
 	      -XLIBRARY_TYPE=$$kind \
-	      -XBUILD_MODE=$(BUILD_MODE) \
+	      -XLALTOOLS_BUILD_MODE=$(BUILD_MODE) \
 	      --prefix="$(DESTDIR)" \
 	      --sources-subdir=include/$$(basename $$proj | cut -d. -f1) \
 	      --build-name=$$kind \
@@ -129,7 +128,7 @@ clean:
 			for library_type in $(ALL_LIBRARY_TYPES) ; do \
 				gprclean \
 					-XLIBRARY_TYPE=$$library_type \
-					-XBUILD_MODE=$$build_mode \
+					-XLALTOOLS_BUILD_MODE=$$build_mode \
 					-q -P $$proj; \
 			done ; \
 		done ; \

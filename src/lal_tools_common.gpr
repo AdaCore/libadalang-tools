@@ -4,7 +4,7 @@ abstract project LAL_Tools_Common is
    Target : Target_Type := external ("OS", "unix");
 
    type Build_Mode_Type is ("dev", "prod", "AddressSanitizer");
-   Build_Mode : Build_Mode_Type := external ("BUILD_MODE", "dev");
+   Build_Mode : Build_Mode_Type := external ("LALTOOLS_BUILD_MODE", external ("BUILD_MODE", "dev"));
 
    Superproject := external ("SUPERPROJECT", "");
 

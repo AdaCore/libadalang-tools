@@ -21,20 +21,12 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Strings;
-with Ada.Strings.Fixed;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Characters.Latin_1;
 with Langkit_Support.Text;
 with Libadalang.Common;
 with Ada.Containers; use Ada.Containers;
-with Libadalang.Project_Provider;
-with GNATCOLL.Projects;
-with GNATCOLL.VFS;
-with Ada.Assertions;
-with VSS.Stream_Element_Vectors.Conversions;
-with VSS.Text_Streams.Memory_UTF8_Output;
 with Output;
 with Ada.Containers.Hashed_Sets;
 with Ada.Containers.Hashed_Maps;
@@ -42,8 +34,6 @@ with Langkit_Support.Slocs; use Langkit_Support.Slocs;
 
 package body Tools.Relocate_Decls_Tool is
    package LALCO renames Libadalang.Common;
-   package GPR renames GNATCOLL.Projects;
-   package LAL_GPR renames Libadalang.Project_Provider;
    package Text renames Langkit_Support.Text;
 
    type Positions is (First, Middle, Last);
@@ -148,9 +138,9 @@ package body Tools.Relocate_Decls_Tool is
       ------------------
 
       procedure Process_Decl (Decl_Part : LAL.Package_Decl) is
-         Public_Node : LAL.Public_Part := Decl_Part.F_Public_Part;
-         Private_Node : LAL.Private_Part := Decl_Part.F_Private_Part;
-         Body_Part : LAL.Package_Body := Decl_Part.P_Body_Part;
+         Public_Node : constant LAL.Public_Part := Decl_Part.F_Public_Part;
+         Private_Node : constant LAL.Private_Part := Decl_Part.F_Private_Part;
+         Body_Part : constant LAL.Package_Body := Decl_Part.P_Body_Part;
 
          function My_Find_Ref (A : LAL.Defining_Name; Node : LAL.Ada_Node)
                                return Integer;
@@ -394,13 +384,13 @@ package body Tools.Relocate_Decls_Tool is
 
          procedure Delete_Names_in_List
          is
-            Names : Defining_Name_Ordered_Sets.Set := Obj_Decl_To_Names (Obj);
-            Name_List : LAL.Defining_Name_List := Obj.F_Ids;
+            Names : constant Defining_Name_Ordered_Sets.Set :=
+              Obj_Decl_To_Names (Obj);
+            Name_List : constant LAL.Defining_Name_List := Obj.F_Ids;
             Name_Position : Positions;
             Last_Position : Positions := First;
             Last_Sloc, Last_Sloc_Start : Source_Location := No_Source_Location;
             Delete_Last : Boolean := False;
-            All_used_component : Boolean := True;
             Deletable_Range : Source_Location_Range;
          begin
             for Name_Node of Name_List loop
@@ -492,7 +482,8 @@ package body Tools.Relocate_Decls_Tool is
                Text_To_Add := Text_To_Add & Tmp_Text
                               & Ada.Characters.Latin_1.LF;
                declare
-                  Decl_Part : LAL.Ada_Node := Last_Decl_For_Name (Name);
+                  Decl_Part : constant LAL.Ada_Node :=
+                    Last_Decl_For_Name (Name);
                   Location : Source_Location_Range :=
                     Decl_Part.Sloc_Range;
                begin

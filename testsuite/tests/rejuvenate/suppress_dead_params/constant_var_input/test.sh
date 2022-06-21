@@ -1,1 +1,1 @@
-rejuvenate suppress_dead_params -P testcase.gpr --pipe
+gnatrejuvenate suppress_dead_params -P testcase.gpr --pipe

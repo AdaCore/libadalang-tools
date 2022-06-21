@@ -1,1 +1,1 @@
-rejuvenate record_components -P example1/example1.gpr --pipe
+gnatrejuvenate record_components -P example1/example1.gpr --pipe

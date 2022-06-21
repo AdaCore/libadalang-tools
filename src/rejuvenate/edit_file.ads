@@ -22,8 +22,7 @@
 ------------------------------------------------------------------------------
 --
 --  Apply the Edit to the code
-with Libadalang.Analysis;
-with VSS.Text_Streams;
+
 with Laltools.Refactor;
 
 package Edit_File is

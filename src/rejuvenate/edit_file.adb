@@ -33,7 +33,7 @@ package body Edit_File is
       function Is_Insert_Enter (Edit : ReFac.Text_Edit) return Boolean;
 
       function Is_Insert_Enter (Edit : ReFac.Text_Edit) return Boolean is
-         Text : String := To_String (Edit.Text);
+         Text : constant String := To_String (Edit.Text);
       begin
          if Integer (Edit.Location.Start_Column) =
            Integer (Edit.Location.End_Column) and
@@ -49,8 +49,8 @@ package body Edit_File is
    begin
       for File in Edits.Iterate loop
          declare
-            File_Name : String := File.Key;
-            Edits_Map : ReFac.Text_Edit_Ordered_Set := Edits (File);
+            File_Name : constant String := File.Key;
+            Edits_Map : constant ReFac.Text_Edit_Ordered_Set := Edits (File);
             Src, Dst : File_Type;
             Line : Ada.Strings.Unbounded.Unbounded_String;
             Line_Count : Integer := 1;
@@ -93,9 +93,10 @@ package body Edit_File is
                end loop;
                Get_Line (Src, Line);
                declare
-                  This_Line : String := To_String (Line);
-                  New_Text : String := To_String (Text_Edit.Text);
-                  Insert_Text : Unbounded_String := Null_Unbounded_String;
+                  This_Line   : constant String := To_String (Line);
+                  New_Text    : constant String := To_String (Text_Edit.Text);
+                  Insert_Text : Unbounded_String :=
+                    Null_Unbounded_String;
                begin
                   if This_Line'First /= Integer
                     (Text_Edit.Location.Start_Column)
@@ -127,7 +128,7 @@ package body Edit_File is
                   end loop;
                   Line_Count := Line_Count + 1;
                   declare
-                     Text : String := To_String (Insert_Text);
+                     Text : constant String := To_String (Insert_Text);
                      Is_Blank : Boolean := True;
                   begin
                      for I in Text'First .. Text'Last loop

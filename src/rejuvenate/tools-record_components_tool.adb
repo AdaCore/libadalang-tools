@@ -25,12 +25,8 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Langkit_Support.Text;
 with Libadalang.Common;
 with Ada.Containers; use Ada.Containers;
-with Libadalang.Project_Provider;
 with GNATCOLL.Projects; use GNATCOLL.Projects;
-with GNATCOLL.VFS;
 with Ada.Assertions;
-with VSS.Stream_Element_Vectors.Conversions;
-with VSS.Text_Streams.Memory_UTF8_Output;
 with Output;
 pragma Unreferenced (Langkit_Support.Text);
 pragma Unreferenced (Ada.Assertions);
@@ -40,9 +36,7 @@ with Ada.Containers.Hashed_Sets;
 package body Tools.Record_Components_Tool is
    package LALCO renames Libadalang.Common;
    package Text renames Langkit_Support.Text;
-   package LAL_GPR renames Libadalang.Project_Provider;
    use type LALCO.Ada_Node_Kind_Type;
-   package GPR renames GNATCOLL.Projects;
 
    type Ref_Status is (Read, Write);
    --  The status of Reference which is Read of Write.

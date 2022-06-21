@@ -1,2 +1,2 @@
-rejuvenate array_aggregates -P testgeneral/testgeneral.gpr --pipe
+gnatrejuvenate array_aggregates -P testgeneral/testgeneral.gpr --pipe
 

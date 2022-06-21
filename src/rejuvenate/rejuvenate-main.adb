@@ -27,7 +27,7 @@ with Ada.Command_Line; use Ada.Command_Line;
 with Ada.Strings.Unbounded;
 use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
-with Libadalang.Analysis;
+with Libadalang.Analysis; use Libadalang.Analysis;
 with Libadalang.Project_Provider;
 with Laltools.Refactor;
 with VSS.Stream_Element_Vectors.Conversions;
@@ -48,14 +48,11 @@ with Tools.Scope_Declarations_Tool;
 with Tools.Relocate_Decls_Tool;
 with Edit_File;
 
-procedure Rejuvenate is
-   package Project_Tree renames Command_Line.Project;
-   package LAL renames Libadalang.Analysis;
-   package GPR renames GNATCOLL.Projects;
-   package LAL_GPR renames Libadalang.Project_Provider;
-   package ReFac renames Laltools.Refactor;
-   Env     : GPR.Project_Environment_Access;
-   Project : constant GPR.Project_Tree_Access := new GPR.Project_Tree;
+procedure Rejuvenate.Main is
+
+   Env     : GNATCOLL.Projects.Project_Environment_Access;
+   Project : constant GNATCOLL.Projects.Project_Tree_Access :=
+     new GNATCOLL.Projects.Project_Tree;
 
    use type GNATCOLL.VFS.Filesystem_String;
    function "+" (Str : String) return XString renames To_XString;
@@ -66,13 +63,12 @@ procedure Rejuvenate is
    Command_Line_Arguments : XString_Array :=
      (if First_Tool_Index = 0 then []
       else [1 .. Argument_Count => +""]);
-   Context          : LAL.Analysis_Context;
-   Provider         : LAL.Unit_Provider_Reference;
+   Context          : Analysis_Context;
+   Provider         : Unit_Provider_Reference;
    Save_Dir         : Ada.Strings.Unbounded.Unbounded_String;
-   File             : File_Type;
    Stream           : aliased VSS.Text_Streams.Memory_UTF8_Output
      .Memory_UTF8_Output_Stream;
-   Edit_Map         : ReFac.Text_Edit_Map;
+   Edit_Map         : Laltools.Refactor.Text_Edit_Map;
 
    --  TODO: Hide the Command_Line_Arguments and Tool_Args logic.
    --  TODO: Rename Command_Line_Arguments since this represents the
@@ -86,20 +82,20 @@ begin
    if Command_Line.Parser.Parse (Command_Line_Arguments) then
       declare
          Project_Filename : constant String :=
-                 To_String (Project_Tree.Get);
+                 To_String (Command_Line.Project.Get);
          My_Project_File  : constant GNATCOLL.VFS.Virtual_File :=
            GNATCOLL.VFS.Create (+Project_Filename);
-         Source_Files : LAL_GPR.Filename_Vectors.Vector;
+         Source_Files : Libadalang.Project_Provider.Filename_Vectors.Vector;
       begin
-         GPR.Initialize (Env);
+         GNATCOLL.Projects.Initialize (Env);
                --  Use procedures in GNATCOLL.Projects to set scenario
                --  variables (Change_Environment), to set the target
                --  and the runtime (Set_Target_And_Runtime), etc.
          Project.Load (My_Project_File, Env);
-         Provider := LAL_GPR.Create_Project_Unit_Provider
+         Provider := Libadalang.Project_Provider.Create_Project_Unit_Provider
            (Tree => Project, Env => Env);
 
-         Context := LAL.Create_Context (Unit_Provider => Provider);
+         Context := Create_Context (Unit_Provider => Provider);
          if Command_Line.Source.Get /= Null_Unbounded_String then
             Source_Files := Libadalang.Project_Provider.Source_Files
                  (Project.all, Libadalang.Project_Provider.Whole_Project);
@@ -109,12 +105,12 @@ begin
             --  TODO : if the user want to specify the source
          end if;
          declare
-            AUA : LAL.Analysis_Unit_Array (Source_Files.First_Index
+            AUA : Analysis_Unit_Array (Source_Files.First_Index
                                                  .. Source_Files.Last_Index);
          begin
             for I in Source_Files.First_Index .. Source_Files.Last_Index loop
                declare
-                  Unit     : constant LAL.Analysis_Unit :=
+                  Unit     : constant Analysis_Unit :=
                     Context.Get_From_File (To_String
                                            (Source_Files.Element (I)));
                begin
@@ -180,4 +176,4 @@ begin
 --        Ada.Text_IO.Put_Line (Ada.Exceptions.Exception_Message (E));
 --  TODO: Raise a ticket with this bug and ammend this comment with the
 --  ticket number.
-end Rejuvenate;
+end Rejuvenate.Main;

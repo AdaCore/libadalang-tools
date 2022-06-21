@@ -4,7 +4,6 @@ with "lal_tools_common.gpr";
 
 project Testgeneral is
    for Source_Dirs use ("src");
-   for Object_Dir use "obj";
    for Main use ("testgeneral.adb");
    package Compiler is
       for Switches ("Ada") use ("-gnat2022");

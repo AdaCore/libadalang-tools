@@ -21,17 +21,10 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Text_IO; use Ada.Text_IO;
-with GNATCOLL.VFS;
 with Langkit_Support.Errors;
 with Libadalang.Common;
-with GNATCOLL.Projects;
-with Libadalang.Project_Provider;
 with Langkit_Support.Slocs; use Langkit_Support.Slocs;
 with Ada.Containers.Vectors;
-with VSS.Stream_Element_Vectors.Conversions;
-with VSS.Text_Streams;
-with VSS.Text_Streams.Memory_UTF8_Output;
 with Ada.Strings;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Characters.Latin_1;
@@ -42,8 +35,6 @@ with Output;
 
 package body Tools.Suppress_Dead_Params_Tool is
    package LALCO renames Libadalang.Common;
-   package GPR renames GNATCOLL.Projects;
-   package LAL_GPR renames Libadalang.Project_Provider;
    package Text renames Langkit_Support.Text;
 
    package Range_Vectors is new Ada.Containers.Vectors
@@ -261,8 +252,7 @@ package body Tools.Suppress_Dead_Params_Tool is
             end if;
          when LALCO.Ada_Call_Expr =>
             declare
-               Call   : constant LAL.Call_Expr'Class := Node.As_Call_Expr;
-               Callee : constant LAL.Name := Call.F_Name;
+               Call : constant LAL.Call_Expr'Class := Node.As_Call_Expr;
             begin
                if Call.F_Suffix.Kind in LALCO.Ada_Assoc_List_Range then
                   declare
@@ -315,15 +305,17 @@ package body Tools.Suppress_Dead_Params_Tool is
       --------------------
 
       procedure Generate_Edits (Func_Name : LAL.Subp_Spec) is
-         Param_Removalbe : Defining_Name_Ordered_Sets.Set :=
+         Param_Removable : constant Defining_Name_Ordered_Sets.Set :=
            Subpspec_To_Param (Func_Name);
          Param_Indices   : Range_Vectors.Vector;
-         Params : LAL.Param_Spec_Array := Func_Name.P_Params;
-         Flag : Boolean := False;
-         First, Last : Positive := 1;
-         Indice_Range : ReFac.Subprogram_Signature.
+         Params          : constant LAL.Param_Spec_Array :=
+           Func_Name.P_Params;
+         Flag            : Boolean := False;
+         First, Last     : Positive := 1;
+         Indice_Range    : ReFac.Subprogram_Signature.
            Parameter_Indices_Range_Type;
-         Father : LAL.Ada_Node := Func_Name.Parent;
+         Father          : constant LAL.Ada_Node := Func_Name.Parent;
+
          function Generate_Constant return ReFac.Text_Edit;
          --  generate the text_edit for each dead parameters
 
@@ -335,7 +327,8 @@ package body Tools.Suppress_Dead_Params_Tool is
             Define_Text : Ada.Strings.Unbounded.Unbounded_String :=
               Ada.Strings.Unbounded.Null_Unbounded_String;
             Text_Edit : ReFac.Text_Edit;
-            Position : Source_Location_Range := Func_Name.Sloc_Range;
+            Position : constant Source_Location_Range := Func_Name.Sloc_Range;
+
             procedure Generate_Text;
             --  generate the declaration of the dead parameters
 
@@ -345,7 +338,7 @@ package body Tools.Suppress_Dead_Params_Tool is
 
             procedure Generate_Text is
             begin
-               for Param of Param_Removalbe loop
+               for Param of Param_Removable loop
                   Define_Text := Define_Text
                     & Text.Image (Param.P_Basic_Decl.Text);
                   if Param.P_Basic_Decl.As_Param_Spec.F_Default_Expr.Is_Null
@@ -380,7 +373,7 @@ package body Tools.Suppress_Dead_Params_Tool is
          end Generate_Constant;
       begin
          for I_Param in Params'Range loop
-            if Param_Removalbe.Contains (Params (I_Param).P_Defining_Name) then
+            if Param_Removable.Contains (Params (I_Param).P_Defining_Name) then
                Last := I_Param;
                Flag := True;
             else
@@ -436,10 +429,12 @@ package body Tools.Suppress_Dead_Params_Tool is
    -- Run --
    ---------
 
-   procedure Run (Unit_Array : LAL.Analysis_Unit_Array;
-                  Stream     : in out
-                               VSS.Text_Streams.Output_Text_Stream'Class) is
+   procedure Run
+     (Unit_Array : LAL.Analysis_Unit_Array;
+      Stream     : in out VSS.Text_Streams.Output_Text_Stream'Class)
+   is
       Edit_Info : Edit_Infos;
+
    begin
       Edit_Info := Find_Dead_Param (Unit_Array);
       Output.JSON_Serialize (Edit_Info, Stream);

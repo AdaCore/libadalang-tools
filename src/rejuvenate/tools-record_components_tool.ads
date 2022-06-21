@@ -31,7 +31,7 @@ with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Containers.Indefinite_Ordered_Sets;
 with Ada.Containers.Indefinite_Hashed_Maps;
 with GNATCOLL.Opt_Parse; use GNATCOLL.Opt_Parse;
-with VSS.Text_Streams.Memory_UTF8_Output;
+with VSS.Text_Streams;
 
 package Tools.Record_Components_Tool is
    package LAL renames Libadalang.Analysis;

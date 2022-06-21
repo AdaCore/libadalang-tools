@@ -1,10 +1,12 @@
-usage: rejuvenate [--help|-h] tool [--verbose|-v] 
+usage: gnatrejuvenate [--help|-h] tool [--verbose|-v] 
 
 Rejuvenate tools
 
 positional arguments:
    tool  record_components
          array_aggregates
+         
+         suppress_dead_params
    
 optional arguments:
    --help, -h     Show this help message

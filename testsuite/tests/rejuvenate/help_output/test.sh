@@ -1,1 +1,1 @@
-rejuvenate --help
+gnatrejuvenate --help

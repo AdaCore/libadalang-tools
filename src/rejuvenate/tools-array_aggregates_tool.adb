@@ -21,11 +21,7 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Text_IO; use Ada.Text_IO;
-with GNATCOLL.VFS;
 with Libadalang.Common;
-with GNATCOLL.Projects;
-with Libadalang.Project_Provider;
 with Langkit_Support.Slocs; use Langkit_Support.Slocs;
 with Ada.Containers.Hashed_Sets;
 with GNATCOLL.GMP.Integers; use GNATCOLL.GMP.Integers;
@@ -35,27 +31,25 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 package body Tools.Array_Aggregates_Tool is
    package LALCO renames Libadalang.Common;
-   package GPR renames GNATCOLL.Projects;
-   package LAL_GPR renames Libadalang.Project_Provider;
 
    use type LALCO.Ada_Node_Kind_Type;
 
-   function Defining_Name_Hash (Element : LAL.Defining_Name)
+   function Defining_Name_Hash (Element : Defining_Name)
                                 return Ada.Containers.Hash_Type is
-   (LAL.Hash (Element.As_Ada_Node));
+   (Hash (Element.As_Ada_Node));
 
    package Defining_Name_Sets is new
      Ada.Containers.Hashed_Sets
-       (Element_Type        => LAL.Defining_Name,
+       (Element_Type        => Defining_Name,
         Hash                => Defining_Name_Hash,
-        Equivalent_Elements => LAL."=",
-        "="                 => LAL."=");
+        Equivalent_Elements => "=",
+        "="                 => "=");
 
    ---------
    -- "<" --
    ---------
 
-   function "<" (L, R : LAL.Aggregate) return Boolean
+   function "<" (L, R : Aggregate) return Boolean
    is
    begin
       if L.Unit.Get_Filename < R.Unit.Get_Filename then
@@ -64,8 +58,8 @@ package body Tools.Array_Aggregates_Tool is
          if L.Unit.Get_Filename > R.Unit.Get_Filename then
             return False;
          else
-            return (Start_Sloc (LAL.Sloc_Range (L)) <
-                      Start_Sloc (LAL.Sloc_Range (R)));
+            return (Start_Sloc (Sloc_Range (L)) <
+                      Start_Sloc (Sloc_Range (R)));
          end if;
       end if;
    end "<";
@@ -74,7 +68,7 @@ package body Tools.Array_Aggregates_Tool is
    -- Find_Arrays_To_Aggregate --
    ------------------------------
 
-   function Find_Arrays_To_Aggregate (Unit_Array : LAL.Analysis_Unit_Array)
+   function Find_Arrays_To_Aggregate (Unit_Array : Analysis_Unit_Array)
                                     return Aggregates_To_Edit_Text.Map is
       Edit_Texts : Aggregates_To_Edit_Text.Map;
       --  This Map stores all the aggregates to edit_info.
@@ -82,7 +76,7 @@ package body Tools.Array_Aggregates_Tool is
       Array_Type_Names : Defining_Name_Sets.Set;
       --  This Set stores all the name defined as array type.
 
-      function Find_Array_Def (Node : LAL.Ada_Node'Class)
+      function Find_Array_Def (Node : Ada_Node'Class)
                              return LALCO.Visit_Status;
       --  The Final goal is find All the defining name which
       --  is defined as the Array type in the project
@@ -92,22 +86,22 @@ package body Tools.Array_Aggregates_Tool is
       --  If it's Type_Decl, We get the type name and find
       --  all the reference.
 
-      procedure Modify_Aggregate (Node : LAL.Aggregate'Class);
+      procedure Modify_Aggregate (Node : Aggregate'Class);
       --  This procedure generates the edit_info for the aggregate
 
-      function Find_Aggregate (Aggregate_Node : LAL.Ada_Node'Class)
+      function Find_Aggregate (Aggregate_Node : Ada_Node'Class)
                                return LALCO.Visit_Status;
       --  Find all the aggregate node in the project
 
       procedure Safe_Insert
-        (Edits : in out ReFac.Text_Edit_Ordered_Set;
-         Edit  : ReFac.Text_Edit);
+        (Edits : in out Laltools.Refactor.Text_Edit_Ordered_Set;
+         Edit  : Laltools.Refactor.Text_Edit);
       --  insert the text_edit information to the set
 
       procedure Safe_Insert
         (Edits          : in out Aggregates_To_Edit_Text.Map;
-         Aggregate_Node : LAL.Aggregate;
-         Edit           : ReFac.Text_Edit);
+         Aggregate_Node : Aggregate;
+         Edit           : Laltools.Refactor.Text_Edit);
       --  insert the text_edit information with aggregate to the
       --  Aggregates_to_edit_text map
 
@@ -116,8 +110,8 @@ package body Tools.Array_Aggregates_Tool is
       -----------------
 
       procedure Safe_Insert
-        (Edits : in out ReFac.Text_Edit_Ordered_Set;
-         Edit  : ReFac.Text_Edit) is
+        (Edits : in out Laltools.Refactor.Text_Edit_Ordered_Set;
+         Edit  : Laltools.Refactor.Text_Edit) is
       begin
          if not Edits.Contains (Edit) then
             Edits.Insert (Edit);
@@ -130,10 +124,10 @@ package body Tools.Array_Aggregates_Tool is
 
       procedure Safe_Insert
         (Edits          : in out Aggregates_To_Edit_Text.Map;
-         Aggregate_Node : LAL.Aggregate;
-         Edit           : ReFac.Text_Edit)
+         Aggregate_Node : Aggregate;
+         Edit           : Laltools.Refactor.Text_Edit)
       is
-         Edits_Set : ReFac.Text_Edit_Ordered_Set;
+         Edits_Set : Laltools.Refactor.Text_Edit_Ordered_Set;
       begin
          if Edits.Contains (Aggregate_Node) then
             Safe_Insert (Edits.Reference (Aggregate_Node), Edit);
@@ -147,19 +141,19 @@ package body Tools.Array_Aggregates_Tool is
       -- Find_Body_Node --
       --------------------
 
-      function Find_Array_Def (Node : LAL.Ada_Node'Class)
+      function Find_Array_Def (Node : Ada_Node'Class)
                                return LALCO.Visit_Status is
-         procedure Process_Decl (Node : LAL.Basic_Decl'Class);
+         procedure Process_Decl (Node : Basic_Decl'Class);
          --  Store all the definig names
 
-         procedure Find_All_Ref_Type (Node : LAL.Ada_Node'Class);
+         procedure Find_All_Ref_Type (Node : Ada_Node'Class);
          --  Find all the references for the type_decl
 
          -----------------
          -- Process_Obj --
          -----------------
 
-         procedure Process_Decl (Node : LAL.Basic_Decl'Class) is
+         procedure Process_Decl (Node : Basic_Decl'Class) is
          begin
             for Type_Name of Node.P_Defining_Names loop
                Array_Type_Names.Include (Type_Name);
@@ -170,8 +164,8 @@ package body Tools.Array_Aggregates_Tool is
          -- Find_All_Ref_Type --
          -----------------------
 
-         procedure Find_All_Ref_Type (Node : LAL.Ada_Node'Class) is
-            Grand_P : constant LAL.Ada_Node := Node.Parent.Parent;
+         procedure Find_All_Ref_Type (Node : Ada_Node'Class) is
+            Grand_P : constant Ada_Node := Node.Parent.Parent;
          begin
             case Grand_P.Kind is
                when LALCO.Ada_Basic_Decl =>
@@ -197,13 +191,13 @@ package body Tools.Array_Aggregates_Tool is
 
       begin
          if Node.Kind = LALCO.Ada_Array_Type_Def then
-            if Node.Parent.Kind = LALCO.Ada_Type_Decl then
+            if Node.Parent.Kind in LALCO.Ada_Type_Decl then
                declare
-                  Type_Name : LAL.Defining_Name;
+                  Type_Name : Defining_Name;
                begin
-                  Type_Name := LAL.F_Name (Node.Parent.As_Base_Type_Decl);
+                  Type_Name := F_Name (Node.Parent.As_Base_Type_Decl);
                   Array_Type_Names.Include (Type_Name);
-                  for Type_Ref of LAL.P_Find_All_References
+                  for Type_Ref of P_Find_All_References
                     (Type_Name, Unit_Array) loop
                      Find_All_Ref_Type (Type_Ref.Ref.As_Ada_Node);
                   end loop;
@@ -219,25 +213,25 @@ package body Tools.Array_Aggregates_Tool is
       -- Find_Aggregate --
       --------------------
 
-      function Find_Aggregate (Aggregate_Node : LAL.Ada_Node'Class)
+      function Find_Aggregate (Aggregate_Node : Ada_Node'Class)
                                return LALCO.Visit_Status is
-         function Is_Array (Node : LAL.Ada_Node'Class) return Boolean;
+         function Is_Array (Node : Ada_Node'Class) return Boolean;
          --  Check if this aggregate is a Array type
 
          --------------
          -- Is_Array --
          --------------
 
-         function Is_Array (Node : LAL.Ada_Node'Class) return Boolean is
-            Father : constant LAL.Ada_Node := Node.Parent;
-            Grand_P : constant LAL.Ada_Node := Father.Parent;
+         function Is_Array (Node : Ada_Node'Class) return Boolean is
+            Father : constant Ada_Node := Node.Parent;
+            Grand_P : constant Ada_Node := Father.Parent;
             Type_Array : Boolean := False;
 
-            function Process_Assign_Stmt (Node : LAL.Assign_Stmt'Class)
+            function Process_Assign_Stmt (Node : Assign_Stmt'Class)
                                        return Boolean;
             --  check if a aggregate in assign_stmt is a Array type.
 
-            function Process_Return_Stmt (Node : LAL.Return_Stmt'Class)
+            function Process_Return_Stmt (Node : Return_Stmt'Class)
                                           return Boolean;
             --  check if a aggregate in return_stmt is a Array type.
 
@@ -245,7 +239,7 @@ package body Tools.Array_Aggregates_Tool is
             -- Process_Assign_Stmt --
             -------------------------
 
-            function Process_Assign_Stmt (Node : LAL.Assign_Stmt'Class)
+            function Process_Assign_Stmt (Node : Assign_Stmt'Class)
                                        return Boolean is
             begin
                if Node.F_Dest.P_Expression_Type.Is_Null then
@@ -254,7 +248,7 @@ package body Tools.Array_Aggregates_Tool is
                return Node.F_Dest.P_Expression_Type.P_Is_Array_Type;
             end Process_Assign_Stmt;
 
-            function Process_Return_Stmt (Node : LAL.Return_Stmt'Class)
+            function Process_Return_Stmt (Node : Return_Stmt'Class)
                                           return Boolean is
             begin
                return Node.F_Return_Expr.P_Expression_Type.P_Is_Array_Type;
@@ -281,9 +275,9 @@ package body Tools.Array_Aggregates_Tool is
                      end if;
                   end if;
                when LALCO.Ada_Basic_Assoc =>
-                  if LAL.P_Get_Params (Father.As_Basic_Assoc)'Length /= 0 then
+                  if P_Get_Params (Father.As_Basic_Assoc)'Length /= 0 then
                      if Array_Type_Names.Contains
-                       (LAL.P_Get_Params (Father.As_Basic_Assoc) (1))
+                       (P_Get_Params (Father.As_Basic_Assoc) (1))
                      then
                         Type_Array := True;
                      end if;
@@ -334,13 +328,13 @@ package body Tools.Array_Aggregates_Tool is
       -- Modify_Aggregate --
       ----------------------
 
-      procedure Modify_Aggregate (Node : LAL.Aggregate'Class) is
-         Assoc_List_Node : constant LAL.Assoc_List
-           := LAL.F_Assocs (Node.As_Base_Aggregate);
+      procedure Modify_Aggregate (Node : Aggregate'Class) is
+         Assoc_List_Node : constant Assoc_List
+           := F_Assocs (Node.As_Base_Aggregate);
          Location_Delete : constant Source_Location_Range
-           := LAL.Sloc_Range (Node);
-         Grand_Child : LAL.Ada_Node;
-         Text_Delete : ReFac.Text_Edit;
+           := Sloc_Range (Node);
+         Grand_Child : Ada_Node;
+         Text_Delete : Laltools.Refactor.Text_Edit;
 
          procedure Paren_To_Square;
          --  this procedure replace () with [] for all array aggregates
@@ -429,9 +423,9 @@ package body Tools.Array_Aggregates_Tool is
                  .F_Designators.Child (1);
                if Grand_Child.Kind in LALCO.Ada_Bin_Op_Range then
                   declare
-                     Start_Val : constant LAL.Expr :=
+                     Start_Val : constant Expr :=
                        Grand_Child.As_Bin_Op.F_Left;
-                     End_Val : constant LAL.Expr :=
+                     End_Val : constant Expr :=
                        Grand_Child.As_Bin_Op.F_Right;
                   begin
                      if Start_Val.Kind in LALCO.Ada_Int_Literal_Range and
@@ -445,7 +439,7 @@ package body Tools.Array_Aggregates_Tool is
                         end if;
                         if Start_Val.P_Eval_As_Int = End_Val.P_Eval_As_Int then
                            Change_One
-                             (LAL.Sloc_Range
+                             (Sloc_Range
                                 (Grand_Child.Parent.Next_Sibling));
                         end if;
                      else
@@ -453,7 +447,7 @@ package body Tools.Array_Aggregates_Tool is
                      end if;
                   end;
                else
-                  Change_One (LAL.Sloc_Range
+                  Change_One (Sloc_Range
                               (Grand_Child.Parent.Next_Sibling));
                end if;
             when others =>
@@ -475,12 +469,14 @@ package body Tools.Array_Aggregates_Tool is
    -- Run --
    ---------
 
-   procedure Run (Unit_Array : LAL.Analysis_Unit_Array;
-                  Stream     : in out
-                               VSS.Text_Streams.Output_Text_Stream'Class) is
+   procedure Run
+     (Units  : Analysis_Unit_Array;
+      Stream : in out VSS.Text_Streams.Output_Text_Stream'Class)
+   is
       Edit_Info : Aggregates_To_Edit_Text.Map;
+
    begin
-      Edit_Info := Find_Arrays_To_Aggregate (Unit_Array);
+      Edit_Info := Find_Arrays_To_Aggregate (Units);
       Output.JSON_Serialize (Edit_Info, Stream);
    end Run;
 

@@ -23,21 +23,16 @@
 
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Strings;
-with Ada.Strings.Fixed;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Characters.Latin_1;
 with Langkit_Support.Text;
 with Libadalang.Common;
 with Ada.Containers; use Ada.Containers;
-with GNATCOLL.VFS;
-with Ada.Assertions;
-with VSS.Stream_Element_Vectors.Conversions;
 with Output;
 with Ada.Containers.Hashed_Sets;
 with Ada.Containers.Ordered_Sets;
 with Ada.Containers.Hashed_Maps;
 with Langkit_Support.Slocs; use Langkit_Support.Slocs;
-with Edit_File;
 
 package body Tools.Scope_Declarations_Tool is
    package LALCO renames Libadalang.Common;
@@ -172,7 +167,7 @@ package body Tools.Scope_Declarations_Tool is
       ------------------
 
       procedure Process_Decl (Decl_Part : LAL.Declarative_Part) is
-         Father : LAL.Ada_Node := Decl_Part.Parent;
+         Father : constant LAL.Ada_Node := Decl_Part.Parent;
       begin
          declare
             Name_Checked_Done : Defining_Name_Sets.Set;
@@ -311,14 +306,13 @@ package body Tools.Scope_Declarations_Tool is
 
             procedure Delete_Names_in_List
             is
-               Name_List                  : LAL.Defining_Name_List :=
+               Name_List                  : constant LAL.Defining_Name_List :=
                                             Obj.F_Ids;
                Name_Position              : Positions;
                Last_Position              : Positions := First;
                Last_Sloc, Last_Sloc_Start : Source_Location :=
                                             No_Source_Location;
                Delete_Last                : Boolean := False;
-               All_used_component         : Boolean := True;
                Deletable_Range            : Source_Location_Range;
             begin
                for Name_Node of Name_List loop
@@ -412,9 +406,9 @@ package body Tools.Scope_Declarations_Tool is
                Text_To_Add := Text_To_Add & Tmp_Text
                               & Ada.Characters.Latin_1.LF;
                declare
-                  Last_Decl : LAL.Declarative_Part :=
+                  Last_Decl : constant LAL.Declarative_Part :=
                     Last_Decl_For_Name (Name);
-                  Location : Source_Location_Range :=
+                  Location  : Source_Location_Range :=
                     Last_Decl.Child (1).Sloc_Range;
                begin
                   Location.End_Column := Location.Start_Column;
@@ -496,7 +490,7 @@ package body Tools.Scope_Declarations_Tool is
       Put_Line ("Please Enter the Changes that you would like to apply, "
                 & "entre 0 to apply all the changes");
       declare
-         Selection : String (1 .. 3 * Count) := (others => ' ');
+         Selection : String (1 .. 3 * Count) := [others => ' '];
          Index_Select : Integer := 0;
          Flag : Boolean := False;
       begin
