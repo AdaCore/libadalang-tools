@@ -50,6 +50,7 @@ package Utils.String_Utilities is
    W_VT : constant W_Char := W_Char'Val (Character'Pos (ASCII.VT));
 
    NL : constant W_Char := W_LF;
+   CR : constant W_Char := W_CR;
    --  Character used to represent new-line in output.
 
    function Image (X : Integer) return String;

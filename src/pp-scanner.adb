@@ -37,7 +37,9 @@ package body Pp.Scanner is
       Enabled_LB_Token => Name_NL,
       Disabled_LB_Token | Tab_Token => Name_Empty,
       False_End_Of_Line => Name_Empty,
-      True_End_Of_Line => Name_NL,
+      True_End_Of_Line_LF => Name_NL,
+      True_End_Of_Line_CR => Name_CR,
+      True_End_Of_Line_CRLF => Name_CRLF,
 
       '!' => Intern ("!"),
       '#' => Intern ("#"),
@@ -360,7 +362,7 @@ package body Pp.Scanner is
                Ignored_Prev := Token_At_Cursor (P);
 
                if Kind (P) = Spaces then
-                  pragma Assert (K not in EOL_Token | Spaces);
+                  pragma Assert (K not in Spaces);
                end if;
             end;
          end if;
@@ -370,7 +372,7 @@ package body Pp.Scanner is
               Length (X) = Text_Len);
          pragma Assert
            (if K in True_End_Of_Line then
-              Length (X) in 1 | 2 and then Text_Len = 1);
+              Length (X) in 1 | 2 and then Text_Len in 1 | 2);
          --  2 is for CR/LF
          if Check_Comment_Length and then K in Comment_Kind then
             declare
@@ -1174,12 +1176,16 @@ package body Pp.Scanner is
             if Cur = W_CR and then Buffers.Lookahead (Input) = W_LF then
                Get;
                CRLF_Seen := CRLF_Seen + 1;
+               Tok := (Kind => True_End_Of_Line_CRLF, Sloc => Tok.Sloc);
             elsif Cur = W_LF then
                LF_Seen := LF_Seen + 1;
+               Tok := (Kind => True_End_Of_Line_LF, Sloc => Tok.Sloc);
+            else
+               Tok := (Kind => True_End_Of_Line_CR, Sloc => Tok.Sloc);
             end if;
 
             Get;
-            Tok := (Kind => True_End_Of_Line, Sloc => Tok.Sloc);
+
             --  Might be ignored below
 
             Cur_Line := Cur_Line + 1;
@@ -1547,7 +1553,8 @@ package body Pp.Scanner is
                     when EOL_Token =>
                       Inp in [1 => W_LF] | [W_CR, W_LF]
                         | [1 => W_FF] | [1 => W_VT] | [1 => W_CR]
-                        and then Outp = [1 => NL],
+                      and then Outp in
+                        [1 => NL] | [1 => W_CR] | [W_CR, W_LF],
                     when Reserved_Word => To_Lower (Inp) = Outp,
                     when others => Inp = Outp);
             end;

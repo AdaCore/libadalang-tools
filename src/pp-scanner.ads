@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2012-2021, AdaCore                    --
+--                      Copyright (C) 2012-2022, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -75,7 +75,8 @@ package Pp.Scanner is
       End_Of_Input,
       Enabled_LB_Token, Disabled_LB_Token,
       Tab_Token,
-      False_End_Of_Line, True_End_Of_Line,
+      False_End_Of_Line, True_End_Of_Line_LF, True_End_Of_Line_CR,
+      True_End_Of_Line_CRLF,
       --  False_End_Of_Line and True_End_Of_Line are used only in Src_Tokns;
       --  the scanner produces these when scanning the source.
       --  A False_End_Of_Line follows a comment, and is merely a placeholder
@@ -217,6 +218,12 @@ package Pp.Scanner is
 
    subtype Comment_Kind is Token_Kind with
         Predicate => Comment_Kind in Whole_Line_Comment | End_Of_Line_Comment;
+
+   subtype True_End_Of_Line is Token_Kind with
+     Predicate => True_End_Of_Line in
+                    True_End_Of_Line_LF
+                      | True_End_Of_Line_CR
+                      | True_End_Of_Line_CRLF;
 
    subtype EOL_Token is Token_Kind with
      Predicate => EOL_Token in False_End_Of_Line | True_End_Of_Line;

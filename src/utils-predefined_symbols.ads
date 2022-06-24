@@ -128,7 +128,8 @@ package Utils.Predefined_Symbols is
    Name_Empty : constant Symbol := Intern ("");
    Name_NL    : constant Symbol :=
      W_Intern ([1 => Utils.String_Utilities.NL]);
-   Name_CRLF    : constant Symbol := Intern (ASCII.CR & ASCII.LF);
+   Name_CR    : constant Symbol := W_Intern ([1 => Utils.String_Utilities.CR]);
+   Name_CRLF  : constant Symbol := Intern (ASCII.CR & ASCII.LF);
 
    Name_Semicolon : constant Symbol := Intern (";");
    Name_L_Paren   : constant Symbol := Intern ("(");

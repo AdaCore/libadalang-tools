@@ -35,6 +35,7 @@ with Pp.Command_Lines; use Pp.Command_Lines;
 with Pp.Error_Slocs; use Pp.Error_Slocs;
 with Pp.Formatting; use Pp.Formatting;
 with Pp.Formatting.Dictionaries;
+with Pp.Scanner;
 with Pp.Scanner.Lines; use Pp.Scanner.Lines;
 
 with Ada.Directories; use Ada.Directories;
@@ -5296,11 +5297,11 @@ package body Pp.Actions is
    end Tree_To_Ada_2;
 
    procedure Format_Vector
-     (Cmd : Command_Line;
-      Input : Char_Vector;
-      Node : Ada_Node;
-      Output : out Char_Vector;
-      Messages : out Pp.Scanner.Source_Message_Vector;
+     (Cmd            : Command_Line;
+      Input          : Char_Vector;
+      Node           : Ada_Node;
+      Output         : out Char_Vector;
+      Messages       : out Pp.Scanner.Source_Message_Vector;
       Partial_Gnatpp : Boolean := False)
    is
       Partial : constant Boolean := Is_Empty (Input);
@@ -5355,7 +5356,9 @@ package body Pp.Actions is
          end if;
 
          Scanner.Get_Tokns
-           (Src_Buf, Src_Tokns, In_File_Format,
+           (Input               => Src_Buf,
+            Result              => Src_Tokns,
+            EOL_Format          => In_File_Format,
             Comments_Special_On => Arg (Cmd, Comments_Special));
          if Debug_Mode then
             Dbg_Out.Put ("Src_Tokens:\n");
@@ -5383,7 +5386,13 @@ package body Pp.Actions is
 
             Tree_To_Ada_2 (Node, Cmd, Partial, Partial_Gnatpp);
             Post_Tree_Phases
-              (Lines_Data'Access, Messages, Src_Buf, Cmd, Partial, Partial_Gnatpp);
+              (Input          => Input,
+               Lines_Data_P   => Lines_Data'Access,
+               Messages       => Messages,
+               Src_Buf        => Src_Buf,
+               Cmd            => Cmd,
+               Partial        => Partial,
+               Partial_Gnatpp => Partial_Gnatpp);
          end if;
       end Tree_To_Ada;
 
@@ -5595,8 +5604,11 @@ package body Pp.Actions is
    begin
       Clear (Src_Buf);
       Insert_Ada_Source
-        (Src_Buf, Elems (Input) (1 .. Last_Index (Input)),
-         Wide_Char_Encoding, Expand_Tabs => True);
+        (Buf                     => Src_Buf,
+         Input                   => Elems (Input) (1 .. Last_Index (Input)),
+         Wide_Character_Encoding => Wide_Char_Encoding,
+         Expand_Tabs             => True,
+         Include_Trailing_Spaces => False);
       --  Expand tabs unconditionally. This differs from the behavior of
       --  the old gnatpp, which has an option for that (but only for
       --  comments).

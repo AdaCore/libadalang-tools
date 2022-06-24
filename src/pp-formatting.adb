@@ -27,6 +27,7 @@ with Ada.Text_IO;
 
 with GNATCOLL.Paragraph_Filling;
 
+with Utils.Command_Lines.Common;
 with Utils.Err_Out;
 with Utils.Formatted_Output;
 with Utils.Generic_Formatted_Output;
@@ -96,12 +97,10 @@ package body Pp.Formatting is
       use Scanner;
    begin
       Next (Cur);
-      if Kind (Cur) = Spaces then
+      while Kind (Cur) = Spaces loop
          Next (Cur);
-
-         pragma Assert
-           (Kind (Cur) not in Enabled_LB_Token | EOL_Token | Spaces);
-      end if;
+      end loop;
+      pragma Assert (Kind (Cur) not in Spaces);
    end Next_ss;
 
    function Next_ss (Cur : Scanner.Tokn_Cursor) return Scanner.Tokn_Cursor is
@@ -247,13 +246,16 @@ package body Pp.Formatting is
       Src_Buf : in out Buffer;
       Cmd : Utils.Command_Lines.Command_Line);
    procedure Final_Check
-     (Lines_Data_P : Lines_Data_Ptr;
-      Src_Buf : in out Buffer;
-      Cmd : Utils.Command_Lines.Command_Line);
+     (Lines_Data_P   : Lines_Data_Ptr;
+      Src_Buf        : in out Buffer;
+      Cmd            : Utils.Command_Lines.Command_Line;
+      Pp_Off_Present : Boolean);
    --  Final pass: check that we have not damaged the input source text.
    --  except that comments are now included in Out_[Tokens|Buf], and this
    --  checks that they match the ones in Src_Tokns. Final_Check simply
    --  calls Final_Check_Helper, plus asserts that Out_Buf wasn't modified.
+   --  If Pp_Off_Present is True, then do not check for trailing spaces since
+   --  pp off regions are allowed to have them.
 
    --  The code in Final_Check[_Helper] is parallel to the code in
    --  Insert_Comments_And_Blank_Lines, so there's a bit of code duplication.
@@ -447,7 +449,7 @@ package body Pp.Formatting is
         (if Kind (Comment_Tok) in Whole_Line_Comment then
            Indentation'Length = Sloc_Col (Comment_Tok) - 1);
       First_Line_Prelude : constant W_Str :=
-          "--" & (1 .. Scanner.Leading_Blanks (Comment_Tok) => ' ');
+          "--" & [1 .. Scanner.Leading_Blanks (Comment_Tok) => ' '];
       --  String that precedes the comment Text (first line)
       Subsequent_Prelude : constant W_Str := Indentation & First_Line_Prelude;
       --  String that precedes subsequent line of the comment Text
@@ -552,7 +554,7 @@ package body Pp.Formatting is
 
    begin
       Append_Tokn (New_Tokns, Start_Of_Input);
-      Append_Tokn (New_Tokns, True_End_Of_Line);
+      Append_Tokn (New_Tokns, True_End_Of_Line_LF);
 
       while Kind (Cur_Tok) /= End_Of_Input loop
          if Kind (Cur_Tok) in Comment_Kind then
@@ -584,7 +586,7 @@ package body Pp.Formatting is
 
       Tokns_To_Buffer (Lines_Data.Out_Buf, New_Tokns, Cmd);
 
-      Final_Check (Lines_Data_P, Src_Buf, Cmd);
+      Final_Check (Lines_Data_P, Src_Buf, Cmd, False);
 
    end Do_Comments_Only;
 
@@ -610,10 +612,13 @@ package body Pp.Formatting is
    --  do this last so the FF doesn't get turned back into NL.
 
    procedure Copy_Pp_Off_Regions
-     (Src_Buf : in out Buffer;
-      Lines_Data_P : Lines_Data_Ptr;
+     (Input          : Char_Vector;
+      Lines_Data_P   : Lines_Data_Ptr;
       Pp_Off_Present : Boolean;
-      Cmd : Command_Line);
+      Cmd            : Command_Line);
+   --  Input is the the Char_Vector with the original source. This should
+   --  be an immaculate copy of the source file, since pp off regions should
+   --  not change at all.
    --  Out_Buf is fully formatted at this point, including regions where
    --  pretty printing is supposed to be turned off. This replaces those
    --  regions of Out_Buf with the corresponding regions of Src_Buf. Note
@@ -731,42 +736,34 @@ package body Pp.Formatting is
    end Insert_Form_Feeds_Helper;
 
    procedure Copy_Pp_Off_Regions_Helper
-     (Src_Buf : in out Buffer;
+     (Input        : Char_Vector;
       Lines_Data_P : Lines_Data_Ptr;
-      Cmd : Command_Line);
+      Cmd          : Command_Line);
 
    procedure Copy_Pp_Off_Regions
-     (Src_Buf : in out Buffer;
-      Lines_Data_P : Lines_Data_Ptr;
+     (Input          : Char_Vector;
+      Lines_Data_P   : Lines_Data_Ptr;
       Pp_Off_Present : Boolean;
-      Cmd : Command_Line) is
+      Cmd            : Command_Line) is
    begin
       --  Optimize by skipping this phase if there are no Pp_Off_Comments
       if Pp_Off_Present then
-         Copy_Pp_Off_Regions_Helper (Src_Buf, Lines_Data_P, Cmd);
+         Copy_Pp_Off_Regions_Helper (Input, Lines_Data_P, Cmd);
       end if;
    end Copy_Pp_Off_Regions;
 
    procedure Copy_Pp_Off_Regions_Helper
-     (Src_Buf : in out Buffer;
+     (Input        : Char_Vector;
       Lines_Data_P : Lines_Data_Ptr;
-      Cmd : Command_Line)
+      Cmd          : Command_Line)
    is
+      Src_Buf   : Buffer;
+
       Lines_Data : Lines_Data_Rec renames Lines_Data_P.all;
-      Out_Buf : Buffer renames Lines_Data.Out_Buf;
+      Out_Buf    : Buffer renames Lines_Data.Out_Buf;
+
       Src_Tokns : Scanner.Tokn_Vec renames Lines_Data.Src_Tokns;
       Out_Tokns : Scanner.Tokn_Vec renames Lines_Data.Out_Tokns;
-
-      --  The Src_Buf contains a sequence of zero or more OFF and ON
-      --  commands. The first must be OFF, then ON, then OFF and so on,
-      --  alternating. If that weren't true, we would have gotten an error in
-      --  Insert_Comments_And_Blank_Lines, in which case we don't get here.
-      --  The final End_Of_Input acts as an ON or OFF as appropriate.
-      --  The Out_Buf contains a corresponding sequence with the same
-      --  number of OFF's and ON's.
-
-      --  Pretty printing is ON between the beginning and the first OFF, then
-      --  OFF until the next ON, and so on.
 
       use Scanner;
 
@@ -775,7 +772,7 @@ package body Pp.Formatting is
       --  Buffer. This will be moved into Out_Buf when we are done.
 
       procedure Get_Next_Off_On
-        (Tok : in out Tokn_Cursor;
+        (Tok    : in out Tokn_Cursor;
          Expect : Pp_Off_On_Comment);
       --  Get the next OFF or ON (or End_Of_Input). The token itself is
       --  returned in Tok. Expect is purely for assertions; it alternates
@@ -799,13 +796,16 @@ package body Pp.Formatting is
       --  indentation preceding those is copied from Src_Buf.
 
       procedure Get_Next_Off_On
-        (Tok : in out Tokn_Cursor;
+        (Tok    : in out Tokn_Cursor;
          Expect : Pp_Off_On_Comment) is
       begin
          loop
             Next (Tok);
-            Error_Sloc := To_Langkit (Scanner.Sloc (Tok));
-            exit when Kind (Tok) in Pp_Off_On_Comment | End_Of_Input;
+            Error_Sloc :=
+              (if Kind (Tok) in End_Of_Input then
+                 Slocs.No_Source_Location
+               else To_Langkit (Scanner.Sloc (Tok)));
+            exit when Kind (Tok) in Expect | End_Of_Input;
          end loop;
          pragma Assert (Kind (Tok) in Expect | End_Of_Input);
          pragma Assert
@@ -839,12 +839,51 @@ package body Pp.Formatting is
         (Out_Buf, Out_Tokns,
          Comments_Special_On => Arg (Cmd, Comments_Special));
 
-      Src_Tok : Tokn_Cursor := First (Src_Tokns'Access);
+      Src_Tok : Tokn_Cursor;
       Out_Tok : Tokn_Cursor := First (Out_Tokns'Access);
 
    --  Start of processing for Copy_Pp_Off_Regions_Helper
 
    begin
+      Clear (Src_Tokns);
+
+      --  UA21-003 : Fill Src_Buf with Input's content, including the trailing
+      --  spaces since trailing spaces in pp off regions should be kept.
+
+      Insert_Ada_Source
+        (Buf                     => Src_Buf,
+         Input                   =>
+           Utils.Char_Vectors.Char_Vectors.Elems
+             (Input) (1 .. Utils.Char_Vectors.Char_Vectors.Last_Index (Input)),
+         Wide_Character_Encoding =>
+           Utils.Command_Lines.Common.Wide_Character_Encoding (Cmd),
+         Expand_Tabs             => True,
+         Include_Trailing_Spaces => True);
+
+      --  The Src_Buf contains a sequence of zero or more OFF and ON
+      --  commands. The first must be OFF, then ON, then OFF and so on,
+      --  alternating. If that weren't true, we would have gotten an error in
+      --  Insert_Comments_And_Blank_Lines, in which case we don't get here.
+      --  The final End_Of_Input acts as an ON or OFF as appropriate.
+      --  The Out_Buf contains a corresponding sequence with the same
+      --  number of OFF's and ON's.
+
+      --  Pretty printing is ON between the beginning and the first OFF, then
+      --  OFF until the next ON, and so on.
+
+      Reset (Src_Buf);
+
+      --  Create a token vector out of the source buffer. This vector will
+      --  include trailing Space tokens.
+
+      Ignored :=
+        Get_Tokns
+          (Input               => Src_Buf,
+           Result              => Src_Tokns,
+           Comments_Special_On => Arg (Cmd, Comments_Special));
+
+      Src_Tok := First (Src_Tokns'Access);
+
       --  When we see an OFF, we want to copy/ignore starting at the
       --  beginning of the line on which the OFF appears, which is the
       --  Prev. For an ON, we ignore the Prev.
@@ -869,20 +908,20 @@ package body Pp.Formatting is
          Copy (Out_Buf, Up_To => Next_Sloc_First (Prev (Out_Tok)));
          Skip (Src_Buf, Up_To => Next_Sloc_First (Prev (Src_Tok)));
 
-         pragma Assert
-           ((Kind (Out_Tok) = End_Of_Input) = (Kind (Src_Tok) = End_Of_Input));
-         exit when Kind (Out_Tok) = End_Of_Input;
+         exit when Kind (Src_Tok) = End_Of_Input;
 
          Indent_Pp_Off (Src_Tok, Out_Tok);
 
-         Get_Next_Off_On (Src_Tok, Expect => Pp_On_Comment);
          Get_Next_Off_On (Out_Tok, Expect => Pp_On_Comment);
-         Copy (Src_Buf, Up_To => Next_Sloc_First (Src_Tok));
-         Skip (Out_Buf, Up_To => Next_Sloc_First (Out_Tok));
+         Get_Next_Off_On (Src_Tok, Expect => Pp_On_Comment);
+         Copy (Src_Buf, Up_To => Next_Sloc_First (Prev (Src_Tok)));
+         Skip (Out_Buf, Up_To => Next_Sloc_First (Prev (Out_Tok)));
 
+         --  Make sure we reach the end of both token vector at the same time
          pragma Assert
            ((Kind (Out_Tok) = End_Of_Input) = (Kind (Src_Tok) = End_Of_Input));
-         exit when Kind (Out_Tok) = End_Of_Input;
+
+         exit when Kind (Src_Tok) = End_Of_Input;
       end loop;
 
       Reset (Src_Buf);
@@ -942,11 +981,12 @@ package body Pp.Formatting is
    end Tok_Phases;
 
    procedure Post_Tree_Phases
-     (Lines_Data_P : Lines_Data_Ptr;
-      Messages : out Scanner.Source_Message_Vector;
-      Src_Buf : in out Buffer;
-      Cmd : Command_Line;
-      Partial : Boolean;
+     (Input          : Char_Vector;
+      Lines_Data_P   : Lines_Data_Ptr;
+      Messages       : out Scanner.Source_Message_Vector;
+      Src_Buf        : in out Buffer;
+      Cmd            : Command_Line;
+      Partial        : Boolean;
       Partial_Gnatpp : Boolean := False)
    is
       Lines_Data : Lines_Data_Rec renames Lines_Data_P.all;
@@ -990,13 +1030,13 @@ package body Pp.Formatting is
 
          Keyword_Casing (Lines_Data_P, Cmd);
          Insert_Form_Feeds (Lines_Data_P, Cmd);
-         Copy_Pp_Off_Regions (Src_Buf, Lines_Data_P, Pp_Off_Present, Cmd);
+         Copy_Pp_Off_Regions (Input, Lines_Data_P, Pp_Off_Present, Cmd);
 
          --  The following pass doesn't modify anything; it just checks that
          --  the sequence of tokens we have constructed matches the original
          --  source code (with some allowed exceptions).
 
-         Final_Check (Lines_Data_P, Src_Buf, Cmd);
+         Final_Check (Lines_Data_P, Src_Buf, Cmd, Pp_Off_Present);
 
       else
          --  Actions only in partial gnatpp mode. Final_Check is omitted
@@ -1076,6 +1116,10 @@ package body Pp.Formatting is
 
       raise Token_Mismatch;
    end Raise_Token_Mismatch;
+
+   ------------------------
+   -- Final_Check_Helper --
+   ------------------------
 
    procedure Final_Check_Helper
      (Lines_Data_P : Lines_Data_Ptr;
@@ -1384,10 +1428,15 @@ package body Pp.Formatting is
       Clear (Out_Tokns);
    end Final_Check_Helper;
 
+   -----------------
+   -- Final_Check --
+   -----------------
+
    procedure Final_Check
-     (Lines_Data_P : Lines_Data_Ptr;
-      Src_Buf : in out Buffer;
-      Cmd : Utils.Command_Lines.Command_Line)
+     (Lines_Data_P   : Lines_Data_Ptr;
+      Src_Buf        : in out Buffer;
+      Cmd            : Utils.Command_Lines.Command_Line;
+      Pp_Off_Present : Boolean)
    is
       Lines_Data : Lines_Data_Rec renames Lines_Data_P.all;
    begin
@@ -1410,7 +1459,11 @@ package body Pp.Formatting is
                  To_Vector (Lines_Data.Out_Buf);
             begin
                pragma Assert (Out_Buf = Old_Out_Buf);
-               pragma Debug (Assert_No_Trailing_Blanks (Out_Buf));
+
+               --  There might exist trailing spaces in pp off regions
+               if not Pp_Off_Present then
+                  pragma Debug (Assert_No_Trailing_Blanks (Out_Buf));
+               end if;
             end;
          end;
 
@@ -2474,12 +2527,12 @@ package body Pp.Formatting is
          begin
             return
               Kind (Src_Tok) in Other_Whole_Line_Comment | Fillable_Comment
-              and then Kind (Prev_ss (Src_Tok)) = True_End_Of_Line
+              and then Kind (Prev_ss (Src_Tok)) in True_End_Of_Line
               and then
                 (Kind (Prev (Prev_ss (Src_Tok))) in  ',' | Res_Is
                  or else Kind (Prev (Prev_ss (Src_Tok))) = End_Of_Line_Comment
                  or else
-                   (Kind (Prev (Prev_ss (Src_Tok))) = True_End_Of_Line
+                   (Kind (Prev (Prev_ss (Src_Tok))) in True_End_Of_Line
                     and then
                     Kind (Prev
                           (Prev (Prev_ss (Src_Tok)))) = End_Of_Line_Comment));
@@ -3543,8 +3596,8 @@ package body Pp.Formatting is
                elsif Arg (Cmd, Source_Line_Breaks)
                  and then not Partial_Gnatpp
                  and then
-                   ((Kind (Src_Tok) = True_End_Of_Line
-                     and then Kind (Prev (Src_Tok)) = True_End_Of_Line
+                   ((Kind (Src_Tok) in True_End_Of_Line
+                     and then Kind (Prev (Src_Tok)) in True_End_Of_Line
                      and then Kind (Prev (Prev (Src_Tok))) in
                        Other_Whole_Line_Comment | Fillable_Comment
                      and then Kind (Next_ss (Src_Tok)) = Kind (New_Tok)
@@ -3554,12 +3607,11 @@ package body Pp.Formatting is
                       (Kind (Src_Tok) = Kind (New_Tok)
                        and then
                          ((Kind (Prev (Prev (Src_Tok))) =
-                               Other_Whole_Line_Comment
-                           and then Kind (Prev (Prev (Prev (Src_Tok)))) =
-
+                             Other_Whole_Line_Comment
+                           and then Kind (Prev (Prev (Prev (Src_Tok)))) in
                              True_End_Of_Line)
                           or else
-                            (Kind (Prev (Prev (Src_Tok))) = True_End_Of_Line
+                            (Kind (Prev (Prev (Src_Tok))) in True_End_Of_Line
                              and then Kind (Prev (Prev (Prev (Src_Tok)))) =
                                Fillable_Comment))
                        and then Kind (Next_ss (Src_Tok)) in Ident | ',' | ')'
@@ -3567,7 +3619,7 @@ package body Pp.Formatting is
                        and then Kind (Prev (Prev (Prev (New_Tok)))) in
                          Res_Is | ',')
                     or else
-                      (Kind (Src_Tok) = True_End_Of_Line
+                      (Kind (Src_Tok) in True_End_Of_Line
                        and then Kind (Prev (Prev (Src_Tok))) in
                            Other_Whole_Line_Comment | Fillable_Comment
                        and then Kind (Prev (Prev (Prev (Src_Tok)))) in
@@ -3578,7 +3630,7 @@ package body Pp.Formatting is
                        and then Kind (Prev (Prev (Prev (New_Tok)))) in
                          Res_Is | ',')
                     or else
-                      (Kind (Src_Tok) = True_End_Of_Line
+                      (Kind (Src_Tok) in True_End_Of_Line
                        and then Kind (Prev (Prev (Src_Tok))) =
                            Fillable_Comment
                        and then Kind (Prev (Prev (Prev (Src_Tok)))) = Spaces
@@ -3588,11 +3640,11 @@ package body Pp.Formatting is
                        and then Kind (Prev (Prev (Prev (New_Tok)))) =
                          Disabled_LB_Token)
                     or else
-                      (Kind (Src_Tok) = True_End_Of_Line
+                      (Kind (Src_Tok) in True_End_Of_Line
                        and then Kind (Prev (Prev (Src_Tok))) =
                            Other_Whole_Line_Comment
-                       and then Kind (Prev (Prev (Prev (Src_Tok)))) =
-                         True_End_Of_Line
+                       and then Kind (Prev (Prev (Prev (Src_Tok)))) in
+                                  True_End_Of_Line
                        and then Kind (New_Tok) = Res_Then
                        and then Kind (New_Tok) = Kind (Next_ss (Src_Tok))
                        and then Kind (Prev (Prev (New_Tok))) = Disabled_LB_Token
@@ -4140,10 +4192,11 @@ package body Pp.Formatting is
                     and then (Kind (Prev (Prev (Prev (New_Tok)))) = ','
                               or else Kind (Prev (Prev (Prev (New_Tok)))) = ';')
                     and then not
-                      (Kind (Prev_ss (Src_Tok)) = True_End_Of_Line
+                      (Kind (Prev_ss (Src_Tok)) in True_End_Of_Line
                        and then
                          (Kind (Prev (Prev_ss (Src_Tok))) = End_Of_Line_Comment
-                          or (Kind (Prev (Prev_ss (Src_Tok))) = True_End_Of_Line
+                          or (Kind (Prev (Prev_ss (Src_Tok))) in
+                                True_End_Of_Line
                               and
                                 (not After_Last (Prev (Prev_ss (Src_Tok)))
                                  and then

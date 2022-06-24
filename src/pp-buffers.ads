@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2013-2021, AdaCore                    --
+--                      Copyright (C) 2013-2022, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -94,10 +94,6 @@ package Pp.Buffers is
    pragma Inline (Cur);
    --  Return the character at 'point'. NUL if At_End.
 
-   function Cur_Column (Buf : Buffer) return Positive;
-   pragma Inline (Cur_Column);
-   --  Column number in which the Cur character appears
-
    function Lookahead (Buf : Buffer; Offset : Positive := 1) return W_Char;
    --  Return the character at 'point' + Offset. NUL if out of range.
 
@@ -152,15 +148,7 @@ package Pp.Buffers is
    procedure Insert_NL (Buf : in out Buffer);
    --  Same as Insert_Any (Buf, NL)
 
-   procedure Append (Buf : in out Buffer; C : W_Char);
-   procedure Append (Buf : in out Buffer; S : W_Str);
    procedure Append_Any (Buf : in out Buffer; C : W_Char);
-   procedure Append_Any (Buf : in out Buffer; S : W_Str);
-   procedure Append_NL (Buf : in out Buffer);
-   --  Above are the same as Insert*, except that they may be slightly more
-   --  efficient, but they only work when inserting at the end of the buffer.
-   --  ???Actually, we should probably get rid of these; they probably don't
-   --  do any good.
 
    procedure Replace_Cur (Buf : in out Buffer; C : W_Char);
    --  Replace character at 'point' with C
@@ -226,19 +214,24 @@ package Pp.Buffers is
    --  less than or equal
 
    procedure Insert_Ada_Source
-     (Buf         : in out Buffer;
-      Input       : String;
+     (Buf                     : in out Buffer;
+      Input                   : String;
       Wide_Character_Encoding : System.WCh_Con.WC_Encoding_Method;
-      Expand_Tabs : Boolean := False);
+      Expand_Tabs             : Boolean := False;
+      Include_Trailing_Spaces : Boolean := False);
    procedure Read_Ada_File
-     (Buf         : in out Buffer;
-      File_Name   : String;
+     (Buf                     : in out Buffer;
+      File_Name               : String;
       Wide_Character_Encoding : System.WCh_Con.WC_Encoding_Method :=
         System.WCh_Con.WCEM_Brackets;
-      BOM_Seen    : out Boolean;
-      Expand_Tabs : Boolean := False);
+      BOM_Seen                : out Boolean;
+      Expand_Tabs             : Boolean := False;
+      Include_Trailing_Spaces : Boolean := False);
    --  Read an Ada source file into Buf. BOM_Seen is set to True if a UTF8_All
    --  BOM was seen; False otherwise.
+   --  If Include_Trailing_Spaces, trailing spaces (those for which
+   --  Is_Space (C) is True) are added to Buf. Otherwise, they're ignored and
+   --  not added to Buf.
 
    procedure Move (Target, Source : in out Buffer);
 

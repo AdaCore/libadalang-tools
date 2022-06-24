@@ -113,6 +113,6 @@ install-bin-strip:
 
 .PHONY: clean
 clean:
-	rm -rf obj bin
+	rm -rf obj bin lib
 	rm -rf testsuite/ada_drivers/bin
 	rm -rf testsuite/ada_drivers/**/obj

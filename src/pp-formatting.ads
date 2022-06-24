@@ -279,12 +279,15 @@ package Pp.Formatting is
    --  pretty-printing passes, and just formats comments.
 
    procedure Post_Tree_Phases
-     (Lines_Data_P : Lines_Data_Ptr;
-      Messages : out Scanner.Source_Message_Vector;
-      Src_Buf : in out Buffer;
-      Cmd : Utils.Command_Lines.Command_Line;
-      Partial : Boolean;
+     (Input          : Char_Vector;
+      Lines_Data_P   : Lines_Data_Ptr;
+      Messages       : out Scanner.Source_Message_Vector;
+      Src_Buf        : in out Buffer;
+      Cmd            : Utils.Command_Lines.Command_Line;
+      Partial        : Boolean;
       Partial_Gnatpp : Boolean := False);
+   --  Input is the original source without any processing. This is needed
+   --  for copying the pp off regions.
    --  The first pretty-printing pass walks the tree and produces text,
    --  along with various tables. This performs the remaining passes, which
    --  do not make use of the tree.

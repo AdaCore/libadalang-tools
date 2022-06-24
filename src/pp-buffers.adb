@@ -43,8 +43,13 @@ package body Pp.Buffers is
    procedure Maybe_Adjust_Marker (Buf : in out Buffer);
    --  See comment in Insert
 
-   procedure Insert_Ada (Buf : in out Buffer; C : W_Char);
-   --  Same as Insert_Any, except we don't need to call Maybe_Adjust_Marker
+   procedure Insert_Ada
+     (Buf                     : in out Buffer;
+      C                       : W_Char;
+      Include_Trailing_Spaces : Boolean := False);
+   --  Same as Insert_Any, except we don't need to call Maybe_Adjust_Marker.
+   --  If Include_Trailing_Spaces, trailing spaces (those for which
+   --  Is_Space (C) is True) are added to Buf.
 
    function Valid_From (Buf : Buffer) return W_Str;
    --  Return the valid portion of Buf.From
@@ -140,14 +145,6 @@ package body Pp.Buffers is
             else Result = Buf.From (Buf.From_First));
       end return;
    end Cur;
-
-   function Cur_Column (Buf : Buffer) return Positive is
-      pragma Assert (False); -- ???Not currently used.
-   --  All adjustments of Cur_Column are commented out, except when inserting
-   --  Ada source code.
-   begin
-      return Buf.Cur_Column;
-   end Cur_Column;
 
    procedure Delete_Char (Buf : in out Buffer) is
       From_First : constant Positive := Buf.From_First + 1;
@@ -410,11 +407,6 @@ package body Pp.Buffers is
       pragma Assert (C /= W_HT);
    begin
       Maybe_Adjust_Marker (Buf);
-
-      pragma Assert -- no trailing blanks allowed
-        (if Is_Line_Terminator (C) then
-          (Is_Empty (Buf.To) or else Last_Element (Buf.To) /= ' '));
-
       Append (Buf.To, C);
    end Insert_Any;
 
@@ -428,67 +420,17 @@ package body Pp.Buffers is
    procedure Insert_NL (Buf : in out Buffer) is
    begin
       Maybe_Adjust_Marker (Buf);
-
-      pragma Assert (Is_Empty (Buf.To) or else Last_Element (Buf.To) /= ' ');
-      --  no trailing blanks allowed
-
       Append (Buf.To, NL);
    end Insert_NL;
-
-   procedure Append (Buf : in out Buffer; C : W_Char) is
-      pragma Assert (False); -- not currently used
-      pragma Assert (At_End (Buf));
-      pragma Assert (not Is_Line_Terminator (C));
-      pragma Assert (C /= W_HT);
-   begin
-      Maybe_Adjust_Marker (Buf);
-      Append (Buf.To, C);
-
-      pragma Assert (At_End (Buf));
-   end Append;
-
-   procedure Append (Buf : in out Buffer; S : W_Str) is
-      pragma Assert (False); -- not currently used
-   begin
-      for C of S loop
-         Append (Buf, C);
-      end loop;
-   end Append;
 
    procedure Append_Any (Buf : in out Buffer; C : W_Char) is
       pragma Assert (At_End (Buf));
       pragma Assert (C /= W_HT);
    begin
       Maybe_Adjust_Marker (Buf);
-
-      pragma Assert -- no trailing blanks allowed
-        (if Is_Line_Terminator (C) then
-          (Is_Empty (Buf.To) or else Last_Element (Buf.To) /= ' '));
-
       Append (Buf.To, C);
       pragma Assert (At_End (Buf));
    end Append_Any;
-
-   procedure Append_Any (Buf : in out Buffer; S : W_Str) is
-      pragma Assert (False); -- not currently used
-   begin
-      for C of S loop
-         Append_Any (Buf, C);
-      end loop;
-   end Append_Any;
-
-   procedure Append_NL (Buf : in out Buffer) is
-      pragma Assert (False); -- not currently used
-      pragma Assert (At_End (Buf));
-   begin
-      Maybe_Adjust_Marker (Buf);
-
-      pragma Assert (Is_Empty (Buf.To) or else Last_Element (Buf.To) /= ' ');
-      --  no trailing blanks allowed
-
-      Append (Buf.To, NL);
-      pragma Assert (At_End (Buf));
-   end Append_NL;
 
    function Is_Empty (Buf : Buffer) return Boolean is
    begin
@@ -601,34 +543,46 @@ package body Pp.Buffers is
       end if;
    end Position;
 
-   procedure Insert_Ada (Buf : in out Buffer; C : W_Char) is
+   procedure Insert_Ada
+     (Buf                     : in out Buffer;
+      C                       : W_Char;
+      Include_Trailing_Spaces : Boolean := False)
+   is
       pragma Assert (C /= W_HT);
    begin
       pragma Assert (At_End (Buf));
       pragma Assert
         (Is_Empty (Buf.To_Markers) and then Is_Empty (Buf.From_Markers));
 
-      if Is_Line_Terminator (C) then
-         Buf.Cur_Column := 1;
-
-         --  Delete trailing blanks at end of line. There are no markers to
-         --  worry about here.
-
-         while not Is_Empty (Buf.To) and then Is_Space (Last_Element (Buf.To))
-         loop
-            Delete_Last (Buf.To);
-         end loop;
-      else
+      if Include_Trailing_Spaces then
          Buf.Cur_Column := Buf.Cur_Column + 1;
+
+      else
+         if Is_Line_Terminator (C) then
+            Buf.Cur_Column := 1;
+
+            --  Delete trailing blanks at end of line. There are no markers to
+            --  worry about here.
+
+            while not Is_Empty (Buf.To)
+              and then Is_Space (Last_Element (Buf.To))
+            loop
+               Delete_Last (Buf.To);
+            end loop;
+         else
+            Buf.Cur_Column := Buf.Cur_Column + 1;
+         end if;
       end if;
+
       Append (Buf.To, C);
    end Insert_Ada;
 
    procedure Insert_Ada_Source
-     (Buf         : in out Buffer;
-      Input       : String;
+     (Buf                     : in out Buffer;
+      Input                   : String;
       Wide_Character_Encoding : System.WCh_Con.WC_Encoding_Method;
-      Expand_Tabs : Boolean := False)
+      Expand_Tabs             : Boolean := False;
+      Include_Trailing_Spaces : Boolean := False)
    is
       pragma Assert (Expand_Tabs);
 
@@ -726,29 +680,30 @@ package body Pp.Buffers is
 
          if C = W_HT and then Expand_Tabs then
             loop
-               Insert_Ada (Buf, ' ');
+               Insert_Ada (Buf, ' ', Include_Trailing_Spaces);
                exit when Buf.Cur_Column mod Tab_Len = 1;
             end loop;
          elsif Is_Space (C) then
-            Insert_Ada (Buf, ' ');
+            Insert_Ada (Buf, ' ', Include_Trailing_Spaces);
          else
-            Insert_Ada (Buf, C);
+            Insert_Ada (Buf, C, Include_Trailing_Spaces);
          end if;
       end loop;
 
       --  Make sure last line is terminated by NL
       if C /= NL then
-         Insert_Ada (Buf, NL);
+         Insert_Ada (Buf, NL, Include_Trailing_Spaces);
       end if;
    end Insert_Ada_Source;
 
    procedure Read_Ada_File
-     (Buf         : in out Buffer;
-      File_Name   : String;
+     (Buf                     : in out Buffer;
+      File_Name               : String;
       Wide_Character_Encoding : System.WCh_Con.WC_Encoding_Method :=
         System.WCh_Con.WCEM_Brackets;
-      BOM_Seen    : out Boolean;
-      Expand_Tabs : Boolean := False)
+      BOM_Seen                : out Boolean;
+      Expand_Tabs             : Boolean := False;
+      Include_Trailing_Spaces : Boolean := False)
    is
       --  We read the file into a String, and convert to wide characters
       --  according to the encoding method.
@@ -782,8 +737,12 @@ package body Pp.Buffers is
          BOM_Seen := False;
       end if;
 
-      Insert_Ada_Source (Buf, Input (First .. Input'Last),
-                         Wide_Character_Encoding, Expand_Tabs);
+      Insert_Ada_Source
+        (Buf                     => Buf,
+         Input                   => Input (First .. Input'Last),
+         Wide_Character_Encoding => Wide_Character_Encoding,
+         Expand_Tabs             => Expand_Tabs,
+         Include_Trailing_Spaces => Include_Trailing_Spaces);
 
       Free (Input);
       Reset (Buf);

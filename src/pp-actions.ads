@@ -33,11 +33,11 @@ package Pp.Actions is
    type Pp_Tool is new Tool_State with private;
 
    procedure Format_Vector
-     (Cmd : Command_Line;
-      Input : Char_Vector;
-      Node : Ada_Node;
-      Output : out Char_Vector;
-      Messages : out Pp.Scanner.Source_Message_Vector;
+     (Cmd            : Command_Line;
+      Input          : Char_Vector;
+      Node           : Ada_Node;
+      Output         : out Char_Vector;
+      Messages       : out Pp.Scanner.Source_Message_Vector;
       Partial_Gnatpp : Boolean := False) with
      Pre => Pp.Scanner.Source_Message_Vectors.Is_Empty (Messages);
    --  This pretty prints the given source. Parameters:
