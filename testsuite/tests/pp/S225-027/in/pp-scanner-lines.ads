@@ -31,10 +31,10 @@ package Pp.Scanner.Lines is
 
    function Line_Break_Token_Index
      (X : Tokn_Cursor) return Line_Break_Index with
-      Pre => Kind (X) in Line_Break_Token;
+     Pre => Kind (X) in Line_Break_Token;
 
    function Tab_Token_Index (X : Tokn_Cursor) return Tab_Index with
-      Pre => Kind (X) in Tab_Token;
+     Pre => Kind (X) in Tab_Token;
 
    procedure Append_Line_Break_Tokn
      (V   : in out Tokn_Vec; Enabled : Boolean; Index : Line_Break_Index;
@@ -45,6 +45,6 @@ package Pp.Scanner.Lines is
       Org :        String := "Append_Tab_Tokn");
 
    procedure Put_Index_Info (All_LB : Line_Break_Vector; X : Tokn_Cursor) with
-      Pre => Kind (X) in Line_Break_Token | Tab_Token;
+     Pre => Kind (X) in Line_Break_Token | Tab_Token;
 
 end Pp.Scanner.Lines;

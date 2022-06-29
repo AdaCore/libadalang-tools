@@ -223,7 +223,7 @@ package body Pp.Scanner is
      (Decode
         (X.V.Octets,
          Next (X.V.Octets, Next (X.V.Octets, Next (X.V.Octets, X.Oc))))) with
-      Pre => Kind (X) in Whole_Line_Comment;
+     Pre => Kind (X) in Whole_Line_Comment;
 
    function Last_Line_Len (X : Tokn_Cursor) return Positive is
      (Decode
@@ -232,7 +232,7 @@ package body Pp.Scanner is
            (X.V.Octets,
             Next
               (X.V.Octets, Next (X.V.Octets, Next (X.V.Octets, X.Oc)))))) with
-      Pre => Kind (X) in Whole_Line_Comment;
+     Pre => Kind (X) in Whole_Line_Comment;
 
    function Index (X : Tokn_Cursor) return Positive is
    begin
@@ -864,11 +864,11 @@ package body Pp.Scanner is
       --  we are collecting fillable comments into a single comment paragraph,
       --  we set Allow_Short_Fillable to False for the first comment line, and
       --  True for subsequent lines, so only the first line can be "too short".
-         --
-         --  Tok.Sloc has already been set before calling this.
+      --
+      --  Tok.Sloc has already been set before calling this.
 
       procedure Collect_Comment_Paragraph (Tok : in out Token) with
-         Pre => Tok.Kind = Fillable_Comment;
+        Pre => Tok.Kind = Fillable_Comment;
       --  Collect series of Fillable_Comment into comment "paragraphs" that
       --  will be filled if the appropriate command-line option was given.
 

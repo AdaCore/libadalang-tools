@@ -54,17 +54,17 @@ package LAL_Extensions is
    --  Text of a token. The L_Token_Text is converted to lower case.
 
    function Id_Name (Nm : Ada_Node'Class) return W_Str with
-      Pre => Kind (Nm) in Ada_Defining_Name | Ada_Identifier |
+     Pre => Kind (Nm) in Ada_Defining_Name | Ada_Identifier |
           Ada_Int_Literal | Ada_Real_Literal | Ada_String_Literal |
           Ada_Char_Literal;
    function L_Name (Nm : Ada_Node'Class) return W_Str with
-      Pre => Kind (Nm) in Ada_Defining_Name | Ada_Identifier |
+     Pre => Kind (Nm) in Ada_Defining_Name | Ada_Identifier |
           Ada_String_Literal;
    --  Text name of an identifier. The L_Name is converted to lower
    --  case.
 
    function Label_Name (L : Ada_Node'Class) return W_Str with
-      Pre => Kind (L) = Ada_Label;
+     Pre => Kind (L) = Ada_Label;
 
    function Full_Name (Nm : Name) return W_Str;
    function L_Full_Name (Nm : Name) return W_Str;

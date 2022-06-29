@@ -175,13 +175,13 @@ package Pp.Scanner is
       Res_Some);
 
    subtype Token_Kind is Opt_Token_Kind with
-        Predicate => Token_Kind /= Nil;
+       Predicate => Token_Kind /= Nil;
 
    subtype Other_Lexeme is Token_Kind range '!' .. Colon_Equal;
 
    subtype Reserved_Word is Token_Kind range Res_Abort .. Res_Some;
    subtype Reserved_Word_Or_Id is Token_Kind with
-        Predicate => Reserved_Word_Or_Id in Ident | Reserved_Word;
+       Predicate => Reserved_Word_Or_Id in Ident | Reserved_Word;
    subtype Reserved_Word_83 is Token_Kind range Res_Abort .. Res_Xor;
    subtype Reserved_Word_95 is Token_Kind range Res_Abort .. Res_Tagged;
    subtype Reserved_Word_2005 is
@@ -189,20 +189,20 @@ package Pp.Scanner is
    subtype Reserved_Word_2012 is Token_Kind range Res_Abort .. Res_Some;
 
    subtype Whole_Line_Comment is Token_Kind with
-        Predicate => Whole_Line_Comment in Pp_Off_Comment | Pp_On_Comment |
+       Predicate => Whole_Line_Comment in Pp_Off_Comment | Pp_On_Comment |
             Special_Comment | Fillable_Comment | Other_Whole_Line_Comment;
 
    subtype Comment_Kind is Token_Kind with
-        Predicate => Comment_Kind in Whole_Line_Comment | End_Of_Line_Comment;
+       Predicate => Comment_Kind in Whole_Line_Comment | End_Of_Line_Comment;
 
    subtype EOL_Token is Token_Kind with
-        Predicate => EOL_Token in False_End_Of_Line | True_End_Of_Line;
+       Predicate => EOL_Token in False_End_Of_Line | True_End_Of_Line;
 
    subtype Line_Break_Token is Token_Kind with
-        Predicate => Line_Break_Token in Enabled_LB_Token | Disabled_LB_Token;
+       Predicate => Line_Break_Token in Enabled_LB_Token | Disabled_LB_Token;
 
    subtype Pp_Off_On_Comment is Token_Kind with
-        Predicate => Pp_Off_On_Comment in Pp_Off_Comment | Pp_On_Comment;
+       Predicate => Pp_Off_On_Comment in Pp_Off_Comment | Pp_On_Comment;
 
    subtype Same_Text_Kind is Opt_Token_Kind range Start_Of_Input .. Res_Some;
    --  These are the tokens that always have the same text associated with
@@ -211,7 +211,7 @@ package Pp.Scanner is
    --  below. Example: Every Less_Or_Equal token has the text "<=".
 
    subtype Stored_Text_Kind is Token_Kind with
-        Predicate => Stored_Text_Kind not in Same_Text_Kind;
+       Predicate => Stored_Text_Kind not in Same_Text_Kind;
    --  These are the tokens that have different text.
    --  The token text is stored separately for each token.
    --  Example: Ident -- one might have text = "Foo",
@@ -324,27 +324,27 @@ package Pp.Scanner is
    function Text (X : Tokn_Cursor) return Syms.Symbol;
    --  The text of the token as it appears in the source, with these
    --  exceptions and clarifications:
-      --
-      --  Start_Of_Input and End_Of_Input have Text = "".
-      --
-      --  EOL_Token have Text equal to a single LF character, even if it is
-      --  CR,LF in the input.
-      --
-      --  For comments, the text of the comment excluding the initial "--"
-      --  and leading and trailing blanks, and followed by an extra NL. For
-      --  multi-line comment "paragraphs", used for filling, NL terminates each
-      --  line. The NL at the end isn't really part of the comment; the next
-      --  token in the stream will be EOL_Token. The reason for the extra NL
-      --  is that GNATCOLL.Paragraph_Filling expects it, so it's simpler and
-      --  more efficient this way.
+   --
+   --  Start_Of_Input and End_Of_Input have Text = "".
+   --
+   --  EOL_Token have Text equal to a single LF character, even if it is
+   --  CR,LF in the input.
+   --
+   --  For comments, the text of the comment excluding the initial "--"
+   --  and leading and trailing blanks, and followed by an extra NL. For
+   --  multi-line comment "paragraphs", used for filling, NL terminates each
+   --  line. The NL at the end isn't really part of the comment; the next
+   --  token in the stream will be EOL_Token. The reason for the extra NL
+   --  is that GNATCOLL.Paragraph_Filling expects it, so it's simpler and
+   --  more efficient this way.
 
    function Leading_Blanks (X : Tokn_Cursor) return Natural with
-      Pre => Kind (X) in Comment_Kind;
+     Pre => Kind (X) in Comment_Kind;
    --  The number of leading blanks, which are blanks after the initial "--"
    --  and before any nonblank characters.
 
    function Width (X : Tokn_Cursor) return Positive with
-      Pre => Kind (X) in Whole_Line_Comment;
+     Pre => Kind (X) in Whole_Line_Comment;
    --  For single-line Whole_Line_Comments, this is the width of the token,
    --  i.e. the same as Sloc.Last-Sloc.First+1, and the same as the length of
    --  Text. For multi-line comments, this is the width of the widest line.
@@ -352,9 +352,9 @@ package Pp.Scanner is
    --  not.
 
    function Token_Output_Len (X : Token) return Positive with
-      Pre => X.Kind in Comment_Kind;
+     Pre => X.Kind in Comment_Kind;
    function Token_Output_Len (X : Tokn_Cursor) return Positive with
-      Pre => Kind (X) in Comment_Kind;
+     Pre => Kind (X) in Comment_Kind;
    --  Returns the length of the comment as it will appear in the output. For
    --  fillable comment paragraphs, this uses Sloc_Col as the indentation. The
    --  comment is assumed to start at the initial "--" and go to the end of the
@@ -394,9 +394,9 @@ package Pp.Scanner is
        and then Kind (Prev (X)) in Enabled_LB_Token));
 
    subtype Nonlexeme_Kind is Opt_Token_Kind with
-        Predicate => Nonlexeme_Kind in EOL_Token | Spaces | Comment_Kind;
+       Predicate => Nonlexeme_Kind in EOL_Token | Spaces | Comment_Kind;
    subtype Lexeme_Kind is Opt_Token_Kind with
-        Predicate => Lexeme_Kind not in Nonlexeme_Kind;
+       Predicate => Lexeme_Kind not in Nonlexeme_Kind;
 
    function Next_Lexeme (Cur : Tokn_Cursor) return Tokn_Cursor;
    --  Returns the next token after Cur that is not EOL_Token, Spaces, or
@@ -434,7 +434,7 @@ package Pp.Scanner is
 
    procedure Append_Comment
      (V : in out Tokn_Vec; X : Tokn_Cursor; Org : String) with
-      Pre => Kind (X) in Comment_Kind;
+     Pre => Kind (X) in Comment_Kind;
    --  Append a comment token, adjusting the length for zero indentation
 
    procedure Append_Comment_Text
@@ -442,7 +442,7 @@ package Pp.Scanner is
       Recompute_Length                       :        Boolean;
       Comments_Only, Comments_Gnat_Beginning : Boolean; Indent : Natural := 0;
       Org                                    :        String) with
-      Pre => Kind (X) in Comment_Kind;
+     Pre => Kind (X) in Comment_Kind;
    --  Append a comment token, adjusting the length for zero indentation,
    --  and using the possibly-filled text Tx. I don't think it's
    --  zero indentation!
@@ -460,9 +460,9 @@ package Pp.Scanner is
    --  this is used to indicate differences.
 
    type Optional_EOL_Formats is (Nil, CRLF, LF) with
-      Default_Value => Nil;
+     Default_Value => Nil;
    subtype EOL_Formats is Optional_EOL_Formats with
-        Predicate => EOL_Formats in CRLF | LF;
+       Predicate => EOL_Formats in CRLF | LF;
    --  Conventions for ends of lines
 
    procedure Get_Tokns
@@ -517,7 +517,7 @@ package Pp.Scanner is
    --  Tok.
 
    Show_Origin : Boolean := False with
-      Export;
+     Export;
    --  Set to True in debugger to see Origins
 
    Check_Comment_Length : Boolean := True;
@@ -600,11 +600,11 @@ private
    --  The following are private, for use by child package Lines:
 
    function Index (X : Tokn_Cursor) return Positive with
-      Pre => Kind (X) in Line_Break_Token | Tab_Token;
+     Pre => Kind (X) in Line_Break_Token | Tab_Token;
 
    procedure Append_Tokn_With_Index
      (V   : in out Tokn_Vec; X : Token_Kind; Index : Positive;
       Org :        String := "Append Kind") with
-      Pre => X in Line_Break_Token | Tab_Token;
+     Pre => X in Line_Break_Token | Tab_Token;
 
 end Pp.Scanner;

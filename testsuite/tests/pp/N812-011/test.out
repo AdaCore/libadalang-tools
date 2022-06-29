@@ -1,16 +1,15 @@
 package P with
-   Pure
+  Pure
 is
 
    type T is new Integer with
-      Atomic;
+     Atomic;
 
    procedure P with
-      Inline;
+     Inline;
 
    procedure Q (A : in Integer; B : out Positive) with
-      Pre  => A > 0,
-      Post => B = A'Old;
+     Pre => A > 0, Post => B = A'Old;
 
 end P;
 package Q is

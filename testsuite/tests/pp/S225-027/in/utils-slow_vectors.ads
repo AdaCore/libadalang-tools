@@ -58,10 +58,10 @@ package Utils.Slow_Vectors is
    function Slice
      (V : Vector; First : Index_Type; Last : Vectors.Extended_Index)
       return Elements_Array with
-      Post => Slice'Result'First = Index_Type'First;
+     Post => Slice'Result'First = Index_Type'First;
 
    function To_Array (V : Vector) return Elements_Array with
-      Post => To_Array'Result'First = Index_Type'First;
+     Post => To_Array'Result'First = Index_Type'First;
 
    procedure Append (V : in out Vector; A : Elements_Array);
 

@@ -268,7 +268,7 @@ package body METRICS.Actions is
    use Ada_Node_Vectors;
 
    subtype Gnatmetric_Eligible is Ada_Node_Kind_Type with
-        Predicate => Gnatmetric_Eligible in Ada_Expr_Function |
+       Predicate => Gnatmetric_Eligible in Ada_Expr_Function |
             Ada_Generic_Package_Decl | Ada_Package_Body | Ada_Package_Decl |
             Ada_Protected_Body | Ada_Single_Protected_Decl |
             Ada_Protected_Type_Decl | Ada_Entry_Body | Ada_Subp_Body |
@@ -282,7 +282,7 @@ package body METRICS.Actions is
    --  exception: see Contract_Complexity below.
 
    subtype Contract_Complexity_Eligible is Ada_Node_Kind_Type with
-        Predicate => Contract_Complexity_Eligible in Ada_Generic_Subp_Decl |
+       Predicate => Contract_Complexity_Eligible in Ada_Generic_Subp_Decl |
             Ada_Abstract_Subp_Decl | Ada_Null_Subp_Decl |
             Ada_Subp_Renaming_Decl | Ada_Subp_Decl;
    --  For the new lalmetric tool, we have the --contract-complexity
@@ -290,7 +290,7 @@ package body METRICS.Actions is
    --  additional "eligible" nodes.
 
    subtype Eligible is Ada_Node_Kind_Type with
-        Predicate => Eligible in Gnatmetric_Eligible |
+       Predicate => Eligible in Gnatmetric_Eligible |
             Contract_Complexity_Eligible;
 
    function Q (S : String) return String is -- quote
@@ -299,12 +299,12 @@ package body METRICS.Actions is
    function Push_New_Metrix
      (Tool             : in out Metrics_Tool'Class; Node : Ada_Node;
       Source_File_Name :        String_Ref := null) return Metrix_Ref with
-      Pre => (Source_File_Name /= null) =
+     Pre => (Source_File_Name /= null) =
       (not Node.Is_Null and then Kind (Node) = Ada_Compilation_Unit);
    --  Pushes a new Metrix onto the Metrix_Stack, and returns it
 
    function Get_Outer_Unit (Node : Ada_Node) return Ada_Node with
-      Pre => Kind (Node) = Ada_Compilation_Unit;
+     Pre => Kind (Node) = Ada_Compilation_Unit;
    --  Given the Compilation_Unit node, return the program unit (Package_Decl,
    --  Package_Body, or whatever node) that is outermost (i.e. directly within
    --  the library item or subunit).
@@ -1857,7 +1857,7 @@ package body METRICS.Actions is
    -----------
 
    procedure Compute_Indirect_Dependencies (Global_M : Metrix) with
-      Pre => Global_M.Kind = Null_Kind;
+     Pre => Global_M.Kind = Null_Kind;
    --  Depends_On contains direct dependencies (as computed by
    --  Gather_Dependencies). This computes the indirect dependencies
    --  for all compilation units by walking the dependency graph.
@@ -1869,7 +1869,7 @@ package body METRICS.Actions is
    --  Metrics_To_Compute is for debugging only.
 
    function Get_Spec (M : Metrix_Ref) return Metrix_Ref with
-      Pre => M.Kind = Ada_Compilation_Unit;
+     Pre => M.Kind = Ada_Compilation_Unit;
    --  If M is a spec, return M. If it's a library unit body, return the
    --  corresponding spec. If it's a subunit, return the spec of the innermost
    --  enclosing library unit. If the spec is not present, return M.
@@ -2675,121 +2675,121 @@ package body METRICS.Actions is
          --  time we increment one of the latter.
 
          --  How we compute the cyclomatic complexity:
-            --
-            --  1. Control statements:
-            --
-            --     IF adds 1 + the number of ELSIF paths
-            --
-            --     CASE statement adds the number of alternatives minus 1
-            --
-            --     WHILE loop always adds 1
-            --
-            --     FOR loop adds 1 unless we can detect that in any case this
-            --          loop will be executes at least once
-            --
-            --     LOOP (condition-less) adds nothing
-            --
+         --
+         --  1. Control statements:
+         --
+         --     IF adds 1 + the number of ELSIF paths
+         --
+         --     CASE statement adds the number of alternatives minus 1
+         --
+         --     WHILE loop always adds 1
+         --
+         --     FOR loop adds 1 unless we can detect that in any case this
+         --          loop will be executes at least once
+         --
+         --     LOOP (condition-less) adds nothing
+         --
          --     EXIT statement adds 1 if contains the exit condition, otherwise
-            --          adds nothing
-            --
-            --     GOTO statement adds nothing
-            --
-            --     RETURN statement adds nothing
-            --
-            --     SELECT STATEMENTS:
-            --
+         --          adds nothing
+         --
+         --     GOTO statement adds nothing
+         --
+         --     RETURN statement adds nothing
+         --
+         --     SELECT STATEMENTS:
+         --
          --        SELECTIVE_ACCEPT is treaded as a CASE statement (number of
-            --           alternatives minus 1). Opposite to IF statement, ELSE
-            --           path adds 1 to the complexity (that is, for IF,
+         --           alternatives minus 1). Opposite to IF statement, ELSE
+         --           path adds 1 to the complexity (that is, for IF,
          --           both IF ... END IF; and IF ... ELSE ... END IF; adds 1,
-            --           whereas
-            --              SELECT
-            --                 ...
-            --              OR
-            --                 ...
-            --              END SELECT;
-            --           adds 1, but
-            --
-            --              SELECT
-            --                 ...
-            --              OR
-            --                 ...
-            --              ELSE
-            --                 ...
-            --              END SELECT;
-            --           adds 2
-            --
-            --        TIMED_ENTRY_CALL, CONDITIONAL_ENTRY_CALL and
-            --        ASYNCHRONOUS_SELECT add 1 (they are considered as an IF
-            --           statement with no ELSIF parts
-            --
+         --           whereas
+         --              SELECT
+         --                 ...
+         --              OR
+         --                 ...
+         --              END SELECT;
+         --           adds 1, but
+         --
+         --              SELECT
+         --                 ...
+         --              OR
+         --                 ...
+         --              ELSE
+         --                 ...
+         --              END SELECT;
+         --           adds 2
+         --
+         --        TIMED_ENTRY_CALL, CONDITIONAL_ENTRY_CALL and
+         --        ASYNCHRONOUS_SELECT add 1 (they are considered as an IF
+         --           statement with no ELSIF parts
+         --
          --  2. We do not check if some code or some path is dead (unreachable)
-            --
+         --
          --  3. We do not take into account the code in the exception handlers
          --     (only the main statement sequence is analyzed). RAISE statement
-            --     adds nothing
-            --
-            --  4. A short-circuit control form add to the complexity value the
+         --     adds nothing
+         --
+         --  4. A short-circuit control form add to the complexity value the
          --     number of AND THEN or OR ELSE at the given level (that is, if
-            --     we have
-            --
-            --       Bool := A and then (B and then C) and then E;
-            --
+         --     we have
+         --
+         --       Bool := A and then (B and then C) and then E;
+         --
          --     we consider this as two short-circuit control forms: the outer
-            --     adds to the complexity 2 and the inner adds 1.
-            --
+         --     adds to the complexity 2 and the inner adds 1.
+         --
          --     Any short-circuit control form is taken into account, including
-            --     expressions being parts of type and object definitions.
-            --
-            --  5. Conditional expressions.
-            --
-            --  5.1 An IF expression is treated in the same way as an IF
+         --     expressions being parts of type and object definitions.
+         --
+         --  5. Conditional expressions.
+         --
+         --  5.1 An IF expression is treated in the same way as an IF
          --      statement: it adds 1 + the number of ELSIF paths, but to the
-            --      expression complexity.
-            --
-            --  5.2 A CASE expression is treated in the same way as an CASE
-            --      statement: it adds the number of CASE paths minus 1, but to
-            --      the expression complexity.
-            --
-            --  6. Quantified expressions are treated as the equivalent loop
-            --     construct:
-            --
-            --        for some X in Y => Z (X)
-            --
-            --     is considered as a shortcut for
-            --
-            --        Result := False;
-            --        Tmp := First (X);
-            --
-            --        while Present (Tmp) loop
-            --           if Z (Tmp) then
-            --              Result := True;
-            --              exit;
-            --           end if;
-            --
-            --           Tmp := Next (Tmp);
-            --        end loop;
-            --
+         --      expression complexity.
+         --
+         --  5.2 A CASE expression is treated in the same way as an CASE
+         --      statement: it adds the number of CASE paths minus 1, but to
+         --      the expression complexity.
+         --
+         --  6. Quantified expressions are treated as the equivalent loop
+         --     construct:
+         --
+         --        for some X in Y => Z (X)
+         --
+         --     is considered as a shortcut for
+         --
+         --        Result := False;
+         --        Tmp := First (X);
+         --
+         --        while Present (Tmp) loop
+         --           if Z (Tmp) then
+         --              Result := True;
+         --              exit;
+         --           end if;
+         --
+         --           Tmp := Next (Tmp);
+         --        end loop;
+         --
          --     That is, it adds 2 (1 as WHILE loop and 1 as IF statement with
-            --     no ELSIF parts.
-            --
-            --     'for all' expression is treated in a similar way.
-            --
-            --     For essential complexity, quantified expressions add 1 if
-            --     Treat_Exit_As_Goto is set ON.
-            --
-            --  7. Any enclosed body is just skipped and is not taken into
-            --     account. The only situation that is not completely clear is
-            --     an enclosed package body with statement sequence part. When
-            --     enclosing body is executed, this enclosed package body will
+         --     no ELSIF parts.
+         --
+         --     'for all' expression is treated in a similar way.
+         --
+         --     For essential complexity, quantified expressions add 1 if
+         --     Treat_Exit_As_Goto is set ON.
+         --
+         --  7. Any enclosed body is just skipped and is not taken into
+         --     account. The only situation that is not completely clear is
+         --     an enclosed package body with statement sequence part. When
+         --     enclosing body is executed, this enclosed package body will
          --     also be executed inconditionally and exactly once - this is the
          --     reason to count it when computing the complexity of enclosing
          --     body. From the other side, the enclosed package body is similar
-            --     to enclosed local procedures, and we for sure do not want to
-            --     count enclosed procedures...
+         --     to enclosed local procedures, and we for sure do not want to
+         --     count enclosed procedures...
 
          procedure Inc_Cyc (Metric : Metrics_Enum; By : Metric_Nat := 1) with
-            Pre => Metric in Complexity_Statement | Complexity_Expression;
+           Pre => Metric in Complexity_Statement | Complexity_Expression;
          --  Increment the specified complexity metric, and also
          --  Complexity_Cyclomatic. Increment the current unit's metrics, as
          --  well as the file-level ones. However, if this is something like a

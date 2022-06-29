@@ -31,7 +31,7 @@ package body Utils.Projects is
    Project_Env     : Project_Environment_Access;
 
    function Project_File_Name (Cmd : Command_Line) return String with
-      Pre => Arg (Cmd, Project_File) /= null;
+     Pre => Arg (Cmd, Project_File) /= null;
    --  Returns the project file name with ".gpr" appended if necessary
 
    function Main_Unit_Name (Cmd : Command_Line) return String_Ref is

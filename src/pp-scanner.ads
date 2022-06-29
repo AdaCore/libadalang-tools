@@ -473,6 +473,12 @@ package Pp.Scanner is
      Pre => Kind (X) in Comment_Kind;
    --  Append a comment token, adjusting the length for zero indentation
 
+   function Is_Header_Comment
+     (Tkn : Token)
+      return Boolean with
+     Pre => Tkn.Kind in Comment_Kind;
+   --  Check if Tkn (which must be a comment) ends with -- or --\NL
+
    procedure Append_Comment_Text
      (V : in out Tokn_Vec; X : Tokn_Cursor; Tx : W_Str;
       Recompute_Length : Boolean;

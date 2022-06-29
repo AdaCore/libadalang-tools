@@ -14,7 +14,7 @@ package Pp.Actions is
       In_Range  :     Char_Subrange; Output : out Char_Vector;
       Out_Range : out Char_Subrange;
       Messages  : out Pp.Scanner.Source_Message_Vector) with
-      Pre => Pp.Scanner.Source_Message_Vectors.Is_Empty (Messages);
+     Pre => Pp.Scanner.Source_Message_Vectors.Is_Empty (Messages);
 --  This pretty prints the given source. Parameters:
    --
    --     Cmd -- processed command line, or "command line" concocted by a tool

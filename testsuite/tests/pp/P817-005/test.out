@@ -14,7 +14,7 @@ package Example_With_Comments is
      (progname : String;  --< Name of the program running
       filename : String   --< Name of the config file to read
    ) with
-      Pre => progname'Length <= 64 and filename'Length <= 4_096;
+     Pre => progname'Length <= 64 and filename'Length <= 4_096;
 
 end Example_With_Comments;
 package Example_With_Comments is -- end of line
@@ -33,6 +33,6 @@ package Example_With_Comments is -- end of line
      (progname : String;  --< Name of the program running
       filename : String   --< Name of the config file to read
    ) with
-      Pre => progname'Length <= 64 and filename'Length <= 4_096;
+     Pre => progname'Length <= 64 and filename'Length <= 4_096;
 
 end Example_With_Comments;-- end of line

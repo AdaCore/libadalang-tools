@@ -675,7 +675,7 @@ package body Pp.Buffers is
       Tab_Len : constant := 8;
 
       function At_Brackets_Start return Boolean with
-         Pre => Input (Ptr) = '[';
+        Pre => Input (Ptr) = '[';
       --  True if we're pointing to the start of a valid brackets sequence
       --  to be interpreted as a wide character.
 

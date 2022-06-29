@@ -1,9 +1,9 @@
 package Spark_Mode with
-   SPARK_Mode
+  SPARK_Mode
 is
    pragma SPARK_Mode;
    procedure pre with
-      Pre => True;
+     Pre => True;
    use Spark_Mode;
    procedure spark_MODE;
 end Spark_Mode;

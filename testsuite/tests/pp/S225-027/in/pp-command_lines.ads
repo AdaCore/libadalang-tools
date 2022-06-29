@@ -335,10 +335,10 @@ package Pp.Command_Lines is
    --  the corresponding defining occurrences in the argument source.
 
    subtype Lower_Upper_PP_Casing is PP_Casing with
-        Predicate => Lower_Upper_PP_Casing in Lower_Case | Upper_Case;
+       Predicate => Lower_Upper_PP_Casing in Lower_Case | Upper_Case;
 
    subtype Lower_Upper_Mixed_PP_Casing is PP_Casing with
-        Predicate => Lower_Upper_Mixed_PP_Casing in Lower_Case | Upper_Case |
+       Predicate => Lower_Upper_Mixed_PP_Casing in Lower_Case | Upper_Case |
             Mixed;
 
    subtype Cmd_Line is Command_Line;

@@ -130,7 +130,7 @@ package Utils.Command_Lines is
    --  For internal use only
 
    subtype String_Ref is GNAT.OS_Lib.String_Access with
-        Predicate => (if String_Ref /= null then String_Ref'First = 1);
+       Predicate => (if String_Ref /= null then String_Ref'First = 1);
    type String_Ref_Array is array (Positive range <>) of String_Ref;
 
    function Present (X : String_Ref) return Boolean is
@@ -354,7 +354,7 @@ package Utils.Command_Lines is
         (Cmd : Command_Line; Switch : Switches) return String_Ref_Array;
       function Arg_Length
         (Cmd : Command_Line; Switch : Switches) return Natural with
-         Post => Arg_Length'Result = Arg (Cmd, Switch)'Length;
+        Post => Arg_Length'Result = Arg (Cmd, Switch)'Length;
 
       procedure Set_Arg
         (Cmd : in out Command_Line; Switch : Switches; Val : String_Ref_Array);
@@ -585,24 +585,24 @@ package Utils.Command_Lines is
    --  True if Parse detected an error
 
    procedure Cmd_Error (Message : String) with
-      No_Return;
+     No_Return;
    --  Prints an error message, and raises Command_Line_Error. This is
    --  called by Parse to report errors, and may also be used by clients
    --  of Parse.
 
    procedure Cmd_Error_No_Help (Message : String) with
-      No_Return;
+     No_Return;
    --  Same as Cmd_Error, but doesn't print the "try help" message
 
    procedure Cmd_Error_No_Tool_Name (Message : String) with
-      No_Return;
+     No_Return;
    --  Same as Cmd_Error, but doesn't print the tool name, and raises
    --  Command_Line_Error_No_Tool_Name instead of Command_Line_Error.  It's not
    --  clear why we want to suppress the tool name, but we're mimicking the way
    --  ASIS tools work.
 
    procedure Raise_Cmd_Error (Message : String) with
-      No_Return;
+     No_Return;
 --  Raises Command_Line_Error with the given message.
 
 private

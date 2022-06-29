@@ -551,6 +551,27 @@ package body Pp.Scanner is
       Append_Tokn (V, Tok, Org);
    end Append_Comment;
 
+   -----------------------
+   -- Is_Header_Comment --
+   -----------------------
+
+   function Is_Header_Comment
+     (Tkn : Token)
+      return Boolean
+   is
+      Tkn_Txt : constant W_Str := To_W_Str (Text (Tkn));
+   begin
+      return
+        (Tkn_Txt'Length >= 2
+         and then Tkn_Txt (Tkn_Txt'Last) = '-'
+         and then Tkn_Txt (Tkn_Txt'Last - 1) = '-')
+        or else
+          (Tkn_Txt'Length >= 3
+           and then Tkn_Txt (Tkn_Txt'Last) = NL
+           and then Tkn_Txt (Tkn_Txt'Last - 1) = '-'
+           and then Tkn_Txt (Tkn_Txt'Last - 2) = '-');
+   end Is_Header_Comment;
+
    procedure Append_Comment_Text
      (V : in out Tokn_Vec; X : Tokn_Cursor; Tx : W_Str;
       Recompute_Length : Boolean;
@@ -560,8 +581,15 @@ package body Pp.Scanner is
       Tok : Token := Token_At_Cursor (X);
       Line_Width, Max_Line_Width : Natural := 0;
       Prefix_Len : Natural;
+
    begin
-      if Comments_Gnat_Beginning and then Tok.Kind = Fillable_Comment then
+      --  Add two leading spaces to Fillable_Comment or
+      --  Other_Whole_Line_Comment tokens that are not part of a header
+      --  comment.
+      if Comments_Gnat_Beginning
+        and then not Is_Header_Comment (Tok)
+        and then Tok.Kind in Fillable_Comment | Other_Whole_Line_Comment
+      then
          Tok.Leading_Blanks := Natural'Max (Tok.Leading_Blanks, 2);
       end if;
       Prefix_Len := W_Str'("--")'Length + Tok.Leading_Blanks;

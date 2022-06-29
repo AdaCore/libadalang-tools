@@ -28,7 +28,7 @@ package body Utils.Var_Length_Ints is
 
       function To_Octet (X : Base; First_Octet : Boolean) return Octet is
         (if First_Octet then Octet (X * 2) else Octet ((X * 2) + 1)) with
-         Pre => X < Radix;
+        Pre => X < Radix;
       --  Turn X into the relevant Octet by shifting left one bit, then setting
       --  the low bit according to First_Octet.
 

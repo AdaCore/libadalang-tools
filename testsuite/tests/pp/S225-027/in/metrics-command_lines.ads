@@ -180,7 +180,7 @@ package METRICS.Command_Lines is
      Metrics_Enum range Tagged_Coupling_Out .. Unit_Coupling_In;
 
    type Metrics_Set is array (Metrics_Enum) of Boolean with
-      Pack;
+     Pack;
    function Empty_Metrics_Set return Metrics_Set is (others => False);
    function All_Metrics_Set return Metrics_Set is (others => True);
 

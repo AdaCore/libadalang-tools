@@ -15,8 +15,7 @@ package test is
    R_57 :
      constant access function
        (SSL : SSL_Handle; Buf : Pointer; Num : int) return int with
-      Import,
-      Convention => C;
+     Import, Convention => C;
 
    function SSL_read
      (SSL : SSL_Handle; Buf : Pointer; Num : int) return int renames
@@ -25,8 +24,7 @@ package test is
    R_58 :
      constant access function
        (SSL : SSL_Handle; Buf : Pointer; Num : int) return int with
-      Import,
-      Convention => C;
+     Import, Convention => C;
 
    function SSL_peek
      (SSL : SSL_Handle; Buf : Pointer; Num : int) return int renames
@@ -35,8 +33,7 @@ package test is
    R_59 :
      constant access function
        (SSL : SSL_Handle; Buf : Pointer; Num : int) return int with
-      Import,
-      Convention => C;
+     Import, Convention => C;
 
    function SSL_write
      (SSL : SSL_Handle; Buf : Pointer; Num : int) return int renames

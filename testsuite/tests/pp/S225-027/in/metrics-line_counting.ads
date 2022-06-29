@@ -12,7 +12,7 @@ package METRICS.Line_Counting is
    --  (code lines, comment lines, etc).
 
    subtype Cumulative_Metrics is Lines_Metrics with
-        Predicate => Cumulative_Metrics in Lines_Code | Lines_Comment |
+       Predicate => Cumulative_Metrics in Lines_Code | Lines_Comment |
             Lines_Eol_Comment | Lines_Blank;
 
    type Cumulative_Counts_Array (<>) is private;

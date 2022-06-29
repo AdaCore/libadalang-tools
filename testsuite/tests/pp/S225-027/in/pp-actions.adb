@@ -310,10 +310,10 @@ package body Pp.Actions is
    --  files.
 
    subtype Create_Modes is Output_Modes with
-        Predicate => Create_Modes in Output | Output_Force;
+       Predicate => Create_Modes in Output | Output_Force;
    pragma Unreferenced (Create_Modes);
    subtype Replace_Modes is Output_Modes with
-        Predicate => Replace_Modes in Replace_Backup | Replace_Force_Backup |
+       Predicate => Replace_Modes in Replace_Backup | Replace_Force_Backup |
             Replace;
 
    function Get_Output_Mode (Cmd : Command_Line) return Output_Modes;
@@ -1206,7 +1206,7 @@ package body Pp.Actions is
       Str_Alt_Table : array (Alt_Templates) of Str_Template_Ptr;
 
       subtype Subp_Decl_Body_Kind is Ada_Tree_Kind with
-           Predicate => Subp_Decl_Body_Kind in Ada_Subp_Decl |
+          Predicate => Subp_Decl_Body_Kind in Ada_Subp_Decl |
                Ada_Subp_Renaming_Decl | Ada_Access_To_Subp_Def |
                Ada_Entry_Decl | Ada_Formal_Subp_Decl | Ada_Generic_Subp_Decl |
                Ada_Subp_Body_Stub | Ada_Subp_Body | Ada_Abstract_Subp_Decl |
@@ -1414,7 +1414,7 @@ package body Pp.Actions is
             end Check_Between;
 
             subtype Illegal_Chars is Character with
-                 Predicate => Illegal_Chars in '~' | '"' | '\' | '%' |
+                Predicate => Illegal_Chars in '~' | '"' | '\' | '%' |
                        '0' .. '9';
             pragma Assert (Str (Text (Cur)).S (1) not in Illegal_Chars);
 
@@ -1734,7 +1734,7 @@ package body Pp.Actions is
 
       declare
          subtype When_Kinds is Ada_Node_Kind_Type with
-              Predicate => When_Kinds in Ada_Case_Stmt_Alternative |
+             Predicate => When_Kinds in Ada_Case_Stmt_Alternative |
                   --  ???                                  Ada_Case_Expr_Alternative |
 
                   Ada_Variant;
@@ -2628,7 +2628,7 @@ package body Pp.Actions is
                   --  this special processing for use type clauses.
 
                   function Has_Prefix (X, Y : Ada_Tree) return Boolean with
-                     Pre => X.Kind in Ada_Identifier | Ada_Dotted_Name
+                    Pre => X.Kind in Ada_Identifier | Ada_Dotted_Name
                      and then Y.Kind in Ada_Identifier | Ada_Dotted_Name;
                   --  True if X contains Y, as in "A.B.C.D" contains "A.B".
                   --  I.e. if Y is a prefix of X.
@@ -2774,7 +2774,7 @@ package body Pp.Actions is
               (Subt : Ada_Tree; Subtree_Index : Query_Index);
 
             subtype Absent_Kinds is Ada_Node_Kind_Type with
-                 Predicate => Absent_Kinds in Ada_Abort_Absent |
+                Predicate => Absent_Kinds in Ada_Abort_Absent |
                      Ada_Abstract_Absent | Ada_Aliased_Absent |
                      Ada_All_Absent | Ada_Constant_Absent |
                      Ada_Limited_Absent | Ada_Not_Null_Absent |

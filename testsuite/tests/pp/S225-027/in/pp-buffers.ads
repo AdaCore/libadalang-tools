@@ -88,7 +88,7 @@ package Pp.Buffers is
    --  True if 'point' points to the first character (i.e. position 1)
 
    function Cur (Buf : Buffer) return W_Char with
-      Post => Cur'Result /= W_HT; -- ???For now
+     Post => Cur'Result /= W_HT; -- ???For now
    pragma Inline (Cur);
    --  Return the character at 'point'. NUL if At_End.
 
@@ -103,19 +103,19 @@ package Pp.Buffers is
    --  Return the character at 'point' - Offset. NUL if out of range.
 
    function To_String (Buf : Buffer) return String with
-      Post => To_String'Result'First = 1;
+     Post => To_String'Result'First = 1;
    function To_W_Str (Buf : Buffer) return W_Str with
-      Post => To_W_Str'Result'First = 1;
+     Post => To_W_Str'Result'First = 1;
    --  Returns the current logical string of the buffer
 
    function To_Vector (Buf : Buffer) return WChar_Vector with
-      Pre => At_Beginning (Buf);
+     Pre => At_Beginning (Buf);
    --  'point' must be at the beginning of the buffer (e.g. after Reset).
    --  Returns the content of the buffer.
 
    function Elements
      (Buf : Buffer) return Utils.Char_Vectors.WChar_Vectors.Big_Ptr with
-      Pre => At_Beginning (Buf);
+     Pre => At_Beginning (Buf);
    --  'point' must be at the beginning of the buffer (e.g. after Reset).
    --  Returns the content of the buffer.
 
@@ -125,13 +125,13 @@ package Pp.Buffers is
    --  Return the character at the given Mark/Position
 
    function Slice (Buf : Buffer; First, Last : Marker) return W_Str with
-      Post => Slice'Result'First = 1;
+     Post => Slice'Result'First = 1;
    --  Return the string from First up to just before Last
 
    function Slice
      (Buf : Buffer; First : Positive; Last : Natural; Lines : Boolean := False)
       return W_Str with
-      Post => Slice'Result'First = 1;
+     Post => Slice'Result'First = 1;
    --  Return the string from First up to and including Last.
    --  If Lines is True, we expand the slice to include whole lines.
 
@@ -158,8 +158,8 @@ package Pp.Buffers is
 
    procedure Insert_Keeping_Mark
      (Buf : in out Buffer; Mark : Marker; C : W_Char) with
-      Pre => At_Point (Buf, Mark),
-      Unreferenced; -- currently not used
+     Pre => At_Point (Buf, Mark),
+     Unreferenced; -- currently not used
    --  Mark must be at 'point'. This does the same as Insert (Buf, C),
    --  except that Mark is not adjusted to point to the character after
    --  'point'; it ends up pointing at the newly-inserted C.
@@ -179,7 +179,7 @@ package Pp.Buffers is
    --  end. The function version returns the new current character.
 
    procedure Delete_Char (Buf : in out Buffer) with
-      Pre => not At_End (Buf) and then False;
+     Pre => not At_End (Buf) and then False;
    --  Delete the character at 'point', leaving 'point' at the following one.
    --  ???This causes "duplicate marker" errors; currently not used.
 
@@ -190,13 +190,13 @@ package Pp.Buffers is
    function Is_Empty (Buf : Buffer) return Boolean;
 
    procedure Reset (Buf : in out Buffer) with
-      Pre  => At_End (Buf),
-      Post => At_Beginning (Buf);
+     Pre  => At_End (Buf),
+     Post => At_Beginning (Buf);
    --  'point' must be at the end of the buffer. Move 'point' back to the
    --  beginning. The buffer contents and markers are not changed.
 
    function Mark (Buf : in out Buffer; Name : W_Char) return Marker with
-      Unreferenced;
+     Unreferenced;
    --  Return a Marker that points to the current 'point'. Name is for
    --  debugging; it is printed by debugging printouts, and may be used to keep
    --  track of different kinds of Markers. Note that if you call Mark twice at
@@ -204,7 +204,7 @@ package Pp.Buffers is
 
    function Mark_Previous
      (Buf : in out Buffer; Name : W_Char) return Marker with
-      Unreferenced;
+     Unreferenced;
    --  Similar to Mark, but the Marker points to the character just before the
    --  current 'point'.
 
@@ -243,7 +243,7 @@ package Pp.Buffers is
    procedure Move (Target, Source : in out Buffer);
 
    function To_Debug_String (Buf : Buffer) return String with
-      Post => To_Debug_String'Result'First = 1;
+     Post => To_Debug_String'Result'First = 1;
    --  For debugging. Returns the current logical string of the buffer, with
    --  the Name of each Marker interspersed.
 

@@ -52,10 +52,10 @@ package Utils.Fast_Vectors is
    No_Index : constant Extended_Index := Extended_Index'First;
 
    type Vector is tagged private with
-      Constant_Indexing => Constant_Reference,
-      Variable_Indexing => Reference,
-      Default_Iterator  => Iterate,
-      Iterator_Element  => Element_Type;
+     Constant_Indexing => Constant_Reference,
+     Variable_Indexing => Reference,
+     Default_Iterator  => Iterate,
+     Iterator_Element  => Element_Type;
 
    type Cursor is private;
 
@@ -94,10 +94,10 @@ package Utils.Fast_Vectors is
    type Constant_Reference_Type
      (Element : not null access constant Element_Type) is
      private with
-      Implicit_Dereference => Element;
+     Implicit_Dereference => Element;
 
    type Reference_Type (Element : not null access Element_Type) is private with
-      Implicit_Dereference => Element;
+     Implicit_Dereference => Element;
 
    function Constant_Reference
      (Container : aliased Vector; Position : Cursor)
@@ -204,13 +204,13 @@ package Utils.Fast_Vectors is
    function Slice
      (Container : Vector; First : Index_Type; Last : Extended_Index)
       return Elements_Array with
-      Post => Slice'Result'First = Index_Type'First;
+     Post => Slice'Result'First = Index_Type'First;
 
    function Slice (Container : Vector; R : Subrange) return Elements_Array is
      (Slice (Container, R.First, R.Last));
 
    function To_Array (Container : Vector) return Elements_Array with
-      Post => To_Array'Result'First = Index_Type'First;
+     Post => To_Array'Result'First = Index_Type'First;
 
    procedure Append (Container : in out Vector; New_Items : Elements_Array);
 

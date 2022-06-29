@@ -732,7 +732,7 @@ package body Pp.Actions is
            when Ada_Unconstrained_Array_Index =>
              L ("! range <>"),
            when Ada_Aspect_Assoc =>
-             L ("!? ^=> ~~~"),
+             L ("!*? ^=># ~~~_"),
            when Ada_At_Clause =>
              L ("for ! use at !"),
            when Ada_Attribute_Def_Clause | Ada_Enum_Rep_Clause =>
@@ -740,7 +740,7 @@ package body Pp.Actions is
            when Ada_Record_Rep_Clause =>
              L ("for ! use record? at mod ~~;~$", "{?~;$~;$~}", "end record"),
            when Ada_Aspect_Spec =>
-             L ("? with$" & "{~,$~}~"),
+             L (" with$[?~,# ~~]"),
              --  ???We could try something like the following:
              --  "? with[#1 ~,#1 ~]~"
            when Ada_Component_Decl =>
@@ -1810,7 +1810,7 @@ package body Pp.Actions is
               L (Replace_One
                  (Ada_Return_Stmt,
                   From => "return[?# ~~~]", To => "return[?$~~~]")),
-            Aspect_Assoc_Alt => L ("/? ^=> ~~~"),
+            Aspect_Assoc_Alt => L ("/*? ^=> #~~~_"),
             Pos_Notation_Assoc_Alt =>
               L ("?~~~!"), -- The "?~~~" generates nothing.
             Single_Name_Vertical_Assoc_Alt => L ("?~~ ^=>[$~!]"),
@@ -4837,12 +4837,6 @@ package body Pp.Actions is
                       then F_Params (F_Subp_Params (Spec))
                       else No_Param_Spec_List));
 
---  ???The following gets SIGSEGV:
---            Is_Function : constant Boolean :=
---              Present (Spec) and then Present (F_Subp_Returns (Spec));
---            Param_Count : constant Query_Count :=
---              Subtree_Count (Params) +
---              Boolean'Pos (Is_Function); -- Add one extra for function result
             Is_Function : Boolean;
             Param_Count : Query_Count :=
               (if Params.Is_Null then 0 else Subtree_Count (Params));

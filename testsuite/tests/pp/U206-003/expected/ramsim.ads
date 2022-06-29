@@ -19,12 +19,12 @@ package RAMSim is
    --  A comment about RAMsim_Ref before
 
    type RAMsim_Ref is access all RAMsim_Device'Class;
-   -- A comment about RAMsim_Ref
+   --  A comment about RAMsim_Ref
 
    --  A comment about Device_Setup
    overriding procedure Device_Setup
      (Self : in out RAMsim_Device);
-   -- A comment about ..
+   --  A comment about ..
    overriding procedure Device_Init
      (Self : in out RAMsim_Device);
    overriding procedure Device_Reset
