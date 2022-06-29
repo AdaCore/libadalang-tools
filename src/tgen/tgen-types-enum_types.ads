@@ -28,14 +28,24 @@ with Ada.Containers.Ordered_Maps;
 with TGen.Context;              use TGen.Context;
 with TGen.Strategies;           use TGen.Strategies;
 with TGen.Types.Discrete_Types; use TGen.Types.Discrete_Types;
+with TGen.Types.Constraints;    use TGen.Types.Constraints;
 
 package TGen.Types.Enum_Types is
 
    type Enum_Typ is new Discrete_Typ with null record;
 
-   type Char_Typ is new Enum_Typ with null record;
+   type Char_Typ (Is_Static, Has_Range : Boolean) is
+     new Enum_Typ (Is_Static) with record
+      case Has_Range is
+         when True =>
+            Range_Value : Discrete_Range_Constraint;
+         when others =>
+            null;
+      end case;
+   end record;
 
-   function Supports_Static_Gen (Self : Char_Typ) return Boolean is (True);
+   function Supports_Static_Gen (Self : Char_Typ) return Boolean is
+      (not Self.Has_Range or else Self.Range_Value.Static);
    --  Wether values for this Typ can be statically generated
 
    function Image (Self : Char_Typ) return String;
@@ -46,6 +56,9 @@ package TGen.Types.Enum_Types is
    --  Wide(_Wide)_Character.
 
    function High_Bound (Self : Char_Typ) return Big_Integer with
+     Pre => Self.Is_Static;
+
+   function Low_Bound (Self : Char_Typ) return Big_Integer with
      Pre => Self.Is_Static;
 
    function Kind (Self : Char_Typ) return Typ_Kind is (Char_Kind);

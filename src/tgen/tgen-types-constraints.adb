@@ -149,6 +149,20 @@ package body TGen.Types.Constraints is
             else
                Res.Set (Mod_Int_Typ'(Is_Static => False, Name => Name));
             end if;
+         when Char_Kind =>
+            if Cst.Static then
+               Res.Set
+                 (Char_Typ'(Is_Static   => True,
+                            Has_Range   => True,
+                            Name        => Name,
+                            Range_Value => Discrete_Range_Constraint (Cst)));
+            else
+               Res.Set
+                 (Char_Typ'(Is_Static   => False,
+                            Has_Range   => True,
+                            Name        => Name,
+                            Range_Value => Discrete_Range_Constraint (Cst)));
+            end if;
          when Enum_Kind =>
             if Cst.Static then
                declare

@@ -21,7 +21,11 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with TGen.Random; use TGen.Random;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+
+with TGen.Numerics; use TGen.Numerics;
+with TGen.Random;   use TGen.Random;
+with TGen.Strings;  use TGen.Strings;
 
 package body TGen.Types.Enum_Types is
 
@@ -48,8 +52,31 @@ package body TGen.Types.Enum_Types is
    end Supports_Static_Gen;
 
    function Image (Self : Char_Typ) return String is
+      Res : Unbounded_String := +Typ (Self).Image & ": Char";
    begin
-      return Typ (Self).Image & ": Char";
+      if Self.Has_Range then
+         Res := Res & " range ";
+         case Self.Range_Value.Low_Bound.Kind is
+            when Static =>
+               Res := Res & Self.Lit_Image
+                 (Self.Range_Value.Low_Bound.Int_Val);
+            when Discriminant =>
+               Append (Res, +Self.Range_Value.Low_Bound.Disc_Name);
+            when Non_Static =>
+               Append (Res, +Self.Range_Value.Low_Bound.Text);
+         end case;
+         Res := Res & " .. ";
+         case Self.Range_Value.High_Bound.Kind is
+            when Static =>
+               Res := Res & Self.Lit_Image
+                 (Self.Range_Value.High_Bound.Int_Val);
+            when Discriminant =>
+               Append (Res, +Self.Range_Value.High_Bound.Disc_Name);
+            when Non_Static =>
+               Append (Res, +Self.Range_Value.High_Bound.Text);
+         end case;
+      end if;
+      return To_String (Res);
    end Image;
 
    function Lit_Image (Self : Char_Typ; Lit : Big_Integer) return String is
@@ -63,13 +90,19 @@ package body TGen.Types.Enum_Types is
    end Lit_Image;
 
    function High_Bound (Self : Char_Typ) return Big_Integer is
-      pragma Unreferenced (Self);
-   begin
-      return (Big_Int.To_Big_Integer (Character'Pos (Character'Last)));
-   end High_Bound;
+   (if Self.Has_Range
+    then Self.Range_Value.High_Bound.Int_Val
+    else Big_Int.To_Big_Integer (Character'Pos ('~')));
    --  Although Char_Typ represents Character, Wide_Character and
-   --  Wide_Wide_Character, we'll conservatively use Character'Last as the high
-   --  bound.
+   --  Wide_Wide_Character, we'll conservatively use ~ (last printable ASCII
+   --  character) as the high bound.
+
+   function Low_Bound (Self : Char_Typ) return Big_Integer is
+     (if Self.Has_Range
+      then Self.Range_Value.Low_Bound.Int_Val
+      else Big_Int.To_Big_Integer (Character'Pos (' ')));
+   --  The space is not the first element of Character but we won't generate
+   --  non printable characters as they need to be unparsable in sources.
 
    function Generate_Static_Value_Char_Typ
      (Ty : Typ'Class) return Static_Value'Class;
@@ -88,8 +121,20 @@ package body TGen.Types.Enum_Types is
 
       use Big_Int;
 
+      LB : constant Natural :=
+        (if Char_Typ (Ty).Has_Range
+         then Nat_Conversions.From_Big_Integer
+           (Char_Typ (Ty).Range_Value.Low_Bound.Int_Val)
+         else Character'Pos (' '));
+
+      HB : constant Natural :=
+        (if Char_Typ (Ty).Has_Range
+         then Nat_Conversions.From_Big_Integer
+           (Char_Typ (Ty).Range_Value.High_Bound.Int_Val)
+         else Character'Pos ('~'));
+
       Lit : constant Integer :=
-        Rand_Int (Min => 32, Max => 126);
+        Rand_Int (Min => LB, Max => HB);
    begin
       SP.From_Element (Result.T, Ty'Unrestricted_Access);
       Result.Value := To_Big_Integer (Lit);

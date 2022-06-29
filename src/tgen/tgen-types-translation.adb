@@ -111,6 +111,12 @@ package body TGen.Types.Translation is
       return Translation_Result with
       Pre => Decl.P_Is_Static_Decl and then Decl.P_Is_Enum_Type;
 
+   function Translate_Char_Decl
+     (Decl      : Base_Type_Decl;
+      Type_Name : Defining_Name)
+      return Translation_Result with
+     Pre => Decl.P_Is_Static_Decl and then Decl.P_Is_Enum_Type;
+
    function Translate_Float_Decl
      (Decl      : Base_Type_Decl;
       Type_Name : Defining_Name) return Translation_Result with
@@ -334,6 +340,73 @@ package body TGen.Types.Translation is
       end if;
       return Res;
    end Translate_Int_Decl;
+
+   -------------------------
+   -- Translate_Char_Decl --
+   -------------------------
+
+   function Translate_Char_Decl
+     (Decl      : Base_Type_Decl;
+      Type_Name : Defining_Name)
+      return Translation_Result
+   is
+      Rang : constant Discrete_Range := Decl.P_Discrete_Range;
+   begin
+
+      if Is_Null (Low_Bound (Rang)) then
+         return Res : Translation_Result (Success => True) do
+            Res.Res.Set (Char_Typ'
+                           (Is_Static => True,
+                            Has_Range => False,
+                            Name      =>
+                              To_Qualified_Name (Type_Name.F_Name)));
+         end return;
+      else
+         declare
+            LB, HB : Discrete_Constraint_Value;
+         begin
+            if Low_Bound (Rang).P_Is_Static_Expr then
+               LB :=
+                 (Kind    => Static,
+                  Int_Val => Big_Int.From_String
+                    (New_Eval_As_Int (Low_Bound (Rang)).Image));
+            else
+               LB := (Kind => Non_Static, Text => +Low_Bound (Rang).Text);
+            end if;
+            if High_Bound (Rang).P_Is_Static_Expr then
+               HB :=
+                 (Kind    => Static,
+                  Int_Val => Big_Int.From_String
+                    (New_Eval_As_Int (High_Bound (Rang)).Image));
+            else
+               HB := (Kind => Non_Static, Text => +High_Bound (Rang).Text);
+            end if;
+            if LB.Kind = Static and then HB.Kind = Static then
+               return Res : Translation_Result (Success => True) do
+                  Res.Res.Set
+                    (Char_Typ'(Is_Static   => True,
+                               Has_Range   => True,
+                               Name        =>
+                                 To_Qualified_Name (Type_Name.F_Name),
+                               Range_Value =>
+                                 (Low_Bound => LB, High_Bound => HB)));
+
+               end return;
+            else
+               return Res : Translation_Result (Success => True) do
+                  Res.Res.Set
+                    (Char_Typ'(Is_Static   => False,
+                               Has_Range   => True,
+                               Name        =>
+                                 To_Qualified_Name (Type_Name.F_Name),
+                               Range_Value =>
+                                 (Low_Bound => LB, High_Bound => HB)));
+
+               end return;
+            end if;
+         end;
+      end if;
+   end Translate_Char_Decl;
 
    -------------------------
    -- Translate_Enum_Decl --
@@ -2810,11 +2883,7 @@ package body TGen.Types.Translation is
               or else Root_Type_Name = "standard.wide_character"
               or else Root_Type_Name = "standard.wide_wide_character"
             then
-               return Res : Translation_Result (Success => True) do
-                  Res.Res.Set (Char_Typ'
-                      (Is_Static => True,
-                       Name      => To_Qualified_Name (Type_Name.F_Name)));
-               end return;
+               return Translate_Char_Decl (N, Type_Name);
             else
                return Translate_Enum_Decl (N, Root_Type, Type_Name);
             end if;
