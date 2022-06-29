@@ -469,10 +469,25 @@ package body TGen.Types.Array_Types is
 
       Dimension_Sizes : Nat_Array (1 .. Self.Num_Dims);
 
+      function Pp_Index_Val
+        (Value : Big_Integer; Current_Index : Positive) return String;
+
       procedure Pp_Arr
         (Arr           : Array_Type;
          Current_Index : in out Positive;
          Indexes       : Index_Values_Array);
+
+      ------------------
+      -- Pp_Index_Val --
+      ------------------
+
+      function Pp_Index_Val
+        (Value : Big_Integer; Current_Index : Positive) return String
+      is
+      begin
+         return As_Discrete_Typ
+           (Self.Index_Types (Current_Index)).Lit_Image (Value);
+      end Pp_Index_Val;
 
       ------------
       -- Pp_Arr --
@@ -500,10 +515,12 @@ package body TGen.Types.Array_Types is
                --  1st special case: array is of size 0. We have to generate
                --  an empty aggregate.
 
-               Append (Res, Big_Int.To_String (Index_Constraint.Low_Bound)
-                       & " .. "
-                       & Big_Int.To_String (Index_Constraint.High_Bound)
-                       & " => <>");
+               Append
+                 (Res,
+                  Pp_Index_Val (Index_Constraint.Low_Bound, Indexes'First)
+                  & " .. "
+                  & Pp_Index_Val (Index_Constraint.High_Bound, Indexes'First)
+                  & " => <>");
             end if;
 
             for I in 0 .. Big_Int.To_Integer
@@ -515,9 +532,10 @@ package body TGen.Types.Array_Types is
                --  type. Time to print values \o/.
 
                   Append (Res,
-                          Big_Int.To_String
-                            (Index_Constraint.Low_Bound
-                             + Big_Int.To_Big_Integer (I))
+                          Pp_Index_Val
+                            (Value         => Index_Constraint.Low_Bound
+                                              + Big_Int.To_Big_Integer (I),
+                             Current_Index => Indexes'First)
                           & " => " & (+Arr (Current_Index)));
                   Current_Index := @ + 1;
 
