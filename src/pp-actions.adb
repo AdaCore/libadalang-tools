@@ -1880,12 +1880,12 @@ package body Pp.Actions is
             Subtype_Ind_Alt => L ("?~~ ~!? ~~~"),
             Record_Type_Decl_Split_Alt =>
               L ("type !! is${!}" & Aspects),
-            Record_Type_Decl_Alt => L ("type !! is !" & Aspects),
+            Record_Type_Decl_Alt => L ("type !! is# !" & Aspects),
                       --  Otherwise, we could have a line break just before the
                       --  last semicolon.
             Record_Type_Decl_Aspects_Alt =>
-              L ("type !! is !" & Aspects),
-            Access_To_Subp_Decl_Alt => L ("type !! is !" & Aspects),
+              L ("type !! is[# !]" & Aspects),
+            Access_To_Subp_Decl_Alt => L ("type !! is[# !]" & Aspects),
                --  gnatpp doesn't put a line break after "is" in this case.
             Enum_Array_Decl_Alt => L ("type !! is$[!]" & Aspects),
             Type_Decl_Alt => L ("type !! is[# !]" & Aspects),
