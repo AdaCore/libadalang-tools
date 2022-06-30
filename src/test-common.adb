@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2011-2021, AdaCore                    --
+--                      Copyright (C) 2011-2022, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -131,8 +131,8 @@ package body Test.Common is
 
       Sign_Image, Hash_Result : Unbounded_String;
 
-      Tagged_Rec  : Base_Type_Decl := No_Base_Type_Decl;
-      Root_Ignore : Base_Type_Decl;
+      Tagged_Rec  : Basic_Decl := No_Basic_Decl;
+      Root_Ignore : Basic_Decl;
 
       Subp_Depth : Natural := 0;
       --  Indicates how deep in subprogrmam specs the analysis is.
@@ -262,7 +262,7 @@ package body Test.Common is
 
          Attr_Flag : Boolean := False;
 
-         Type_Decl : Base_Type_Decl;
+         Type_Decl : Basic_Decl;
       begin
          case Kind (Param) is
             when Ada_Subtype_Indication =>
@@ -294,7 +294,12 @@ package body Test.Common is
 
                Type_Decl :=
                  P_Canonical_Type
-                   (As_Base_Type_Decl (P_Referenced_Decl (Param_Type_Name)));
+                   (As_Base_Type_Decl (P_Referenced_Decl (Param_Type_Name))).
+                      As_Basic_Decl;
+               while not Type_Decl.P_Next_Part_For_Decl.Is_Null loop
+                  Type_Decl :=
+                    Type_Decl.P_Next_Part_For_Decl;
+               end loop;
 
                if
                  Subp_Depth < 2 and then not Attr_Flag
@@ -353,7 +358,12 @@ package body Test.Common is
                      Type_Decl :=
                        P_Canonical_Type
                          (As_Base_Type_Decl
-                            (P_Referenced_Decl (Param_Type_Name)));
+                            (P_Referenced_Decl (Param_Type_Name))).
+                               As_Basic_Decl;
+                     while not Type_Decl.P_Next_Part_For_Decl.Is_Null loop
+                        Type_Decl :=
+                          Type_Decl.P_Next_Part_For_Decl;
+                     end loop;
 
                      if
                        Subp_Depth < 2 and then not Attr_Flag
@@ -413,10 +423,14 @@ package body Test.Common is
            else " at line" & L_Subp_Span.Start_Line'Img));
       Increase_Indent (Me_Hash);
 
-      Tagged_Rec := P_Primitive_Subp_Tagged_Type (L_Subp);
+      Tagged_Rec := P_Primitive_Subp_Tagged_Type (L_Subp).As_Basic_Decl;
 
       if Tagged_Rec /= No_Base_Type_Decl then
-         Root_Ignore := Root_Type_Declaration (Tagged_Rec);
+         while not Tagged_Rec.P_Next_Part_For_Decl.Is_Null loop
+            Tagged_Rec := Tagged_Rec.P_Next_Part_For_Decl;
+         end loop;
+         Root_Ignore :=
+           Root_Type_Declaration (Tagged_Rec.As_Base_Type_Decl).As_Basic_Decl;
       end if;
 
       case Kind (F_Subp_Kind (As_Subp_Spec (L_Subp))) is

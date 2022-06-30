@@ -1789,10 +1789,13 @@ package body Test.Skeleton is
                  Type_Dec.P_Get_Primitives (Only_Inherited => True);
                ISubs2 : constant Basic_Decl_Array :=
                  Type_Dec.P_Get_Primitives (Only_Inherited => False);
+               ISub : Basic_Decl;
                Ancestor_Type : Base_Type_Decl;
             begin
 
-               for ISub of ISubs loop
+               for ISub_Iter of ISubs loop
+
+                  ISub := ISub_Iter;
 
                   if
                     Source_Present (ISub.Unit.Get_Filename)
@@ -1800,6 +1803,17 @@ package body Test.Skeleton is
                     and then not Is_Private (ISub)
                     and then not Is_Overridden (ISub, ISubs2)
                   then
+
+                     --  We need to go to original declaration of the inherited
+                     --  subprogram to have same controlling type as specified
+                     --  for the parameter to perform root type substitution
+                     --  during hash computation.
+                     declare
+                        Arr : constant Basic_Decl_Array :=
+                          P_Base_Subp_Declarations (ISub_Iter);
+                     begin
+                        ISub := Arr (Arr'Last);
+                     end;
 
                      if ISub.Kind = Ada_Expr_Function then
                         Ancestor_Type :=
@@ -1838,6 +1852,7 @@ package body Test.Skeleton is
                           new String'(Mangle_Hash (ISub));
                         Tmp_Subp.Subp_Name_Image := new String'
                           (Node_Image (ISub.As_Basic_Decl.P_Defining_Name));
+                        Tmp_Subp.Corresp_Type := K;
 
                         Gather_Test_Cases
                           (Tmp_Subp,
@@ -2530,12 +2545,12 @@ package body Test.Skeleton is
 
       Decrease_Indent (Me, "Traversings finished");
 
-      if Inheritance_To_Suite then
+      if Inheritance_To_Suite and then not Stub_Mode_ON then
          Gather_Inherited_Subprograms
            (Dummy_Type_Counter, Suite_Data_List);
       end if;
 
-      if Substitution_Suite then
+      if Substitution_Suite and then not Stub_Mode_ON then
          Gather_Substitution_Data (Suite_Data_List);
       end if;
 
@@ -5668,8 +5683,7 @@ package body Test.Skeleton is
 
                      Put_Closing_Comment_Section
                        (Stub,
-                        Elem_Numbers.Element
-                          (Current_Subp.Subp_Declaration),
+                        0,
                         True,
                         False);
                      New_Line_Count;
