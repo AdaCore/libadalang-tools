@@ -3794,6 +3794,26 @@ package body Test.Skeleton is
          Test_Count   : Positive := 1;
          Is_Function  : Boolean;
          Generation_Complete : Boolean := False;
+
+         procedure Pp_Subp_Call (Initial_Pad : Natural := 0);
+
+         ------------------
+         -- Pp_Subp_Call --
+         ------------------
+
+         procedure Pp_Subp_Call (Initial_Pad : Natural := 0) is
+         begin
+            S_Put
+              (Initial_Pad, Subp_Content.Get ("fully_qualified_name") & " (");
+            for Param_Id in Single_Vec loop
+               S_Put (0, Array_Element (Single_Vec, Param_Id).Get ("name"));
+               if Array_Has_Element (Single_Vec, Param_Id + 1) then
+                  S_Put (0, ", ");
+               end if;
+            end loop;
+            S_Put (0, ");");
+         end Pp_Subp_Call;
+
       begin
 
          if not Is_Regular_File (JSON_Unit_File)
@@ -3863,25 +3883,36 @@ package body Test.Skeleton is
                                else ";"));
                   New_Line_Count;
                end loop;
-               if Is_Function then
-                  S_Put (6, Com);
-                  S_Put (3, Com & "Ret_Val : "
-                            & Subp_Content.Get ("return_type") & ";");
-                  New_Line_Count;
-               end if;
                S_Put (6, Com);
                S_Put (0, "begin");
                New_Line_Count;
-               S_Put (6, Com);
-               S_Put (3, (if Is_Function then "Ret_Val := " else "")
-                         & Subp_Content.Get ("fully_qualified_name") & " (");
-               for Param_Id in Single_Vec loop
-                  S_Put (0, Array_Element (Single_Vec, Param_Id).Get ("name"));
-                  if Array_Has_Element (Single_Vec, Param_Id + 1) then
-                     S_Put (0, ", ");
-                  end if;
-               end loop;
-               S_Put (0, ");");
+               if Is_Function then
+                  S_Put (6, Com);
+                  S_Put (3, "declare");
+                  New_Line_Count;
+                  S_Put (6, Com);
+                  S_Put (6, Com & "Ret_Val : "
+                            & Subp_Content.Get ("return_type") & ":=");
+                  New_Line_Count;
+                  S_Put (6, Com);
+                  Pp_Subp_Call (8);
+                  New_Line_Count;
+                  S_Put (6, Com);
+                  S_Put (3, "begin");
+                  New_Line_Count;
+                  S_Put (6, Com);
+                  S_Put
+                    (6, "--  Insert function call result validation here");
+                  New_Line_Count;
+                  S_Put (6, Com);
+                  S_Put (6, "null;");
+                  New_Line_Count;
+                  S_Put (6, Com);
+                  S_Put (3, "end;");
+               else
+                  S_Put (6, Com);
+                  Pp_Subp_Call (3);
+               end if;
                New_Line_Count;
                S_Put (6, Com);
                S_Put (0, "exception");
