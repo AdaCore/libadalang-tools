@@ -389,7 +389,7 @@ package body Pp.Formatting is
       Leading_Blanks : constant Natural :=
         (if Arg (Cmd, Comments_Gnat_Beginning)
            and then not Is_Header_Comment (Token_At_Cursor (Comment_Tok))
-           and then Comment_Tok.Kind in
+           and then Kind (Comment_Tok) in
                       Fillable_Comment | Other_Whole_Line_Comment
          then
            Natural'Max (Scanner.Leading_Blanks (Comment_Tok), 2)
