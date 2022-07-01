@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -202,6 +202,10 @@ package Utils.Command_Lines is
       procedure Set_Arg
         (Cmd : in out Command_Line; Switch : Switches; Val : Boolean := True);
       --  Set the given switch to True.
+
+      function Explicit (Cmd : Command_Line; Switch : Switches) return Boolean;
+      --  True if the switch was specified explicitly, as opposed to being
+      --  defaulted.
 
       type Switch_To_String_Mapping is array (Switches) of String_Ref;
 
@@ -435,6 +439,10 @@ package Utils.Command_Lines is
       procedure Set_Arg
         (Cmd : in out Command_Line; Switch : Switches; Val : Arg_Type);
       --  Set parameter of the given switch to Val.
+
+      function Explicit (Cmd : Command_Line; Switch : Switches) return Boolean;
+      --  True if the switch was specified explicitly, as opposed to being
+      --  defaulted.
 
       type Switch_To_Syntax_Mapping is array (Switches) of Switch_Syntax;
       type Switch_To_Arg_Type_Mapping is array (Switches) of Arg_Type;

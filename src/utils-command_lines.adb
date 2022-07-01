@@ -166,6 +166,10 @@ package body Utils.Command_Lines is
          Cmd.Sw (To_All (Switch)).Boolean_Val := Val;
       end Set_Arg;
 
+      function Explicit (Cmd : Command_Line; Switch : Switches) return Boolean
+      is
+        (Cmd.Sw (To_All (Switch)).Explicit);
+
       package body Set_Shorthands is
          pragma Assert (Descriptor.Allowed_Switches = null);
       begin
@@ -590,6 +594,10 @@ package body Utils.Command_Lines is
             Cmd.Sw (To_All (Switch)).String_Val := new String'(S);
          end if;
       end Set_Arg;
+
+      function Explicit (Cmd : Command_Line; Switch : Switches) return Boolean
+      is
+        (Cmd.Sw (To_All (Switch)).Explicit);
 
       Set_Shorthands_Instantiated : Boolean := False;
 
