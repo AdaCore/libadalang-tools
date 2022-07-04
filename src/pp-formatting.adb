@@ -3470,6 +3470,23 @@ package body Pp.Formatting is
                         Corrected_Indentation := Indentation;
                      end;
 
+                  elsif Prev_Indentation_Affect_Comments
+                    and then Kind (New_Tok) = Res_Record
+                    and then Kind (Src_Tok) in
+                      Other_Whole_Line_Comment | Fillable_Comment
+                    and then
+                      Kind (Prev (Prev (Prev (Src_Tok)))) = End_Of_Line_Comment
+                    and then
+                      Kind (Prev_ss (Prev (Prev (Prev (Src_Tok))))) = Res_Is
+                    and then Kind (Next (New_Tok)) = Enabled_LB_Token
+                  then
+                     --  This is the case of a type declaration having an EOL
+                     --  comment and a whole line or fillable comment between
+                     --  "is" and "record" keyword.
+                     --  In this case, the line comment should be aligned on
+                     --  the type indentation.
+
+                     Indentation := Before_Indentation;
                   else
                      Indentation := Natural'Max (Indentation,
                                                  Before_Indentation);
@@ -3717,6 +3734,19 @@ package body Pp.Formatting is
                then
                   --  The Disabled_LB_Token was enabled and will match the
                   --  True_End_Of_Line between the source token and a blank line
+                  null;
+
+               elsif Kind (LB.Tok) = Disabled_LB_Token
+                 and then Kind (Src_Tok) = Res_Record
+                 and then Kind (Src_Tok) = Kind (New_Tok)
+                 and then Kind (Prev (Prev_ss (Src_Tok))) = Fillable_Comment
+                 and then
+                   Kind (Prev (Prev_ss (Prev (Prev (Prev_ss (Src_Tok)))))) =
+                     End_Of_Line_Comment
+                 and then
+                   Kind (Prev_ss (Prev
+                         (Prev_ss (Prev (Prev (Prev_ss (Src_Tok))))))) = Res_Is
+               then
                   null;
 
                else

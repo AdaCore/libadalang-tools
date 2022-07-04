@@ -11,7 +11,7 @@ package Records is
 
   type Status_Type is  -- IRS Table F-44
   -- another comment, aligned with 'record' here
-    record
+  record
     -- yet another comment, aligned with record fields here
     Nav_Status : Nav_Status_Type;
     -- still another comment, aligned with record fields here

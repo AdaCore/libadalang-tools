@@ -509,7 +509,7 @@ package Utils.Command_Lines is
    end record; -- Dynamically_Typed_Switch
 
    type Parse_Callback is access procedure
-     (Phase : Parse_Phase; Swit : Dynamically_Typed_Switch);
+       (Phase : Parse_Phase; Swit : Dynamically_Typed_Switch);
 
    procedure Null_Callback
      (Phase : Parse_Phase; Swit : Dynamically_Typed_Switch) is null;
