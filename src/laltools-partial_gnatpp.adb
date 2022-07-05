@@ -178,7 +178,8 @@ package body Laltools.Partial_GNATPP is
    ---------------------
 
    function Get_Selection
-     (Unit : Analysis_Unit; Node : Ada_Node;
+     (Unit : Analysis_Unit;
+      Node : Ada_Node;
       Start_Tok, End_Tok : Token_Reference)
       return Utils.Char_Vectors.Char_Vector
    is
@@ -212,7 +213,7 @@ package body Laltools.Partial_GNATPP is
       begin
          for Line_Nb in
            (if Include_SL then Start_Line else Start_Line + 1)
-           .. Node.Sloc_Range.Start_Line
+           .. Node.Sloc_Range.End_Line
          loop
             declare
                L : constant Text_Type := Unit.Get_Line (Positive (Line_Nb));
@@ -659,11 +660,42 @@ package body Laltools.Partial_GNATPP is
          Parent_Node := Parent;
       end Is_Expected_Parent_Node_Callback;
 
+      function Get_Parent_Offset (Node : Ada_Node) return Natural;
+      --  Returns the parent indentation related to the current Node.
+
+      function Get_Parent_Offset (Node : Ada_Node) return Natural
+      is
+         Offset : Natural := 0;
+      begin
+         Parent_Node := Node;
+         Find_Matching_Parents
+           (Node, Is_Expected_Parent_Node'Access,
+            Is_Expected_Parent_Node_Callback'Access);
+
+         if Kind (Parent_Node) = Ada_Library_Item
+           and then Natural (Parent_Node.Sloc_Range.Start_Line) = 1
+           and then Natural (Parent_Node.Sloc_Range.Start_Column) > 0
+         then
+            Offset := 0;
+         else
+            Offset := Natural (Parent_Node.Sloc_Range.Start_Column);
+         end if;
+
+         case Kind (Parent_Node) is
+            when Ada_Package_Body | Ada_Package_Decl
+               | Ada_Task_Body | Ada_Subp_Body =>
+
+               Offset := Offset + PP_Indent;
+
+            when others => null;
+         end case;
+         return Offset;
+      end Get_Parent_Offset;
+
       Prev_Sibling : constant Ada_Node := Get_Previous_Sibling (Node);
       Next_Sibling : constant Ada_Node := Get_Next_Sibling (Node);
       Offset       : Natural := 0;
    begin
-
       if Prev_Sibling /= No_Ada_Node and then Next_Sibling /= No_Ada_Node
         and then Prev_Sibling.Sloc_Range.Start_Column =
           Next_Sibling.Sloc_Range.Start_Column
@@ -678,8 +710,7 @@ package body Laltools.Partial_GNATPP is
             then
                --  Get the parent node which should be a Library_Item which
                --  will give us the offset to use for the reformatting
-               Offset :=
-                 Natural (Node.Parent.As_Ada_Node.Sloc_Range.Start_Column);
+               Offset := Get_Parent_Offset (Node);
             else
                Offset := Natural (Prev_Sibling.Sloc_Range.Start_Column);
             end if;
@@ -695,22 +726,7 @@ package body Laltools.Partial_GNATPP is
          --  We should look backward for the Node parent to find the offset
          --  of the parent and compute the one related to the reformatted node
          --  based on gnatpp indentation and indent continuation parameters
-         Parent_Node := Node;
-         Find_Matching_Parents
-           (Node, Is_Expected_Parent_Node'Access,
-            Is_Expected_Parent_Node_Callback'Access);
-
-         Offset := Natural (Parent_Node.Sloc_Range.Start_Column);
-
-         case Kind (Parent_Node) is
-            when Ada_Package_Body | Ada_Package_Decl
-               | Ada_Task_Body | Ada_Subp_Body =>
-
-               Offset := Offset + PP_Indent;
-
-            when others => null;
-         end case;
-
+         Offset := Get_Parent_Offset (Node);
       end if;
 
       return Offset;
