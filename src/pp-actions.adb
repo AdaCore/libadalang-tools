@@ -1601,6 +1601,7 @@ package body Pp.Actions is
          Multi_Name_Assoc_Alt,
          Comp_Clause_Alt,
          Handled_Stmts_With_Begin_Alt,
+         Handled_Stmts_With_Begin_Alt_Partial_Mode,
          Handled_Stmts_With_Do_Alt,
          Handled_Stmts_With_Do_Vertical_Agg_Alt,
          Depends_Hack_Alt,
@@ -1823,6 +1824,11 @@ package body Pp.Actions is
              --  the template, because function Tab_Token checks for the ".".
             Handled_Stmts_With_Begin_Alt =>
               L ("?begin$" & Stmts_And_Handlers),
+            Handled_Stmts_With_Begin_Alt_Partial_Mode =>
+              L ("begin$" & "?{~;$~;$}~" & "?exception$" & "{~$~}~"),
+           --              "{~;$~;$}~" &
+           --  "?exception$" &
+           --  "{~$~}~"
             Handled_Stmts_With_Do_Alt =>
               L ("# ?do$" & Stmts_And_Handlers),
             Handled_Stmts_With_Do_Vertical_Agg_Alt =>
@@ -4085,7 +4091,13 @@ package body Pp.Actions is
                  Ada_Task_Body |
                  Ada_Begin_Block |
                  Ada_Decl_Block =>
-                  Interpret_Alt_Template (Handled_Stmts_With_Begin_Alt);
+
+                  if Partial_Gnatpp then
+                     Interpret_Alt_Template
+                       (Handled_Stmts_With_Begin_Alt_Partial_Mode);
+                  else
+                     Interpret_Alt_Template (Handled_Stmts_With_Begin_Alt);
+                  end if;
 
                when Ada_Extended_Return_Stmt =>
                   declare
@@ -5377,7 +5389,6 @@ package body Pp.Actions is
          else
             --  Otherwise, convert the tree to text, and then run all the
             --  text-based passes.
-
             Tree_To_Ada_2 (Node, Cmd, Partial, Partial_Gnatpp);
             Post_Tree_Phases
               (Input          => Input,

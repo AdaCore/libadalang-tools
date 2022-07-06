@@ -42,6 +42,9 @@ package Pp.Formatting is
    Token_Mismatch : exception;
    --  Raised by Tree_To_Ada if it detects a bug in itself that causes the
    --  output tokens to not match the input properly.
+   Partial_Gnatpp_Error : exception;
+   --  Raised in partial gnatpp formatting mode when infinite loops are
+   --  detected.
 
    -------------------
    -- Line Breaking --

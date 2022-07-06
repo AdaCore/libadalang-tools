@@ -2364,6 +2364,7 @@ package body Pp.Formatting is
                      Move_Past_Out_Tok;
                      pragma Assert (Sname_83 (New_Tok));
                   end loop;
+
                   pragma Assert
                     (Disable_Final_Check or else
                        Kind (Src_Tok) in ';' | EOL_Token | Comment_Kind);
@@ -2438,13 +2439,20 @@ package body Pp.Formatting is
                      goto Done;
                   end if;
                else
+                  --  Partial mode formatting specific tokens synchronisations
+                  --  where no token mismatch is supposed to be raised
                   if Partial_Gnatpp then
+
                      if Kind (Src_Tok) = ';'
                        and then Kind (Prev (Src_Tok)) in
                          Res_End | Res_Record | Res_Loop | Ident | ')'
                        and then Kind (New_Tok) = End_Of_Input
                      then
                         Next_ss (Src_Tok);
+                     else
+                        --  When enter here mostly an infinite loop situation
+                        --  is detected in partial mode
+                        raise Partial_Gnatpp_Error;
                      end if;
 
                   else
@@ -2458,7 +2466,6 @@ package body Pp.Formatting is
 
          pragma Assert (At_Last (Src_Tok));
          pragma Assert (At_Last (New_Tok));
-
          <<Done>> null;
 
          pragma Assert (Disable_Final_Check or else Qual_Nesting = 0);
@@ -3879,7 +3886,6 @@ package body Pp.Formatting is
            (Lines_Data_P, Saved_New_Tokns,
             Do_All => True, Do_Enabled => True, Do_Syntax => True,
             First_Time => False);
-
          Append_Tokn (Pending_Tokns, Start_Of_Input);
 
          pragma Assert (Is_Empty (New_Tokns));
@@ -4266,6 +4272,7 @@ package body Pp.Formatting is
                   end if;
 
                elsif Kind (Src_Tok) in Whole_Line_Comment then
+
                   --  In the context of call parameters or aggregate association
                   --  having a whole line comment inserted in between the
                   --  elements the present Disabled_LB_Token should be enabled
@@ -4355,6 +4362,8 @@ package body Pp.Formatting is
                      goto Done;
                   end if;
                else
+                  --  Handle specific cases in partial formatting where no
+                  --  token mismatch raise is needed
                   if Partial_Gnatpp then
                      if Kind (Src_Tok) = ';'
                        and then Kind (Prev (Src_Tok)) in
@@ -4362,7 +4371,12 @@ package body Pp.Formatting is
                        and then Kind (New_Tok) = End_Of_Input
                      then
                         Next_ss (Src_Tok);
+                     else
+                        --  When enter here mostly an infinite loop situation
+                        --  is detected in partial mode
+                        raise Partial_Gnatpp_Error;
                      end if;
+
                   else
                      Raise_Token_Mismatch
                        ("Inserting", Lines_Data, Src_Buf, Src_Tok, New_Tok);
