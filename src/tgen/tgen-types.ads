@@ -81,6 +81,8 @@ package TGen.Types is
 
    subtype Big_Integer is Big_Int.Big_Integer;
 
+   subtype Big_Real is Big_Reals.Big_Real;
+
    function Image (Self : Typ) return String;
 
    function Is_Anonymous (Self : Typ) return Boolean;
@@ -205,6 +207,8 @@ package TGen.Types is
 
    Big_Zero : constant Big_Integer :=
      Ada.Numerics.Big_Numbers.Big_Integers.To_Big_Integer (0);
+
+   Big_Zero_F : constant Big_Reals.Big_Real := Big_Reals.To_Real (0);
 
    type Unsupported_Typ is new Typ with null record;
 
