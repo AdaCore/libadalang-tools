@@ -172,6 +172,8 @@ package body TGen.Types.Array_Types is
       end Callback;
 
    begin
+      Found := False;
+      Constraint := (Present => False);
       Callback_On_Constraint (Self, Var_Name, Callback'Access);
    end Is_Constrained_By_Variable;
 
