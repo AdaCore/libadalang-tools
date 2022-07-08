@@ -33,56 +33,65 @@ package body TGen.Types.Real_Types is
    function Image (Self : Float_Typ) return String is
      (Typ (Self).Image & ": Real Type"
       & (if Self.Is_Static
-         then " digits" & Self.Digits_Value'Image
+         then " digits " & Self.Digits_Value'Image
               & (if Self.Has_Range
-                 then " range" & Self.Range_Value.Min'Image & " .."
-                       & Self.Range_Value.Max'Image
+                 then " range " & Big_Reals.To_String (Self.Range_Value.Min)
+                      & " .. " & Big_Reals.To_String (Self.Range_Value.Max)
                  else "")
          else " (non static)"));
 
    function Image (Self : Ordinary_Fixed_Typ) return String is
      (Typ (Self).Image & ": Ordinary Fixed Point"
       & (if Self.Is_Static
-         then " delta " & Self.Delta_Value'Image & " range"
-              & Self.Range_Value.Min'Image & " .." & Self.Range_Value.Max'Image
+         then " delta " & Big_Reals.To_String (Self.Delta_Value) & " range "
+              & Big_Reals.To_String (Self.Range_Value.Min) & " .. "
+              & Big_Reals.To_String (Self.Range_Value.Max)
          else " (non static)"));
 
    function Image (Self : Decimal_Fixed_Typ) return String is
      (Typ (Self).Image & ": Decimal Fixed Point"
       & (if Self.Is_Static
-         then " delta" & Self.Delta_Value'Image & " digits"
+         then " delta " & Big_Reals.To_String (Self.Delta_Value) & " digits"
               & Self.Digits_Value'Image
               & (if Self.Has_Range
-                 then " range" & Self.Range_Value.Min'Image & " .."
-                      & Self.Range_Value.Max'Image
+                 then " range " & Big_Reals.To_String (Self.Range_Value.Min)
+                      & " .. " & Big_Reals.To_String (Self.Range_Value.Max)
                  else "")
          else " (non static)"));
 
-   function Low_Bound_Or_Default (Self : Float_Typ) return Long_Float is
-     (if Self.Has_Range and then Self.Range_Value.Min'Valid
+   function Low_Bound_Or_Default (Self : Float_Typ) return Big_Real is
+     (if Self.Has_Range and then Big_Reals.Is_Valid (Self.Range_Value.Min)
       then Self.Range_Value.Min
-      else Long_Float'First);
+      else LF_Conversions.To_Big_Real (Long_Float'First));
 
-   function High_Bound_Or_Default (Self : Float_Typ) return Long_Float is
-     (if Self.Has_Range and then Self.Range_Value.Max'Valid
+   function High_Bound_Or_Default (Self : Float_Typ) return Big_Real is
+     (if Self.Has_Range and then Big_Reals.Is_Valid (Self.Range_Value.Max)
       then Self.Range_Value.Max
-      else Long_Float'Last);
+      else LF_Conversions.To_Big_Real (Long_Float'Last));
 
-   function Low_Bound_Or_Default (Self : Ordinary_Fixed_Typ) return Long_Float
+   function Low_Bound_Or_Default (Self : Ordinary_Fixed_Typ) return Big_Real
    is (Self.Range_Value.Min);
 
-   function High_Bound_Or_Default (Self : Ordinary_Fixed_Typ) return Long_Float
+   function High_Bound_Or_Default (Self : Ordinary_Fixed_Typ) return Big_Real
    is (Self.Range_Value.Max);
 
-   function Low_Bound_Or_Default (Self : Decimal_Fixed_Typ) return Long_Float
-   is (if Self.Has_Range
-       then Self.Range_Value.Min
-       else -10.0 ** Self.Digits_Value * Self.Delta_Value);
+   function Low_Bound_Or_Default (Self : Decimal_Fixed_Typ) return Big_Real
+   is
+      use Big_Reals;
+   begin
+      return (if Self.Has_Range
+              then Self.Range_Value.Min
+              else To_Real (-10) ** Self.Digits_Value * Self.Delta_Value);
+   end Low_Bound_Or_Default;
 
-   function High_Bound_Or_Default (Self : Decimal_Fixed_Typ) return Long_Float
-   is (if Self.Has_Range
-       then Self.Range_Value.Max
-       else 10.0 ** Self.Digits_Value * Self.Delta_Value);
+   function High_Bound_Or_Default (Self : Decimal_Fixed_Typ) return Big_Real
+   is
+      use Big_Reals;
+   begin
+      return (if Self.Has_Range
+              then Self.Range_Value.Max
+              else To_Real (10) ** Self.Digits_Value * Self.Delta_Value);
+   end High_Bound_Or_Default;
 
    function Gen return T is
       function Rand is new GNAT.Random_Numbers.Random_Float (T);
@@ -135,8 +144,13 @@ package body TGen.Types.Real_Types is
    is
       Self : constant Float_Typ := Float_Typ (Ty);
 
+      LB : constant Big_Real := Self.Low_Bound_Or_Default;
+
+      HB : constant Big_Real := Self.High_Bound_Or_Default;
+
       type T is new Long_Float
-        range Self.Low_Bound_Or_Default .. Self.High_Bound_Or_Default;
+      range LF_Conversions.From_Big_Real (LB)
+        .. LF_Conversions.From_Big_Real (HB);
 
       function Rand is new Gen (T);
    begin
@@ -165,9 +179,6 @@ package body TGen.Types.Real_Types is
       return Strat;
    end Generate_Static;
 
-   function LLI_Gen is new GNAT.Random_Numbers.Random_Discrete
-     (Long_Long_Integer, 1);
-
    function Generate_Ordinary_Fixed_Typ
      (Ty : Typ'Class) return Static_Value'Class;
 
@@ -181,18 +192,24 @@ package body TGen.Types.Real_Types is
    function Generate_Ordinary_Fixed_Typ
      (Ty : Typ'Class) return Static_Value'Class
    is
+      use Big_Reals;
       Self : constant Ordinary_Fixed_Typ := Ordinary_Fixed_Typ (Ty);
-      High_Bound : constant Long_Long_Integer :=
-        Long_Long_Integer (Self.Range_Value.Max / Self.Delta_Value);
-      Low_Bound  : constant Long_Long_Integer :=
-        Long_Long_Integer (Self.Range_Value.Min / Self.Delta_Value);
 
-      Rand_Val : constant Long_Long_Integer :=
-        LLI_Gen (Generator_Instance, Low_Bound, High_Bound);
+      High_Bound : constant Long_Long_Long_Integer :=
+        Long_Long_Long_Integer
+          (LF_Conversions.From_Big_Real
+             (Self.Range_Value.Max / Self.Delta_Value));
+      Low_Bound  : constant Long_Long_Long_Integer :=
+        Long_Long_Long_Integer
+          (LF_Conversions.From_Big_Real
+             (Self.Range_Value.Min / Self.Delta_Value));
+
+      Rand_Val : constant Long_Long_Long_Integer :=
+        Rand_LLLI (Low_Bound, High_Bound);
    begin
       return Base_Static_Value'
         (Value => +(
-           Long_Float'Image (Self.Delta_Value)
+           To_String (Self.Delta_Value)
            & " * "
            & (if Rand_Val >= 0
               then Rand_Val'Image
@@ -206,6 +223,7 @@ package body TGen.Types.Real_Types is
    function Generate_Decimal_Fixed_Typ
      (Ty : Typ'Class) return Static_Value'Class
    is
+      use Big_Reals;
       Self : constant Decimal_Fixed_Typ := Decimal_Fixed_Typ (Ty);
 
       --  TODO: Using High/Low_Bound_Or_Default ignores the digits value, which
@@ -213,17 +231,21 @@ package body TGen.Types.Real_Types is
       --  to generate some "sparse" integer ranges to ensure we do not go
       --  beyond the specified precision.
 
-      High_Bound : constant Long_Long_Integer :=
-        Long_Long_Integer (Self.High_Bound_Or_Default / Self.Delta_Value);
-      Low_Bound  : constant Long_Long_Integer :=
-        Long_Long_Integer (Self.Low_Bound_Or_Default / Self.Delta_Value);
+      High_Bound : constant Long_Long_Long_Integer :=
+        Long_Long_Long_Integer
+          (LF_Conversions.From_Big_Real
+             (Self.High_Bound_Or_Default / Self.Delta_Value));
+      Low_Bound  : constant Long_Long_Long_Integer :=
+        Long_Long_Long_Integer
+          (LF_Conversions.From_Big_Real
+             (Self.Low_Bound_Or_Default / Self.Delta_Value));
 
-      Rand_Val : constant Long_Long_Integer :=
-        LLI_Gen (Generator_Instance, Low_Bound, High_Bound);
+      Rand_Val : constant Long_Long_Long_Integer :=
+        Rand_LLLI (Low_Bound, High_Bound);
    begin
       return Base_Static_Value'
         (Value => +(
-           Long_Float'Image (Self.Delta_Value)
+           Self.Delta_Value'Image
            & " * "
            & (if Rand_Val >= 0
               then Rand_Val'Image

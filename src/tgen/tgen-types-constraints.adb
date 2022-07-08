@@ -45,7 +45,7 @@ package body TGen.Types.Constraints is
 
    function Image (Self : Real_Constraint_Value) return String is
      (case Self.Kind is
-      when Static => Self.Real_Val'Image,
+      when Static => Big_Reals.To_String (Self.Real_Val),
       when Non_Static => +Self.Text);
 
    -----------

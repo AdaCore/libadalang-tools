@@ -78,7 +78,7 @@ package TGen.Types.Constraints is
    is record
       case Kind is
          when Static =>
-            Real_Val : Long_Float;
+            Real_Val : Big_Reals.Big_Real;
             --  The static real value of the constraint
 
          when Non_Static =>
