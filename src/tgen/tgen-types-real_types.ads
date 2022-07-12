@@ -29,18 +29,18 @@ with TGen.Strategies; use TGen.Strategies;
 package TGen.Types.Real_Types is
 
    type Float_Range is record
-      Min, Max : Big_Real;
+      Min, Max : Long_Float;
    end record;
 
    type Real_Typ is new Scalar_Typ with null record;
 
-   function Low_Bound_Or_Default (Self : Real_Typ) return Big_Real is
-     (LF_Conversions.To_Big_Real (Long_Float'First));
+   function Low_Bound_Or_Default (Self : Real_Typ) return Long_Float is
+     (Long_Float'First);
    --  Return the low bound for Self if it has one explicitly defined, or
    --  Long_Float'First otherwise.
 
-   function High_Bound_Or_Default (Self : Real_Typ) return Big_Real is
-     (LF_Conversions.To_Big_Real (Long_Float'Last));
+   function High_Bound_Or_Default (Self : Real_Typ) return Long_Float is
+     (Long_Float'Last);
    --  Return the high bound for Self if it has one explicitly defined, or
    --  Long_Float'Last otherwise.
 
@@ -64,12 +64,12 @@ package TGen.Types.Real_Types is
      (Self.Is_Static);
    --  Wether values for this Typ can be statically generated
 
-   function Low_Bound_Or_Default (Self : Float_Typ) return Big_Real
+   function Low_Bound_Or_Default (Self : Float_Typ) return Long_Float
    with Pre => Self.Is_Static;
    --  Return the low bound for Self if it has one explicitly defined, or
    --  Long_Float'First otherwise.
 
-   function High_Bound_Or_Default (Self : Float_Typ) return Big_Real
+   function High_Bound_Or_Default (Self : Float_Typ) return Long_Float
    with Pre => Self.Is_Static;
    --  Return the high bound for Self if it has one explicitly defined, or
    --  Long_Float'Last otherwise.
@@ -99,7 +99,7 @@ package TGen.Types.Real_Types is
      Real_Typ (Is_Static => Is_Static) with record
       case Is_Static is
          when True =>
-            Delta_Value : Big_Real;
+            Delta_Value : Long_Float;
             Range_Value : Float_Range;
          when others =>
             null;
@@ -115,12 +115,12 @@ package TGen.Types.Real_Types is
       Context : in out Generation_Context) return Static_Strategy_Type'Class;
    --  Generate a strategy to statically generate (in one pass) values for Self
 
-   function Low_Bound_Or_Default (Self : Ordinary_Fixed_Typ) return Big_Real
+   function Low_Bound_Or_Default (Self : Ordinary_Fixed_Typ) return Long_Float
    with Pre => Self.Is_Static;
    --  Return the low bound for Self if it has one explicitly defined, or
    --  Long_Float'First otherwise.
 
-   function High_Bound_Or_Default (Self : Ordinary_Fixed_Typ) return Big_Real
+   function High_Bound_Or_Default (Self : Ordinary_Fixed_Typ) return Long_Float
    with Pre => Self.Is_Static;
    --  Return the high bound for Self if it has one explicitly defined, or
    --  Long_Float'Last otherwise.
@@ -140,7 +140,7 @@ package TGen.Types.Real_Types is
      Real_Typ (Is_Static => Is_Static) with record
       case Is_Static is
          when True =>
-            Delta_Value  : Big_Real;
+            Delta_Value  : Long_Float;
             Digits_Value : Natural;
             case Has_Range is
                when True =>
@@ -165,12 +165,12 @@ package TGen.Types.Real_Types is
 
    function Kind (Self : Decimal_Fixed_Typ) return Typ_Kind is (Decimal_Kind);
 
-   function Low_Bound_Or_Default (Self : Decimal_Fixed_Typ) return Big_Real
+   function Low_Bound_Or_Default (Self : Decimal_Fixed_Typ) return Long_Float
    with Pre => Self.Is_Static;
    --  Return the low bound for Self if it has one explicitly defined, or
    --  Long_Float'First otherwise.
 
-   function High_Bound_Or_Default (Self : Decimal_Fixed_Typ) return Big_Real
+   function High_Bound_Or_Default (Self : Decimal_Fixed_Typ) return Long_Float
    with Pre => Self.Is_Static;
    --  Return the high bound for Self if it has one explicitly defined, or
    --  Long_Float'Last otherwise.

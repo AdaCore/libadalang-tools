@@ -135,7 +135,7 @@ package body TGen.Types.Translation is
    procedure Translate_Float_Range
      (Decl      :     Base_Type_Decl;
       Has_Range : out Boolean;
-      Min, Max  : out Big_Reals.Big_Real);
+      Min, Max  : out Long_Float);
 
    function Extract_Real_Range_Spec
      (Node : LAL.Constraint) return LAL.Range_Spec;
@@ -543,7 +543,7 @@ package body TGen.Types.Translation is
 
       Digits_Value : Natural := 0;
       Has_Range    : Boolean;
-      Min, Max     : Big_Reals.Big_Real;
+      Min, Max     : Long_Float;
 
       Res : Translation_Result (Success => True);
 
@@ -589,17 +589,17 @@ package body TGen.Types.Translation is
      (Decl      : Base_Type_Decl;
       Type_Name : Defining_Name) return Translation_Result
    is
-      Min, Max    : Big_Real;
-      Delta_Value : Big_Real;
+      Min, Max    : Long_Float;
+      Delta_Value : Long_Float;
       Has_Range   : Boolean;
 
       procedure Find_Delta
-        (Decl : Base_Type_Decl; Delta_Value : out Big_Real);
+        (Decl : Base_Type_Decl; Delta_Value : out Long_Float);
       --  Travese the type hierachy from the bottom to find the inner most
       --  delta value of Decl.
 
       procedure Find_Delta
-        (Decl : Base_Type_Decl; Delta_Value : out Big_Real)
+        (Decl : Base_Type_Decl; Delta_Value : out Long_Float)
       is
          Delta_Expr : Expr;
          --  Expr corresponding to the delta value, which will later be
@@ -682,9 +682,7 @@ package body TGen.Types.Translation is
             if Delta_Eval.Kind /= Real then
                raise Translation_Error with "wrong eval type for delta value";
             end if;
-            Delta_Value :=  Big_Reals.From_Universal_Image
-              (Num => Delta_Eval.Real_Result.Numerator.Image,
-               Den => Delta_Eval.Real_Result.Denominator.Image);
+            Delta_Value := Long_Float (Delta_Eval.Real_Result.To_Double);
          end;
       end Find_Delta;
 
@@ -728,15 +726,15 @@ package body TGen.Types.Translation is
      (Decl      : Base_Type_Decl;
       Type_Name : Defining_Name) return Translation_Result
    is
-      Delta_Val  : Big_Real;
+      Delta_Val  : Long_Float;
       Digits_Val : Natural;
       Has_Range  : Boolean;
 
-      Range_Min, Range_Max : Big_Real;
+      Range_Min, Range_Max : Long_Float;
 
       procedure Find_Digits (Decl : Base_Type_Decl; Digits_Val : out Natural);
 
-      procedure Find_Delta (Decl : Base_Type_Decl; Delta_Val : out Big_Real);
+      procedure Find_Delta (Decl : Base_Type_Decl; Delta_Val : out Long_Float);
 
       -----------------
       -- Find_Digits --
@@ -795,7 +793,7 @@ package body TGen.Types.Translation is
       -- Find_Delta --
       ----------------
 
-      procedure Find_Delta (Decl : Base_Type_Decl; Delta_Val : out Big_Real)
+      procedure Find_Delta (Decl : Base_Type_Decl; Delta_Val : out Long_Float)
       is
          --  There can be no delta constraints on a decimal fixed point type
          --  as per RM J.3 (5) so lets work on the type definition directly.
@@ -809,9 +807,7 @@ package body TGen.Types.Translation is
               "Evalutation of delta value for a decimal fixed point did not"
               & " return a real type";
          end if;
-         Delta_Val := Big_Reals.From_Universal_Image
-           (Num => Eval_Res.Real_Result.Numerator.Image,
-            Den => Eval_Res.Real_Result.Denominator.Image);
+         Delta_Val := Long_Float (Eval_Res.Real_Result.To_Double);
       end Find_Delta;
 
    begin
@@ -849,7 +845,7 @@ package body TGen.Types.Translation is
 
    procedure Translate_Float_Range
      (Decl     :     Base_Type_Decl; Has_Range : out Boolean;
-      Min, Max : out Big_Reals.Big_Real)
+      Min, Max : out Long_Float)
    is
       Root           : constant Type_Decl := Decl.P_Root_Type.As_Type_Decl;
       Parent_Type    : Subtype_Indication := No_Subtype_Indication;
@@ -880,8 +876,8 @@ package body TGen.Types.Translation is
          if Is_Null (Range_Spec_Val) then
 
             Has_Range := False;
-            Min       := TGen.Types.Big_Zero_F;
-            Max       := TGen.Types.Big_Zero_F;
+            Min       := 0.0;
+            Max       := 0.0;
             return;
          end if;
 
@@ -960,7 +956,7 @@ package body TGen.Types.Translation is
    function Translate_Real_Range_Spec
      (Node : LAL.Range_Spec) return Real_Range_Constraint
    is
-      Min, Max : Big_Reals.Big_Real;
+      Min, Max : Long_Float;
       Min_Text, Max_Text : Unbounded_Text_Type;
       Has_Range : Boolean;
       Min_Static, Max_Static : Boolean;
@@ -979,8 +975,8 @@ package body TGen.Types.Translation is
                   .As_Base_Type_Decl,
                   Has_Range, Min, Max);
                if not Has_Range then
-                  Min := LF_Conversions.To_Big_Real (Long_Float'First);
-                  Max := LF_Conversions.To_Big_Real (Long_Float'Last);
+                  Min := Long_Float'First;
+                  Max := Long_Float'Last;
                end if;
                Min_Static := True;
                Max_Static := True;
@@ -1000,9 +996,7 @@ package body TGen.Types.Translation is
                      raise Translation_Error with
                      "Wrong type of static eval for real range constraint.";
                   end if;
-                  Min := Big_Reals.From_Universal_Image
-                    (Num => Min_Eval.Real_Result.Numerator.Image,
-                     Den => Min_Eval.Real_Result.Denominator.Image);
+                  Min := Long_Float (Min_Eval.Real_Result.To_Double);
                   Min_Static := True;
                end;
             else
@@ -1018,9 +1012,7 @@ package body TGen.Types.Translation is
                      raise Translation_Error with
                      "Wrong type of static eval for real range constraint.";
                   end if;
-                  Max := Big_Reals.From_Universal_Image
-                    (Num => Max_Eval.Real_Result.Numerator.Image,
-                     Den => Max_Eval.Real_Result.Denominator.Image);
+                  Max := Long_Float (Max_Eval.Real_Result.To_Double);
                   Max_Static := True;
                end;
             else

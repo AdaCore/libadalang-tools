@@ -24,24 +24,14 @@
 --  Numeric utility functions for Big integers
 
 with Ada.Numerics.Big_Numbers.Big_Integers;
-with Ada.Numerics.Big_Numbers.Big_Reals;
-
 with Ada.Numerics.Generic_Elementary_Functions;
 
 package TGen.Numerics is
 
    package Big_Int renames Ada.Numerics.Big_Numbers.Big_Integers;
 
-   package Big_Reals renames Ada.Numerics.Big_Numbers.Big_Reals;
-
-   package LF_Conversions is
-     new Ada.Numerics.Big_Numbers.Big_Reals.Float_Conversions (Long_Float);
-   --  We use Long_Float instead of Long_Long_Float for random generation
-   --  purposes because there is a bug Float_Conversions which results in
-   --  Storage_Errors when using the package instantiated with Long_Long_Float.
-
-   package LF_Functions is
-     new Ada.Numerics.Generic_Elementary_Functions (Long_Float);
+   package LLF_Functions is
+     new Ada.Numerics.Generic_Elementary_Functions (Long_Long_Float);
 
    package LLLI_Conversions is
      new Big_Int.Signed_Conversions (Long_Long_Long_Integer);
@@ -51,10 +41,10 @@ package TGen.Numerics is
 
    function Log
      (N    : Big_Int.Big_Integer;
-      Base : Long_Float) return Integer is
+      Base : Long_Long_Float) return Integer is
      (Integer
-        (LF_Functions.Log
-             (Long_Float
+        (LLF_Functions.Log
+             (Long_Long_Float
                   (LLLI_Conversions.From_Big_Integer (N)),
               Base)));
 
