@@ -945,6 +945,10 @@ package body Laltools.Refactor.Pull_Up_Declaration is
             else
                Other_Insertion_Point :=
                  End_Sloc (Declaration_Part.P_Defining_Name.Sloc_Range);
+               Indentation :=
+                 Natural
+                   (Declaration_Part.P_Defining_Name.Sloc_Range.End_Column)
+                 + 1;
                Append (New_Parameters, " (");
                Parameter_Declaration :=
                  Key (Parameters_Cursor);
@@ -1053,12 +1057,17 @@ package body Laltools.Refactor.Pull_Up_Declaration is
                Append (Actual_Parameters, Indentation * " ");
                Append
                  (Actual_Parameters,
-                  +Object_Decl.As_Object_Decl.F_Ids.Text);
-               Append
-                 (Actual_Parameters, " => ");
+                  (if Object_Decl.Kind in Ada_Object_Decl then
+                     +Object_Decl.As_Object_Decl.F_Ids.Text
+                   else
+                     +Object_Decl.As_Param_Spec.F_Ids.Text));
+               Append (Actual_Parameters, " => ");
                Append
                  (Actual_Parameters,
-                  +Object_Decl.As_Object_Decl.F_Ids.Text);
+                  (if Object_Decl.Kind in Ada_Object_Decl then
+                     +Object_Decl.As_Object_Decl.F_Ids.Text
+                   else
+                     +Object_Decl.As_Param_Spec.F_Ids.Text));
                Next (Parameters_Cursor);
             end loop;
             Append (Actual_Parameters, ")");
