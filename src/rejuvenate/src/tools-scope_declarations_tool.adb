@@ -52,6 +52,9 @@ package body Tools.Scope_Declarations_Tool is
    function Hash (N : LAL.Object_Decl) return Ada.Containers.Hash_Type is
      (N.As_Ada_Node.Hash);
 
+   function Hash (N : LAL.Declarative_Part) return Ada.Containers.Hash_Type is
+     (N.As_Ada_Node.Hash);
+
    package Defining_Name_Sets is new
      Ada.Containers.Hashed_Sets
        (Element_Type        => LAL.Defining_Name,
@@ -81,6 +84,13 @@ package body Tools.Scope_Declarations_Tool is
         Hash            => Hash,
         Equivalent_Keys => LAL."=",
         "="             => "=");
+
+   package Decl_Part_Sets is new
+     Ada.Containers.Hashed_Sets
+       (Element_Type        => LAL.Declarative_Part,
+        Hash                => Hash,
+        Equivalent_Elements => LAL."=",
+        "="                 => LAL."=");
 
    type Positions is (First, Middle, Last);
 
@@ -128,6 +138,12 @@ package body Tools.Scope_Declarations_Tool is
       Obj_Decl_To_Modify : Object_Decl_Sets.Set;
       --  Stores the Object declarations to be modified
 
+      Decl_Parts : Decl_Part_Sets.Set;
+      --  Stores the declarative part nodes.
+
+      Removable_Decl_Part : Decl_Part_To_Edit_Map.Map;
+      --  Stores the Declarative Part that can be removed.
+
       procedure Process_Decl (Decl_Part : LAL.Declarative_Part);
       --  Process the declarative part
       --  1. first check all the defining name in the decl_to_check that how
@@ -145,7 +161,7 @@ package body Tools.Scope_Declarations_Tool is
       function Find_Decl_Part (Node : LAL.Ada_Node'Class)
                                return LALCO.Visit_Status;
       --  go through the AST to find all the decl part.
-      procedure Generate_Edit (Obj : LAL.Object_Decl);
+      procedure Generate_Edit (Decl_Part : LAL.Declarative_Part);
       --  generate the text edit information
 
       ------------------
@@ -202,6 +218,7 @@ package body Tools.Scope_Declarations_Tool is
                                return LALCO.Visit_Status is
       begin
          if Node.Kind in LALCO.Ada_Declarative_Part_Range then
+            Decl_Parts.Include (Node.As_Declarative_Part);
             Process_Decl (Node.As_Declarative_Part);
          end if;
          return LALCO.Into;
@@ -211,195 +228,240 @@ package body Tools.Scope_Declarations_Tool is
       -- Generate_Edit --
       -------------------
 
-      procedure Generate_Edit (Obj : LAL.Object_Decl) is
-         Text_To_Add, Tmp_Text    : Unbounded_String;
-         Edit_Texts               : ReFac.Text_Edit_Map;
-         Text_Edit                : ReFac.Text_Edit;
-         Name_Count, Modify_Count : Integer := 0;
-         Names                    : Defining_Name_Ordered_Sets.Set;
-         function Check_Position (List_Node : LAL.Ada_Node'Class;
-                                  Name_Node : LAL.Defining_Name'Class)
+      procedure Generate_Edit (Decl_Part : LAL.Declarative_Part) is
+         Is_Empty : Boolean := True;
+         Has_Decl : Boolean := False;
+         Edit_Map_Of_Decl_Part : ReFac.Text_Edit_Map;
+         procedure Generate_Edit (Obj : LAL.Object_Decl);
+
+         procedure Generate_Edit (Obj : LAL.Object_Decl) is
+            Text_To_Add, Tmp_Text    : Unbounded_String;
+            Edit_Texts               : ReFac.Text_Edit_Map;
+            Text_Edit                : ReFac.Text_Edit;
+            Name_Count, Modify_Count : Integer := 0;
+            Names                    : Defining_Name_Ordered_Sets.Set;
+            function Check_Position (List_Node : LAL.Ada_Node'Class;
+                                     Name_Node : LAL.Defining_Name'Class)
                                   return Positions;
-         --  Check the position of the name in the name list
+            --  Check the position of the name in the name list
 
-         function Delete_Position (Name     : LAL.Ada_Node'Class;
-                                   Position : Positions)
+            function Delete_Position (Name     : LAL.Ada_Node'Class;
+                                      Position : Positions)
                                    return Source_Location_Range;
-         --  Get the delete sloc by the location
+            --  Get the delete sloc by the location
 
-         procedure Delete_Names_in_List;
-         --  Generate the edit text of delete name in the list
+            procedure Delete_Names_in_List;
+            --  Generate the edit text of delete name in the list
 
-         --------------------
-         -- Check_Position --
-         --------------------
+            --------------------
+            -- Check_Position --
+            --------------------
 
-         function Check_Position (List_Node : LAL.Ada_Node'Class;
-                                  Name_Node : LAL.Defining_Name'Class)
+            function Check_Position (List_Node : LAL.Ada_Node'Class;
+                                     Name_Node : LAL.Defining_Name'Class)
                                   return Positions
-         is
-         begin
-            if Name_Node.Child_Index = 0 then
-               return First;
-            else
-               if Name_Node.Child_Index = LAL.Children (List_Node)'Length - 1
-               then
-                  return Last;
+            is
+            begin
+               if Name_Node.Child_Index = 0 then
+                  return First;
                else
-                  return Middle;
-               end if;
-            end if;
-         end Check_Position;
-
-         ---------------------
-         -- Delete_Position --
-         ---------------------
-
-         function Delete_Position (Name     : LAL.Ada_Node'Class;
-                                   Position : Positions)
-                                   return Source_Location_Range
-         is
-            Deletable_Range, Next_Range,
-            Previous_Range : Source_Location_Range;
-         begin
-            Deletable_Range := LAL.Sloc_Range (Name);
-            if Position /= Last then
-               Next_Range :=
-                 LAL.Sloc_Range (LAL.Next_Sibling (Name));
-               Deletable_Range.End_Column := Next_Range.Start_Column;
-               Deletable_Range.End_Line := Next_Range.Start_Line;
-            end if;
-            if Position /= First then
-               Previous_Range :=
-                 LAL.Sloc_Range (LAL.Previous_Sibling (Name));
-               Deletable_Range.Start_Column := Previous_Range.End_Column;
-               Deletable_Range.Start_Line := Previous_Range.End_Line;
-            end if;
-            return Deletable_Range;
-         end Delete_Position;
-
-         --------------------------
-         -- Delete_Names_in_List --
-         --------------------------
-
-         procedure Delete_Names_in_List
-         is
-            Name_List                  : LAL.Defining_Name_List := Obj.F_Ids;
-            Name_Position              : Positions;
-            Last_Position              : Positions := First;
-            Last_Sloc, Last_Sloc_Start : Source_Location := No_Source_Location;
-            Delete_Last                : Boolean := False;
-            All_used_component         : Boolean := True;
-            Deletable_Range            : Source_Location_Range;
-         begin
-            for Name_Node of Name_List loop
-               if Names.Contains (Name_Node.As_Defining_Name) then
-                  Name_Position := Check_Position (Name_List, Name_Node);
-                  if Name_Position = Last then
-                     Delete_Last := True;
-                  end if;
-                  Deletable_Range := Delete_Position
-                    (Name_Node.As_Ada_Node, Name_Position);
-                  if Start_Sloc (Deletable_Range) < Last_Sloc then
-                     Last_Sloc := End_Sloc (Deletable_Range);
+                  if Name_Node.Child_Index =
+                    LAL.Children (List_Node)'Length - 1
+                  then
+                     return Last;
                   else
-                     if Last_Sloc /= No_Source_Location then
-                        if Last_Position = First then
-                           Text_Edit.Location := Make_Range
-                             (Last_Sloc_Start, Last_Sloc);
-                           Text_Edit.Text := Null_Unbounded_String;
-                           ReFac.Safe_Insert (Edit_Texts,
-                                              Obj.Unit.Get_Filename,
-                                              Text_Edit);
-                        else
-                           Text_Edit.Location := Make_Range
-                             (Last_Sloc_Start, Last_Sloc);
-                           Text_Edit.Text := To_Unbounded_String (", ");
-                           ReFac.Safe_Insert (Edit_Texts,
-                                  Obj.Unit.Get_Filename,
-                                  Text_Edit);
+                     return Middle;
+                  end if;
+               end if;
+            end Check_Position;
+
+            ---------------------
+            -- Delete_Position --
+            ---------------------
+
+            function Delete_Position (Name     : LAL.Ada_Node'Class;
+                                      Position : Positions)
+                                   return Source_Location_Range
+            is
+               Deletable_Range, Next_Range,
+               Previous_Range : Source_Location_Range;
+            begin
+               Deletable_Range := LAL.Sloc_Range (Name);
+               if Position /= Last then
+                  Next_Range :=
+                    LAL.Sloc_Range (LAL.Next_Sibling (Name));
+                  Deletable_Range.End_Column := Next_Range.Start_Column;
+                  Deletable_Range.End_Line := Next_Range.Start_Line;
+               end if;
+               if Position /= First then
+                  Previous_Range :=
+                    LAL.Sloc_Range (LAL.Previous_Sibling (Name));
+                  Deletable_Range.Start_Column := Previous_Range.End_Column;
+                  Deletable_Range.Start_Line := Previous_Range.End_Line;
+               end if;
+               return Deletable_Range;
+            end Delete_Position;
+
+            --------------------------
+            -- Delete_Names_in_List --
+            --------------------------
+
+            procedure Delete_Names_in_List
+            is
+               Name_List                  : LAL.Defining_Name_List :=
+                                            Obj.F_Ids;
+               Name_Position              : Positions;
+               Last_Position              : Positions := First;
+               Last_Sloc, Last_Sloc_Start : Source_Location :=
+                                            No_Source_Location;
+               Delete_Last                : Boolean := False;
+               All_used_component         : Boolean := True;
+               Deletable_Range            : Source_Location_Range;
+            begin
+               for Name_Node of Name_List loop
+                  if Names.Contains (Name_Node.As_Defining_Name) then
+                     Name_Position := Check_Position (Name_List, Name_Node);
+                     if Name_Position = Last then
+                        Delete_Last := True;
+                     end if;
+                     Deletable_Range := Delete_Position
+                       (Name_Node.As_Ada_Node, Name_Position);
+                     if Start_Sloc (Deletable_Range) < Last_Sloc then
+                        Last_Sloc := End_Sloc (Deletable_Range);
+                     else
+                        if Last_Sloc /= No_Source_Location then
+                           if Last_Position = First then
+                              Text_Edit.Location := Make_Range
+                                (Last_Sloc_Start, Last_Sloc);
+                              Text_Edit.Text := Null_Unbounded_String;
+                              ReFac.Safe_Insert (Edit_Texts,
+                                                 Obj.Unit.Get_Filename,
+                                                 Text_Edit);
+                           else
+                              Text_Edit.Location := Make_Range
+                                (Last_Sloc_Start, Last_Sloc);
+                              Text_Edit.Text := To_Unbounded_String (", ");
+                              ReFac.Safe_Insert (Edit_Texts,
+                                                 Obj.Unit.Get_Filename,
+                                                 Text_Edit);
+                           end if;
+                           Last_Position := Name_Position;
+
                         end if;
                         Last_Position := Name_Position;
-
+                        Last_Sloc_Start := Start_Sloc (Deletable_Range);
+                        Last_Sloc := End_Sloc (Deletable_Range);
                      end if;
-                     Last_Position := Name_Position;
-                     Last_Sloc_Start := Start_Sloc (Deletable_Range);
-                     Last_Sloc := End_Sloc (Deletable_Range);
                   end if;
+               end loop;
+               if Delete_Last or Last_Position = First then
+                  Text_Edit.Location := Make_Range
+                                        (Last_Sloc_Start, Last_Sloc);
+                  Text_Edit.Text := Null_Unbounded_String;
+                  ReFac.Safe_Insert (Edit_Texts,
+                                     Obj.Unit.Get_Filename,
+                                     Text_Edit);
+               else
+                  Text_Edit.Location := Make_Range
+                                        (Last_Sloc_Start, Last_Sloc);
+                  Text_Edit.Text := To_Unbounded_String (", ");
+                  ReFac.Safe_Insert (Edit_Texts,
+                                     Obj.Unit.Get_Filename,
+                                     Text_Edit);
+               end if;
+            end Delete_Names_in_List;
+         begin
+            for Name of Obj.F_Ids loop
+               Name_Count := Name_Count + 1;
+               if Last_Decl_For_Name.Contains (Name.As_Defining_Name) then
+                  Modify_Count := Modify_Count + 1;
+                  Names.Include (Name.As_Defining_Name);
                end if;
             end loop;
-            if Delete_Last or Last_Position = First then
-               Text_Edit.Location := Make_Range (Last_Sloc_Start, Last_Sloc);
+            Obj_Decl_To_Names.Include (Obj, Names);
+            Tmp_Text := Null_Unbounded_String;
+            declare
+               Delete_Lenth : Integer;
+               Tmp_String : String := Text.Image (Obj.Text);
+            begin
+               Delete_Lenth := Integer (Obj.F_Ids.Sloc_Range.End_Column -
+                                          Obj.Sloc_Range.Start_Column) + 1;
+               for I in Tmp_String'Range loop
+                  if I > Delete_Lenth then
+                     Tmp_Text := Tmp_Text & Tmp_String (I);
+                  end if;
+               end loop;
+            end;
+
+            if Name_Count = Modify_Count then
+               Text_Edit.Location := Obj.Sloc_Range;
                Text_Edit.Text := Null_Unbounded_String;
                ReFac.Safe_Insert (Edit_Texts,
                                   Obj.Unit.Get_Filename,
                                   Text_Edit);
             else
-               Text_Edit.Location := Make_Range (Last_Sloc_Start, Last_Sloc);
-               Text_Edit.Text := To_Unbounded_String (", ");
-               ReFac.Safe_Insert (Edit_Texts,
-                                  Obj.Unit.Get_Filename,
-                                  Text_Edit);
+               Delete_Names_in_List;
+               Is_Empty := False;
             end if;
-         end Delete_Names_in_List;
-      begin
-         for Name of Obj.F_Ids loop
-            Name_Count := Name_Count + 1;
-            if Last_Decl_For_Name.Contains (Name.As_Defining_Name) then
-               Modify_Count := Modify_Count + 1;
-               Names.Include (Name.As_Defining_Name);
-            end if;
-         end loop;
-         Obj_Decl_To_Names.Include (Obj, Names);
-         Tmp_Text := Null_Unbounded_String;
-         declare
-            Delete_Lenth : Integer;
-            Tmp_String : String := Text.Image (Obj.Text);
-         begin
-            Delete_Lenth := Integer (Obj.F_Ids.Sloc_Range.End_Column -
-                                       Obj.Sloc_Range.Start_Column) + 1;
-            for I in Tmp_String'Range loop
-               if I > Delete_Lenth then
-                  Tmp_Text := Tmp_Text & Tmp_String (I);
-               end if;
+            for Name of Names loop
+               Text_To_Add := Null_Unbounded_String;
+               Text_To_Add := Text_To_Add & Text.Image (Name.Text);
+               Text_To_Add := Text_To_Add & Tmp_Text
+                              & Ada.Characters.Latin_1.LF;
+               declare
+                  Last_Decl : LAL.Declarative_Part :=
+                    Last_Decl_For_Name (Name);
+                  Location : Source_Location_Range :=
+                    Last_Decl.Child (1).Sloc_Range;
+               begin
+                  Location.End_Column := Location.Start_Column;
+                  Location.End_Line := Location.Start_Line;
+                  Text_Edit.Location := Location;
+                  Text_Edit.Text := Text_To_Add;
+                  ReFac.Safe_Insert (Edit_Texts,
+                                     Last_Decl.Unit.Get_Filename,
+                                     Text_Edit);
+                  ReFac.Safe_Insert (Edit_Map_Of_Decl_Part,
+                                     Last_Decl.Unit.Get_Filename,
+                                     Text_Edit);
+               end;
             end loop;
-         end;
-
-         if Name_Count = Modify_Count then
-            Text_Edit.Location := Obj.Sloc_Range;
-            Text_Edit.Text := Null_Unbounded_String;
-            ReFac.Safe_Insert (Edit_Texts, Obj.Unit.Get_Filename, Text_Edit);
-         else
-            Delete_Names_in_List;
-         end if;
-         for Name of Names loop
-            Text_To_Add := Null_Unbounded_String;
-            Text_To_Add := Text_To_Add & Text.Image (Name.Text);
-            Text_To_Add := Text_To_Add & Tmp_Text & Ada.Characters.Latin_1.LF;
-            declare
-               Decl_Part : LAL.Declarative_Part := Last_Decl_For_Name (Name);
-               Location : Source_Location_Range :=
-                 Decl_Part.Child (1).Sloc_Range;
-            begin
-               Location.End_Column := Location.Start_Column;
-               Location.End_Line := Location.Start_Line;
-               Text_Edit.Location := Location;
-               Text_Edit.Text := Text_To_Add;
-               ReFac.Safe_Insert (Edit_Texts,
-                                  Decl_Part.Unit.Get_Filename,
-                                  Text_Edit);
-            end;
+            Edit_Info.Insert (Obj, Edit_Texts);
+         end Generate_Edit;
+      begin
+         for Decl of Decl_Part.F_Decls loop
+            if Decl.Kind in LALCO.Ada_Object_Decl_Range then
+               if not Obj_Decl_To_Modify.Contains (Decl.As_Object_Decl) then
+                  Is_Empty := False;
+               else
+                  Generate_Edit (Decl.As_Object_Decl);
+               end if;
+            else
+               Is_Empty := False;
+            end if;
+            Has_Decl := True;
          end loop;
-         Edit_Info.Insert (Obj, Edit_Texts);
+         if Is_Empty and Has_Decl then
+            declare
+               Text_Delete : ReFac.Text_Edit;
+            begin
+               Text_Delete.Text := Null_Unbounded_String;
+               Text_Delete.Location := Decl_Part.Sloc_Range;
+               ReFac.Safe_Insert (Edit_Map_Of_Decl_Part,
+                                  Decl_Part.Unit.Get_Filename,
+                                  Text_Delete);
+            end;
+            Removable_Decl_Part.Insert (Decl_Part, Edit_Map_Of_Decl_Part);
+         end if;
       end Generate_Edit;
    begin
       for Unit of Unit_Array loop
          Unit.Root.Traverse (Find_Decl_Part'Access);
       end loop;
-      for Obj of Obj_Decl_To_Modify loop
-         Generate_Edit (Obj);
+      for Decl_Part of Decl_Parts loop
+         Generate_Edit (Decl_Part);
       end loop;
-      return (Obj_Decl_To_Names, Edit_Info);
+      return (Obj_Decl_To_Names, Edit_Info, Removable_Decl_Part);
    end Scope_Declarations;
 
    ---------

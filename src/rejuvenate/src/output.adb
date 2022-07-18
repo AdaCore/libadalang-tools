@@ -184,6 +184,19 @@ package body Output is
       Success   : in out Boolean);
    --  Create message for the relocate_decls for the other decls part
 
+   procedure Write_Removable_Decl_Part
+     (Writer  : in out VSS.JSON.Content_Handlers.
+                       JSON_Content_Handler'Class;
+      Success : in out Boolean);
+   --  Create message that suggests remove the whole declarative part
+
+   procedure Write
+     (Writer    : in out VSS.JSON.Content_Handlers.
+                  JSON_Content_Handler'Class;
+      Decl_Part : LAL.Declarative_Part;
+      Item      : Text_Edit_Map;
+      Success   : in out Boolean);
+
    procedure Write
      (Writer    : in out VSS.JSON.Content_Handlers.
                   JSON_Content_Handler'Class;
@@ -448,6 +461,19 @@ package body Output is
       Writer.String_Value (To_Virtual_String (Words), Success);
    end Write_Message;
 
+   procedure Write_Removable_Decl_Part
+     (Writer  : in out VSS.JSON.Content_Handlers.
+                       JSON_Content_Handler'Class;
+      Success : in out Boolean)
+   is
+      Words : Unbounded_String := Null_Unbounded_String;
+   begin
+      Writer.Key_Name ("message", Success);
+      Words := Words & "This declarative part could possibly be empty, can be"
+               & " removed entirely";
+      Writer.String_Value (To_Virtual_String (Words), Success);
+   end Write_Removable_Decl_Part;
+
    ---------------------------
    -- Write_Message_Private --
    ---------------------------
@@ -651,6 +677,35 @@ package body Output is
    procedure Write
      (Writer    : in out VSS.JSON.Content_Handlers.
                   JSON_Content_Handler'Class;
+      Decl_Part : LAL.Declarative_Part;
+      Item      : Text_Edit_Map;
+      Success   : in out Boolean) is
+   begin
+      Writer.Start_Object (Success);
+
+      Writer.Key_Name ("children", Success);
+      Writer.Start_Array (Success);
+      Writer.End_Array (Success);
+
+      Write_Fixit (Writer, Item, Success);
+
+      Write_Warning (Writer, Success);
+      Writer.Key_Name ("locations", Success);
+
+      Write_Node (Writer, Decl_Part.As_Ada_Node, Success);
+
+      Write_Removable_Decl_Part (Writer, Success);
+
+      Writer.End_Object (Success);
+   end Write;
+
+   -----------
+   -- Write --
+   -----------
+
+   procedure Write
+     (Writer    : in out VSS.JSON.Content_Handlers.
+                  JSON_Content_Handler'Class;
       Decl_Name : LAL.Defining_Name;
       Item      : Text_Edit_Map;
       Success   : in out Boolean) is
@@ -773,6 +828,12 @@ package body Output is
                 Item          => Edits_Info.Edit_Info (Obj),
                 Names         => Edits_Info.Object_To_Decl (Obj.Key),
                 Success       => Success);
+      end loop;
+      for Decl_Part in Edits_Info.Removable_Decl_Part.Iterate loop
+         Write (Writer    => Writer,
+                Decl_Part => Decl_Part.Key,
+                Item      => Edits_Info.Removable_Decl_Part (Decl_Part),
+                Success   => Success);
       end loop;
       Writer.End_Array (Success);
       Writer.End_Document (Success);
