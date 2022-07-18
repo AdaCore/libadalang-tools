@@ -40,6 +40,8 @@ package Tools.Scope_Declarations_Tool is
    is (L.As_Ada_Node < R.As_Ada_Node);
    function "<" (L, R : LAL.Object_Decl) return Boolean
    is (L.As_Ada_Node < R.As_Ada_Node);
+   function "<" (L, R : LAL.Declarative_Part) return Boolean
+   is (L.As_Ada_Node < R.As_Ada_Node);
 
    package Project is new Parse_Option
      (Parser      => Parser,
@@ -66,6 +68,13 @@ package Tools.Scope_Declarations_Tool is
         "<"                 => "<",
         "="                 => ReFac.Text_Edit_Ordered_Maps."=");
 
+   package Decl_Part_To_Edit_Map is
+     new Ada.Containers.Indefinite_Ordered_Maps
+       (Key_Type            => LAL.Declarative_Part,
+        Element_Type        => ReFac.Text_Edit_Map,
+        "<"                 => "<",
+        "="                 => ReFac.Text_Edit_Ordered_Maps."=");
+
    package Defining_Name_Ordered_Sets is
      new Ada.Containers.Indefinite_Ordered_Sets
        (Element_Type => LAL.Defining_Name,
@@ -82,6 +91,7 @@ package Tools.Scope_Declarations_Tool is
    type Modify_Info is record
       Object_To_Decl : Obj_Decl_To_Defining_Name.Map;
       Edit_Info : Obj_Decl_To_Edit_Map.Map;
+      Removable_Decl_Part : Decl_Part_To_Edit_Map.Map;
    end record;
 
    function Scope_Declarations (Unit_Array : LAL.Analysis_Unit_Array)
