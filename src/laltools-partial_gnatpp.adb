@@ -23,6 +23,7 @@
 --
 --  Common GNATpp partial selection utilities
 
+with Ada.Directories;
 with Ada.Text_IO;
 with Ada.Strings.Unbounded;
 with Ada.Strings.Wide_Wide_Fixed;
@@ -41,10 +42,11 @@ package body Laltools.Partial_GNATPP is
    -----------
 
    procedure Print (E : Partial_Select_Edits) is
+      use Ada.Directories;
    begin
       Ada.Text_IO.Put_Line ("*************************************");
       Ada.Text_IO.Put_Line
-        (E.Unit.Get_Filename & "(" & E.Node.Image & ") - " &
+        (Simple_Name (E.Unit.Get_Filename) & "(" & E.Node.Image & ") - " &
          Image (E.Edit.Location));
       Ada.Text_IO.Put_Line (Ada.Strings.Unbounded.To_String (E.Edit.Text));
       Ada.Text_IO.Put_Line ("*************************************");
