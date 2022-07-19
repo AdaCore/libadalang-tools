@@ -210,7 +210,7 @@ package body Laltools.Partial_GNATPP is
            Index_Non_Blank (Unit.Get_Line (Positive (Start_Line)));
          Include_SL : constant Boolean :=
            (SL_First_Non_Blank = Text (Start_Tok)'First);
-         Crt_Indent : Natural;
+         Crt_Indent : Natural := 0;
          Min_Indent : Natural := Natural'Last;
       begin
          for Line_Nb in
@@ -220,7 +220,10 @@ package body Laltools.Partial_GNATPP is
             declare
                L : constant Text_Type := Unit.Get_Line (Positive (Line_Nb));
             begin
-               if L /= "" then
+               if L /= ""
+                 and then Index_Non_Blank (L) > 0
+                 and then Index_Non_Blank (L) >= L'First
+               then
                   Crt_Indent := Index_Non_Blank (L) - L'First;
                   if Crt_Indent < Min_Indent then
                      Min_Indent := Crt_Indent;
@@ -640,7 +643,7 @@ package body Laltools.Partial_GNATPP is
                                         return Boolean
       is
         (Kind in Ada_Package_Body | Ada_Package_Decl |
-         Ada_Library_Item | Ada_Subp_Body | Ada_Task_Body);
+         Ada_Library_Item | Ada_Subp_Body | Ada_Task_Body | Ada_Decl_Block);
 
       function Is_Expected_Parent_Node
         (Node : Ada_Node'Class) return Boolean is
@@ -685,12 +688,13 @@ package body Laltools.Partial_GNATPP is
 
          case Kind (Parent_Node) is
             when Ada_Package_Body | Ada_Package_Decl
-               | Ada_Task_Body | Ada_Subp_Body =>
+               | Ada_Task_Body | Ada_Subp_Body | Ada_Decl_Block =>
 
                Offset := Offset + PP_Indent;
 
             when others => null;
          end case;
+
          return Offset;
       end Get_Parent_Offset;
 
