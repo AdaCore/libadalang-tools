@@ -266,7 +266,6 @@ procedure Partial_GNATpp is
          Offset := Get_Starting_Offset (Enclosing_Node,
                                         PP_Indentation (PP_Options),
                                         PP_Indent_Continuation (PP_Options));
-         --  Ada.Text_IO.Put_Line (" MKU   Offset = " & Offset'Img);
 
          if Offset /= 0 then
             Set_Partial_Gnatpp_Offset (Offset - 1);
