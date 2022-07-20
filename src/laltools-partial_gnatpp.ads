@@ -75,4 +75,23 @@ package Laltools.Partial_GNATPP is
    --  Returns the starting offset that needs to be used for the selected Node
    --  formatting
 
+   procedure Filter_Initially_Selected_Lines_From_Output
+     (Unit              : Analysis_Unit;
+      Initial_SL_Range  : Source_Location_Range;
+      Output            : Utils.Char_Vectors.Char_Vector;
+      Output_SL_Range   : Source_Location_Range;
+      New_Output        : out Utils.Char_Vectors.Char_Vector;
+      New_SL_Range      : out Source_Location_Range);
+   --  Retrieves the initial selected line(s) from the Output and returns
+   --  the related Char_Vector with the associated new selection range.
+   --  This will be used only for the case when the initial sourece line breaks
+   --  are preserved.
+   --  The Initial_SL_Range contains the initial source location range selected
+   --  in the source file related to the given Unit.
+   --  The Enclosing_Node is the enclosing parent that was reformatted.
+   --  Input_Sel will contain the initial text selection of the enclosing node.
+   --  Output and Output_SL_Range contains the results of Format_Vector.
+   --  New_Output and New_SL_Range will contain the filtered lines of the
+   --  reformatted selection.
+
 end Laltools.Partial_GNATPP;

@@ -119,7 +119,9 @@ package body Laltools.Partial_GNATPP is
    ------------
 
    function Lookup
-     (Unit : Analysis_Unit; Token : Token_Reference; Look : Search_Direction)
+     (Unit : Analysis_Unit;
+      Token : Token_Reference;
+      Look : Search_Direction)
       return Ada_Node
    is
       Crt_Token      : Token_Reference              := Token;
@@ -180,8 +182,8 @@ package body Laltools.Partial_GNATPP is
    ---------------------
 
    function Get_Selection
-     (Unit : Analysis_Unit;
-      Node : Ada_Node;
+     (Unit               : Analysis_Unit;
+      Node               : Ada_Node;
       Start_Tok, End_Tok : Token_Reference)
       return Utils.Char_Vectors.Char_Vector
    is
@@ -737,5 +739,258 @@ package body Laltools.Partial_GNATPP is
 
       return Offset;
    end Get_Starting_Offset;
+
+   ---------------------------------------------------
+   --  Filter_Initially_Selected_Lines_From_Output  --
+   ---------------------------------------------------
+
+   procedure Filter_Initially_Selected_Lines_From_Output
+     (Unit              : Analysis_Unit;
+      Initial_SL_Range  : Source_Location_Range;
+      --  Enclosing_Node    : Ada_Node;
+      --  Input_Sel         : Utils.Char_Vectors.Char_Vector;
+      Output            : Utils.Char_Vectors.Char_Vector;
+      Output_SL_Range   : Source_Location_Range;
+      New_Output        : out Utils.Char_Vectors.Char_Vector;
+      New_SL_Range      : out Source_Location_Range)
+   is
+      use Utils.Char_Vectors;
+      use Ada.Characters.Latin_1;
+      use Ada.Strings.Unbounded;
+      --
+      --  Output_Str : constant String :=
+      --    Char_Vectors.Elems (Output)
+      --    (1 .. Char_Vectors.Last_Index (Output));
+
+      type Selected_Line_Record is
+         record
+            Line_Nb : Line_Number;
+            Line    : Unbounded_String;
+            SLOC    : Source_Location_Range;
+         end record;
+      No_Line : constant Selected_Line_Record := Selected_Line_Record'
+        (Line_Nb => 0,
+         Line =>  Null_Unbounded_String,
+         SLOC => No_Source_Location_Range);
+      type Selected_Lines_Arr is
+        array (Natural range <>) of Selected_Line_Record;
+
+      function Get_Initial_Selection
+        (Unit     : Analysis_Unit;
+         SL_Range : Source_Location_Range)
+      return Utils.Char_Vectors.Char_Vector;
+      --  The returned value is the initial text selection corresponding
+      --  to the given SL_Range in the given Unit.
+
+      procedure Split_Lines (Buffer        : Utils.Char_Vectors.Char_Vector;
+                             SL_Range      : Source_Location_Range;
+                             Split_Char    : Character;
+                             Sel_Lines_Arr : out Selected_Lines_Arr);
+      --  Split a selection buffer based on the split character that is passed
+      --  into lines and return them as an array of lines.
+
+      procedure Extract_Original_Selection_From_Output
+        (Original_Arr  : Selected_Lines_Arr;
+         Formatted_Arr : Selected_Lines_Arr;
+         Filtered_Arr  : out Selected_Lines_Arr);
+      --  Given the original and the formatted arrays retrieves the reformatted
+      --  original lines and returns them as filtered array elements
+
+      function Create_Filtered_Output (Filtered_Arr : Selected_Lines_Arr)
+                                       return Utils.Char_Vectors.Char_Vector;
+      --  Creates the regenerated and filtred output selection
+
+      -----------------------------
+      --  Get_Initial_Selection  --
+      -----------------------------
+
+      function Get_Initial_Selection
+        (Unit     : Analysis_Unit;
+         SL_Range : Source_Location_Range)
+      return Utils.Char_Vectors.Char_Vector
+      is
+         Sel : Utils.Char_Vectors.Char_Vector;
+
+         Start_Line : constant Line_Number := SL_Range.Start_Line;
+         End_Line   : constant Line_Number := SL_Range.End_Line;
+      begin
+         for L_Nb in Start_Line .. End_Line loop
+            declare
+               Crt_Line : constant Text_Type := Unit.Get_Line (Integer (L_Nb));
+               S        : GNAT.Strings.String_Access :=
+                 new String'(To_UTF8 (Crt_Line));
+            begin
+               Sel.Append (S.all & LF);
+               GNAT.Strings.Free (S);
+            end;
+         end loop;
+         return Sel;
+      end Get_Initial_Selection;
+
+      ------------------
+      --  Split_Lines --
+      ------------------
+
+      procedure Split_Lines (Buffer        : Utils.Char_Vectors.Char_Vector;
+                             SL_Range      : Source_Location_Range;
+                             Split_Char    : Character;
+                             Sel_Lines_Arr : out Selected_Lines_Arr)
+      is
+         Str : constant String :=
+           Char_Vectors.Elems (Buffer)
+           (1 .. Char_Vectors.Last_Index (Buffer));
+         Crt_Line : Unbounded_String := Null_Unbounded_String;
+
+         Start_Line   : constant Line_Number := SL_Range.Start_Line;
+         End_Line     : constant Line_Number := SL_Range.End_Line;
+
+         Sel_Lines_Nb : constant Positive :=
+           1 + Positive (End_Line) - Positive (Start_Line);
+
+         Line_Nb           : Natural := 0;
+         Crt_Line_Nb       : Line_Number := 0;
+      begin
+         for Idx in Str'Range loop
+            Append (Crt_Line, Str (Idx));
+            if Str (Idx) = Split_Char then
+               Line_Nb := Line_Nb + 1;
+               Crt_Line_Nb := Line_Number (Line_Nb + Natural (Start_Line) - 1);
+               Sel_Lines_Arr (Line_Nb) := Selected_Line_Record'
+                 (Line_Nb => Crt_Line_Nb,
+                  Line    => Crt_Line,
+                  SLOC    => Source_Location_Range'
+                    (Start_Line   => Crt_Line_Nb,
+                     End_Line     => Crt_Line_Nb,
+                     Start_Column => 1,
+                     End_Column   => Column_Number (Length (Crt_Line) - 1)));
+               Crt_Line := Null_Unbounded_String;
+            end if;
+         end loop;
+
+         --  The array should contain the same number of lines as the selection
+         --  source range passed as parameter
+         pragma Assert (Sel_Lines_Nb = Line_Nb);
+      end Split_Lines;
+
+      ----------------------------------------------
+      --  Extract_Original_Selection_From_Output  --
+      ----------------------------------------------
+
+      procedure Extract_Original_Selection_From_Output
+        (Original_Arr  : Selected_Lines_Arr;
+         Formatted_Arr : Selected_Lines_Arr;
+         Filtered_Arr  : out Selected_Lines_Arr)
+      is
+         pragma Assert (Original_Arr'Size > 0
+                        and then Formatted_Arr'Size > 0
+                        and then Original_Arr'Size <= Formatted_Arr'Size);
+
+         Orig_Line_Nb  : constant Line_Number := Original_Arr (1).Line_Nb;
+         Count         : Natural              := 0;
+      begin
+         for Idx in Formatted_Arr'Range loop
+            if Formatted_Arr (Idx).Line_Nb >= Orig_Line_Nb then
+               Count := Count + 1;
+               if Count <= Original_Arr'Last then
+                  Filtered_Arr (Count) := Formatted_Arr (Idx);
+               else
+                  exit;
+               end if;
+            end if;
+         end loop;
+      end Extract_Original_Selection_From_Output;
+
+      ------------------------------
+      --  Create_Filtered_Output  --
+      ------------------------------
+
+      function Create_Filtered_Output (Filtered_Arr : Selected_Lines_Arr)
+                                       return Utils.Char_Vectors.Char_Vector
+      is
+         Sel      : Utils.Char_Vectors.Char_Vector;
+         Crt_Line : Unbounded_String := Null_Unbounded_String;
+      begin
+         for Idx in Filtered_Arr'Range loop
+            Crt_Line := Filtered_Arr (Idx).Line;
+            declare
+               S : GNAT.Strings.String_Access :=
+                 new String'(To_String (Crt_Line));
+            begin
+               Sel.Append (S.all);
+               GNAT.Strings.Free (S);
+            end;
+         end loop;
+         return Sel;
+      end Create_Filtered_Output;
+
+      ---------------------------------------
+      --  Create_Filtered_Selection_Range  --
+      ---------------------------------------
+
+      function Create_Filtered_Selection_Range
+        (Filtered_Arr : Selected_Lines_Arr) return Source_Location_Range
+      is
+        (Source_Location_Range'
+           (Start_Line =>
+                 Filtered_Arr (Filtered_Arr'First).SLOC.Start_Line,
+            Start_Column =>
+               Filtered_Arr (Filtered_Arr'First).SLOC.Start_Column,
+            End_Line =>
+               Filtered_Arr (Filtered_Arr'Last).SLOC.Start_Line,
+            End_Column =>
+               Filtered_Arr (Filtered_Arr'Last).SLOC.End_Column));
+      --  Creates the new filtered and reformatted text source location range
+
+      --  ORIGINAL SELECTION specifics
+      Orig_Sel : constant Utils.Char_Vectors.Char_Vector :=
+        Get_Initial_Selection (Unit, Initial_SL_Range);
+      --  Orig_Sel_Str : constant String :=
+      --    Char_Vectors.Elems (Orig_Sel)
+      --    (1 .. Char_Vectors.Last_Index (Orig_Sel));
+
+      Orig_Start_Line : constant Line_Number := Initial_SL_Range.Start_Line;
+      Orig_End_Line   : constant Line_Number := Initial_SL_Range.End_Line;
+
+      Orig_Lines_Number : constant Positive :=
+        1 + Positive (Orig_End_Line) - Positive (Orig_Start_Line);
+      --  Stores the number of lines contained by the selection
+
+      Orig_Lines_Arr : Selected_Lines_Arr (1 .. Orig_Lines_Number) :=
+        [others => No_Line];
+
+      --  OUTPUT specifics
+      Output_Start_Line : constant Line_Number := Output_SL_Range.Start_Line;
+      Output_End_Line   : constant Line_Number := Output_SL_Range.End_Line;
+
+      Output_Lines_Number : constant Positive :=
+        1 + Positive (Output_End_Line) - Positive (Output_Start_Line);
+      --  Stores the number of lines contained by the generated output
+
+      Output_Lines_Arr : Selected_Lines_Arr (1 .. Output_Lines_Number) :=
+        [others => No_Line];
+      --  Stores the reformatted output lines obtained from the initial
+      --  selection
+
+      Filtered_Sel_Arr : Selected_Lines_Arr (1 .. Orig_Lines_Number) :=
+        [others => No_Line];
+      --  Stores the reformatted lines matching the initial selection
+
+   begin
+      --  Create lines arrays related to the origial selected lines
+      --  and the ones reformatted by the partial gnatpp engine
+      Split_Lines (Orig_Sel, Initial_SL_Range, LF, Orig_Lines_Arr);
+      Split_Lines (Output, Output_SL_Range, LF, Output_Lines_Arr);
+
+      --  Extract the significant part of the generated output matching the
+      --  original selection and update the output selection.
+      Extract_Original_Selection_From_Output
+        (Orig_Lines_Arr, Output_Lines_Arr, Filtered_Sel_Arr);
+
+      --  Create the new filtered and formatted selection related informations
+      --  to be used by the IDE
+      New_Output := Create_Filtered_Output (Filtered_Sel_Arr);
+      New_SL_Range := Create_Filtered_Selection_Range (Filtered_Sel_Arr);
+
+   end Filter_Initially_Selected_Lines_From_Output;
 
 end Laltools.Partial_GNATPP;

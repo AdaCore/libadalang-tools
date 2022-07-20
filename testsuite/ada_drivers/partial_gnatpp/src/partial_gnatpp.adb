@@ -214,7 +214,7 @@ procedure Partial_GNATpp is
 
          Validated  : GNAT.Strings.String_List_Access :=
            new GNAT.Strings.String_List (1 .. 0);
-         Output_Sel_Range : Source_Location_Range;
+         Output_SL_Range : Source_Location_Range;
       begin
 
          Parse
@@ -239,7 +239,7 @@ procedure Partial_GNATpp is
                                              End_Node,
                                              Enclosing_Node,
                                              Input_Sel,
-                                             Output_Sel_Range);
+                                             Output_SL_Range);
 
          --  Ada.Text_IO.Put_Line
          --    ("MKU Enclosing_Node = " & Enclosing_Node.Image);
@@ -298,6 +298,29 @@ procedure Partial_GNATpp is
                Output := Input_Sel;
          end;
 
+         --  In the case of preserving source line breaks switch usage, get the
+         --  filtered output of the significant lines based on the initial
+         --  selection to make text edits only on that part of the code.
+
+         if Partial_Gnatpp_SLB then
+            declare
+               New_Output          : Char_Vector;
+               New_Output_SL_Range : Source_Location_Range;
+            begin
+               Filter_Initially_Selected_Lines_From_Output
+                 (Unit             => Main_Unit,
+                  Initial_SL_Range => Selection_Range,
+                  Output           => Output,
+                  Output_SL_Range  => Output_SL_Range,
+                  New_Output       => New_Output,
+                  New_SL_Range     => New_Output_SL_Range);
+
+               Output := New_Output;
+               Output_SL_Range := New_Output_SL_Range;
+            end;
+         end if;
+
+         --  Create the text edits to be passed to the IDE.
          declare
             Output_Str : constant String :=
               Char_Vectors.Elems (Output)
@@ -311,7 +334,7 @@ procedure Partial_GNATpp is
               (Unit => Main_Unit,
                Node => Enclosing_Node,
                Edit => Text_Edit'
-                 (Location => Output_Sel_Range,
+                 (Location => Output_SL_Range,
                   Text     => Ada.Strings.Unbounded.To_Unbounded_String
                     (Output_Str)));
             Print (Edits);
