@@ -1053,7 +1053,7 @@ package body Laltools.Refactor.Pull_Up_Declaration is
             Next (Parameters_Cursor);
             while Has_Element (Parameters_Cursor) loop
                Object_Decl := Key (Parameters_Cursor);
-               Append (Actual_Parameters, "" & LF);
+               Append (Actual_Parameters, "," & LF);
                Append (Actual_Parameters, Indentation * " ");
                Append
                  (Actual_Parameters,
