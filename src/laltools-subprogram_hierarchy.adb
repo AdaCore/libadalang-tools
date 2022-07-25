@@ -106,7 +106,7 @@ package body Laltools.Subprogram_Hierarchy is
       return Generic_Subp_Instantiation_Array
    is
       Instantiations : Generic_Subp_Instantiation_Array (1 .. Refs'Length) :=
-        (others => No_Generic_Subp_Instantiation);
+        [others => No_Generic_Subp_Instantiation];
       True_Length    : Natural := 0;
 
    begin
@@ -132,7 +132,7 @@ package body Laltools.Subprogram_Hierarchy is
       return Subp_Renaming_Decl_Array
    is
       Subp_Renames : Subp_Renaming_Decl_Array (1 .. Refs'Length) :=
-        (others => No_Subp_Renaming_Decl);
+        [others => No_Subp_Renaming_Decl];
       True_Length  : Natural := 0;
 
    begin

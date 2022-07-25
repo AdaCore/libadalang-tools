@@ -21,18 +21,16 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Characters.Handling; use Ada.Characters.Handling;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with GNATCOLL.Opt_Parse; use GNATCOLL.Opt_Parse;
-with GNATCOLL.Projects; use GNATCOLL.Projects;
-with GNATCOLL.VFS; use GNATCOLL.VFS;
 
 with Langkit_Support.Slocs; use Langkit_Support.Slocs;
 
 with Libadalang.Analysis; use Libadalang.Analysis;
 with Libadalang.Helpers; use Libadalang.Helpers;
 
+with Laltools.Common; use Laltools.Common;
 with Laltools.Refactor; use Laltools.Refactor;
 with Laltools.Refactor.Subprogram_Signature.Change_Parameters_Default_Value;
 use Laltools.Refactor.Subprogram_Signature.Change_Parameters_Default_Value;
@@ -133,25 +131,8 @@ procedure Change_Parameters_Default_Value is
    is
       use Args;
 
-      function Is_Ada_File (File : Virtual_File) return Boolean is
-        (declare Set : constant File_Info_Set :=
-           Context.Provider.Project.Info_Set (File);
-         begin
-           --  The file can be listed in several projects with different
-           --  Info_Sets, in the case of aggregate projects. However, assume
-           --  that the language is the same in all projects, so look only at
-           --  the first entry in the set.
-           not Set.Is_Empty
-             and then To_Lower (File_Info'Class (Set.First_Element).Language) =
-                        "ada");
-      --  Checks if File is an Ada source file
-
-      Source_File : constant String := To_String (Args.Source.Get);
-      Files       : constant File_Array_Access :=
-        Context.Provider.Project.Root_Project.Source_Files;
-      Ada_Files   : constant File_Array :=
-        [for File of Files.all when Is_Ada_File (File) => File];
-
+      Source_File                      : constant String :=
+        To_String (Args.Source.Get);
       Unit                             : constant Analysis_Unit :=
         Jobs (1).Analysis_Ctx.Get_From_File (Source_File);
       Parameters_Source_Location_Range : constant Source_Location_Range :=
@@ -159,10 +140,8 @@ procedure Change_Parameters_Default_Value is
          Line_Number (End_Line.Get),
          Column_Number (Start_Column.Get),
          Column_Number (End_Column.Get));
-
-      Units : constant Analysis_Unit_Array :=
-        [for File of Ada_Files
-         => Jobs (1).Analysis_Ctx.Get_From_File (+File.Full_Name)];
+      Units                            : constant Analysis_Unit_Array :=
+        Get_Ada_Analysis_Units (Context.Provider, Jobs (1).Analysis_Ctx);
 
       function Analysis_Units return Analysis_Unit_Array is (Units);
 

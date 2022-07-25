@@ -22,11 +22,15 @@
 ------------------------------------------------------------------------------
 
 with Ada.Assertions; use Ada.Assertions;
+with Ada.Characters.Handling;
 with Ada.Containers; use Ada.Containers;
 with Ada.Exceptions;
 with Ada.Strings.Fixed;
 with Ada.Strings.Wide_Wide_Fixed;
 with Ada.Wide_Wide_Characters.Handling;
+
+with GNATCOLL.Projects;
+with GNATCOLL.VFS;
 
 with GNAT.Traceback.Symbolic;
 
@@ -1527,6 +1531,49 @@ package body Laltools.Common is
          Parent := Parent.Parent;
       end loop;
    end Find_Matching_Parents;
+
+   ----------------------------
+   -- Get_Ada_Analysis_Units --
+   ----------------------------
+
+   function Get_Ada_Analysis_Units
+     (Source_Provider  : Libadalang.Helpers.Source_Provider;
+      Analysis_Context : Libadalang.Analysis.Analysis_Context)
+      return Analysis_Unit_Array
+   is
+      use Ada.Characters.Handling;
+      use GNATCOLL.Projects;
+      use GNATCOLL.VFS;
+
+      function Is_Ada_File (File : Virtual_File) return Boolean is
+        (declare Set : constant File_Info_Set :=
+           Source_Provider.Project.Info_Set (File);
+         begin
+           --  The file can be listed in several projects with different
+           --  Info_Sets, in the case of aggregate projects. However, assume
+           --  that the language is the same in all projects, so look only
+           --  at the first entry in the set.
+           not Set.Is_Empty
+           and then To_Lower (File_Info'Class (Set.First_Element).Language) =
+                      "ada");
+      --  Checks if File is an Ada source file
+
+      Files          : constant File_Array_Access :=
+        Source_Provider.Project.Root_Project.Source_Files;
+      Analysis_Units : Analysis_Unit_Array (1 .. Files'Length);
+      Counter        : Natural := 0;
+
+   begin
+      for File of Files.all loop
+         if Is_Ada_File (File) then
+            Counter := Counter + 1;
+            Analysis_Units (Counter) :=
+              Analysis_Context.Get_From_File (+File.Full_Name);
+         end if;
+      end loop;
+
+      return Analysis_Units (1 .. Counter);
+   end Get_Ada_Analysis_Units;
 
    -------------------------------------
    -- Get_Decl_Block_Declarative_Part --
