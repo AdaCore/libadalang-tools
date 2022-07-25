@@ -983,7 +983,9 @@ package body Pp.Formatting is
 
       procedure Insert_Alignment
         (Lines_Data_P : Lines_Data_Ptr;
-         Cmd : Command_Line);
+         Cmd : Command_Line;
+         Partial_Gnatpp : Boolean := False);
+
       --  Expand tabs as necessary to align things
 
    end Tok_Phases;
@@ -1070,8 +1072,7 @@ package body Pp.Formatting is
 
          Tok_Phases.Insert_Indentation (Lines_Data_P, Cmd, Partial_Gnatpp);
 
-         --  KEEP commented for now
-         --  Tok_Phases.Insert_Alignment (Lines_Data_P, Cmd);
+         Tok_Phases.Insert_Alignment (Lines_Data_P, Cmd, Partial_Gnatpp);
 
          Tokns_To_Buffer (Lines_Data.Out_Buf, Lines_Data.New_Tokns, Cmd);
 
@@ -4522,7 +4523,7 @@ package body Pp.Formatting is
                  or else
                    Kind (Crt_Tok)
                in Res_For | Res_When | Res_Begin | Res_Is | Colon_Equal |
-                  Res_Package | Res_With;
+                  Res_Package | Res_With | Start_Of_Input;
 
                Crt_Tok := Prev (Crt_Tok);
             end loop;
@@ -4538,11 +4539,12 @@ package body Pp.Formatting is
             Crt_Tok : Tokn_Cursor := Prev (Tok);
 
             function Call_Pattern_Found (Tok : Tokn_Cursor) return Boolean is
-              ((Kind (Prev (Tok)) = Spaces
-               and then Kind (Prev (Prev (Tok))) = Ident)
-               or else
-                 (Kind (Prev (Tok)) in Line_Break_Token
-                  and then Kind (Prev (Prev (Tok))) = Ident));
+              (not Is_Nil (Prev (Tok)) and then not Is_Nil (Prev (Prev (Tok)))
+               and then ((Kind (Prev (Tok)) = Spaces
+                          and then Kind (Prev (Prev (Tok))) = Ident)
+                         or else
+                         (Kind (Prev (Tok)) in Line_Break_Token
+                          and then Kind (Prev (Prev (Tok))) = Ident)));
 
             Pattern_Found  : Boolean     := False;
             Call_Ident_Tok : Tokn_Cursor := Nil_Tokn_Cursor;
@@ -4558,10 +4560,16 @@ package body Pp.Formatting is
             end if;
 
             while not Is_Nil (Crt_Tok) loop
+
                if Kind (Crt_Tok) = '(' then
                   if Call_Pattern_Found (Crt_Tok) then
                      Pattern_Found := True;
-                     Call_Ident_Tok := Prev (Prev (Prev (Crt_Tok)));
+                     Call_Ident_Tok :=
+                       (if not Is_Nil (Prev (Crt_Tok))
+                           and then not Is_Nil (Prev (Prev (Crt_Tok)))
+                           and then not Is_Nil (Prev (Prev (Prev (Crt_Tok))))
+                        then Prev (Prev (Prev (Crt_Tok)))
+                        else Nil_Tokn_Cursor);
                      exit;
                   end if;
                end if;
@@ -4569,7 +4577,8 @@ package body Pp.Formatting is
                exit when Is_Nil (Crt_Tok)
                  or else
                    Kind (Crt_Tok)
-                     in Res_For | Res_When | Res_Begin | Res_Is | Colon_Equal;
+                     in Res_For | Res_When | Res_Begin | Res_Is | Colon_Equal
+                        | Start_Of_Input;
 
                Crt_Tok := Prev (Crt_Tok);
             end loop;
@@ -4582,7 +4591,6 @@ package body Pp.Formatting is
 
             Crt_Tok := Call_Ident_Tok;
             while not Is_Nil (Crt_Tok) loop
-
                case Kind (Crt_Tok) is
                   when ',' | Arrow =>
                      return True;
@@ -4604,13 +4612,13 @@ package body Pp.Formatting is
                exit when Is_Nil (Crt_Tok)
                  or else
                    Kind (Crt_Tok)
-                     in Res_For | Res_When | Res_Begin | Res_Is | Colon_Equal;
+                   in Res_For | Res_When | Res_Begin | Res_Is | Colon_Equal
+                      | Start_Of_Input;
 
                Crt_Tok := Prev (Crt_Tok);
             end loop;
 
             return False;
-
          end Called_As_Parameter_Of_An_Action_Call;
 
          function Is_Expected_Token (Tok : Tokn_Cursor) return Boolean
@@ -4636,7 +4644,8 @@ package body Pp.Formatting is
                exit when Is_Nil (Crt_Tok)
                  or else
                    Kind (Crt_Tok)
-                     in Res_For | Res_When | Res_Begin | Res_Is | Colon_Equal;
+                     in Res_For | Res_When | Res_Begin | Res_Is | Colon_Equal
+                       | Start_Of_Input;
                Prev (Crt_Tok);
             end loop;
 
@@ -4653,7 +4662,6 @@ package body Pp.Formatting is
             CP_Count  : Natural := 0;
          begin
             pragma Assert (Kind (Tok) in Line_Break_Token and then LB.Enabled);
-
             if not Called_As_Parameter_Of_An_Action_Call (Crt_Tok) then
                return;
             end if;
@@ -4746,6 +4754,7 @@ package body Pp.Formatting is
                   when others => null;
                end case;
             end loop;
+
          end Adjust_Indentation_After_Comma;
 
          Saved_New_Tokns : Scanner.Tokn_Vec renames Lines_Data.Saved_New_Tokns;
@@ -4867,7 +4876,6 @@ package body Pp.Formatting is
                         Append_Spaces (New_Tokns, Crt_Indent);
                      end;
                   end if;
-
                end;
             end if;
 
@@ -4881,6 +4889,7 @@ package body Pp.Formatting is
                pragma Warnings (On);
             end loop;
          end if;
+
          Clear (All_LB);
          Clear (Lines_Data.All_LBI);
          Assert_No_LB (Lines_Data);
@@ -4890,20 +4899,23 @@ package body Pp.Formatting is
 
       procedure Insert_Alignment_Helper
         (Lines_Data_P : Lines_Data_Ptr;
-         Cmd : Command_Line);
+         Cmd : Command_Line;
+         Partial_Gnatpp : Boolean := False);
 
       procedure Insert_Alignment
         (Lines_Data_P : Lines_Data_Ptr;
-         Cmd : Command_Line) is
+         Cmd : Command_Line;
+         Partial_Gnatpp : Boolean := False) is
       begin
          if Alignment_Enabled (Cmd) then
-            Insert_Alignment_Helper (Lines_Data_P, Cmd);
+            Insert_Alignment_Helper (Lines_Data_P, Cmd, Partial_Gnatpp);
          end if;
       end Insert_Alignment;
 
       procedure Insert_Alignment_Helper
         (Lines_Data_P : Lines_Data_Ptr;
-         Cmd : Command_Line)
+         Cmd : Command_Line;
+         Partial_Gnatpp : Boolean := False)
       is
          Lines_Data : Lines_Data_Rec renames Lines_Data_P.all;
          Tabs : Tab_Vector renames Lines_Data.Tabs;
@@ -5026,6 +5038,7 @@ package body Pp.Formatting is
                Num_Lines : constant Tab_In_Line_Vector_Index'Base :=
                  Last_Index (Paragraph_Tabs);
             begin
+
                --  Here we have Paragraph_Tabs set to a sequence of lines (or the
                --  tabs in those lines, really). For example, if the input text
                --  was (*1):
@@ -5109,6 +5122,7 @@ package body Pp.Formatting is
                   Clear (Paragraph_Tabs);
                   return;
                end if;
+
                pragma Debug (Put_Paragraph_Tabs);
                pragma Assert (Last_Index (Paragraph_Tabs (1)) /= 0);
 
@@ -5116,7 +5130,9 @@ package body Pp.Formatting is
                   declare
                      Max_Col : Positive := 1;
                   begin
+
                      for Line of Paragraph_Tabs loop
+
                         declare
                            Tab_I : constant Tab_Index := Line (Index_In_Line);
                            Tab : Tab_Rec renames Tabs (Tab_I);
@@ -5145,6 +5161,7 @@ package body Pp.Formatting is
                                  Tab_2.Col := Tab_2.Col + Tab.Num_Blanks;
                               end;
                            end loop;
+
                            pragma Assert (Tab.Col = Max_Col);
 
                            pragma Assert
@@ -5186,6 +5203,7 @@ package body Pp.Formatting is
                         First_Time := False;
                         Tree := Cur_Tab.Tree;
                      end if;
+
                      if Cur_Tab.Tree = Tree then
                         --  Ignore if too many tabs in one line:
 
@@ -5194,6 +5212,7 @@ package body Pp.Formatting is
                             Tab_Index_In_Line'Last
                         then
                            Append (Cur_Line_Tabs, Cur_Tab_Index);
+
                            if Cur_Tab.Index_In_Line /=
                              Last_Index (Cur_Line_Tabs)
                            then
@@ -5313,7 +5332,16 @@ package body Pp.Formatting is
    --               Put_Tab_In_Line_Vector ("First", First_Line_Tabs);
    --               Put_Tab_In_Line_Vector ("Cur", Cur_Line_Tabs);
 
-                  Next_ss (New_Tok);
+                  if Partial_Gnatpp and then Kind (New_Tok) = End_Of_Input
+                  then
+                     --  In order to avoid constraint errors, in partial
+                     --  gnatpp mode, when a selection needs to be reformatted
+                     --  the end of input might be reached after process line
+                     --  and no next token is present.
+                     null;
+                  else
+                     Next_ss (New_Tok);
+                  end if;
 
                   --  Consume the newline
                   if Is_Empty (Cur_Line_Tabs) then
@@ -5349,12 +5377,28 @@ package body Pp.Formatting is
    --                        Dbg_Out.Put ("Flush_Para -- parent mismatch\n");
                            Flush_Para;
                            First_Line_Tabs := Cur_Line_Tabs;
+
                         end if;
                         pragma Warnings (Off);
                         F_Tab := (others => <>);
                         C_Tab := (others => <>);
                         pragma Warnings (On);
                      end if;
+
+                     Append (Paragraph_Tabs, Cur_Line_Tabs);
+                     Clear (Cur_Line_Tabs);
+                  end if;
+
+                  --  This is to handle last line of the selection in partial
+                  --  mode and compute accurately the alignment spaces.
+                  if Partial_Gnatpp and then Kind (New_Tok) = End_Of_Input then
+                     Set_Length (Cur_Line_Tabs, 0);
+
+                     --  Recompute the tabs taking into account all the lines,
+                     --  namely the last line which in case of the partial
+                     --  formatting might be omitted.
+                     Flush_Para;
+                     Clear (First_Line_Tabs);
                      Append (Paragraph_Tabs, Cur_Line_Tabs);
                      Clear (Cur_Line_Tabs);
                   end if;
@@ -5382,6 +5426,7 @@ package body Pp.Formatting is
             Check_Comment_Length := False;
 
             while not After_Last (New_Tok) loop
+
                case Kind (New_Tok) is
                   when Enabled_LB_Token =>
                      Cur_Line_Num := Cur_Line_Num + 1;
@@ -5406,6 +5451,7 @@ package body Pp.Formatting is
                            --  Num_Blanks.
 
                            if Tab.Is_Insertion_Point then
+
                               pragma Assert (Tab.Num_Blanks = 0);
                               Tab.Num_Blanks := Next_Tab.Num_Blanks;
                               Next_Tab.Num_Blanks := 0;
@@ -5461,11 +5507,11 @@ package body Pp.Formatting is
               (Lines_Data, "after Calculate_Num_Blanks"));
 
          --  Then do the actual insertions:
-
          Do_Insertions;
 
          Clear (Saved_New_Tokns);
          Clear (Tabs);
+
       end Insert_Alignment_Helper;
 
    end Tok_Phases;
