@@ -271,31 +271,18 @@ procedure Partial_GNATpp is
             Set_Partial_Gnatpp_Offset (Offset - 1);
          end if;
 
-         begin
-            Format_Vector
-              (Cmd       => PP_Options,
-               Input     => Input_Sel,
-               Node      => Enclosing_Node,
-               Output    => Output,
-               Messages  => Messages,
-               Partial_Gnatpp => True);
-         exception
-            when others =>
-               Ada.Text_IO.Put_Line
-                 ("Partial_Gnatpp: Unknown error!"
-                  & " Keep the initial input selection without formatting ");
+         --  Format_Vector will rewrite the input selection and returns the
+         --  formatted text corresponding to the Enclosing_Node. The output
+         --  contains more than the initial selected text since it is based
+         --  on the closest enclosing parent of the initial selection.
 
-               declare
-                  Input_Sel_Str : constant String :=
-                    Char_Vectors.Elems (Input_Sel)
-                    (1 .. Char_Vectors.Last_Index (Input_Sel));
-                  --  pragma Unreferenced (Input_Sel_Str);
-               begin
-                  Ada.Text_IO.Put_Line (Input_Sel_Str);
-               end;
-
-               Output := Input_Sel;
-         end;
+         Format_Vector
+           (Cmd       => PP_Options,
+            Input     => Input_Sel,
+            Node      => Enclosing_Node,
+            Output    => Output,
+            Messages  => Messages,
+            Partial_Gnatpp => True);
 
          --  In the case of preserving source line breaks switch usage, get the
          --  filtered output of the significant lines based on the initial
@@ -319,7 +306,8 @@ procedure Partial_GNATpp is
             end;
          end if;
 
-         --  Create the text edits to be passed to the IDE.
+         --  Create the text edits to be passed to the IDE related to the
+         --  rewritten selection.
          declare
             Output_Str : constant String :=
               Char_Vectors.Elems (Output)

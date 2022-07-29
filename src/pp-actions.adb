@@ -5677,6 +5677,22 @@ package body Pp.Actions is
          end if;
       end if;
       Clear_Lines_Data;
+
+   exception
+      --  In partial formatting mode whenever an exception is raised we need
+      --  to keep at least the same output as the initial selection in order
+      --  to be able to provide an output even it is not the expected one.
+      --  The clean up should be done in any cases when an exception is issued.
+      when Partial_Gnatpp_Error =>
+         if Partial_Gnatpp then
+            Ada.Text_IO.Put_Line
+              ("Partial_Gnatpp: Partial_Gnatpp_Error!"
+               & " Probably caused by an infinite loop detection!"
+               & " Keep the initial input selection without formatting"
+               & " and clear internal datas!");
+            Output := Input;
+         end if;
+         Clear_Lines_Data;
    end Format_Vector;
 
    procedure Per_File_Action
