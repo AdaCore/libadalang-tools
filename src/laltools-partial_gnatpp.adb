@@ -844,13 +844,8 @@ package body Laltools.Partial_GNATPP is
          Crt_Line : Unbounded_String := Null_Unbounded_String;
 
          Start_Line   : constant Line_Number := SL_Range.Start_Line;
-         End_Line     : constant Line_Number := SL_Range.End_Line;
-
-         Sel_Lines_Nb : constant Positive :=
-           1 + Positive (End_Line) - Positive (Start_Line);
-
-         Line_Nb           : Natural := 0;
-         Crt_Line_Nb       : Line_Number := 0;
+         Line_Nb      : Natural := 0;
+         Crt_Line_Nb  : Line_Number := 0;
       begin
          for Idx in Str'Range loop
             Append (Crt_Line, Str (Idx));
@@ -869,9 +864,6 @@ package body Laltools.Partial_GNATPP is
             end if;
          end loop;
 
-         --  The array should contain the same number of lines as the selection
-         --  source range passed as parameter
-         pragma Assert (Sel_Lines_Nb = Line_Nb);
       end Split_Lines;
 
       ----------------------------------------------
