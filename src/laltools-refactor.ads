@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -26,8 +26,9 @@
 with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Containers.Indefinite_Vectors;
 with Ada.Containers.Ordered_Sets;
-
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+
+with GNATCOLL.Traces;
 
 with Langkit_Support.Slocs; use Langkit_Support.Slocs;
 
@@ -36,6 +37,9 @@ with Libadalang.Analysis; use Libadalang.Analysis;
 with Laltools.Common; use Laltools.Common;
 
 package Laltools.Refactor is
+
+   Refactor_Trace : GNATCOLL.Traces.Trace_Handle :=
+     GNATCOLL.Traces.Create ("LALTOOLS.REFACTOR", GNATCOLL.Traces.Off);
 
    type Refactoring_Diagnotic is interface;
 
@@ -111,7 +115,9 @@ package Laltools.Refactor is
       "<"          => "<",
       "="          => "=");
 
-   subtype File_Deletion_Ordered_Set is Unbounded_String_Ordered_Sets.Set;
+   package File_Deletion_Ordered_Sets renames Unbounded_String_Ordered_Sets;
+
+   subtype File_Deletion_Ordered_Set is File_Deletion_Ordered_Sets.Set;
 
    type File_Creation is
       record
@@ -154,6 +160,14 @@ package Laltools.Refactor is
          Diagnostics    : Refactoring_Diagnotic_Vector;
       end record;
 
+   No_Refactoring_Edits : constant Refactoring_Edits :=
+     Refactoring_Edits'
+       (Text_Edits     => Text_Edit_Ordered_Maps.Empty_Map,
+        File_Creations => File_Creation_Ordered_Sets.Empty_Set,
+        File_Deletions => File_Deletion_Ordered_Sets.Empty_Set,
+        File_Renames   => File_Rename_Ordered_Sets.Empty_Set,
+        Diagnostics    => Refactoring_Diagnotic_Vectors.Empty_Vector);
+
    procedure Merge
      (Source : in out Text_Edit_Map;
       Target : Text_Edit_Map);
@@ -184,6 +198,23 @@ package Laltools.Refactor is
      (Self           : Refactoring_Tool;
       Analysis_Units : access function return Analysis_Unit_Array)
       return Refactoring_Edits is abstract;
-   --  Runs the refactoring analysis and return all the needed edits
+   --  Runs the refactoring analysis and return all the needed edits.
+   --  No_Refactoring_Edits shall be returned when an error occured.
+
+private
+
+   function Is_Refactoring_Tool_Available_Default_Error_Message
+     (Tool_Name : String)
+      return String
+   is ("Failed to check if the " & Tool_Name & " refactor is available");
+   --  Default error message for when Is_<Refactoring_Tool>_Available functions
+   --  fail.
+
+   function Refactoring_Tool_Refactor_Default_Error_Message
+     (Tool_Name : String)
+      return String
+   is ("Failed to execute the " & Tool_Name & " refactor");
+   --  Default error message for when <Refactoring_Tool>.Refactor functions
+   --  fail.
 
 end Laltools.Refactor;

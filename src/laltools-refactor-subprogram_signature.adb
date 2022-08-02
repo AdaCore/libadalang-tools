@@ -839,6 +839,14 @@ package body Laltools.Refactor.Subprogram_Signature is
         Aux_Node.As_Subp_Spec.F_Subp_Params.Is_Null;
 
       return True;
+
+   exception
+      when E : others =>
+         Refactor_Trace.Trace
+           (E,
+            Is_Refactoring_Tool_Available_Default_Error_Message
+              ("Add Parameter"));
+         return False;
    end Is_Add_Parameter_Available;
 
    ------------------------------
@@ -957,12 +965,17 @@ package body Laltools.Refactor.Subprogram_Signature is
       else
          return False;
       end if;
+
    exception
-      when Precondition_Failure =>
-         --  Assume that Precondition_Failure is raised due to invalid code and
+      when E : others =>
+         --  Assume that exceptions can be raised due to invalid code and
          --  set again the out parameters since they might have been changed
          --  since initialized.
          Initialize_Out_Parameters;
+         Refactor_Trace.Trace
+           (E,
+            Is_Refactoring_Tool_Available_Default_Error_Message
+              ("Change Parameter Mode"));
          return False;
    end Is_Change_Mode_Available;
 
@@ -1067,12 +1080,17 @@ package body Laltools.Refactor.Subprogram_Signature is
       end if;
 
       return True;
+
    exception
-      when Precondition_Failure =>
-         --  Assume that Precondition_Failure is raised due to invalid code and
+      when E : others =>
+         --  Assume that exceptions can be raised due to invalid code and
          --  set again the out parameters since they might have been changed
          --  since initialized.
          Initialize_Out_Parameters;
+         Refactor_Trace.Trace
+           (E,
+            Is_Refactoring_Tool_Available_Default_Error_Message
+              ("Move Parameter"));
          return False;
    end Is_Move_Parameter_Available;
 
@@ -1935,6 +1953,13 @@ package body Laltools.Refactor.Subprogram_Signature is
       end if;
 
       return Refactoring_Edits'(Text_Edits => Edits, others => <>);
+
+   exception
+      when E : others =>
+         Refactor_Trace.Trace
+           (E,
+            Refactoring_Tool_Refactor_Default_Error_Message ("Add Parameter"));
+         return No_Refactoring_Edits;
    end Refactor;
 
    --------------------------------------
@@ -2401,6 +2426,14 @@ package body Laltools.Refactor.Subprogram_Signature is
               Self.New_Mode,
               Analysis_Units.all),
          others     => <>);
+
+   exception
+      when E : others =>
+         Refactor_Trace.Trace
+           (E,
+            Refactoring_Tool_Refactor_Default_Error_Message
+              ("Change Parameter Mode"));
+         return No_Refactoring_Edits;
    end Refactor;
 
    -----------------
@@ -2827,6 +2860,14 @@ package body Laltools.Refactor.Subprogram_Signature is
         (Text_Edits =>
            Move_Backward (Self.Subp, Self.Parameter_Index, Analysis_Units.all),
          others     => <>);
+
+   exception
+      when E : others =>
+         Refactor_Trace.Trace
+           (E,
+            Refactoring_Tool_Refactor_Default_Error_Message
+              ("Move Parameter Backward"));
+         return No_Refactoring_Edits;
    end Refactor;
 
    -------------------
@@ -3210,7 +3251,17 @@ package body Laltools.Refactor.Subprogram_Signature is
    function Refactor
      (Self           : Forward_Mover;
       Analysis_Units : access function return Analysis_Unit_Array)
-      return Refactoring_Edits
-   is (Self.Mover.Refactor (Analysis_Units));
+      return Refactoring_Edits is
+   begin
+      return Self.Mover.Refactor (Analysis_Units);
+
+   exception
+      when E : others =>
+         Refactor_Trace.Trace
+           (E,
+            Refactoring_Tool_Refactor_Default_Error_Message
+              ("Move Parameter Forward"));
+         return No_Refactoring_Edits;
+   end Refactor;
 
 end Laltools.Refactor.Subprogram_Signature;

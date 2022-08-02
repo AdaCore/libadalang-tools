@@ -31,6 +31,8 @@ with Laltools.Refactor.Subprogram_Signature;
 
 package body Laltools.Refactor.Introduce_Parameter is
 
+   Tool_Name : constant String := "Introduce Parameter";
+
    -------------------------
    -- Introduce_Parameter --
    -------------------------
@@ -453,6 +455,13 @@ package body Laltools.Refactor.Introduce_Parameter is
       return Is_Object_Decl_With_Enclosing_Subp_Body (Enclosing_Parent)
                or else Is_Expr_With_Non_Null_Type_And_Enclosing_Subp_Body
                          (Enclosing_Parent);
+
+   exception
+      when E : others =>
+         Refactor_Trace.Trace
+           (E,
+            Is_Refactoring_Tool_Available_Default_Error_Message (Tool_Name));
+         return False;
    end Is_Introduce_Parameter_Available;
 
    ---------------------------------
@@ -505,7 +514,16 @@ package body Laltools.Refactor.Introduce_Parameter is
    function Refactor
      (Self           : Parameter_Introducer;
       Analysis_Units : access function return Analysis_Unit_Array)
-      return Refactoring_Edits
-   is (Self.Define_Strategy.Introduce_Parameter (Analysis_Units));
+      return Refactoring_Edits is
+   begin
+      return Self.Define_Strategy.Introduce_Parameter (Analysis_Units);
+
+   exception
+      when E : others =>
+         Refactor_Trace.Trace
+           (E,
+            Refactoring_Tool_Refactor_Default_Error_Message (Tool_Name));
+         return No_Refactoring_Edits;
+   end Refactor;
 
 end Laltools.Refactor.Introduce_Parameter;

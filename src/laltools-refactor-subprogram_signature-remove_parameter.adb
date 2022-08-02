@@ -26,6 +26,8 @@ with Laltools.Subprogram_Hierarchy; use Laltools.Subprogram_Hierarchy;
 
 package body Laltools.Refactor.Subprogram_Signature.Remove_Parameter is
 
+   Tool_Name : constant String := "Remove Parameter";
+
    function Unique is new Generic_Array_Unique
      (Index_Type   => Positive,
       Element_Type => Positive,
@@ -202,12 +204,16 @@ package body Laltools.Refactor.Subprogram_Signature.Remove_Parameter is
             return True;
          end if;
       end if;
+
    exception
-      when Precondition_Failure =>
-         --  Assume that Precondition_Failure is raised due to invalid code and
+      when E : others =>
+         --  Assume that exceptions can be raised due to invalid code and
          --  set again the out parameters since they might have been changed
          --  since initialized.
          Initialize_Out_Parameters;
+         Refactor_Trace.Trace
+           (E,
+            Is_Refactoring_Tool_Available_Default_Error_Message (Tool_Name));
          return False;
    end Is_Remove_Parameter_Available;
 
@@ -578,6 +584,13 @@ package body Laltools.Refactor.Subprogram_Signature.Remove_Parameter is
               Parameter_Indices_Ranges => [Self.Parameter_Indices_Range],
               Units                    => Analysis_Units.all),
          others     => <>);
+
+   exception
+      when E : others =>
+         Refactor_Trace.Trace
+           (E,
+            Refactoring_Tool_Refactor_Default_Error_Message (Tool_Name));
+         return No_Refactoring_Edits;
    end Refactor;
 
 end Laltools.Refactor.Subprogram_Signature.Remove_Parameter;

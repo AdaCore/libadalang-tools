@@ -37,6 +37,8 @@ with Langkit_Support.Text;
 
 package body Laltools.Refactor.Extract_Subprogram is
 
+   Tool_Name : constant String := "Extract Subprogram";
+
    function Get_Parameter_Mode_From_Reference
      (Reference : Base_Id'Class)
       return Ada_Mode;
@@ -2150,6 +2152,13 @@ package body Laltools.Refactor.Extract_Subprogram is
       end if;
 
       return True;
+
+   exception
+      when E : others =>
+         Refactor_Trace.Trace
+           (E,
+            Is_Refactoring_Tool_Available_Default_Error_Message (Tool_Name));
+         return False;
    end Is_Extract_Subprogram_Available;
 
    ---------------------------------------
@@ -2392,6 +2401,13 @@ package body Laltools.Refactor.Extract_Subprogram is
                  Self.End_Stmt,
                  Self.Name).Extract;
       end case;
+
+   exception
+      when E : others =>
+         Refactor_Trace.Trace
+           (E,
+            Refactoring_Tool_Refactor_Default_Error_Message (Tool_Name));
+         return No_Refactoring_Edits;
    end Refactor;
 
 end Laltools.Refactor.Extract_Subprogram;

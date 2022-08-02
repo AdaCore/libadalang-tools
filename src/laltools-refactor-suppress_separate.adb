@@ -32,6 +32,8 @@ with Libadalang.Common; use Libadalang.Common;
 
 package body Laltools.Refactor.Suppress_Separate is
 
+   Tool_Name : constant String := "Suppress Separate";
+
    ------------------------------------
    -- Is_Suppress_Separate_Available --
    ------------------------------------
@@ -119,6 +121,13 @@ package body Laltools.Refactor.Suppress_Separate is
       end if;
 
       return True;
+
+   exception
+      when E : others =>
+         Refactor_Trace.Trace
+           (E,
+            Is_Refactoring_Tool_Available_Default_Error_Message (Tool_Name));
+         return False;
    end Is_Suppress_Separate_Available;
 
    -----------------------
@@ -441,6 +450,13 @@ package body Laltools.Refactor.Suppress_Separate is
 
    begin
       return Suppress_Separate (Self.Target_Separate);
+
+   exception
+      when E : others =>
+         Refactor_Trace.Trace
+           (E,
+            Refactoring_Tool_Refactor_Default_Error_Message (Tool_Name));
+         return No_Refactoring_Edits;
    end Refactor;
 
    ------------

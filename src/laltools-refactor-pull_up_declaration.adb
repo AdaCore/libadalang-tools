@@ -41,6 +41,8 @@ with Laltools.Common; use Laltools.Common;
 
 package body Laltools.Refactor.Pull_Up_Declaration is
 
+   Tool_Name : constant String := "Pull Up Declaration";
+
    function "+" (T : Text_Type) return String renames To_UTF8;
 
    function "+"
@@ -1447,7 +1449,8 @@ package body Laltools.Refactor.Pull_Up_Declaration is
       Node                              : constant Ada_Node :=
         Unit.Root.Lookup (Node_SLOC);
       Enclosing_Declaration             : constant Basic_Decl :=
-        (if Node.Kind in Ada_Name
+        (if not Node.Is_Null
+         and then Node.Kind in Ada_Name
          and then not Node.As_Name.P_Enclosing_Defining_Name.Is_Null
          and then not Node.As_Name.P_Enclosing_Defining_Name.P_Basic_Decl.
            Is_Null
@@ -1496,6 +1499,13 @@ package body Laltools.Refactor.Pull_Up_Declaration is
       end if;
 
       return True;
+
+   exception
+      when E : others =>
+         Refactor_Trace.Trace
+           (E,
+            Is_Refactoring_Tool_Available_Default_Error_Message (Tool_Name));
+         return False;
    end Is_Pull_Up_Declaration_Available;
 
    -----------------------------------
@@ -1824,6 +1834,13 @@ package body Laltools.Refactor.Pull_Up_Declaration is
 
       Edits.Text_Edits := Text_Edits;
       return Edits;
+
+   exception
+      when E : others =>
+         Refactor_Trace.Trace
+           (E,
+            Refactoring_Tool_Refactor_Default_Error_Message (Tool_Name));
+         return No_Refactoring_Edits;
    end Refactor;
 
 end Laltools.Refactor.Pull_Up_Declaration;

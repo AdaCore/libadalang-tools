@@ -30,6 +30,8 @@ with Laltools.Subprogram_Hierarchy; use Laltools.Subprogram_Hierarchy;
 package body Laltools.Refactor.Subprogram_Signature.
                Change_Parameters_Default_Value is
 
+   Tool_Name : constant String := "Change Parameters Default Value";
+
    procedure Change_Parameter_Default_Value
      (Subprogram                  : Basic_Decl'Class;
       Parameters_Indices          : Parameter_Indices_Range_Type;
@@ -630,6 +632,13 @@ package body Laltools.Refactor.Subprogram_Signature.
       end loop;
 
       return True;
+
+   exception
+      when E : others =>
+         Refactor_Trace.Trace
+           (E,
+            Is_Refactoring_Tool_Available_Default_Error_Message (Tool_Name));
+         return False;
    end Is_Change_Parameters_Default_Value_Available;
 
    ---------------------------------------------
@@ -708,6 +717,13 @@ package body Laltools.Refactor.Subprogram_Signature.
          Decls_Callback => Change_Parameter_Default_Values_Callback'Access);
 
       return Edits;
+
+   exception
+      when E : others =>
+         Refactor_Trace.Trace
+           (E,
+            Refactoring_Tool_Refactor_Default_Error_Message (Tool_Name));
+         return No_Refactoring_Edits;
    end Refactor;
 
 end Laltools.Refactor.Subprogram_Signature.Change_Parameters_Default_Value;
