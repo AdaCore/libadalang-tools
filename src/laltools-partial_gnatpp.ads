@@ -27,12 +27,47 @@ with Langkit_Support.Slocs;
 with Libadalang.Analysis;
 with Laltools.Refactor;
 
+with Pp.Command_Lines;
+with Pp.Scanner;
+
 with Utils.Char_Vectors;
 
 package Laltools.Partial_GNATPP is
    use Langkit_Support.Slocs;
    use Libadalang.Analysis;
    use Laltools.Refactor;
+
+   procedure Format_Selection
+     (Main_Unit              : Analysis_Unit;
+      Input_Selection_Range  : Source_Location_Range;
+      Output                 : out Utils.Char_Vectors.Char_Vector;
+      Output_Selection_Range : out Source_Location_Range;
+      PP_Messages            : out Pp.Scanner.Source_Message_Vector;
+      Formatted_Node         : out Ada_Node;
+      PP_Options             : in out Pp.Command_Lines.Cmd_Line;
+      Keep_Source_LB         : Boolean := True);
+   --  This is the procedure to be called for the IDE integration with the
+   --  Ada Language Server for the partial formatting of a text selection.
+   --
+   --  Starting from an initial selection given by Input_Selection_Range of the
+   --  given Main_Unit, the procedure returns the formatted text related to the
+   --  selection using the gnatpp engine for the formatting. The entry
+   --  point for the gnatpp engine is Format_Vector from PP.Actions and is
+   --  called during the formatting pass.
+   --
+   --  The Keep_Source_LB flag is set by default. This means that the initial
+   --  source line breaks will be preserved during the formatting process and
+   --  only the reformatted initially selected lines will be returned as values
+   --  for Output and Output_Selection_Range.
+   --  If this flag is not set then the enclosing parent node of the initial
+   --  selection will be rewritten and the Output and Output_Selection_Range
+   --  will contain the corresponding values related to this node. In this case
+   --  the reformatted selection might be larger than the initial selection.
+   --  The enclosing parent node is returned as value for Formatted_Node.
+   --
+   --  PP_Options contains the gnatpp switches to be used during the formatting
+   --  process. PP_Messages contains the Error messages issued by gnatpp during
+   --  the formatting process.
 
    type Partial_Select_Edits is
       record
