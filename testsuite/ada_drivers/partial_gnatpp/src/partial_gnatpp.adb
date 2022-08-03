@@ -21,10 +21,14 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Assertions;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
+with GNAT.OS_Lib;
+with GNAT.Strings;
 with GNATCOLL.Opt_Parse; use GNATCOLL.Opt_Parse;
+with GNATCOLL.Projects;
 
 with Langkit_Support.Slocs; use Langkit_Support.Slocs;
 
@@ -36,11 +40,10 @@ with Pp.Scanner;
 
 with Utils.Char_Vectors;
 with Utils.Command_Lines;
+with Utils.Command_Lines.Common;
 
 with Laltools.Partial_GNATPP;
 with Laltools.Refactor;
-
-with GNAT.Strings;
 
 --  This procedure defines the partial gnatpp formatting tool
 
@@ -132,7 +135,11 @@ procedure Partial_GNATpp is
      (Context : App_Context;
       Jobs    : App_Job_Context_Array)
    is
-      pragma Unreferenced (Context);
+      procedure Setup_Pretty_Printer_Switches;
+      --  Setups PP_Options by doing the first pass and then checks if this
+      --  project has a "Pretty_Printer" package with additional switches.
+      --  If so, do a second and final parse to update PP_Options with these.
+
       Source_File : constant String := To_String (Args.Source.Get);
 
       Selection_Range      : constant Source_Location_Range :=
@@ -155,20 +162,75 @@ procedure Partial_GNATpp is
       Output          : Char_Vector;
       Output_SL_Range : Source_Location_Range;
       Messages        : Pp.Scanner.Source_Message_Vector;
-      Validated       : GNAT.Strings.String_List_Access :=
-        new GNAT.Strings.String_List (1 .. 0);
+
+      -----------------------------------
+      -- Setup_Pretty_Printer_Switches --
+      -----------------------------------
+
+      procedure Setup_Pretty_Printer_Switches is
+         Dummy : GNAT.Strings.String_List_Access :=
+           new GNAT.Strings.String_List (1 .. 0);
+
+      begin
+         Parse
+           (Dummy,
+            PP_Options,
+            Phase              => Cmd_Line_1,
+            Callback           => null,
+            Collect_File_Names => False,
+            Ignore_Errors      => True);
+         GNAT.OS_Lib.Free (Dummy);
+
+         --  If Context.Provider.Kind is in Project_File, it means that a
+         --  project was given by the -P option.
+         --  Partial_GNATpp_App.Args.Project_File cannot be an empty string
+         --  in that case.
+         if Context.Provider.Kind in Project_File then
+            Ada.Assertions.Assert
+               (To_String (Partial_GNATpp_App.Args.Project_File.Get) /= "");
+
+            --  Set the Project_File option in PP_Options
+            Utils.Command_Lines.Common.Common_String_Switches.Set_Arg
+               (PP_Options,
+               Utils.Command_Lines.Common.Project_File,
+               To_String (Partial_GNATpp_App.Args.Project_File.Get));
+
+            --  Check if this project has a "Pretty_Printer" package with
+            --  additional switches. If so, do a second and final parse to
+            --  update PP_Options with these.
+            declare
+               use GNATCOLL.Projects;
+               use GNAT.OS_Lib;
+
+               Project          : constant Project_Type :=
+                  Root_Project (Context.Provider.Project.all);
+               PP_Switches      : constant Attribute_Pkg_List :=
+                  Build ("Pretty_Printer", "Default_Switches");
+               PP_Switches_Text : Argument_List_Access := null;
+
+            begin
+               if Has_Attribute (Project, PP_Switches, "ada") then
+                  PP_Switches_Text :=
+                     Attribute_Value (Project, PP_Switches, "ada");
+                  if PP_Switches_Text /= null then
+                     Parse
+                        (PP_Switches_Text,
+                        PP_Options,
+                        Phase              => Project_File,
+                        Callback           => null,
+                        Collect_File_Names => False,
+                        Ignore_Errors      => True);
+                     Free (PP_Switches_Text);
+                  end if;
+               end if;
+            end;
+         end if;
+      end Setup_Pretty_Printer_Switches;
 
    begin
-      Main_Unit := Jobs (1).Analysis_Ctx.Get_From_File (Source_File);
+      Setup_Pretty_Printer_Switches;
 
-      Parse
-        (Validated,
-         PP_Options,
-         Phase              => Cmd_Line_1,
-         Callback           => null,
-         Collect_File_Names => False,
-         Ignore_Errors      => True);
-      GNAT.Strings.Free (Validated);
+      Main_Unit := Jobs (1).Analysis_Ctx.Get_From_File (Source_File);
 
       --  Format the selected range of the text. If the --source-line-breaks
       --  switch is passed then the formetted text will be filtered and only
