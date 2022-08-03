@@ -1,0 +1,7 @@
+Code-Review+2: Monika Kurovszky <kurovszky@adacore.com>
+Code-Review-1: CI Builder <ci-builder@adacore.com>
+Submitted-by: João Azevedo <azevedo@adacore.com>
+Submitted-at: Wed, 03 Aug 2022 15:10:30 +0000
+Reviewed-on: https://git.adacore-it.com/c/libadalang-tools/+/119585
+Project: libadalang-tools
+Branch: refs/heads/master
