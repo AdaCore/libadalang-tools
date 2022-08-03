@@ -1985,7 +1985,10 @@ package body Laltools.Refactor.Extract_Subprogram is
                     (Node : Ada_Node'Class)
                      return Visit_Status is
                   begin
-                     if Node.Kind in Ada_Return_Stmt_Range then
+                     if Node.Is_Null then
+                        return Over;
+
+                     elsif Node.Kind in Ada_Return_Stmt_Range then
                         Found_Forbidden_Return_Stmt := True;
                         return Stop;
 
@@ -2014,7 +2017,17 @@ package body Laltools.Refactor.Extract_Subprogram is
             end if;
 
             exit when It_Stmt = End_Stmt;
-            It_Stmt := It_Stmt.Next_Sibling.As_Stmt;
+
+            --  It_Stmt.Next_Sibling should never be null, because it should be
+            --  End_Stmt before going beyond the last statement. However, with
+            --  invalid code, it might be null. In that case, the refactoring
+            --  is not available.
+            if It_Stmt.Next_Sibling.Is_Null then
+               return False;
+
+            else
+               It_Stmt := It_Stmt.Next_Sibling.As_Stmt;
+            end if;
          end loop;
       end if;
 
@@ -2079,7 +2092,10 @@ package body Laltools.Refactor.Extract_Subprogram is
                     No_Defining_Name;
 
                begin
-                  if Node.Kind in Ada_Base_Loop_Stmt then
+                  if Node.Is_Null then
+                        return Over;
+
+                  elsif Node.Kind in Ada_Base_Loop_Stmt then
                      Found_Loop := True;
 
                      if Node.Parent.Kind in Ada_Named_Stmt_Range then
@@ -2131,7 +2147,17 @@ package body Laltools.Refactor.Extract_Subprogram is
          end if;
 
          exit when It_Stmt = End_Stmt;
-         It_Stmt := It_Stmt.Next_Sibling.As_Stmt;
+
+         --  It_Stmt.Next_Sibling should never be null, because it should be
+         --  End_Stmt before going beyond the last statement. However, with
+         --  invalid code, it might be null. In that case, the refactoring is
+         --  not available.
+         if It_Stmt.Next_Sibling.Is_Null then
+            return False;
+
+         else
+            It_Stmt := It_Stmt.Next_Sibling.As_Stmt;
+         end if;
       end loop;
 
       --  Check what kind of subprograms can be extracted
