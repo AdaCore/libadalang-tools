@@ -1,0 +1,5 @@
+title: introduce_from_object_decl_without_default_expr_and_out_mode
+
+description: introduce_parameter tool test
+
+driver: shell_script

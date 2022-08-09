@@ -46,30 +46,29 @@ package body Laltools.Refactor.Introduce_Parameter is
       use Laltools.Refactor.Subprogram_Signature;
       use Laltools.Refactor.Pull_Up_Declaration;
 
-      Object_Decl         : constant Libadalang.Analysis.Object_Decl :=
-        Self.Definition.P_Basic_Decl.As_Object_Decl;
-      Enclosing_Subp_Body : constant Subp_Body :=
-        Object_Decl.P_Parent_Basic_Decl.As_Subp_Body;
+      Object_Decl_Default_Expr : constant Text_Type :=
+        (if Self.Object_Decl.F_Default_Expr.Is_Null then ""
+         else " := " & Self.Object_Decl.F_Default_Expr.Text);
 
       Parameter_Adder        :
         constant Laltools.Refactor.Subprogram_Signature.Parameter_Adder :=
           Create
-            (Unit          => Enclosing_Subp_Body.Unit,
+            (Unit          => Self.Parent_Subp.Unit,
              Location      =>
-               End_Sloc (Enclosing_Subp_Body.F_Subp_Spec.Sloc_Range),
+               End_Sloc (Self.Parent_Subp.F_Subp_Spec.Sloc_Range),
              New_Parameter =>
                To_Unbounded_String
                  (To_UTF8
                     (Self.Definition.Text
                      & " : "
-                     & Object_Decl.F_Type_Expr.Text
-                     & " := "
-                     & Object_Decl.F_Default_Expr.Text)));
+                     & To_Text_In_Lower_Case (Self.Compute_Object_Decl_Mode)
+                     & Self.Object_Decl.F_Type_Expr.Text
+                     & Object_Decl_Default_Expr)));
       Declaration_Pull_Upper : constant Declaration_Extractor :=
         Create_Declaration_Pull_Upper
-          (Unit                     => Object_Decl.Unit,
+          (Unit                     => Self.Object_Decl.Unit,
            Declaration_SLOC         =>
-             Start_Sloc (Object_Decl.Sloc_Range),
+             Start_Sloc (Self.Object_Decl.Sloc_Range),
            Indentation              => 3,
            Only_Dependencies        => True,
            Try_Subp_Insertion_Point => True);
@@ -87,10 +86,10 @@ package body Laltools.Refactor.Introduce_Parameter is
 
       Safe_Insert
         (Edits     => Text_Edits,
-         File_Name => Object_Decl.Unit.Get_Filename,
+         File_Name => Self.Object_Decl.Unit.Get_Filename,
          Edit      =>
            Text_Edit'
-             (Location => Expand_SLOC_Range (Object_Decl),
+             (Location => Expand_SLOC_Range (Self.Object_Decl),
               Text     => Null_Unbounded_String));
 
       return
@@ -101,6 +100,68 @@ package body Laltools.Refactor.Introduce_Parameter is
            File_Renames   => File_Rename_Ordered_Sets.Empty_Set,
            Diagnostics    => Refactoring_Diagnotic_Vectors.Empty_Vector);
    end Introduce_Parameter;
+
+   ------------------------------
+   -- Compute_Object_Decl_Mode --
+   ------------------------------
+
+   function Compute_Object_Decl_Mode
+     (Self : Parameter_From_Object_Decl_Introducer)
+      return Ada_Mode
+   is
+      Is_Constant              : constant Boolean :=
+        Self.Object_Decl.F_Has_Constant;
+      References               : constant Ref_Result_Array :=
+        Self.Definition.P_Find_Refs (Self.Parent_Subp);
+      First_Is_Write_Reference : Boolean;
+      Any_Write_References     : Boolean;
+
+   begin
+      if Is_Constant then
+         return Ada_Mode_In;
+      end if;
+
+      if References'Length > 1 then
+         First_Is_Write_Reference :=
+           Ref (References (References'First + 1)).P_Is_Write_Reference;
+         Any_Write_References :=
+           (for some Reference of
+              References (References'First + 1 .. References'Last)
+            => Ref (Reference).P_Is_Write_Reference);
+
+         if First_Is_Write_Reference then
+            --  First reference is a write reference so this
+            --  parameter must be an `out` parameter.
+            return Ada_Mode_Out;
+
+         else
+            --  First reference is a read reference.
+            --  This parameter must be either `in` or `in out`.
+            if Any_Write_References then
+               --  Must be `in out`
+               return Ada_Mode_In_Out;
+            else
+               --  Must be `in`
+               return Ada_Mode_In;
+            end if;
+         end if;
+      else
+         return Ada_Mode_Default;
+      end if;
+   end Compute_Object_Decl_Mode;
+
+   ---------------------------
+   -- To_Text_In_Lower_Case --
+   ---------------------------
+
+   function To_Text_In_Lower_Case
+     (Ada_Mode : Libadalang.Common.Ada_Mode)
+      return Text_Type
+   is (To_Text
+         ((case Ada_Mode is
+             when Ada_Mode_In_Range | Ada_Mode_Default_Range => "",
+             when Ada_Mode_In_Out_Range                      => "in out ",
+             when Ada_Mode_Out_Range                         => "out ")));
 
    -------------------------
    -- Introduce_Parameter --
@@ -451,10 +512,60 @@ package body Laltools.Refactor.Introduce_Parameter is
       Enclosing_Parent : constant Ada_Node :=
         Find_First_Common_Parent (Start_Node, End_Node);
 
+      function Is_Valid_Object_Decl_For_Pull_Up
+        (Object_Definition : Defining_Name)
+         return Boolean;
+      --  Checks that if Object_Definition has a default expression, then
+      --  there are no other write references in the parent subprogram.
+      --  This is because when introducing a parameter from an Object_Decl that
+      --  has a defaut expression, we want to use it as the default expression
+      --  of the introduced formal parameter. Only In mode parameters are
+      --  allowed to have default expressions, therefore, there cannot be
+      --  write references of Object_Definition other thant he first.
+
+      --------------------------------------
+      -- Is_Valid_Object_Decl_For_Pull_Up --
+      --------------------------------------
+
+      function Is_Valid_Object_Decl_For_Pull_Up
+        (Object_Definition : Defining_Name)
+         return Boolean
+      is
+         Object_Decl_Default_Expr : constant Expr :=
+           Object_Definition.P_Basic_Decl.As_Object_Decl.F_Default_Expr;
+         Parent_Subp_Body         : constant Subp_Body :=
+           Object_Definition.P_Basic_Decl.As_Object_Decl.P_Parent_Basic_Decl.
+             As_Subp_Body;
+
+      begin
+         if Object_Decl_Default_Expr.Is_Null then
+            return True;
+         end if;
+
+         declare
+            References               : constant Ref_Result_Array :=
+              Object_Definition.P_Find_Refs (Parent_Subp_Body);
+
+         begin
+            --  Ignore the first reference which is the declaration
+            if References'Length > 1 then
+               --  All references must be read references
+               return (for all Reference of
+                         References (References'First + 1 .. References'Last)
+                       => not Ref (Reference).P_Is_Write_Reference);
+            end if;
+
+            return True;
+         end;
+      end Is_Valid_Object_Decl_For_Pull_Up;
+
    begin
-      return Is_Object_Decl_With_Enclosing_Subp_Body (Enclosing_Parent)
-               or else Is_Expr_With_Non_Null_Type_And_Enclosing_Subp_Body
-                         (Enclosing_Parent);
+      return
+        (Is_Object_Decl_With_Enclosing_Subp_Body (Enclosing_Parent)
+         and then Is_Valid_Object_Decl_For_Pull_Up
+                    (Enclosing_Parent.As_Name.P_Enclosing_Defining_Name))
+        or else Is_Expr_With_Non_Null_Type_And_Enclosing_Subp_Body
+                  (Enclosing_Parent);
 
    exception
       when E : others =>
@@ -496,7 +607,13 @@ package body Laltools.Refactor.Introduce_Parameter is
       if Is_Object_Decl_With_Enclosing_Subp_Body (Self.Target) then
          return Parameter_From_Object_Decl_Introducer'
                  (Definition =>
-                    Self.Target.As_Name.P_Enclosing_Defining_Name);
+                    Self.Target.As_Name.P_Enclosing_Defining_Name,
+                  Object_Decl =>
+                    Self.Target.As_Name.P_Enclosing_Defining_Name.P_Basic_Decl.
+                      As_Object_Decl,
+                  Parent_Subp =>
+                    Self.Target.As_Name.P_Enclosing_Defining_Name.P_Basic_Decl.
+                      P_Semantic_Parent.As_Subp_Body);
       elsif Is_Expr_With_Non_Null_Type_And_Enclosing_Subp_Body
               (Self.Target)
       then

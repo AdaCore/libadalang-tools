@@ -23,6 +23,9 @@
 --
 --  This package contains refactoring tools that allow introducing parameters
 
+private with Langkit_Support.Text;
+private with Libadalang.Common;
+
 package Laltools.Refactor.Introduce_Parameter is
 
    function Is_Introduce_Parameter_Available
@@ -60,6 +63,8 @@ package Laltools.Refactor.Introduce_Parameter is
    --  Create_Parameter_Introducer.
 
 private
+   use Langkit_Support.Text;
+   use Libadalang.Common;
 
    type Introduction_Strategy is interface;
 
@@ -77,7 +82,9 @@ private
 
    type Parameter_From_Object_Decl_Introducer is new Introduction_Strategy with
       record
-         Definition : Defining_Name;
+         Definition  : Defining_Name;
+         Object_Decl : Libadalang.Analysis.Object_Decl;
+         Parent_Subp : Subp_Body;
       end record
      with Dynamic_Predicate =>
             Is_Object_Decl_With_Enclosing_Subp_Body (Definition.F_Name);
@@ -89,6 +96,17 @@ private
       return Refactoring_Edits;
    --  Introduces an Object_Decl as a parameter in its enclosing subprogram.
    --  Also pulls up any dependent declaration declared in this subprogram.
+
+   function Compute_Object_Decl_Mode
+     (Self : Parameter_From_Object_Decl_Introducer)
+      return Ada_Mode;
+   --  Compute which mode the introduced parameter from Self.Definition should
+   --  have.
+
+   function To_Text_In_Lower_Case
+     (Ada_Mode : Libadalang.Common.Ada_Mode)
+      return Text_Type;
+   --  Converts Ada_Mode to Text_Type in lower case
 
    function Is_Expr_With_Non_Null_Type_And_Enclosing_Subp_Body
      (Node : Ada_Node'Class)

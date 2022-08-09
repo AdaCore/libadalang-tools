@@ -1,0 +1,5 @@
+title: introduce_from_object_decl_with_default_expr_and_write_references
+
+description: introduce_parameter tool test
+
+driver: shell_script
