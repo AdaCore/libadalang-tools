@@ -1,0 +1,13 @@
+a.adb:4:11: error: "Map" is not visible (more references follow)
+a.adb:4:11: error: non-visible declaration from "Private_Integer_Hashed_Maps" at a-cihama.ads:56, instance at a.ads:110
+a.adb:4:11: error: non-visible declaration from "Private_Integer_Hashed_Maps" at a-cihama.ads:56, instance at a.ads:92
+a.adb:4:11: error: non-visible declaration from "Private_Integer_Hashed_Maps" at a-cihama.ads:56, instance at a.ads:75
+a.adb:4:11: error: non-visible declaration from "Private_Integer_Hashed_Maps" at a-cihama.ads:56, instance at a.ads:58
+a.adb:4:11: error: non-visible declaration from "Integer_Hashed_Maps" at a-cihama.ads:56, instance at a.ads:45
+a.adb:4:11: error: non-visible declaration from "Integer_Hashed_Maps" at a-cihama.ads:56, instance at a.ads:32
+a.adb:4:11: error: non-visible declaration from "Integer_Hashed_Maps" at a-cihama.ads:56, instance at a.ads:19
+a.adb:4:11: error: non-visible declaration from "Integer_Hashed_Maps" at a-cihama.ads:56, instance at a.ads:6
+a.adb:6:07: warning: infinite recursion [enabled by default]
+a.adb:6:07: warning: Storage_Error will be raised at run time [enabled by default]
+a.adb:48:16: warning: infinite recursion [enabled by default]
+a.adb:48:16: warning: Storage_Error will be raised at run time [enabled by default]
