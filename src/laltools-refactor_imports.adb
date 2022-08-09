@@ -21,7 +21,10 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Containers.Indefinite_Hashed_Maps;
+with Ada.Containers.Hashed_Sets;
 with Ada.Strings;
+with Ada.Strings.Wide_Wide_Hash;
 
 with Langkit_Support.Errors;
 
@@ -30,6 +33,57 @@ with Libadalang.Common; use Libadalang.Common;
 with Laltools.Common;
 
 package body Laltools.Refactor_Imports is
+
+   function Basic_Decl_Hash (Decl : Basic_Decl)
+                             return Ada.Containers.Hash_Type;
+   --  Casts Decl as Ada_Node and uses Hash from Libadalang.Analysis.
+   --  This is convenient for containers with Basic_Decl elements.
+
+   package Reachable_Declarations_Hashed_Set is new Ada.Containers.Hashed_Sets
+     (Element_Type        => Basic_Decl,
+      Hash                => Basic_Decl_Hash,
+      Equivalent_Elements => "=",
+      "="                 => "=");
+
+   function Text_Type_Equivalent
+     (Left, Right : Text_Type) return Boolean is (Left = Right);
+   --  True if two Text_Type elements are the same.
+
+   package Reachable_Declarations_Map is new
+     Ada.Containers.Indefinite_Hashed_Maps
+       (Key_Type        => Text_Type,
+        Element_Type    => Reachable_Declarations_Hashed_Set.Set,
+        Hash            => Ada.Strings.Wide_Wide_Hash,
+        Equivalent_Keys => Text_Type_Equivalent,
+        "="             => Reachable_Declarations_Hashed_Set."=");
+
+   package Aliases_Hashed_Set is new Ada.Containers.Hashed_Sets
+     (Element_Type => Basic_Decl,
+      Hash                => Basic_Decl_Hash,
+      Equivalent_Elements => "=",
+      "="                 => "=");
+
+   package Reachable_Declarations_Aliases_Map is new
+     Ada.Containers.Indefinite_Hashed_Maps
+       (Key_Type        => Basic_Decl,
+        Element_Type    => Aliases_Hashed_Set.Set,
+        Hash            => Basic_Decl_Hash,
+        Equivalent_Keys => "=",
+        "="             => Aliases_Hashed_Set."=");
+
+   type Reachable_Declarations is record
+      Decls_Map         : Reachable_Declarations_Map.Map;
+      Aliased_Decls_Map : Reachable_Declarations_Aliases_Map.Map;
+   end record;
+
+   function Get_Reachable_Declarations
+     (Identifier : Libadalang.Analysis.Identifier;
+      Units      : Unit_Vectors.Vector)
+      return Reachable_Declarations;
+   --  Finds all the declarations that are reachable by Identifier. A reachable
+   --  declaration is one that is visible by adding a with clause of the
+   --  respective package or that is visible because it is declared in a
+   --  visible part of the local unit.
 
    function "<" (L, R : Unbounded_Text_Type) return Boolean
    renames Ada.Strings.Wide_Wide_Unbounded."<";
@@ -798,8 +852,8 @@ package body Laltools.Refactor_Imports is
    ----------------------------
 
    function Get_Import_Suggestions
-     (Identifier : Libadalang.Analysis.Identifier;
-      Units      : Unit_Vectors.Vector)
+     (Node  : Ada_Node'Class;
+      Units : Unit_Vectors.Vector)
       return Import_Suggestions_Vector.Vector
    is
       type Vectorized_Suggestion is
@@ -913,143 +967,222 @@ package body Laltools.Refactor_Imports is
          return Suggestions;
       end Apply_Aliases;
 
-      use type Ada.Containers.Count_Type;
+      Identifier        : constant Libadalang.Analysis.Identifier :=
+        (if not Node.Is_Null and then Node.Kind in Ada_Identifier_Range then
+           Node.As_Identifier
+         else
+           No_Identifier);
+      Identifier_Text   : constant Text_Type :=
+        (if not Identifier.Is_Null then Identifier.Text
+         else "");
+      Name              : Libadalang.Analysis.Name :=
+        (if not Identifier.Is_Null and then Identifier.Kind in Ada_Name then
+           Identifier.As_Name
+         else
+           No_Name);
+      Resolved_Name     : Defining_Name := No_Defining_Name;
 
-      Identifier_Text : constant Text_Type  := Identifier.Text;
       Reach_Decls       : Reachable_Declarations;
       Decls_List        : Reachable_Declarations_Hashed_Set.Set;
       Id_Parent_Pkgs    : Parent_Packages_Vector.Vector;
+
       Suggestions       : Import_Suggestions_Vector.Vector;
 
-      Decls_Map         : Reachable_Declarations_Map.Map renames
-        Reach_Decls.Decls_Map;
+      use type Ada.Containers.Count_Type;
+
    begin
-
-      if Identifier.Is_Null or else Identifier.Parent.Is_Null then
+      if Name.Is_Null then
          return Suggestions;
       end if;
 
-      Reach_Decls := Get_Reachable_Declarations (Identifier, Units);
-
-      if Decls_Map.Length = 0 then
-         return Suggestions;
-      end if;
-
-      if Decls_Map.Contains (Identifier_Text) then
-         Decls_List := Decls_Map.Element (Identifier_Text);
-      end if;
-
-      Id_Parent_Pkgs := Get_Parent_Packages (Identifier);
-
-      for D of Decls_List loop
-         declare
-            Decl_Parent_Pkgs : constant Parent_Packages_Vector.Vector :=
-              Get_Parent_Packages (D);
-            Vec_Sug : Vectorized_Suggestion;
-
-            Prefix_Decls      : Parent_Packages_Vector.Vector
-            renames Vec_Sug.Prefix_Decls;
-            With_Clause_Decls : Parent_Packages_Vector.Vector
-            renames Vec_Sug.With_Clause_Decls;
-            Aliased_Decls_Map : Reachable_Declarations_Aliases_Map.Map renames
-              Reach_Decls.Aliased_Decls_Map;
-
-         begin
-
-            if Id_Parent_Pkgs.Length = 0 then
-               --  Id is in a unit that does not have a parent package
-               --  (for instance, a standalone subprogram).
-
-               if Decl_Parent_Pkgs.Length /= 0 then
-                  --  Otherwise, the prefix must contain all the parent
-                  --  packages of D but the with clause must only contain
-                  --  the top level parent package of D.
-
-                  Prefix_Decls := Decl_Parent_Pkgs;
-                  With_Clause_Decls.Append (Decl_Parent_Pkgs.Last_Element);
-               end if;
-            else
-               if Decl_Parent_Pkgs.Length /= 0
-                 and then Id_Parent_Pkgs.Last_Element.P_Defining_Name.
-                 P_Canonical_Part.P_Basic_Decl =
-                   Decl_Parent_Pkgs.Last_Element.P_Defining_Name.
-                     P_Canonical_Part.P_Basic_Decl
-               then
-                  --  Nested packages cases. If both D and Id share the same
-                  --  parent, no with clause or prefix is needed.
-
-                  --  If they do not share the same parent, then the with
-                  --  clause is still not needed but the prefix is. Prefix
-                  --  depends on the hierarchy. All packages are added to the
-                  --  prefix up to the one that is shared by Id and D.
-
-                  if Id_Parent_Pkgs.First_Element.P_Defining_Name.
-                    P_Canonical_Part.P_Basic_Decl /=
-                      Decl_Parent_Pkgs.First_Element.P_Defining_Name.
-                        P_Canonical_Part.P_Basic_Decl
-                  then
-                     for P of Decl_Parent_Pkgs loop
-                        exit when P.P_Defining_Name.P_Canonical_Part.
-                          P_Basic_Decl = Id_Parent_Pkgs.First_Element.
-                            P_Defining_Name.P_Canonical_Part.P_Basic_Decl;
-
-                        Prefix_Decls.Append (P);
-                     end loop;
-                  end if;
-               else
-                  Prefix_Decls := Decl_Parent_Pkgs;
-                  With_Clause_Decls.Append (Decl_Parent_Pkgs.Last_Element);
-               end if;
-            end if;
-
-            declare
-               Vectorized_Suggestion_Vector : constant
-                 Vectorized_Suggestion_Vectors.Vector
-                   := Apply_Aliases (Vec_Sug, Aliased_Decls_Map);
-               Suggestion       : Import_Suggestion;
-            begin
-               for Vec_Sug of Vectorized_Suggestion_Vector loop
-                  Suggestion.Declaration := D;
-                  Suggestion.Prefix_Text :=
-                    Ada.Strings.Wide_Wide_Unbounded.
-                      Null_Unbounded_Wide_Wide_String;
-                  Suggestion.With_Clause_Text :=
-                    Ada.Strings.Wide_Wide_Unbounded.
-                      Null_Unbounded_Wide_Wide_String;
-
-                  for D of Vec_Sug.Prefix_Decls loop
-                     Suggestion.Prefix_Text :=
-                       To_Unbounded_Text (D.P_Defining_Name.Text)
-                       & To_Unbounded_Text (To_Text ("."))
-                       & Suggestion.Prefix_Text;
-                  end loop;
-
-                  for D of Vec_Sug.With_Clause_Decls loop
-                     if D /= Vec_Sug.With_Clause_Decls.First_Element then
-                        Suggestion.With_Clause_Text :=
-                          To_Unbounded_Text (D.P_Defining_Name.Text)
-                          & To_Unbounded_Text (To_Text ("."))
-                          & Suggestion.With_Clause_Text;
-                     else
-                        Suggestion.With_Clause_Text :=
-                          To_Unbounded_Text (D.P_Defining_Name.Text);
-                     end if;
-                  end loop;
-
-                  if Suggestion.Prefix_Text /=
-                    Ada.Strings.Wide_Wide_Unbounded.
-                      Null_Unbounded_Wide_Wide_String
-                  then
-                     Suggestions.Append (Suggestion);
-                  end if;
-               end loop;
-            end;
-         end;
+      while not Name.Is_Null
+        and then not Name.Parent.Is_Null
+        and then Name.Parent.Kind in Ada_Dotted_Name_Range
+      loop
+         Name := Name.Parent.As_Name;
       end loop;
 
-      Import_Suggestions_Vector_Sorting.Sort (Suggestions);
-      Remove_Duplicated_Suggestions (Suggestions);
+      if Name.Is_Null or else Name.P_Is_Defining then
+         return Suggestions;
+      end if;
+
+      if Name.Kind in Ada_Dotted_Name_Range then
+         Name := Name.As_Dotted_Name.F_Suffix.As_Name;
+      end if;
+
+      Resolved_Name := Laltools.Common.Resolve_Name_Precisely (Name);
+
+      if Resolved_Name.Is_Null then
+         Reach_Decls :=
+           Get_Reachable_Declarations
+             (Identifier =>
+                (if Name.Kind in Ada_Dotted_Name_Range then
+                        Name.As_Dotted_Name.F_Suffix.As_Identifier
+                 else
+                    Name.As_Identifier),
+              Units      => Units);
+
+         if Reach_Decls.Decls_Map.Length = 0 then
+            return Suggestions;
+         end if;
+
+         if Reach_Decls.Decls_Map.Contains (Identifier_Text) then
+            Decls_List := Reach_Decls.Decls_Map.Element (Identifier_Text);
+         end if;
+
+         Id_Parent_Pkgs := Get_Parent_Packages (Name);
+
+         for D of Decls_List loop
+            declare
+               Decl_Parent_Pkgs : constant Parent_Packages_Vector.Vector :=
+                 Get_Parent_Packages (D);
+               Vec_Sug          : Vectorized_Suggestion;
+
+               Prefix_Decls      : Parent_Packages_Vector.Vector
+               renames Vec_Sug.Prefix_Decls;
+               With_Clause_Decls : Parent_Packages_Vector.Vector
+               renames Vec_Sug.With_Clause_Decls;
+               Aliased_Decls_Map :
+               Reachable_Declarations_Aliases_Map.Map renames
+                 Reach_Decls.Aliased_Decls_Map;
+
+            begin
+
+               if Id_Parent_Pkgs.Length = 0 then
+                  --  Id is in a unit that does not have a parent package
+                  --  (for instance, a standalone subprogram).
+
+                  if Decl_Parent_Pkgs.Length /= 0 then
+                     --  Otherwise, the prefix must contain all the parent
+                     --  packages of D but the with clause must only contain
+                     --  the top level parent package of D.
+
+                     Prefix_Decls := Decl_Parent_Pkgs;
+                     With_Clause_Decls.Append
+                       (Decl_Parent_Pkgs.Last_Element);
+                  end if;
+               else
+                  if Decl_Parent_Pkgs.Length /= 0
+                    and then Id_Parent_Pkgs.Last_Element.P_Defining_Name.
+                      P_Canonical_Part.P_Basic_Decl =
+                        Decl_Parent_Pkgs.Last_Element.P_Defining_Name.
+                          P_Canonical_Part.P_Basic_Decl
+                  then
+                     --  Nested packages cases. If both D and Id share the
+                     --  same parent, no with clause or prefix is needed.
+
+                     --  If they do not share the same parent, then the with
+                     --  clause is still not needed but the prefix is.
+                     --  Prefix depends on the hierarchy. All packages are
+                     --  added to the prefix up to the one that is shared by
+                     --  Id and D.
+
+                     if Id_Parent_Pkgs.First_Element.P_Defining_Name.
+                       P_Canonical_Part.P_Basic_Decl /=
+                         Decl_Parent_Pkgs.First_Element.P_Defining_Name.
+                           P_Canonical_Part.P_Basic_Decl
+                     then
+                        for P of Decl_Parent_Pkgs loop
+                           exit when P.P_Defining_Name.P_Canonical_Part.
+                             P_Basic_Decl = Id_Parent_Pkgs.First_Element.
+                               P_Defining_Name.P_Canonical_Part.
+                                 P_Basic_Decl;
+
+                           Prefix_Decls.Append (P);
+                        end loop;
+                     end if;
+                  else
+                     Prefix_Decls := Decl_Parent_Pkgs;
+                     With_Clause_Decls.Append
+                       (Decl_Parent_Pkgs.Last_Element);
+                  end if;
+               end if;
+
+               declare
+                  Vectorized_Suggestion_Vector : constant
+                    Vectorized_Suggestion_Vectors.Vector
+                      := Apply_Aliases (Vec_Sug, Aliased_Decls_Map);
+                  Suggestion                   : Import_Suggestion;
+               begin
+                  for Vec_Sug of Vectorized_Suggestion_Vector loop
+                     Suggestion.Declaration := D;
+                     Suggestion.Prefix_Text :=
+                       Ada.Strings.Wide_Wide_Unbounded.
+                         Null_Unbounded_Wide_Wide_String;
+                     Suggestion.With_Clause_Text :=
+                       Ada.Strings.Wide_Wide_Unbounded.
+                         Null_Unbounded_Wide_Wide_String;
+
+                     for D of Vec_Sug.Prefix_Decls loop
+                        Suggestion.Prefix_Text :=
+                          To_Unbounded_Text (D.P_Defining_Name.Text)
+                          & To_Unbounded_Text (To_Text ("."))
+                          & Suggestion.Prefix_Text;
+                     end loop;
+
+                     for D of Vec_Sug.With_Clause_Decls loop
+                        if D /= Vec_Sug.With_Clause_Decls.First_Element then
+                           Suggestion.With_Clause_Text :=
+                             To_Unbounded_Text (D.P_Defining_Name.Text)
+                             & To_Unbounded_Text (To_Text ("."))
+                             & Suggestion.With_Clause_Text;
+                        else
+                           Suggestion.With_Clause_Text :=
+                             To_Unbounded_Text (D.P_Defining_Name.Text);
+                        end if;
+                     end loop;
+
+                     if Suggestion.Prefix_Text /=
+                       Ada.Strings.Wide_Wide_Unbounded.
+                         Null_Unbounded_Wide_Wide_String
+                     then
+                        Suggestions.Append (Suggestion);
+                     end if;
+                  end loop;
+               end;
+            end;
+         end loop;
+
+         Import_Suggestions_Vector_Sorting.Sort (Suggestions);
+         Remove_Duplicated_Suggestions (Suggestions);
+
+      else
+         declare
+            Resolved_Name_CU  : constant Compilation_Unit :=
+              Resolved_Name.P_Enclosing_Compilation_Unit;
+            Unit_Dependencies : constant Compilation_Unit_Array :=
+              Node.P_Enclosing_Compilation_Unit.P_Unit_Dependencies;
+
+         begin
+            if Name.P_Enclosing_Compilation_Unit /= Resolved_Name_CU
+              and then not (for some Unit of Unit_Dependencies
+                            => Unit = Resolved_Name_CU)
+            then
+               declare
+                  Top_Level_Decl : constant Basic_Decl :=
+                    Resolved_Name_CU.P_Top_Level_Decl
+                      (Resolved_Name_CU.Unit);
+                  Suggestion     : constant Import_Suggestion :=
+                    (Declaration      =>
+                       Resolved_Name.P_Basic_Decl,
+                     With_Clause_Text =>
+                       Langkit_Support.Text.To_Unbounded_Text
+                         (Top_Level_Decl.P_Fully_Qualified_Name),
+                     Prefix_Text      =>
+                       Ada.Strings.Wide_Wide_Unbounded.
+                         Null_Unbounded_Wide_Wide_String);
+
+               begin
+                  Suggestions.Append (Suggestion);
+               end;
+            end if;
+         end;
+      end if;
+
       return Suggestions;
+   exception
+      when others =>
+         return Import_Suggestions_Vector.Empty_Vector;
    end Get_Import_Suggestions;
 
 end Laltools.Refactor_Imports;

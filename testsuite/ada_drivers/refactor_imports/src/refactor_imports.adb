@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                    Copyright (C) 2020-2021, AdaCore                      --
+--                    Copyright (C) 2020-2022, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -172,8 +172,8 @@ procedure Refactor_Imports is
          end if;
          declare
             use Laltools.Refactor_Imports;
-            Suggestions : constant Import_Suggestions_Vector.Vector
-              := Get_Import_Suggestions (Node.As_Identifier, Units);
+            Suggestions : constant Import_Suggestions_Vector.Vector :=
+              Get_Import_Suggestions (Node, Units);
          begin
             for S of Suggestions loop
                Ada.Text_IO.Put_Line (S.Declaration.Image);
