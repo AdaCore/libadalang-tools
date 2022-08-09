@@ -254,8 +254,10 @@ package body Laltools.Refactor.Introduce_Parameter is
                  Resolve_Name_Precisely (Base_Id.As_Name);
 
                References : constant Ref_Result_Array :=
-                 (if Base_Id_Definition.Is_Null then []
-                  else Base_Id_Definition.P_Find_Refs (Parent_Subp));
+                 (if Base_Id_Definition.Is_Null then
+                    [Create_Ref_Result (Base_Id, Precise)]
+                  else
+                    Base_Id_Definition.P_Find_Refs (Parent_Subp));
 
             begin
                for Reference of References loop
