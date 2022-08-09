@@ -21,6 +21,12 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Containers.Indefinite_Hashed_Sets;
+with Ada.Strings;
+with Ada.Strings.Equal_Case_Insensitive;
+with Ada.Strings.Fixed;
+with Ada.Strings.Hash;
+
 with Langkit_Support.Text; use Langkit_Support.Text;
 
 with Libadalang.Common; use Libadalang.Common;
@@ -32,6 +38,16 @@ with Laltools.Refactor.Subprogram_Signature;
 package body Laltools.Refactor.Introduce_Parameter is
 
    Tool_Name : constant String := "Introduce Parameter";
+
+   function Compute_Introduced_Parameter_Name
+     (Subp_Spec : Libadalang.Analysis.Subp_Spec'Class;
+      Base_Name : String := "Introduced_Parameter")
+         return String
+     with Pre => not Subp_Spec.Is_Null;
+   --  Computes the name of the parameter to be introduced based on the
+   --  parameters that already exist in Subp_Spec and Base_Name.
+   --  If Base_Name is already used by one of the parameters,
+   --  then "_$" appended with $ as the next available number.
 
    -------------------------
    -- Introduce_Parameter --
@@ -100,6 +116,59 @@ package body Laltools.Refactor.Introduce_Parameter is
            File_Renames   => File_Rename_Ordered_Sets.Empty_Set,
            Diagnostics    => Refactoring_Diagnotic_Vectors.Empty_Vector);
    end Introduce_Parameter;
+
+   ---------------------------------------
+   -- Compute_Introduced_Parameter_Name --
+   ---------------------------------------
+
+   function Compute_Introduced_Parameter_Name
+     (Subp_Spec : Libadalang.Analysis.Subp_Spec'Class;
+      Base_Name : String := "Introduced_Parameter")
+      return String
+   is
+      Counter : Positive := 1;
+
+      package Case_Insensitive_String_Indefinite_Hashed_Sets is new
+        Ada.Containers.Indefinite_Hashed_Sets
+          (String,
+           Ada.Strings.Hash,
+           Ada.Strings.Equal_Case_Insensitive,
+           Ada.Strings.Equal_Case_Insensitive);
+
+      subtype Case_Insensitive_String_Indefinite_Hashed_Set is
+        Case_Insensitive_String_Indefinite_Hashed_Sets.Set;
+
+      Parameters : Case_Insensitive_String_Indefinite_Hashed_Set;
+
+   begin
+      if Subp_Spec.F_Subp_Params.Is_Null then
+         return Base_Name;
+      end if;
+
+      for Param_Spec of Subp_Spec.F_Subp_Params.F_Params loop
+         for Parameter of Param_Spec.F_Ids loop
+            Parameters.Include (To_UTF8 (Parameter.Text));
+         end loop;
+      end loop;
+
+      if Parameters.Contains (Base_Name) then
+         while Parameters.Contains
+           (Base_Name
+            & "_"
+            & Ada.Strings.Fixed.Trim
+              (Counter'Image, Ada.Strings.Both))
+         loop
+            Counter := @ + 1;
+         end loop;
+
+         return
+           Base_Name
+           & "_"
+           & Ada.Strings.Fixed.Trim (Counter'Image, Ada.Strings.Both);
+      else
+         return Base_Name;
+      end if;
+   end Compute_Introduced_Parameter_Name;
 
    ------------------------------
    -- Compute_Object_Decl_Mode --
@@ -187,7 +256,8 @@ package body Laltools.Refactor.Introduce_Parameter is
         Self.Expr.P_Semantic_Parent.As_Subp_Body;
 
       Introduced_Parameter_Name : constant Unbounded_String :=
-        To_Unbounded_String ("Introduced_Parameter");
+        To_Unbounded_String
+          (Compute_Introduced_Parameter_Name (Parent_Subp.F_Subp_Spec));
       Introduced_Parameter_Type : constant Unbounded_String :=
         To_Unbounded_String
           (To_UTF8 (Target_Expression_Type.F_Name.Text));
