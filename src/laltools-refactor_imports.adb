@@ -25,30 +25,36 @@ with Ada.Strings;
 
 with Langkit_Support.Errors;
 
-with Libadalang.Common;
+with Libadalang.Common; use Libadalang.Common;
 
 with Laltools.Common;
 
 package body Laltools.Refactor_Imports is
 
-   package LALCommon renames Libadalang.Common;
+   function "<" (L, R : Unbounded_Text_Type) return Boolean
+   renames Ada.Strings.Wide_Wide_Unbounded."<";
+   --  Shortcut for the unbounded text type less than operator
+
+   function "&" (L, R : Unbounded_Text_Type) return Unbounded_Text_Type
+   renames Ada.Strings.Wide_Wide_Unbounded."&";
+   --  Shortcut for the unbounded text type and operator
 
    package Parent_Packages_Vector is new Ada.Containers.Vectors
-     (Index_Type => Natural, Element_Type => LALAnalysis.Basic_Decl,
-      "="        => LALAnalysis."=");
+     (Index_Type => Natural, Element_Type => Basic_Decl,
+      "="        => "=");
 
    function Weak_Equivalent (Left, Right : Import_Suggestion) return Boolean;
    --  True if Declaration's defining name text is the same, as well as the
    --  with clause and the prefix. For instance, overloaded subprograms.
 
    function Is_Specification_Unit
-     (Unit : LALAnalysis.Analysis_Unit) return Boolean;
+     (Unit : Analysis_Unit) return Boolean;
    --  Check if Unit is an analysis unit of a package specification file.
    --  ??? Possibly move this function to Libadalang.
 
    function Get_Generic_Package_Internal
-     (Gen_Pkg_Instantiation : LALAnalysis.Generic_Package_Instantiation)
-      return LALAnalysis.Generic_Package_Internal;
+     (Gen_Pkg_Instantiation : Generic_Package_Instantiation)
+      return Generic_Package_Internal;
    --  Finds the Generic_Package_Internal node given a
    --  Generic_Package_Instantiation. Note that P_Designated_Generic_Decl
    --  sometimes raises an unexpected exception when Gen_Pkg_Instantiation is
@@ -58,7 +64,7 @@ package body Laltools.Refactor_Imports is
    --  Generic_Package_Instantiation nodes.
 
    function List_And_Expand_Package_Declarations
-     (Pkg_Decl : LALAnalysis.Base_Package_Decl'Class; Incl_Private : Boolean)
+     (Pkg_Decl : Base_Package_Decl'Class; Incl_Private : Boolean)
       return Reachable_Declarations_Hashed_Set.Set;
    --  Add every declaration of Pkg_Decl to a list. If any declaration is
    --  also a Package_Declaration (in case of nested packages) then the nested
@@ -67,7 +73,7 @@ package body Laltools.Refactor_Imports is
    --  also added.
 
    procedure Add_Declaration
-     (Decl          :        LALAnalysis.Basic_Decl;
+     (Decl          :        Basic_Decl;
       Reach_Decls   : in out Reachable_Declarations;
       Incl_Private  :        Boolean);
    --  Add Decl to Declarations by creating a key with the text of Decl's first
@@ -75,20 +81,20 @@ package body Laltools.Refactor_Imports is
    --  share the same identifier text.
 
    function Get_Specification_Unit_Declarations
-     (Unit : LALAnalysis.Analysis_Unit; Incl_Private : Boolean)
+     (Unit : Analysis_Unit; Incl_Private : Boolean)
       return Reachable_Declarations;
    --  If Unit is a specification unit, then creates a map where the keys
    --  identify a declaration by its identifier text, and the key's value is
    --  a list of all declarations with such identifier text.
 
    function Get_Local_Unit_Reachable_Declarations
-     (Node : LALAnalysis.Ada_Node'Class)
+     (Node : Ada_Node'Class)
       return Reachable_Declarations;
    --  Finds all the declarations declared in a Node's analysis unit, that are
    --  visible to Node.
 
    function Get_Parent_Packages
-     (Node : LALAnalysis.Ada_Node'Class) return Parent_Packages_Vector.Vector;
+     (Node : Ada_Node'Class) return Parent_Packages_Vector.Vector;
    --  Finds all parent packages of a node that is inside nested packages
 
    procedure Remove_Duplicated_Suggestions
@@ -100,10 +106,7 @@ package body Laltools.Refactor_Imports is
    -- "<" --
    ---------
 
-   function "<" (Left, Right : Import_Suggestion)
-                 return Boolean
-   is
-      use type LKSText.Unbounded_Text_Type;
+   function "<" (Left, Right : Import_Suggestion) return Boolean is
    begin
       if Left.With_Clause_Text = Right.With_Clause_Text then
          return Left.Prefix_Text < Right.Prefix_Text;
@@ -115,13 +118,10 @@ package body Laltools.Refactor_Imports is
    -- Weak_Equivalent --
    ---------------------
 
-   function Weak_Equivalent (Left, Right : Import_Suggestion)
-                             return Boolean
-   is
-      use type LKSText.Unbounded_Text_Type;
+   function Weak_Equivalent (Left, Right : Import_Suggestion) return Boolean is
    begin
       return Left.Declaration.P_Defining_Name.Text
-        = Right.Declaration.P_Defining_Name.Text
+               = Right.Declaration.P_Defining_Name.Text
         and then Left.With_Clause_Text = Right.With_Clause_Text
         and then Left.Prefix_Text = Right.Prefix_Text;
    end Weak_Equivalent;
@@ -130,10 +130,10 @@ package body Laltools.Refactor_Imports is
    -- Basic_Decl_Hash --
    ---------------------
 
-   function Basic_Decl_Hash (Decl : LALAnalysis.Basic_Decl)
+   function Basic_Decl_Hash (Decl : Basic_Decl)
                              return Ada.Containers.Hash_Type is
    begin
-      return LALAnalysis.Hash (Decl.As_Ada_Node);
+      return Hash (Decl.As_Ada_Node);
    end Basic_Decl_Hash;
 
    ----------------------------------
@@ -141,15 +141,15 @@ package body Laltools.Refactor_Imports is
    ----------------------------------
 
    function Get_Generic_Package_Internal
-     (Gen_Pkg_Instantiation : LALAnalysis.Generic_Package_Instantiation)
-      return LALAnalysis.Generic_Package_Internal is
+     (Gen_Pkg_Instantiation : Generic_Package_Instantiation)
+      return Generic_Package_Internal is
    begin
       return Gen_Pkg_Instantiation.P_Designated_Generic_Decl.
         As_Generic_Package_Decl.F_Package_Decl.As_Generic_Package_Internal;
    exception
       when E : Langkit_Support.Errors.Property_Error =>
          pragma Unreferenced (E);
-         return LALAnalysis.No_Generic_Package_Internal;
+         return No_Generic_Package_Internal;
    end Get_Generic_Package_Internal;
 
    ---------------------------
@@ -157,26 +157,22 @@ package body Laltools.Refactor_Imports is
    ---------------------------
 
    function Is_Specification_Unit
-     (Unit : LALAnalysis.Analysis_Unit) return Boolean
-   is
-      use type LALAnalysis.Analysis_Unit;
-      use type LALCommon.Ada_Node_Kind_Type;
-      use type LALCommon.Analysis_Unit_Kind;
+     (Unit : Analysis_Unit) return Boolean is
    begin
-      if Unit /= LALAnalysis.No_Analysis_Unit then
+      if Unit /= No_Analysis_Unit then
          declare
-            Root_Node : constant LALAnalysis.Ada_Node := Unit.Root;
+            Root_Node : constant Ada_Node := Unit.Root;
          begin
             if not Root_Node.Is_Null
-              and then Root_Node.Kind = LALCommon.Ada_Compilation_Unit
+              and then Root_Node.Kind = Ada_Compilation_Unit
             then
                declare
-                  Compilation_Unit : constant LALAnalysis.Compilation_Unit :=
-                    LALAnalysis.As_Compilation_Unit (Root_Node);
+                  Compilation_Unit :
+                    constant Libadalang.Analysis.Compilation_Unit :=
+                      As_Compilation_Unit (Root_Node);
                begin
                   if not Compilation_Unit.Is_Null then
-                     return Compilation_Unit.P_Unit_Kind =
-                       LALCommon.Unit_Specification;
+                     return Compilation_Unit.P_Unit_Kind = Unit_Specification;
                   end if;
                end;
             end if;
@@ -190,12 +186,12 @@ package body Laltools.Refactor_Imports is
    ------------------------------------------
 
    function List_And_Expand_Package_Declarations
-     (Pkg_Decl : LALAnalysis.Base_Package_Decl'Class; Incl_Private : Boolean)
+     (Pkg_Decl : Base_Package_Decl'Class; Incl_Private : Boolean)
       return Reachable_Declarations_Hashed_Set.Set
    is
       All_Decls : Reachable_Declarations_Hashed_Set.Set;
 
-      procedure Explore_Declarative_Part (Decls : LALAnalysis.Ada_Node_List);
+      procedure Explore_Declarative_Part (Decls : Ada_Node_List);
       --  Iterates through Decls adding each declaration to All_Decls. If
       --  a declaration is a Package_Decl then it is expanded and nested
       --  declarations are also added to All_Decls
@@ -204,15 +200,14 @@ package body Laltools.Refactor_Imports is
       -- Explore_Declarative_Part --
       ------------------------------
 
-      procedure Explore_Declarative_Part (Decls : LALAnalysis.Ada_Node_List) is
-         use type LALCommon.Ada_Node_Kind_Type;
+      procedure Explore_Declarative_Part (Decls : Ada_Node_List) is
       begin
          for Node of Decls loop
-            if Node.Kind in LALCommon.Ada_Basic_Decl then
+            if Node.Kind in Ada_Basic_Decl then
                --  F_Decls can return nodes that not not inherit from
                --  Basic_Decl type, so ignore those.
 
-               if Node.Kind = LALCommon.Ada_Package_Decl then
+               if Node.Kind = Ada_Package_Decl then
                   --  Expand again nested Package_Decl nodes.
 
                   for Nested_Node of List_And_Expand_Package_Declarations
@@ -220,7 +215,7 @@ package body Laltools.Refactor_Imports is
                   loop
                      All_Decls.Include (Nested_Node.As_Basic_Decl);
                   end loop;
-               elsif Node.Kind = LALCommon.Ada_Generic_Package_Instantiation
+               elsif Node.Kind = Ada_Generic_Package_Instantiation
                then
                   --  Expand again nested Generic_Package_Instantiation nodes.
 
@@ -285,7 +280,7 @@ package body Laltools.Refactor_Imports is
    ---------------------
 
    procedure Add_Declaration
-     (Decl          :        LALAnalysis.Basic_Decl;
+     (Decl          :        Basic_Decl;
       Reach_Decls   : in out Reachable_Declarations;
       Incl_Private  :        Boolean)
    is
@@ -294,13 +289,13 @@ package body Laltools.Refactor_Imports is
       Aliased_Decls_Map : Reachable_Declarations_Aliases_Map.Map renames
         Reach_Decls.Aliased_Decls_Map;
 
-      procedure Append (Decl : LALAnalysis.Basic_Decl);
+      procedure Append (Decl : Basic_Decl);
       --  If Decls_Map already has a key equal to Decl's first identifier text
       --  then its set is expanded with Decl, otherwise and new set is created
       --  with Decl as the only element.
 
-      procedure Append_Alias (Alias : LALAnalysis.Basic_Decl;
-                              Decl  : LALAnalysis.Basic_Decl);
+      procedure Append_Alias (Alias : Basic_Decl;
+                              Decl  : Basic_Decl);
       --  If Aliased_Decls_Map already has a key equal to Alias then its set
       --  is expanded with Decl, otherwise and new set is created with Decl
       --  as the only element.
@@ -309,15 +304,15 @@ package body Laltools.Refactor_Imports is
       -- Append --
       ------------
 
-      procedure Append (Decl : LALAnalysis.Basic_Decl) is
+      procedure Append (Decl : Basic_Decl) is
       begin
          if Decl.Is_Null or else Decl.P_Defining_Name.Is_Null then
             return;
          end if;
 
          declare
-            Text : constant LKSText.Text_Type :=
-              Decl.P_Defining_Name.F_Name.Text;
+            Text : constant Text_Type := Decl.P_Defining_Name.F_Name.Text;
+
          begin
             if Decls_Map.Contains (Text) then
                Decls_Map.Reference (Text).Include (Decl);
@@ -336,8 +331,8 @@ package body Laltools.Refactor_Imports is
       -- Append_Alias --
       ------------------
 
-      procedure Append_Alias (Alias : LALAnalysis.Basic_Decl;
-                              Decl  : LALAnalysis.Basic_Decl) is
+      procedure Append_Alias (Alias : Basic_Decl;
+                              Decl  : Basic_Decl) is
       begin
          if Aliased_Decls_Map.Contains (Alias) then
             if not Aliased_Decls_Map.Reference (Alias).Contains (Decl) then
@@ -353,14 +348,12 @@ package body Laltools.Refactor_Imports is
          end if;
       end Append_Alias;
 
-      use type LALCommon.Ada_Node_Kind_Type;
-
    begin
-      if Decl.Kind in LALCommon.Ada_Error_Decl then
+      if Decl.Kind in Ada_Error_Decl then
          --  Do not add nodes of Error_Declaration type.
 
          return;
-      elsif Decl.Kind = LALCommon.Ada_Package_Decl then
+      elsif Decl.Kind = Ada_Package_Decl then
          --  Nodes of type Package_Decl are nested packages and need to be
          --  expanded since they contain more declarations
 
@@ -369,12 +362,12 @@ package body Laltools.Refactor_Imports is
          loop
             Append (D);
 
-            if D.Kind = LALCommon.Ada_Package_Renaming_Decl then
+            if D.Kind = Ada_Package_Renaming_Decl then
                Append_Alias (D.As_Package_Renaming_Decl.P_Renamed_Package,
                              D);
             end if;
          end loop;
-      elsif Decl.Kind = LALCommon.Ada_Generic_Package_Instantiation then
+      elsif Decl.Kind = Ada_Generic_Package_Instantiation then
          for D of List_And_Expand_Package_Declarations
            (Get_Generic_Package_Internal
               (Decl.As_Generic_Package_Instantiation),
@@ -382,7 +375,7 @@ package body Laltools.Refactor_Imports is
          loop
             Append (D);
 
-            if D.Kind = LALCommon.Ada_Package_Renaming_Decl then
+            if D.Kind = Ada_Package_Renaming_Decl then
                Append_Alias
                  (D.As_Package_Renaming_Decl.P_Renamed_Package, D);
             end if;
@@ -390,14 +383,14 @@ package body Laltools.Refactor_Imports is
       else
          Append (Decl.As_Basic_Decl);
 
-         if Decl.Kind = LALCommon.Ada_Package_Renaming_Decl then
+         if Decl.Kind = Ada_Package_Renaming_Decl then
             Append_Alias (Decl.As_Package_Renaming_Decl.P_Renamed_Package,
                           Decl);
          end if;
 
          --  ??? The same code should be applicable to
-         --  LALCommon.Ada_Generic_Renaming_Decl and
-         --  LALCommon.Ada_Subp_Renaming_Decl_Range. However, for now, LAL does
+         --  Ada_Generic_Renaming_Decl and
+         --  Ada_Subp_Renaming_Decl_Range. However, for now, LAL does
          --  not provide property P_Renamed_Package for such types.
       end if;
    end Add_Declaration;
@@ -407,14 +400,13 @@ package body Laltools.Refactor_Imports is
    -----------------------------------------
 
    function Get_Specification_Unit_Declarations
-     (Unit : LALAnalysis.Analysis_Unit; Incl_Private : Boolean)
+     (Unit         : Analysis_Unit;
+      Incl_Private : Boolean)
       return Reachable_Declarations
    is
       Reach_Decls : Reachable_Declarations;
 
-      use type LALCommon.Ada_Node_Kind_Type;
-
-      procedure Add_Declarations (Decls : LALAnalysis.Ada_Node_List);
+      procedure Add_Declarations (Decls : Ada_Node_List);
       --  Iterates through all declarations of the list and adds them to Map by
       --  calling Add_Declaration. Add_Declaration expands also expands nested
       --  package declarations.
@@ -423,10 +415,10 @@ package body Laltools.Refactor_Imports is
       -- Add_Declarations --
       ----------------------
 
-      procedure Add_Declarations (Decls : LALAnalysis.Ada_Node_List) is
+      procedure Add_Declarations (Decls : Ada_Node_List) is
       begin
          for Node of Decls loop
-            if Node.Kind in LALCommon.Ada_Basic_Decl then
+            if Node.Kind in Ada_Basic_Decl then
                Add_Declaration
                  (Decl         => Node.As_Basic_Decl,
                   Reach_Decls  => Reach_Decls,
@@ -435,13 +427,13 @@ package body Laltools.Refactor_Imports is
          end loop;
       end Add_Declarations;
 
-      Comp_Unit_Decl      : LALAnalysis.Basic_Decl;
-      Comp_Unit_Decl_Kind : LALCommon.Ada_Node_Kind_Type;
+      Comp_Unit_Decl      : Basic_Decl;
+      Comp_Unit_Decl_Kind : Ada_Node_Kind_Type;
 
    begin
       if not Is_Specification_Unit (Unit)
         or else not (not Unit.Root.Is_Null
-                     and then Unit.Root.Kind = LALCommon.Ada_Compilation_Unit)
+                     and then Unit.Root.Kind = Ada_Compilation_Unit)
       then
          return Reach_Decls;
       end if;
@@ -450,7 +442,7 @@ package body Laltools.Refactor_Imports is
       Comp_Unit_Decl_Kind := Unit.Root.As_Compilation_Unit.P_Decl.Kind;
 
       case Comp_Unit_Decl_Kind is
-         when LALCommon.Ada_Package_Decl =>
+         when Ada_Package_Decl =>
             --  Add all public declarations inside an Ada_Package_Decl node,
             --  expanding nested Ada_Package_Decl and
             --  Ada_Generic_Package_Instantiation nodes. Private declarations
@@ -459,7 +451,7 @@ package body Laltools.Refactor_Imports is
             --  instantiations are not added.
 
             declare
-               Pkg_Decl : constant LALAnalysis.Package_Decl :=
+               Pkg_Decl : constant Package_Decl :=
                  Comp_Unit_Decl.As_Package_Decl;
             begin
                if not Pkg_Decl.F_Public_Part.Is_Null then
@@ -474,7 +466,7 @@ package body Laltools.Refactor_Imports is
                end if;
             end;
 
-         when LALCommon.Ada_Generic_Package_Instantiation =>
+         when Ada_Generic_Package_Instantiation =>
             --  Add all public declarations inside
             --  Ada_Generic_Package_Instantiation, expanding nested
             --  Ada_Package_Decl and Ada_Generic_Package_Instantiation nodes.
@@ -482,7 +474,7 @@ package body Laltools.Refactor_Imports is
 
             declare
                Gen_Pkg_Internal : constant
-                 LALAnalysis.Generic_Package_Internal :=
+                 Generic_Package_Internal :=
                    Get_Generic_Package_Internal
                      (Comp_Unit_Decl.As_Generic_Package_Instantiation);
             begin
@@ -495,14 +487,14 @@ package body Laltools.Refactor_Imports is
                end if;
             end;
 
-         when LALCommon.Ada_Package_Renaming_Decl
-            | LALCommon.Ada_Subp_Renaming_Decl
-            | LALCommon.Ada_Generic_Package_Renaming_Decl
-            | LALCommon.Ada_Generic_Subp_Renaming_Decl_Range
-            | LALCommon.Ada_Generic_Package_Decl
-            | LALCommon.Ada_Subp_Decl
-            | LALCommon.Ada_Generic_Subp_Instantiation
-            | LALCommon.Ada_Generic_Subp_Decl_Range
+         when Ada_Package_Renaming_Decl
+            | Ada_Subp_Renaming_Decl
+            | Ada_Generic_Package_Renaming_Decl
+            | Ada_Generic_Subp_Renaming_Decl_Range
+            | Ada_Generic_Package_Decl
+            | Ada_Subp_Decl
+            | Ada_Generic_Subp_Instantiation
+            | Ada_Generic_Subp_Decl_Range
          =>
             --  Other kinds of specification units are considered as basic
             --  declarations and are added to the Reach_Decls.
@@ -523,7 +515,7 @@ package body Laltools.Refactor_Imports is
    -------------------------------------------
 
    function Get_Local_Unit_Reachable_Declarations
-     (Node : LALAnalysis.Ada_Node'Class)
+     (Node : Ada_Node'Class)
       return Reachable_Declarations
    is
       Reach_Decls : Reachable_Declarations;
@@ -534,32 +526,30 @@ package body Laltools.Refactor_Imports is
       end if;
 
       declare
-         Stop_Decl : LALAnalysis.Basic_Decl := LALAnalysis.No_Basic_Decl;
+         Stop_Decl : Basic_Decl := No_Basic_Decl;
 
-         use type LALAnalysis.Basic_Decl;
-         use type LALCommon.Ada_Node_Kind_Type;
       begin
          for Parent of Node.Parent.Parents loop
-            if Parent.Kind in LALCommon.Ada_Basic_Decl
+            if Parent.Kind in Ada_Basic_Decl
               and then Stop_Decl.Is_Null
             then
                Stop_Decl := Parent.As_Basic_Decl;
             end if;
 
-            if Parent.Kind = LALCommon.Ada_Handled_Stmts then
+            if Parent.Kind = Ada_Handled_Stmts then
                --  If this Handled_Statements has a corresponding
                --  Declarative_Part, add all those declarations to Map.
                --  If a declaration is a package declaration, then only add
                --  the visible declarations.
 
                declare
-                  Decl_Part : constant LALAnalysis.Declarative_Part :=
+                  Decl_Part : constant Declarative_Part :=
                     Laltools.Common.Get_Declarative_Part
                       (Parent.As_Handled_Stmts);
                begin
                   if not Decl_Part.Is_Null then
                      for Decl of Decl_Part.F_Decls loop
-                        if Decl.Kind in LALCommon.Ada_Basic_Decl then
+                        if Decl.Kind in Ada_Basic_Decl then
                            Add_Declaration
                              (Decl         => Decl.As_Basic_Decl,
                               Reach_Decls  => Reach_Decls,
@@ -568,9 +558,9 @@ package body Laltools.Refactor_Imports is
                      end loop;
                   end if;
                end;
-            elsif Parent.Kind = LALCommon.Ada_Declarative_Part then
+            elsif Parent.Kind = Ada_Declarative_Part then
                declare
-                  Decl_Part : constant LALAnalysis.Declarative_Part :=
+                  Decl_Part : constant Declarative_Part :=
                     Parent.As_Declarative_Part;
                begin
                   if not Decl_Part.Is_Null then
@@ -583,11 +573,11 @@ package body Laltools.Refactor_Imports is
                         --  Allow recursion for declarations that are not
                         --  packages
 
-                        if Decl.Kind in LALCommon.Ada_Basic_Decl
+                        if Decl.Kind in Ada_Basic_Decl
                           and then Decl.As_Basic_Decl = Stop_Decl
                         then
-                           if not (Decl.Kind in LALCommon.Ada_Package_Decl |
-                                   LALCommon.Ada_Package_Body)
+                           if not (Decl.Kind in Ada_Package_Decl |
+                                   Ada_Package_Body)
                            then
                               Add_Declaration
                                 (Decl         =>
@@ -601,8 +591,8 @@ package body Laltools.Refactor_Imports is
 
                         --  Do not add Package_Body
 
-                        if Decl.Kind in LALCommon.Ada_Basic_Decl
-                          and then Decl.Kind /= LALCommon.Ada_Package_Body
+                        if Decl.Kind in Ada_Basic_Decl
+                          and then Decl.Kind /= Ada_Package_Body
                         then
                            Add_Declaration
                              (Decl         =>
@@ -614,7 +604,7 @@ package body Laltools.Refactor_Imports is
                      end loop Decl_Loop;
                   end if;
                end;
-            elsif Parent.Kind = LALCommon.Ada_Package_Body then
+            elsif Parent.Kind = Ada_Package_Body then
                --  If Node is inside a Package_Body then all private
                --  declarations found in the Package_Declaration are
                --  added to Map.
@@ -669,8 +659,8 @@ package body Laltools.Refactor_Imports is
    --------------------------------
 
    function Get_Reachable_Declarations
-     (Identifier : LALAnalysis.Identifier;
-      Units      : LALHelpers.Unit_Vectors.Vector)
+     (Identifier : Libadalang.Analysis.Identifier;
+      Units      : Unit_Vectors.Vector)
       return Reachable_Declarations
    is
 
@@ -763,27 +753,26 @@ package body Laltools.Refactor_Imports is
    ------------------------
 
    function Get_Parent_Packages
-     (Node : LALAnalysis.Ada_Node'Class) return Parent_Packages_Vector.Vector
+     (Node : Ada_Node'Class) return Parent_Packages_Vector.Vector
    is
       Parent_Pkgs : Parent_Packages_Vector.Vector;
-      use type LALCommon.Ada_Node_Kind_Type;
-      use type LALAnalysis.Basic_Decl;
+
    begin
       for P of Node.Parent.Parents loop
-         if P.Kind in LALCommon.Ada_Package_Body
-           | LALCommon.Ada_Package_Decl
-             | LALCommon.Ada_Generic_Package_Decl
+         if P.Kind in Ada_Package_Body
+           | Ada_Package_Decl
+             | Ada_Generic_Package_Decl
          then
             Parent_Pkgs.Append (P.As_Basic_Decl);
          end if;
       end loop;
 
       declare
-         Top_Level : constant LALAnalysis.Basic_Decl :=
+         Top_Level : constant Basic_Decl :=
            Node.P_Top_Level_Decl (Node.Unit);
       begin
-         if Top_Level /= LALAnalysis.No_Basic_Decl
-           and then Top_Level.Kind in LALCommon.Ada_Subp_Body_Range
+         if Top_Level /= No_Basic_Decl
+           and then Top_Level.Kind in Ada_Subp_Body_Range
          then
             --  Inside a main file: add the main name as the last element
             --  it will be used to filter out all the elements defined inside
@@ -793,7 +782,7 @@ package body Laltools.Refactor_Imports is
       end;
 
       if Node.P_Parent_Basic_Decl.Kind =
-        LALCommon.Ada_Generic_Package_Instantiation
+        Ada_Generic_Package_Instantiation
       then
          Parent_Pkgs.Delete_Last;
          Parent_Pkgs.Append (Node.P_Parent_Basic_Decl);
@@ -809,8 +798,8 @@ package body Laltools.Refactor_Imports is
    ----------------------------
 
    function Get_Import_Suggestions
-     (Identifier : LALAnalysis.Identifier;
-      Units      : LALHelpers.Unit_Vectors.Vector)
+     (Identifier : Libadalang.Analysis.Identifier;
+      Units      : Unit_Vectors.Vector)
       return Import_Suggestions_Vector.Vector
    is
       type Vectorized_Suggestion is
@@ -924,12 +913,9 @@ package body Laltools.Refactor_Imports is
          return Suggestions;
       end Apply_Aliases;
 
-      use type LALAnalysis.Basic_Decl;
       use type Ada.Containers.Count_Type;
 
-      package LKSText renames Langkit_Support.Text;
-
-      Identifier_Text : constant LKSText.Text_Type  := Identifier.Text;
+      Identifier_Text : constant Text_Type  := Identifier.Text;
       Reach_Decls       : Reachable_Declarations;
       Decls_List        : Reachable_Declarations_Hashed_Set.Set;
       Id_Parent_Pkgs    : Parent_Packages_Vector.Vector;
@@ -968,7 +954,6 @@ package body Laltools.Refactor_Imports is
             Aliased_Decls_Map : Reachable_Declarations_Aliases_Map.Map renames
               Reach_Decls.Aliased_Decls_Map;
 
-            use type LKSText.Unbounded_Text_Type;
          begin
 
             if Id_Parent_Pkgs.Length = 0 then
@@ -1034,20 +1019,20 @@ package body Laltools.Refactor_Imports is
 
                   for D of Vec_Sug.Prefix_Decls loop
                      Suggestion.Prefix_Text :=
-                       LKSText.To_Unbounded_Text (D.P_Defining_Name.Text)
-                       & "."
+                       To_Unbounded_Text (D.P_Defining_Name.Text)
+                       & To_Unbounded_Text (To_Text ("."))
                        & Suggestion.Prefix_Text;
                   end loop;
 
                   for D of Vec_Sug.With_Clause_Decls loop
                      if D /= Vec_Sug.With_Clause_Decls.First_Element then
                         Suggestion.With_Clause_Text :=
-                          LKSText.To_Unbounded_Text (D.P_Defining_Name.Text)
-                          & "."
+                          To_Unbounded_Text (D.P_Defining_Name.Text)
+                          & To_Unbounded_Text (To_Text ("."))
                           & Suggestion.With_Clause_Text;
                      else
                         Suggestion.With_Clause_Text :=
-                          LKSText.To_Unbounded_Text (D.P_Defining_Name.Text);
+                          To_Unbounded_Text (D.P_Defining_Name.Text);
                      end if;
                   end loop;
 

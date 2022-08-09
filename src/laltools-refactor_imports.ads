@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2022, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -29,52 +29,48 @@ with Ada.Containers.Vectors;
 with Ada.Strings.Wide_Wide_Hash;
 with Ada.Strings.Wide_Wide_Unbounded;
 
-with Libadalang.Analysis;
-with Libadalang.Helpers;
+with Libadalang.Analysis; use Libadalang.Analysis;
+with Libadalang.Helpers; use Libadalang.Helpers;
 
-with Langkit_Support.Text;
+with Langkit_Support.Text; use Langkit_Support.Text;
 
 package Laltools.Refactor_Imports is
 
-   package LALAnalysis renames Libadalang.Analysis;
-   package LALHelpers renames Libadalang.Helpers;
-   package LKSText renames Langkit_Support.Text;
-
-   function Basic_Decl_Hash (Decl : LALAnalysis.Basic_Decl)
+   function Basic_Decl_Hash (Decl : Basic_Decl)
                              return Ada.Containers.Hash_Type;
    --  Casts Decl as Ada_Node and uses Hash from Libadalang.Analysis.
    --  This is convenient for containers with Basic_Decl elements.
 
    package Reachable_Declarations_Hashed_Set is new Ada.Containers.Hashed_Sets
-     (Element_Type        => LALAnalysis.Basic_Decl,
+     (Element_Type        => Basic_Decl,
       Hash                => Basic_Decl_Hash,
-      Equivalent_Elements => LALAnalysis."=",
-      "="                 => LALAnalysis."=");
+      Equivalent_Elements => "=",
+      "="                 => "=");
 
    function Text_Type_Equivalent
-     (Left, Right : LKSText.Text_Type) return Boolean is (Left = Right);
+     (Left, Right : Text_Type) return Boolean is (Left = Right);
    --  True if two Text_Type elements are the same.
 
    package Reachable_Declarations_Map is new
      Ada.Containers.Indefinite_Hashed_Maps
-       (Key_Type        => LKSText.Text_Type,
+       (Key_Type        => Text_Type,
         Element_Type    => Reachable_Declarations_Hashed_Set.Set,
         Hash            => Ada.Strings.Wide_Wide_Hash,
         Equivalent_Keys => Text_Type_Equivalent,
         "="             => Reachable_Declarations_Hashed_Set."=");
 
    package Aliases_Hashed_Set is new Ada.Containers.Hashed_Sets
-     (Element_Type => LALAnalysis.Basic_Decl,
+     (Element_Type => Basic_Decl,
       Hash                => Basic_Decl_Hash,
-      Equivalent_Elements => LALAnalysis."=",
-      "="                 => LALAnalysis."=");
+      Equivalent_Elements => "=",
+      "="                 => "=");
 
    package Reachable_Declarations_Aliases_Map is new
      Ada.Containers.Indefinite_Hashed_Maps
-       (Key_Type        => LALAnalysis.Basic_Decl,
+       (Key_Type        => Basic_Decl,
         Element_Type    => Aliases_Hashed_Set.Set,
         Hash            => Basic_Decl_Hash,
-        Equivalent_Keys => LALAnalysis."=",
+        Equivalent_Keys => "=",
         "="             => Aliases_Hashed_Set."=");
 
    type Reachable_Declarations is record
@@ -83,10 +79,10 @@ package Laltools.Refactor_Imports is
    end record;
 
    type Import_Suggestion is record
-      Declaration      : LALAnalysis.Basic_Decl := LALAnalysis.No_Basic_Decl;
-      With_Clause_Text : LKSText.Unbounded_Text_Type :=
+      Declaration      : Basic_Decl := No_Basic_Decl;
+      With_Clause_Text : Unbounded_Text_Type :=
         Ada.Strings.Wide_Wide_Unbounded.Null_Unbounded_Wide_Wide_String;
-      Prefix_Text      : LKSText.Unbounded_Text_Type :=
+      Prefix_Text      : Unbounded_Text_Type :=
         Ada.Strings.Wide_Wide_Unbounded.Null_Unbounded_Wide_Wide_String;
    end record;
 
@@ -100,8 +96,8 @@ package Laltools.Refactor_Imports is
      Import_Suggestions_Vector.Generic_Sorting;
 
    function Get_Reachable_Declarations
-     (Identifier : LALAnalysis.Identifier;
-      Units      : LALHelpers.Unit_Vectors.Vector)
+     (Identifier : Libadalang.Analysis.Identifier;
+      Units      : Unit_Vectors.Vector)
       return Reachable_Declarations;
    --  Finds all the declarations that are reachable by Identifier. A reachable
    --  declaration is one that is visible by adding a with clause of the
@@ -109,8 +105,8 @@ package Laltools.Refactor_Imports is
    --  visible part of the local unit.
 
    function Get_Import_Suggestions
-     (Identifier : LALAnalysis.Identifier;
-      Units      : LALHelpers.Unit_Vectors.Vector)
+     (Identifier : Libadalang.Analysis.Identifier;
+      Units      : Unit_Vectors.Vector)
       return Import_Suggestions_Vector.Vector;
    --  For each declaration of Reachable_Declarations, determines a vector of
    --  valid with clauses and corresponding prefixes so that Identifier becomes
