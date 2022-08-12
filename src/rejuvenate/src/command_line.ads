@@ -26,6 +26,7 @@
 with GNATCOLL.Opt_Parse; use GNATCOLL.Opt_Parse;
 
 with Tools;
+with Ada.Strings.Unbounded;
 
 package Command_Line is
 
@@ -44,5 +45,43 @@ package Command_Line is
       Short    => "-v",
       Long     => "--verbose",
       Help     => "Verbose output");
+
+   package Project is new Parse_Option
+     (Parser      => Parser,
+      Short       => "-P",
+      Long        => "--project",
+      Help        => "Project",
+      Arg_Type    => Ada.Strings.Unbounded.Unbounded_String,
+      Convert     => Ada.Strings.Unbounded.To_Unbounded_String,
+      Default_Val => Ada.Strings.Unbounded.Null_Unbounded_String);
+
+   package Source is new Parse_Option
+     (Parser      => Parser,
+      Short       => "-S",
+      Long        => "--source",
+      Help        => "Source",
+      Arg_Type    => Ada.Strings.Unbounded.Unbounded_String,
+      Convert     => Ada.Strings.Unbounded.To_Unbounded_String,
+      Default_Val => Ada.Strings.Unbounded.Null_Unbounded_String);
+
+   package Pipe is new Parse_Flag
+     (Parser      => Parser,
+      Long        => "--pipe",
+      Help        => "Print result to stdout");
+
+   package Interactive is new Parse_Flag
+     (Parser      => Parser,
+      Short       => "-i",
+      Long        => "--interactive",
+      Help        => "Interactive mode");
+
+   package Output_Dir is new Parse_Option
+     (Parser      => Parser,
+      Short       => "-o",
+      Long        => "--output",
+      Help        => "Save the output to given file",
+      Arg_Type    => Ada.Strings.Unbounded.Unbounded_String,
+      Convert     => Ada.Strings.Unbounded.To_Unbounded_String,
+      Default_Val => Ada.Strings.Unbounded.Null_Unbounded_String);
 
 end Command_Line;

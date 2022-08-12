@@ -31,6 +31,7 @@ with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Containers.Indefinite_Ordered_Sets;
 with Ada.Containers.Indefinite_Hashed_Maps;
 with GNATCOLL.Opt_Parse; use GNATCOLL.Opt_Parse;
+with VSS.Text_Streams.Memory_UTF8_Output;
 
 package Tools.Record_Components_Tool is
    package LAL renames Libadalang.Analysis;
@@ -105,7 +106,9 @@ package Tools.Record_Components_Tool is
    --  this procedure finds all the unused components in records in
    --  all project files, gives the delete infomation as output.
 
-   procedure Run;
+   procedure Run (Unit_Array : LAL.Analysis_Unit_Array;
+                  Stream     : in out
+                               VSS.Text_Streams.Output_Text_Stream'Class);
    --  Record_Components_Tool main procedure
 
 end Tools.Record_Components_Tool;

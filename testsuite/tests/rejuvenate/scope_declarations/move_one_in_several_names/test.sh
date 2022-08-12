@@ -1,1 +1,1 @@
-rejuvenate scope_declarations -P testcase.gpr
+rejuvenate scope_declarations -P testcase.gpr --pipe

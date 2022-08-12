@@ -29,6 +29,7 @@ with Laltools.Refactor;
 with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Containers.Indefinite_Ordered_Sets;
 with GNATCOLL.Opt_Parse; use GNATCOLL.Opt_Parse;
+with VSS.Text_Streams.Memory_UTF8_Output;
 
 package Tools.Relocate_Decls_Tool is
    package LAL renames Libadalang.Analysis;
@@ -98,6 +99,8 @@ package Tools.Relocate_Decls_Tool is
    function Find_Decl_Private (Unit_Array : LAL.Analysis_Unit_Array)
                                return Modify_Info;
 
-   procedure Run;
+   procedure Run (Unit_Array : LAL.Analysis_Unit_Array;
+                  Stream     : in out
+                               VSS.Text_Streams.Output_Text_Stream'Class);
 
 end Tools.Relocate_Decls_Tool;

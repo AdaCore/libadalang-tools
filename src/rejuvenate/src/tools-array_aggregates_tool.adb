@@ -29,10 +29,7 @@ with Libadalang.Project_Provider;
 with Langkit_Support.Slocs; use Langkit_Support.Slocs;
 with Ada.Containers.Hashed_Sets;
 with GNATCOLL.GMP.Integers; use GNATCOLL.GMP.Integers;
-with VSS.Stream_Element_Vectors.Conversions;
 with Output;
-with VSS.Text_Streams;
-with VSS.Text_Streams.Memory_UTF8_Output;
 with Ada.Strings;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
@@ -478,72 +475,13 @@ package body Tools.Array_Aggregates_Tool is
    -- Run --
    ---------
 
-   procedure Run is
-      package Project_Tree renames Project;
-      Env     : GPR.Project_Environment_Access;
-      Project : constant GPR.Project_Tree_Access :=
-        new GPR.Project_Tree;
-
-      use type GNATCOLL.VFS.Filesystem_String;
-
-      Context  : LAL.Analysis_Context;
-      Provider : LAL.Unit_Provider_Reference;
-      Project_Filename : constant String
-        := Ada.Strings.Unbounded.To_String (Project_Tree.Get);
-      My_Project_File     : constant GNATCOLL.VFS.Virtual_File :=
-        GNATCOLL.VFS.Create (+Project_Filename);
+   procedure Run (Unit_Array : LAL.Analysis_Unit_Array;
+                  Stream     : in out
+                               VSS.Text_Streams.Output_Text_Stream'Class) is
       Edit_Info : Aggregates_To_Edit_Text.Map;
    begin
-      --  Ada.Text_IO.Put_Line (Ada.Strings.Unbounded.To_String (Project.Get));
-      GPR.Initialize (Env);
-      --  Use procedures in GNATCOLL.Projects to set scenario
-      --  variables (Change_Environment), to set the target
-      --  and the runtime (Set_Target_And_Runtime), etc.
-
-      Project.Load (My_Project_File, Env);
-      Provider := LAL_GPR.Create_Project_Unit_Provider
-        (Tree => Project, Env => Env);
-      Context := LAL.Create_Context (Unit_Provider => Provider);
-
-      declare
-         Source_Files : Libadalang.Project_Provider.Filename_Vectors.Vector;
-         Stream : aliased VSS.Text_Streams.Memory_UTF8_Output
-           .Memory_UTF8_Output_Stream;
-      begin
-         if Source.Get /= Ada.Strings.Unbounded.Null_Unbounded_String then
-            Source_Files := Libadalang.Project_Provider.Source_Files
-              (Project.all, Libadalang.Project_Provider.Root_Project);
-         else
-            Source_Files := Libadalang.Project_Provider.Source_Files
-               (Project.all, Libadalang.Project_Provider.Whole_Project);
-         end if;
-         declare
-            AUA : LAL.Analysis_Unit_Array (Source_Files.First_Index
-                                           .. Source_Files.Last_Index);
-         begin
-            for I in Source_Files.First_Index .. Source_Files.Last_Index loop
-               declare
-                  Unit     : constant LAL.Analysis_Unit :=
-                    Context.Get_From_File (Ada.Strings.Unbounded.To_String
-                                           (Source_Files.Element (I)));
-               begin
-                  --  Report parsing errors, if any
-                  if Unit.Has_Diagnostics then
-                     for D of Unit.Diagnostics loop
-                        Put_Line (Unit.Format_GNU_Diagnostic (D));
-                     end loop;
-                     --  Otherwise, look for object declarations
-                  else
-                     AUA (I) := Unit;
-                  end if;
-               end;
-            end loop;
-            Edit_Info := Find_Arrays_To_Aggregate (AUA);
-            Output.JSON_Serialize (Edit_Info, Stream);
-            Put_Line (VSS.Stream_Element_Vectors.Conversions
-                      .Unchecked_To_String (Stream.Buffer));
-         end;
-      end;
+      Edit_Info := Find_Arrays_To_Aggregate (Unit_Array);
+      Output.JSON_Serialize (Edit_Info, Stream);
    end Run;
 
 end Tools.Array_Aggregates_Tool;

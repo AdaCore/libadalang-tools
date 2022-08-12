@@ -29,6 +29,8 @@ with Laltools.Refactor;
 with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Containers.Indefinite_Ordered_Sets;
 with GNATCOLL.Opt_Parse; use GNATCOLL.Opt_Parse;
+with VSS.Text_Streams.Memory_UTF8_Output;
+
 package Tools.Scope_Declarations_Tool is
    package LAL renames Libadalang.Analysis;
    package ReFac renames Laltools.Refactor;
@@ -42,24 +44,6 @@ package Tools.Scope_Declarations_Tool is
    is (L.As_Ada_Node < R.As_Ada_Node);
    function "<" (L, R : LAL.Declarative_Part) return Boolean
    is (L.As_Ada_Node < R.As_Ada_Node);
-
-   package Project is new Parse_Option
-     (Parser      => Parser,
-      Short       => "-P",
-      Long        => "--project",
-      Help        => "Project",
-      Arg_Type    => Ada.Strings.Unbounded.Unbounded_String,
-      Convert     => Ada.Strings.Unbounded.To_Unbounded_String,
-      Default_Val => Ada.Strings.Unbounded.Null_Unbounded_String);
-
-   package Source is new Parse_Option
-     (Parser      => Parser,
-      Short       => "-S",
-      Long        => "--source",
-      Help        => "Project",
-      Arg_Type    => Ada.Strings.Unbounded.Unbounded_String,
-      Convert     => Ada.Strings.Unbounded.To_Unbounded_String,
-      Default_Val => Ada.Strings.Unbounded.Null_Unbounded_String);
 
    package Obj_Decl_To_Edit_Map is
      new Ada.Containers.Indefinite_Ordered_Maps
@@ -97,6 +81,10 @@ package Tools.Scope_Declarations_Tool is
    function Scope_Declarations (Unit_Array : LAL.Analysis_Unit_Array)
                                 return Modify_Info;
 
-   procedure Run;
+   procedure Run (Unit_Array : LAL.Analysis_Unit_Array;
+                  Stream     : in out
+                    VSS.Text_Streams.Output_Text_Stream'Class);
+
+   function Interact return ReFac.Text_Edit_Map;
 
 end Tools.Scope_Declarations_Tool;

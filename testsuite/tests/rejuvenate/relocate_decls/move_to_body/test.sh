@@ -1,1 +1,1 @@
-rejuvenate relocate_decls -P testcase.gpr
+rejuvenate relocate_decls -P testcase.gpr --pipe

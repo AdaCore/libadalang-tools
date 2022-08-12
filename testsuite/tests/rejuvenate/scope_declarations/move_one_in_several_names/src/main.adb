@@ -7,12 +7,14 @@ begin
       Put_Line (Another_Foo'Image);
       declare
          Bar : Integer := Foo;
+         Other_Foo : Integer := Foo;
       begin
          Put_Line (Bar'Image);
          declare
             Baz : Integer;
          begin
             Baz := Foo;
+            Ada.Text_IO.Put_Line (Other_Foo'Image);
             Ada.Text_IO.Put_Line (Foo'Image);
          end;
       exception
