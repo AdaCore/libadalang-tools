@@ -31,6 +31,7 @@ with Ada.Containers.Hashed_Maps;
 with Ada.Containers.Ordered_Sets;
 with Ada.Containers.Indefinite_Hashed_Maps;
 with GNATCOLL.Opt_Parse; use GNATCOLL.Opt_Parse;
+with VSS.Text_Streams.Memory_UTF8_Output;
 
 package Tools.Suppress_Dead_Params_Tool is
    package LAL renames Libadalang.Analysis;
@@ -112,7 +113,9 @@ package Tools.Suppress_Dead_Params_Tool is
    function Find_Dead_Param (Unit_Array : LAL.Analysis_Unit_Array)
                                       return Edit_Infos;
 
-   procedure Run;
+   procedure Run (Unit_Array : LAL.Analysis_Unit_Array;
+                  Stream     : in out
+                               VSS.Text_Streams.Output_Text_Stream'Class);
    --  Suppress_Params_Tool main procedure
 
 end Tools.Suppress_Dead_Params_Tool;

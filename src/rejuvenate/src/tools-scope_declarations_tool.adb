@@ -29,21 +29,18 @@ with Ada.Characters.Latin_1;
 with Langkit_Support.Text;
 with Libadalang.Common;
 with Ada.Containers; use Ada.Containers;
-with Libadalang.Project_Provider;
-with GNATCOLL.Projects;
 with GNATCOLL.VFS;
 with Ada.Assertions;
 with VSS.Stream_Element_Vectors.Conversions;
-with VSS.Text_Streams.Memory_UTF8_Output;
 with Output;
 with Ada.Containers.Hashed_Sets;
+with Ada.Containers.Ordered_Sets;
 with Ada.Containers.Hashed_Maps;
 with Langkit_Support.Slocs; use Langkit_Support.Slocs;
+with Edit_File;
 
 package body Tools.Scope_Declarations_Tool is
    package LALCO renames Libadalang.Common;
-   package GPR renames GNATCOLL.Projects;
-   package LAL_GPR renames Libadalang.Project_Provider;
    package Text renames Langkit_Support.Text;
 
    function Hash (N : LAL.Defining_Name) return Ada.Containers.Hash_Type is
@@ -92,7 +89,13 @@ package body Tools.Scope_Declarations_Tool is
         Equivalent_Elements => LAL."=",
         "="                 => LAL."=");
 
+   package Integer_Sets is new
+     Ada.Containers.Ordered_Sets
+       (Element_Type => Integer);
+
    type Positions is (First, Middle, Last);
+
+   Edit_Info : Modify_Info;
 
    ---------
    -- "<" --
@@ -464,69 +467,108 @@ package body Tools.Scope_Declarations_Tool is
       return (Obj_Decl_To_Names, Edit_Info, Removable_Decl_Part);
    end Scope_Declarations;
 
-   ---------
-   -- Run --
-   ---------
-
-   procedure Run is
-      package Project_Tree renames Project;
-      Env     : GPR.Project_Environment_Access;
-      Project : constant GPR.Project_Tree_Access :=
-                new GPR.Project_Tree;
-
-      use type GNATCOLL.VFS.Filesystem_String;
-
-      Context          : LAL.Analysis_Context;
-      Provider         : LAL.Unit_Provider_Reference;
-      Project_Filename : constant String :=
-                         Ada.Strings.Unbounded.To_String (Project_Tree.Get);
-      My_Project_File  : constant GNATCOLL.VFS.Virtual_File :=
-                         GNATCOLL.VFS.Create (+Project_Filename);
-      Edit_Info        : Modify_Info;
+   procedure Run (Unit_Array : LAL.Analysis_Unit_Array;
+                  Stream     : in out
+                    VSS.Text_Streams.Output_Text_Stream'Class) is
    begin
-      --  Ada.Text_IO.Put_Line (Ada.Strings.Unbounded.To_String (Project.Get));
-      GPR.Initialize (Env);
-      --  Use procedures in GNATCOLL.Projects to set scenario
-      --  variables (Change_Environment), to set the target
-      --  and the runtime (Set_Target_And_Runtime), etc.
+      Edit_Info := Scope_Declarations (Unit_Array);
 
-      Project.Load (My_Project_File, Env);
-      Provider := LAL_GPR.Create_Project_Unit_Provider
-        (Tree => Project, Env => Env);
-      Context := LAL.Create_Context (Unit_Provider => Provider);
-
-      declare
-         Source_Files : constant LAL_GPR.Filename_Vectors.Vector :=
-                        LAL_GPR.Source_Files
-                        (Project.all, LAL_GPR.Root_Project);
-         Stream : aliased VSS.Text_Streams.Memory_UTF8_Output
-           .Memory_UTF8_Output_Stream;
-         AUA : LAL.Analysis_Unit_Array (Source_Files.First_Index
-                                           .. Source_Files.Last_Index);
-      begin
-         for I in Source_Files.First_Index .. Source_Files.Last_Index loop
-            declare
-               Unit     : constant LAL.Analysis_Unit :=
-                    Context.Get_From_File (Ada.Strings.Unbounded.To_String
-                                           (Source_Files.Element (I)));
-            begin
-                  --  Report parsing errors, if any
-               if Unit.Has_Diagnostics then
-                  for D of Unit.Diagnostics loop
-                     Put_Line (Unit.Format_GNU_Diagnostic (D));
-                  end loop;
-                     --  Otherwise, look for object declarations
-               else
-                  AUA (I) := Unit;
-               end if;
-            end;
-         end loop;
-         Edit_Info := Scope_Declarations (AUA);
-
-         Output.JSON_Serialize (Edit_Info, Stream);
-         Put_Line (VSS.Stream_Element_Vectors.Conversions
-                      .Unchecked_To_String (Stream.Buffer));
-      end;
+      Output.JSON_Serialize (Edit_Info, Stream);
    end Run;
+
+   function Interact return ReFac.Text_Edit_Map is
+      Count : Integer := 0;
+      Last : Integer;
+      Index_Set : Integer_Sets.Set;
+      Output_Map : ReFac.Text_Edit_Map;
+      Is_Apply_All : Boolean := False;
+   begin
+      Put_Line ("There is(are)"
+                & Edit_Info.Object_To_Decl.Length'Image
+                & " object declaration(s) that could be scoped:");
+      for Obj_Decl in Edit_Info.Object_To_Decl.Iterate loop
+         Count := Count + 1;
+         Put_Line (Count'Image & ". "
+                   & Text.Image (Obj_Decl.Key.Text)
+                   & " in Line"
+                   & Obj_Decl.Key.Sloc_Range.Start_Line'Image);
+      end loop;
+      Put_Line ("Please Enter the Changes that you would like to apply, "
+                & "entre 0 to apply all the changes");
+      declare
+         Selection : String (1 .. 3 * Count) := (others => ' ');
+         Index_Select : Integer := 0;
+         Flag : Boolean := False;
+      begin
+         Get_Line (Selection, Last);
+         for I in 1 .. Last loop
+            case Selection (I) is
+            when ' ' =>
+               if Flag then
+                  Flag := False;
+                  if Index_Select > Count then
+                     Put_Line ("Please Enter Legal Value");
+                  else
+                     Index_Set.Insert (Index_Select);
+                  end if;
+                  Index_Select := 0;
+               end if;
+            when '0' =>
+               if not Flag then
+                  Is_Apply_All := True;
+                  exit;
+               else
+                  Index_Select := Index_Select * 10;
+               end if;
+            when '1' =>
+               Flag := True;
+               Index_Select := Index_Select * 10 + 1;
+            when '2' =>
+               Flag := True;
+               Index_Select := Index_Select * 10 + 2;
+            when '3' =>
+               Flag := True;
+               Index_Select := Index_Select * 10 + 3;
+            when '4' =>
+               Flag := True;
+               Index_Select := Index_Select * 10 + 4;
+            when '5' =>
+               Flag := True;
+               Index_Select := Index_Select * 10 + 5;
+            when '6' =>
+               Flag := True;
+               Index_Select := Index_Select * 10 + 6;
+            when '7' =>
+               Flag := True;
+               Index_Select := Index_Select * 10 + 7;
+            when '8' =>
+               Flag := True;
+               Index_Select := Index_Select * 10 + 8;
+            when '9' =>
+               Flag := True;
+               Index_Select := Index_Select * 10 + 9;
+            when others =>
+               Put_Line ("Please Enter Legal Value");
+            end case;
+         end loop;
+         if Flag then
+            Flag := False;
+            if Index_Select > Count then
+               Put_Line ("Please Enter Legal Value");
+            else
+               Index_Set.Insert (Index_Select);
+            end if;
+               Index_Select := 0;
+         end if;
+      end;
+      Count := 0;
+      for Obj_Decl in Edit_Info.Object_To_Decl.Iterate loop
+         Count := Count + 1;
+         if Index_Set.Contains (Count) or Is_Apply_All then
+            ReFac.Merge (Output_Map, Edit_Info.Edit_Info (Obj_Decl.Key));
+         end if;
+      end loop;
+      return Output_Map;
+   end Interact;
 
 end Tools.Scope_Declarations_Tool;

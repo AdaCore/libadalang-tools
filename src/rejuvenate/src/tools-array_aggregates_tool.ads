@@ -27,6 +27,7 @@ with Ada.Strings.Unbounded;
 with Libadalang.Analysis;
 with Laltools.Refactor;
 with Ada.Containers.Indefinite_Ordered_Maps;
+with VSS.Text_Streams.Memory_UTF8_Output;
 
 with GNATCOLL.Opt_Parse; use GNATCOLL.Opt_Parse;
 
@@ -51,7 +52,7 @@ package Tools.Array_Aggregates_Tool is
      (Parser      => Parser,
       Short       => "-S",
       Long        => "--source",
-      Help        => "Project",
+      Help        => "Source",
       Arg_Type    => Ada.Strings.Unbounded.Unbounded_String,
       Convert     => Ada.Strings.Unbounded.To_Unbounded_String,
       Default_Val => Ada.Strings.Unbounded.Null_Unbounded_String);
@@ -67,7 +68,9 @@ package Tools.Array_Aggregates_Tool is
    function Find_Arrays_To_Aggregate (Unit_Array : LAL.Analysis_Unit_Array)
                                       return Aggregates_To_Edit_Text.Map;
 
-   procedure Run;
+   procedure Run (Unit_Array : LAL.Analysis_Unit_Array;
+                  Stream     : in out
+                               VSS.Text_Streams.Output_Text_Stream'Class);
    --  Array_Aggregates_Tool main procedure
 
 end Tools.Array_Aggregates_Tool;
