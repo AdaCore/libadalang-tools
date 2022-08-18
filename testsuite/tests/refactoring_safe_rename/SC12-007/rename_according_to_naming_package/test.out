@@ -1,0 +1,65 @@
+# Renaming node Test.2.ada:1:6: 
+References:
+Unit:Foo--Bar--Baz.1.ada
+Line: 1
+Source Location Range:
+Start_Line: 1
+Start_Column: 9
+End_Line: 1
+End_Column: 12
+Line: 2
+Source Location Range:
+Start_Line: 2
+Start_Column: 5
+End_Line: 2
+End_Column: 8
+Unit:Foo--Bar.1.ada
+Line: 1
+Source Location Range:
+Start_Line: 1
+Start_Column: 9
+End_Line: 1
+End_Column: 12
+Line: 2
+Source Location Range:
+Start_Line: 2
+Start_Column: 5
+End_Line: 2
+End_Column: 8
+Unit:Foo.1.ada
+Line: 1
+Source Location Range:
+Start_Line: 1
+Start_Column: 9
+End_Line: 1
+End_Column: 12
+Line: 2
+Source Location Range:
+Start_Line: 2
+Start_Column: 5
+End_Line: 2
+End_Column: 8
+Unit:Test.2.ada
+Line: 1
+Source Location Range:
+Start_Line: 1
+Start_Column: 6
+End_Line: 1
+End_Column: 9
+Line: 2
+Source Location Range:
+Start_Line: 2
+Start_Column: 6
+End_Line: 2
+End_Column: 9
+Line: 3
+Source Location Range:
+Start_Line: 3
+Start_Column: 6
+End_Line: 3
+End_Column: 9
+File renames:
+Foo--Bar--Baz.1.ada -> Fox--Bar--Baz.1.ada
+Foo--Bar.1.ada -> Fox--Bar.1.ada
+Foo.1.ada -> Fox.1.ada
+

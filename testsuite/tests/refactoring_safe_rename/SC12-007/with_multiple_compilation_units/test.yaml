@@ -1,0 +1,7 @@
+description: |
+    This test checks if the safe rename tool when renaming a
+    top level declaration of a compilation unit in an analysis
+    unit with multiple compilation units does not rename the
+    source filename.
+
+driver: shell_script

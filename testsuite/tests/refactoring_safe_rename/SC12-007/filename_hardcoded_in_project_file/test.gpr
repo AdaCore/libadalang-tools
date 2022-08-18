@@ -1,0 +1,12 @@
+project Test is
+   for Main use ("Test.2.ada");
+   package Naming is
+      for Casing               use "mixedcase";
+      for Dot_Replacement      use "--";
+      for Spec_Suffix ("Ada")  use ".1.ada";
+      for Body_Suffix ("Ada")  use ".2.ada";
+      for Spec ("Qux_1") use "qux.1.ada" at 1;
+      for Spec ("Qux_2") use "qux.1.ada" at 2;
+      for Spec ("Corge") use "corge.ads";
+   end Naming;
+end Test;

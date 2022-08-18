@@ -25,16 +25,12 @@ with Ada.Assertions; use Ada.Assertions;
 
 with Ada.Characters.Handling; use Ada.Characters.Handling;
 with Ada.Characters.Latin_1; use Ada.Characters.Latin_1;
-
 with Ada.Containers.Vectors;
-
 with Ada.Directories; use Ada.Directories;
-
 with Ada.Strings; use Ada.Strings;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Strings.Unbounded.Text_IO; use Ada.Strings.Unbounded.Text_IO;
 with Ada.Strings.UTF_Encoding; use Ada.Strings.UTF_Encoding;
-
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Libadalang.Common; use Libadalang.Common;
@@ -49,6 +45,52 @@ package body Laltools.Refactor.Safe_Rename is
    function "+"
      (Source : String)
       return Unbounded_String renames To_Unbounded_String;
+
+   --------------------------
+   -- Create_Naming_Scheme --
+   --------------------------
+
+   function Create_Naming_Scheme
+     (Attribute_Value_Provider : not null Attribute_Value_Provider_Access)
+      return Naming_Scheme_Type
+   is
+      use GNATCOLL.Projects;
+
+      Casing          : constant String :=
+        Attribute_Value_Provider.all (Casing_Attribute);
+      Dot_Replacement : constant String :=
+        Attribute_Value_Provider.all (Dot_Replacement_Attribute);
+      Spec_Suffix     : constant String :=
+        Attribute_Value_Provider.all (Spec_Suffix_Attribute, "Ada");
+      Body_Suffix     : constant String :=
+        Attribute_Value_Provider.all (Impl_Suffix_Attribute, "Ada");
+
+   begin
+      return
+        Naming_Scheme_Type'
+          (Casing          =>
+             (if Casing = "" then lowercase
+              else Casing_Type'Value (To_Lower (Casing))),
+           Dot_Replacement =>
+             (if Dot_Replacement = "" then +"-"
+              else +Dot_Replacement),
+           Spec_Suffix     =>
+             (if Spec_Suffix = "" then +".ads"
+              else +Spec_Suffix),
+           Body_Suffix     =>
+             (if Body_Suffix = "" then +".adb"
+              else +Body_Suffix));
+
+   exception
+      when others => return Invalid_Naming_Scheme;
+   end Create_Naming_Scheme;
+
+   --------------
+   -- Is_Valid --
+   --------------
+
+   function Is_Valid (Self : Naming_Scheme_Type) return Boolean is
+     (Self /= Invalid_Naming_Scheme);
 
    function Equivalent_Parameter_Mode (L, R : Ada_Mode) return Boolean is
       (L = R
@@ -1074,91 +1116,140 @@ package body Laltools.Refactor.Safe_Rename is
    is
       Parent_Unit : constant Analysis_Unit :=
         Self.Canonical_Definition.P_Basic_Decl.P_Parent_Basic_Decl.Unit;
-      Parent_Package : Package_Decl := No_Package_Decl;
+
+      function Process_Compilation_Unit
+        (Compilation_Unit : Libadalang.Analysis.Compilation_Unit)
+         return Rename_Problem'Class;
+      --  Checks if there are collisions with the top level declaration of
+      --  Compilation_Unit.
+
+      ------------------------------
+      -- Process_Compilation_Unit --
+      ------------------------------
+
+      function Process_Compilation_Unit
+        (Compilation_Unit : Libadalang.Analysis.Compilation_Unit)
+         return Rename_Problem'Class
+      is
+         Parent_Package : Package_Decl := No_Package_Decl;
+
+      begin
+         if Compilation_Unit.P_Decl /=
+           Self.Canonical_Definition.P_Basic_Decl
+         then
+            return No_Rename_Problem;
+         end if;
+
+         Parent_Package :=
+           Parent_Unit.Root.As_Compilation_Unit.P_Decl.As_Package_Decl;
+
+         --  There are two kinds of conflicts:
+         --
+         --  1) Package/Subprogram that defines a compilation unit is renamed
+         --  to an already existing declaration in the spec of the parent
+         --  package.
+
+         if Parent_Unit /= Self.Canonical_Definition.P_Standard_Unit then
+            for Node of Get_Package_Decl_Public_Decls (Parent_Package) loop
+               if Node.Kind in Ada_Basic_Decl
+                 and then Check_Rename_Conflict
+                   (Self.New_Name,
+                    Node.As_Basic_Decl.P_Defining_Name)
+               then
+                  return Name_Collision'
+                    (Canonical_Definition => Self.Canonical_Definition,
+                     New_Name             => Self.New_Name,
+                     Conflicting_Id       =>
+                       Node.As_Basic_Decl.P_Defining_Name.F_Name);
+               end if;
+            end loop;
+
+            declare
+               Private_Decls : constant Ada_Node_List :=
+                 Get_Package_Decl_Private_Decls (Parent_Package);
+            begin
+               if Private_Decls /= No_Ada_Node_List then
+                  for Node of Private_Decls loop
+                     if Node.Kind in Ada_Basic_Decl
+                       and then Check_Rename_Conflict
+                         (Self.New_Name,
+                          Node.As_Basic_Decl.P_Defining_Name)
+                     then
+                        return Name_Collision'
+                          (Canonical_Definition => Self.Canonical_Definition,
+                           New_Name             => Self.New_Name,
+                           Conflicting_Id       =>
+                             Node.As_Basic_Decl.P_Defining_Name.F_Name);
+                     end if;
+                  end loop;
+               end if;
+            end;
+         end if;
+
+         --  2) Package/Subprogram that defines a compilation unit is renamed
+         --  to an already existing Package/Subprogram that also defines
+         --  a compilation unit and both share the same parent package.
+
+         for Analysis_Unit of Self.Units loop
+            for Compilation_Unit of Get_Compilation_Units (Analysis_Unit) loop
+               if Compilation_Unit.P_Decl.P_Parent_Basic_Decl.Unit =
+                 Parent_Unit
+               then
+                  declare
+                     --  Get the suffix of the declaration of this unit and
+                     --  check.
+
+                     Unit_Decl_Identifier : constant Identifier :=
+                       Get_Defining_Name_Id
+                         (Compilation_Unit.P_Decl.P_Defining_Name);
+
+                  begin
+                     --  Check if Self.New_Name is already used by this unit
+
+                     if Unit_Decl_Identifier.Text =
+                          To_Text (Self.New_Name)
+                     then
+                        return Name_Collision'
+                          (Canonical_Definition => Self.Canonical_Definition,
+                           New_Name             => Self.New_Name,
+                           Conflicting_Id       =>
+                             Compilation_Unit.P_Decl.P_Defining_Name.F_Name);
+                     end if;
+                  end;
+               end if;
+            end loop;
+         end loop;
+         return No_Rename_Problem;
+      end Process_Compilation_Unit;
 
    begin
-      if Self.Canonical_Definition.Unit.Root.As_Compilation_Unit.P_Decl
-        /= Self.Canonical_Definition.P_Basic_Decl
-      then
-         return No_Rename_Problem;
-      end if;
-
-      Parent_Package :=
-        Parent_Unit.Root.As_Compilation_Unit.P_Decl.As_Package_Decl;
-
-      --  There are two kinds of conflicts:
-      --
-      --  1) Package/Subprogram that defines a compilation unit is renamed to
-      --  an already existing declaration in the spec of the parent package.
-
-      if Parent_Unit /= Self.Canonical_Definition.P_Standard_Unit then
-         for Node of Get_Package_Decl_Public_Decls (Parent_Package) loop
-            if Node.Kind in Ada_Basic_Decl
-              and then Check_Rename_Conflict
-                (Self.New_Name,
-                 Node.As_Basic_Decl.P_Defining_Name)
-            then
-               return Name_Collision'
-                 (Canonical_Definition => Self.Canonical_Definition,
-                  New_Name             => Self.New_Name,
-                  Conflicting_Id       =>
-                    Node.As_Basic_Decl.P_Defining_Name.F_Name);
-            end if;
-         end loop;
-
-         declare
-            Private_Decls : constant Ada_Node_List :=
-              Get_Package_Decl_Private_Decls (Parent_Package);
-         begin
-            if Private_Decls /= No_Ada_Node_List then
-               for Node of Private_Decls loop
-                  if Node.Kind in Ada_Basic_Decl
-                    and then Check_Rename_Conflict
-                      (Self.New_Name,
-                       Node.As_Basic_Decl.P_Defining_Name)
-                  then
-                     return Name_Collision'
-                       (Canonical_Definition => Self.Canonical_Definition,
-                        New_Name             => Self.New_Name,
-                        Conflicting_Id       =>
-                          Node.As_Basic_Decl.P_Defining_Name.F_Name);
-                  end if;
-               end loop;
-            end if;
-         end;
-      end if;
-
-      --  2) Package/Subprogram that defines a compilation unit is renamed to
-      --  an already existing Package/Subprogram that also defines
-      --  a compilation unit and both share the same parent package.
-
-      for Analysis_Unit of Self.Units loop
-         for Compilation_Unit of Get_Compilation_Units (Analysis_Unit) loop
-            if Compilation_Unit.P_Decl.P_Parent_Basic_Decl.Unit =
-                 Parent_Unit
-            then
+      case Self.Canonical_Definition.Unit.Root.Kind is
+         when Ada_Compilation_Unit_List_Range =>
+            for Compilaton_Unit of
+              Self.Canonical_Definition.Unit.Root.As_Compilation_Unit_List
+            loop
                declare
-                  --  Get the suffix of the declaration of this unit and check
-
-                  Unit_Decl_Identifier : constant Identifier :=
-                    Get_Defining_Name_Id
-                      (Compilation_Unit.P_Decl.P_Defining_Name);
+                  Problem : constant Rename_Problem'Class :=
+                    Process_Compilation_Unit
+                      (Compilaton_Unit.As_Compilation_Unit);
 
                begin
-                  --  Check if Self.New_Name is already used by this unit
-
-                  if Unit_Decl_Identifier.Text = To_Text (Self.New_Name) then
-                     return Name_Collision'
-                       (Canonical_Definition => Self.Canonical_Definition,
-                        New_Name             => Self.New_Name,
-                        Conflicting_Id       =>
-                          Compilation_Unit.P_Decl.P_Defining_Name.F_Name);
+                  if Problem /= No_Rename_Problem then
+                     return Problem;
                   end if;
                end;
-            end if;
-         end loop;
-      end loop;
-      return No_Rename_Problem;
+            end loop;
+
+            return No_Rename_Problem;
+
+         when Ada_Compilation_Unit_Range =>
+            return
+              Process_Compilation_Unit
+                (Self.Canonical_Definition.Unit.Root.As_Compilation_Unit);
+
+         when others =>
+            return No_Rename_Problem;
+      end case;
    end Find;
 
    ----------
@@ -2203,11 +2294,19 @@ package body Laltools.Refactor.Safe_Rename is
    -------------------------
 
    function Create_Safe_Renamer
-     (Definition : Defining_Name'Class;
-      New_Name   : Unbounded_Text_Type;
-      Algorithm  : Problem_Finder_Algorithm_Kind)
-      return Safe_Renamer is
-     ((Definition.P_Canonical_Part, New_Name, Algorithm));
+     (Definition               : Defining_Name'Class;
+      New_Name                 : Unbounded_Text_Type;
+      Algorithm                : Problem_Finder_Algorithm_Kind;
+      Attribute_Value_Provider : Attribute_Value_Provider_Access := null)
+      return Safe_Renamer
+   is (((Definition.P_Canonical_Part,
+          New_Name,
+          Algorithm,
+          (if Attribute_Value_Provider = null then
+            Default_Naming_Scheme
+          else
+            Create_Naming_Scheme (Attribute_Value_Provider)),
+          Attribute_Value_Provider)));
 
    --------------
    -- Refactor --
@@ -2316,7 +2415,11 @@ package body Laltools.Refactor.Safe_Rename is
       return Boolean
    is
       Top_Level_Decl : constant Basic_Decl :=
-        (if not Decl.Is_Null then Decl.P_Top_Level_Decl (Decl.Unit)
+        (if not Decl.Is_Null
+         and then Decl.P_Enclosing_Compilation_Unit.F_Body.Kind in
+                    Ada_Library_Item
+         then
+           Decl.P_Enclosing_Compilation_Unit.F_Body.As_Library_Item.F_Item
          else No_Basic_Decl);
 
    begin
@@ -2367,7 +2470,13 @@ package body Laltools.Refactor.Safe_Rename is
            Reference.Unit.Get_Filename;
          Directory_Name    : constant String :=
            Containing_Directory (Unit_Old_Filename);
-         File_Extension    : constant String := Extension (Unit_Old_Filename);
+         File_Extension    : constant String :=
+           (if Reference.P_Top_Level_Decl (Reference.Unit).Kind in
+              Ada_Body_Node
+            then
+              To_String (Self.Naming_Scheme.Body_Suffix)
+            else
+              To_String (Self.Naming_Scheme.Spec_Suffix));
 
          New_Definition_Name : Unbounded_Text_Type;
 
@@ -2379,26 +2488,78 @@ package body Laltools.Refactor.Safe_Rename is
          --  Transforms all characters to lower case and replaces all `.` by
          --  `-`.
 
+         function Compose
+           (Containing_Directory : String;
+            Name                 : String;
+            Extension            : String)
+            return String;
+         --  Returns the name of the file with the specified
+         --  Containing_Directory, Name, and Extension.
+         --  Similar to Ada.Directories.Compose but it won't add '.' between
+         --  Name and Extension.
+
          ---------------
          -- Transform --
          ---------------
 
          function Transform (Old_Definition_Name : String) return String
          is
-            New_Definition_Name : String (Old_Definition_Name'Range);
+            New_Definition_Name    : Unbounded_String;
+            Next_May_Be_Upper_Case : Boolean := True;
 
          begin
             for J in Old_Definition_Name'Range loop
                if Old_Definition_Name (J) = '.' then
-                  New_Definition_Name (J) := '-';
+                  Append
+                    (New_Definition_Name,
+                     Self.Naming_Scheme.Dot_Replacement);
+                  Next_May_Be_Upper_Case := True;
+
                else
-                  New_Definition_Name (J) :=
-                    To_Lower (Old_Definition_Name (J));
+                  case Self.Naming_Scheme.Casing is
+                     when mixedcase =>
+                        if Next_May_Be_Upper_Case then
+                           Append
+                             (New_Definition_Name,
+                              To_Upper (Old_Definition_Name (J)));
+                        else
+                           Append
+                             (New_Definition_Name,
+                              To_Lower (Old_Definition_Name (J)));
+                        end if;
+                     when lowercase =>
+                        Append
+                          (New_Definition_Name,
+                           To_Lower (Old_Definition_Name (J)));
+                     when uppercase =>
+                           Append
+                             (New_Definition_Name,
+                              To_Upper (Old_Definition_Name (J)));
+                  end case;
+                  Next_May_Be_Upper_Case := False;
                end if;
             end loop;
 
-            return New_Definition_Name;
+            return To_String (New_Definition_Name);
          end Transform;
+
+         -------------
+         -- Compose --
+         -------------
+
+         function Compose
+           (Containing_Directory : String;
+            Name                 : String;
+            Extension            : String)
+            return String
+         is
+            Dir_Separator : constant Character;
+            pragma Import (C, Dir_Separator, "__gnat_dir_separator");
+            --  Running system default directory separator
+
+         begin
+            return Containing_Directory & Dir_Separator & Name & Extension;
+         end Compose;
 
       begin
          if Reference.Parent.Kind in Ada_Dotted_Name then
@@ -2480,6 +2641,13 @@ package body Laltools.Refactor.Safe_Rename is
       end New_File_Name;
 
    begin
+      if not Is_Valid (Self.Naming_Scheme) then
+         Refactor_Trace.Trace
+           ("Invalid naming scheme. Safe Rename refactoring will not try to "
+            & "rename any source files.");
+         return;
+      end if;
+
       for Reference of References loop
          declare
             Enclosing_Defining_Name : constant Defining_Name :=
@@ -2489,7 +2657,20 @@ package body Laltools.Refactor.Safe_Rename is
                else Enclosing_Defining_Name.P_Basic_Decl);
 
          begin
-            if Self.Is_Top_Level_Decl (Enclosing_Basic_Decl) then
+            --  Only rename sources if Enclosing_Basic_Decl is a top level
+            --  declaration of its compilation unit, and its analysis unit
+            --  only has one compilation unit.
+            if Self.Is_Top_Level_Decl (Enclosing_Basic_Decl)
+              and then Enclosing_Basic_Decl.Unit.Root.Kind in
+                Ada_Compilation_Unit_Range
+              and then
+                (Self.Attribute_Value_Provider = null
+                 or else Self.Attribute_Value_Provider.all
+                          (GNATCOLL.Projects.Spec_Attribute,
+                           To_UTF8
+                             (Enclosing_Basic_Decl.P_Defining_Name.Text)) =
+                           "")
+            then
                File_Rename.Filepath :=
                  To_Unbounded_String (Reference.Unit.Get_Filename);
                File_Rename.New_Name :=

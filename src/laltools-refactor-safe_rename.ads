@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2022, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -29,8 +29,9 @@ with Ada.Containers.Indefinite_Hashed_Maps;
 with Ada.Containers.Indefinite_Vectors;
 with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Ordered_Sets;
-
 with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
+
+with GNATCOLL.Projects;
 
 with Langkit_Support.Text; use Langkit_Support.Text;
 
@@ -58,18 +59,31 @@ package Laltools.Refactor.Safe_Rename is
      (Map_References,
       Analyse_AST);
 
+   type Attribute_Value_Provider_Access is access
+     function
+       (Attribute    : GNATCOLL.Projects.Attribute_Pkg_String;
+        Index        : String := "";
+        Default      : String := "";
+        Use_Extended : Boolean := False) return String;
+
    type Safe_Renamer is new Refactoring_Tool with private;
 
    function Create_Safe_Renamer
-     (Definition : Defining_Name'Class;
-      New_Name   : Unbounded_Text_Type;
-      Algorithm  : Problem_Finder_Algorithm_Kind)
+     (Definition               : Defining_Name'Class;
+      New_Name                 : Unbounded_Text_Type;
+      Algorithm                : Problem_Finder_Algorithm_Kind;
+      Attribute_Value_Provider : Attribute_Value_Provider_Access := null)
       return Safe_Renamer
      with Pre => not Definition.Is_Null;
    --  Safe_Renamer constructor.
    --  Creates a `Safe_Renamer` object that renames all references of
    --  `Definition` to `New_Name`.
    --  Uses the `Algorithm` kind to search for problems causes by the rename.
+   --  Uses Attribute_Value_Provider to compute source file names when top
+   --  level declarations are renamed, with the exception of top level
+   --  declarations in an analysis unit with multiple compilation units.
+   --  In that case, the source name must be hardcoded in the gpr file so it
+   --  does not need to be renamed.
 
    overriding
    function Refactor
@@ -87,6 +101,38 @@ package Laltools.Refactor.Safe_Rename is
    --  is being overridden by.
 
 private
+
+   type Casing_Type is (lowercase, uppercase, mixedcase);
+
+   type Naming_Scheme_Type is
+      record
+         Casing          : Casing_Type;
+         Dot_Replacement : Unbounded_String;
+         Spec_Suffix     : Unbounded_String;
+         Body_Suffix     : Unbounded_String;
+      end record;
+
+   function Create_Naming_Scheme
+     (Attribute_Value_Provider : not null Attribute_Value_Provider_Access)
+     return Naming_Scheme_Type;
+   --  Naming_Scheme_Type constructor.
+   --  The formal parameters have the same meaning as the corresponding
+   --  attributes in the Naming package of a .gpr project file.
+
+   function Is_Valid (Self : Naming_Scheme_Type) return Boolean;
+   --  Checks if Self is valid, i.e., not equal to Invalid_Naming_Scheme.
+
+   Invalid_Naming_Scheme : constant Naming_Scheme_Type :=
+     (Casing          => lowercase,
+      Dot_Replacement => Null_Unbounded_String,
+      Spec_Suffix     => Null_Unbounded_String,
+      Body_Suffix     => Null_Unbounded_String);
+
+   Default_Naming_Scheme : constant Naming_Scheme_Type :=
+     (Casing          => lowercase,
+      Dot_Replacement => To_Unbounded_String ("-"),
+      Spec_Suffix     => To_Unbounded_String (".ads"),
+      Body_Suffix     => To_Unbounded_String (".adb"));
 
    type Dummy_Rename_Problem is new Rename_Problem with null record;
 
@@ -391,9 +437,11 @@ private
    type Safe_Renamer is new Refactoring_Tool with
       record
          --  Canonical Defining_Name that we want to rename
-         Canonical_Definition : Defining_Name;
-         New_Name             : Unbounded_Text_Type;
-         Algorithm            : Problem_Finder_Algorithm_Kind;
+         Canonical_Definition     : Defining_Name;
+         New_Name                 : Unbounded_Text_Type;
+         Algorithm                : Problem_Finder_Algorithm_Kind;
+         Naming_Scheme            : Naming_Scheme_Type;
+         Attribute_Value_Provider : Attribute_Value_Provider_Access;
       end record;
 
    procedure Add_References_To_Edits

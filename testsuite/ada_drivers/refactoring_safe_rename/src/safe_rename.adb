@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2022, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -186,12 +186,32 @@ procedure Safe_Rename is
       end loop;
 
       declare
+         function Attribute_Value_Provider_Callback
+           (Attribute : GNATCOLL.Projects.Attribute_Pkg_String;
+            Index : String := "";
+            Default : String := "";
+            Use_Extended : Boolean := False)
+            return String
+         is (if Context.Provider.Kind = Project_File
+               and then Context.Provider.Project /= null
+             then
+                Root_Project (Context.Provider.Project.all).
+                  Attribute_Value (Attribute, Index, Default,  Use_Extended)
+             else
+                Default);
+         --  Attribute provider for the project on this Context
+
+         Attribute_Value_Provider : constant Attribute_Value_Provider_Access :=
+           Attribute_Value_Provider_Callback'Unrestricted_Access;
+
          Renamer : constant Safe_Renamer :=
            Create_Safe_Renamer
-             (Definition =>
+             (Definition               =>
                 Resolve_Name_Precisely (Get_Node_As_Name (Node)),
-              New_Name   => To_Unbounded_Text (To_Text (New_Name)),
-              Algorithm  => Algorithm);
+              New_Name                 =>
+                To_Unbounded_Text (To_Text (New_Name)),
+              Algorithm                => Algorithm,
+              Attribute_Value_Provider => Attribute_Value_Provider);
 
          Units_Array : Analysis_Unit_Array (1 .. Integer (Units.Length));
 

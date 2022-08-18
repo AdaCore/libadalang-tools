@@ -1,0 +1,5 @@
+description: |
+    This test checks if the safe rename tool correctly handles
+    use the Naming package from project file.
+
+driver: shell_script
