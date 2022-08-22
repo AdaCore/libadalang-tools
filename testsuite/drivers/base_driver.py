@@ -1,5 +1,4 @@
-import os
-import os.path
+from typing import Union
 
 from e3.testsuite.control import YAMLTestControlCreator
 from e3.testsuite.driver.classic import TestAbortWithError, TestSkip
@@ -41,7 +40,7 @@ class BaseDriver(DiffTestDriver):
         "refactoring_safe_rename",
         "refactoring_extract_subprogram",
         "refactoring_pull_up_declaration",
-        "refactoring_suppress_separate"
+        "refactoring_suppress_separate",
     } | WIP_TOOLS
 
     @property
@@ -63,22 +62,30 @@ class BaseDriver(DiffTestDriver):
 
     @property
     def baseline(self):
-        # Allow a missing test.out or regex_test.out -- treat as empty
-        test_out = self.test_dir("test.out")
-        regex_test_out = self.test_dir("regex_test.out")
-        regex = False
-        if os.path.exists(test_out):
-            with open(test_out, encoding=self.default_encoding) as f:
-                baseline = f.read()
-        elif os.path.exists(regex_test_out):
-            with open(regex_test_out, encoding=self.default_encoding) as f:
-                baseline = f.read()
-            regex = True
-        else:
-            baseline = ""
-            test_out = None
+        filename, is_regexp = self.baseline_file
+        filename = self.test_dir(filename)
+        baseline: Union[str, bytes]
 
-        return (test_out, baseline, regex)
+        try:
+            if self.default_encoding == "binary":
+                with open(filename, "rb") as text_f:
+                    baseline = text_f.read()
+            else:
+                with open(
+                    filename, "r", encoding=self.default_encoding
+                ) as bin_f:
+                    baseline = bin_f.read()
+        except FileNotFoundError:
+            # Allow a missing test baseline file - treat as empty
+            return (None, "", is_regexp)
+        except Exception as exc:
+            raise TestAbortWithError(
+                "cannot read baseline file ({}: {})".format(
+                    type(exc).__name__, exc
+                )
+            )
+
+        return (filename, baseline, is_regexp)
 
     @property
     def test_control_creator(self):
