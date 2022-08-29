@@ -652,7 +652,7 @@ package body Laltools.Refactor.Extract_Subprogram is
          for Candidate of Candidates loop
             Find_Candidate_In_Statements :
             for Stmt of Statements loop
-               if Candidate.P_Find_Refs (Stmt, Stmt)'Length > 0 then
+               if Candidate.P_Find_Refs (Stmt)'Length > 0 then
                   Parameters.Insert (Candidate);
                   exit Find_Candidate_In_Statements;
                end if;
@@ -1026,7 +1026,7 @@ package body Laltools.Refactor.Extract_Subprogram is
             for Candidate of Candidates loop
                Find_Candidate_In_Statements :
                for Stmt of Statements loop
-                  if Candidate.P_Find_Refs (Stmt, Stmt)'Length > 0 then
+                  if Candidate.P_Find_Refs (Stmt)'Length > 0 then
                      Parameters.Insert (Candidate);
                      exit Find_Candidate_In_Statements;
                   end if;

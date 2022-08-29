@@ -192,10 +192,10 @@ package body Laltools.Refactor.Introduce_Parameter is
 
       if References'Length > 1 then
          First_Is_Write_Reference :=
-           Ref (References (References'First + 1)).P_Is_Write_Reference;
+           Ref (References (References'First)).P_Is_Write_Reference;
          Any_Write_References :=
            (for some Reference of
-              References (References'First + 1 .. References'Last)
+              References (References'First .. References'Last)
             => Ref (Reference).P_Is_Write_Reference);
 
          if First_Is_Write_Reference then
