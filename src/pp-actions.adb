@@ -3836,6 +3836,10 @@ package body Pp.Actions is
          --  parent is something else, like a parenthesized expression), Is_Right
          --  is False.
 
+         procedure Do_Concat_Op
+           (Tree      : Ada_Tree;
+            Cur_Level : Nesting_Level);
+
          procedure Do_List;
          procedure Do_Literal;
          procedure Do_Label;
@@ -4200,6 +4204,9 @@ package body Pp.Actions is
                         raise Program_Error;
                   end case;
 
+               when Ada_Concat_Op =>
+                  return 5;
+
                --  Assume anything else is a unary operator or a primary
                --  (highest precedence)
 
@@ -4453,6 +4460,50 @@ package body Pp.Actions is
 
             Bin_Op_Count := Bin_Op_Count - 1;
          end Do_Bin_Op;
+
+         procedure Do_Concat_Op
+           (Tree      : Ada_Tree;
+            Cur_Level : Nesting_Level)
+         is
+            Expr : constant Concat_Op := Tree.As_Concat_Op;
+            Arg1 : constant Ada_Tree := F_First_Operand (Expr).As_Ada_Node;
+
+         --  Start of processing for Do_Concat_Op
+
+         begin
+            Bin_Op_Count := Bin_Op_Count + 1;
+
+            Interpret_Alt_Template
+              (Subtree_Alt,
+               Subtrees  => [1 => Arg1],
+               Cur_Level => Cur_Level);
+
+            for Operand of F_Other_Operands (Expr) loop
+               declare
+                  Arg2 : constant Ada_Tree := F_Operand (Operand).As_Ada_Node;
+               begin
+
+                  if Arg (Cmd, Split_Line_Before_Op) then
+                     Interpret_Alt_Template (Soft_Alt, Empty_Tree_Array, Cur_Level);
+                  end if;
+
+                  Append_And_Put (New_Tokns, Spaces, Name_Space);
+                  Append_And_Put (New_Tokns, '&');
+                  Append_And_Put (New_Tokns, Spaces, Name_Space);
+
+                  if not Arg (Cmd, Split_Line_Before_Op) then
+                     Interpret_Alt_Template (Soft_Alt, Empty_Tree_Array, Cur_Level);
+                  end if;
+
+                  Interpret_Alt_Template
+                    (Subtree_Alt,
+                     Subtrees  => [1 => Arg2],
+                     Cur_Level => Cur_Level);
+               end;
+            end loop;
+
+            Bin_Op_Count := Bin_Op_Count - 1;
+         end Do_Concat_Op;
 
          procedure Do_For_Loop_Spec is
          begin
@@ -5135,6 +5186,9 @@ package body Pp.Actions is
 
             when Ada_Bin_Op | Ada_Relation_Op =>
                Do_Bin_Op (Tree, Is_Right  => False, Cur_Level => Cur_Level);
+
+            when Ada_Concat_Op =>
+               Do_Concat_Op (Tree, Cur_Level => Cur_Level);
 
             when Ada_For_Loop_Spec =>
                Do_For_Loop_Spec;
