@@ -1,6 +1,4 @@
-Units remaining: 6     
-Units remaining: 5     
-CompilationUnit[1:1-8:9]
+Units remaining: 6     Units remaining: 5     CompilationUnit[1:1-8:9]
 |f_prelude:
 |  AdaNodeList[1:1-1:1]: <empty list>
 |f_body:
@@ -1555,23 +1553,26 @@ Units remaining: 1     CompilationUnitList[1:1-43:20]
 |  |  |  |  |  |  |  |  |  ParamAssoc[14:14-14:40]
 |  |  |  |  |  |  |  |  |  |f_designator: <null>
 |  |  |  |  |  |  |  |  |  |f_r_expr:
-|  |  |  |  |  |  |  |  |  |  BinOp[14:14-14:40]
-|  |  |  |  |  |  |  |  |  |  |f_left:
+|  |  |  |  |  |  |  |  |  |  ConcatOp[14:14-14:40]
+|  |  |  |  |  |  |  |  |  |  |f_first_operand:
 |  |  |  |  |  |  |  |  |  |  |  Str[14:14-14:19]: "Hi "
-|  |  |  |  |  |  |  |  |  |  |f_op:
-|  |  |  |  |  |  |  |  |  |  |  OpConcat[14:20-14:21]
-|  |  |  |  |  |  |  |  |  |  |f_right:
-|  |  |  |  |  |  |  |  |  |  |  CallExpr[14:22-14:40]
-|  |  |  |  |  |  |  |  |  |  |  |f_name:
-|  |  |  |  |  |  |  |  |  |  |  |  Id[14:22-14:31]: Full_Name
-|  |  |  |  |  |  |  |  |  |  |  |f_suffix:
-|  |  |  |  |  |  |  |  |  |  |  |  BinOp[14:33-14:39]
-|  |  |  |  |  |  |  |  |  |  |  |  |f_left:
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int[14:33-14:34]: 1
-|  |  |  |  |  |  |  |  |  |  |  |  |f_op:
-|  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot[14:35-14:37]
-|  |  |  |  |  |  |  |  |  |  |  |  |f_right:
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int[14:38-14:39]: 4
+|  |  |  |  |  |  |  |  |  |  |f_other_operands:
+|  |  |  |  |  |  |  |  |  |  |  ConcatOperandList[14:20-14:40]
+|  |  |  |  |  |  |  |  |  |  |  |  ConcatOperand[14:20-14:40]
+|  |  |  |  |  |  |  |  |  |  |  |  |f_operator:
+|  |  |  |  |  |  |  |  |  |  |  |  |  OpConcat[14:20-14:21]
+|  |  |  |  |  |  |  |  |  |  |  |  |f_operand:
+|  |  |  |  |  |  |  |  |  |  |  |  |  CallExpr[14:22-14:40]
+|  |  |  |  |  |  |  |  |  |  |  |  |  |f_name:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  Id[14:22-14:31]: Full_Name
+|  |  |  |  |  |  |  |  |  |  |  |  |  |f_suffix:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  BinOp[14:33-14:39]
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_left:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[14:33-14:34]: 1
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_op:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot[14:35-14:37]
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_right:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[14:38-14:39]: 4
 |  |  |  |  |f_exceptions:
 |  |  |  |  |  AdaNodeList[14:41-14:41]: <empty list>
 |  |  |  |f_end_name:
@@ -1692,23 +1693,26 @@ Units remaining: 1     CompilationUnitList[1:1-43:20]
 |  |  |  |  |  |  |  |  |  ParamAssoc[28:14-28:40]
 |  |  |  |  |  |  |  |  |  |f_designator: <null>
 |  |  |  |  |  |  |  |  |  |f_r_expr:
-|  |  |  |  |  |  |  |  |  |  BinOp[28:14-28:40]
-|  |  |  |  |  |  |  |  |  |  |f_left:
+|  |  |  |  |  |  |  |  |  |  ConcatOp[28:14-28:40]
+|  |  |  |  |  |  |  |  |  |  |f_first_operand:
 |  |  |  |  |  |  |  |  |  |  |  Str[28:14-28:19]: "Hi "
-|  |  |  |  |  |  |  |  |  |  |f_op:
-|  |  |  |  |  |  |  |  |  |  |  OpConcat[28:20-28:21]
-|  |  |  |  |  |  |  |  |  |  |f_right:
-|  |  |  |  |  |  |  |  |  |  |  CallExpr[28:22-28:40]
-|  |  |  |  |  |  |  |  |  |  |  |f_name:
-|  |  |  |  |  |  |  |  |  |  |  |  Id[28:22-28:31]: Full_Name
-|  |  |  |  |  |  |  |  |  |  |  |f_suffix:
-|  |  |  |  |  |  |  |  |  |  |  |  BinOp[28:33-28:39]
-|  |  |  |  |  |  |  |  |  |  |  |  |f_left:
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int[28:33-28:34]: 1
-|  |  |  |  |  |  |  |  |  |  |  |  |f_op:
-|  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot[28:35-28:37]
-|  |  |  |  |  |  |  |  |  |  |  |  |f_right:
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int[28:38-28:39]: 4
+|  |  |  |  |  |  |  |  |  |  |f_other_operands:
+|  |  |  |  |  |  |  |  |  |  |  ConcatOperandList[28:20-28:40]
+|  |  |  |  |  |  |  |  |  |  |  |  ConcatOperand[28:20-28:40]
+|  |  |  |  |  |  |  |  |  |  |  |  |f_operator:
+|  |  |  |  |  |  |  |  |  |  |  |  |  OpConcat[28:20-28:21]
+|  |  |  |  |  |  |  |  |  |  |  |  |f_operand:
+|  |  |  |  |  |  |  |  |  |  |  |  |  CallExpr[28:22-28:40]
+|  |  |  |  |  |  |  |  |  |  |  |  |  |f_name:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  Id[28:22-28:31]: Full_Name
+|  |  |  |  |  |  |  |  |  |  |  |  |  |f_suffix:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  BinOp[28:33-28:39]
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_left:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[28:33-28:34]: 1
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_op:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot[28:35-28:37]
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_right:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[28:38-28:39]: 4
 |  |  |  |  |f_exceptions:
 |  |  |  |  |  AdaNodeList[28:41-28:41]: <empty list>
 |  |  |  |f_end_name:
@@ -1829,23 +1833,26 @@ Units remaining: 1     CompilationUnitList[1:1-43:20]
 |  |  |  |  |  |  |  |  |  ParamAssoc[42:14-42:40]
 |  |  |  |  |  |  |  |  |  |f_designator: <null>
 |  |  |  |  |  |  |  |  |  |f_r_expr:
-|  |  |  |  |  |  |  |  |  |  BinOp[42:14-42:40]
-|  |  |  |  |  |  |  |  |  |  |f_left:
+|  |  |  |  |  |  |  |  |  |  ConcatOp[42:14-42:40]
+|  |  |  |  |  |  |  |  |  |  |f_first_operand:
 |  |  |  |  |  |  |  |  |  |  |  Str[42:14-42:19]: "Hi "
-|  |  |  |  |  |  |  |  |  |  |f_op:
-|  |  |  |  |  |  |  |  |  |  |  OpConcat[42:20-42:21]
-|  |  |  |  |  |  |  |  |  |  |f_right:
-|  |  |  |  |  |  |  |  |  |  |  CallExpr[42:22-42:40]
-|  |  |  |  |  |  |  |  |  |  |  |f_name:
-|  |  |  |  |  |  |  |  |  |  |  |  Id[42:22-42:31]: Full_Name
-|  |  |  |  |  |  |  |  |  |  |  |f_suffix:
-|  |  |  |  |  |  |  |  |  |  |  |  BinOp[42:33-42:39]
-|  |  |  |  |  |  |  |  |  |  |  |  |f_left:
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int[42:33-42:34]: 1
-|  |  |  |  |  |  |  |  |  |  |  |  |f_op:
-|  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot[42:35-42:37]
-|  |  |  |  |  |  |  |  |  |  |  |  |f_right:
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int[42:38-42:39]: 4
+|  |  |  |  |  |  |  |  |  |  |f_other_operands:
+|  |  |  |  |  |  |  |  |  |  |  ConcatOperandList[42:20-42:40]
+|  |  |  |  |  |  |  |  |  |  |  |  ConcatOperand[42:20-42:40]
+|  |  |  |  |  |  |  |  |  |  |  |  |f_operator:
+|  |  |  |  |  |  |  |  |  |  |  |  |  OpConcat[42:20-42:21]
+|  |  |  |  |  |  |  |  |  |  |  |  |f_operand:
+|  |  |  |  |  |  |  |  |  |  |  |  |  CallExpr[42:22-42:40]
+|  |  |  |  |  |  |  |  |  |  |  |  |  |f_name:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  Id[42:22-42:31]: Full_Name
+|  |  |  |  |  |  |  |  |  |  |  |  |  |f_suffix:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  BinOp[42:33-42:39]
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_left:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[42:33-42:34]: 1
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_op:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot[42:35-42:37]
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_right:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[42:38-42:39]: 4
 |  |  |  |  |f_exceptions:
 |  |  |  |  |  AdaNodeList[42:41-42:41]: <empty list>
 |  |  |  |f_end_name:
@@ -1955,20 +1962,22 @@ CompilationUnitList
 |  |  |  |  |  |  |  |   
 |  |  |  |  |  |  |  |  AssocList
 |  |  |  |  |  |  |  |  |  ParamAssoc
-|  |  |  |  |  |  |  |  |  |  BinOp
+|  |  |  |  |  |  |  |  |  |  ConcatOp
 |  |  |  |  |  |  |  |  |  |  |  Str
 |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  OpConcat
-|  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  CallExpr
-|  |  |  |  |  |  |  |  |  |  |  |  Id
-|  |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  |  BinOp
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |  |  |  |  |  |  |  ConcatOperandList
+|  |  |  |  |  |  |  |  |  |  |  |  ConcatOperand
+|  |  |  |  |  |  |  |  |  |  |  |  |  OpConcat
 |  |  |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot
-|  |  |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |  |  |  |  |  |  |  |  |  CallExpr
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  Id
+|  |  |  |  |  |  |  |  |  |  |  |  |  |   
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  BinOp
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |   
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |   
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int
 |  |  |  |  |  AdaNodeList
 |  |  |  |   
 |  |  |  |  --  Prints "Hi John"
@@ -2063,20 +2072,22 @@ CompilationUnitList
 |  |  |  |  |  |  |  |   
 |  |  |  |  |  |  |  |  AssocList
 |  |  |  |  |  |  |  |  |  ParamAssoc
-|  |  |  |  |  |  |  |  |  |  BinOp
+|  |  |  |  |  |  |  |  |  |  ConcatOp
 |  |  |  |  |  |  |  |  |  |  |  Str
 |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  OpConcat
-|  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  CallExpr
-|  |  |  |  |  |  |  |  |  |  |  |  Id
-|  |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  |  BinOp
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |  |  |  |  |  |  |  ConcatOperandList
+|  |  |  |  |  |  |  |  |  |  |  |  ConcatOperand
+|  |  |  |  |  |  |  |  |  |  |  |  |  OpConcat
 |  |  |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot
-|  |  |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |  |  |  |  |  |  |  |  |  CallExpr
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  Id
+|  |  |  |  |  |  |  |  |  |  |  |  |  |   
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  BinOp
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |   
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |   
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int
 |  |  |  |  |  AdaNodeList
 |  |  |  |   
 |  |  |  |  --  Prints "Hi John"
@@ -2171,20 +2182,22 @@ CompilationUnitList
 |  |  |  |  |  |  |  |   
 |  |  |  |  |  |  |  |  AssocList
 |  |  |  |  |  |  |  |  |  ParamAssoc
-|  |  |  |  |  |  |  |  |  |  BinOp
+|  |  |  |  |  |  |  |  |  |  ConcatOp
 |  |  |  |  |  |  |  |  |  |  |  Str
 |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  OpConcat
-|  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  CallExpr
-|  |  |  |  |  |  |  |  |  |  |  |  Id
-|  |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  |  BinOp
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |  |  |  |  |  |  |  ConcatOperandList
+|  |  |  |  |  |  |  |  |  |  |  |  ConcatOperand
+|  |  |  |  |  |  |  |  |  |  |  |  |  OpConcat
 |  |  |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot
-|  |  |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |  |  |  |  |  |  |  |  |  CallExpr
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  Id
+|  |  |  |  |  |  |  |  |  |  |  |  |  |   
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  BinOp
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |   
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |   
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int
 |  |  |  |  |  AdaNodeList
 |  |  |  |   
 |  |  |  |  --  Prints "Hi John"
@@ -2328,23 +2341,26 @@ CompilationUnitList[1:1-43:20]
 |  |  |  |  |  |  |  |  |  ParamAssoc[14:14-14:40]
 |  |  |  |  |  |  |  |  |  |f_designator: <null>
 |  |  |  |  |  |  |  |  |  |f_r_expr:
-|  |  |  |  |  |  |  |  |  |  BinOp[14:14-14:40]
-|  |  |  |  |  |  |  |  |  |  |f_left:
+|  |  |  |  |  |  |  |  |  |  ConcatOp[14:14-14:40]
+|  |  |  |  |  |  |  |  |  |  |f_first_operand:
 |  |  |  |  |  |  |  |  |  |  |  Str[14:14-14:19]: "Hi "
-|  |  |  |  |  |  |  |  |  |  |f_op:
-|  |  |  |  |  |  |  |  |  |  |  OpConcat[14:20-14:21]
-|  |  |  |  |  |  |  |  |  |  |f_right:
-|  |  |  |  |  |  |  |  |  |  |  CallExpr[14:22-14:40]
-|  |  |  |  |  |  |  |  |  |  |  |f_name:
-|  |  |  |  |  |  |  |  |  |  |  |  Id[14:22-14:31]: Full_Name
-|  |  |  |  |  |  |  |  |  |  |  |f_suffix:
-|  |  |  |  |  |  |  |  |  |  |  |  BinOp[14:33-14:39]
-|  |  |  |  |  |  |  |  |  |  |  |  |f_left:
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int[14:33-14:34]: 1
-|  |  |  |  |  |  |  |  |  |  |  |  |f_op:
-|  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot[14:35-14:37]
-|  |  |  |  |  |  |  |  |  |  |  |  |f_right:
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int[14:38-14:39]: 4
+|  |  |  |  |  |  |  |  |  |  |f_other_operands:
+|  |  |  |  |  |  |  |  |  |  |  ConcatOperandList[14:20-14:40]
+|  |  |  |  |  |  |  |  |  |  |  |  ConcatOperand[14:20-14:40]
+|  |  |  |  |  |  |  |  |  |  |  |  |f_operator:
+|  |  |  |  |  |  |  |  |  |  |  |  |  OpConcat[14:20-14:21]
+|  |  |  |  |  |  |  |  |  |  |  |  |f_operand:
+|  |  |  |  |  |  |  |  |  |  |  |  |  CallExpr[14:22-14:40]
+|  |  |  |  |  |  |  |  |  |  |  |  |  |f_name:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  Id[14:22-14:31]: Full_Name
+|  |  |  |  |  |  |  |  |  |  |  |  |  |f_suffix:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  BinOp[14:33-14:39]
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_left:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[14:33-14:34]: 1
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_op:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot[14:35-14:37]
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_right:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[14:38-14:39]: 4
 |  |  |  |  |f_exceptions:
 |  |  |  |  |  AdaNodeList[14:41-14:41]: <empty list>
 |  |  |  |f_end_name:
@@ -2465,23 +2481,26 @@ CompilationUnitList[1:1-43:20]
 |  |  |  |  |  |  |  |  |  ParamAssoc[28:14-28:40]
 |  |  |  |  |  |  |  |  |  |f_designator: <null>
 |  |  |  |  |  |  |  |  |  |f_r_expr:
-|  |  |  |  |  |  |  |  |  |  BinOp[28:14-28:40]
-|  |  |  |  |  |  |  |  |  |  |f_left:
+|  |  |  |  |  |  |  |  |  |  ConcatOp[28:14-28:40]
+|  |  |  |  |  |  |  |  |  |  |f_first_operand:
 |  |  |  |  |  |  |  |  |  |  |  Str[28:14-28:19]: "Hi "
-|  |  |  |  |  |  |  |  |  |  |f_op:
-|  |  |  |  |  |  |  |  |  |  |  OpConcat[28:20-28:21]
-|  |  |  |  |  |  |  |  |  |  |f_right:
-|  |  |  |  |  |  |  |  |  |  |  CallExpr[28:22-28:40]
-|  |  |  |  |  |  |  |  |  |  |  |f_name:
-|  |  |  |  |  |  |  |  |  |  |  |  Id[28:22-28:31]: Full_Name
-|  |  |  |  |  |  |  |  |  |  |  |f_suffix:
-|  |  |  |  |  |  |  |  |  |  |  |  BinOp[28:33-28:39]
-|  |  |  |  |  |  |  |  |  |  |  |  |f_left:
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int[28:33-28:34]: 1
-|  |  |  |  |  |  |  |  |  |  |  |  |f_op:
-|  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot[28:35-28:37]
-|  |  |  |  |  |  |  |  |  |  |  |  |f_right:
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int[28:38-28:39]: 4
+|  |  |  |  |  |  |  |  |  |  |f_other_operands:
+|  |  |  |  |  |  |  |  |  |  |  ConcatOperandList[28:20-28:40]
+|  |  |  |  |  |  |  |  |  |  |  |  ConcatOperand[28:20-28:40]
+|  |  |  |  |  |  |  |  |  |  |  |  |f_operator:
+|  |  |  |  |  |  |  |  |  |  |  |  |  OpConcat[28:20-28:21]
+|  |  |  |  |  |  |  |  |  |  |  |  |f_operand:
+|  |  |  |  |  |  |  |  |  |  |  |  |  CallExpr[28:22-28:40]
+|  |  |  |  |  |  |  |  |  |  |  |  |  |f_name:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  Id[28:22-28:31]: Full_Name
+|  |  |  |  |  |  |  |  |  |  |  |  |  |f_suffix:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  BinOp[28:33-28:39]
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_left:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[28:33-28:34]: 1
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_op:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot[28:35-28:37]
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_right:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[28:38-28:39]: 4
 |  |  |  |  |f_exceptions:
 |  |  |  |  |  AdaNodeList[28:41-28:41]: <empty list>
 |  |  |  |f_end_name:
@@ -2602,23 +2621,26 @@ CompilationUnitList[1:1-43:20]
 |  |  |  |  |  |  |  |  |  ParamAssoc[42:14-42:40]
 |  |  |  |  |  |  |  |  |  |f_designator: <null>
 |  |  |  |  |  |  |  |  |  |f_r_expr:
-|  |  |  |  |  |  |  |  |  |  BinOp[42:14-42:40]
-|  |  |  |  |  |  |  |  |  |  |f_left:
+|  |  |  |  |  |  |  |  |  |  ConcatOp[42:14-42:40]
+|  |  |  |  |  |  |  |  |  |  |f_first_operand:
 |  |  |  |  |  |  |  |  |  |  |  Str[42:14-42:19]: "Hi "
-|  |  |  |  |  |  |  |  |  |  |f_op:
-|  |  |  |  |  |  |  |  |  |  |  OpConcat[42:20-42:21]
-|  |  |  |  |  |  |  |  |  |  |f_right:
-|  |  |  |  |  |  |  |  |  |  |  CallExpr[42:22-42:40]
-|  |  |  |  |  |  |  |  |  |  |  |f_name:
-|  |  |  |  |  |  |  |  |  |  |  |  Id[42:22-42:31]: Full_Name
-|  |  |  |  |  |  |  |  |  |  |  |f_suffix:
-|  |  |  |  |  |  |  |  |  |  |  |  BinOp[42:33-42:39]
-|  |  |  |  |  |  |  |  |  |  |  |  |f_left:
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int[42:33-42:34]: 1
-|  |  |  |  |  |  |  |  |  |  |  |  |f_op:
-|  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot[42:35-42:37]
-|  |  |  |  |  |  |  |  |  |  |  |  |f_right:
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int[42:38-42:39]: 4
+|  |  |  |  |  |  |  |  |  |  |f_other_operands:
+|  |  |  |  |  |  |  |  |  |  |  ConcatOperandList[42:20-42:40]
+|  |  |  |  |  |  |  |  |  |  |  |  ConcatOperand[42:20-42:40]
+|  |  |  |  |  |  |  |  |  |  |  |  |f_operator:
+|  |  |  |  |  |  |  |  |  |  |  |  |  OpConcat[42:20-42:21]
+|  |  |  |  |  |  |  |  |  |  |  |  |f_operand:
+|  |  |  |  |  |  |  |  |  |  |  |  |  CallExpr[42:22-42:40]
+|  |  |  |  |  |  |  |  |  |  |  |  |  |f_name:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  Id[42:22-42:31]: Full_Name
+|  |  |  |  |  |  |  |  |  |  |  |  |  |f_suffix:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  BinOp[42:33-42:39]
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_left:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[42:33-42:34]: 1
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_op:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot[42:35-42:37]
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_right:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[42:38-42:39]: 4
 |  |  |  |  |f_exceptions:
 |  |  |  |  |  AdaNodeList[42:41-42:41]: <empty list>
 |  |  |  |f_end_name:
@@ -2728,20 +2750,22 @@ CompilationUnitList
 |  |  |  |  |  |  |  |   
 |  |  |  |  |  |  |  |  AssocList
 |  |  |  |  |  |  |  |  |  ParamAssoc
-|  |  |  |  |  |  |  |  |  |  BinOp
+|  |  |  |  |  |  |  |  |  |  ConcatOp
 |  |  |  |  |  |  |  |  |  |  |  Str
 |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  OpConcat
-|  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  CallExpr
-|  |  |  |  |  |  |  |  |  |  |  |  Id
-|  |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  |  BinOp
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |  |  |  |  |  |  |  ConcatOperandList
+|  |  |  |  |  |  |  |  |  |  |  |  ConcatOperand
+|  |  |  |  |  |  |  |  |  |  |  |  |  OpConcat
 |  |  |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot
-|  |  |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |  |  |  |  |  |  |  |  |  CallExpr
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  Id
+|  |  |  |  |  |  |  |  |  |  |  |  |  |   
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  BinOp
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |   
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |   
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int
 |  |  |  |  |  AdaNodeList
 |  |  |  |   
 |  |  |  |  --  Prints "Hi John"
@@ -2836,20 +2860,22 @@ CompilationUnitList
 |  |  |  |  |  |  |  |   
 |  |  |  |  |  |  |  |  AssocList
 |  |  |  |  |  |  |  |  |  ParamAssoc
-|  |  |  |  |  |  |  |  |  |  BinOp
+|  |  |  |  |  |  |  |  |  |  ConcatOp
 |  |  |  |  |  |  |  |  |  |  |  Str
 |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  OpConcat
-|  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  CallExpr
-|  |  |  |  |  |  |  |  |  |  |  |  Id
-|  |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  |  BinOp
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |  |  |  |  |  |  |  ConcatOperandList
+|  |  |  |  |  |  |  |  |  |  |  |  ConcatOperand
+|  |  |  |  |  |  |  |  |  |  |  |  |  OpConcat
 |  |  |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot
-|  |  |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |  |  |  |  |  |  |  |  |  CallExpr
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  Id
+|  |  |  |  |  |  |  |  |  |  |  |  |  |   
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  BinOp
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |   
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |   
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int
 |  |  |  |  |  AdaNodeList
 |  |  |  |   
 |  |  |  |  --  Prints "Hi John"
@@ -2944,20 +2970,22 @@ CompilationUnitList
 |  |  |  |  |  |  |  |   
 |  |  |  |  |  |  |  |  AssocList
 |  |  |  |  |  |  |  |  |  ParamAssoc
-|  |  |  |  |  |  |  |  |  |  BinOp
+|  |  |  |  |  |  |  |  |  |  ConcatOp
 |  |  |  |  |  |  |  |  |  |  |  Str
 |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  OpConcat
-|  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  CallExpr
-|  |  |  |  |  |  |  |  |  |  |  |  Id
-|  |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  |  BinOp
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |  |  |  |  |  |  |  ConcatOperandList
+|  |  |  |  |  |  |  |  |  |  |  |  ConcatOperand
+|  |  |  |  |  |  |  |  |  |  |  |  |  OpConcat
 |  |  |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot
-|  |  |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |  |  |  |  |  |  |  |  |  CallExpr
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  Id
+|  |  |  |  |  |  |  |  |  |  |  |  |  |   
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  BinOp
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |   
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |   
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int
 |  |  |  |  |  AdaNodeList
 |  |  |  |   
 |  |  |  |  --  Prints "Hi John"
@@ -3093,24 +3121,28 @@ CompilationUnitList
                      <--Walk: <Id "Put_Line" playground_1.adb:14:4-14:12>
                      -->Walk: <AssocList playground_1.adb:14:14-14:40>
                         -->Walk: <ParamAssoc playground_1.adb:14:14-14:40>
-                           -->Walk: <BinOp playground_1.adb:14:14-14:40>
+                           -->Walk: <ConcatOp playground_1.adb:14:14-14:40>
                               -->Walk: <Str ""Hi "" playground_1.adb:14:14-14:19>
                               <--Walk: <Str ""Hi "" playground_1.adb:14:14-14:19>
-                              -->Walk: <OpConcat "&" playground_1.adb:14:20-14:21>
-                              <--Walk: <OpConcat "&" playground_1.adb:14:20-14:21>
-                              -->Walk: <CallExpr playground_1.adb:14:22-14:40>
-                                 -->Walk: <Id "Full_Name" playground_1.adb:14:22-14:31>
-                                 <--Walk: <Id "Full_Name" playground_1.adb:14:22-14:31>
-                                 -->Walk: <BinOp playground_1.adb:14:33-14:39>
-                                    -->Walk: <Int playground_1.adb:14:33-14:34>
-                                    <--Walk: <Int playground_1.adb:14:33-14:34>
-                                    -->Walk: <OpDoubleDot ".." playground_1.adb:14:35-14:37>
-                                    <--Walk: <OpDoubleDot ".." playground_1.adb:14:35-14:37>
-                                    -->Walk: <Int playground_1.adb:14:38-14:39>
-                                    <--Walk: <Int playground_1.adb:14:38-14:39>
-                                 <--Walk: <BinOp playground_1.adb:14:33-14:39>
-                              <--Walk: <CallExpr playground_1.adb:14:22-14:40>
-                           <--Walk: <BinOp playground_1.adb:14:14-14:40>
+                              -->Walk: <ConcatOperandList playground_1.adb:14:20-14:40>
+                                 -->Walk: <ConcatOperand playground_1.adb:14:20-14:40>
+                                    -->Walk: <OpConcat "&" playground_1.adb:14:20-14:21>
+                                    <--Walk: <OpConcat "&" playground_1.adb:14:20-14:21>
+                                    -->Walk: <CallExpr playground_1.adb:14:22-14:40>
+                                       -->Walk: <Id "Full_Name" playground_1.adb:14:22-14:31>
+                                       <--Walk: <Id "Full_Name" playground_1.adb:14:22-14:31>
+                                       -->Walk: <BinOp playground_1.adb:14:33-14:39>
+                                          -->Walk: <Int playground_1.adb:14:33-14:34>
+                                          <--Walk: <Int playground_1.adb:14:33-14:34>
+                                          -->Walk: <OpDoubleDot ".." playground_1.adb:14:35-14:37>
+                                          <--Walk: <OpDoubleDot ".." playground_1.adb:14:35-14:37>
+                                          -->Walk: <Int playground_1.adb:14:38-14:39>
+                                          <--Walk: <Int playground_1.adb:14:38-14:39>
+                                       <--Walk: <BinOp playground_1.adb:14:33-14:39>
+                                    <--Walk: <CallExpr playground_1.adb:14:22-14:40>
+                                 <--Walk: <ConcatOperand playground_1.adb:14:20-14:40>
+                              <--Walk: <ConcatOperandList playground_1.adb:14:20-14:40>
+                           <--Walk: <ConcatOp playground_1.adb:14:14-14:40>
                         <--Walk: <ParamAssoc playground_1.adb:14:14-14:40>
                      <--Walk: <AssocList playground_1.adb:14:14-14:40>
                   <--Walk: <CallExpr playground_1.adb:14:4-14:41>
@@ -3261,23 +3293,26 @@ CompilationUnitList[1:1-43:20]
 |  |  |  |  |  |  |  |  |  ParamAssoc[14:14-14:40]
 |  |  |  |  |  |  |  |  |  |f_designator: <null>
 |  |  |  |  |  |  |  |  |  |f_r_expr:
-|  |  |  |  |  |  |  |  |  |  BinOp[14:14-14:40]
-|  |  |  |  |  |  |  |  |  |  |f_left:
+|  |  |  |  |  |  |  |  |  |  ConcatOp[14:14-14:40]
+|  |  |  |  |  |  |  |  |  |  |f_first_operand:
 |  |  |  |  |  |  |  |  |  |  |  Str[14:14-14:19]: "Hi "
-|  |  |  |  |  |  |  |  |  |  |f_op:
-|  |  |  |  |  |  |  |  |  |  |  OpConcat[14:20-14:21]
-|  |  |  |  |  |  |  |  |  |  |f_right:
-|  |  |  |  |  |  |  |  |  |  |  CallExpr[14:22-14:40]
-|  |  |  |  |  |  |  |  |  |  |  |f_name:
-|  |  |  |  |  |  |  |  |  |  |  |  Id[14:22-14:31]: Full_Name
-|  |  |  |  |  |  |  |  |  |  |  |f_suffix:
-|  |  |  |  |  |  |  |  |  |  |  |  BinOp[14:33-14:39]
-|  |  |  |  |  |  |  |  |  |  |  |  |f_left:
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int[14:33-14:34]: 1
-|  |  |  |  |  |  |  |  |  |  |  |  |f_op:
-|  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot[14:35-14:37]
-|  |  |  |  |  |  |  |  |  |  |  |  |f_right:
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int[14:38-14:39]: 4
+|  |  |  |  |  |  |  |  |  |  |f_other_operands:
+|  |  |  |  |  |  |  |  |  |  |  ConcatOperandList[14:20-14:40]
+|  |  |  |  |  |  |  |  |  |  |  |  ConcatOperand[14:20-14:40]
+|  |  |  |  |  |  |  |  |  |  |  |  |f_operator:
+|  |  |  |  |  |  |  |  |  |  |  |  |  OpConcat[14:20-14:21]
+|  |  |  |  |  |  |  |  |  |  |  |  |f_operand:
+|  |  |  |  |  |  |  |  |  |  |  |  |  CallExpr[14:22-14:40]
+|  |  |  |  |  |  |  |  |  |  |  |  |  |f_name:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  Id[14:22-14:31]: Full_Name
+|  |  |  |  |  |  |  |  |  |  |  |  |  |f_suffix:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  BinOp[14:33-14:39]
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_left:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[14:33-14:34]: 1
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_op:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot[14:35-14:37]
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_right:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[14:38-14:39]: 4
 |  |  |  |  |f_exceptions:
 |  |  |  |  |  AdaNodeList[14:41-14:41]: <empty list>
 |  |  |  |f_end_name:
@@ -3398,23 +3433,26 @@ CompilationUnitList[1:1-43:20]
 |  |  |  |  |  |  |  |  |  ParamAssoc[28:14-28:40]
 |  |  |  |  |  |  |  |  |  |f_designator: <null>
 |  |  |  |  |  |  |  |  |  |f_r_expr:
-|  |  |  |  |  |  |  |  |  |  BinOp[28:14-28:40]
-|  |  |  |  |  |  |  |  |  |  |f_left:
+|  |  |  |  |  |  |  |  |  |  ConcatOp[28:14-28:40]
+|  |  |  |  |  |  |  |  |  |  |f_first_operand:
 |  |  |  |  |  |  |  |  |  |  |  Str[28:14-28:19]: "Hi "
-|  |  |  |  |  |  |  |  |  |  |f_op:
-|  |  |  |  |  |  |  |  |  |  |  OpConcat[28:20-28:21]
-|  |  |  |  |  |  |  |  |  |  |f_right:
-|  |  |  |  |  |  |  |  |  |  |  CallExpr[28:22-28:40]
-|  |  |  |  |  |  |  |  |  |  |  |f_name:
-|  |  |  |  |  |  |  |  |  |  |  |  Id[28:22-28:31]: Full_Name
-|  |  |  |  |  |  |  |  |  |  |  |f_suffix:
-|  |  |  |  |  |  |  |  |  |  |  |  BinOp[28:33-28:39]
-|  |  |  |  |  |  |  |  |  |  |  |  |f_left:
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int[28:33-28:34]: 1
-|  |  |  |  |  |  |  |  |  |  |  |  |f_op:
-|  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot[28:35-28:37]
-|  |  |  |  |  |  |  |  |  |  |  |  |f_right:
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int[28:38-28:39]: 4
+|  |  |  |  |  |  |  |  |  |  |f_other_operands:
+|  |  |  |  |  |  |  |  |  |  |  ConcatOperandList[28:20-28:40]
+|  |  |  |  |  |  |  |  |  |  |  |  ConcatOperand[28:20-28:40]
+|  |  |  |  |  |  |  |  |  |  |  |  |f_operator:
+|  |  |  |  |  |  |  |  |  |  |  |  |  OpConcat[28:20-28:21]
+|  |  |  |  |  |  |  |  |  |  |  |  |f_operand:
+|  |  |  |  |  |  |  |  |  |  |  |  |  CallExpr[28:22-28:40]
+|  |  |  |  |  |  |  |  |  |  |  |  |  |f_name:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  Id[28:22-28:31]: Full_Name
+|  |  |  |  |  |  |  |  |  |  |  |  |  |f_suffix:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  BinOp[28:33-28:39]
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_left:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[28:33-28:34]: 1
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_op:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot[28:35-28:37]
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_right:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[28:38-28:39]: 4
 |  |  |  |  |f_exceptions:
 |  |  |  |  |  AdaNodeList[28:41-28:41]: <empty list>
 |  |  |  |f_end_name:
@@ -3535,23 +3573,26 @@ CompilationUnitList[1:1-43:20]
 |  |  |  |  |  |  |  |  |  ParamAssoc[42:14-42:40]
 |  |  |  |  |  |  |  |  |  |f_designator: <null>
 |  |  |  |  |  |  |  |  |  |f_r_expr:
-|  |  |  |  |  |  |  |  |  |  BinOp[42:14-42:40]
-|  |  |  |  |  |  |  |  |  |  |f_left:
+|  |  |  |  |  |  |  |  |  |  ConcatOp[42:14-42:40]
+|  |  |  |  |  |  |  |  |  |  |f_first_operand:
 |  |  |  |  |  |  |  |  |  |  |  Str[42:14-42:19]: "Hi "
-|  |  |  |  |  |  |  |  |  |  |f_op:
-|  |  |  |  |  |  |  |  |  |  |  OpConcat[42:20-42:21]
-|  |  |  |  |  |  |  |  |  |  |f_right:
-|  |  |  |  |  |  |  |  |  |  |  CallExpr[42:22-42:40]
-|  |  |  |  |  |  |  |  |  |  |  |f_name:
-|  |  |  |  |  |  |  |  |  |  |  |  Id[42:22-42:31]: Full_Name
-|  |  |  |  |  |  |  |  |  |  |  |f_suffix:
-|  |  |  |  |  |  |  |  |  |  |  |  BinOp[42:33-42:39]
-|  |  |  |  |  |  |  |  |  |  |  |  |f_left:
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int[42:33-42:34]: 1
-|  |  |  |  |  |  |  |  |  |  |  |  |f_op:
-|  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot[42:35-42:37]
-|  |  |  |  |  |  |  |  |  |  |  |  |f_right:
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int[42:38-42:39]: 4
+|  |  |  |  |  |  |  |  |  |  |f_other_operands:
+|  |  |  |  |  |  |  |  |  |  |  ConcatOperandList[42:20-42:40]
+|  |  |  |  |  |  |  |  |  |  |  |  ConcatOperand[42:20-42:40]
+|  |  |  |  |  |  |  |  |  |  |  |  |f_operator:
+|  |  |  |  |  |  |  |  |  |  |  |  |  OpConcat[42:20-42:21]
+|  |  |  |  |  |  |  |  |  |  |  |  |f_operand:
+|  |  |  |  |  |  |  |  |  |  |  |  |  CallExpr[42:22-42:40]
+|  |  |  |  |  |  |  |  |  |  |  |  |  |f_name:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  Id[42:22-42:31]: Full_Name
+|  |  |  |  |  |  |  |  |  |  |  |  |  |f_suffix:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  BinOp[42:33-42:39]
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_left:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[42:33-42:34]: 1
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_op:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot[42:35-42:37]
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_right:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[42:38-42:39]: 4
 |  |  |  |  |f_exceptions:
 |  |  |  |  |  AdaNodeList[42:41-42:41]: <empty list>
 |  |  |  |f_end_name:
@@ -3661,20 +3702,22 @@ CompilationUnitList
 |  |  |  |  |  |  |  |   
 |  |  |  |  |  |  |  |  AssocList
 |  |  |  |  |  |  |  |  |  ParamAssoc
-|  |  |  |  |  |  |  |  |  |  BinOp
+|  |  |  |  |  |  |  |  |  |  ConcatOp
 |  |  |  |  |  |  |  |  |  |  |  Str
 |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  OpConcat
-|  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  CallExpr
-|  |  |  |  |  |  |  |  |  |  |  |  Id
-|  |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  |  BinOp
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |  |  |  |  |  |  |  ConcatOperandList
+|  |  |  |  |  |  |  |  |  |  |  |  ConcatOperand
+|  |  |  |  |  |  |  |  |  |  |  |  |  OpConcat
 |  |  |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot
-|  |  |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |  |  |  |  |  |  |  |  |  CallExpr
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  Id
+|  |  |  |  |  |  |  |  |  |  |  |  |  |   
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  BinOp
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |   
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |   
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int
 |  |  |  |  |  AdaNodeList
 |  |  |  |   
 |  |  |  |  --  Prints "Hi John"
@@ -3769,20 +3812,22 @@ CompilationUnitList
 |  |  |  |  |  |  |  |   
 |  |  |  |  |  |  |  |  AssocList
 |  |  |  |  |  |  |  |  |  ParamAssoc
-|  |  |  |  |  |  |  |  |  |  BinOp
+|  |  |  |  |  |  |  |  |  |  ConcatOp
 |  |  |  |  |  |  |  |  |  |  |  Str
 |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  OpConcat
-|  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  CallExpr
-|  |  |  |  |  |  |  |  |  |  |  |  Id
-|  |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  |  BinOp
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |  |  |  |  |  |  |  ConcatOperandList
+|  |  |  |  |  |  |  |  |  |  |  |  ConcatOperand
+|  |  |  |  |  |  |  |  |  |  |  |  |  OpConcat
 |  |  |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot
-|  |  |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |  |  |  |  |  |  |  |  |  CallExpr
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  Id
+|  |  |  |  |  |  |  |  |  |  |  |  |  |   
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  BinOp
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |   
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |   
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int
 |  |  |  |  |  AdaNodeList
 |  |  |  |   
 |  |  |  |  --  Prints "Hi John"
@@ -3877,20 +3922,22 @@ CompilationUnitList
 |  |  |  |  |  |  |  |   
 |  |  |  |  |  |  |  |  AssocList
 |  |  |  |  |  |  |  |  |  ParamAssoc
-|  |  |  |  |  |  |  |  |  |  BinOp
+|  |  |  |  |  |  |  |  |  |  ConcatOp
 |  |  |  |  |  |  |  |  |  |  |  Str
 |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  OpConcat
-|  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  CallExpr
-|  |  |  |  |  |  |  |  |  |  |  |  Id
-|  |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  |  BinOp
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |  |  |  |  |  |  |  ConcatOperandList
+|  |  |  |  |  |  |  |  |  |  |  |  ConcatOperand
+|  |  |  |  |  |  |  |  |  |  |  |  |  OpConcat
 |  |  |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot
-|  |  |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |  |  |  |  |  |  |  |  |  CallExpr
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  Id
+|  |  |  |  |  |  |  |  |  |  |  |  |  |   
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  BinOp
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |   
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |   
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int
 |  |  |  |  |  AdaNodeList
 |  |  |  |   
 |  |  |  |  --  Prints "Hi John"
@@ -4002,24 +4049,28 @@ CompilationUnitList
                      <--Walk: <Id "Put_Line" playground_1.adb:28:4-28:12>
                      -->Walk: <AssocList playground_1.adb:28:14-28:40>
                         -->Walk: <ParamAssoc playground_1.adb:28:14-28:40>
-                           -->Walk: <BinOp playground_1.adb:28:14-28:40>
+                           -->Walk: <ConcatOp playground_1.adb:28:14-28:40>
                               -->Walk: <Str ""Hi "" playground_1.adb:28:14-28:19>
                               <--Walk: <Str ""Hi "" playground_1.adb:28:14-28:19>
-                              -->Walk: <OpConcat "&" playground_1.adb:28:20-28:21>
-                              <--Walk: <OpConcat "&" playground_1.adb:28:20-28:21>
-                              -->Walk: <CallExpr playground_1.adb:28:22-28:40>
-                                 -->Walk: <Id "Full_Name" playground_1.adb:28:22-28:31>
-                                 <--Walk: <Id "Full_Name" playground_1.adb:28:22-28:31>
-                                 -->Walk: <BinOp playground_1.adb:28:33-28:39>
-                                    -->Walk: <Int playground_1.adb:28:33-28:34>
-                                    <--Walk: <Int playground_1.adb:28:33-28:34>
-                                    -->Walk: <OpDoubleDot ".." playground_1.adb:28:35-28:37>
-                                    <--Walk: <OpDoubleDot ".." playground_1.adb:28:35-28:37>
-                                    -->Walk: <Int playground_1.adb:28:38-28:39>
-                                    <--Walk: <Int playground_1.adb:28:38-28:39>
-                                 <--Walk: <BinOp playground_1.adb:28:33-28:39>
-                              <--Walk: <CallExpr playground_1.adb:28:22-28:40>
-                           <--Walk: <BinOp playground_1.adb:28:14-28:40>
+                              -->Walk: <ConcatOperandList playground_1.adb:28:20-28:40>
+                                 -->Walk: <ConcatOperand playground_1.adb:28:20-28:40>
+                                    -->Walk: <OpConcat "&" playground_1.adb:28:20-28:21>
+                                    <--Walk: <OpConcat "&" playground_1.adb:28:20-28:21>
+                                    -->Walk: <CallExpr playground_1.adb:28:22-28:40>
+                                       -->Walk: <Id "Full_Name" playground_1.adb:28:22-28:31>
+                                       <--Walk: <Id "Full_Name" playground_1.adb:28:22-28:31>
+                                       -->Walk: <BinOp playground_1.adb:28:33-28:39>
+                                          -->Walk: <Int playground_1.adb:28:33-28:34>
+                                          <--Walk: <Int playground_1.adb:28:33-28:34>
+                                          -->Walk: <OpDoubleDot ".." playground_1.adb:28:35-28:37>
+                                          <--Walk: <OpDoubleDot ".." playground_1.adb:28:35-28:37>
+                                          -->Walk: <Int playground_1.adb:28:38-28:39>
+                                          <--Walk: <Int playground_1.adb:28:38-28:39>
+                                       <--Walk: <BinOp playground_1.adb:28:33-28:39>
+                                    <--Walk: <CallExpr playground_1.adb:28:22-28:40>
+                                 <--Walk: <ConcatOperand playground_1.adb:28:20-28:40>
+                              <--Walk: <ConcatOperandList playground_1.adb:28:20-28:40>
+                           <--Walk: <ConcatOp playground_1.adb:28:14-28:40>
                         <--Walk: <ParamAssoc playground_1.adb:28:14-28:40>
                      <--Walk: <AssocList playground_1.adb:28:14-28:40>
                   <--Walk: <CallExpr playground_1.adb:28:4-28:41>
@@ -4170,23 +4221,26 @@ CompilationUnitList[1:1-43:20]
 |  |  |  |  |  |  |  |  |  ParamAssoc[14:14-14:40]
 |  |  |  |  |  |  |  |  |  |f_designator: <null>
 |  |  |  |  |  |  |  |  |  |f_r_expr:
-|  |  |  |  |  |  |  |  |  |  BinOp[14:14-14:40]
-|  |  |  |  |  |  |  |  |  |  |f_left:
+|  |  |  |  |  |  |  |  |  |  ConcatOp[14:14-14:40]
+|  |  |  |  |  |  |  |  |  |  |f_first_operand:
 |  |  |  |  |  |  |  |  |  |  |  Str[14:14-14:19]: "Hi "
-|  |  |  |  |  |  |  |  |  |  |f_op:
-|  |  |  |  |  |  |  |  |  |  |  OpConcat[14:20-14:21]
-|  |  |  |  |  |  |  |  |  |  |f_right:
-|  |  |  |  |  |  |  |  |  |  |  CallExpr[14:22-14:40]
-|  |  |  |  |  |  |  |  |  |  |  |f_name:
-|  |  |  |  |  |  |  |  |  |  |  |  Id[14:22-14:31]: Full_Name
-|  |  |  |  |  |  |  |  |  |  |  |f_suffix:
-|  |  |  |  |  |  |  |  |  |  |  |  BinOp[14:33-14:39]
-|  |  |  |  |  |  |  |  |  |  |  |  |f_left:
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int[14:33-14:34]: 1
-|  |  |  |  |  |  |  |  |  |  |  |  |f_op:
-|  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot[14:35-14:37]
-|  |  |  |  |  |  |  |  |  |  |  |  |f_right:
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int[14:38-14:39]: 4
+|  |  |  |  |  |  |  |  |  |  |f_other_operands:
+|  |  |  |  |  |  |  |  |  |  |  ConcatOperandList[14:20-14:40]
+|  |  |  |  |  |  |  |  |  |  |  |  ConcatOperand[14:20-14:40]
+|  |  |  |  |  |  |  |  |  |  |  |  |f_operator:
+|  |  |  |  |  |  |  |  |  |  |  |  |  OpConcat[14:20-14:21]
+|  |  |  |  |  |  |  |  |  |  |  |  |f_operand:
+|  |  |  |  |  |  |  |  |  |  |  |  |  CallExpr[14:22-14:40]
+|  |  |  |  |  |  |  |  |  |  |  |  |  |f_name:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  Id[14:22-14:31]: Full_Name
+|  |  |  |  |  |  |  |  |  |  |  |  |  |f_suffix:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  BinOp[14:33-14:39]
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_left:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[14:33-14:34]: 1
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_op:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot[14:35-14:37]
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_right:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[14:38-14:39]: 4
 |  |  |  |  |f_exceptions:
 |  |  |  |  |  AdaNodeList[14:41-14:41]: <empty list>
 |  |  |  |f_end_name:
@@ -4307,23 +4361,26 @@ CompilationUnitList[1:1-43:20]
 |  |  |  |  |  |  |  |  |  ParamAssoc[28:14-28:40]
 |  |  |  |  |  |  |  |  |  |f_designator: <null>
 |  |  |  |  |  |  |  |  |  |f_r_expr:
-|  |  |  |  |  |  |  |  |  |  BinOp[28:14-28:40]
-|  |  |  |  |  |  |  |  |  |  |f_left:
+|  |  |  |  |  |  |  |  |  |  ConcatOp[28:14-28:40]
+|  |  |  |  |  |  |  |  |  |  |f_first_operand:
 |  |  |  |  |  |  |  |  |  |  |  Str[28:14-28:19]: "Hi "
-|  |  |  |  |  |  |  |  |  |  |f_op:
-|  |  |  |  |  |  |  |  |  |  |  OpConcat[28:20-28:21]
-|  |  |  |  |  |  |  |  |  |  |f_right:
-|  |  |  |  |  |  |  |  |  |  |  CallExpr[28:22-28:40]
-|  |  |  |  |  |  |  |  |  |  |  |f_name:
-|  |  |  |  |  |  |  |  |  |  |  |  Id[28:22-28:31]: Full_Name
-|  |  |  |  |  |  |  |  |  |  |  |f_suffix:
-|  |  |  |  |  |  |  |  |  |  |  |  BinOp[28:33-28:39]
-|  |  |  |  |  |  |  |  |  |  |  |  |f_left:
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int[28:33-28:34]: 1
-|  |  |  |  |  |  |  |  |  |  |  |  |f_op:
-|  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot[28:35-28:37]
-|  |  |  |  |  |  |  |  |  |  |  |  |f_right:
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int[28:38-28:39]: 4
+|  |  |  |  |  |  |  |  |  |  |f_other_operands:
+|  |  |  |  |  |  |  |  |  |  |  ConcatOperandList[28:20-28:40]
+|  |  |  |  |  |  |  |  |  |  |  |  ConcatOperand[28:20-28:40]
+|  |  |  |  |  |  |  |  |  |  |  |  |f_operator:
+|  |  |  |  |  |  |  |  |  |  |  |  |  OpConcat[28:20-28:21]
+|  |  |  |  |  |  |  |  |  |  |  |  |f_operand:
+|  |  |  |  |  |  |  |  |  |  |  |  |  CallExpr[28:22-28:40]
+|  |  |  |  |  |  |  |  |  |  |  |  |  |f_name:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  Id[28:22-28:31]: Full_Name
+|  |  |  |  |  |  |  |  |  |  |  |  |  |f_suffix:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  BinOp[28:33-28:39]
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_left:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[28:33-28:34]: 1
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_op:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot[28:35-28:37]
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_right:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[28:38-28:39]: 4
 |  |  |  |  |f_exceptions:
 |  |  |  |  |  AdaNodeList[28:41-28:41]: <empty list>
 |  |  |  |f_end_name:
@@ -4444,23 +4501,26 @@ CompilationUnitList[1:1-43:20]
 |  |  |  |  |  |  |  |  |  ParamAssoc[42:14-42:40]
 |  |  |  |  |  |  |  |  |  |f_designator: <null>
 |  |  |  |  |  |  |  |  |  |f_r_expr:
-|  |  |  |  |  |  |  |  |  |  BinOp[42:14-42:40]
-|  |  |  |  |  |  |  |  |  |  |f_left:
+|  |  |  |  |  |  |  |  |  |  ConcatOp[42:14-42:40]
+|  |  |  |  |  |  |  |  |  |  |f_first_operand:
 |  |  |  |  |  |  |  |  |  |  |  Str[42:14-42:19]: "Hi "
-|  |  |  |  |  |  |  |  |  |  |f_op:
-|  |  |  |  |  |  |  |  |  |  |  OpConcat[42:20-42:21]
-|  |  |  |  |  |  |  |  |  |  |f_right:
-|  |  |  |  |  |  |  |  |  |  |  CallExpr[42:22-42:40]
-|  |  |  |  |  |  |  |  |  |  |  |f_name:
-|  |  |  |  |  |  |  |  |  |  |  |  Id[42:22-42:31]: Full_Name
-|  |  |  |  |  |  |  |  |  |  |  |f_suffix:
-|  |  |  |  |  |  |  |  |  |  |  |  BinOp[42:33-42:39]
-|  |  |  |  |  |  |  |  |  |  |  |  |f_left:
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int[42:33-42:34]: 1
-|  |  |  |  |  |  |  |  |  |  |  |  |f_op:
-|  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot[42:35-42:37]
-|  |  |  |  |  |  |  |  |  |  |  |  |f_right:
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int[42:38-42:39]: 4
+|  |  |  |  |  |  |  |  |  |  |f_other_operands:
+|  |  |  |  |  |  |  |  |  |  |  ConcatOperandList[42:20-42:40]
+|  |  |  |  |  |  |  |  |  |  |  |  ConcatOperand[42:20-42:40]
+|  |  |  |  |  |  |  |  |  |  |  |  |f_operator:
+|  |  |  |  |  |  |  |  |  |  |  |  |  OpConcat[42:20-42:21]
+|  |  |  |  |  |  |  |  |  |  |  |  |f_operand:
+|  |  |  |  |  |  |  |  |  |  |  |  |  CallExpr[42:22-42:40]
+|  |  |  |  |  |  |  |  |  |  |  |  |  |f_name:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  Id[42:22-42:31]: Full_Name
+|  |  |  |  |  |  |  |  |  |  |  |  |  |f_suffix:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  BinOp[42:33-42:39]
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_left:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[42:33-42:34]: 1
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_op:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot[42:35-42:37]
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_right:
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[42:38-42:39]: 4
 |  |  |  |  |f_exceptions:
 |  |  |  |  |  AdaNodeList[42:41-42:41]: <empty list>
 |  |  |  |f_end_name:
@@ -4570,20 +4630,22 @@ CompilationUnitList
 |  |  |  |  |  |  |  |   
 |  |  |  |  |  |  |  |  AssocList
 |  |  |  |  |  |  |  |  |  ParamAssoc
-|  |  |  |  |  |  |  |  |  |  BinOp
+|  |  |  |  |  |  |  |  |  |  ConcatOp
 |  |  |  |  |  |  |  |  |  |  |  Str
 |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  OpConcat
-|  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  CallExpr
-|  |  |  |  |  |  |  |  |  |  |  |  Id
-|  |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  |  BinOp
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |  |  |  |  |  |  |  ConcatOperandList
+|  |  |  |  |  |  |  |  |  |  |  |  ConcatOperand
+|  |  |  |  |  |  |  |  |  |  |  |  |  OpConcat
 |  |  |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot
-|  |  |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |  |  |  |  |  |  |  |  |  CallExpr
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  Id
+|  |  |  |  |  |  |  |  |  |  |  |  |  |   
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  BinOp
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |   
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |   
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int
 |  |  |  |  |  AdaNodeList
 |  |  |  |   
 |  |  |  |  --  Prints "Hi John"
@@ -4678,20 +4740,22 @@ CompilationUnitList
 |  |  |  |  |  |  |  |   
 |  |  |  |  |  |  |  |  AssocList
 |  |  |  |  |  |  |  |  |  ParamAssoc
-|  |  |  |  |  |  |  |  |  |  BinOp
+|  |  |  |  |  |  |  |  |  |  ConcatOp
 |  |  |  |  |  |  |  |  |  |  |  Str
 |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  OpConcat
-|  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  CallExpr
-|  |  |  |  |  |  |  |  |  |  |  |  Id
-|  |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  |  BinOp
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |  |  |  |  |  |  |  ConcatOperandList
+|  |  |  |  |  |  |  |  |  |  |  |  ConcatOperand
+|  |  |  |  |  |  |  |  |  |  |  |  |  OpConcat
 |  |  |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot
-|  |  |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |  |  |  |  |  |  |  |  |  CallExpr
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  Id
+|  |  |  |  |  |  |  |  |  |  |  |  |  |   
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  BinOp
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |   
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |   
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int
 |  |  |  |  |  AdaNodeList
 |  |  |  |   
 |  |  |  |  --  Prints "Hi John"
@@ -4786,20 +4850,22 @@ CompilationUnitList
 |  |  |  |  |  |  |  |   
 |  |  |  |  |  |  |  |  AssocList
 |  |  |  |  |  |  |  |  |  ParamAssoc
-|  |  |  |  |  |  |  |  |  |  BinOp
+|  |  |  |  |  |  |  |  |  |  ConcatOp
 |  |  |  |  |  |  |  |  |  |  |  Str
 |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  OpConcat
-|  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  CallExpr
-|  |  |  |  |  |  |  |  |  |  |  |  Id
-|  |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  |  BinOp
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |  |  |  |  |  |  |  ConcatOperandList
+|  |  |  |  |  |  |  |  |  |  |  |  ConcatOperand
+|  |  |  |  |  |  |  |  |  |  |  |  |  OpConcat
 |  |  |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot
-|  |  |  |  |  |  |  |  |  |  |  |  |   
-|  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |  |  |  |  |  |  |  |  |  CallExpr
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  Id
+|  |  |  |  |  |  |  |  |  |  |  |  |  |   
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  BinOp
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |   
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |   
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int
 |  |  |  |  |  AdaNodeList
 |  |  |  |   
 |  |  |  |  --  Prints "Hi John"
@@ -4911,24 +4977,28 @@ CompilationUnitList
                      <--Walk: <Id "Put_Line" playground_1.adb:42:4-42:12>
                      -->Walk: <AssocList playground_1.adb:42:14-42:40>
                         -->Walk: <ParamAssoc playground_1.adb:42:14-42:40>
-                           -->Walk: <BinOp playground_1.adb:42:14-42:40>
+                           -->Walk: <ConcatOp playground_1.adb:42:14-42:40>
                               -->Walk: <Str ""Hi "" playground_1.adb:42:14-42:19>
                               <--Walk: <Str ""Hi "" playground_1.adb:42:14-42:19>
-                              -->Walk: <OpConcat "&" playground_1.adb:42:20-42:21>
-                              <--Walk: <OpConcat "&" playground_1.adb:42:20-42:21>
-                              -->Walk: <CallExpr playground_1.adb:42:22-42:40>
-                                 -->Walk: <Id "Full_Name" playground_1.adb:42:22-42:31>
-                                 <--Walk: <Id "Full_Name" playground_1.adb:42:22-42:31>
-                                 -->Walk: <BinOp playground_1.adb:42:33-42:39>
-                                    -->Walk: <Int playground_1.adb:42:33-42:34>
-                                    <--Walk: <Int playground_1.adb:42:33-42:34>
-                                    -->Walk: <OpDoubleDot ".." playground_1.adb:42:35-42:37>
-                                    <--Walk: <OpDoubleDot ".." playground_1.adb:42:35-42:37>
-                                    -->Walk: <Int playground_1.adb:42:38-42:39>
-                                    <--Walk: <Int playground_1.adb:42:38-42:39>
-                                 <--Walk: <BinOp playground_1.adb:42:33-42:39>
-                              <--Walk: <CallExpr playground_1.adb:42:22-42:40>
-                           <--Walk: <BinOp playground_1.adb:42:14-42:40>
+                              -->Walk: <ConcatOperandList playground_1.adb:42:20-42:40>
+                                 -->Walk: <ConcatOperand playground_1.adb:42:20-42:40>
+                                    -->Walk: <OpConcat "&" playground_1.adb:42:20-42:21>
+                                    <--Walk: <OpConcat "&" playground_1.adb:42:20-42:21>
+                                    -->Walk: <CallExpr playground_1.adb:42:22-42:40>
+                                       -->Walk: <Id "Full_Name" playground_1.adb:42:22-42:31>
+                                       <--Walk: <Id "Full_Name" playground_1.adb:42:22-42:31>
+                                       -->Walk: <BinOp playground_1.adb:42:33-42:39>
+                                          -->Walk: <Int playground_1.adb:42:33-42:34>
+                                          <--Walk: <Int playground_1.adb:42:33-42:34>
+                                          -->Walk: <OpDoubleDot ".." playground_1.adb:42:35-42:37>
+                                          <--Walk: <OpDoubleDot ".." playground_1.adb:42:35-42:37>
+                                          -->Walk: <Int playground_1.adb:42:38-42:39>
+                                          <--Walk: <Int playground_1.adb:42:38-42:39>
+                                       <--Walk: <BinOp playground_1.adb:42:33-42:39>
+                                    <--Walk: <CallExpr playground_1.adb:42:22-42:40>
+                                 <--Walk: <ConcatOperand playground_1.adb:42:20-42:40>
+                              <--Walk: <ConcatOperandList playground_1.adb:42:20-42:40>
+                           <--Walk: <ConcatOp playground_1.adb:42:14-42:40>
                         <--Walk: <ParamAssoc playground_1.adb:42:14-42:40>
                      <--Walk: <AssocList playground_1.adb:42:14-42:40>
                   <--Walk: <CallExpr playground_1.adb:42:4-42:41>

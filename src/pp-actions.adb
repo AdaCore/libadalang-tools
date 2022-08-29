@@ -949,6 +949,7 @@ package body Pp.Actions is
            when Ada_Update_Attribute_Ref =>
              L ("!'[#1!# !]"),
            when Ada_Bin_Op |  Ada_Relation_Op => null,
+           when Ada_Concat_Op | Ada_Concat_Operand => null,
            when Ada_Call_Expr => null,
            when Ada_Case_Expr =>
              L ("case ! is[# ?#~,# ~~]"),
