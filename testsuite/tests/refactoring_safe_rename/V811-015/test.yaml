@@ -1,0 +1,5 @@
+description: |
+    This test checks if the safe rename tool Name_Hidden_Finder ignores
+    references of actual parameters on parameter associations.
+
+driver: shell_script

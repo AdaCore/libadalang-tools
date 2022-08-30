@@ -1627,6 +1627,12 @@ package body Laltools.Refactor.Safe_Rename is
       --  Delegates to Check_Subp_Rename_Conflict after doing necessary
       --  convertions between node types.
 
+      function Is_Safe_Reference (Reference : Base_Id'Class) return Boolean
+        with Pre => not Reference.Is_Null;
+      --  Checks if renaming this reference is always safe. For instance, the
+      --  actual parameter reference in a parameter association is safe to
+      --  be renamed.
+
       --------------------
       -- Check_Conflict --
       --------------------
@@ -1660,6 +1666,21 @@ package body Laltools.Refactor.Safe_Rename is
 
          return False;
       end Check_Conflict;
+
+      -----------------------
+      -- Is_Safe_Reference --
+      -----------------------
+
+      function Is_Safe_Reference (Reference : Base_Id'Class) return Boolean is
+      begin
+         --  For now, only one check is done: if Reference is a reference to
+         --  an actual parameter in a parameter association. These are always
+         --  safe to be renamed.
+         return not Reference.Parent.Is_Null
+           and then (Reference.Parent.Kind in Ada_Param_Assoc
+                     and then Reference.Parent.As_Param_Assoc.F_Designator =
+                       Reference);
+      end Is_Safe_Reference;
 
    begin
       --  If we're renaming a Generic_Subp_Instantiation whose
@@ -1721,7 +1742,9 @@ package body Laltools.Refactor.Safe_Rename is
       --  by another definition, i.e., if they will become references of
       --  another definition.
 
-      for Reference of Self.References loop
+      for Reference of Self.References
+        when not Reference.Is_Null and then not Is_Safe_Reference (Reference)
+      loop
          Reference_Local_Scopes :=
            Difference
              (Find_Visible_Scopes (Reference),
