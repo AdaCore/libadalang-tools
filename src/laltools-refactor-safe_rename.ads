@@ -432,7 +432,7 @@ private
 
    overriding
    function Find (Self : Name_Hidden_Finder) return Rename_Problem'Class;
-   --  Checks if renamin a definition will make it hidden by another one.
+   --  Checks if renaming a definition will make it hidden by another one
 
    type Safe_Renamer is new Refactoring_Tool with
       record
