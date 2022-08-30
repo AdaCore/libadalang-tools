@@ -38,4 +38,20 @@ project Build is
       for Default_Switches ("Ada") use ("-Es");
    end Binder;
 
+   package Linker is
+      case LAL_Tools_Common.Target is
+         when "Windows_NT" =>
+            for Default_Switches ("Ada") use
+              --  V225-006: On Windows, increase the stack size to deal with
+              --  long files.
+              --  This can be removed once the proper fix is done in
+              --  Libadalang - see V810-011 for more info.
+              LAL_Tools_Common.Linker'Switches ("Ada")
+              & ("-Wl,--stack=0xF42400"); -- 16MB
+         when others =>
+            for Default_Switches ("Ada") use
+              LAL_Tools_Common.Linker'Switches ("Ada");
+      end case;
+   end Linker;
+
 end Build;
