@@ -684,8 +684,9 @@ package body Pp.Actions is
            when Ada_Enum_Lit_Synth_Type_Expr => null,
             --  ???The above are not used
 
-           when Ada_Predefined_Bin_Op_Spec => null,
-           when Ada_Predefined_Un_Op_Spec => null,
+           when Ada_Type_Attributes_Repository => null,
+           when Ada_Synthetic_Binary_Spec => null,
+           when Ada_Synthetic_Unary_Spec => null,
            when Ada_Synthetic_Formal_Param_Decl => null,
            when Ada_Synthetic_Subp_Decl => null,
            when Ada_Synthetic_Defining_Name => null,

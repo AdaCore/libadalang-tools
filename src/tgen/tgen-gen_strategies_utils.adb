@@ -271,9 +271,9 @@ package body TGen.Gen_Strategies_Utils is
             => return No_Params;
          when Ada_Subp_Spec_Range
             => return Subp_Spec.As_Subp_Spec.F_Subp_Params;
-         when Ada_Predefined_Bin_Op_Spec
+         when Ada_Synthetic_Binary_Spec
             => return No_Params;
-         when Ada_Predefined_Un_Op_Spec
+         when Ada_Synthetic_Unary_Spec
             => return No_Params;
       end case;
    end Get_Subp_Spec_Params;
