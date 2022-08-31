@@ -913,8 +913,15 @@ package body Laltools.Partial_GNATPP is
                S : GNAT.Strings.String_Access :=
                  new String'(To_String (Crt_Line));
             begin
-               Sel.Append (S.all);
-               GNAT.Strings.Free (S);
+               if Idx = Filtered_Arr'Last
+                 and then S'Last > S'First
+               then
+                  Sel.Append (S.all (S'First .. S'Last - 1));
+                  GNAT.Strings.Free (S);
+               else
+                  Sel.Append (S.all);
+                  GNAT.Strings.Free (S);
+               end if;
             end;
          end loop;
          return Sel;
@@ -935,7 +942,7 @@ package body Laltools.Partial_GNATPP is
             End_Line =>
                Filtered_Arr (Filtered_Arr'Last).SLOC.Start_Line,
             End_Column =>
-               Filtered_Arr (Filtered_Arr'Last).SLOC.End_Column));
+               Filtered_Arr (Filtered_Arr'Last).SLOC.End_Column + 1));
       --  Creates the new filtered and reformatted text source location range
 
       --  ORIGINAL SELECTION specifics
@@ -986,7 +993,7 @@ package body Laltools.Partial_GNATPP is
       --  Create the new filtered and formatted selection related informations
       --  to be used by the IDE
       New_Output := Create_Filtered_Output (Filtered_Sel_Arr);
-      New_SL_Range := Create_Filtered_Selection_Range (Filtered_Sel_Arr);
+      New_SL_Range := Create_Filtered_Selection_Range (Orig_Lines_Arr);
 
    end Filter_Initially_Selected_Lines_From_Output;
 
@@ -995,23 +1002,30 @@ package body Laltools.Partial_GNATPP is
    ------------------------
 
    procedure Format_Selection
-     (Main_Unit              : Analysis_Unit;
-      Input_Selection_Range  : Source_Location_Range;
-      Output                 : out Utils.Char_Vectors.Char_Vector;
-      Output_Selection_Range : out Source_Location_Range;
-      PP_Messages            : out Pp.Scanner.Source_Message_Vector;
-      Formatted_Node         : out Ada_Node;
-      PP_Options             : in out Pp.Command_Lines.Cmd_Line;
-      Keep_Source_LB         : Boolean := True)
-
+     (Main_Unit                : Analysis_Unit;
+      Input_Selection_Range    : Source_Location_Range;
+      Output                   : out Utils.Char_Vectors.Char_Vector;
+      Output_Selection_Range   : out Source_Location_Range;
+      PP_Messages              : out Pp.Scanner.Source_Message_Vector;
+      Formatted_Node           : out Ada_Node;
+      PP_Options               : Pp.Command_Lines.Cmd_Line;
+      Force_Source_Line_Breaks : Boolean := True)
    is
       use Pp.Actions;
       use Pp.Command_Lines;
       use Utils.Char_Vectors;
       use Utils.Command_Lines;
 
-      procedure Set_Args (PP_Options : in out Command_Line; Opt : Boolean);
-      --  pragma Unreferenced (Set_Args);
+      Source_Line_Breaks : constant Boolean :=
+        Force_Source_Line_Breaks
+        or else Pp_Boolean_Switches.Arg
+                  (PP_Options, Pp.Command_Lines.Source_Line_Breaks);
+
+      Final_PP_Options : Pp.Command_Lines.Cmd_Line :=
+        Copy_Command_Line (PP_Options);
+
+      procedure Set_Source_Line_Breaks_Switches
+        (PP_Options : in out Command_Line);
       --  This procedure will updates the gnatpp command line switches
       --  if the flag --source-line-breaks is passed to patial_gnatpp.
       --  The gnatpp command line will get --source-line-breaks switch and
@@ -1019,17 +1033,15 @@ package body Laltools.Partial_GNATPP is
       --  incompatibles with this one, in order to get the expected gnatpp
       --  behavior.
 
-      procedure Set_Args (PP_Options : in out Command_Line; Opt : Boolean)
+      procedure Set_Source_Line_Breaks_Switches
+        (PP_Options : in out Command_Line)
       is
          use Pp.Command_Lines.Pp_Boolean_Switches;
          use Pp.Command_Lines.Pp_Flag_Switches;
          use Pp.Command_Lines.Pp_Nat_Switches;
-      begin
-         if not Opt then
-            return;
-         end if;
 
-         Set_Arg (PP_Options, Source_Line_Breaks, True);
+      begin
+         Set_Arg (PP_Options, Pp.Command_Lines.Source_Line_Breaks, True);
          Set_Arg (PP_Options, Comments_Fill, False);
          Set_Arg (PP_Options, Separate_Loop_Then, False);
          Set_Arg (PP_Options, Separate_Then, False);
@@ -1053,7 +1065,7 @@ package body Laltools.Partial_GNATPP is
          Set_Arg (PP_Options, Call_Threshold, Natural'Last);
          Set_Arg (PP_Options, Par_Threshold, Natural'Last);
          Set_Arg (PP_Options, Case_Threshold, Natural'Last);
-      end Set_Args;
+      end Set_Source_Line_Breaks_Switches;
 
       Start_Node, End_Node : Ada_Node;
       Offset               : Natural := 0;
@@ -1064,7 +1076,9 @@ package body Laltools.Partial_GNATPP is
       --  Pass --source-line-breaks to gnatpp and update other potentially
       --  used switches if this is needed based on the partial gnatpp
       --  command line flag
-      Set_Args (PP_Options, Keep_Source_LB);
+      if Source_Line_Breaks then
+         Set_Source_Line_Breaks_Switches (Final_PP_Options);
+      end if;
 
       --  Find the corresponding Start_Node and End_Node given the initial
 
@@ -1112,7 +1126,7 @@ package body Laltools.Partial_GNATPP is
       --  on the closest enclosing parent of the initial selection.
 
       Format_Vector
-        (Cmd            => PP_Options,
+        (Cmd            => Final_PP_Options,
          Input          => Input_Sel,
          Node           => Formatted_Node,
          Output         => Output,
@@ -1123,7 +1137,7 @@ package body Laltools.Partial_GNATPP is
       --  filtered output of the significant lines based on the initial
       --  selection to make text edits only on that part of the code.
 
-      if Keep_Source_LB then
+      if Source_Line_Breaks then
          declare
             New_Output          : Char_Vector;
             New_Output_SL_Range : Source_Location_Range;

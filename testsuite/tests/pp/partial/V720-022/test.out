@@ -1,5 +1,6 @@
 *************************************
 main.adb(<IfStmt main.adb:5:11-11:17>) - 5:1-11:17
+^
       if Item.kind = Snippet then
          declare
             X : Integer;
@@ -7,11 +8,12 @@ main.adb(<IfStmt main.adb:5:11-11:17>) - 5:1-11:17
             null;
          end;
       end if;
-
+$
 *************************************
 
 *************************************
 main.adb(<IfStmt main.adb:5:11-11:17>) - 5:1-11:17
+^
       if Item.kind = Snippet then
          declare
             X : Integer;
@@ -19,11 +21,12 @@ main.adb(<IfStmt main.adb:5:11-11:17>) - 5:1-11:17
             null;
          end;
       end if;
-
+$
 *************************************
 
 *************************************
 main.adb(<ForLoopStmt main.adb:4:4-12:16>) - 4:1-12:16
+^
    for Item of Result loop
       if Item.kind = Snippet then
          declare
@@ -33,27 +36,28 @@ main.adb(<ForLoopStmt main.adb:4:4-12:16>) - 4:1-12:16
          end;
       end if;
    end loop;
-
+$
 *************************************
 
 *************************************
-main.adb(<ForLoopStmt main.adb:4:4-12:16>) - 5:1-5:33
-      if Item.kind = Snippet then
-
+main.adb(<ForLoopStmt main.adb:4:4-12:16>) - 5:1-5:38
+^
+      if Item.kind = Snippet then$
 *************************************
 
 *************************************
-main.adb(<IfStmt main.adb:5:11-11:17>) - 5:1-9:17
+main.adb(<IfStmt main.adb:5:11-11:17>) - 5:1-9:20
+^
       if Item.kind = Snippet then
          declare
             X : Integer;
          begin
-            null;
-
+            null;$
 *************************************
 
 *************************************
 main.adb(<SubpBody ["main"] main.adb:1:1-14:10>) - 1:1-14:10
+^
 procedure main is
 begin
 
@@ -68,6 +72,6 @@ begin
    end loop;
 
 end main;
-
+$
 *************************************
 

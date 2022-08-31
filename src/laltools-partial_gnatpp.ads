@@ -38,14 +38,14 @@ package Laltools.Partial_GNATPP is
    use Laltools.Refactor;
 
    procedure Format_Selection
-     (Main_Unit              : Analysis_Unit;
-      Input_Selection_Range  : Source_Location_Range;
-      Output                 : out Utils.Char_Vectors.Char_Vector;
-      Output_Selection_Range : out Source_Location_Range;
-      PP_Messages            : out Pp.Scanner.Source_Message_Vector;
-      Formatted_Node         : out Ada_Node;
-      PP_Options             : in out Pp.Command_Lines.Cmd_Line;
-      Keep_Source_LB         : Boolean := True);
+     (Main_Unit                : Analysis_Unit;
+      Input_Selection_Range    : Source_Location_Range;
+      Output                   : out Utils.Char_Vectors.Char_Vector;
+      Output_Selection_Range   : out Source_Location_Range;
+      PP_Messages              : out Pp.Scanner.Source_Message_Vector;
+      Formatted_Node           : out Ada_Node;
+      PP_Options               : Pp.Command_Lines.Cmd_Line;
+      Force_Source_Line_Breaks : Boolean := True);
    --  This is the procedure to be called for the IDE integration with the
    --  Ada Language Server for the partial formatting of a text selection.
    --
@@ -55,10 +55,10 @@ package Laltools.Partial_GNATPP is
    --  point for the gnatpp engine is Format_Vector from PP.Actions and is
    --  called during the formatting pass.
    --
-   --  The Keep_Source_LB flag is set by default. This means that the initial
-   --  source line breaks will be preserved during the formatting process and
-   --  only the reformatted initially selected lines will be returned as values
-   --  for Output and Output_Selection_Range.
+   --  The Force_Source_Line_Breaks flag is set by default.
+   --  This means that the initial source line breaks will be preserved during
+   --  the formatting process and only the reformatted initially selected lines
+   --  will be returned as values for Output and Output_Selection_Range.
    --  If this flag is not set then the enclosing parent node of the initial
    --  selection will be rewritten and the Output and Output_Selection_Range
    --  will contain the corresponding values related to this node. In this case

@@ -22,6 +22,7 @@
 ------------------------------------------------------------------------------
 
 with Ada.Assertions;
+with Ada.Characters.Latin_1;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -120,11 +121,12 @@ procedure Partial_GNATpp is
          Default_Val => 1,
          Enabled     => True);
 
-      package Keep_Source_LB is new GNATCOLL.Opt_Parse.Parse_Flag
+      package Source_Line_Breaks is new GNATCOLL.Opt_Parse.Parse_Flag
         (Parser      => Partial_GNATpp_App.Args.Parser,
          Long        => "--source-line-breaks",
          Help        => "Take line breaks only from source",
          Enabled     => True);
+
    end Args;
 
    --------------------------------
@@ -136,6 +138,7 @@ procedure Partial_GNATpp is
       Jobs    : App_Job_Context_Array)
    is
       procedure Setup_Pretty_Printer_Switches;
+
       --  Setups PP_Options by doing the first pass and then checks if this
       --  project has a "Pretty_Printer" package with additional switches.
       --  If so, do a second and final parse to update PP_Options with these.
@@ -147,8 +150,6 @@ procedure Partial_GNATpp is
          Line_Number (Args.End_Line.Get),
          Column_Number (Args.Start_Column.Get),
          Column_Number (Args.End_Column.Get));
-
-      Partial_Gnatpp_SLB   : constant Boolean := Args.Keep_Source_LB.Get;
 
       Main_Unit            : Analysis_Unit;
       Enclosing_Node       : Ada_Node;
@@ -241,14 +242,14 @@ procedure Partial_GNATpp is
       --  Format_Vector of PP.Actions.
 
       Format_Selection
-        (Main_Unit              => Main_Unit,
-         Input_Selection_Range  => Selection_Range,
-         Output                 => Output,
-         Output_Selection_Range => Output_SL_Range,
-         PP_Messages            => Messages,
-         Formatted_Node         => Enclosing_Node,
-         PP_Options             => PP_Options,
-         Keep_Source_LB         => Partial_Gnatpp_SLB);
+        (Main_Unit                => Main_Unit,
+         Input_Selection_Range    => Selection_Range,
+         Output                   => Output,
+         Output_Selection_Range   => Output_SL_Range,
+         PP_Messages              => Messages,
+         Formatted_Node           => Enclosing_Node,
+         PP_Options               => PP_Options,
+         Force_Source_Line_Breaks => Args.Source_Line_Breaks.Get);
 
       --  Create the text edits to be passed to the IDE related to the
       --  rewritten selection.
@@ -268,7 +269,7 @@ procedure Partial_GNATpp is
             Edit => Text_Edit'
               (Location => Output_SL_Range,
                Text     => Ada.Strings.Unbounded.To_Unbounded_String
-                 (Output_Str)));
+                 ('^' & Ada.Characters.Latin_1.LF & Output_Str & '$')));
          Print (Edits);
       end;
 
