@@ -2559,7 +2559,7 @@ package body Test.Stub is
             return False;
          end if;
 
-         if Type_Decl.Kind = Ada_Type_Decl then
+         if Type_Decl.Kind in Ada_Type_Decl then
             Param_Type_Def := Type_Decl.As_Type_Decl.F_Type_Def;
             if Param_Type_Def.Kind = Ada_Derived_Type_Def
               and then Param_Type_Def.As_Derived_Type_Def.F_Has_Limited

@@ -3841,7 +3841,7 @@ package body METRICS.Actions is
                   Inc_All (Public_Types);
                end if;
 
-               if Kind (Node) = Ada_Type_Decl then
+               if Kind (Node) in Ada_Type_Decl then
                   declare
                      Def : constant Type_Def := Node.As_Type_Decl.F_Type_Def;
                   begin

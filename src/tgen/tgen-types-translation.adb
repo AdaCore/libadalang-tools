@@ -627,7 +627,7 @@ package body TGen.Types.Translation is
 
          elsif Kind (Decl) in Ada_Subtype_Decl_Range
            or else
-           (Kind (Decl) in Ada_Type_Decl_Range
+           (Kind (Decl) in Ada_Type_Decl
             and then Kind (Decl.As_Type_Decl.F_Type_Def) =
               Ada_Derived_Type_Def)
          then
@@ -748,7 +748,7 @@ package body TGen.Types.Translation is
          Parent_Subtype : Subtype_Indication;
       begin
          case Kind (Decl) is
-            when Ada_Type_Decl_Range =>
+            when Ada_Type_Decl =>
                if Kind (Decl.As_Type_Decl.F_Type_Def)
                     in Ada_Decimal_Fixed_Point_Def_Range
                then
@@ -887,7 +887,7 @@ package body TGen.Types.Translation is
          end if;
 
       else
-         if Kind (Decl) in Ada_Type_Decl_Range
+         if Kind (Decl) in Ada_Type_Decl
            and then Kind (Decl.As_Type_Decl.F_Type_Def) in
                       Ada_Derived_Type_Def_Range
          then
@@ -1068,7 +1068,7 @@ package body TGen.Types.Translation is
       Constraints : LAL.Constraint;
    begin
       case Kind (Decl_Or_Constraint) is
-         when Ada_Type_Decl_Range =>
+         when Ada_Type_Decl =>
             case Kind (Decl_Or_Constraint.As_Type_Decl.F_Type_Def) is
                when Ada_Array_Type_Def_Range =>
                   for Node of Decl_Or_Constraint.As_Type_Decl.F_Type_Def
@@ -1409,7 +1409,7 @@ package body TGen.Types.Translation is
                return Translate_Constrained (Decl, Type_Name);
             end if;
 
-         when Ada_Type_Decl_Range =>
+         when Ada_Type_Decl =>
 
             if Kind (Decl.As_Type_Decl.F_Type_Def)
               in Ada_Derived_Type_Def_Range
@@ -2138,7 +2138,7 @@ package body TGen.Types.Translation is
          end if;
 
          case Kind (Decl) is
-            when Ada_Type_Decl_Range =>
+            when Ada_Type_Decl =>
 
                --  First apply constraints of the ancestor type
 
@@ -2187,7 +2187,7 @@ package body TGen.Types.Translation is
 
       --  First the simple case of an undiscriminated record
 
-      if Kind (Decl.P_Root_Type) in Ada_Type_Decl_Range
+      if Kind (Decl.P_Root_Type) in Ada_Type_Decl
         and then Kind (Decl.P_Root_Type.As_Type_Decl.F_Type_Def)
                    in Ada_Record_Type_Def_Range
         and then Is_Null (Decl.P_Root_Type.As_Type_Decl.F_Discriminants)

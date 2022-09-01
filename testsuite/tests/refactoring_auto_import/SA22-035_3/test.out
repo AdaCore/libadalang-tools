@@ -1,120 +1,120 @@
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:32:10\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:32:10\] \|>
 
 A.B.C.IHM.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:32:10\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:32:10\] \|>
 
 A.B.C.Integer_Hashed_Maps.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:75:10\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:75:10\] \|>
 
 A.B.C.PIHM.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:75:10\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:75:10\] \|>
 
 A.B.C.Private_Integer_Hashed_Maps.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:19:7\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:19:7\] \|>
 
 A.B.IHM.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:19:7\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:19:7\] \|>
 
 A.B.Integer_Hashed_Maps.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:92:7\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:92:7\] \|>
 
 A.B.PIHM.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:92:7\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:92:7\] \|>
 
 A.B.Private_Integer_Hashed_Maps.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:6:4\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:6:4\] \|>
 
 A.IHM.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:6:4\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:6:4\] \|>
 
 A.Integer_Hashed_Maps.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:110:4\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:110:4\] \|>
 
 A.PIHM.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:110:4\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:110:4\] \|>
 
 A.Private_Integer_Hashed_Maps.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:32:10\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:32:10\] \|>
 
 E.B.C.IHM.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:32:10\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:32:10\] \|>
 
 E.B.C.Integer_Hashed_Maps.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:75:10\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:75:10\] \|>
 
 E.B.C.PIHM.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:75:10\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:75:10\] \|>
 
 E.B.C.Private_Integer_Hashed_Maps.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:19:7\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:19:7\] \|>
 
 E.B.IHM.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:19:7\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:19:7\] \|>
 
 E.B.Integer_Hashed_Maps.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:92:7\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:92:7\] \|>
 
 E.B.PIHM.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:92:7\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:92:7\] \|>
 
 E.B.Private_Integer_Hashed_Maps.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:6:4\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:6:4\] \|>
 
 E.IHM.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:6:4\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:6:4\] \|>
 
 E.Integer_Hashed_Maps.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:110:4\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:110:4\] \|>
 
 E.PIHM.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:110:4\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:110:4\] \|>
 
 E.Private_Integer_Hashed_Maps.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:32:10\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:32:10\] \|>
 
 F.B.C.IHM.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:32:10\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:32:10\] \|>
 
 F.B.C.Integer_Hashed_Maps.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:75:10\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:75:10\] \|>
 
 F.B.C.PIHM.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:75:10\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:75:10\] \|>
 
 F.B.C.Private_Integer_Hashed_Maps.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:19:7\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:19:7\] \|>
 
 F.B.IHM.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:19:7\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:19:7\] \|>
 
 F.B.Integer_Hashed_Maps.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:92:7\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:92:7\] \|>
 
 F.B.PIHM.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:92:7\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:92:7\] \|>
 
 F.B.Private_Integer_Hashed_Maps.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:6:4\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:6:4\] \|>
 
 F.IHM.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:6:4\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:6:4\] \|>
 
 F.Integer_Hashed_Maps.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:110:4\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:110:4\] \|>
 
 F.PIHM.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:110:4\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:110:4\] \|>
 
 F.Private_Integer_Hashed_Maps.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:45:13\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:45:13\] \|>
 
 IHM.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:45:13\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:45:13\] \|>
 
 Integer_Hashed_Maps.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:58:13\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:58:13\] \|>
 
 PIHM.
-<\| TypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:58:13\] \|>
+<\| ConcreteTypeDecl \["Map"\] a-cihama.ads:[1-9][0-9]*:[1-9][0-9]*-[1-9][0-9]*:[1-9][0-9]* \[a.ads:58:13\] \|>
 
 Private_Integer_Hashed_Maps.

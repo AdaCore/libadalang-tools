@@ -900,8 +900,10 @@ package body Pp.Actions is
 
            when Ada_Enum_Type_Def =>
              L ("(?~,#1 ~~)"),
-           when Ada_Type_Decl => null,
-           when Ada_Incomplete_Type_Decl =>
+           when Ada_Concrete_Type_Decl |
+              Ada_Formal_Type_Decl => null,
+           when Ada_Incomplete_Type_Decl |
+              Ada_Incomplete_Formal_Type_Decl =>
              L ("type !!"), -- Aspects?
            when Ada_Incomplete_Tagged_Type_Decl =>
              L ("type !! is /tagged"),
@@ -1122,7 +1124,7 @@ package body Pp.Actions is
            when Ada_Access_To_Subp_Def =>
               L ("?~~ ~access? ~~~ !"),
            when Ada_Anonymous_Type_Decl =>
-             L ("//!", Aspects),
+             L ("//!"),
            when Ada_Synth_Anonymous_Type_Decl => null,
            when Ada_Anonymous_Expr_Decl => null,
                --  Anonymous expr decls cannot appear in source trees
@@ -1640,6 +1642,7 @@ package body Pp.Actions is
          Access_To_Subp_Decl_Alt,
          Enum_Array_Decl_Alt,
          Type_Decl_Alt,
+         Formal_Type_Decl_Alt,
          Boxy_Constrained_Alt);
 
       Str_Alt_Table : array (Alt_Templates) of Str_Template_Ptr;
@@ -1897,6 +1900,7 @@ package body Pp.Actions is
                --  gnatpp doesn't put a line break after "is" in this case.
             Enum_Array_Decl_Alt => L ("type !! is$[!]" & Aspects),
             Type_Decl_Alt => L ("type !! is[# !]" & Aspects),
+            Formal_Type_Decl_Alt => L ("type !! is[# !]?~~~" & Aspects),
             Boxy_Constrained_Alt => L ("(?~,# ~~)")];
 
          for Alt in Alt_Templates loop
@@ -2696,6 +2700,7 @@ package body Pp.Actions is
 
                  when Ada_Type_Decl |
                      Ada_Incomplete_Type_Decl |
+                     Ada_Incomplete_Formal_Type_Decl |
                      Ada_Incomplete_Tagged_Type_Decl |
                      Ada_Subtype_Decl |
                      Ada_Task_Type_Decl |
@@ -5013,7 +5018,11 @@ package body Pp.Actions is
                Interpret_Alt_Template (Enum_Array_Decl_Alt);
 
             else
-               Interpret_Alt_Template (Type_Decl_Alt);
+               if Tree.Kind in Ada_Formal_Type_Decl then
+                  Interpret_Alt_Template (Formal_Type_Decl_Alt);
+               else
+                  Interpret_Alt_Template (Type_Decl_Alt);
+               end if;
             end if;
          end Do_Type_Decl;
 
@@ -5236,7 +5245,7 @@ package body Pp.Actions is
             when Ada_Component_Decl =>
                Do_Component_Decl;
 
-            when Ada_Type_Decl =>
+            when Ada_Concrete_Type_Decl | Ada_Formal_Type_Decl =>
                Do_Type_Decl;
 
             when Ada_Select_When_Part =>

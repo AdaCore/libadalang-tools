@@ -1385,7 +1385,7 @@ package body Laltools.Refactor.Safe_Rename is
           (Imprecise_Fallback => False).As_Type_Decl;
 
       if First_Type = No_Type_Decl
-        or else First_Type.Kind /= Ada_Type_Decl
+        or else First_Type.Kind not in Ada_Type_Decl
       then
          return No_Rename_Problem;
       end if;
@@ -1395,7 +1395,7 @@ package body Laltools.Refactor.Safe_Rename is
       Base_Type := First_Type.P_Base_Type;
 
       if Base_Type = No_Base_Type_Decl
-        or else Base_Type.Kind /= Ada_Type_Decl
+        or else Base_Type.Kind not in Ada_Type_Decl
       then
          return No_Rename_Problem;
       end if;
