@@ -1804,14 +1804,14 @@ package body Pp.Actions is
                   From => (if Arg (Cmd, RM_Style_Spacing) then
                              "?[#(~,#1 ~)]~"
                            else "?[# (~,#1 ~)]~"),
-                  To => "?[$(~,$ ~)]~")),
+                  To => "?[$(~,$0 ~)]~")),
             Generic_Subp_Instantiation_Vertical_Agg_Alt =>
               L (Replace_One
                  (Ada_Generic_Subp_Instantiation,
                   From => (if Arg (Cmd, RM_Style_Spacing) then
                              "?[#(~,#1 ~)]~"
                            else "?[# (~,#1 ~)]~"),
-                  To => "?[$(~,$ ~)]~")),
+                  To => "?[$(~,$0 ~)]~")),
             Return_Stmt_Vertical_Agg_Alt =>
               L (Replace_One
                  (Ada_Return_Stmt,
@@ -4814,6 +4814,16 @@ package body Pp.Actions is
          end Do_Select_When_Part;
 
          procedure Do_Instantiation is
+            function Past_Call_Threshold (Actuals : Assoc_List) return Boolean
+            is
+               (Natural (Subtree_Count (Actuals)) >
+                  Arg (Cmd, Call_Threshold)
+                  and then
+                  (for some Assoc of Subtrees (Actuals) =>
+                     Present (Subtree (Assoc, 1))));
+            --  True if there are more parameter associations than the value
+            --  given for the threshold and at least one of them is named.
+
             Actuals : constant Assoc_List :=
               (if Tree.Kind = Ada_Generic_Subp_Instantiation then
                  Tree.As_Generic_Subp_Instantiation.F_Params
@@ -4826,11 +4836,14 @@ package body Pp.Actions is
                else
                  Generic_Package_Instantiation_Vertical_Agg_Alt);
          begin
-            if Has_Vertical_Aggregates (Actuals) then
+            if Has_Vertical_Aggregates (Actuals.As_Assoc_List)
+              or else Past_Call_Threshold (Actuals.As_Assoc_List)
+            then
                Interpret_Alt_Template (Temp);
             else
                Interpret_Template;
             end if;
+
          end Do_Instantiation;
 
          procedure Do_Params is
@@ -6175,9 +6188,10 @@ package body Pp.Actions is
 
       Put (" --par-threshold=nnn              - If the number of parameter specifications is greater than nnn,\n");
       Put ("                                    each specification starts from a new line\n");
-      Put (" --call-threshold=nnn             - If the number of parameter associations in a call is greater\n");
-      Put ("                                    than nnn and there is at least one named association, each\n");
-      Put ("                                    association starts from a new line\n");
+      Put (" --call-threshold=nnn             - If the number of parameter associations in a call or generic\n");
+      Put ("                                    package or subprogram instantiation is greater than nnn\n");
+      Put ("                                    and there is at least one named association, each association\n");
+      Put ("                                    starts from a new line\n");
 
       Put (" --no-separate-is                 - Try not to place 'IS' on a separate line in a subprogram body\n");
       Put (" --no-separate-return             - Try not to place 'RETURN' on a separate line in specs\n");
