@@ -591,7 +591,7 @@ package body Laltools.Refactor.Pull_Up_Declaration is
                  (First_Enclosing_Declarative_Part.Unit.Get_Filename),
                Source_Location'
                  (First_Enclosing_Declarative_Part.P_Parent_Basic_Decl.
-                    P_Canonical_Part.Sloc_Range.Start_Line,
+                    Sloc_Range.Start_Line,
                   1)));
    end Get_Insertion_Point;
 
@@ -1650,6 +1650,7 @@ package body Laltools.Refactor.Pull_Up_Declaration is
       begin
          for Local_Dependency of
            Get_Local_Dependencies (Self.Declaration.P_Defining_Name)
+           when Local_Dependency.P_Basic_Decl.Kind not in Ada_Param_Spec_Range
          loop
             for Local_Dependency_Part of
                   Local_Dependency.P_Basic_Decl.P_All_Parts
