@@ -1,0 +1,40 @@
+main.adb
+3:1-3:1    R : constant Integer := 1;
+   Z : constant Integer := 1;
+
+   function Bar return Integer is (Z + R);
+
+   procedure Foo
+     (A : Integer;
+      B : Integer;
+      V : Integer;
+      X : Integer;
+      Y : Integer;
+      W : Integer);
+
+   procedure Foo
+     (A : Integer;
+      B : Integer;
+      V : Integer;
+      X : Integer;
+      Y : Integer;
+      W : Integer) is
+   begin
+      Ada.Text_IO.Put_Line (R'Image);
+      Ada.Text_IO.Put_Line (V'Image);
+      Ada.Text_IO.Put_Line (X'Image);
+      Ada.Text_IO.Put_Line (Y'Image);
+      Ada.Text_IO.Put_Line (W'Image);
+      Ada.Text_IO.Put_Line (Bar'Image);
+   end Foo;
+
+5:1-5:36 S : constant Integer := 1;
+
+8:1-26:15 W : constant Integer := 1;
+
+28:16-28:16 ,
+           V,
+           X,
+           Y,
+           W
+

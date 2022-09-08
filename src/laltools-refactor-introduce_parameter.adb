@@ -83,7 +83,7 @@ package body Laltools.Refactor.Introduce_Parameter is
       Declaration_Pull_Upper : constant Declaration_Extractor :=
         Create_Declaration_Pull_Upper
           (Unit                     => Self.Object_Decl.Unit,
-           Declaration_SLOC         =>
+           Definition_SLOC          =>
              Start_Sloc (Self.Object_Decl.Sloc_Range),
            Indentation              => 3,
            Only_Dependencies        => True,

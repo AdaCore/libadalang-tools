@@ -1,6 +1,5 @@
 main.adb
-4:1-4:1 
-   procedure Extracted (A : Integer;
+4:1-4:1    procedure Extracted (A : Integer;
                         B : Integer);
 
    procedure Extracted (A : Integer;
@@ -9,6 +8,7 @@ main.adb
       Put_Line (A'Image);
       Put_Line (B'Image);
    end Extracted;
+
 
 6:1-13:1 
 15:16-15:16  (A => A,

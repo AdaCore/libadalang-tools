@@ -1,6 +1,6 @@
 main.adb
-2:1-2:1 
-   procedure Bar is null;
+2:1-2:1    procedure Bar is null;
+
 
 3:1-4:1 
 

@@ -1,6 +1,5 @@
 main.adb
-4:1-4:1 
-   type My_Natural_Range;
+4:1-4:1    type My_Natural_Range;
 
    --  Some comments
    --  A very natural range
@@ -44,6 +43,7 @@ main.adb
       Cant_Be_Pulled_Up := 0;
       Natural_Array_2 := (others => 0);
    end A_Natural_Procedure;
+
 
 8:1-20:1 
 23:1-24:1 

@@ -40,12 +40,12 @@ package Laltools.Refactor.Pull_Up_Declaration is
 
    function Create_Declaration_Pull_Upper
      (Unit                     : Analysis_Unit;
-      Declaration_SLOC         : Source_Location;
+      Definition_SLOC          : Source_Location;
       Indentation              : Natural := 3;
       Only_Dependencies        : Boolean := False;
       Try_Subp_Insertion_Point : Boolean := False)
       return Declaration_Extractor
-     with Pre => Is_Pull_Up_Declaration_Available (Unit, Declaration_SLOC);
+     with Pre => Is_Pull_Up_Declaration_Available (Unit, Definition_SLOC);
    --  Declaration_Extractor constructor.
    --  Declaration_SLOC must be the SLOC of the declaration Name'Class node
    --  that will be extracted. Use Is_Pull_Up_Declaration_Available to check
@@ -64,11 +64,11 @@ private
 
    type Declaration_Extractor is new Refactoring_Tool with
       record
-         Declaration              : Basic_Decl;
+         Definition               : Defining_Name;
          Indentation              : Natural := 3;
          Only_Dependencies        : Boolean := False;
          Try_Subp_Insertion_Point : Boolean := False;
       end record
-     with Dynamic_Predicate => not Declaration.Is_Null;
+     with Dynamic_Predicate => not Definition.Is_Null;
 
 end Laltools.Refactor.Pull_Up_Declaration;
