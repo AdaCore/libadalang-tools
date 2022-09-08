@@ -1639,7 +1639,6 @@ package body Pp.Actions is
          Record_Type_Decl_Split_Alt,
          Record_Type_Decl_Alt,
          Record_Type_Decl_Aspects_Alt,
-         Access_To_Subp_Decl_Alt,
          Enum_Array_Decl_Alt,
          Type_Decl_Alt,
          Formal_Type_Decl_Alt,
@@ -1896,8 +1895,6 @@ package body Pp.Actions is
                       --  last semicolon.
             Record_Type_Decl_Aspects_Alt =>
               L ("type !! is# !" & Aspects),
-            Access_To_Subp_Decl_Alt => L ("type !! is[# !]" & Aspects),
-               --  gnatpp doesn't put a line break after "is" in this case.
             Enum_Array_Decl_Alt => L ("type !! is$[!]" & Aspects),
             Type_Decl_Alt => L ("type !! is[# !]" & Aspects),
             Formal_Type_Decl_Alt => L ("type !! is[# !]?~~~" & Aspects),
@@ -5019,9 +5016,6 @@ package body Pp.Actions is
                else
                   Interpret_Alt_Template (Record_Type_Decl_Aspects_Alt);
                end if;
-
-            elsif Def.Kind = Ada_Access_To_Subp_Def then
-               Interpret_Alt_Template (Access_To_Subp_Decl_Alt);
 
             elsif (Def.Kind = Ada_Enum_Type_Def
                      and then Arg (Cmd, Vertical_Enum_Types))
