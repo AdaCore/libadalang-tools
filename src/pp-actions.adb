@@ -902,13 +902,15 @@ package body Pp.Actions is
              L ("(?~,#1 ~~)"),
            when Ada_Concrete_Type_Decl |
               Ada_Formal_Type_Decl => null,
-           when Ada_Incomplete_Type_Decl |
-              Ada_Incomplete_Formal_Type_Decl =>
-             L ("type !!"), -- Aspects?
+           when Ada_Incomplete_Type_Decl =>
+              L ("type !!"), -- Aspects?
+           when Ada_Incomplete_Formal_Type_Decl =>
+              L ("type !!? is ~~~? or use ~~~"),
            when Ada_Incomplete_Tagged_Type_Decl =>
-             L ("type !! is /tagged"),
-               --  The "/" is for F_Has_Abstract, which is always
-               --  Abstract_Absent.
+              L ("type !! is /tagged"),
+              --  The "/" is for F_Has_Abstract, which is always
+              --  Abstract_Absent.
+
            when Ada_Classwide_Type_Decl => null,
            when Ada_Subtype_Decl =>
              L ("subtype ! is[# !", Aspects, "]"),
@@ -5140,8 +5142,10 @@ package body Pp.Actions is
             pragma Assert (if Is_Def_Name then Def_Name = Id);
 
             Is_Attr_Name : constant Boolean :=
-              Parent_Tree.Kind in Ada_Attribute_Ref | Ada_Update_Attribute_Ref
-                and then Tree = Parent_Tree.As_Attribute_Ref.F_Attribute;
+              (Parent_Tree.Kind = Ada_Attribute_Ref
+               and then Tree = Parent_Tree.As_Attribute_Ref.F_Attribute)
+               or else (Parent_Tree.Kind = Ada_Update_Attribute_Ref and then
+                        Tree = Parent_Tree.As_Update_Attribute_Ref.F_Attribute);
 
             K : constant Ada_Node_Kind_Type :=
               (if Is_Attr_Name then Parent_Tree.Kind
