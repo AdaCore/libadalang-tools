@@ -24,12 +24,12 @@
 --  This package contains refactoring tools that allow pulling up declarations
 --  to an outer scope
 
+with Ada.Assertions;
 with Ada.Characters.Latin_1;
 with Ada.Containers; use Ada.Containers;
 with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Ordered_Sets;
 with Ada.Strings.Fixed;
-
 with GNAT.String_Split;
 
 with Langkit_Support.Text; use Langkit_Support.Text;
@@ -112,6 +112,13 @@ package body Laltools.Refactor.Pull_Up_Declaration is
    --  as Definition.
    --  If Recursive, then also returns local dependencies of the dependencies.
 
+   function Get_Text
+     (Unit       : Analysis_Unit;
+      SLOC_Range : Source_Location_Range;
+      Prepend_Spaces : Boolean := False)
+      return Unbounded_String;
+   --  Gets Unit's text delimited by SLOC_Range
+
    type Comments_Position_Type is (Before, After, Both);
 
    function Get_Declaration_SLOC_Range_With_Comments
@@ -128,7 +135,7 @@ package body Laltools.Refactor.Pull_Up_Declaration is
       end record;
 
    function Get_Insertion_Point
-     (Decl                     : Basic_Decl'Class;
+     (Definition               : Defining_Name'Class;
       Try_Subp_Insertion_Point : Boolean := False)
       return Insertion_Point_Type;
    --  Assuming that Decl is the Basic_Decl that will be pulled up, computes
@@ -149,32 +156,32 @@ package body Laltools.Refactor.Pull_Up_Declaration is
       return Source_Location_Range_Ordered_Set;
    --  Merges the elements of SLOC_Ranges that intersect each other
 
-   procedure Compute_Subp_Dependencies_To_Pull_Up
-     (Subp                    : Basic_Decl;
-      Declarations_To_Pull_Up : out Basic_Decl_Ordered_Set;
-      Parameters_To_Pull_Up   : out Basic_Decl_Ordered_Set)
-     with Pre => Is_Subprogram (Subp);
+   procedure Find_Subp_Dependencies_To_Pull_Up
+     (Subp                                   : Basic_Decl'Class;
+      Definitions_To_Pull_Up_As_Declarations : out Defining_Name_Ordered_Set;
+      Definitions_To_Pull_Up_As_Parameters   : out Defining_Name_Ordered_Set)
+     with Pre => not Subp.Is_Null and then Is_Subprogram (Subp);
    --  Compute all declarations that need to be pulled up and
    --  parameters that need to be added to Subp.
 
-   package Basic_Decl_To_Ada_Mode_Ordered_Maps is new
+   package Defining_Name_To_Ada_Mode_Ordered_Maps is new
      Ada.Containers.Ordered_Maps
-       (Key_Type     => Basic_Decl,
+       (Key_Type     => Defining_Name,
         Element_Type => Ada_Mode,
         "<"          => "<",
         "="          => "=");
 
-   subtype Basic_Decl_To_Ada_Mode_Ordered_Map is
-     Basic_Decl_To_Ada_Mode_Ordered_Maps.Map;
+   subtype Defining_Name_To_Ada_Mode_Ordered_Map is
+     Defining_Name_To_Ada_Mode_Ordered_Maps.Map;
 
    function Compute_Parameters_Mode
      (Subp         : Basic_Decl;
-      Object_Decls : Basic_Decl_Ordered_Set)
-      return Basic_Decl_To_Ada_Mode_Ordered_Map;
+      Object_Decls : Defining_Name_Ordered_Set)
+      return Defining_Name_To_Ada_Mode_Ordered_Map;
    --  Compute the mode of each parameter that need to be added do Subp
 
    function Get_Subp_Headers
-     (Subps : Basic_Decl_Ordered_Set)
+     (Subps : Defining_Name_Ordered_Set)
       return Source_Location_Range_Ordered_Set;
    --  For each Basic_Decl of Subps that is a subprogram, gets the
    --  Source_Location_Range of the subprogram header.
@@ -189,10 +196,44 @@ package body Laltools.Refactor.Pull_Up_Declaration is
    subtype Source_Location_To_Unbounded_String_Ordered_Map is
      Source_Location_To_Unbounded_String_Ordered_Maps.Map;
 
+   function "<" (L, R : Source_Location_Range) return Boolean is
+     (Compare (L, Start_Sloc (R)) = After);
+
+   package Source_Location_Range_To_Unbounded_String_Ordered_Maps is new
+     Ada.Containers.Ordered_Maps
+       (Key_Type     => Source_Location_Range,
+        Element_Type => Unbounded_String,
+        "<"          => "<");
+
+   subtype Source_Location_Range_To_Unbounded_String_Ordered_Map is
+     Source_Location_Range_To_Unbounded_String_Ordered_Maps.Map;
+
+   type Extraction_Edit is record
+      SLOC_Range       : Source_Location_Range;
+      Replacement_Text : Unbounded_String;
+      Extracted_Text   : Unbounded_String;
+   end record;
+
+   No_Extraction_Edit : constant Extraction_Edit :=
+     (SLOC_Range       => No_Source_Location_Range,
+      Replacement_Text => Null_Unbounded_String,
+      Extracted_Text   => Null_Unbounded_String);
+
+   function "<" (L, R : Extraction_Edit) return Boolean is
+     (Compare (L.SLOC_Range, Start_Sloc (R.SLOC_Range)) = After);
+
+   package Extraction_Edit_Ordered_Sets is new
+     Ada.Containers.Ordered_Sets
+       (Element_Type => Extraction_Edit,
+        "<"          => "<",
+        "="          => "=");
+
+   subtype Extraction_Edit_Ordered_Set is Extraction_Edit_Ordered_Sets.Set;
+
    function Compute_Parameter_Insertions
      (Subp            : Basic_Decl;
-      Parameters_Mode : Basic_Decl_To_Ada_Mode_Ordered_Map)
-      return Source_Location_To_Unbounded_String_Ordered_Map;
+      Parameters_Mode : Defining_Name_To_Ada_Mode_Ordered_Map)
+      return Extraction_Edit_Ordered_Set;
    --  Computes a map where the keys are Source_Locations in the original
    --  source where the parameters needs to be added and the the elements are
    --  Unbounded_Strings with the content of such parameters.
@@ -200,18 +241,21 @@ package body Laltools.Refactor.Pull_Up_Declaration is
    function Compute_Actual_Parameter_Insertions
      (Subp            : Basic_Decl;
       Analysis_Units  : Analysis_Unit_Array;
-      Parameters_Mode : Basic_Decl_To_Ada_Mode_Ordered_Map)
+      Parameters_Mode : Defining_Name_To_Ada_Mode_Ordered_Map)
       return Source_Location_To_Unbounded_String_Ordered_Map;
    --  Computes a map where the keys are Source_Locations in the original
    --  source where the actual parameters needs to be added and the the
    --  elements are Unbounded_Strings with the content of such
    --  actual parameters.
 
-   function Apply_Insertions
-     (Unit        : Analysis_Unit;
-      SLOC_Ranges : Source_Location_Range_Ordered_Set;
-      Insertions  : Source_Location_To_Unbounded_String_Ordered_Map;
-      Padding     : Natural := 3)
+   function Apply_Extraction_Edits
+     (Unit                 : Analysis_Unit;
+      Original_SLOC_Ranges : Source_Location_Range_Ordered_Set;
+      Extraction_Edits     : Extraction_Edit_Ordered_Set;
+      Output_Text_Edits    :
+        out Source_Location_Range_To_Unbounded_String_Ordered_Map;
+      Extracted_Text      :
+        out Unbounded_String)
       return Unbounded_String;
    --  Returns an Unbounded_String with the concatenation of the text of each
    --  Source_Location_Range of SLOC_Range with any insertion found in
@@ -236,39 +280,45 @@ package body Laltools.Refactor.Pull_Up_Declaration is
 
    begin
       return Local_Basic_Decls : Basic_Decl_Ordered_Set do
-         for Decl_Part of Decl.P_All_Parts loop
-            Enclosing_Declarative_Part :=
-              Get_Enclosing_Declarative_Part (Decl_Part);
+         for Definition of Decl.P_Defining_Names loop
+            for Decl_Part of Definition.P_All_Parts loop
+               Enclosing_Declarative_Part :=
+                 Get_Enclosing_Declarative_Part (Decl_Part.P_Basic_Decl);
 
-            for Node of Enclosing_Declarative_Part.F_Decls loop
-               if Node.Kind in Ada_Basic_Decl
-                 and then Node.As_Basic_Decl.P_Canonical_Part /=
-                   Decl.P_Canonical_Part
+               for Node of Enclosing_Declarative_Part.F_Decls
+                 when Node.Kind in Ada_Basic_Decl
+               loop
+                  for Node_Defining_Name of
+                    Node.As_Basic_Decl.P_Defining_Names
+                  loop
+                     Local_Basic_Decls.Include
+                       (Node_Defining_Name.P_Canonical_Part.P_Basic_Decl);
+                  end loop;
+               end loop;
+
+               if Enclosing_Declarative_Part.Parent.Kind in
+                 Ada_Subp_Body_Range
                then
-                  Local_Basic_Decls.Include
-                    (Node.As_Basic_Decl.P_Canonical_Part);
+                  declare
+                     Parent_Subp_Body : constant Basic_Decl :=
+                       Enclosing_Declarative_Part.Parent.As_Subp_Body.
+                         P_Canonical_Part;
+                     Subp_Params      : constant Params :=
+                       Get_Subp_Params (Parent_Subp_Body);
+
+                  begin
+                     if not Subp_Params.Is_Null then
+                        for Param_Spec of Subp_Params.F_Params loop
+                           Local_Basic_Decls.Include
+                             (Param_Spec.As_Basic_Decl);
+                        end loop;
+                     end if;
+                  end;
                end if;
             end loop;
-
-            if Enclosing_Declarative_Part.Parent.Kind in
-                 Ada_Subp_Body_Range
-            then
-               declare
-                  Parent_Subp_Body : constant Basic_Decl :=
-                    Enclosing_Declarative_Part.Parent.As_Subp_Body.
-                      P_Canonical_Part;
-                  Subp_Params      : constant Params :=
-                    Get_Subp_Params (Parent_Subp_Body);
-
-               begin
-                  if not Subp_Params.Is_Null then
-                     for Param_Spec of Subp_Params.F_Params loop
-                        Local_Basic_Decls.Include (Param_Spec.As_Basic_Decl);
-                     end loop;
-                  end if;
-               end;
-            end if;
          end loop;
+
+         Local_Basic_Decls.Exclude (Decl.As_Basic_Decl);
       end return;
    end Get_Local_Declarations;
 
@@ -349,16 +399,15 @@ package body Laltools.Refactor.Pull_Up_Declaration is
    begin
       for Local_Declaration of Local_Declarations loop
          for Local_Defining_Name of Local_Declaration.P_Defining_Names loop
-            for Defining_Name_Decl_Part of
-                  Definition.P_Basic_Decl.P_All_Parts
-            loop
+            for Defining_Name_Decl_Part of Definition.P_All_Parts  loop
                if Local_Defining_Name.P_Find_Refs
-                    (Defining_Name_Decl_Part)'Length > 0
+                 (Defining_Name_Decl_Part.P_Basic_Decl)'Length > 0
                then
                   All_Parts_Local_Dependencies.Include
                     (Local_Defining_Name.P_Canonical_Part);
 
-                  if Local_Declaration.Kind not in Ada_Param_Spec
+                  if Local_Defining_Name.P_Basic_Decl.Kind
+                       not in Ada_Param_Spec
                     and then Recursive
                   then
                      Union
@@ -368,6 +417,10 @@ package body Laltools.Refactor.Pull_Up_Declaration is
                end if;
             end loop;
          end loop;
+      end loop;
+
+      for Defition_Part of Definition.P_All_Parts loop
+         All_Parts_Local_Dependencies.Exclude (Defition_Part);
       end loop;
 
       return All_Parts_Local_Dependencies;
@@ -508,12 +561,12 @@ package body Laltools.Refactor.Pull_Up_Declaration is
    -------------------------
 
    function Get_Insertion_Point
-     (Decl                     : Basic_Decl'Class;
+     (Definition               : Defining_Name'Class;
       Try_Subp_Insertion_Point : Boolean := False)
       return Insertion_Point_Type
    is
       First_Enclosing_Declarative_Part : constant Declarative_Part :=
-        Get_Enclosing_Declarative_Part (Decl);
+        Get_Enclosing_Declarative_Part (Definition.P_Basic_Decl);
 
       Owner_Is_Decl_Block : constant Boolean :=
         First_Enclosing_Declarative_Part.Parent.Kind in Ada_Decl_Block_Range;
@@ -535,7 +588,9 @@ package body Laltools.Refactor.Pull_Up_Declaration is
             Subp_Body : Libadalang.Analysis.Subp_Body := No_Subp_Body;
 
          begin
-            for Parent of Decl.Parents (With_Self => False) loop
+            for Parent of
+              Definition.P_Basic_Decl.Parents (With_Self => False)
+            loop
                if Parent.Kind in Ada_Subp_Body then
                   Subp_Body := Parent.As_Subp_Body;
                   exit;
@@ -594,6 +649,83 @@ package body Laltools.Refactor.Pull_Up_Declaration is
                     Sloc_Range.Start_Line,
                   1)));
    end Get_Insertion_Point;
+
+   --------------
+   -- Get_Text --
+   --------------
+
+   function Get_Text
+     (Unit           : Analysis_Unit;
+      SLOC_Range     : Source_Location_Range;
+      Prepend_Spaces : Boolean := False)
+      return Unbounded_String
+   is
+      use Ada.Characters.Latin_1;
+
+   begin
+      return Extracted_Text : Unbounded_String do
+         if SLOC_Range.Start_Line = SLOC_Range.End_Line then
+            declare
+               Line        : constant Text_Type :=
+                 Unit.Get_Line (Integer (SLOC_Range.Start_Line));
+               Start_Index : constant Natural :=
+                 Line'First + Integer (SLOC_Range.Start_Column) - 1;
+               End_Index   : constant Natural :=
+                 Line'First + Integer (SLOC_Range.End_Column) - 2;
+
+            begin
+               Extracted_Text :=
+                 (if Prepend_Spaces then
+                    Natural ((SLOC_Range.Start_Column - 1)) * " "
+                    & (+(+(Line (Start_Index .. End_Index))))
+                  else
+                     +(+(Line (Start_Index .. End_Index))));
+            end;
+
+         else
+            for Line_Number in
+              SLOC_Range.Start_Line .. SLOC_Range.End_Line
+            loop
+               declare
+                  Line            : constant Text_Type :=
+                    Unit.Get_Line (Integer (Line_Number));
+                  Start_Index     : constant Integer :=
+                    (if Line_Number = SLOC_Range.Start_Line then
+                        Line'First
+                     + Integer (SLOC_Range.Start_Column)
+                     - 1
+                     else Line'First);
+                  End_Index       : constant Integer :=
+                    (if Line_Number = SLOC_Range.End_Line then
+                        Line'First
+                     + Integer (SLOC_Range.End_Column)
+                     - 2
+                     else
+                        Line'Last);
+
+               begin
+                  if Prepend_Spaces
+                    and then Line_Number = SLOC_Range.Start_Line
+                  then
+                     Append
+                       (Extracted_Text,
+                        Natural ((SLOC_Range.Start_Column - 1)) * " "
+                        & (+(+(Line (Start_Index .. End_Index)))));
+
+                  else
+                     Append
+                       (Extracted_Text,
+                        +(+(Line (Start_Index .. End_Index))));
+                  end if;
+
+                  if Line_Number /= SLOC_Range.End_Line then
+                     Append (Extracted_Text, LF);
+                  end if;
+               end;
+            end loop;
+         end if;
+      end return;
+   end Get_Text;
 
    -------------------
    -- Line_Distance --
@@ -672,58 +804,57 @@ package body Laltools.Refactor.Pull_Up_Declaration is
       return Reduced_SLOC_Ranges;
    end Merge_Intersecting_SLOC_Ranges;
 
-   ------------------------------------------
-   -- Compute_Subp_Dependencies_To_Pull_Up --
-   ------------------------------------------
+   ---------------------------------------
+   -- Find_Subp_Dependencies_To_Pull_Up --
+   ---------------------------------------
 
-   procedure Compute_Subp_Dependencies_To_Pull_Up
-     (Subp                    : Basic_Decl;
-      Declarations_To_Pull_Up : out Basic_Decl_Ordered_Set;
-      Parameters_To_Pull_Up   : out Basic_Decl_Ordered_Set)
+   procedure Find_Subp_Dependencies_To_Pull_Up
+     (Subp                                   : Basic_Decl'Class;
+      Definitions_To_Pull_Up_As_Declarations : out Defining_Name_Ordered_Set;
+      Definitions_To_Pull_Up_As_Parameters   : out Defining_Name_Ordered_Set)
    is
-      use Basic_Decl_Ordered_Sets;
+      use Defining_Name_Ordered_Sets;
 
-      Object_Decl_Dependencies       : Basic_Decl_Ordered_Set;
-      Final_Object_Decl_Dependencies : Basic_Decl_Ordered_Set;
+      Object_Decl_Dependencies       : Defining_Name_Ordered_Set;
+      Final_Object_Decl_Dependencies : Defining_Name_Ordered_Set;
 
    begin
-      for Local_Dependency of
-            Get_Local_Dependencies (Subp.P_Defining_Name)
-      loop
-         Declarations_To_Pull_Up.Include
-           (Local_Dependency.P_Basic_Decl);
-      end loop;
+      Definitions_To_Pull_Up_As_Declarations :=
+        Get_Local_Dependencies (Subp.P_Defining_Name);
 
-      for Declaration of Declarations_To_Pull_Up loop
-         if Declaration.Kind in Ada_Object_Decl | Ada_Param_Spec then
-            Object_Decl_Dependencies.Include (Declaration);
+      for Dependency of Definitions_To_Pull_Up_As_Declarations loop
+         if Dependency.P_Basic_Decl.Kind in
+           Ada_Object_Decl | Ada_Param_Spec
+         then
+            Object_Decl_Dependencies.Include (Dependency);
          end if;
       end loop;
 
-      for Declaration of Declarations_To_Pull_Up loop
-         if Is_Subprogram (Declaration) then
+      for Dependency of Definitions_To_Pull_Up_As_Declarations loop
+         if Is_Subprogram (Dependency.P_Basic_Decl) then
             declare
                Dependencies_Of_Subp_Dependency :
                  constant Defining_Name_Ordered_Set :=
-                   Get_Local_Dependencies (Declaration.P_Defining_Name);
+                   Get_Local_Dependencies (Dependency);
 
             begin
                for Dependency of Dependencies_Of_Subp_Dependency loop
                   if Dependency.P_Basic_Decl.Kind in Ada_Object_Decl then
-                     Final_Object_Decl_Dependencies.Include
-                       (Dependency.P_Basic_Decl);
+                     Final_Object_Decl_Dependencies.Include (Dependency);
                   end if;
                end loop;
             end;
          end if;
       end loop;
 
-      Parameters_To_Pull_Up :=
+      Definitions_To_Pull_Up_As_Parameters :=
         Object_Decl_Dependencies - Final_Object_Decl_Dependencies;
 
-      Declarations_To_Pull_Up.Union (Final_Object_Decl_Dependencies);
-      Declarations_To_Pull_Up.Difference (Parameters_To_Pull_Up);
-   end Compute_Subp_Dependencies_To_Pull_Up;
+      Definitions_To_Pull_Up_As_Declarations.Union
+        (Final_Object_Decl_Dependencies);
+      Definitions_To_Pull_Up_As_Declarations.Difference
+        (Definitions_To_Pull_Up_As_Parameters);
+   end Find_Subp_Dependencies_To_Pull_Up;
 
    -----------------------------
    -- Compute_Parameters_Mode --
@@ -731,17 +862,17 @@ package body Laltools.Refactor.Pull_Up_Declaration is
 
    function Compute_Parameters_Mode
      (Subp         : Basic_Decl;
-      Object_Decls : Basic_Decl_Ordered_Set)
-      return Basic_Decl_To_Ada_Mode_Ordered_Map
+      Object_Decls : Defining_Name_Ordered_Set)
+      return Defining_Name_To_Ada_Mode_Ordered_Map
    is
-      Parameters_Mode_Map : Basic_Decl_To_Ada_Mode_Ordered_Map;
+      Parameters_Mode_Map : Defining_Name_To_Ada_Mode_Ordered_Map;
 
    begin
-      for Object_Decl of Object_Decls loop
+      for Definition of Object_Decls loop
          for Declaration_Part of Subp.P_All_Parts loop
             declare
                References               : constant Ref_Result_Array :=
-                 Object_Decl.P_Defining_Name.P_Find_Refs (Declaration_Part);
+                 Definition.P_Find_Refs (Declaration_Part);
                First_Is_Write_Reference : Boolean;
                Any_Write_References     : Boolean;
 
@@ -757,7 +888,7 @@ package body Laltools.Refactor.Pull_Up_Declaration is
                   if First_Is_Write_Reference then
                      --  First reference is a write reference so this
                      --  parameter must be an `out` parameter.
-                     Parameters_Mode_Map.Include (Object_Decl, Ada_Mode_Out);
+                     Parameters_Mode_Map.Include (Definition, Ada_Mode_Out);
 
                   else
                      --  First reference is a read reference.
@@ -765,10 +896,10 @@ package body Laltools.Refactor.Pull_Up_Declaration is
                      if Any_Write_References then
                         --  Must be `in out`
                         Parameters_Mode_Map.Include
-                          (Object_Decl, Ada_Mode_In_Out);
+                          (Definition, Ada_Mode_In_Out);
                      else
                         --  Must be `in`
-                        Parameters_Mode_Map.Include (Object_Decl, Ada_Mode_In);
+                        Parameters_Mode_Map.Include (Definition, Ada_Mode_In);
                      end if;
                   end if;
                end if;
@@ -784,7 +915,7 @@ package body Laltools.Refactor.Pull_Up_Declaration is
    ----------------------
 
    function Get_Subp_Headers
-     (Subps : Basic_Decl_Ordered_Set)
+     (Subps : Defining_Name_Ordered_Set)
       return Source_Location_Range_Ordered_Set
    is
       use Ada.Strings;
@@ -821,8 +952,8 @@ package body Laltools.Refactor.Pull_Up_Declaration is
 
    begin
       for Subp of Subps loop
-         if Is_Subprogram (Subp) then
-            for Subprogram_Part of Subp.P_All_Parts loop
+         if Is_Subprogram (Subp.P_Basic_Decl) then
+            for Subprogram_Part of Subp.P_Basic_Decl.P_All_Parts loop
                Token_0 := Subprogram_Part.Token_Start;
                Token_1 := Token_0;
                loop
@@ -876,11 +1007,11 @@ package body Laltools.Refactor.Pull_Up_Declaration is
 
    function Compute_Parameter_Insertions
      (Subp            : Basic_Decl;
-      Parameters_Mode : Basic_Decl_To_Ada_Mode_Ordered_Map)
-      return Source_Location_To_Unbounded_String_Ordered_Map
+      Parameters_Mode : Defining_Name_To_Ada_Mode_Ordered_Map)
+      return Extraction_Edit_Ordered_Set
    is
       use Ada.Characters.Latin_1;
-      use Basic_Decl_To_Ada_Mode_Ordered_Maps;
+      use Defining_Name_To_Ada_Mode_Ordered_Maps;
 
       Other_Insertion_Point : Source_Location;
       New_Parameters        : Unbounded_String;
@@ -892,14 +1023,12 @@ package body Laltools.Refactor.Pull_Up_Declaration is
       Indentation           : Natural;
 
       Parameters_Cursor     :
-        Basic_Decl_To_Ada_Mode_Ordered_Maps.Cursor :=
+        Defining_Name_To_Ada_Mode_Ordered_Maps.Cursor :=
           Parameters_Mode.First;
-      Parameter_Declaration : Basic_Decl;
       Parameter_Definition  : Defining_Name;
       Parameter_Type        : Type_Expr;
 
-      Parameters_Insertions :
-        Source_Location_To_Unbounded_String_Ordered_Map;
+      Parameters_Insertions : Extraction_Edit_Ordered_Set;
 
    begin
       if Has_Element (Parameters_Cursor) then
@@ -922,11 +1051,9 @@ package body Laltools.Refactor.Pull_Up_Declaration is
                Other_Insertion_Point :=
                  End_Sloc (Subp_Last_Param_Spec.Sloc_Range);
                while Has_Element (Parameters_Cursor) loop
-                  Parameter_Declaration := Key (Parameters_Cursor);
-                  Parameter_Definition :=
-                    Parameter_Declaration.P_Defining_Name;
+                  Parameter_Definition := Key (Parameters_Cursor);
                   Parameter_Type :=
-                    Parameter_Declaration.P_Type_Expression;
+                    Parameter_Definition.P_Basic_Decl.P_Type_Expression;
                   Append (New_Parameters, ";" & LF);
                   Append (New_Parameters, Indentation * " ");
                   Append
@@ -942,7 +1069,12 @@ package body Laltools.Refactor.Pull_Up_Declaration is
                   Next (Parameters_Cursor);
                end loop;
                Parameters_Insertions.Insert
-                 (Other_Insertion_Point, New_Parameters);
+                 (Extraction_Edit'
+                    (SLOC_Range       =>
+                       Make_Range
+                         (Other_Insertion_Point, Other_Insertion_Point),
+                     Replacement_Text => Null_Unbounded_String,
+                     Extracted_Text   => New_Parameters));
 
             else
                Other_Insertion_Point :=
@@ -952,12 +1084,9 @@ package body Laltools.Refactor.Pull_Up_Declaration is
                    (Declaration_Part.P_Defining_Name.Sloc_Range.End_Column)
                  + 1;
                Append (New_Parameters, " (");
-               Parameter_Declaration :=
-                 Key (Parameters_Cursor);
-               Parameter_Definition :=
-                 Parameter_Declaration.P_Defining_Name;
+               Parameter_Definition := Key (Parameters_Cursor);
                Parameter_Type :=
-                 Parameter_Declaration.P_Type_Expression;
+                 Parameter_Definition.P_Basic_Decl.P_Type_Expression;
                Append
                  (New_Parameters,
                   (+Parameter_Definition.Text)
@@ -969,11 +1098,9 @@ package body Laltools.Refactor.Pull_Up_Declaration is
                   & (+Parameter_Type.Text));
                Next (Parameters_Cursor);
                while Has_Element (Parameters_Cursor) loop
-                  Parameter_Declaration := Key (Parameters_Cursor);
-                  Parameter_Definition :=
-                    Parameter_Declaration.P_Defining_Name;
+                  Parameter_Definition := Key (Parameters_Cursor);
                   Parameter_Type :=
-                    Parameter_Declaration.P_Type_Expression;
+                    Parameter_Definition.P_Basic_Decl.P_Type_Expression;
                   Append (New_Parameters, ";" & LF);
                   Append (New_Parameters, Indentation * " ");
                   Append
@@ -989,7 +1116,12 @@ package body Laltools.Refactor.Pull_Up_Declaration is
                end loop;
                Append (New_Parameters, ")");
                Parameters_Insertions.Insert
-                 (Other_Insertion_Point, New_Parameters);
+                 (Extraction_Edit'
+                    (SLOC_Range       =>
+                       Make_Range
+                         (Other_Insertion_Point, Other_Insertion_Point),
+                     Replacement_Text => Null_Unbounded_String,
+                     Extracted_Text   => New_Parameters));
             end if;
          end loop;
       end if;
@@ -1004,11 +1136,11 @@ package body Laltools.Refactor.Pull_Up_Declaration is
    function Compute_Actual_Parameter_Insertions
      (Subp            : Basic_Decl;
       Analysis_Units  : Analysis_Unit_Array;
-      Parameters_Mode : Basic_Decl_To_Ada_Mode_Ordered_Map)
+      Parameters_Mode : Defining_Name_To_Ada_Mode_Ordered_Map)
       return Source_Location_To_Unbounded_String_Ordered_Map
    is
       use Ada.Characters.Latin_1;
-      use Basic_Decl_To_Ada_Mode_Ordered_Maps;
+      use Defining_Name_To_Ada_Mode_Ordered_Maps;
 
       Calls_References  : constant Ref_Result_Array :=
         P_Find_All_Calls (Subp.P_Defining_Name, Analysis_Units);
@@ -1018,8 +1150,7 @@ package body Laltools.Refactor.Pull_Up_Declaration is
       Param_Assoc_List  : Assoc_List;
       First_Param_Assoc : Param_Assoc;
       Has_Designators   : Boolean;
-      Parameters_Cursor : Basic_Decl_To_Ada_Mode_Ordered_Maps.Cursor;
-      Object_Decl       : Basic_Decl;
+      Parameters_Cursor : Defining_Name_To_Ada_Mode_Ordered_Maps.Cursor;
       Actual_Parameters : Unbounded_String;
       Indentation       : Natural;
 
@@ -1037,39 +1168,25 @@ package body Laltools.Refactor.Pull_Up_Declaration is
          if Ref (Call_Reference).Parent.Kind in Ada_Call_Stmt then
             Call := Ref (Call_Reference).Parent.As_Call_Stmt;
             Indentation := Natural (Call.Sloc_Range.End_Column) + 2 - 1;
-            Object_Decl := Key (Parameters_Cursor);
             Append (Actual_Parameters, " (");
             Append
               (Actual_Parameters,
-               (if Object_Decl.Kind in Ada_Object_Decl then
-                  +Object_Decl.As_Object_Decl.F_Ids.Text
-                else
-                  +Object_Decl.As_Param_Spec.F_Ids.Text));
+               +(Key (Parameters_Cursor).F_Name.Text));
             Append (Actual_Parameters, " => ");
             Append
               (Actual_Parameters,
-               (if Object_Decl.Kind in Ada_Object_Decl then
-                  +Object_Decl.As_Object_Decl.F_Ids.Text
-                else
-                  +Object_Decl.As_Param_Spec.F_Ids.Text));
+               +(Key (Parameters_Cursor).F_Name.Text));
             Next (Parameters_Cursor);
             while Has_Element (Parameters_Cursor) loop
-               Object_Decl := Key (Parameters_Cursor);
                Append (Actual_Parameters, "," & LF);
                Append (Actual_Parameters, Indentation * " ");
                Append
                  (Actual_Parameters,
-                  (if Object_Decl.Kind in Ada_Object_Decl then
-                     +Object_Decl.As_Object_Decl.F_Ids.Text
-                   else
-                     +Object_Decl.As_Param_Spec.F_Ids.Text));
+                  +(Key (Parameters_Cursor).F_Name.Text));
                Append (Actual_Parameters, " => ");
                Append
                  (Actual_Parameters,
-                  (if Object_Decl.Kind in Ada_Object_Decl then
-                     +Object_Decl.As_Object_Decl.F_Ids.Text
-                   else
-                     +Object_Decl.As_Param_Spec.F_Ids.Text));
+                  +(Key (Parameters_Cursor).F_Name.Text));
                Next (Parameters_Cursor);
             end loop;
             Append (Actual_Parameters, ")");
@@ -1095,29 +1212,24 @@ package body Laltools.Refactor.Pull_Up_Declaration is
                     Natural (First_Param_Assoc.Sloc_Range.Start_Column) - 1;
                   if Has_Designators then
                      while Has_Element (Parameters_Cursor) loop
-                        Object_Decl := Key (Parameters_Cursor);
                         Append (Actual_Parameters, "," & LF);
                         Append (Actual_Parameters, Indentation * " ");
                         Append
                           (Actual_Parameters,
-                           +Object_Decl.As_Object_Decl.F_Ids.Text);
+                           +(Key (Parameters_Cursor).F_Name.Text));
                         Append (Actual_Parameters, " => ");
                         Append
                           (Actual_Parameters,
-                           +Object_Decl.As_Object_Decl.F_Ids.Text);
+                           +(Key (Parameters_Cursor).F_Name.Text));
                         Next (Parameters_Cursor);
                      end loop;
                   else
                      while Has_Element (Parameters_Cursor) loop
-                        Object_Decl := Key (Parameters_Cursor);
                         Append (Actual_Parameters, "," & LF);
                         Append (Actual_Parameters, Indentation * " ");
                         Append
                           (Actual_Parameters,
-                           (if Object_Decl.Kind in Ada_Object_Decl then
-                              +Object_Decl.As_Object_Decl.F_Ids.Text
-                            else
-                              +Object_Decl.As_Param_Spec.F_Ids.Text));
+                           +(Key (Parameters_Cursor).F_Name.Text));
                         Next (Parameters_Cursor);
                      end loop;
                   end if;
@@ -1134,254 +1246,197 @@ package body Laltools.Refactor.Pull_Up_Declaration is
       return Insertions;
    end Compute_Actual_Parameter_Insertions;
 
-   ----------------------
-   -- Apply_Insertions --
-   ----------------------
+   -------------------------------
+   -- Apply_Extraction_Edits --
+   -------------------------------
 
-   function Apply_Insertions
-     (Unit        : Analysis_Unit;
-      SLOC_Ranges : Source_Location_Range_Ordered_Set;
-      Insertions  : Source_Location_To_Unbounded_String_Ordered_Map;
-      Padding     : Natural := 3)
+   function Apply_Extraction_Edits
+     (Unit                 : Analysis_Unit;
+      Original_SLOC_Ranges : Source_Location_Range_Ordered_Set;
+      Extraction_Edits     : Extraction_Edit_Ordered_Set;
+      Output_Text_Edits    :
+        out Source_Location_Range_To_Unbounded_String_Ordered_Map;
+      Extracted_Text      :
+        out Unbounded_String)
       return Unbounded_String
    is
       use Ada.Characters.Latin_1;
-      use Source_Location_To_Unbounded_String_Ordered_Maps;
+      use Extraction_Edit_Ordered_Sets;
 
-      Insertions_Cursor :
-        Source_Location_To_Unbounded_String_Ordered_Maps.Cursor :=
-          Insertions.Last;
-      Insertion_Point   : Source_Location :=
-        (if Has_Element (Insertions_Cursor) then  Key (Insertions_Cursor)
-         else No_Source_Location);
-      Insertion_Text    : Unbounded_String :=
-        (if Has_Element (Insertions_Cursor) then Element (Insertions_Cursor)
-         else Null_Unbounded_String);
-
-      Extracted_Text : Unbounded_String;
+      Extraction_Edits_Cursor : Cursor :=
+        Extraction_Edits.First;
+      Current_Extraction_Edit  : Extraction_Edit :=
+        (if Has_Element (Extraction_Edits_Cursor) then
+           Element (Extraction_Edits_Cursor)
+         else
+            No_Extraction_Edit);
+      Previous_Extraction_Edit : Extraction_Edit;
 
    begin
-      for SLOC_Range of reverse SLOC_Ranges loop
-         if SLOC_Range.Start_Line = SLOC_Range.End_Line then
-            --  Only one line to pull up
-            if Has_Element (Insertions_Cursor)
-              and then SLOC_Range.Start_Line = Insertion_Point.Line
-            then
-               declare
-                  Line        : constant Text_Type :=
-                    Unit.Get_Line (Integer (SLOC_Range.Start_Line));
-                  Start_Index : Integer :=
-                    Line'First + Integer (Insertion_Point.Column) - 1;
-                  End_Index   : Integer :=
-                    Line'First + Integer (SLOC_Range.End_Column) - 2;
+      --  Default the out parameters
+      Output_Text_Edits :=
+        Source_Location_Range_To_Unbounded_String_Ordered_Maps.Empty_Map;
+      Extracted_Text := Null_Unbounded_String;
 
-                  Slice           : Unbounded_String;
-                  Text_To_Extract : Unbounded_String;
+      for Original_SLOC_Range of Original_SLOC_Ranges loop
+         if Current_Extraction_Edit = No_Extraction_Edit then
+            Append
+              (Extracted_Text,
+               Get_Text (Unit, Original_SLOC_Range, False));
+            Append (Extracted_Text, LF);
+            Output_Text_Edits.Insert
+              (Original_SLOC_Range,
+               Null_Unbounded_String);
+
+         else
+            if Current_Extraction_Edit.SLOC_Range = Original_SLOC_Range then
+               Append
+                 (Extracted_Text,
+                  Current_Extraction_Edit.Extracted_Text & LF);
+               Output_Text_Edits.Insert
+                 (Original_SLOC_Range,
+                  Current_Extraction_Edit.Replacement_Text);
+
+               Next (Extraction_Edits_Cursor);
+               Current_Extraction_Edit :=
+                 (if Has_Element (Extraction_Edits_Cursor) then
+                    Element (Extraction_Edits_Cursor)
+                  else
+                    No_Extraction_Edit);
+
+            elsif Compare
+                   (Original_SLOC_Range,
+                    Start_Sloc (Current_Extraction_Edit.SLOC_Range)) = Inside
+            then
+               Ada.Assertions.Assert
+                 ("<="
+                    (End_Sloc (Current_Extraction_Edit.SLOC_Range),
+                     End_Sloc (Original_SLOC_Range)));
+
+               declare
+                  Pre_Extraction_Edit_SLOC_Range : Source_Location_Range :=
+                    Source_Location_Range'
+                      (Start_Line   => Original_SLOC_Range.Start_Line,
+                       End_Line     =>
+                         Current_Extraction_Edit.SLOC_Range.Start_Line,
+                       Start_Column => Original_SLOC_Range.Start_Column,
+                       End_Column   =>
+                         Current_Extraction_Edit.SLOC_Range.Start_Column);
+                  Pre_Extraction_Edit_Text       : Unbounded_String :=
+                    (if Start_Sloc (Pre_Extraction_Edit_SLOC_Range) /=
+                       End_Sloc (Pre_Extraction_Edit_SLOC_Range)
+                     then
+                       Get_Text
+                         (Unit           => Unit,
+                          SLOC_Range     =>
+                            Pre_Extraction_Edit_SLOC_Range,
+                          Prepend_Spaces => True)
+                     else
+                       Null_Unbounded_String);
+
+                  Edited_Extraction_Text : Unbounded_String;
+                  Edited_Output_Text     : Unbounded_String;
 
                begin
-                  --  Add the intertions while they belong to this
-                  --  line.
+                  Extraction_Edit_Loop :
                   loop
-                     Slice := +(+Line (Start_Index .. End_Index));
-                     Text_To_Extract :=
-                       Insertion_Text & Slice & Text_To_Extract;
-
-                     --  Go to the next insertion and update the
-                     --  intersion data if it exists. Otherwise,
-                     --  Append the last slice and exit.
-                     Previous (Insertions_Cursor);
-                     if Has_Element (Insertions_Cursor) then
-                        Insertion_Point := Key (Insertions_Cursor);
-                        Insertion_Text := Element (Insertions_Cursor);
-
-                     else
-                        Start_Index :=
-                          Line'First + Integer (SLOC_Range.Start_Column) - 1;
-                        End_Index := Start_Index - 1;
-
-                        Slice :=
-                          (Start_Index - Line'First) * " "
-                          & (+(+Line (Start_Index .. End_Index)));
-                        Text_To_Extract :=
-                          LF & Slice & Text_To_Extract;
-                        Extracted_Text :=
-                          Text_To_Extract & Extracted_Text;
-                        exit;
-                     end if;
-
-                     --  Update Start/End_Index taking into account if
-                     --  the next intersection is in this line.
-                     --  Also append the last slice and exit if it is
-                     --  not.
-                     if SLOC_Range.Start_Line /=
-                       Insertion_Point.Line
+                     Append
+                       (Edited_Extraction_Text, Pre_Extraction_Edit_Text);
+                     Append
+                       (Edited_Extraction_Text,
+                        Current_Extraction_Edit.Extracted_Text);
+                     if Current_Extraction_Edit.Replacement_Text /=
+                          ""
                      then
-                        Start_Index :=
-                          Line'First
-                            + Integer (SLOC_Range.Start_Column) - 1;
-                        End_Index := Start_Index - 1;
-
-                        Slice :=
-                          (Start_Index - Line'First) * " "
-                          & (+(+Line (Start_Index .. End_Index)));
-                        Text_To_Extract :=
-                          LF & Slice & Text_To_Extract;
-                        Extracted_Text :=
-                          Text_To_Extract & Extracted_Text;
-                        exit;
-
-                     else
-                        Start_Index :=
-                          Line'First
-                            + Integer (Insertion_Point.Column)
-                          - 1;
-                        End_Index := Start_Index - 1;
+                        Append
+                          (Edited_Output_Text,
+                           Current_Extraction_Edit.Replacement_Text);
+                        Append (Edited_Output_Text, LF);
                      end if;
-                  end loop;
+
+                     Previous_Extraction_Edit := Current_Extraction_Edit;
+
+                     Next (Extraction_Edits_Cursor);
+                     Current_Extraction_Edit :=
+                       (if Has_Element (Extraction_Edits_Cursor) then
+                          Element (Extraction_Edits_Cursor)
+                        else
+                          No_Extraction_Edit);
+
+                     exit Extraction_Edit_Loop
+                       when Current_Extraction_Edit = No_Extraction_Edit
+                         or else Compare
+                         (Original_SLOC_Range,
+                          Start_Sloc (Current_Extraction_Edit.SLOC_Range))
+                           /= Inside;
+
+                     Pre_Extraction_Edit_SLOC_Range :=
+                       Source_Location_Range'
+                         (Start_Line   =>
+                            Previous_Extraction_Edit.SLOC_Range.End_Line,
+                          End_Line     =>
+                            Current_Extraction_Edit.SLOC_Range.Start_Line,
+                          Start_Column =>
+                            Previous_Extraction_Edit.SLOC_Range.End_Column,
+                          End_Column   =>
+                            Current_Extraction_Edit.SLOC_Range.Start_Column);
+                     Pre_Extraction_Edit_Text :=
+                       (if Start_Sloc (Pre_Extraction_Edit_SLOC_Range) /=
+                            End_Sloc (Pre_Extraction_Edit_SLOC_Range)
+                        then
+                          Get_Text
+                            (Unit           => Unit,
+                             SLOC_Range     =>
+                               Pre_Extraction_Edit_SLOC_Range,
+                             Prepend_Spaces => False)
+                        else
+                           Null_Unbounded_String);
+                  end loop Extraction_Edit_Loop;
+
+                  declare
+                     Post_Extraction_Edit_SLOC_Range :
+                       constant Source_Location_Range :=
+                         Source_Location_Range'
+                           (Start_Line   =>
+                              Previous_Extraction_Edit.SLOC_Range.End_Line,
+                            End_Line     => Original_SLOC_Range.End_Line,
+                            Start_Column =>
+                              Previous_Extraction_Edit.SLOC_Range.End_Column,
+                            End_Column   => Original_SLOC_Range.End_Column);
+                     Post_Extraction_Edit_Text       :
+                       constant Unbounded_String :=
+                         (if Start_Sloc (Post_Extraction_Edit_SLOC_Range) /=
+                            End_Sloc (Post_Extraction_Edit_SLOC_Range)
+                          then
+                            Get_Text
+                              (Unit           => Unit,
+                               SLOC_Range     =>
+                                 Post_Extraction_Edit_SLOC_Range,
+                               Prepend_Spaces => False)
+                          else
+                            Null_Unbounded_String);
+
+                  begin
+                     Append
+                       (Edited_Extraction_Text, Post_Extraction_Edit_Text);
+                     Append (Edited_Extraction_Text, LF);
+                  end;
+
+                  Append (Extracted_Text, Edited_Extraction_Text);
+                  Output_Text_Edits.Insert
+                    (Original_SLOC_Range, Edited_Output_Text);
                end;
 
             else
-               declare
-                  Line        : constant Text_Type :=
-                    Unit.Get_Line (Integer (SLOC_Range.Start_Line));
-                  Start_Index : constant Natural :=
-                    Line'First + Integer (SLOC_Range.Start_Column) - 1;
-                  End_Index   : constant Natural :=
-                    Line'First + Integer (SLOC_Range.End_Column) - 2;
-                  Line_Text   : constant Unbounded_String :=
-                    (Start_Index - Line'First) * " "
-                    & (+(+(Line (Start_Index .. End_Index))));
+               Append
+                 (Extracted_Text,
+                  Get_Text (Unit, Original_SLOC_Range, True));
+               Append (Extracted_Text, LF);
 
-               begin
-                  Extracted_Text := LF & Line_Text & Extracted_Text;
-               end;
+               Output_Text_Edits.Insert
+                 (Original_SLOC_Range,
+                  Null_Unbounded_String);
             end if;
-
-         else
-            --  Multiples lines to extract
-            for Line_Number in reverse
-              SLOC_Range.Start_Line .. SLOC_Range.End_Line
-            loop
-               if Has_Element (Insertions_Cursor)
-                 and then Line_Number = Insertion_Point.Line
-               then
-                  --  There is a least one insertion point in this
-                  --  line.
-                  declare
-                     Line        : constant Text_Type :=
-                       Unit.Get_Line (Integer (Line_Number));
-                     Start_Index : Integer :=
-                       Line'First + Integer (Insertion_Point.Column) - 1;
-                     End_Index   : Integer :=
-                       (if Line_Number = SLOC_Range.End_Line then
-                           Line'First + Integer (SLOC_Range.End_Column) - 2
-                        else
-                           Line'Last);
-
-                     Slice           : Unbounded_String;
-                     Text_To_Extract : Unbounded_String;
-
-                  begin
-                     --  Add the intertions while they belong to this
-                     --  line.
-                     loop
-                        Slice := +(+(Line (Start_Index .. End_Index)));
-                        Text_To_Extract :=
-                          Insertion_Text & Slice & Text_To_Extract;
-
-                        --  Go to the next insertion and update the
-                        --  insertion data if it exists. Otherwise,
-                        --  Append the last slice and exit.
-                        Previous (Insertions_Cursor);
-                        if Has_Element (Insertions_Cursor) then
-                           Insertion_Point :=
-                             Key (Insertions_Cursor);
-                           Insertion_Text :=
-                             Element (Insertions_Cursor);
-                        else
-                           End_Index := Start_Index - 1;
-                           Start_Index :=
-                             (if Line_Number =
-                                SLOC_Range.Start_Line
-                              then
-                                Line'First
-                                + Integer (SLOC_Range.Start_Column)
-                                - 1
-                              else
-                                Line'First);
-
-                           Slice :=
-                             (Start_Index - Line'First) * " "
-                             & (+(+Line (Start_Index .. End_Index)));
-                           Text_To_Extract := Slice & Text_To_Extract;
-                           Extracted_Text :=
-                             LF & Text_To_Extract & Extracted_Text;
-                           exit;
-                        end if;
-
-                        --  Update Start/End_Index taking into account
-                        --  if the next interstion is in this line.
-                        --  Also append the last slice and exit if it
-                        --  is not.
-                        if Line_Number /=
-                          Insertion_Point.Line
-                        then
-                           End_Index := Start_Index - 1;
-                           Start_Index :=
-                             (if Line_Number =  SLOC_Range.Start_Line then
-                                Line'First
-                                + Integer (SLOC_Range.Start_Column)
-                                - 1
-                              else
-                                Line'First);
-
-                           Slice :=
-                             (Start_Index - Line'First) * " "
-                             & (+(+(Line (Start_Index .. End_Index))));
-                           Text_To_Extract :=
-                             Slice & Text_To_Extract;
-                           Extracted_Text :=
-                             LF & Text_To_Extract & Extracted_Text;
-                           exit;
-                        else
-                           End_Index := Start_Index - 1;
-                           Start_Index :=
-                             Line'First + Integer (Insertion_Point.Column) - 1;
-                        end if;
-                     end loop;
-                  end;
-               else
-                  declare
-                     Line            : constant Text_Type :=
-                       Unit.Get_Line
-                         (Integer (Line_Number));
-                     Start_Index     : constant Integer :=
-                       (if Line_Number =
-                          SLOC_Range.Start_Line
-                        then
-                          Line'First
-                          + Integer (SLOC_Range.Start_Column)
-                          - 1
-                        else Line'First);
-                     End_Index       : constant Integer :=
-                       (if Line_Number =
-                          SLOC_Range.End_Line
-                        then
-                          Line'First
-                          + Integer (SLOC_Range.End_Column)
-                          - 2
-                        else
-                           Line'Last);
-                     Line_Text   : constant Unbounded_String :=
-                       (Start_Index - Line'First) * " "
-                       & (+(+(Line (Start_Index .. End_Index))));
-
-                  begin
-                     Extracted_Text :=
-                       LF & Line_Text & Extracted_Text;
-                  end;
-               end if;
-            end loop;
          end if;
       end loop;
 
@@ -1404,16 +1459,16 @@ package body Laltools.Refactor.Pull_Up_Declaration is
               (Extracted_Text,
                (if Cursor = Slice_Count (Extracted_Text_Lines) then
                   Remove_Padding
-                    (Slice (Extracted_Text_Lines, Cursor), Padding)
+                    (Slice (Extracted_Text_Lines, Cursor), 3)
                 else
                   Remove_Padding
-                  (Slice (Extracted_Text_Lines, Cursor) & LF, Padding)));
+                    (Slice (Extracted_Text_Lines, Cursor) & LF, 3)));
             Cursor := Advance (Extracted_Text_Lines, Cursor);
          end loop;
       end;
 
       return Extracted_Text;
-   end Apply_Insertions;
+   end Apply_Extraction_Edits;
 
    --------------------
    -- Remove_Padding --
@@ -1514,14 +1569,14 @@ package body Laltools.Refactor.Pull_Up_Declaration is
 
    function Create_Declaration_Pull_Upper
      (Unit              : Analysis_Unit;
-      Declaration_SLOC  : Source_Location;
+      Definition_SLOC   : Source_Location;
       Indentation       : Natural := 3;
       Only_Dependencies : Boolean := False;
       Try_Subp_Insertion_Point : Boolean := False)
       return Declaration_Extractor
-   is ((Declaration                     =>
-          (Unit.Root.Lookup (Declaration_SLOC).As_Name.
-             P_Enclosing_Defining_Name.P_Basic_Decl.P_Canonical_Part),
+   is ((Definition                      =>
+          (Unit.Root.Lookup (Definition_SLOC).As_Name.
+             P_Enclosing_Defining_Name.P_Canonical_Part),
         Indentation                     => Indentation,
         Only_Dependencies               => Only_Dependencies,
         Try_Subp_Insertion_Point => Try_Subp_Insertion_Point));
@@ -1536,23 +1591,14 @@ package body Laltools.Refactor.Pull_Up_Declaration is
       Analysis_Units : access function return Analysis_Unit_Array)
       return Refactoring_Edits
    is
-      Unit : constant Analysis_Unit := Self.Declaration.Unit;
+      Unit : constant Analysis_Unit := Self.Definition.Unit;
 
       Insertion_Point : constant Insertion_Point_Type :=
         Get_Insertion_Point
-          (Self.Declaration, Self.Try_Subp_Insertion_Point);
-
-      Declarations_To_Pull_Up : Unbounded_String;
+          (Self.Definition, Self.Try_Subp_Insertion_Point);
 
       Text_Edits : Text_Edit_Map;
       Edits      : Refactoring_Edits;
-
-      procedure Append
-        (Text       : in out Unbounded_String;
-         Unit       : Analysis_Unit;
-         SLOC_Range : Source_Location_Range);
-      --  Adds to Text the text in the SLOC_Range of Unit, removing leading
-      --  whitespaces (the amount of whitespaces is given by Padding).
 
       procedure Process_Non_Subprogram;
       --  Pull up a declaration that is not a subprogram
@@ -1560,129 +1606,307 @@ package body Laltools.Refactor.Pull_Up_Declaration is
       procedure Process_Subprogram;
       --  Pull up a declaration that is a subprogram
 
-      ------------
-      -- Append --
-      ------------
+      package Basic_Decl_To_Defining_Name_Ordered_Set_Ordered_Maps is new
+        Ordered_Maps
+          (Key_Type     => Basic_Decl,
+           Element_Type => Defining_Name_Ordered_Set,
+           "<"          => "<",
+           "="          => Defining_Name_Ordered_Sets."=");
 
-      procedure Append
-        (Text       : in out Unbounded_String;
-         Unit       : Analysis_Unit;
-         SLOC_Range : Source_Location_Range)
+      subtype Basic_Decl_To_Defining_Name_Ordered_Set_Ordered_Map is
+        Basic_Decl_To_Defining_Name_Ordered_Set_Ordered_Maps.Map;
+
+      function Ordered_Keys
+        (Map : Basic_Decl_To_Defining_Name_Ordered_Set_Ordered_Map)
+         return Basic_Decl_Ordered_Set;
+      --  Returns a ordered set with Map's keys
+
+      ------------------
+      -- Ordered_Keys --
+      ------------------
+
+      function Ordered_Keys
+        (Map : Basic_Decl_To_Defining_Name_Ordered_Set_Ordered_Map)
+            return Basic_Decl_Ordered_Set
       is
-         use Ada.Characters.Latin_1;
+         use Basic_Decl_To_Defining_Name_Ordered_Set_Ordered_Maps;
+
+         C : Cursor := Map.First;
 
       begin
-         if SLOC_Range.Start_Line = SLOC_Range.End_Line then
+         return Keys : Basic_Decl_Ordered_Set do
+            while Has_Element (C) loop
+               Keys.Insert (Key (C));
+               Next (C);
+            end loop;
+         end return;
+      end Ordered_Keys;
+
+      procedure Split_Definitions_To_Pull_Up
+        (Definitions_To_Pull_Up_As_Declarations  :
+         Defining_Name_Ordered_Set;
+         Declarations_To_Pull_Up_As_Declarations :
+         out Basic_Decl_Ordered_Set;
+         Declarations_To_Pull_Up_Incompletelly   :
+         out Basic_Decl_To_Defining_Name_Ordered_Set_Ordered_Map);
+      --  Splits Definitions_To_Pull_Up_As_Declarations in two groups:
+      --  1) A set with all the declarations that need to be fully pulled up
+      --  2) A map where the keys are the declarations that need to be
+      --     partially pulled up and the values are the defining names that
+      --     need to be pulled up.
+
+      ----------------------------------
+      -- Split_Definitions_To_Pull_Up --
+      ----------------------------------
+
+      procedure Split_Definitions_To_Pull_Up
+        (Definitions_To_Pull_Up_As_Declarations  :
+         Defining_Name_Ordered_Set;
+         Declarations_To_Pull_Up_As_Declarations :
+         out Basic_Decl_Ordered_Set;
+         Declarations_To_Pull_Up_Incompletelly   :
+         out Basic_Decl_To_Defining_Name_Ordered_Set_Ordered_Map) is
+      begin
+         for Definition of Definitions_To_Pull_Up_As_Declarations loop
+            if Definition.Parent.Kind in Ada_Defining_Name_List_Range
+              and then Definition.Parent.Children_Count > 1
+            then
+               if Declarations_To_Pull_Up_Incompletelly.Contains
+                 (Definition.P_Basic_Decl)
+               then
+                  Declarations_To_Pull_Up_Incompletelly.Reference
+                    (Definition.P_Basic_Decl).Insert (Definition);
+               else
+                  declare
+                     Group : Defining_Name_Ordered_Set;
+
+                  begin
+                     Group.Insert (Definition);
+                     Declarations_To_Pull_Up_Incompletelly.Insert
+                       (Definition.P_Basic_Decl, Group);
+                  end;
+               end if;
+
+            else
+               Declarations_To_Pull_Up_As_Declarations.Insert
+                 (Definition.P_Basic_Decl);
+            end if;
+         end loop;
+
+         declare
+            use Basic_Decl_To_Defining_Name_Ordered_Set_Ordered_Maps;
+
+            Complete_Basic_Decls : Basic_Decl_Ordered_Set;
+
+            C : Cursor := Declarations_To_Pull_Up_Incompletelly.First;
+
+         begin
+            while Has_Element (C) loop
+               if (for all Definition of Key (C).P_Defining_Names
+                   => Definitions_To_Pull_Up_As_Declarations.Contains
+                     (Definition))
+               then
+                  Complete_Basic_Decls.Insert (Key (C));
+               end if;
+               Next (C);
+            end loop;
+
+            for Basic_Decl of Complete_Basic_Decls loop
+               Declarations_To_Pull_Up_Incompletelly.Delete (Basic_Decl);
+            end loop;
+         end;
+      end Split_Definitions_To_Pull_Up;
+
+      function Compute_Declarations_To_Pull_Up_Incompletelly_Extraction_Edits
+        (Declarations_To_Pull_Up_Incompletelly :
+           Basic_Decl_To_Defining_Name_Ordered_Set_Ordered_Map)
+         return Extraction_Edit_Ordered_Set;
+      --  Object declarations that need to be pulled up incompletelly
+      --  need a special handling. The pulled up text can only contain the
+      --  declarations that must be pulled up and the original list of
+      --  object should be replaced by the ones that will not be pulled up.
+
+      --------------------------------------------------------------------
+      -- Compute_Declarations_To_Pull_Up_Incompletelly_Extraction_Edits --
+      --------------------------------------------------------------------
+
+      function Compute_Declarations_To_Pull_Up_Incompletelly_Extraction_Edits
+        (Declarations_To_Pull_Up_Incompletelly :
+         Basic_Decl_To_Defining_Name_Ordered_Set_Ordered_Map)
+         return Extraction_Edit_Ordered_Set
+      is
+         use Basic_Decl_To_Defining_Name_Ordered_Set_Ordered_Maps;
+
+         C : Cursor := Declarations_To_Pull_Up_Incompletelly.First;
+
+         Result : Extraction_Edit_Ordered_Set;
+
+      begin
+         while Has_Element (C) loop
             declare
-               Start_Line       : constant Text_Type :=
-                 Unit.Get_Line (Positive (SLOC_Range.Start_Line));
-               Start_Line_Slice : constant String :=
-                 +(Start_Line
-                     (Start_Line'First + Positive (SLOC_Range.Start_Column) - 1
-                      .. Start_Line'First + Positive (SLOC_Range.End_Column)
-                         - 2));
+               First_Extracted   : Boolean := True;
+               First_Replacement : Boolean := True;
+
+               Declaration : constant Object_Decl :=
+                 Key (C).As_Object_Decl;
+               Definitions : constant Defining_Name_List :=
+                 Declaration.F_Ids;
+
+               Decl_Text_WO_Definitions : constant Unbounded_String :=
+                 Get_Text
+                   (Definitions.Unit,
+                    Make_Range
+                      (End_Sloc (Definitions.Sloc_Range),
+                       End_Sloc (Declaration.Sloc_Range)));
+
+               Declaration_Extraction_Edit : Extraction_Edit;
 
             begin
-               Append (Text, Remove_Padding (Start_Line_Slice) & LF);
-            end;
+               Declaration_Extraction_Edit.SLOC_Range :=
+                 Declaration.Sloc_Range;
 
-         elsif SLOC_Range.End_Line = SLOC_Range.Start_Line + 1 then
-            declare
-               Start_Line       : constant Text_Type :=
-                 Unit.Get_Line (Positive (SLOC_Range.Start_Line));
-               Start_Line_Slice : constant String :=
-                 +(Start_Line
-                     (Start_Line'First + Positive (SLOC_Range.Start_Column) - 1
-                      .. Start_Line'Last));
+               for Definition of Definitions loop
+                  if Element (C).Contains (Definition.As_Defining_Name) then
+                     --  This definition needs to be pulled up
+                     if not First_Extracted then
+                        Append
+                          (Declaration_Extraction_Edit.Extracted_Text,
+                           ", ");
+                     end if;
+                     First_Extracted := True;
 
-               End_Line       : constant Text_Type :=
-                 Unit.Get_Line (Positive (SLOC_Range.End_Line));
-               End_Line_Slice : constant String :=
-                 +End_Line
-                   (End_Line'First ..
-                    End_Line'First + Positive (SLOC_Range.End_Column) - 2);
+                     Append
+                       (Declaration_Extraction_Edit.Extracted_Text,
+                        +(+Definition.Text));
 
-            begin
-               Append (Text, Remove_Padding (Start_Line_Slice) & LF);
-               Append (Text, Remove_Padding (End_Line_Slice) & LF);
-            end;
-         else
-            declare
-               Start_Line       : constant Text_Type :=
-                 Unit.Get_Line (Positive (SLOC_Range.Start_Line));
-               Start_Line_Slice : constant String :=
-                 +Start_Line
-                    (Start_Line'First + Positive (SLOC_Range.Start_Column) - 1
-                     .. Start_Line'Last);
+                  else
+                     --  This definition cannot be pulled up
+                     if not First_Replacement then
+                        Append
+                          (Declaration_Extraction_Edit.Replacement_Text,
+                           ", ");
+                     end if;
+                     First_Replacement := False;
 
-               End_Line       : constant Text_Type :=
-                 Unit.Get_Line (Positive (SLOC_Range.End_Line));
-               End_Line_Slice : constant String :=
-                 +End_Line
-                    (End_Line'First
-                     .. End_Line'First + Positive (SLOC_Range.End_Column) - 2);
+                     Append
+                       (Declaration_Extraction_Edit.Replacement_Text,
+                        +(+Definition.Text));
 
-            begin
-               Append (Text, Remove_Padding (Start_Line_Slice) & LF);
-               for Line_Number in
-                 SLOC_Range.Start_Line + 1 .. SLOC_Range.End_Line - 1
-               loop
-                  Append
-                    (Text,
-                     Remove_Padding (+Unit.Get_Line (Positive (Line_Number)))
-                     & LF);
+                  end if;
                end loop;
                Append
-                 (Text,
-                  Remove_Padding (End_Line_Slice)
-                  & LF);
+                 (Declaration_Extraction_Edit.Extracted_Text,
+                  Decl_Text_WO_Definitions);
+               Append
+                 (Declaration_Extraction_Edit.Replacement_Text,
+                  Decl_Text_WO_Definitions);
+
+               Result.Insert (Declaration_Extraction_Edit);
             end;
-         end if;
-      end Append;
+
+            Next (C);
+         end loop;
+
+         return Result;
+      end Compute_Declarations_To_Pull_Up_Incompletelly_Extraction_Edits;
 
       ----------------------------
       -- Process_Non_Subprogram --
       ----------------------------
 
       procedure Process_Non_Subprogram is
-         SLOC_Ranges_To_Pull_Up : Source_Location_Range_Ordered_Set;
+         Declarations_To_Pull_Up_SLOCs : Source_Location_Range_Ordered_Set;
+
+         Definitions_To_Pull_Up : Defining_Name_Ordered_Set;
+
+         Declarations_To_Pull_Up_As_Declarations : Basic_Decl_Ordered_Set;
+         Declarations_To_Pull_Up_Incompletelly   :
+           Basic_Decl_To_Defining_Name_Ordered_Set_Ordered_Map;
+
+         Declarations_To_Pull_Up_Incompletelly_Extraction_Edits :
+           Extraction_Edit_Ordered_Set;
+
+         Output_Text_Edits :
+           Source_Location_Range_To_Unbounded_String_Ordered_Map;
+         Declarations_To_Pull_Up_Text : Unbounded_String;
 
       begin
-         for Local_Dependency of
-           Get_Local_Dependencies (Self.Declaration.P_Defining_Name)
+         for Local_Dependency of Get_Local_Dependencies (Self.Definition)
            when Local_Dependency.P_Basic_Decl.Kind not in Ada_Param_Spec_Range
          loop
+            Definitions_To_Pull_Up.Include (Local_Dependency);
+
             for Local_Dependency_Part of
-                  Local_Dependency.P_Basic_Decl.P_All_Parts
+                  Local_Dependency.P_All_Parts
             loop
-               SLOC_Ranges_To_Pull_Up.Include
+               Declarations_To_Pull_Up_SLOCs.Include
                  (Get_Declaration_SLOC_Range_With_Comments
-                    (Local_Dependency_Part));
+                    (Local_Dependency_Part.P_Basic_Decl));
             end loop;
          end loop;
 
          if not Self.Only_Dependencies then
-            for Declaration_Part of Self.Declaration.P_All_Parts loop
-               SLOC_Ranges_To_Pull_Up.Include
-                 (Get_Declaration_SLOC_Range_With_Comments (Declaration_Part));
+            Definitions_To_Pull_Up.Include (Self.Definition);
+            for Declaration_Part of Self.Definition.P_All_Parts loop
+               Declarations_To_Pull_Up_SLOCs.Include
+                 (Get_Declaration_SLOC_Range_With_Comments
+                    (Declaration_Part.P_Basic_Decl));
             end loop;
          end if;
 
-         SLOC_Ranges_To_Pull_Up :=
-           Expand_SLOC_Ranges (Unit, SLOC_Ranges_To_Pull_Up);
-         SLOC_Ranges_To_Pull_Up :=
-           Merge_Intersecting_SLOC_Ranges (Unit, SLOC_Ranges_To_Pull_Up);
+         Split_Definitions_To_Pull_Up
+           (Definitions_To_Pull_Up,
+            Declarations_To_Pull_Up_As_Declarations,
+            Declarations_To_Pull_Up_Incompletelly);
 
-         for SLOC_Range of SLOC_Ranges_To_Pull_Up loop
-            Safe_Insert
-              (Edits     => Text_Edits,
-               File_Name => Unit.Get_Filename,
-               Edit      => Text_Edit'(SLOC_Range, Null_Unbounded_String));
-            Append
-              (Declarations_To_Pull_Up,
-               Unit,
-               SLOC_Range);
-         end loop;
+         Declarations_To_Pull_Up_Incompletelly_Extraction_Edits :=
+           Compute_Declarations_To_Pull_Up_Incompletelly_Extraction_Edits
+             (Declarations_To_Pull_Up_Incompletelly);
+
+         Declarations_To_Pull_Up_SLOCs :=
+           Expand_SLOC_Ranges (Unit, Declarations_To_Pull_Up_SLOCs);
+         Declarations_To_Pull_Up_SLOCs :=
+           Merge_Intersecting_SLOC_Ranges
+             (Unit, Declarations_To_Pull_Up_SLOCs);
+
+         --  for SLOC_Range of Declarations_To_Pull_Up_SLOCs loop
+         --     Safe_Insert
+         --       (Edits     => Text_Edits,
+         --        File_Name => Unit.Get_Filename,
+         --        Edit      => Text_Edit'(SLOC_Range, Null_Unbounded_String));
+         --     Append
+         --       (Declarations_To_Pull_Up,
+         --        Unit,
+         --        SLOC_Range);
+         --  end loop;
+
+         Declarations_To_Pull_Up_Text :=
+           Apply_Extraction_Edits
+             (Unit                 => Unit,
+              Original_SLOC_Ranges => Declarations_To_Pull_Up_SLOCs,
+              Extraction_Edits     =>
+                Declarations_To_Pull_Up_Incompletelly_Extraction_Edits,
+              Output_Text_Edits    => Output_Text_Edits,
+              Extracted_Text       => Declarations_To_Pull_Up_Text);
+
+         --  Replace the Source_Location_Ranges of the declarations that
+         --  need to be pulled up by an empty string.
+         declare
+            use Source_Location_Range_To_Unbounded_String_Ordered_Maps;
+            C : Cursor := Output_Text_Edits.First;
+
+         begin
+            while Has_Element (C) loop
+               Safe_Insert
+                 (Edits     => Text_Edits,
+                  File_Name => Self.Definition.Unit.Get_Filename,
+                  Edit      =>
+                    Text_Edit'
+                      (Key (C),
+                       Element (C)));
+               Next (C);
+            end loop;
+         end;
 
          Safe_Insert
            (Edits     => Text_Edits,
@@ -1692,7 +1916,7 @@ package body Laltools.Refactor.Pull_Up_Declaration is
                 (Make_Range
                    (Insertion_Point.Location,
                     Insertion_Point.Location),
-                 Declarations_To_Pull_Up));
+                 Declarations_To_Pull_Up_Text));
       end Process_Non_Subprogram;
 
       ------------------------
@@ -1700,47 +1924,74 @@ package body Laltools.Refactor.Pull_Up_Declaration is
       ------------------------
 
       procedure Process_Subprogram is
-         Declarations_To_Pull_Up       : Basic_Decl_Ordered_Set;
-         Parameters_To_Pull_Up         : Basic_Decl_Ordered_Set;
-         Subprogram_Headers            : Source_Location_Range_Ordered_Set;
-         Parameters_Mode               : Basic_Decl_To_Ada_Mode_Ordered_Map;
-         Parameter_Insertions          :
+         All_Definitions_To_Pull_Up_As_Declarations :
+           Defining_Name_Ordered_Set;
+         All_Definitions_To_Pull_Up_As_Parameters   :
+           Defining_Name_Ordered_Set;
+
+         Declarations_To_Pull_Up_As_Declarations : Basic_Decl_Ordered_Set;
+         Declarations_To_Pull_Up_Incompletelly   :
+           Basic_Decl_To_Defining_Name_Ordered_Set_Ordered_Map;
+
+         Subprogram_Headers             : Source_Location_Range_Ordered_Set;
+         Parameters_Mode                :
+           Defining_Name_To_Ada_Mode_Ordered_Map;
+         Parameter_Insertions           :
+           Extraction_Edit_Ordered_Set;
+         Actual_Parameter_Insertions    :
            Source_Location_To_Unbounded_String_Ordered_Map;
-         Actual_Parameter_Insertions   :
-           Source_Location_To_Unbounded_String_Ordered_Map;
-         Declarations_To_Pull_Up_SLOCs : Source_Location_Range_Ordered_Set;
-         Declarations_To_Pull_Up_Text  : Unbounded_String;
+         Declarations_To_Pull_Up_Incompletelly_Extraction_Edits :
+           Extraction_Edit_Ordered_Set;
+
+         Declarations_To_Pull_Up_SLOCs  : Source_Location_Range_Ordered_Set;
+         Declarations_To_Pull_Up_Text   : Unbounded_String;
+
+         Output_Text_Edits :
+           Source_Location_Range_To_Unbounded_String_Ordered_Map;
 
       begin
          --  For a subprogram, some object declarations can now be passed as a
          --  new parameter. So compute which declarations need to be pulled up
          --  and which object declarations need to be added as parameters.
-         Compute_Subp_Dependencies_To_Pull_Up
-           (Subp                    => Self.Declaration,
-            Declarations_To_Pull_Up => Declarations_To_Pull_Up,
-            Parameters_To_Pull_Up   => Parameters_To_Pull_Up);
+         Find_Subp_Dependencies_To_Pull_Up
+           (Subp                    => Self.Definition.P_Basic_Decl,
+            Definitions_To_Pull_Up_As_Declarations =>
+              All_Definitions_To_Pull_Up_As_Declarations,
+            Definitions_To_Pull_Up_As_Parameters   =>
+              All_Definitions_To_Pull_Up_As_Parameters);
 
          if not Self.Only_Dependencies then
-            Declarations_To_Pull_Up.Include (Self.Declaration);
+            All_Definitions_To_Pull_Up_As_Declarations.Include
+              (Self.Definition);
          end if;
 
-         --  For any dependency in Declarations_To_Pull_Up that is a
-         --  subprogram, including Self.Declaration, find their headers.
-         Subprogram_Headers := Get_Subp_Headers (Declarations_To_Pull_Up);
+         Split_Definitions_To_Pull_Up
+           (All_Definitions_To_Pull_Up_As_Declarations,
+            Declarations_To_Pull_Up_As_Declarations,
+            Declarations_To_Pull_Up_Incompletelly);
+
+         Declarations_To_Pull_Up_Incompletelly_Extraction_Edits :=
+           Compute_Declarations_To_Pull_Up_Incompletelly_Extraction_Edits
+             (Declarations_To_Pull_Up_Incompletelly);
 
          --  For each declaration that needs to be added as a parameter,
          --  compute which parameter mode it needs to have.
          Parameters_Mode :=
            Compute_Parameters_Mode
-             (Subp         => Self.Declaration,
-              Object_Decls => Parameters_To_Pull_Up);
+             (Subp         => Self.Definition.P_Basic_Decl,
+              Object_Decls => All_Definitions_To_Pull_Up_As_Parameters);
+
+         --  For any dependency in Declarations_To_Pull_Up that is a
+         --  subprogram, including Self.Declaration, find their headers.
+         Subprogram_Headers :=
+           Get_Subp_Headers (All_Definitions_To_Pull_Up_As_Declarations);
 
          --  Formal parameters need to be added to the spec of
          --  Self.Declaration. Compute the Source_Location where they need to
          --  be added in the spec.
          Parameter_Insertions :=
            Compute_Parameter_Insertions
-             (Subp            => Self.Declaration,
+             (Subp            => Self.Definition.P_Basic_Decl,
               Parameters_Mode => Parameters_Mode);
 
          --  Actual parameters need to be added to Self.Declaration's calls.
@@ -1748,7 +1999,7 @@ package body Laltools.Refactor.Pull_Up_Declaration is
          --  such calls.
          Actual_Parameter_Insertions :=
            Compute_Actual_Parameter_Insertions
-             (Subp            => Self.Declaration,
+             (Subp            => Self.Definition.P_Basic_Decl,
               Analysis_Units  => Analysis_Units.all,
               Parameters_Mode => Parameters_Mode);
 
@@ -1757,13 +2008,25 @@ package body Laltools.Refactor.Pull_Up_Declaration is
          --  the dependency, compute it's Source_Location_Range, including
          --  leading whitespaces, adjacent comments and blank lines that
          --  follow immidiatelly after.
-         for Declaration of Declarations_To_Pull_Up loop
-            for Declaration_Part of Declaration.P_All_Parts loop
-               Declarations_To_Pull_Up_SLOCs.Include
-                 (Get_Declaration_SLOC_Range_With_Comments
-                    (Declaration_Part));
+         declare
+            use Basic_Decl_Ordered_Sets;
+
+            All_Declarations : constant Basic_Decl_Ordered_Set :=
+              Union
+                (Declarations_To_Pull_Up_As_Declarations,
+                 Ordered_Keys (Declarations_To_Pull_Up_Incompletelly));
+
+         begin
+            for Declaration of All_Declarations loop
+               for Defining_Name of Declaration.P_Defining_Names loop
+                  for Definition_Part of Defining_Name.P_All_Parts loop
+                     Declarations_To_Pull_Up_SLOCs.Include
+                       (Get_Declaration_SLOC_Range_With_Comments
+                          (Definition_Part.P_Basic_Decl));
+                  end loop;
+               end loop;
             end loop;
-         end loop;
+         end;
          Declarations_To_Pull_Up_SLOCs.Union (Subprogram_Headers);
          Declarations_To_Pull_Up_SLOCs :=
            Expand_SLOC_Ranges (Unit, Declarations_To_Pull_Up_SLOCs);
@@ -1776,20 +2039,34 @@ package body Laltools.Refactor.Pull_Up_Declaration is
          --  all that text while inserting the formal parameters in
          --  Self.Declaration's spec and body.
          Declarations_To_Pull_Up_Text :=
-           Apply_Insertions
-             (Unit, Declarations_To_Pull_Up_SLOCs, Parameter_Insertions);
+           Apply_Extraction_Edits
+             (Unit                 => Unit,
+              Original_SLOC_Ranges => Declarations_To_Pull_Up_SLOCs,
+              Extraction_Edits     =>
+                Extraction_Edit_Ordered_Sets.Union
+                  (Declarations_To_Pull_Up_Incompletelly_Extraction_Edits,
+                   Parameter_Insertions),
+              Output_Text_Edits    => Output_Text_Edits,
+              Extracted_Text       => Declarations_To_Pull_Up_Text);
 
          --  Replace the Source_Location_Ranges of the declarations that
          --  need to be pulled up by an empty string.
-         for SLOC_Range of Declarations_To_Pull_Up_SLOCs loop
-            Safe_Insert
-              (Edits     => Text_Edits,
-               File_Name => Self.Declaration.Unit.Get_Filename,
-               Edit      =>
-                 Text_Edit'
-                   (SLOC_Range,
-                    Null_Unbounded_String));
-         end loop;
+         declare
+            use Source_Location_Range_To_Unbounded_String_Ordered_Maps;
+            C : Cursor := Output_Text_Edits.First;
+
+         begin
+            while Has_Element (C) loop
+               Safe_Insert
+                 (Edits     => Text_Edits,
+                  File_Name => Self.Definition.Unit.Get_Filename,
+                  Edit      =>
+                    Text_Edit'
+                      (Key (C),
+                       Element (C)));
+               Next (C);
+            end loop;
+         end;
 
          --  Insert the pulled up declarations in the parent Declarative_Part
          Safe_Insert
@@ -1827,7 +2104,7 @@ package body Laltools.Refactor.Pull_Up_Declaration is
       end Process_Subprogram;
 
    begin
-      if not Is_Subprogram (Self.Declaration) then
+      if not Is_Subprogram (Self.Definition.P_Basic_Decl) then
          Process_Non_Subprogram;
       else
          Process_Subprogram;

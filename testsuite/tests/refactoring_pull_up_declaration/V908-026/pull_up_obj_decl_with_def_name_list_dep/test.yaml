@@ -1,0 +1,5 @@
+title: pull_up_obj_decl_with_def_name_list_dep
+
+description: pull_up_declaration tool test
+
+driver: shell_script
