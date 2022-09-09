@@ -844,7 +844,9 @@ package body Utils.Command_Lines is
                        Switch_Descriptor renames
                          Descriptor.Allowed_Switches (Switch2);
                   begin
-                     if Desc1.Text.all = Desc2.Text.all then
+                     if Desc1.Kind = Desc2.Kind
+                       and then Desc1.Text.all = Desc2.Text.all
+                     then
                         OK := False;
                         Put_Line
                           (Standard_Error, "duplicate " & Desc1.Text.all);

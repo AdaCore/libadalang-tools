@@ -423,7 +423,31 @@ package Pp.Command_Lines is
        Based_Grouping => null,
        Call_Threshold => null,
        Par_Threshold => null,
-       Case_Threshold => +"-T"]); -- Not documented
+       Case_Threshold      => +"-T"]); -- Not documented
+
+   type PP_Layout is (Layout);
+
+   type Layout_Kind is
+     (Default,
+      Minimal,
+      Tall,
+      Compact);
+
+   package Layout_Switches is new Other_Switches
+     (Descriptor,
+      PP_Layout,
+      Layout_Kind,
+      Layout_Kind'Image,
+      Layout_Kind'Value);
+
+   package Layout_Syntax is
+     new Layout_Switches.Set_Syntax ([Layout => '=']);
+
+   package Layout_Defaults is
+     new Layout_Switches.Set_Defaults ([Layout => Default]);
+
+   package Layout_Shorthand is
+     new Layout_Switches.Set_Shorthands ([Layout => +"-L"]);
 
    package Freeze is new Freeze_Descriptor (Descriptor);
 
