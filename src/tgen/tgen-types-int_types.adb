@@ -57,7 +57,10 @@ package body TGen.Types.Int_Types is
    end Image;
 
    function High_Bound (Self : Mod_Int_Typ) return Big_Integer is
-     (Self.Mod_Value - Big_Int.To_Big_Integer (1));
+      use Big_Int;
+   begin
+      return Self.Mod_Value - To_Big_Integer (1);
+   end High_Bound;
 
    ------------------------------
    -- Generate_Random_Strategy --
