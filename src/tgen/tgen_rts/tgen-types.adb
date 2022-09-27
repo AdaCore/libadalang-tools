@@ -22,11 +22,7 @@
 ------------------------------------------------------------------------------
 
 with Ada.Strings.Fixed;
-with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
 
-with Libadalang.Common; use Libadalang.Common;
-
-with TGen.Context; use TGen.Context;
 with TGen.Strategies; use TGen.Strategies;
 
 package body TGen.Types is
@@ -50,16 +46,6 @@ package body TGen.Types is
    begin
       return Self.Name = Ada_Identifier_Vectors.Empty_Vector;
    end Is_Anonymous;
-
-   -----------------------------------
-   -- Generate_Constrained_Strategy --
-   -----------------------------------
-
-   function Generate_Constrained_Strategy
-     (Self     : Typ;
-      Var_Name : Unbounded_Text_Type)
-      return Static_Strategy_Type'Class
-     is (Unimplemented_Static_Strategy_Type'(null record));
 
    ----------
    -- Kind --
@@ -110,87 +96,18 @@ package body TGen.Types is
 
    function Try_Generate_Static
      (Self    : SP.Ref;
-      Context : in out TGen.Context.Generation_Context)
+      Context : in out Generation_Context)
       return TGen.Strategies.Static_Strategy_Type'Class
    is
    begin
       if Self.Get.Supports_Static_Gen then
          return Self.Get.Generate_Static (Context);
-      elsif Context.Unsupported_Type_Behavior = Commented_Out then
-         return TGen.Strategies.Commented_Out_Strategy_Type'(null record);
       else
          return raise Program_Error with
            "Type " & To_Ada (Self.Get.Name)
            & " does not support static generation";
       end if;
    end Try_Generate_Static;
-
-   ------------------------------
-   -- Generate_Random_Strategy --
-   ------------------------------
-
-   function Generate_Random_Strategy
-     (Self    : Typ;
-      Context : in out Generation_Context) return Strategy_Type'Class
-   is
-      Res : Unimplemented_Strategy_Type;
-   begin
-      raise Program_Error
-        with "Generation of dynamic strategy not implemented";
-      return Res;
-   end Generate_Random_Strategy;
-
-   ------------------------------------------
-   -- Generate_Constrained_Random_Strategy --
-   ------------------------------------------
-
-   function Generate_Constrained_Random_Strategy
-     (Self    : Typ;
-      Context : Generation_Context) return Strategy_Type'Class
-   is
-      Res : Unimplemented_Strategy_Type;
-   begin
-      raise Program_Error
-        with "Generation of dynamic strategy not implemented";
-      return Res;
-   end Generate_Constrained_Random_Strategy;
-
-   ---------------------------------
-   -- Generation_Package_For_Type --
-   ---------------------------------
-
-   function Generation_Package_For_Type
-     (Self : Typ'Class) return Unbounded_Text_Type
-   is
-      Pkg_Name : constant Unbounded_Text_Type :=
-        +(String'("Type_Strategies"));
-   begin
-      return Unbounded_Wide_Wide_String'(+Self.Parent_Package_Name)
-        & Unbounded_Wide_Wide_String'(+String'("."))
-        & Pkg_Name;
-   end Generation_Package_For_Type;
-
-   ------------------------------
-   -- Random_Strategy_Function --
-   ------------------------------
-
-   function Random_Strategy_Function
-     (Self : Typ) return Subprogram_Data
-   is
-      Result : Subprogram_Data (Kind => Ada_Subp_Kind_Function);
-   begin
-      Result.Name := +Self.Gen_Random_Function_Name;
-      Result.Fully_Qualified_Name :=
-        Generation_Package_For_Type (Self)
-        & Result.Name;
-      Result.Parent_Package :=
-        Generation_Package_For_Type (Self);
-      Result.Precondition := +(String'(""));
-
-      Result.Return_Type_Fully_Qualified_Name := +Self.Fully_Qualified_Name;
-      Result.Return_Type_Parent_Package := +Self.Parent_Package_Name;
-      return Result;
-   end Random_Strategy_Function;
 
    ----------
    -- Slug --

@@ -23,20 +23,18 @@
 
 with Ada.Characters.Latin_9;
 with Ada.Characters;
-with Ada.Containers.Ordered_Maps;
 with Ada.Strings.Fixed;
 with Ada.Strings.Maps;
-with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
 
-with Libadalang.Common; use Libadalang.Common;
+with Langkit_Support.Text; use Langkit_Support.Text;
 
-with Templates_Parser; use Templates_Parser;
+with GNATCOLL.VFS; use GNATCOLL.VFS;
 
-with TGen.Gen_Types_Value;   use TGen.Gen_Types_Value;
-with TGen.Files;             use TGen.Files;
-with TGen.Strategies;        use TGen.Strategies;
+with TGen.Files;                use TGen.Files;
 with TGen.Gen_Strategies_Utils; use TGen.Gen_Strategies_Utils;
-with TGen.Types.Translation; use TGen.Types.Translation;
+with TGen.LAL_Utils;            use TGen.LAL_Utils;
+with TGen.Strategies;
+with TGen.Types.Translation;    use TGen.Types.Translation;
 
 package body TGen.Gen_Strategies is
 
@@ -107,219 +105,9 @@ package body TGen.Gen_Strategies is
       return S;
    end Distinct_Type_Parent_Package;
 
-   ------------------------------
-   -- Generate_Type_Strategies --
-   ------------------------------
-
-   procedure Generate_Type_Strategies
-     (Context : Generation_Context) is
-      package Strategies_Per_Package_Maps is new Ada.Containers.Ordered_Maps
-        (Key_Type     => Unbounded_Text_Type,
-         Element_Type => Strategy_Set,
-         "="          => Strategy_Sets."=");
-      subtype Strategies_Per_Package_Map is Strategies_Per_Package_Maps.Map;
-
-      Strategies_Per_Package : Strategies_Per_Package_Map;
-
-   begin
-
-      --  Let's order strategies per package
-
-      for Strat of Context.Strategies loop
-         declare
-            procedure Update_Element
-              (Ignored    : Unbounded_Text_Type;
-               Strategies : in out Strategy_Set);
-
-            procedure Update_Element
-              (Ignored    : Unbounded_Text_Type;
-               Strategies : in out Strategy_Set) is
-            begin
-               Strategies.Insert (Strat);
-            end Update_Element;
-            Pkg_Name : constant Unbounded_Text_Type :=
-              +Package_Name (Dynamic_Strategy_Type (Strat));
-         begin
-            if not Strategies_Per_Package.Contains (Pkg_Name) then
-               Strategies_Per_Package.Insert
-                 (Pkg_Name, Strategy_Sets.Empty_Set);
-            end if;
-            Strategies_Per_Package.Update_Element
-              (Strategies_Per_Package.Find (Pkg_Name),
-               Update_Element'Access);
-         end;
-      end loop;
-
-      --  Then generate the packages
-
-      for Strats of Strategies_Per_Package loop
-         declare
-            TSG : constant Type_Value_Generator := Create (Context, Strats);
-         begin
-            TSG.Generate_Source_Code (Context);
-         end;
-      end loop;
-   end Generate_Type_Strategies;
-
-   package body Test_Generator is
-
-      function Generate_Source_Code
-        (Self : Test_Generator;
-         Ctx  : TGen.Templates.Context'Class) return Wide_Wide_String
-      is
-         pragma Unreferenced (Ctx);
-         use type Ada.Containers.Count_Type;
-
-         TS : aliased constant Test_Translator :=
-           Create_Test_Translator (Self.Subp);
-
-         Proc_Name_Tag : constant String := "PROC_NAME";
-
-         Proc_Qualified_Name_Tag : constant String := "PROC_QUALIFIED_NAME";
-
-         Has_Params_Tag : constant String := "HAS_PARAMS";
-
-         Precondition_Tag : constant String := "PRECONDITION_EXPRESSION";
-
-         Table : Templates_Parser.Translate_Set;
-
-      begin
-         TS.Translate (Table);
-
-         --  All the tables are translated. Now translate the individual
-         --  tags.
-
-         Templates_Parser.Insert
-           (Table,
-            Templates_Parser.Assoc
-              (Proc_Name_Tag,
-               +Self.Subp.Name));
-
-         Templates_Parser.Insert
-           (Table,
-            Templates_Parser.Assoc
-              (Proc_Qualified_Name_Tag,
-               +Self.Subp.Fully_Qualified_Name));
-
-         Templates_Parser.Insert
-           (Table,
-            Templates_Parser.Assoc
-              (Has_Params_Tag,
-               Self.Subp.Parameters_Data.Length > 0));
-
-         Templates_Parser.Insert
-           (Table,
-            Templates_Parser.Assoc
-              (Precondition_Tag,
-               +Self.Subp.Precondition));
-
-         return
-           To_Text
-             (Templates_Parser.Parse
-                (Filename          => +Self.Test_Template_File.Full_Name,
-                 Translations      => Table,
-                 Cached            => True,
-                 Keep_Unknown_Tags => True));
-      end Generate_Source_Code;
-
-      function Create
-        (Test_Template_File  : GNATCOLL.VFS.Virtual_File;
-         Subp                : Subprogram_Data)
-         return Test_Generator
-      is
-      begin
-         return Test_Generator'
-           (Test_Template_File, Subp);
-      end Create;
-
-      function Create_Test_Translator
-        (Subp : Subprogram_Data;
-         Next  : access constant Translator'Class := null)
-         return Test_Translator is
-           (Next, Subp);
-
-      procedure Translate_Helper
-        (Self  : Test_Translator;
-         Table : in out Templates_Parser.Translate_Set)
-      is
-         Strategy_Name_Tag : constant String := "STRATEGY_NAME";
-         Strategy_Name_Vector_Tag : Templates_Parser.Vector_Tag;
-
-         Type_Name_Tag : constant String := "TYPE_NAME";
-         Type_Name_Vector_Tag : Templates_Parser.Vector_Tag;
-
-         Gen_Subp_Name_Tag : constant String := "GEN_SUBP_NAME";
-         Gen_Subp_Name_Vector_Tag : Templates_Parser.Vector_Tag;
-
-         Param_Name_Tag : constant String := "PARAM_NAME";
-         Param_Name_Vector_Tag : Templates_Parser.Vector_Tag;
-
-      begin
-         for Param of Self.Subp.Parameters_Data loop
-            Templates_Parser.Append
-              (Strategy_Name_Vector_Tag,
-               Strat_Param_Name (Param));
-            Templates_Parser.Append
-              (Type_Name_Vector_Tag,
-               (+Param.Type_Fully_Qualified_Name));
-            Templates_Parser.Append
-              (Gen_Subp_Name_Vector_Tag,
-               Gen_Param_Full_Function_Name (Self.Subp, Param));
-            Templates_Parser.Append
-              (Param_Name_Vector_Tag,
-               (+Param.Name));
-         end loop;
-
-         Templates_Parser.Insert
-           (Table,
-            Templates_Parser.Assoc
-              (Strategy_Name_Tag, Strategy_Name_Vector_Tag));
-         Templates_Parser.Insert
-           (Table,
-            Templates_Parser.Assoc
-              (Type_Name_Tag, Type_Name_Vector_Tag));
-         Templates_Parser.Insert
-           (Table,
-            Templates_Parser.Assoc
-              (Gen_Subp_Name_Tag, Gen_Subp_Name_Vector_Tag));
-         Templates_Parser.Insert
-           (Table,
-            Templates_Parser.Assoc
-              (Param_Name_Tag, Param_Name_Vector_Tag));
-      end Translate_Helper;
-   end Test_Generator;
-
-   function Get_Parent_Package (Node : Ada_Node) return Package_Decl;
-
-   function Get_Parent_Package (Node : Ada_Node) return Package_Decl is
-      Parent_Node : Ada_Node := Node.P_Semantic_Parent;
-   begin
-      while not Parent_Node.Is_Null
-        and then Kind (Parent_Node) /= Ada_Package_Decl
-      loop
-         Parent_Node := Parent_Node.P_Semantic_Parent;
-      end loop;
-
-      return Parent_Node.As_Package_Decl;
-   end Get_Parent_Package;
-
-   function Get_With_Clauses (Subp : Subprogram_Data) return String_Sets.Set;
-
-   function Get_With_Clauses (Subp : Subprogram_Data) return String_Sets.Set
-   is
-      Res : String_Sets.Set;
-   begin
-      Res.Insert ("TGen.Stream");
-      Res.Insert ("TGen.Engine");
-      Res.Insert ("TGen.Strategies");
-      Res.Insert (+Subp.Parent_Package);
-      Res.Insert (Param_Strat_Package_Name (+Subp.Parent_Package));
-      return Res;
-   end Get_With_Clauses;
-
    function Indent (Amount : Natural; Str : String) return String is
       Res    : Unbounded_String;
-      Indent : constant String (1 .. Amount) := (others => ' ');
+      Indent : constant String (1 .. Amount) := [others => ' '];
    begin
       Append (Res, Indent);
       for C of Str loop
@@ -389,188 +177,6 @@ package body TGen.Gen_Strategies is
       end loop;
    end Collect_Type_Translations;
 
-   ------------------------
-   -- Generate_Tests_For --
-   ------------------------
-
-   function Generate_Tests_For
-     (Context  : in out Generation_Context;
-      Nb_Tests : Positive;
-      Subp     : Subp_Decl) return Generated_Body is
-
-      Pkg      : constant Package_Decl :=
-        Get_Parent_Package (Subp.As_Ada_Node);
-      Pkg_Data : Package_Data;
-
-      Res : Generated_Body;
-   begin
-      pragma Unreferenced (Nb_Tests);
-      if Pkg.Is_Null then
-         raise Program_Error with
-           "Unable to find parent package of node "
-           & Image (Subp.Full_Sloc_Image);
-      end if;
-
-      Pkg_Data.Pkg_Name := Pkg;
-
-      if not Context.Packages_Data.Contains (Pkg_Data) then
-         Context.Packages_Data.Insert (Pkg_Data);
-      else
-         Pkg_Data := Package_Data_Sets.Element
-           (Context.Packages_Data.Find (Pkg_Data));
-      end if;
-
-      declare
-         Subp_Data : constant Subprogram_Data :=
-           Extract_Subprogram_Data (Subp);
-
-      begin
-
-         --  Collect the user-defined strategies here. If no strategies are
-         --  defined by the user (which is the only supported case right now),
-         --  generate default (random) strategies.
-
-         --  Collect the type translations
-
-         Collect_Type_Translations (Context, Subp);
-
-         --  Generate the actual body of the test. Consists of the test body +
-         --  the needed with clauses.
-
-         declare
-            Test_Gen : constant Test_Generator.Test_Generator :=
-              Test_Generator.Create
-                (Test_Template_File => Get_Template_Test_ADB,
-                 Subp               => Subp_Data);
-         begin
-            Res.Generated_Body :=
-              Unbounded_Text_Type'
-                (To_Unbounded_Wide_Wide_String
-                   (Test_Gen.Generate_Source_Code (Context)));
-
-            Res.With_Clauses := Get_With_Clauses (Subp_Data);
-         end;
-
-         Pkg_Data.Subprograms.Append (Subp_Data);
-         Context.Packages_Data.Replace (Pkg_Data);
-
-         --  Register parameters' type in the context
-
-         for Param of Subp_Data.Parameters_Data loop
-            declare
-
-               Param_Type : constant SP.Ref :=
-                 Context.Type_Translations.Element
-                   (Param.Type_Fully_Qualified_Name);
-
-               Typ_Parent_Package : constant Unbounded_Text_Type :=
-                 To_Unbounded_Text
-                   (+Param_Type.Get.Parent_Package_Name);
-
-               procedure Add_To_Set
-                 (Parent_Pkg_Name : Unbounded_Text_Type;
-                  TS : in out Typ_Set);
-
-               procedure Add_To_Set
-                 (Parent_Pkg_Name : Unbounded_Text_Type;
-                  TS : in out Typ_Set)
-               is
-                  pragma Unreferenced (Parent_Pkg_Name);
-               begin
-                  if not TS.Contains (Param_Type) then
-                     TS.Insert (Param_Type);
-                  end if;
-               end Add_To_Set;
-
-            begin
-               if not Context.Required_Type_Strategies.
-                 Contains (Typ_Parent_Package)
-               then
-                  Context.Required_Type_Strategies.Insert
-                    (Typ_Parent_Package, Typ_Sets.Empty);
-               end if;
-               Context.Required_Type_Strategies.Update_Element
-                 (Context.Required_Type_Strategies.Find
-                    (Typ_Parent_Package),
-                  Add_To_Set'Access);
-            end;
-         end loop;
-
-         --  Then, register the strategies used for each type. We will consider
-         --  the default random generation strategies here. Actual generation
-         --  (of source code) is deferred to the finalization of the generation
-         --  context.
-
-         for Param of Subp_Data.Parameters_Data loop
-            declare
-
-               Param_Type : constant SP.Ref :=
-                 Context.Type_Translations.Element
-                   (Param.Type_Fully_Qualified_Name);
-
-            begin
-               if not Context.Type_And_Param_Strategies.Contains
-                 (Param.Type_Fully_Qualified_Name)
-               then
-                  Context.Type_And_Param_Strategies.Insert
-                    (Param.Type_Fully_Qualified_Name,
-                     Param_Type.Get.Generate_Random_Strategy (Context));
-               end if;
-               declare
-                  Type_Strategy : constant Dynamic_Strategy_Type :=
-                    Dynamic_Strategy_Type
-                      (Context.Type_And_Param_Strategies.Element
-                         (Param.Type_Fully_Qualified_Name));
-               begin
-
-                  --  Insert in the context all the needed strategies for that
-                  --  strategy. TODO: consider strategy nesting (for
-                  --  dispatching strategies for example).
-
-                  Context.Strategies.Include (Type_Strategy);
-
-               --  Then, also generate a strategy for the parameter. This is
-               --  by default a wrapping strategy around the default (random)
-               --  type strategy. We could imagine using constant in the
-               --  function body and generate sampling strategies. TODO: think
-               --  about this.
-
-                  declare
-                     Param_Strategy : Dynamic_Strategy_Type
-                       (Kind => Wrapping_Kind, Constrained => False);
-
-                     --  The param strategy function takes the same parameters
-                     --  as the default type strategy, but has a different
-                     --  name, and is defined in a different package.
-
-                     Param_Strategy_Function : Subprogram_Data :=
-                       Type_Strategy.Strategy_Function;
-
-                  begin
-                     Param_Strategy_Function.Parent_Package :=
-                       +Param_Strat_Package_Name
-                       (Strip (+Param_Strategy_Function.Parent_Package));
-                     Param_Strategy_Function.Name :=
-                       +Gen_Param_Function_Name (Subp_Data, Param);
-                     Param_Strategy_Function.Fully_Qualified_Name :=
-                       +Param_Strat_Package_Name
-                       (Strip (+Param_Strategy_Function.Name));
-                     Param_Strategy.Strategy_Function :=
-                       Param_Strategy_Function;
-
-                     Context.Type_And_Param_Strategies.Insert
-                       (Subp_Data.Fully_Qualified_Name & Param.Name,
-                        Param_Strategy);
-
-                     Context.Strategies.Insert (Param_Strategy);
-                  end;
-               end;
-            end;
-         end loop;
-      end;
-      return Res;
-   end Generate_Tests_For;
-
    procedure Dump_JSON
      (Context : Generation_Context) is
       use Unit_To_JSON_Maps;
@@ -605,6 +211,7 @@ package body TGen.Gen_Strategies is
       Function_JSON     : constant JSON_Value := Create_Object;
       Test_Vectors_JSON : JSON_Array := Empty_Array;
       Test_Vector_JSON : JSON_Array;
+      Context_Strat : Strategies.Generation_Context;
    begin
       Collect_Type_Translations (Context, Subp);
       Subp_Data.All_Params_Static := True;
@@ -626,7 +233,7 @@ package body TGen.Gen_Strategies is
                then
                   Context.Type_And_Param_Strategies.Insert
                   (Param.Type_Fully_Qualified_Name,
-                     Try_Generate_Static (Param_Type, Context));
+                     Try_Generate_Static (Param_Type, Context_Strat));
                end if;
             end;
          end if;
@@ -648,15 +255,15 @@ package body TGen.Gen_Strategies is
                Param_JSON.Set_Field ("type_name", Create (+Param.Type_Name));
                if Param.Mode in In_Mode | In_Out_Mode then
                   declare
-                     Strat : Static_Strategy_Type'Class :=
-                        Static_Strategy_Type
+                     Strat : Strategies.Static_Strategy_Type'Class :=
+                        Strategies.Static_Strategy_Type
                           (Context.Type_And_Param_Strategies.Element
                             (Param.Type_Fully_Qualified_Name));
                   begin
                      Param_JSON.Set_Field
                      ("value",
-                        Strat.Generate_Static_Value
-                        (Disc_Value_Maps.Empty_Map).To_String);
+                      Strat.Generate_Static_Value
+                        (Strategies.Disc_Value_Maps.Empty_Map).To_String);
                   end;
                end if;
                Param_JSON.Set_Field

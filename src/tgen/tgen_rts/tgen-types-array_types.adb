@@ -93,7 +93,7 @@ package body TGen.Types.Array_Types is
 
    procedure Callback_On_Constraint
      (Self     : Constrained_Array_Typ;
-      Var_Name : Unbounded_Text_Type;
+      Var_Name : Unbounded_String;
       Callback : access procedure
         (T          : Discrete_Typ'Class;
          Constraint : TGen.Types.Constraints.Index_Constraint));
@@ -107,7 +107,7 @@ package body TGen.Types.Array_Types is
 
    procedure Callback_On_Constraint
      (Self     : Constrained_Array_Typ;
-      Var_Name : Unbounded_Text_Type;
+      Var_Name : Unbounded_String;
       Callback : access procedure
         (T          : Discrete_Typ'Class;
          Constraint : TGen.Types.Constraints.Index_Constraint))
@@ -149,7 +149,7 @@ package body TGen.Types.Array_Types is
 
    procedure Is_Constrained_By_Variable
      (Self       : Constrained_Array_Typ;
-      Var_Name   : Unbounded_Text_Type;
+      Var_Name   : Unbounded_String;
       Found      : out Boolean;
       Constraint : out TGen.Types.Constraints.Index_Constraint)
    is

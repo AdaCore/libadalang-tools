@@ -25,10 +25,9 @@
 --  generation strategies
 
 with Ada.Containers.Hashed_Maps;
-with Ada.Strings.Wide_Wide_Unbounded.Wide_Wide_Hash;
+with Ada.Strings.Unbounded.Hash;
 with Ada.Unchecked_Deallocation;
 
-with TGen.Context;    use TGen.Context;
 with TGen.Strategies; use TGen.Strategies;
 
 package TGen.Types.Constraints is
@@ -59,11 +58,11 @@ package TGen.Types.Constraints is
             --  The Static integer value of the constraint
 
          when Non_Static =>
-            Text : Unbounded_Text_Type;
+            Text : Unbounded_String;
             --  The textual representation of the constraint
 
          when Discriminant =>
-            Disc_Name : Unbounded_Text_Type;
+            Disc_Name : Unbounded_String;
             --  The defining name of the discriminant that appears in this
             --  context.
 
@@ -82,7 +81,7 @@ package TGen.Types.Constraints is
             --  The static real value of the constraint
 
          when Non_Static =>
-            Text : Unbounded_Text_Type;
+            Text : Unbounded_String;
             --  Textual representation of the constraint
 
       end case;
@@ -168,14 +167,10 @@ package TGen.Types.Constraints is
    function Static (Self : Index_Constraints) return Boolean is
      (for all J in 1 .. Self.Num_Dims => Static (Self.Constraint_Array (J)));
 
-   function Hash_Defining_Name
-     (Node : LAL.Defining_Name) return Ada.Containers.Hash_Type is
-       (Node.As_Ada_Node.Hash);
-
    package Discriminant_Constraint_Maps is new Ada.Containers.Hashed_Maps
-     (Key_Type        => Unbounded_Text_Type,
+     (Key_Type        => Unbounded_String,
       Element_Type    => Discrete_Constraint_Value,
-      Hash            => Ada.Strings.Wide_Wide_Unbounded.Wide_Wide_Hash,
+      Hash            => Ada.Strings.Unbounded.Hash,
       Equivalent_Keys => "=");
    subtype Discriminant_Constraint_Map is Discriminant_Constraint_Maps.Map;
    --  Maps to represent discriminant constraints. Each entry specifies the

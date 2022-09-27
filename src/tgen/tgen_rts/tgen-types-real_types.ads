@@ -23,7 +23,6 @@
 --
 --  Type representation for real types, and associated generation functions
 
-with TGen.Context;    use TGen.Context;
 with TGen.Strategies; use TGen.Strategies;
 
 package TGen.Types.Real_Types is
@@ -82,12 +81,6 @@ package TGen.Types.Real_Types is
      (Self    : Float_Typ;
       Context : in out Generation_Context) return Static_Strategy_Type'Class;
    --  Generate a strategy to statically generate (in one pass) values for Self
-
-   overriding function Generate_Random_Strategy
-     (Self    : Float_Typ;
-      Context : in out Generation_Context) return Strategy_Type'Class;
-   --  Generate a strategy for dynamic (two pass) generation to generate
-   --  uniformly distributed values.
 
    function As_Float_Typ (Self : SP.Ref) return Float_Typ'Class is
      (Float_Typ'Class (Self.Unchecked_Get.all)) with

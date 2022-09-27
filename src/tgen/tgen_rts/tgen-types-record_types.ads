@@ -25,21 +25,15 @@
 
 with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Hashed_Maps;
-with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Vectors;
 
-with Libadalang.Analysis;
-
-with TGen.Context;              use TGen.Context;
 with TGen.Strategies;           use TGen.Strategies;
 with TGen.Types.Discrete_Types; use TGen.Types.Discrete_Types;
 with TGen.Types.Constraints;    use TGen.Types.Constraints;
 
-with Ada.Strings.Wide_Wide_Unbounded.Wide_Wide_Hash;
+with Ada.Strings.Unbounded.Hash;
 
 package TGen.Types.Record_Types is
-
-   package LAL renames Libadalang.Analysis;
 
    Discriminant_Value_Error : exception;
    --  Will be raised each time an illegal value is used for a discriminant,
@@ -47,9 +41,9 @@ package TGen.Types.Record_Types is
    --  or because it does not respect the discriminant constraints of a record.
 
    package Component_Maps is new Ada.Containers.Hashed_Maps
-     (Key_Type        => Unbounded_Text_Type,
+     (Key_Type        => Unbounded_String,
       Element_Type    => SP.Ref,
-      Hash            => Ada.Strings.Wide_Wide_Unbounded.Wide_Wide_Hash,
+      Hash            => Ada.Strings.Unbounded.Hash,
       Equivalent_Keys => "=",
       "="             => SP."=");
    subtype Component_Map is Component_Maps.Map;
@@ -61,7 +55,7 @@ package TGen.Types.Record_Types is
 
    package Component_Vectors is new Ada.Containers.Vectors
      (Index_Type   => Positive,
-      Element_Type => Unbounded_Text_Type,
+      Element_Type => Unbounded_String,
       "="          => "=");
    subtype Component_Vector is Component_Vectors.Vector;
 
@@ -105,17 +99,6 @@ package TGen.Types.Record_Types is
             and then (Self.Get.Kind in Non_Disc_Record_Kind);
    pragma Inline (As_Nondiscriminated_Record_Typ);
 
-   type Discriminant_Choice_Entry is record
-      Defining_Name : Unbounded_Text_Type;
-      Choices       : LAL.Alternatives_List;
-   end record;
-
-   package Discriminant_Choices_Maps is new Ada.Containers.Ordered_Maps
-     (Key_Type        => Positive,
-      Element_Type    => Discriminant_Choice_Entry);
-   --  We cannot simply use a Defining_Name -> Choice_List map here because
-   --  a discriminant may appear multiple time in the variant parts.
-
    type Variant_Part;
 
    type Variant_Part_Acc is access Variant_Part;
@@ -140,7 +123,7 @@ package TGen.Types.Record_Types is
      (Element_Type => Variant_Choice);
 
    type Variant_Part is record
-      Discr_Name      : Unbounded_Text_Type;
+      Discr_Name      : Unbounded_String;
       Variant_Choices : Variant_Choice_Lists.List;
    end record;
 
@@ -202,18 +185,6 @@ package TGen.Types.Record_Types is
       Context : in out Generation_Context) return Static_Strategy_Type'Class;
    --  Generate a strategy to statically generate (in one pass) values for Self
 
-   overriding function Generate_Random_Strategy
-     (Self    : Discriminated_Record_Typ;
-      Context : in out Generation_Context) return Strategy_Type'Class;
-   --  Generate a strategy for dynamic (two pass) generation to generate
-   --  uniformly distributed values.
-
-   overriding function Generate_Constrained_Random_Strategy
-     (Self    : Discriminated_Record_Typ;
-      Context : Generation_Context) return Strategy_Type'Class;
-   --  Generate a strategy for dynamic (two pass) generation to generate
-   --  uniformly distributed values.
-
    function Get_All_Components
      (Self : Discriminated_Record_Typ) return Component_Map;
    --  Aggregates all the components of a record (as two components of a record
@@ -236,7 +207,7 @@ package TGen.Types.Record_Types is
 
    procedure Disc_Constrains_Array
      (Self       : Discriminated_Record_Typ;
-      Disc_Name  : Unbounded_Text_Type;
+      Disc_Name  : Unbounded_String;
       Found      : out Boolean;
       Constraint : out TGen.Types.Constraints.Index_Constraint);
    --  Whether the discriminant Disc_Name constrains an array inside the

@@ -29,18 +29,17 @@ with Ada.Containers.Indefinite_Hashed_Maps;
 with Ada.Containers.Indefinite_Ordered_Sets;
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-with Ada.Strings.Wide_Wide_Hash;
-with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
-with Ada.Strings.Wide_Wide_Unbounded.Wide_Wide_Hash;
-
-with Langkit_Support.Text; use Langkit_Support.Text;
+with Ada.Strings.Unbounded.Hash;
 
 with TGen.Numerics;    use TGen.Numerics;
-with TGen.Subprograms; use TGen.Subprograms;
 with TGen.Strings;    use TGen.Strings;
 with TGen.Types;      use TGen.Types;
 
 package TGen.Strategies is
+
+   type Generation_Context is tagged null record;
+   --  Context for the generation of parameter values. For now, no information
+   --  is needed as generation is not contextual.
 
    type Strategy_Kind is
      (Random_Kind, State_Kind, Dispatching_Kind, Wrapping_Kind);
@@ -65,16 +64,10 @@ package TGen.Strategies is
      (Self : Base_Static_Value) return String is
      (+Self.Value);
 
-   function Hash (Name : LAL.Defining_Name) return Ada.Containers.Hash_Type is
-     (Ada.Strings.Wide_Wide_Hash (Name.Text));
-
-   function Equivalent_Keys (Left, Right : LAL.Defining_Name) return Boolean is
-     (Left.Text = Right.Text);
-
    package Disc_Value_Maps is new Ada.Containers.Indefinite_Hashed_Maps
-     (Key_Type        => Unbounded_Text_Type,
+     (Key_Type        => Unbounded_String,
       Element_Type    => Big_Integer,
-      Hash            => Ada.Strings.Wide_Wide_Unbounded.Wide_Wide_Hash,
+      Hash            => Ada.Strings.Unbounded.Hash,
       Equivalent_Keys => "=",
       "="             => Big_Int."=");
    subtype Disc_Value_Map is Disc_Value_Maps.Map;
@@ -169,83 +162,6 @@ package TGen.Strategies is
         (S : in out Equivalence_Class_Strategy_Type;
          Disc_Context : Disc_Value_Map) return Static_Value'Class;
    end Equivalence_Classes_Strategy_Package;
-
-   type Dynamic_Strategy_Type is tagged;
-   type Dynamic_Strategy_Type_Acc is access all Dynamic_Strategy_Type;
-
-   type Dynamic_Strategy_Type
-     (Kind        : Strategy_Kind;
-      Constrained : Boolean) is new Strategy_Type with
-      record
-         Generated : Boolean := True;
-         --  Whether the strategy is generated or user-defined (and thus,
-         --  requires no generation of code but only checking that the right
-         --  functions are defined for the strategy kind). For now, we only
-         --  support generated strategies.
-
-         Strategy_Function : Subprogram_Data;
-         --  Textual representation of the strategy specification
-
-         Strategy_Body : Unbounded_Text_Type;
-         --  Textual representation of the strategy body. Should be left empty
-         --  when Generated is False.
-
-         Constrained_Strategy_Function : Dynamic_Strategy_Type_Acc := null;
-         --  For constrained types, we also need a separate generation function
-         --  that takes care of generating the type once the constraints are
-         --  fixed. TODO: rethink about how this should be implemented.
-
-         case Kind is
-            when State_Kind =>
-               --  Stateful strategies come with an initialization function (to
-               --  get the initial state).
-
-               Initialize_Function : Subprogram_Data;
-               Initialize_Body : Unbounded_Text_Type;
-               --  Textual representation of the initialize procedure body.
-               --  Should be left empty when Generated is False;
-
-            when Dispatching_Kind =>
-               --  Dispatching strategies delegate the generation to one of the
-               --  underlying strategies, randomly picking one of them each
-               --  time.
-
-               S1, S2 : Dynamic_Strategy_Type_Acc;
-               --  Wrapped strategies
-
-               Bias   : Float;
-               --  Probability to pick the first strategy
-
-            when others =>
-               null;
-         end case;
-      end record;
-
-   function "<" (L, R : Dynamic_Strategy_Type) return Boolean is
-     (L.Strategy_Function.Name < R.Strategy_Function.Name);
-
-   function Image_Body (Strat : Dynamic_Strategy_Type) return String
-     with Pre => Strat.Generated;
-   --  Return the full body image of the strategy. Raise an error if this is
-   --  not a generated strat. Also returns the Initialize procedure body if
-   --  this is a stateful strategy.
-
-   function Image_Spec (Strat : Dynamic_Strategy_Type) return String
-     with Pre => Strat.Generated;
-   --  Return the spec image of the strategy. Also return the Initialize
-   --  procedure spec if this is a stateful strategy.
-
-   function Package_Name (Strat : Dynamic_Strategy_Type) return String is
-     (+Strat.Strategy_Function.Parent_Package);
-
-   package Fully_Qualified_Name_To_Strat_Maps is
-     new Ada.Containers.Indefinite_Hashed_Maps
-       (Key_Type        => Unbounded_Text_Type,
-        Element_Type    => Strategy_Type'Class,
-        Hash            => Ada.Strings.Wide_Wide_Unbounded.Wide_Wide_Hash,
-        Equivalent_Keys => Ada.Strings.Wide_Wide_Unbounded."=");
-   subtype Fully_Qualified_Name_To_Strat_Map is
-     Fully_Qualified_Name_To_Strat_Maps.Map;
 
    package Strategy_Sets is new
      Ada.Containers.Indefinite_Ordered_Sets

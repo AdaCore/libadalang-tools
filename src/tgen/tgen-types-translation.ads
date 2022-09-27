@@ -24,7 +24,11 @@
 --  Provides translation utilities for types represented by Libadalang nodes
 --  to TGen's internal type representation.
 
+with Libadalang.Analysis;
+
 package TGen.Types.Translation is
+
+   package LAL renames Libadalang.Analysis;
 
    type Translation_Result (Success : Boolean := False) is record
       case Success is

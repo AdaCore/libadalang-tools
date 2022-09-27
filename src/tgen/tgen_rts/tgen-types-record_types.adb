@@ -21,7 +21,6 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Characters.Latin_1;
 with Ada.Containers; use Ada.Containers;
 with Ada.Containers.Indefinite_Hashed_Maps;
 with Ada.Unchecked_Deallocation;
@@ -30,7 +29,6 @@ with Ada.Numerics.Big_Numbers.Big_Integers;
 with Ada.Strings;           use Ada.Strings;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-with TGen.Gen_Strategies_Utils; use TGen.Gen_Strategies_Utils;
 with TGen.Types.Array_Types;    use TGen.Types.Array_Types;
 
 package body TGen.Types.Record_Types is
@@ -392,9 +390,9 @@ package body TGen.Types.Record_Types is
    --  Static generation
 
    package Strategy_Maps is new Ada.Containers.Indefinite_Hashed_Maps
-     (Key_Type        => Unbounded_Text_Type,
+     (Key_Type        => Unbounded_String,
       Element_Type    => Static_Strategy_Type'Class,
-      Hash            => Ada.Strings.Wide_Wide_Unbounded.Wide_Wide_Hash,
+      Hash            => Ada.Strings.Unbounded.Hash,
       Equivalent_Keys => "=",
       "="             => "=");
    subtype Strategy_Map is Strategy_Maps.Map;
@@ -448,7 +446,7 @@ package body TGen.Types.Record_Types is
                for Comp_Cursor in Choice.Components.Iterate loop
                   declare
                      use Component_Maps;
-                     Comp_Name : constant Unbounded_Text_Type :=
+                     Comp_Name : constant Unbounded_String :=
                        Key (Comp_Cursor);
                      Comp_Type : constant SP.Ref := Element (Comp_Cursor);
                   begin
@@ -483,14 +481,14 @@ package body TGen.Types.Record_Types is
    begin
       for Comp in Self.Component_Types.Iterate loop
          declare
-            Comp_Name : constant Unbounded_Text_Type := Key (Comp);
+            Comp_Name : constant Unbounded_String := Key (Comp);
 
             procedure Generate_Val
-              (Comp_Name  : Unbounded_Text_Type;
+              (Comp_Name  : Unbounded_String;
                Comp_Strat : in out Static_Strategy_Type'Class);
 
             procedure Generate_Val
-              (Comp_Name  : Unbounded_Text_Type;
+              (Comp_Name  : Unbounded_String;
                Comp_Strat : in out Static_Strategy_Type'Class)
             is
                pragma Unreferenced (Comp_Name);
@@ -516,7 +514,7 @@ package body TGen.Types.Record_Types is
    end Generate_Record_Typ;
 
    function Pick_Samples_For_Disc
-     (Variant : Variant_Part_Acc; Disc_Name : Unbounded_Text_Type)
+     (Variant : Variant_Part_Acc; Disc_Name : Unbounded_String)
       return Alternatives_Set_Vector;
    --  Returns a list of samples for the discriminant name, recurring through
    --  all the variant parts and checking whether the discriminant is present
@@ -541,7 +539,7 @@ package body TGen.Types.Record_Types is
    ---------------------------
 
    function Pick_Samples_For_Disc
-     (Variant : Variant_Part_Acc; Disc_Name : Unbounded_Text_Type)
+     (Variant : Variant_Part_Acc; Disc_Name : Unbounded_String)
       return Alternatives_Set_Vector
    is
       use Alternatives_Set_Vectors;
@@ -552,7 +550,7 @@ package body TGen.Types.Record_Types is
          return Alternatives_Set_Vectors.Empty_Vector;
       end if;
 
-      if Langkit_Support.Text."=" (Variant.all.Discr_Name, Disc_Name) then
+      if Variant.all.Discr_Name = Disc_Name then
          for Choice of Variant.Variant_Choices loop
             Res.Append (Choice.Alt_Set);
          end loop;
@@ -568,7 +566,7 @@ package body TGen.Types.Record_Types is
 
    function Pick_Strat_For_Disc
      (Self      : Discriminated_Record_Typ;
-      Disc_Name : Unbounded_Text_Type;
+      Disc_Name : Unbounded_String;
       Disc_Type : Discrete_Typ'Class;
       Context   : in out Generation_Context)
       return Static_Strategy_Type'Class;
@@ -580,7 +578,7 @@ package body TGen.Types.Record_Types is
 
    function Pick_Strat_For_Disc
      (Self      : Discriminated_Record_Typ;
-      Disc_Name : Unbounded_Text_Type;
+      Disc_Name : Unbounded_String;
       Disc_Type : Discrete_Typ'Class;
       Context   : in out Generation_Context)
       return Static_Strategy_Type'Class
@@ -590,9 +588,6 @@ package body TGen.Types.Record_Types is
         (Context);
       Samples          : Alternatives_Set_Vector;
    begin
-
-      Context.Strategies.Include (Default_Strategy);
-
       --  TODO: special strategies when discriminant also is an array index
       --  constraint, as we don't want to be purely random there, otherwise
       --  we would end up generating arrays that are too big.
@@ -680,7 +675,7 @@ package body TGen.Types.Record_Types is
       Strat.Generate := Generate_Record_Typ'Access;
       for Component in Self.Component_Types.Iterate loop
          declare
-            Comp_Name : constant Unbounded_Text_Type := Key (Component);
+            Comp_Name : constant Unbounded_String := Key (Component);
          begin
             Strat.Component_Strats.Insert
               (Comp_Name, Element (Component).Get.Generate_Static (Context));
@@ -732,7 +727,7 @@ package body TGen.Types.Record_Types is
             declare
                use Discriminant_Constraint_Maps;
 
-               Discriminant_Name : constant Unbounded_Text_Type :=
+               Discriminant_Name : constant Unbounded_String :=
                  Key (Constraint_Cursor);
                Constraint        : constant Discrete_Constraint_Value :=
                  Element (Constraint_Cursor);
@@ -763,11 +758,11 @@ package body TGen.Types.Record_Types is
                use Strategy_Maps;
 
                procedure Generate_Val
-                 (Disc_Name  : Unbounded_Text_Type;
+                 (Disc_Name  : Unbounded_String;
                   Disc_Strat : in out Static_Strategy_Type'Class);
 
                procedure Generate_Val
-                 (Disc_Name  : Unbounded_Text_Type;
+                 (Disc_Name  : Unbounded_String;
                   Disc_Strat : in out Static_Strategy_Type'Class)
                is
                   Val : constant Discrete_Static_Value'Class :=
@@ -791,7 +786,7 @@ package body TGen.Types.Record_Types is
 
       for Disc_Cursor in Current_Context.Iterate loop
          declare
-            Disc_Name           : constant Unbounded_Text_Type :=
+            Disc_Name           : constant Unbounded_String :=
               Key (Disc_Cursor);
             Disc_Type_Classwide : constant Typ'Class :=
               Disc_Record.Discriminant_Types.Element (Disc_Name).Get;
@@ -847,7 +842,7 @@ package body TGen.Types.Record_Types is
 
       for Disc in Self.Discriminant_Types.Iterate loop
          declare
-            Disc_Name : constant Unbounded_Text_Type := Key (Disc);
+            Disc_Name : constant Unbounded_String := Key (Disc);
          begin
             Strat.Disc_Strats.Insert
               (Disc_Name,
@@ -864,7 +859,7 @@ package body TGen.Types.Record_Types is
       Strat.Generate := Generate_Record_Typ'Access;
       for Component in Self.Get_All_Components.Iterate loop
          declare
-            Comp_Name : constant Unbounded_Text_Type := Key (Component);
+            Comp_Name : constant Unbounded_String := Key (Component);
          begin
             Strat.Component_Strats.Insert
               (Comp_Name, Element (Component).Get.Generate_Static (Context));
@@ -874,251 +869,10 @@ package body TGen.Types.Record_Types is
       return Strat;
    end Generate_Static;
 
-   --  Dynamic generation
-
-   ------------------------------------------
-   -- Generate_Constrained_Random_Strategy --
-   ------------------------------------------
-
-   function Generate_Constrained_Random_Strategy
-     (Self : Discriminated_Record_Typ; Context : Generation_Context)
-      return Strategy_Type'Class
-   is
-      use Component_Maps;
-
-      Res : Dynamic_Strategy_Type (Kind => Random_Kind, Constrained => False);
-      F_Body      : Unbounded_String;
-      Indentation : Unbounded_String := +"";
-      Rec_Name    : constant String  := "Rec";
-
-      procedure A (Str : String);
-      procedure NL;
-      procedure I;
-      procedure UI;
-      procedure Pp_Components (Components : Component_Maps.Map);
-      procedure Pp_Variant
-        (Components : Component_Vector; Variant : Variant_Part);
-
-      procedure A (Str : String) is
-      begin
-         Append (F_Body, Str);
-      end A;
-
-      procedure NL is
-      begin
-         Append (F_Body, Ada.Characters.Latin_1.LF & (+Indentation));
-      end NL;
-
-      procedure I is
-      begin
-         Append (Indentation, "   ");
-      end I;
-
-      procedure UI is
-      begin
-         Indentation := Head (Indentation, Length (Indentation) - 3);
-      end UI;
-
-      procedure Pp_Components (Components : Component_Maps.Map) is
-      begin
-         for Component in Components.Iterate loop
-            declare
-               Component_Name : constant Unbounded_Text_Type :=
-                 Key (Component);
-               Component_Type : constant Typ'Class := Element (Component).Get;
-            begin
-               A ((+Component_Name) & " : ");
-               A (To_Ada (Component_Type.Name) & " :=");
-               I;
-               NL;
-               A (Component_Type.Gen_Random_Function_Name & ";");
-               UI;
-            end;
-         end loop;
-      end Pp_Components;
-
-      procedure Pp_Variant
-        (Components : Component_Vector; Variant : Variant_Part)
-      is
-         use Variant_Choice_Lists;
-
-      begin
-         A ("case " & (+Self.Variant.Discr_Name) & " is ");
-         I;
-         NL;
-         for Choice of Variant.Variant_Choices loop
-            declare
-               use Component_Vectors;
-
-               New_Components : Component_Vector := Components.Copy;
-            begin
-               for C in Choice.Components.Iterate loop
-                  Append (New_Components, Key (C));
-               end loop;
-               --  A ("when " & (+Choice.Alternatives.Text) & " => ");
-               I;
-               NL;
-               if Choice.Components.Length /= 0 then
-                  A ("declare");
-                  I;
-                  NL;
-                  Pp_Components (Choice.Components);
-                  UI;
-                  NL;
-                  A ("begin");
-                  I;
-               end if;
-
-               if Choice.Variant /= null then
-                  Pp_Variant (New_Components, Choice.Variant.all);
-
-               else
-                  if New_Components.Length = 0 then
-                     A ("null;");
-                  end if;
-                  for C of New_Components loop
-                     NL;
-                     A (Rec_Name & "." & (+C) & " := " & (+C) & ";");
-                  end loop;
-               end if;
-
-               if Choice.Components.Length /= 0 then
-                  UI;
-                  NL;
-                  A ("end;");
-               end if;
-               UI;
-               NL;
-            end;
-         end loop;
-         UI;
-         NL;
-         A ("end case;");
-         NL;
-      end Pp_Variant;
-
-      Constrained_Function : constant Subprogram_Data :=
-        Gen_Constrained_Function (Self);
-   begin
-
-      A ("declare");
-      I;
-      NL;
-      A (Rec_Name & " : " & Self.Fully_Qualified_Name);
-
-      --  Then add the discriminants to the record type declaration
-
-      if Self.Discriminant_Types.Length > 0 then
-         A (" (");
-         for Disc in Self.Discriminant_Types.Iterate loop
-            A (+Key (Disc));
-            if Next (Disc) /= No_Element then
-               A (", ");
-            end if;
-         end loop;
-         A (");");
-      end if;
-
-      --  Now generate a function that is similar to the record declaration:
-      --  generate the different variant parts, and when there are no more
-      --  variant, assign the list of generated components to the resulting
-      --  record.
-
-      UI;
-      NL;
-      A ("begin");
-      I;
-      NL;
-
-      Pp_Components (Self.Component_Types);
-      if Self.Variant /= null then
-         Pp_Variant (Component_Vectors.Empty, Self.Variant.all);
-      end if;
-
-      A ("return " & Rec_Name & ";");
-      UI;
-      NL;
-      A ("end;");
-
-      Res.Strategy_Function := Constrained_Function;
-      Res.Strategy_Body     := +(+F_Body);
-
-      return Res;
-   end Generate_Constrained_Random_Strategy;
-
-   ------------------------------
-   -- Generate_Random_Strategy --
-   ------------------------------
-
-   function Generate_Random_Strategy
-     (Self : Discriminated_Record_Typ; Context : in out Generation_Context)
-      return Strategy_Type'Class
-   is
-      Result : Dynamic_Strategy_Type
-        (Kind => Random_Kind, Constrained => True);
-      F_Body : Unbounded_String;
-
-      Indentation : Natural := 0;
-
-      Constrained_Function : constant Subprogram_Data :=
-        Gen_Constrained_Function (Self);
-   begin
-
-      Write_Line (F_Body, "declare", Indentation);
-      Write_Line (F_Body, "begin", Indentation);
-
-      Write_Line
-        (F_Body, "return " & (+Constrained_Function.Name), Indentation);
-
-      Indentation := Indentation + 3;
-
-      S_Write (F_Body, "( ", Indentation);
-
-      --  Expected parameters are discriminant values; pass them
-
-      for Disc_Cursor in Self.Discriminant_Types.Iterate loop
-         declare
-            use Component_Maps;
-
-            Disc_Name : constant String := +Key (Disc_Cursor);
-            Disc_Type : constant Typ'Class := Element (Disc_Cursor).Get;
-
-            Suffix : constant String :=
-              (if Next (Disc_Cursor) = No_Element then ");" else " ,");
-         begin
-            Write_Line
-              (F_Body,
-               Disc_Name & " => " & Disc_Type.Gen_Random_Function_Name &
-               Suffix,
-               Indentation);
-         end;
-      end loop;
-
-      Indentation := Indentation - 3;
-      Write_Line (F_Body, "end;", Indentation);
-
-      Result.Strategy_Body     := +(+F_Body);
-      Result.Strategy_Function := Self.Random_Strategy_Function;
-
-      --  This uses the constrained strategy
-
-      declare
-         Constrained_Strategy : aliased Dynamic_Strategy_Type :=
-           Dynamic_Strategy_Type
-             (Self.Generate_Constrained_Random_Strategy (Context));
-      begin
-         Context.Strategies.Insert (Constrained_Strategy);
-         Result.Constrained_Strategy_Function :=
-           Constrained_Strategy'Unchecked_Access;
-      end;
-
-      return Result;
-   end Generate_Random_Strategy;
-
    procedure Disc_Constrains_Array
      (Component_Types     : Component_Map;
       Variant             : Variant_Part_Acc;
-      Disc_Name           : Unbounded_Text_Type;
+      Disc_Name           : Unbounded_String;
       Disc_Correspondence : UTT_Map;
       Found               : out Boolean;
       Constraint          : out TGen.Types.Constraints.Index_Constraint);
@@ -1135,7 +889,7 @@ package body TGen.Types.Record_Types is
    procedure Disc_Constrains_Array
      (Component_Types     : Component_Map;
       Variant             : Variant_Part_Acc;
-      Disc_Name           : Unbounded_Text_Type;
+      Disc_Name           : Unbounded_String;
       Disc_Correspondence : UTT_Map;
       Found               : out Boolean;
       Constraint          : out TGen.Types.Constraints.Index_Constraint)
@@ -1222,7 +976,7 @@ package body TGen.Types.Record_Types is
                     As_Discriminated_Record_Typ (T_Ref);
 
                   Inspect_Subrecord       : Boolean := False;
-                  Correspondent_Disc_Name : Unbounded_Text_Type;
+                  Correspondent_Disc_Name : Unbounded_String;
                   --  Whether the discriminant Disc_Name can affect the sub-
                   --  record, i.e. if it is propagated through a discriminant
                   --  constraint. If it is the case, Correspondent_Disc_Name
@@ -1232,7 +986,7 @@ package body TGen.Types.Record_Types is
                begin
                   for Constraint_Cursor in Disc_Constraints.Iterate loop
                      declare
-                        Disc_Constrained : constant Unbounded_Text_Type :=
+                        Disc_Constrained : constant Unbounded_String :=
                           Discriminant_Constraint_Maps.Key (Constraint_Cursor);
 
                         Constraint : constant Discrete_Constraint_Value :=
@@ -1245,7 +999,7 @@ package body TGen.Types.Record_Types is
 
                         if Constraint.Kind = Discriminant then
                            declare
-                              Orig_Disc : constant Unbounded_Text_Type :=
+                              Orig_Disc : constant Unbounded_String :=
                                 Disc_Correspondence.Element
                                   (Constraint.Disc_Name);
                            begin
@@ -1308,7 +1062,7 @@ package body TGen.Types.Record_Types is
 
    procedure Disc_Constrains_Array
      (Self       : Discriminated_Record_Typ;
-      Disc_Name  : Unbounded_Text_Type;
+      Disc_Name  : Unbounded_String;
       Found      : out Boolean;
       Constraint : out TGen.Types.Constraints.Index_Constraint)
    is
@@ -1316,7 +1070,7 @@ package body TGen.Types.Record_Types is
    begin
       for Disc_Cursor in Self.Discriminant_Types.Iterate loop
          declare
-            Disc_Name : constant Unbounded_Text_Type :=
+            Disc_Name : constant Unbounded_String :=
               Component_Maps.Key (Disc_Cursor);
          begin
             Disc_Correspondence.Insert (Disc_Name, Disc_Name);

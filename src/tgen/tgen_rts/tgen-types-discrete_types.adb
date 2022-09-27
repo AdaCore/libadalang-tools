@@ -350,7 +350,7 @@ package body TGen.Types.Discrete_Types is
 
    function Generate_Array_Index_Constraint_Strategy
      (Self       : Discrete_Typ'Class;
-      Var_Name   : Unbounded_Text_Type;
+      Var_Name   : Unbounded_String;
       Constraint : TGen.Types.Constraints.Index_Constraint;
       Context    : in out Generation_Context)
       return Static_Strategy_Type'Class

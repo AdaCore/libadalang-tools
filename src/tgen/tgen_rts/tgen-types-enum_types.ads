@@ -25,7 +25,6 @@
 
 with Ada.Containers.Ordered_Maps;
 
-with TGen.Context;              use TGen.Context;
 with TGen.Strategies;           use TGen.Strategies;
 with TGen.Types.Discrete_Types; use TGen.Types.Discrete_Types;
 with TGen.Types.Constraints;    use TGen.Types.Constraints;
@@ -97,7 +96,7 @@ package TGen.Types.Enum_Types is
 
    package Enum_Literal_Maps is new Ada.Containers.Ordered_Maps
      (Key_Type     => Big_Integer,
-      Element_Type => Unbounded_Text_Type,
+      Element_Type => Unbounded_String,
        "<"         => Big_Int."<");
 
    type Other_Enum_Typ (Is_Static : Boolean) is new

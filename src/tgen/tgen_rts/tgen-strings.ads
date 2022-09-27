@@ -33,12 +33,8 @@ with Ada.Strings.Hash;
 with Ada.Strings.Less_Case_Insensitive;
 with Ada.Strings.Maps;      use Ada.Strings.Maps;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-with Ada.Strings.Wide_Wide_Unbounded;
 
 with GNATCOLL.Projects; use GNATCOLL.Projects;
-
-with Libadalang.Analysis;
-with Langkit_Support.Text; use Langkit_Support.Text;
 
 package TGen.Strings is
 
@@ -66,9 +62,9 @@ package TGen.Strings is
    subtype String_Ordered_Set is String_Ordered_Sets.Set;
 
    package UTT_Maps is new Ada.Containers.Ordered_Maps
-     (Key_Type     => Unbounded_Text_Type,
-      Element_Type => Unbounded_Text_Type,
-      "<"          => Ada.Strings.Wide_Wide_Unbounded."<");
+     (Key_Type     => Unbounded_String,
+      Element_Type => Unbounded_String,
+      "<"          => Ada.Strings.Unbounded."<");
    subtype UTT_Map is UTT_Maps.Map;
 
    function "+"
@@ -80,22 +76,6 @@ package TGen.Strings is
      (S : Ada.Strings.Unbounded.Unbounded_String)
       return String
       renames Ada.Strings.Unbounded.To_String;
-
-   function "+" (Text : Text_Type) return String renames To_UTF8;
-
-   function "+" (Str : String) return Text_Type renames From_UTF8;
-
-   function "+" (T : Text_Type) return Unbounded_Text_Type
-                 renames To_Unbounded_Text;
-
-   function "+" (T : Unbounded_Text_Type) return Text_Type
-                 renames To_Text;
-
-   function "+" (Text : Unbounded_Text_Type) return String is
-     (+(+Text));
-
-   function "+" (Str : String) return Unbounded_Text_Type is
-     (+(+Str));
 
    function Remove_Trailing_Comma_And_Spaces
      (Text : Unbounded_String) return Unbounded_String is
@@ -109,11 +89,6 @@ package TGen.Strings is
 
    function Dot_To_Underscore (C : Character) return Character is
      ((if C = '.' then '_' else C));
-
-   function Qualified_To_Unique_Name (Qualified_Name : Text_Type) return String
-     is (Ada.Strings.Fixed.Translate
-              (Source  => To_UTF8 (Qualified_Name),
-               Mapping => Dot_To_Underscore'Access));
 
    procedure New_Line (Str : in out Unbounded_String);
    --  Append a new line to Str
@@ -159,14 +134,8 @@ package TGen.Strings is
      with Pre => not Name.Is_Empty;
    --  Turn the given qualified name into Ada syntax
 
-   function To_Qualified_Name
-     (Name : Libadalang.Analysis.Name) return Ada_Qualified_Name;
-   --  Return the qualified name corresponding to the given name from a parse
-   --  tree.
-
-   function Convert_Qualified_Name
-     (Text_QN : Libadalang.Analysis.Unbounded_Text_Type_Array)
-      return Ada_Qualified_Name;
+   function To_Qualified_Name (Name : String) return Ada_Qualified_Name;
+   --  Turn the given string into our internal qualified name structure
 
    function Hash (Self : Ada_Qualified_Name) return Ada.Containers.Hash_Type is
      (Ada.Strings.Hash (To_Ada (Self)));

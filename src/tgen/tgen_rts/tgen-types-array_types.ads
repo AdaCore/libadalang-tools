@@ -23,7 +23,6 @@
 --
 --  Type representation for arrays, and associated generation strategies
 
-with TGen.Context;           use TGen.Context;
 with TGen.Strategies;        use TGen.Strategies;
 with TGen.Types.Constraints; use TGen.Types.Constraints;
 
@@ -34,9 +33,9 @@ package TGen.Types.Array_Types is
    --  Min / max size of generated unconstrained arrays. Hardcoded at the
    --  moment.
 
-   Low_Bound_Disc_Name : constant Unbounded_Text_Type :=
+   Low_Bound_Disc_Name : constant Unbounded_String :=
      +String'("Magic_TGen_Low_Bound");
-   High_Bound_Disc_Name : constant Unbounded_Text_Type :=
+   High_Bound_Disc_Name : constant Unbounded_String :=
      +String'("Magic_TGen_High_Bound");
 
    type Index_Typ_Arr is array (Positive range <>) of TGen.Types.SP.Ref;
@@ -98,7 +97,7 @@ package TGen.Types.Array_Types is
 
    procedure Is_Constrained_By_Variable
      (Self       : Constrained_Array_Typ;
-      Var_Name   : Unbounded_Text_Type;
+      Var_Name   : Unbounded_String;
       Found      : out Boolean;
       Constraint : out TGen.Types.Constraints.Index_Constraint);
    --  Return whether the type is constrained by the variable named Var_Name.

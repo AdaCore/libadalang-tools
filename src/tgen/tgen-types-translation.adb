@@ -27,11 +27,13 @@ with Ada.Containers.Hashed_Maps;
 
 with GNATCOLL.GMP.Integers;
 
-with Langkit_Support.Text;
+with Langkit_Support.Text; use Langkit_Support.Text;
 
+with Libadalang.Analysis;  use Libadalang.Analysis;
 with Libadalang.Common;    use Libadalang.Common;
 with Libadalang.Expr_Eval; use Libadalang.Expr_Eval;
 
+with TGen.LAL_Utils;            use TGen.LAL_Utils;
 with TGen.Types.Discrete_Types; use TGen.Types.Discrete_Types;
 with TGen.Types.Int_Types;      use TGen.Types.Int_Types;
 with TGen.Types.Real_Types;     use TGen.Types.Real_Types;
@@ -96,9 +98,6 @@ package body TGen.Types.Translation is
    --  memoization wrapper.
    --  If Assume_Non_Static is true, the the translated type will always be
    --  flaged as non static.
-
-   function "+" (Str : String) return Unbounded_String is
-     (To_Unbounded_String (Str));
 
    function Translate_Int_Decl
      (Decl      : Base_Type_Decl;
@@ -253,6 +252,11 @@ package body TGen.Types.Translation is
 
    function Var_Choice_Supports_Static_Gen
      (Choice : Variant_Choice) return Boolean;
+
+   function "+" (Text : Text_Type) return Unbounded_String is (+(+Text));
+
+   function "+" (Text : Unbounded_Text_Type) return Unbounded_String is
+     (TGen.Types.Translation."+" (+Text));
 
    ------------------------------------
    -- Var_Choice_Supports_Static_Gen --
@@ -437,8 +441,7 @@ package body TGen.Types.Translation is
         .F_Enum_Literals
       loop
          Enum_Lits.Insert
-           (To_Big_Integer (Index),
-            +Literal.F_Name.Text);
+           (To_Big_Integer (Index), +Literal.F_Name.Text);
          Index := Index + 1;
       end loop;
 
@@ -1042,15 +1045,15 @@ package body TGen.Types.Translation is
       elsif Min_Static then
          return Real_Range_Constraint'
            (Low_Bound  => (Kind => Static, Real_Val => Min),
-            High_Bound => (Kind => Non_Static, Text => Max_Text));
+            High_Bound => (Kind => Non_Static, Text => +Max_Text));
       elsif Max_Static then
          return Real_Range_Constraint'
-           (Low_Bound  => (Kind => Non_Static, Text => Min_Text),
+           (Low_Bound  => (Kind => Non_Static, Text => +Min_Text),
             High_Bound => (Kind => Static, Real_Val => Max));
       else
          return Real_Range_Constraint'
-           (Low_Bound  => (Kind => Non_Static, Text => Min_Text),
-            High_Bound => (Kind => Non_Static, Text => Max_Text));
+           (Low_Bound  => (Kind => Non_Static, Text => +Min_Text),
+            High_Bound => (Kind => Non_Static, Text => +Max_Text));
       end if;
 
    end Translate_Real_Range_Spec;
@@ -1118,8 +1121,8 @@ package body TGen.Types.Translation is
    --------------------------
 
    function Translate_Array_Decl
-    (Decl       : Base_Type_Decl;
-      Type_Name : Defining_Name) return Translation_Result
+    (Decl      : Base_Type_Decl;
+     Type_Name : Defining_Name) return Translation_Result
    is
       function Translate_Constrained
         (Decl      : Base_Type_Decl;
@@ -1282,22 +1285,22 @@ package body TGen.Types.Translation is
                   Res_Typ.Index_Constraints (Current_Index) :=
                   (Present        => True,
                      Discrete_Range =>
-                     (Low_Bound  => (Kind => Non_Static, Text => Min_Text),
+                     (Low_Bound  => (Kind => Non_Static, Text => +Min_Text),
                       High_Bound => (Kind    => Static,
                                      Int_Val => Constraint_Min)));
                elsif Min_Static and not Max_Static then
                   Res_Typ.Index_Constraints (Current_Index) :=
                   (Present        => True,
                      Discrete_Range =>
-                     (High_Bound  => (Kind => Non_Static, Text => Max_Text),
+                     (High_Bound  => (Kind => Non_Static, Text => +Max_Text),
                       Low_Bound   => (Kind    => Static,
                                       Int_Val => Constraint_Max)));
                elsif not (Max_Static and then Min_Static) then
                   Res_Typ.Index_Constraints (Current_Index) :=
                   (Present        => True,
                      Discrete_Range =>
-                     (High_Bound  => (Kind => Non_Static, Text => Max_Text),
-                      Low_Bound   => (Kind => Non_Static, Text => Min_Text)));
+                     (High_Bound  => (Kind => Non_Static, Text => +Max_Text),
+                      Low_Bound   => (Kind => Non_Static, Text => +Min_Text)));
                else
                   Res_Typ.Index_Constraints (Current_Index) :=
                   (Present        => True,
@@ -1438,17 +1441,20 @@ package body TGen.Types.Translation is
                      return
                      (Success     => False,
                         Diagnostics =>
-                        +"Unexpected array indices for array type def:"
-                           & Kind_Name (Decl.As_Type_Decl.F_Type_Def
-                                       .As_Array_Type_Def.F_Indices));
+                         To_Unbounded_String
+                            ("Unexpected array indices for array type def:")
+                         & Kind_Name (Decl.As_Type_Decl.F_Type_Def
+                                     .As_Array_Type_Def.F_Indices));
                end case;
             end if;
 
          when others =>
             return
               (Success     => False,
-               Diagnostics => +"Unexpected base type decl kind for an array:"
-                              & Kind_Name (Decl));
+               Diagnostics =>
+                  To_Unbounded_String
+                     ("Unexpected base type decl kind for an array:")
+                  & Kind_Name (Decl));
       end case;
    end Translate_Array_Decl;
 
@@ -2742,12 +2748,15 @@ package body TGen.Types.Translation is
    exception
       when Exc : Property_Error =>
          return (Success     => False,
-                 Diagnostics => +"Error translating " & N.Image & " : "
-                                 & Ada.Exceptions.Exception_Message (Exc));
+                 Diagnostics => To_Unbounded_String ("Error translating ")
+                                & N.Image & " : "
+                                & Ada.Exceptions.Exception_Message (Exc));
       when Exc : Translation_Error =>
          return (Success     => False,
-                 Diagnostics => +"Error translating the following constraints:"
-                                & Ada.Exceptions.Exception_Information (Exc));
+                 Diagnostics =>
+                    To_Unbounded_String
+                       ("Error translating the following constraints:")
+                    & Ada.Exceptions.Exception_Information (Exc));
    end Translate;
 
    ---------------
@@ -2972,7 +2981,7 @@ package body TGen.Types.Translation is
          return
            (Success     => False,
             Diagnostics =>
-              +"Error translating " & N.Image & " : " &
+              To_Unbounded_String ("Error translating ") & N.Image & " : " &
               Ada.Exceptions.Exception_Information (Exc));
       when Exc : Non_Static_Error =>
          if Verbose_Diag then

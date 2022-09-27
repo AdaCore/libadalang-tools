@@ -105,37 +105,6 @@ package body TGen.Types.Real_Types is
       return Rand (Generator_Instance);
    end Gen;
 
-   ------------------------------
-   -- Generate_Random_Strategy --
-   ------------------------------
-
-   function Generate_Random_Strategy
-     (Self    : Float_Typ;
-      Context : in out Generation_Context) return Strategy_Type'Class
-   is
-      Res : Dynamic_Strategy_Type (Kind => Random_Kind, Constrained => False);
-      F_Body : Unbounded_String;
-      Indent : Natural := 0;
-   begin
-      Write_Line (F_Body, "declare", Indent);
-      Indent := @ + 3;
-      Write_Line
-        (F_Body,
-         "function Gen is new TGen.Types.Real_Types.Gen ("
-         & Self.Fully_Qualified_Name & ");",
-         Indent);
-      Indent := @ - 3;
-      Write_Line (F_Body, "begin", Indent);
-      Indent := @ + 3;
-      Write_Line (F_Body, "return Gen;", Indent);
-      Indent := @ - 3;
-      Write_Line (F_Body, "end;", Indent);
-
-      Res.Strategy_Function := Self.Random_Strategy_Function;
-      Res.Strategy_Body := +(+F_Body);
-      return Res;
-   end Generate_Random_Strategy;
-
    function Generate_Float_Typ (Ty : Typ'Class) return Static_Value'Class;
 
    --------------

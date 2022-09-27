@@ -30,8 +30,6 @@ with Ada.Strings.Fixed;            use Ada.Strings.Fixed;
 with Ada.Strings.Hash;
 with Ada.Strings.Unbounded;        use Ada.Strings.Unbounded;
 
-with Langkit_Support.Text;         use Langkit_Support.Text;
-
 with Templates_Parser;             use Templates_Parser;
 
 with TGen.Strings;                 use TGen.Strings;
@@ -450,7 +448,7 @@ package body TGen.Marshalling is
 
                for Cu in Discr_Constraints.Iterate loop
                   declare
-                     Discr_Text   : constant Unbounded_Text_Type :=
+                     Discr_Text   : constant Unbounded_String :=
                        Discriminant_Constraint_Maps.Key (Cu);
                      Discr_Name   : constant String := +Discr_Text;
                      Discr_Constr : constant Discrete_Constraint_Value :=

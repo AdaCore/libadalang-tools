@@ -31,6 +31,7 @@ with Libadalang.Common;
 with Langkit_Support.Text; use Langkit_Support.Text;
 
 with TGen.Context; use TGen.Context;
+with TGen.LAL_Utils; use TGen.LAL_Utils;
 with TGen.Strings; use TGen.Strings;
 with TGen.Subprograms; use TGen.Subprograms;
 with TGen.Types; use TGen.Types;
@@ -133,8 +134,5 @@ package TGen.Gen_Strategies_Utils is
 
    function Get_All_Types (Self : Typ'Class) return Typ_Set;
    --  Return the set of all types a type is composed of
-
-   function Gen_Constrained_Function (Self : Typ'Class) return Subprogram_Data;
-   --  TODO unused today (ony for dynamic generation of constrained records)
 
 end TGen.Gen_Strategies_Utils;

@@ -21,6 +21,8 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
+with TGen.LAL_Utils; use TGen.LAL_Utils;
+
 package body TGen.Subprograms is
 
    ---------------

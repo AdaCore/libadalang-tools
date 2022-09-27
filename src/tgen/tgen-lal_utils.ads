@@ -2,7 +2,7 @@
 --                                                                          --
 --                                  TGen                                    --
 --                                                                          --
---                       Copyright (C) 2022, AdaCore                        --
+--                      Copyright (C) 2021-2022, AdaCore                    --
 --                                                                          --
 -- TGen  is  free software; you can redistribute it and/or modify it  under --
 -- under  terms of  the  GNU General  Public License  as  published by  the --
@@ -20,54 +20,40 @@
 -- the files COPYING3 and COPYING.RUNTIME respectively.  If not, see        --
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
---
---  Stream utilities to communicate between the value generation units and the
---  test execution engine.
 
-with Ada.Streams; use Ada.Streams;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-package TGen.Stream is
+with Langkit_Support.Text; use Langkit_Support.Text;
 
-   type Buffer_Access is access Ada.Streams.Stream_Element_Array;
+with Libadalang.Analysis;
 
-   type Flushable_Stream is abstract limited new Root_Stream_Type
-   with null record;
+with TGen.Strings; use TGen.Strings;
 
-   procedure Flush (Stream : in out Flushable_Stream) is abstract;
+package TGen.LAL_Utils is
 
-   type Buffer_Stream is new Flushable_Stream with private;
+   function "+" (Text : Text_Type) return String renames To_UTF8;
 
-   procedure Initialize (Stream : out Buffer_Stream);
-   --  Allocate a buffer for the stream
+   function "+" (Str : String) return Text_Type renames From_UTF8;
 
-   procedure Finalize (Object : in out Buffer_Stream);
-   --  Release the buffer.
+   function "+" (T : Text_Type) return Unbounded_Text_Type
+                 renames To_Unbounded_Text;
 
-   procedure Read
-     (Stream : in out Buffer_Stream;
-      Item   : out Stream_Element_Array;
-      Last   : out Stream_Element_Offset);
-   --  Read the buffer array from the stream.
+   function "+" (T : Unbounded_Text_Type) return Text_Type
+                 renames To_Text;
 
-   procedure Write (Stream : in out Buffer_Stream;
-                    Item : Ada.Streams.Stream_Element_Array);
-   --  Write the buffer array to the output stream.
+   function "+" (Text : Unbounded_Text_Type) return String is
+     (+(+Text));
 
-   overriding procedure Flush (Stream : in out Buffer_Stream);
-   --  Flush the stream
+   function "+" (Str : String) return Unbounded_Text_Type is
+     (+(+Str));
 
-private
+   function To_Qualified_Name
+     (Name : Libadalang.Analysis.Name) return Ada_Qualified_Name;
+   --  Return the qualified name corresponding to the given name from a parse
+   --  tree.
 
-   type Buffer_Stream is new Flushable_Stream with record
-      --  The buffer where the data is written before being flushed.
-      Buffer      : Buffer_Access := null;
+   function Convert_Qualified_Name
+     (Text_QN : Libadalang.Analysis.Unbounded_Text_Type_Array)
+      return Ada_Qualified_Name;
 
-      --  Position of last-written element.
-      Write_Pos : Stream_Element_Offset := 1;
-
-      Read_Pos : Stream_Element_Offset := 1;
-
-      Written_Chunk_Size : Stream_Element_Offset := 0;
-   end record with Type_Invariant => Read_Pos <= Write_Pos;
-
-end TGen.Stream;
+end TGen.LAL_Utils;
