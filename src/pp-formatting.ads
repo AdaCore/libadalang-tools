@@ -200,13 +200,11 @@ package Pp.Formatting is
    --  use all type Tab_Vector;
 
    package Tab_In_Line_Vectors is new Ada.Containers.Bounded_Vectors
-     (Tab_Index_In_Line,
-      Tab_Index);
+     (Tab_Index_In_Line, Tab_Index);
    use Tab_In_Line_Vectors;
    subtype Tab_In_Line_Vector is
-     Tab_In_Line_Vectors
-       .Vector
-     (Capacity => Ada.Containers.Count_Type (Tab_Index_In_Line'Last));
+     Tab_In_Line_Vectors.Vector
+       (Capacity => Ada.Containers.Count_Type (Tab_Index_In_Line'Last));
 
    type Tab_In_Line_Vector_Index is new Positive;
    package Tab_In_Line_Vector_Vectors is new Ada.Containers.Indefinite_Vectors

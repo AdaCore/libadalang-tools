@@ -982,10 +982,9 @@ package body Pp.Formatting is
                                     Partial_Gnatpp : Boolean := False);
 
       procedure Insert_Alignment
-        (Lines_Data_P : Lines_Data_Ptr;
-         Cmd : Command_Line;
+        (Lines_Data_P   : Lines_Data_Ptr;
+         Cmd            : Command_Line;
          Partial_Gnatpp : Boolean := False);
-
       --  Expand tabs as necessary to align things
 
    end Tok_Phases;
@@ -4898,13 +4897,18 @@ package body Pp.Formatting is
       end Insert_Indentation;
 
       procedure Insert_Alignment_Helper
-        (Lines_Data_P : Lines_Data_Ptr;
-         Cmd : Command_Line;
+        (Lines_Data_P   : Lines_Data_Ptr;
+         Cmd            : Command_Line;
          Partial_Gnatpp : Boolean := False);
+      --  Expand tabs as necessary to align things
+
+      ----------------------
+      -- Insert_Alignment --
+      ----------------------
 
       procedure Insert_Alignment
-        (Lines_Data_P : Lines_Data_Ptr;
-         Cmd : Command_Line;
+        (Lines_Data_P   : Lines_Data_Ptr;
+         Cmd            : Command_Line;
          Partial_Gnatpp : Boolean := False) is
       begin
          if Alignment_Enabled (Cmd) then
@@ -4912,18 +4916,23 @@ package body Pp.Formatting is
          end if;
       end Insert_Alignment;
 
+      -----------------------------
+      -- Insert_Alignment_Helper --
+      -----------------------------
+
       procedure Insert_Alignment_Helper
-        (Lines_Data_P : Lines_Data_Ptr;
-         Cmd : Command_Line;
+        (Lines_Data_P   : Lines_Data_Ptr;
+         Cmd            : Command_Line;
          Partial_Gnatpp : Boolean := False)
       is
          Lines_Data : Lines_Data_Rec renames Lines_Data_P.all;
-         Tabs : Tab_Vector renames Lines_Data.Tabs;
+         Tabs       : Tab_Vector renames Lines_Data.Tabs;
 
          Saved_New_Tokns : Scanner.Tokn_Vec renames Lines_Data.Saved_New_Tokns;
-         New_Tokns : Scanner.Tokn_Vec renames Lines_Data.New_Tokns;
-         Ignore : Boolean := Scanner.Move_Tokns
-           (Target => Saved_New_Tokns, Source => New_Tokns);
+         New_Tokns       : Scanner.Tokn_Vec renames Lines_Data.New_Tokns;
+
+         Ignore : constant Boolean :=
+           Scanner.Move_Tokns (Target => Saved_New_Tokns, Source => New_Tokns);
 
          procedure Assign_Insertion_Points;
          --  Assign the Insertion_Point component of each Tab_Rec to point to
@@ -4937,8 +4946,13 @@ package body Pp.Formatting is
          --  Do the actual insertions of spaces, based on the computation done
          --  by Calculate_Num_Blanks.
 
+         -----------------------------
+         -- Assign_Insertion_Points --
+         -----------------------------
+
          procedure Assign_Insertion_Points is
             New_Tok : Tokn_Cursor := First (Saved_New_Tokns'Access);
+
          begin
             while not After_Last (New_Tok) loop
                if Kind (New_Tok) = Tab_Token then
@@ -4956,21 +4970,42 @@ package body Pp.Formatting is
               Last (Saved_New_Tokns'Access);
          end Assign_Insertion_Points;
 
-         procedure Calculate_Num_Blanks is
+         --------------------------
+         -- Calculate_Num_Blanks --
+         --------------------------
 
-            --  Note on Col and Num_Blanks components of Tab_Rec: Col is
-            --  initialized to a bogus value, and Num_Blanks to 0. Process_Line
-            --  sets Col to the correct value. Flush_Para uses Col, and possibly
-            --  changes Num_Blanks to some positive value. After the call to
-            --  Calculate_Num_Blanks, Num_Blanks is used to insert the correct
-            --  number of ' ' characters. Thus, Col is temporary, used only within
-            --  Calculate_Num_Blanks, to communicate information from Process_Line
-            --  to Flush_Para.
+         procedure Calculate_Num_Blanks is
+            --  Note on Col and Num_Blanks components of Tab_Rec:
+            --  Col is initialized to a bogus value, and Num_Blanks to 0.
+            --  Process_Line sets Col to the correct value. Flush_Para uses
+            --  Col, and possibly changes Num_Blanks to some positive value.
+            --  After the call to Calculate_Num_Blanks, Num_Blanks is used to
+            --  insert the correct number of ' ' characters. Thus, Col is
+            --  temporary, used only within Calculate_Num_Blanks, to
+            --  communicate information from Process_Line to Flush_Para.
 
             Paragraph_Tabs : Tab_In_Line_Vector_Vectors.Vector;
             --  One Tab_In_Line_Vector for each line in the current paragraph
 
-            procedure Put_Paragraph_Tabs;
+            New_Tok : Tokn_Cursor := First (Saved_New_Tokns'Access);
+
+            Cur_Tab_Index : Tab_Index := 1;
+
+            First_Line_Tabs, Cur_Line_Tabs : Tab_In_Line_Vector;
+            --  Tabs for first line of paragraph and for current line.
+            --  Tabs are represented by their index.
+
+            procedure Check_Tokens_Match (X, Y : Tab_In_Line_Vector);
+            --  If two lines come from the same construct, then the tokens
+            --  should match. Raise an exception if they don't.
+
+            function Cur_Tab return Tab_Rec is (Tabs (Cur_Tab_Index));
+            pragma Assert (not Cur_Tab.Deleted);
+
+            procedure Flush_Para;
+            --  Called at the end of a "tabbing paragraph", i.e. a group of one
+            --  or more lines that each represents similar constructs that
+            --  should be treated together for alignment purposes.
 
             procedure Process_Line;
             --  Process a single line. Collect together all relevant tabs in
@@ -4982,35 +5017,39 @@ package body Pp.Formatting is
             --
             --  we collect two tabs for ':' and ':=', which have the same Tree
             --  (a variable declaration tree). The '|' and '=>' characters in
-            --  the discriminant constraint and the aggregate also have tabs, but
-            --  these are skipped, because their Tree is different (more nested).
+            --  the discriminant constraint and the aggregate also have tabs,
+            --  but these are skipped, because their Tree is different
+            --  (more nested).
             --  If there are no tabs on the line, then of course Cur_Line_Tabs
             --  will be empty. In addition, if we have something like:
             --
             --     A := (1 | 2 | 3 => ...);
             --
-            --  the '|' and '=>' tabs will have the same Index_In_Line, in which
-            --  case we give up (set Tab_Mismatch to True, and set Cur_Line_Tabs
-            --  to empty). Those tabs are only of use if we end up enabling line
-            --  breaks after the '|'s.
+            --  the '|' and '=>' tabs will have the same Index_In_Line, in
+            --  which case we give up (set Tab_Mismatch to True, and set
+            --  Cur_Line_Tabs to empty). Those tabs are only of use if we end
+            --  up enabling line breaks after the '|'s.
             --
-            --  Handling of "insertion points".
+            --
+            --  ------------------------------
+            --  Handling of "insertion points"
+            --  ------------------------------
             --
             --  Let's pretend the template for assignment_statement is
             --
             --     ! ^:= !
             --
             --  which means insert the left-hand side, followed by " := ",
-            --  followed by the right-hand side. (It's actually more complicated;
-            --  this is just an example.) There is a tab before ":=", so multiple
-            --  assignment_statements line up like this:
+            --  followed by the right-hand side. (It's actually more
+            --  complicated; this is just an example.) There is a tab before
+            --  ":=", so multiple assignment_statements line up like this:
             --
             --     Long_Name        := 1;
             --     X                := 10_000;
             --     Even_Longer_Name := 1_000_000;
             --
-            --  If we add a tab at the end (just before the ";"): "! ^:= !^2", we
-            --  get this:
+            --  If we add a tab at the end (just before the ";"): "! ^:= !^2",
+            --  we get this:
             --
             --     Long_Name        := 1        ;
             --     X                := 10_000   ;
@@ -5018,30 +5057,68 @@ package body Pp.Formatting is
             --
             --  If in addition we add an insertion point before the right-hand
             --  side, so the template is: "! ^:= &2!^2", then the blanks are
-            --  inserted before the right-hand side, resulting in right-justified
-            --  expressions:
+            --  inserted before the right-hand side, resulting in
+            --  right-justified expressions:
             --
             --     Long_Name        :=         1;
             --     X                :=    10_000;
             --     Even_Longer_Name := 1_000_000;
             --
-            --  (We currently do not right-justify those expressions; this is just
-            --  an example to show how "&" works. "&" is actually used in
+            --  (We currently do not right-justify those expressions; this is
+            --  just an example to show how "&" works. "&" is actually used in
             --  Do_Component_Clause.)
 
-            procedure Flush_Para;
-            --  Called at the end of a "tabbing paragraph", i.e. a group of one or
-            --  more lines that each represents similar constructs that should be
-            --  treated together for alignment purposes.
+            procedure Put_Paragraph_Tabs;
+            --  TODO
+
+            procedure Put_Tab_In_Line_Vector
+              (Name : String;
+               X    : Tab_In_Line_Vector);
+            --  TODO
+
+            ------------------------
+            -- Check_Tokens_Match --
+            ------------------------
+
+            procedure Check_Tokens_Match (X, Y : Tab_In_Line_Vector) is
+            begin
+               pragma Assert (not Is_Empty (X) and then not Is_Empty (Y));
+               for J in 1 .. Last_Index (X) loop
+                  declare
+                     XX : constant Tab_Index := X (J);
+                     YY : constant Tab_Index := Y (J);
+                     XT : constant Symbol   := Tabs (XX).Token;
+                     YT : constant Symbol   := Tabs (YY).Token;
+                  begin
+                     if XT /= YT then
+                        --  "=>" matches a preceding "|", and vice versa
+                        if (XT = Name_Arrow and then YT = Name_Bar)
+                          or else (XT = Name_Bar and then YT = Name_Arrow)
+                        then
+                           null;
+                        else
+                           Put_Token (New_Tok);
+                           raise Program_Error with
+                             "Tab token mismatch: " &
+                             Str (XT).S & " " & Str (YT).S;
+                        end if;
+                     end if;
+                  end;
+               end loop;
+            end Check_Tokens_Match;
+
+            ----------------
+            -- Flush_Para --
+            ----------------
 
             procedure Flush_Para is
                Num_Lines : constant Tab_In_Line_Vector_Index'Base :=
                  Last_Index (Paragraph_Tabs);
             begin
 
-               --  Here we have Paragraph_Tabs set to a sequence of lines (or the
-               --  tabs in those lines, really). For example, if the input text
-               --  was (*1):
+               --  Here we have Paragraph_Tabs set to a sequence of lines (or
+               --  the tabs in those lines, really). For example, if the input
+               --  text was (*1):
                --
                --     package P is
                --
@@ -5065,8 +5142,9 @@ package body Pp.Formatting is
                --     end P;
                --
                --  The tabs are shown as ^1 and ^2 in (*2) above, although they
-               --  are really kept in a separate data structure (Tabs) rather than
-               --  in the text itself, and take up zero columns in the buffer.
+               --  are really kept in a separate data structure (Tabs) rather
+               --  than in the text itself, and take up zero columns in the
+               --  buffer.
                --  The "paragraph" we're talking about consists of the three
                --  variable-declaration lines. Note that the alignment from the
                --  input has been forgotten; we would get the same thing if the
@@ -5076,30 +5154,32 @@ package body Pp.Formatting is
                --  ^1 means Index_In_Line = 1; ^2 means Index_In_Line = 2 (see
                --  type Tab_Rec). The Col of each tab is currently set to the
                --  column in which it appears in (*2), and the Num_Blanks is
-               --  currently set to 0. The following code sets the Col of each tab
-               --  to the column in which it WILL appear, and the Num_Blanks to
-               --  the number of blanks to expand the tab to in order to achieve
-               --  that.
+               --  currently set to 0. The following code sets the Col of each
+               --  tab to the column in which it WILL appear, and the
+               --  Num_Blanks to the number of blanks to expand the tab to in
+               --  order to achieve that.
                --
                --  We first loop through all the ^1 tabs, and calculate the max
                --  Col, which will be the ":" of the A_Long_Variable_Name line.
-               --  We then loop through those again, and set the Num_Blanks to be
-               --  the number of blanks needed to reach that max column. For each
-               --  such ^1 tab, we loop from that ^1, through ^2 and ^3 and so
-               --  on (we have no ^3... in this example), adjusting their Col
-               --  accordingly.
+               --  We then loop through those again, and set the Num_Blanks to
+               --  be the number of blanks needed to reach that max column. For
+               --  each such ^1 tab, we loop from that ^1, through ^2 and ^3
+               --  and so on (we have no ^3... in this example), adjusting
+               --  their Col accordingly.
                --
-               --  Then we loop through all the ^2 tabs in the same way, and so on
-               --  for ^3, etc.
+               --  Then we loop through all the ^2 tabs in the same way, and so
+               --  on for ^3, etc.
                --
                --  So in this example, we loop down through the ^1 tabs to
-               --  calculate where to put the ":"'s. Then down through the ^1 tabs
-               --  again to adjust the Num_Blanks for the ^1 tabs, and loop across
-               --  to adjust the Col for the ^1 and ^2 tabs. Then down through the
-               --  ^2 tabs to calculate where to put the ":="'s.
+               --  calculate where to put the ":"'s. Then down through the ^1
+               --  tabs again to adjust the Num_Blanks for the ^1 tabs, and
+               --  loop accross to adjust the Col for the ^1 and ^2 tabs. Then
+               --  down through the ^2 tabs to calculate where to put the
+               --  ":="'s.
                --
-               --  Then down through the ^2 tabs to adjust the Num_Blanks for the
-               --  ^2 tabs, and loop across to adjust the Col for the ^2 tabs.
+               --  Then down through the ^2 tabs to adjust the Num_Blanks for
+               --  the ^2 tabs, and loop across to adjust the Col for the ^2
+               --  tabs.
                --  Note that adjusting the Col for the ":"'s affects where
                --  we're going to put the ":="'s -- that's the reason for the
                --  "loop across" part.
@@ -5108,11 +5188,11 @@ package body Pp.Formatting is
                --  we expand the tabs, (*2) above will be turned (back) into
                --  the (*1).
 
-               --  We must not process a zero-line paragraph. For efficiency, we
-               --  can avoid processing a one-line paragraph (leaving all tabs, if
-               --  any with Num_Blanks = 0). Multi-line paragraphs always have at
-               --  least one tab per line, and all lines have the same number of
-               --  tabs.
+               --  We must not process a zero-line paragraph. For efficiency,
+               --  we can avoid processing a one-line paragraph (leaving all
+               --  tabs, if any with Num_Blanks = 0). Multi-line paragraphs
+               --  always have at least one tab per line, and all lines have
+               --  the same number of tabs.
 
                if Num_Lines = 0 then
                   return;
@@ -5150,12 +5230,14 @@ package body Pp.Formatting is
                               Tab.Col := Max_Col;
                            end if;
                            Tab.Num_Blanks := Max_Col - Tab.Col;
-                           pragma Assert (if Tab.Is_Fake then Tab.Num_Blanks = 0);
+                           pragma Assert
+                                    (if Tab.Is_Fake then Tab.Num_Blanks = 0);
 
                            for X_In_Line in Index_In_Line .. Last_Index (Line)
                            loop
                               declare
-                                 Tab_J : constant Tab_Index := Line (X_In_Line);
+                                 Tab_J : constant Tab_Index :=
+                                   Line (X_In_Line);
                                  Tab_2 : Tab_Rec renames Tabs (Tab_J);
                               begin
                                  Tab_2.Col := Tab_2.Col + Tab.Num_Blanks;
@@ -5177,27 +5259,25 @@ package body Pp.Formatting is
                Clear (Paragraph_Tabs);
             end Flush_Para;
 
-            New_Tok : Tokn_Cursor := First (Saved_New_Tokns'Access);
-            Cur_Tab_Index : Tab_Index := 1;
-            function Cur_Tab return Tab_Rec is (Tabs (Cur_Tab_Index));
-            pragma Assert (not Cur_Tab.Deleted);
-
-            First_Line_Tabs, Cur_Line_Tabs : Tab_In_Line_Vector;
-            --  Tabs for first line of paragraph and for current line.
+            ------------------
+            -- Process_Line --
+            ------------------
 
             procedure Process_Line is
                Tab_Mismatch : Boolean := False;
-               First_Time : Boolean := True;
-               Tree : Ada_Node;
+               First_Time   : Boolean := True;
+               Tree         : Ada_Node;
+
             begin
                while Kind (New_Tok) not in End_Of_Input | Enabled_LB_Token loop
-
-                  --  We can have two tabs at the same place if the second one is
-                  --  fake. Also for implicit 'in' mode, etc. Hence 'while', not
-                  --  'if' here:
-
+                  --  Iterate this line tokens until New_Tok is preceded by a
+                  --  tab.
+                  --  We can have two tabs at the same place if the second one
+                  --  is fake. Also for implicit 'in' mode, etc. Hence 'while',
+                  --  not 'if' here.
                   while Cur_Tab.Insertion_Point = New_Tok loop
                      pragma Assert (not Cur_Tab.Deleted);
+
                      if First_Time then
                         pragma Assert (Is_Empty (Cur_Line_Tabs));
                         First_Time := False;
@@ -5205,11 +5285,10 @@ package body Pp.Formatting is
                      end if;
 
                      if Cur_Tab.Tree = Tree then
-                        --  Ignore if too many tabs in one line:
-
+                        --  Ignore if too many tabs in one line
                         if not Cur_Tab.Is_Insertion_Point
                           and then Last_Index (Cur_Line_Tabs) <
-                            Tab_Index_In_Line'Last
+                                     Tab_Index_In_Line'Last
                         then
                            Append (Cur_Line_Tabs, Cur_Tab_Index);
 
@@ -5223,12 +5302,12 @@ package body Pp.Formatting is
                         end if;
                      end if;
 
+                     --  Skip all deleted and fake tabs
                      loop
                         Cur_Tab_Index := Cur_Tab_Index + 1;
                         exit when not Cur_Tab.Deleted;
                      end loop;
                   end loop;
-
                   Next_ss (New_Tok);
                end loop;
 
@@ -5237,61 +5316,9 @@ package body Pp.Formatting is
                end if;
             end Process_Line;
 
-            procedure Check_Tokens_Match (X, Y : Tab_In_Line_Vector);
-            --  If two lines come from the same construct, then the tokens should
-            --  match. Raise an exception if they don't.
-
-            procedure Check_Tokens_Match (X, Y : Tab_In_Line_Vector) is
-            begin
-               pragma Assert (not Is_Empty (X) and then not Is_Empty (Y));
-               for J in 1 .. Last_Index (X) loop
-                  declare
-                     XX : constant Tab_Index := X (J);
-                     YY : constant Tab_Index := Y (J);
-                     XT : constant Symbol   := Tabs (XX).Token;
-                     YT : constant Symbol   := Tabs (YY).Token;
-                  begin
-                     if XT /= YT then
-                        --  "=>" matches a preceding "|", and vice versa
-                        if (XT = Name_Arrow and then YT = Name_Bar)
-                          or else (XT = Name_Bar and then YT = Name_Arrow)
-                        then
-                           null;
-                        else
-                           Put_Token (New_Tok);
-                           raise Program_Error with
-                             "Tab token mismatch: " &
-                             Str (XT).S & " " & Str (YT).S;
-                        end if;
-                     end if;
-                  end;
-               end loop;
-            end Check_Tokens_Match;
-
-            procedure Put_Tab_In_Line_Vector
-              (Name : String;
-               X    : Tab_In_Line_Vector);
-
-            procedure Put_Tab_In_Line_Vector
-              (Name : String;
-               X    : Tab_In_Line_Vector)
-            is
-               pragma Unreferenced (Name);
-            begin
-               if Is_Empty (X) then
-                  return;
-               end if;
-
---               Dbg_Out.Put ("\1: \t", Name);
---
---               for J in 1 .. Last_Index (X) loop
---                  if J /= 1 then
---                     Dbg_Out.Put ("; ");
---                  end if;
---                  Dbg_Out.Put ("\1", Tab_Image (Out_Buf, Tabs, X (J)));
---               end loop;
---               Dbg_Out.Put ("\n");
-            end Put_Tab_In_Line_Vector;
+            ------------------------
+            -- Put_Paragraph_Tabs --
+            ------------------------
 
             procedure Put_Paragraph_Tabs is
             begin
@@ -5305,32 +5332,60 @@ package body Pp.Formatting is
                Dbg_Out.Put ("end Paragraph_Tabs\n");
             end Put_Paragraph_Tabs;
 
+            ----------------------------
+            -- Put_Tab_In_Line_Vector --
+            ----------------------------
+
+            procedure Put_Tab_In_Line_Vector
+              (Name : String;
+               X    : Tab_In_Line_Vector)
+            is
+               pragma Unreferenced (Name);
+            begin
+               if Is_Empty (X) then
+                  return;
+               end if;
+
+               --  Dbg_Out.Put ("\1: \t", Name);
+               --
+               --  for J in 1 .. Last_Index (X) loop
+               --     if J /= 1 then
+               --        Dbg_Out.Put ("; ");
+               --     end if;
+               --     Dbg_Out.Put ("\1", Tab_Image (Out_Buf, Tabs, X (J)));
+               --  end loop;
+               --  Dbg_Out.Put ("\n");
+            end Put_Tab_In_Line_Vector;
+
             F_Tab, C_Tab : Tab_Rec;
 
          --  Start of processing for Calculate_Num_Blanks
 
          begin
-   --  Debug printouts commented out for efficiency
+            --  Debug printouts commented out for efficiency
+
             while Kind (New_Tok) /= End_Of_Input loop
                declare
-   --               First_Char_In_Line : constant Natural :=
-   --                 Sloc (New_Tok).First - Sloc (New_Tok).Col + 1;
+                  --  First_Char_In_Line : constant Natural :=
+                  --    Sloc (New_Tok).First - Sloc (New_Tok).Col + 1;
                begin
                   Process_Line;
 
-   --               Dbg_Out.Put ("<<");
-   --
-   --               for X in First_Char_In_Line .. Sloc (New_Tok).First - 1 loop
-   --                  for Tab of Cur_Line_Tabs loop
-   --                     if X = Position (Out_Buf, Tabs (Tab).Mark) then
-   --                        Dbg_Out.Put ("^");
-   --                     end if;
-   --                  end loop;
-   --                  Dbg_Out.Put ("\1", To_UTF8 ((1 => Char_At (Out_Buf, X))));
-   --               end loop;
-   --               Dbg_Out.Put (">>\n");
-   --               Put_Tab_In_Line_Vector ("First", First_Line_Tabs);
-   --               Put_Tab_In_Line_Vector ("Cur", Cur_Line_Tabs);
+                  --  Dbg_Out.Put ("<<");
+                  --  for X in First_Char_In_Line ..
+                  --       Sloc (New_Tok).First - 1
+                  --  loop
+                  --     for Tab of Cur_Line_Tabs loop
+                  --        if X = Position (Out_Buf, Tabs (Tab).Mark) then
+                  --           Dbg_Out.Put ("^");
+                  --        end if;
+                  --     end loop;
+                  --     Dbg_Out.Put
+                  --       ("\1", To_UTF8 ((1 => Char_At (Out_Buf, X))));
+                  --  end loop;
+                  --  Dbg_Out.Put (">>\n");
+                  --  Put_Tab_In_Line_Vector ("First", First_Line_Tabs);
+                  --  Put_Tab_In_Line_Vector ("Cur", Cur_Line_Tabs);
 
                   if Partial_Gnatpp and then Kind (New_Tok) = End_Of_Input
                   then
@@ -5345,7 +5400,7 @@ package body Pp.Formatting is
 
                   --  Consume the newline
                   if Is_Empty (Cur_Line_Tabs) then
-   --                  Dbg_Out.Put ("Flush_Para -- no tabs\n");
+                     --  Dbg_Out.Put ("Flush_Para -- no tabs\n");
                      Flush_Para;
                      --  Leave tabs from this line with Num_Blanks = 0.
                      Clear (First_Line_Tabs);
@@ -5355,11 +5410,12 @@ package body Pp.Formatting is
                         First_Line_Tabs := Cur_Line_Tabs;
                      else
                         --  If the Parents don't match, we're at the end of a
-                        --  paragraph. We also end the paragraph if the line-tab
-                        --  arrays are of different length, which can only
-                        --  happen if a comment occurs in the middle of a
+                        --  paragraph. We also end the paragraph if the
+                        --  line-tab arrays are of different length, which can
+                        --  only happen if a comment occurs in the middle of a
                         --  tabable construct (e.g. before ":=" in a variable
-                        --  declaration), thus forcing a tab onto the next line.
+                        --  declaration), thus forcing a tab onto the next
+                        --  line.
 
                         F_Tab := Element (Tabs, First_Line_Tabs (1));
                         C_Tab := Element (Tabs, Cur_Line_Tabs (1));
@@ -5374,7 +5430,7 @@ package body Pp.Formatting is
                                 (Cur_Line_Tabs,
                                  First_Line_Tabs));
                         else
-   --                        Dbg_Out.Put ("Flush_Para -- parent mismatch\n");
+                           --  Dbg_Out.Put ("Flush_Para -- parent mismatch\n");
                            Flush_Para;
                            First_Line_Tabs := Cur_Line_Tabs;
 
@@ -5403,11 +5459,15 @@ package body Pp.Formatting is
                      Clear (Cur_Line_Tabs);
                   end if;
                end;
-   --            Dbg_Out.Put ("\n");
+               --  Dbg_Out.Put ("\n");
             end loop;
 
             pragma Assert (Cur_Tab_Index = Last_Index (Tabs));
          end Calculate_Num_Blanks;
+
+         -------------------
+         -- Do_Insertions --
+         -------------------
 
          procedure Do_Insertions is
             --  Go through the tokens, inserting Spaces for tabs that should
@@ -5497,21 +5557,17 @@ package body Pp.Formatting is
          --  Go through the tabs and set their Num_Blanks field to the
          --  appropriate value. Tabs that are not expanded at all will
          --  have Num_Blanks left equal to zero.
-
          pragma Debug
-           (Format_Debug_Output
-              (Lines_Data, "before Calculate_Num_Blanks"));
+           (Format_Debug_Output (Lines_Data, "before Calculate_Num_Blanks"));
          Calculate_Num_Blanks;
          pragma Debug
-           (Format_Debug_Output
-              (Lines_Data, "after Calculate_Num_Blanks"));
+           (Format_Debug_Output (Lines_Data, "after Calculate_Num_Blanks"));
 
-         --  Then do the actual insertions:
+         --  Then do the actual insertions
          Do_Insertions;
 
          Clear (Saved_New_Tokns);
          Clear (Tabs);
-
       end Insert_Alignment_Helper;
 
    end Tok_Phases;
