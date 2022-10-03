@@ -22,8 +22,14 @@
 ------------------------------------------------------------------------------
 
 with Ada.Characters.Latin_1;
+with Ada.Characters.Handling;
 
 package body TGen.Strings is
+
+   function To_Symbol
+     (Name : Ada_Qualified_Name; Sep : Character) return String;
+   --  Turn the given qualified name to a symbol, using the given Sep to
+   --  separate identifiers.
 
    --------------
    -- New_Line --
@@ -107,22 +113,43 @@ package body TGen.Strings is
       end loop;
    end Indent_String;
 
-   ------------
-   -- To_Ada --
-   ------------
+   ---------------
+   -- To_Symbol --
+   ---------------
 
-   function To_Ada (Name : Ada_Qualified_Name) return String is
+   function To_Symbol
+     (Name : Ada_Qualified_Name; Sep : Character) return String
+   is
       Result : Unbounded_String;
    begin
       for Id of Name loop
          if Length (Result) > 0 then
-            Append (Result, ".");
+            Append (Result, Sep);
          end if;
          Append (Result, To_String (Id));
       end loop;
 
       return +Result;
+   end To_Symbol;
+
+   ------------
+   -- To_Ada --
+   ------------
+
+   function To_Ada (Name : Ada_Qualified_Name) return String is
+   begin
+      return To_Symbol (Name, Sep => '.');
    end To_Ada;
+
+   -----------------
+   -- To_Filename --
+   -----------------
+
+   function To_Filename (Name : Ada_Qualified_Name) return String is
+      use Ada.Characters.Handling;
+   begin
+      return To_Lower (To_Symbol (Name, Sep => '-'));
+   end To_Filename;
 
    -----------------------
    -- To_Qualified_Name --

@@ -134,6 +134,10 @@ package TGen.Strings is
      with Pre => not Name.Is_Empty;
    --  Turn the given qualified name into Ada syntax
 
+   function To_Filename (Name : Ada_Qualified_Name) return String
+     with Pre => not Name.Is_Empty;
+   --  Turn the given qualified name into a filename
+
    function To_Qualified_Name (Name : String) return Ada_Qualified_Name;
    --  Turn the given string into our internal qualified name structure
 
