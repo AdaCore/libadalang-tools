@@ -64,7 +64,7 @@ package body TGen.Types.Translation is
    package Translation_Maps is new Ada.Containers.Hashed_Maps
      (Key_Type        => Ada_Qualified_Name,
       Element_Type    => TGen.Types.SP.Ref,
-      Hash            => TGen.Strings.Hash,
+      Hash            => TGen.Strings.Hash2,
       Equivalent_Keys => TGen.Strings.Ada_Identifier_Vectors."=",
       "="             => TGen.Types.SP."=");
 

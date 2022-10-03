@@ -137,7 +137,7 @@ package TGen.Strings is
    function To_Qualified_Name (Name : String) return Ada_Qualified_Name;
    --  Turn the given string into our internal qualified name structure
 
-   function Hash (Self : Ada_Qualified_Name) return Ada.Containers.Hash_Type is
-     (Ada.Strings.Hash (To_Ada (Self)));
+   function Hash2 (Self : Ada_Qualified_Name) return Ada.Containers.Hash_Type
+   is (Ada.Strings.Hash (To_Ada (Self)));
 
 end TGen.Strings;
