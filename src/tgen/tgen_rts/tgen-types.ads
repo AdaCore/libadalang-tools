@@ -87,10 +87,6 @@ package TGen.Types is
      (To_Ada (Self.Name));
    --  Return the FQN of Self
 
-   function Parent_Package_Name (Self : Typ) return String is
-     (raise Program_Error with "To implement");
-   --  Return the name of the package in which Self is defined
-
    function Type_Name (Self : Typ) return String is
      (if Ada_Identifier_Vectors.Is_Empty (Self.Name)
       then "anonymous"
