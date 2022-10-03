@@ -162,7 +162,7 @@ package Test.Common is
 
    procedure Generate_Common_File;
    --  Creates a file with package gnattest_generated which denotes the default
-   --  skeletons behavior and declares renamins necessary to avoid name
+   --  skeletons behavior and declares renamings necessary to avoid name
    --  conflicts with tested sources.
 
    procedure Put_Harness_Header;
@@ -252,7 +252,7 @@ package Test.Common is
      ("gnattest" & GNAT.OS_Lib.Directory_Separator & "stubs");
 
    Test_Subdir_Name  : String_Access;
-   --  Name of subdirectory to place test files in case of --sudbir option
+   --  Name of subdirectory to place test files in case of --subdir option
 
    Separate_Root_Dir : String_Access;
    --  The root directory to place the test file hierarchy in case of
