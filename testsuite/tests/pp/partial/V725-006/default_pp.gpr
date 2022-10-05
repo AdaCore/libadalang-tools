@@ -1,0 +1,8 @@
+project Default_pp is
+   for Main use ("main.adb");
+
+   package Pretty_Printer is
+      for Default_Switches ("ada") use ("--call-threshold=1");
+   end Pretty_Printer;
+   
+end Default_pp;

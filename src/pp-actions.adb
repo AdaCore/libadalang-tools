@@ -5330,8 +5330,10 @@ package body Pp.Actions is
 
          --  In Partial mode, we might need to add a line break. Same for
          --  Source_Line_Breaks.
+         --  No need to add line break in partial_gnatpp mode
 
-         if Partial or else Arg (Cmd, Source_Line_Breaks) then
+         if Partial or else Arg (Cmd, Source_Line_Breaks)
+         then
             if Kind (Last (New_Tokns'Access)) not in Line_Break_Token
               and then not Partial_Gnatpp
             then
@@ -5661,10 +5663,13 @@ package body Pp.Actions is
                end;
             end loop;
 
-            if not Inside_Pp_Off_Region then
+            --  In partial formatting mode no need to add a last LB at the end
+            --  as expected for a whole file formatting.
+            if not Inside_Pp_Off_Region and then not Partial_Gnatpp then
                if Add_CR then
                   Append (Result, W_CR);
                end if;
+
                Append (Result, W_LF);
                pragma Assert (Result (1) = NL);
                pragma Assert (Result (2) /= NL);
@@ -5761,11 +5766,10 @@ package body Pp.Actions is
       --  The clean up should be done in any cases when an exception is issued.
       when Partial_Gnatpp_Error =>
          if Partial_Gnatpp then
-            Ada.Text_IO.Put_Line
-              ("Partial_Gnatpp: Partial_Gnatpp_Error!"
-               & " Probably caused by an infinite loop detection!"
-               & " Keep the initial input selection without formatting"
-               & " and clear internal datas!");
+            Err_Out.Put
+              ("Partial_Gnatpp_Error: \1 \2\n",
+               "Keeping the initial input selection unchanged for",
+               Node.Image);
             Output := Input;
          end if;
          Clear_Lines_Data;

@@ -1039,7 +1039,6 @@ package body Laltools.Partial_GNATPP is
          use Pp.Command_Lines.Pp_Boolean_Switches;
          use Pp.Command_Lines.Pp_Flag_Switches;
          use Pp.Command_Lines.Pp_Nat_Switches;
-
       begin
          Set_Arg (PP_Options, Pp.Command_Lines.Source_Line_Breaks, True);
          Set_Arg (PP_Options, Comments_Fill, False);
