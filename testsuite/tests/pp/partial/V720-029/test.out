@@ -5,8 +5,7 @@ main.adb(<CallStmt main.adb:4:1-4:95>) - 4:1-4:95
      (AAAA                                 => Foo_1,
       BB                                   => Foo_2,
       CCCCCCC                              => Foo_3,
-      DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD => 7);
-$
+      DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD => 7);$
 *************************************
 
 *************************************
@@ -21,7 +20,6 @@ begin
       CCCCCCC                              => Foo_3,
       DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD => 7);
 
-end main;
-$
+end main;$
 *************************************
 
