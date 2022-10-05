@@ -1133,6 +1133,8 @@ package body Laltools.Partial_GNATPP is
          Messages       => PP_Messages,
          Partial_Gnatpp => True);
 
+      Clear (Final_PP_Options);
+
       --  In the case of preserving source line breaks switch usage, get the
       --  filtered output of the significant lines based on the initial
       --  selection to make text edits only on that part of the code.
