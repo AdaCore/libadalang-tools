@@ -83,6 +83,10 @@ package Pp.Actions is
    --  global Partial_Gnatpp_Offset variable value. They are used exclusively
    --  for the partial formatting of the code.
 
+   procedure Clear_Template_Tables;
+   --  Clear all gnatpp's predefined template tables.
+   --  Should be called everytime gnatpp's command line changes.
+
 private
 
    overriding procedure Init

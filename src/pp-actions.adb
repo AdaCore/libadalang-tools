@@ -5378,6 +5378,44 @@ package body Pp.Actions is
       pragma Assert (Bin_Op_Count = 0);
    end Tree_To_Ada_2;
 
+   procedure Clear_Template_Tables is
+      use Alternative_Templates;
+
+      procedure Free_Tok_Template
+        (Template : in out Tok_Template);
+
+      procedure Free_Tok_Template
+        (Template : in out Tok_Template)
+      is
+         procedure Free is
+           new Ada.Unchecked_Deallocation (Instr_Array, Instr_Array_Ptr);
+      begin
+         if Template.Instructions /= null then
+            for Instr of Template.Instructions.all loop
+               if Instr.Kind = Opt_Subtree_Or_List then
+                  Free (Instr.Pre.Instructions);
+                  Free (Instr.Post.Instructions);
+                  Free (Instr.Between.Instructions);
+               end if;
+            end loop;
+            Free (Template.Instructions);
+         end if;
+      end Free_Tok_Template;
+
+   begin
+      for Template of Tok_Template_Table loop
+         Free_Tok_Template (Template);
+      end loop;
+
+      for Template of Tok_Alt_Table loop
+         Free_Tok_Template (Template);
+      end loop;
+
+      for Template of Tok_Subp_Decl_With_Hard_Breaks_Alt_Table loop
+         Free_Tok_Template (Template);
+      end loop;
+   end Clear_Template_Tables;
+
    procedure Format_Vector
      (Cmd            : Command_Line;
       Input          : Char_Vector;
