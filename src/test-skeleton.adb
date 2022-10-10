@@ -1812,7 +1812,13 @@ package body Test.Skeleton is
                         Arr : constant Basic_Decl_Array :=
                           P_Base_Subp_Declarations (ISub_Iter);
                      begin
-                        ISub := Arr (Arr'Last);
+                        for J in reverse Arr'Range loop
+                           if Arr (J).Kind /= Ada_Synthetic_Subp_Decl then
+                              ISub := Arr (J);
+                              exit;
+                           end if;
+                        end loop;
+
                      end;
 
                      if ISub.Kind = Ada_Expr_Function then
