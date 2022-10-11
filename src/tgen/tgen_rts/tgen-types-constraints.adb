@@ -92,7 +92,7 @@ package body TGen.Types.Constraints is
    function Image (Self : Discriminant_Constraints) return String is
       use Discriminant_Constraint_Maps;
       Res : Unbounded_String := To_Unbounded_String ("(");
-      Cur : Cursor := Self.Constraint_Map.First;
+      Cur : Discriminant_Constraint_Maps.Cursor := Self.Constraint_Map.First;
    begin
       while Has_Element (Cur) loop
          Res := Res & (+Key (Cur)) & " => " & Image (Element (Cur));
@@ -182,9 +182,8 @@ package body TGen.Types.Constraints is
             if Cst.Static then
                declare
                   use Enum_Literal_Maps;
-                  use Big_Int;
                   New_Lit_Set  : Enum_Literal_Maps.Map;
-                  Old_Enum_Cur : constant Cursor :=
+                  Old_Enum_Cur : constant Enum_Literal_Maps.Cursor :=
                     As_Other_Enum_Typ (Self.Named_Ancestor).Literals.First;
 
                   Min : constant Big_Integer :=

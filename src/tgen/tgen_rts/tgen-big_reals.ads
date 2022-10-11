@@ -2,7 +2,7 @@
 --                                                                          --
 --                                  TGen                                    --
 --                                                                          --
---                       Copyright (C) 2022, AdaCore                        --
+--                       Copyright (C) 2023, AdaCore                        --
 --                                                                          --
 -- TGen  is  free software; you can redistribute it and/or modify it  under --
 -- under  terms of  the  GNU General  Public License  as  published by  the --
@@ -20,11 +20,7 @@
 -- the files COPYING3 and COPYING.RUNTIME respectively.  If not, see        --
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
---
---  Library for value generation and marshalling of Ada types
 
-package TGen is
-   pragma Preelaborate;
+with Ada.Numerics.Big_Numbers.Big_Reals;
 
-   Version : constant String := "0.0";
-end TGen;
+package TGen.Big_Reals renames Ada.Numerics.Big_Numbers.Big_Reals;

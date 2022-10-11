@@ -24,6 +24,8 @@
 with Ada.Streams;
 with Interfaces; use Interfaces;
 
+with TGen.JSON; use TGen.JSON;
+
 package TGen.Marshalling_Lib is
 
    Invalid_Value : exception;
@@ -124,6 +126,24 @@ package TGen.Marshalling_Lib is
    end Read_Write_Unsigned;
 
    generic
+      type T is (<>);
+   package Read_Write_Discrete_JSON is
+
+      procedure Write
+        (JSON   : out TGen.JSON.JSON_Value;
+         V      : T;
+         First  : T := T'First;
+         Last   : T := T'Last);
+
+      procedure Read
+        (JSON  : TGen.JSON.JSON_Value;
+         V     : out T;
+         First : T := T'First;
+         Last  : T := T'Last);
+
+   end Read_Write_Discrete_JSON;
+
+   generic
       type T is delta <> digits <>;
    package Read_Write_Decimal_Fixed is
 
@@ -151,6 +171,24 @@ package TGen.Marshalling_Lib is
    end Read_Write_Decimal_Fixed;
 
    generic
+      type T is delta <> digits <>;
+   package Read_Write_Decimal_Fixed_JSON is
+
+      procedure Write
+        (JSON   : out TGen.JSON.JSON_Value;
+         V      : T;
+         First  : T := T'First;
+         Last   : T := T'Last);
+
+      procedure Read
+        (JSON  : TGen.JSON.JSON_Value;
+         V     : out T;
+         First : T := T'First;
+         Last  : T := T'Last);
+
+   end Read_Write_Decimal_Fixed_JSON;
+
+   generic
       type T is delta <>;
    package Read_Write_Ordinary_Fixed is
 
@@ -176,6 +214,24 @@ package TGen.Marshalling_Lib is
          Last   : T := T'Last);
 
    end Read_Write_Ordinary_Fixed;
+
+   generic
+      type T is delta <>;
+   package Read_Write_Ordinary_Fixed_JSON is
+
+      procedure Write
+        (JSON   : out TGen.JSON.JSON_Value;
+         V      : T;
+         First  : T := T'First;
+         Last   : T := T'Last);
+
+      procedure Read
+        (JSON  : TGen.JSON.JSON_Value;
+         V     : out T;
+         First : T := T'First;
+         Last  : T := T'Last);
+
+   end Read_Write_Ordinary_Fixed_JSON;
 
    generic
       type T is digits <>;
@@ -215,6 +271,24 @@ package TGen.Marshalling_Lib is
    end Read_Write_Float;
 
    generic
+      type T is digits <>;
+   package Read_Write_Float_JSON is
+
+      procedure Write
+        (JSON   : out TGen.JSON.JSON_Value;
+         V      : T;
+         First  : T := T'First;
+         Last   : T := T'Last);
+
+      procedure Read
+        (JSON  : TGen.JSON.JSON_Value;
+         V     : out T;
+         First : T := T'First;
+         Last  : T := T'Last);
+
+   end Read_Write_Float_JSON;
+
+   generic
       type T is private;
 
       with procedure Write
@@ -250,6 +324,23 @@ package TGen.Marshalling_Lib is
          V      : T);
 
    end In_Out;
+
+   generic
+      type T is private;
+
+      with procedure Write
+        (JSON : out TGen.JSON.JSON_Value; V : T);
+
+      with procedure Read
+        (JSON  : TGen.JSON.JSON_Value; V : out T);
+
+   package In_Out_JSON is
+
+      function Input (JSON : TGen.JSON.JSON_Value) return T;
+
+      function Output (V : T) return TGen.JSON.JSON_Value;
+
+   end In_Out_JSON;
 
    generic
       type T (<>) is private;
@@ -298,5 +389,29 @@ package TGen.Marshalling_Lib is
          V      : T);
 
    end In_Out_Unconstrained;
+
+   generic
+      type T (<>) is private;
+      type Header is private;
+
+      with function Init (H : Header) return T;
+
+      with procedure Output_Header
+        (JSON : out TGen.JSON.JSON_Value; V : T);
+
+      with function Input_Header
+        (JSON : TGen.JSON.JSON_Value) return Header;
+
+      with procedure Write (JSON : out TGen.JSON.JSON_Value; V : T);
+
+      with procedure Read (JSON  : TGen.JSON.JSON_Value; V : out T);
+
+   package In_Out_Unconstrained_JSON is
+
+      function Input (JSON : TGen.JSON.JSON_Value) return T;
+
+      function Output (V : T) return TGen.JSON.JSON_Value;
+
+   end In_Out_Unconstrained_JSON;
 
 end TGen.Marshalling_Lib;

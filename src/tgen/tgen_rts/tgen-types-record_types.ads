@@ -61,7 +61,7 @@ package TGen.Types.Record_Types is
 
    type Record_Typ is new Composite_Typ with record
       Component_Types : Component_Maps.Map;
-      Static_Gen : Boolean := False;
+      Static_Gen      : Boolean := False;
    end record;
 
    function Supports_Static_Gen (Self : Record_Typ) return Boolean is
@@ -217,5 +217,17 @@ package TGen.Types.Record_Types is
      Pre => (not SP.Is_Null (Self))
             and then (Self.Get.Kind in Disc_Record_Kind);
    pragma Inline (As_Discriminated_Record_Typ);
+
+   type Function_Typ is new Record_Typ with null record;
+
+   function Kind (Self : Function_Typ) return Typ_Kind is
+     (Function_Kind);
+
+   function As_Function_Typ
+     (Self : SP.Ref) return Function_Typ'Class is
+     (Function_Typ'Class (Self.Unchecked_Get.all)) with
+     Pre => (not SP.Is_Null (Self))
+            and then (Self.Get.Kind in Function_Kind);
+   pragma Inline (As_Function_Typ);
 
 end TGen.Types.Record_Types;

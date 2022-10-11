@@ -27,15 +27,15 @@
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-with GNATCOLL.JSON;     use GNATCOLL.JSON;
 with GNATCOLL.Projects; use GNATCOLL.Projects;
 
 with Libadalang.Analysis; use Libadalang.Analysis;
 
-with TGen.Context;     use TGen.Context;
-with TGen.Strings;     use TGen.Strings;
-with TGen.Types;       use TGen.Types;
-with TGen.Subprograms; use TGen.Subprograms;
+with TGen.Context;              use TGen.Context;
+with TGen.JSON;        use TGen.JSON;
+with TGen.Strings;              use TGen.Strings;
+with TGen.Types;                use TGen.Types;
+with TGen.Subprograms;          use TGen.Subprograms;
 
 package TGen.Gen_Strategies is
 
@@ -53,7 +53,7 @@ package TGen.Gen_Strategies is
    procedure Generate_Test_Vectors
      (Context  : in out Generation_Context;
       Nb_Tests : Positive;
-      Subp     : Basic_Decl'Class;
+      Subp     : Subp_Decl'Class;
       Subp_UID : Unbounded_String := Null_Unbounded_String);
    --  Generate values for all types that support static (single pass)
    --  generation.

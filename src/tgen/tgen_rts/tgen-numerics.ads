@@ -23,23 +23,20 @@
 --
 --  Numeric utility functions for Big integers
 
-with Ada.Numerics.Big_Numbers.Big_Integers;
-with Ada.Numerics.Big_Numbers.Big_Reals;
-
 with Ada.Numerics.Generic_Elementary_Functions;
+
+with TGen.Big_Int;
+with TGen.Big_Reals;
 
 package TGen.Numerics is
 
-   package Big_Int renames Ada.Numerics.Big_Numbers.Big_Integers;
-
-   package Big_Reals renames Ada.Numerics.Big_Numbers.Big_Reals;
+   pragma Preelaborate;
 
    function From_Universal_Image (Num, Den : String) return Big_Reals.Big_Real
    is
      (Big_Reals."/" (Big_Int.From_String (Num), Big_Int.From_String (Den)));
 
-   package LF_Conversions is
-     new Ada.Numerics.Big_Numbers.Big_Reals.Float_Conversions (Long_Float);
+   package LF_Conversions is new Big_Reals.Float_Conversions (Long_Float);
    --  We use Long_Float instead of Long_Long_Float for random generation
    --  purposes because there is a bug Float_Conversions which results in
    --  Storage_Errors when using the package instantiated with Long_Long_Float.

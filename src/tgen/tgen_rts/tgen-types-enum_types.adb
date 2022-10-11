@@ -104,22 +104,17 @@ package body TGen.Types.Enum_Types is
    --  The space is not the first element of Character but we won't generate
    --  non printable characters as they need to be unparsable in sources.
 
-   function Generate_Static_Value_Char_Typ
-     (Ty : Typ'Class) return Value_Type'Class;
+   function Generate_Value_Char_Typ
+     (Ty : Typ'Class) return JSON_Value;
 
-   ------------------------------------
-   -- Generate_Static_Value_Char_Typ --
-   ------------------------------------
+   -----------------------------
+   -- Generate_Value_Char_Typ --
+   -----------------------------
 
-   function Generate_Static_Value_Char_Typ
-     (Ty : Typ'Class) return Value_Type'Class
+   function Generate_Value_Char_Typ (Ty : Typ'Class) return JSON_Value
    is
-      Result : Discrete_Static_Value;
-
       --  Let's use only the standard characters in the ASCII table. Others
       --  can't be represented as Character literals. Improvements TODO.
-
-      use Big_Int;
 
       LB : constant Natural :=
         (if Char_Typ (Ty).Has_Range
@@ -136,10 +131,8 @@ package body TGen.Types.Enum_Types is
       Lit : constant Integer :=
         Rand_Int (Min => LB, Max => HB);
    begin
-      SP.From_Element (Result.T, Ty'Unrestricted_Access);
-      Result.Value := To_Big_Integer (Lit);
-      return Result;
-   end Generate_Static_Value_Char_Typ;
+      return Create (To_Big_Integer (Lit));
+   end Generate_Value_Char_Typ;
 
    ----------------------
    -- Default_Strategy --
@@ -150,7 +143,7 @@ package body TGen.Types.Enum_Types is
       Strat : Basic_Strategy_Type;
    begin
       SP.From_Element (Strat.T, Self'Unrestricted_Access);
-      Strat.F := Generate_Static_Value_Char_Typ'Access;
+      Strat.F := Generate_Value_Char_Typ'Access;
       return Strat;
    end Default_Strategy;
 

@@ -1,0 +1,29 @@
+--  Generated with TGen
+
+@@TABLE@@
+@_WITH_CLAUSES_@
+@@END_TABLE@@
+
+with TGen.Types.Array_Types;
+with TGen.Types.Constraints;
+with TGen.Types.Discrete_Types;
+with TGen.Types.Enum_Types;
+with TGen.Types.Int_Types;
+with TGen.Types.Parameter_Types;
+with TGen.Types.Real_Types;
+with TGen.Types.Record_Types;
+
+with TGen.Big_Int;
+with TGen.JSON;
+with TGen.Strings;
+
+package @_PACKAGE_NAME_@ is
+   pragma Elaborate_Body;
+
+   procedure Dummy;
+
+   @@TABLE@@
+   @_TYPE_TEMPLATES_@
+   @@END_TABLE@@
+
+end @_PACKAGE_NAME_@;

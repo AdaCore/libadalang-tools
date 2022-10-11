@@ -12,7 +12,7 @@
 @@--  @_CHOICES_@ Vector of choices for the variant part.
 @@--  @_COMPONENT_SIZE_MAX_@ Vector of calls to Size_Max for all the
 @@--       components of the current type.
-@@--  @_VARIANT_SIZE_MAX_@ Computation of in NB_Bits of the maximum of the
+@@--  @_VARIANT_SIZE_MAX_@ Computation of in Nb_Bits of the maximum of the
 @@--       Size_Max of all the components in each choice value from the variant
 @@--       part of the current type.
 @@--

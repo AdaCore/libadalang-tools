@@ -9,6 +9,7 @@ abstract project LAL_Tools_Common is
    Superproject := external ("SUPERPROJECT", "");
 
    package Compiler is
+      for Driver ("Templates") use "";
       case Build_Mode is
          when "dev" =>
             for Default_Switches ("Ada") use

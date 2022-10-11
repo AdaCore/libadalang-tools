@@ -21,8 +21,8 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Characters.Latin_1;
 with Ada.Characters.Handling;
+with Ada.Characters.Latin_1;
 
 package body TGen.Strings is
 
@@ -160,18 +160,19 @@ package body TGen.Strings is
 
    function To_Qualified_Name (Name : String) return Ada_Qualified_Name
    is
+      use Ada.Characters.Handling;
       I      : Positive := 1;
       Result : Ada_Qualified_Name;
    begin
       for J in Name'Range loop
          if Name (J) = '.' then
-            I := J + 1;
             Ada_Identifier_Vectors.Append
-              (Result, To_Unbounded_String (Name (I .. J)));
+              (Result, To_Unbounded_String (To_Lower (Name (I .. J - 1))));
+            I := J + 1;
          end if;
       end loop;
       Ada_Identifier_Vectors.Append
-        (Result, To_Unbounded_String (Name (I .. Name'Last)));
+        (Result, To_Unbounded_String (To_Lower (Name (I .. Name'Last))));
       return Result;
    end To_Qualified_Name;
 end TGen.Strings;

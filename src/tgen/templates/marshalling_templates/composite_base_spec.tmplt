@@ -32,13 +32,13 @@
    function @_TY_PREFIX_@_Size_Max
 @@IF@@ @_DISCR_NAME_@ /= ""
 @@TABLE'ALIGN_ON(":", ":=")@@
-     @_LPAR()_@@_GLOBAL_PREFIX_@_@_DISCR_NAME_@_D_Min : @_COMP_TYP_@ := @_COMP_TYP_@'First;
-      @_GLOBAL_PREFIX_@_@_DISCR_NAME_@_D_Max : @_COMP_TYP_@ := @_COMP_TYP_@'Last@_RPAR()_@
+     @_LPAR()_@@_GLOBAL_PREFIX_@_@_DISCR_NAME_@_D_Min : @_DISCR_TYP_@ := @_DISCR_TYP_@'First;
+      @_GLOBAL_PREFIX_@_@_DISCR_NAME_@_D_Max : @_DISCR_TYP_@ := @_DISCR_TYP_@'Last@_RPAR()_@
 @@END_TABLE@@
 @@ELSIF@@ @_FIRST_NAME_@ /= ""
 @@TABLE'ALIGN_ON(":", ":=")@@
-     @_LPAR()_@@_GLOBAL_PREFIX_@_@_FIRST_NAME_@ : @_COMP_TYP_@'Base := @_COMP_TYP_@'First;
-      @_GLOBAL_PREFIX_@_@_LAST_NAME_@ : @_COMP_TYP_@'Base := @_COMP_TYP_@'Last@_RPAR()_@
+     @_LPAR()_@@_GLOBAL_PREFIX_@_@_FIRST_NAME_@ : @_BOUND_TYP_@'Base := @_BOUND_TYP_@'First;
+      @_GLOBAL_PREFIX_@_@_LAST_NAME_@ : @_BOUND_TYP_@'Base := @_BOUND_TYP_@'Last@_RPAR()_@
 @@END_TABLE@@
 @@END_IF@@
      return Natural;

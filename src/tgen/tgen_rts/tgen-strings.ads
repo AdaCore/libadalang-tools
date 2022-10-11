@@ -143,11 +143,11 @@ package TGen.Strings is
      with Pre => not Name.Is_Empty;
    --  Turn the given qualified name into a filename
 
-   function To_Qualified_Name (Name : String) return Ada_Qualified_Name;
-   --  Turn the given string into our internal qualified name structure
-
    function "<" (L, R : Ada_Qualified_Name) return Boolean is
      (Ada.Strings.Less_Case_Insensitive (To_Ada (L), To_Ada (R)));
+
+   function To_Qualified_Name (Name : String) return Ada_Qualified_Name;
+   --  Turn the given string into our internal qualified name structure
 
    function Hash2 (Self : Ada_Qualified_Name) return Ada.Containers.Hash_Type
    is (Ada.Strings.Hash (To_Ada (Self)));

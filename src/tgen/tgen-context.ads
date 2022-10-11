@@ -30,10 +30,9 @@ with Ada.Strings.Unbounded;           use Ada.Strings.Unbounded;
 with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
 with Ada.Strings.Wide_Wide_Unbounded.Wide_Wide_Hash;
 
-with GNATCOLL.JSON; use GNATCOLL.JSON;
-
 with Langkit_Support.Text; use Langkit_Support.Text;
 
+with TGen.JSON; use TGen.JSON;
 with TGen.Strategies;  use TGen.Strategies;
 with TGen.Strings;     use TGen.Strings;
 with TGen.Subprograms; use TGen.Subprograms;
@@ -89,9 +88,6 @@ package TGen.Context is
       Codegen_Required : Boolean := False;
       --  Whether generation of some type values requires a dynamic-validation
       --  step (for non-static types, and for subprograms with a precondition).
-
-      Type_Translations : Fully_Qualified_Name_To_Type_Map;
-      --  Contains all the type translations
 
       Type_And_Param_Strategies : Fully_Qualified_Name_To_Strat_Map;
       --  The strategies to use for each type / component of type / parameter /

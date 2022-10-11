@@ -746,7 +746,7 @@ package body Test.Skeleton is
                      TGen.Gen_Strategies.Generate_Test_Vectors
                      (TGen_Ctx,
                         Test.Common.TGen_Num_Tests,
-                        Element (Subp_Cur).Subp_Declaration.As_Basic_Decl,
+                        Element (Subp_Cur).Subp_Declaration.As_Subp_Decl,
                         Ada.Strings.Unbounded.To_Unbounded_String
                         (Element (Subp_Cur).Subp_Full_Hash.all));
                   when others =>
@@ -6959,6 +6959,9 @@ package body Test.Skeleton is
                   & " (Gnattest_T : in out Test) is");
 
                for Param of Single_Vec loop
+                  for Decl of JSON_Array'(Param.Get ("decls")) loop
+                     Put_Line (Body_F, Com & "   " & Decl.Get);
+                  end loop;
                   Put_Line
                     (Body_F,
                      Com & "   Param_" & Param.Get ("name") & " : "

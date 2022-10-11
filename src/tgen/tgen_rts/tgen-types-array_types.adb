@@ -315,14 +315,14 @@ package body TGen.Types.Array_Types is
 
    overriding function Generate
      (S            : in out Array_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return Value_Type'Class;
+      Disc_Context : Disc_Value_Map) return JSON_Value;
 
    function Generate_Static_Common
      (Self                   : Array_Typ'Class;
       Disc_Context           : Disc_Value_Map;
       Generate_Element_Strat : in out Strategy_Type'Class;
       Generate_Index_Strat   : in out Index_Strategy_Array)
-      return Value_Type'Class;
+      return JSON_Value;
 
    ------------
    -- Length --
@@ -345,7 +345,6 @@ package body TGen.Types.Array_Types is
                raise Program_Error with
                  "Dynamic constraint unsupported for static generation");
 
-      use type Big_Integer;
       LB, HB : Big_Integer;
    begin
       if I_Constraint.Present then
@@ -367,22 +366,20 @@ package body TGen.Types.Array_Types is
       Disc_Context           : Disc_Value_Map;
       Generate_Element_Strat : in out Strategy_Type'Class;
       Generate_Index_Strat   : in out Index_Strategy_Array)
-      return Value_Type'Class
+      return JSON_Value
    is
-      use type Big_Int.Big_Integer;
+      pragma Warnings (Off);
+      function Generate_Component_Wrapper
+        (Data : Data_Type) return JSON_Value;
+      pragma Warnings (On);
 
       function Generate_Component_Wrapper
-        (Data : Data_Type) return Unbounded_String;
-
-      function Generate_Component_Wrapper
-        (Data : Data_Type) return Unbounded_String is
+        (Data : Data_Type) return JSON_Value
+      is
          pragma Unreferenced (Data);
       begin
-         return (+Generate_Element_Strat.Generate
-                    (Disc_Context).To_String);
+         return Generate_Element_Strat.Generate (Disc_Context);
       end Generate_Component_Wrapper;
-
-      Res : Unbounded_String;
 
       --  Let's use the somewhat generic Array_Strategy capabilities here,
       --  and pick a Min_Size of 0 and a Max_Size of (10 ** Nb_Dim). We will
@@ -392,7 +389,7 @@ package body TGen.Types.Array_Types is
       Data : Data_Type;
 
       package Array_Generation_Static is new Array_Generation_Package
-        (Element_Type   => Unbounded_String,
+        (Element_Type   => JSON_Value,
          Generate_Value => Generate_Component_Wrapper);
 
       use Array_Generation_Static;
@@ -405,36 +402,21 @@ package body TGen.Types.Array_Types is
 
       Dimension_Sizes : Nat_Array (1 .. Self.Num_Dims);
 
-      function Pp_Index_Val
-        (Value : Big_Integer; Current_Index : Positive) return String;
-
-      procedure Pp_Arr
+      function Pp_Arr
         (Arr           : Generic_Array_Type;
          Current_Index : in out Positive;
-         Indexes       : Index_Values_Array);
-
-      ------------------
-      -- Pp_Index_Val --
-      ------------------
-
-      function Pp_Index_Val
-        (Value : Big_Integer; Current_Index : Positive) return String
-      is
-      begin
-         return As_Discrete_Typ
-           (Self.Index_Types (Current_Index)).Lit_Image (Value);
-      end Pp_Index_Val;
+         Indexes       : Index_Values_Array) return JSON_Array;
 
       ------------
       -- Pp_Arr --
       ------------
 
-      procedure Pp_Arr
+      function Pp_Arr
         (Arr           : Generic_Array_Type;
          Current_Index : in out Positive;
-         Indexes       : Index_Values_Array)
+         Indexes       : Index_Values_Array) return JSON_Array
       is
-         use Big_Int;
+         Sub_Array : JSON_Array;
       begin
          if Indexes'Length = 0 then
             raise Program_Error with "Array dimension can't be 0";
@@ -444,21 +426,6 @@ package body TGen.Types.Array_Types is
             Index_Constraint : constant Index_Value :=
               Indexes (Indexes'First);
          begin
-            Append (Res, "(");
-
-            if Index_Constraint.High_Bound - Index_Constraint.Low_Bound < 0
-            then
-               --  1st special case: array is of size 0. We have to generate
-               --  an empty aggregate.
-
-               Append
-                 (Res,
-                  Pp_Index_Val (Index_Constraint.Low_Bound, Indexes'First)
-                  & " .. "
-                  & Pp_Index_Val (Index_Constraint.High_Bound, Indexes'First)
-                  & " => <>");
-            end if;
-
             for I in 0 .. Big_Int.To_Integer
               (Index_Constraint.High_Bound - Index_Constraint.Low_Bound)
             loop
@@ -467,46 +434,42 @@ package body TGen.Types.Array_Types is
                --  We have reached leafs of a possible multi-dimensional array
                --  type. Time to print values \o/.
 
-                  Append (Res,
-                          Pp_Index_Val
-                            (Value         => Index_Constraint.Low_Bound
-                                              + Big_Int.To_Big_Integer (I),
-                             Current_Index => Indexes'First)
-                          & " => " & (+Arr (Current_Index)));
+                  Append
+                    (Sub_Array,
+                     JSON_Value (Arr (Current_Index)));
                   Current_Index := @ + 1;
 
                else
                   --  Otherwise, generate the nested array recursively
 
-                  Pp_Arr
-                    (Arr,
-                     Current_Index,
-                     Indexes (Indexes'First + 1 .. Indexes'Last));
+                  Append
+                    (Sub_Array,
+                     Create
+                       (Pp_Arr
+                          (Arr,
+                           Current_Index,
+                           Indexes (Indexes'First + 1 .. Indexes'Last))));
                end if;
-
-               Append (Res, ", ");
             end loop;
          end;
-
-         Res := Remove_Trailing_Comma_And_Spaces (Res);
-         Append (Res, ")");
+         return Sub_Array;
       end Pp_Arr;
 
-      procedure Pp_Arr_Wrapper
+      function Pp_Arr_Wrapper
         (Arr     : Generic_Array_Type;
-         Indexes : Index_Values_Array);
+         Indexes : Index_Values_Array) return JSON_Array;
 
       --------------------
       -- Pp_Arr_Wrapper --
       --------------------
 
-      procedure Pp_Arr_Wrapper
+      function Pp_Arr_Wrapper
         (Arr     : Generic_Array_Type;
-         Indexes : Index_Values_Array)
+         Indexes : Index_Values_Array) return JSON_Array
       is
          Ignore : Positive := 1;
       begin
-         Pp_Arr (Arr, Ignore, Indexes);
+         return Pp_Arr (Arr, Ignore, Indexes);
       end Pp_Arr_Wrapper;
 
       Disc_Context_With_Low_Bound : Disc_Value_Map := Disc_Context.Copy;
@@ -520,27 +483,25 @@ package body TGen.Types.Array_Types is
             Index_Strat : constant Index_Strategies_Type :=
               Generate_Index_Strat (I);
 
-            Low_Bound : constant Discrete_Static_Value :=
-              Discrete_Static_Value
-                (Index_Strat.Low_Bound_Strat.Generate
-                   (Disc_Context));
-            High_Bound : Discrete_Static_Value;
+            Low_Bound  : constant Big_Integer :=
+              Get (Index_Strat.Low_Bound_Strat.Generate (Disc_Context));
+            High_Bound : Big_Integer;
          begin
-            Index_Values (I).Low_Bound := Low_Bound.Value;
+            Index_Values (I).Low_Bound := Low_Bound;
 
             --  After having generated the low bound, we insert it in the
             --  discriminant map. This is a hack to generate index values for
             --  unconstrained array type. TODO: refactor.
 
             Disc_Context_With_Low_Bound.Include
-              (Low_Bound_Disc_Name, Low_Bound.Value);
+              (Low_Bound_Disc_Name, Low_Bound);
 
             High_Bound :=
-              Discrete_Static_Value
+              Get
                 (Index_Strat.High_Bound_Strat.Generate
                    (Disc_Context_With_Low_Bound));
 
-            Index_Values (I).High_Bound := High_Bound.Value;
+            Index_Values (I).High_Bound := High_Bound;
          end;
       end loop;
 
@@ -565,13 +526,9 @@ package body TGen.Types.Array_Types is
            Strat.Draw (Data, Dimension_Sizes);
 
       begin
-      --  Let's pretty print it. TODO??? we should also print the generated
-      --  index values, and not directly an array literal.
-
-         Pp_Arr_Wrapper (Random_Arr, Index_Values);
+         return Create (Pp_Arr_Wrapper (Random_Arr, Index_Values));
       end;
 
-      return Base_Static_Value'(Value => Res);
    end Generate_Static_Common;
 
    --------------
@@ -580,7 +537,7 @@ package body TGen.Types.Array_Types is
 
    function Generate
      (S            : in out Array_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return Value_Type'Class
+      Disc_Context : Disc_Value_Map) return JSON_Value
    is
       T : constant Array_Typ'Class := As_Array_Typ (S.T);
    begin

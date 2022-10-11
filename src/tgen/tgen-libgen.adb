@@ -193,6 +193,7 @@ package body TGen.Libgen is
       Create (F_Spec, Out_File, File_Name & ".ads");
       Put (F_Spec, "with TGen.Marshalling_Lib; ");
       Put_Line (F_Spec, "use TGen.Marshalling_Lib;");
+      Put_Line (F_Spec, "with TGen.JSON;");
       Put (F_Spec, "with Interfaces; ");
       Put_Line (F_Spec, "use Interfaces;");
       Put_Line (F_Spec, "with Ada.Streams; use Ada.Streams;");
@@ -253,8 +254,12 @@ package body TGen.Libgen is
 
       if Part in Marshalling_Part | All_Parts then
          for T of Types loop
-            Generate_Marshalling_Functions_For_Typ
-              (F_Spec, F_Body, T.Get, To_String (Ctx.Root_Templates_Dir));
+            if Is_Supported_Type (T.Get) then
+               Generate_Marshalling_Functions_For_Typ
+                 (F_Spec, F_Body, T.Get, To_String (Ctx.Root_Templates_Dir));
+               Generate_JSON_Marshalling_Functions_For_Typ
+                 (F_Spec, F_Body, T.Get, To_String (Ctx.Root_Templates_Dir));
+            end if;
          end loop;
       end if;
 
@@ -459,7 +464,12 @@ package body TGen.Libgen is
       --  Generate all support packages
 
       for Cur in Ctx.Types_Per_Package.Iterate loop
-         Generate_Support_Library (Ctx, Key (Cur), Part);
+         --  If all types are not supported, do not generate a support library
+
+         if not (for all T of Element (Cur) => not Is_Supported_Type (T.Get))
+         then
+            Generate_Support_Library (Ctx, Key (Cur), Part);
+         end if;
       end loop;
    end Generate;
 

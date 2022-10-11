@@ -72,9 +72,6 @@ package body TGen.Types is
       return Pack_Name;
    end Package_Name;
 
-   function Package_Name (Self : Typ) return String is
-    (To_Ada (Self.Package_Name));
-
    ---------------------------
    -- Compilation_Unit_Name --
    ---------------------------

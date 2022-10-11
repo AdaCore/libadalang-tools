@@ -84,15 +84,8 @@ package TGen.Types.Discrete_Types is
    --  Generate a strategy to statically generate (in one pass) values for Self
 
    function Generate_Static_Common
-     (Self    : Discrete_Typ'Class) return Strategy_Type'Class;
+     (Self : Discrete_Typ'Class) return Strategy_Type'Class;
    --  Generate a strategy to statically generate (in one pass) values for Self
-
-   type Discrete_Static_Value is new Value_Type with record
-      T     : SP.Ref;
-      Value : Big_Integer;
-   end record;
-
-   overriding function To_String (Self : Discrete_Static_Value) return String;
 
    type Sample_Strategy_Type is new Strategy_Type
      with record
@@ -102,7 +95,7 @@ package TGen.Types.Discrete_Types is
 
    overriding function Generate
      (S            : in out Sample_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return Value_Type'Class;
+      Disc_Context : Disc_Value_Map) return JSON_Value;
    --  Given a static sampling strategy, generate one single value from it
 
    function Generate_Sampling_Strategy
@@ -123,7 +116,7 @@ package TGen.Types.Discrete_Types is
 
    overriding function Generate
      (S            : in out Array_Index_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return Value_Type'Class;
+      Disc_Context : Disc_Value_Map) return JSON_Value;
 
    type Identity_Constraint_Strategy_Type is new Strategy_Type with
       record
@@ -136,7 +129,7 @@ package TGen.Types.Discrete_Types is
 
    overriding function Generate
      (S            : in out Identity_Constraint_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return Value_Type'Class;
+      Disc_Context : Disc_Value_Map) return JSON_Value;
 
    function Generate_Array_Index_Constraint_Strategy
      (Self       : Discrete_Typ'Class;

@@ -66,4 +66,31 @@ package TGen.Marshalling is
    --  Templates_Root_Dir should be the path to the root directory in which all
    --  TGen templates are stored.
 
+   procedure Generate_JSON_Marshalling_Functions_For_Typ
+     (F_Spec, F_Body     : File_Type;
+      Typ                : TGen.Types.Typ'Class;
+      Templates_Root_Dir : String);
+   --  Generate JSON converters for the given type, in the same fashion as
+   --  the binary marshallers.
+
+   function Needs_Header (Typ : TGen.Types.Typ'Class) return Boolean;
+   --  Return True for types which have constraints (bounds of unconstrained
+   --  array types, and discriminants of unconstrained record types).
+
+   function Output_Fname_For_Typ (Typ : TGen.Types.Typ'Class) return String;
+   --  Name of the output marshalling function for the given type
+
+   function Input_Fname_For_Typ (Typ : TGen.Types.Typ'Class) return String;
+   --  Name of the input marshalling function for the given type
+
+   function Output_Header_Fname_For_Typ
+     (Typ : TGen.Types.Typ'Class) return String
+     with Pre => Needs_Header (Typ);
+   --  Name of the output marshalling function for the given type header
+
+   function Input_Header_Fname_For_Typ
+     (Typ : TGen.Types.Typ'Class) return String
+     with Pre => Needs_Header (Typ);
+   --  Name of the input marshalling function for the given type header
+
 end TGen.Marshalling;

@@ -25,15 +25,18 @@
 --  Specialized representations and generation functions are avalaible in the
 --  various TGen.Types.XXX_Type units.
 
-with Ada.Numerics.Big_Numbers.Big_Integers;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-with GNATCOLL.JSON;     use GNATCOLL.JSON;
 with GNATCOLL.Refcount; use GNATCOLL.Refcount;
 
 limited with TGen.Strategies;
-with TGen.Numerics;    use TGen.Numerics;
-with TGen.Strings; use TGen.Strings;
+with TGen.Big_Int;   use TGen.Big_Int;
+with TGen.Big_Reals; use TGen.Big_Reals;
+with TGen.JSON;      use TGen.JSON;
+pragma Warnings (Off);
+with TGen.Numerics;  use TGen.Numerics;
+pragma Warnings (On);
+with TGen.Strings;   use TGen.Strings;
 
 package TGen.Types is
 
@@ -48,8 +51,6 @@ package TGen.Types is
       --  which this type is declared.
 
    end record;
-
-   function Template return String is ("");
 
    type Typ_Kind is (Invalid_Kind,
                      Signed_Int_Kind,
@@ -66,6 +67,8 @@ package TGen.Types is
                      Disc_Record_Kind,
                      Non_Disc_Record_Kind,
                      Anonymous_Kind,
+                     Parameter_Kind,
+                     Function_Kind,
                      Unsupported);
 
    subtype Discrete_Typ_Range is Typ_Kind range Signed_Int_Kind .. Enum_Kind;
@@ -83,6 +86,9 @@ package TGen.Types is
    subtype Big_Real is Big_Reals.Big_Real;
 
    function Image (Self : Typ) return String;
+
+   function Slug (Self : Typ) return String;
+   --  Return a unique identifier for the type
 
    function Is_Anonymous (Self : Typ) return Boolean;
    --  Whether Self represents an anonymous type
@@ -106,10 +112,6 @@ package TGen.Types is
    function "<" (L : Typ'Class; R : Typ'Class) return Boolean is
      (To_Ada (L.Name) < To_Ada (R.Name));
 
-   function Slug (Self : Typ) return String;
-   --  Return a unique identifier for the type
-
-   function Package_Name (Self : Typ) return String;
    function Package_Name (Self : Typ) return Ada_Qualified_Name;
    --  Return the package name this type belongs to
 
@@ -129,6 +131,19 @@ package TGen.Types is
    --  Return a strategy generating elements of the given type
 
    function Kind (Self : Typ) return Typ_Kind;
+
+   function JSON_Kind (Kind : Typ_Kind) return JSON_Value_Type is
+     (case Kind is
+         when Signed_Int_Kind | Mod_Int_Kind | Enum_Kind | Char_Kind =>
+            JSON_Int_Type,
+         when Bool_Kind =>
+            JSON_Boolean_Type,
+         when Float_Kind | Fixed_Kind | Decimal_Kind =>
+            JSON_Float_Type,
+         when Unconstrained_Array_Kind | Constrained_Array_Kind =>
+            JSON_Array_Type,
+         when others =>
+            JSON_Object_Type);
 
    procedure Free_Content (Self : in out Typ) is null;
    --  Helper for shared pointers
@@ -153,8 +168,7 @@ package TGen.Types is
                 and then L.Get.Name = R.Get.Name));
 
    function Try_Generate_Static
-     (Self    : SP.Ref)
-      return TGen.Strategies.Strategy_Type'Class;
+     (Self : SP.Ref) return TGen.Strategies.Strategy_Type'Class;
    --  Return a static strategy if the type supports it, otherwise return
    --  a Commented_Out_Strategy or raise program error depending on the
    --  behavior specified in the context.
@@ -166,9 +180,10 @@ package TGen.Types is
    --  so under no circumstances should it be freed.
 
    Big_Zero : constant Big_Integer :=
-     Ada.Numerics.Big_Numbers.Big_Integers.To_Big_Integer (0);
+     TGen.Big_Int.To_Big_Integer (0);
 
-   Big_Zero_F : constant Big_Reals.Big_Real := Big_Reals.To_Real (0);
+   Big_Zero_F : constant Big_Reals.Big_Real :=
+     TGen.Big_Reals.To_Real (0);
 
    type Unsupported_Typ is new Typ with null record;
 

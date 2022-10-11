@@ -32,14 +32,15 @@ with Libadalang.Analysis;  use Libadalang.Analysis;
 with Libadalang.Common;    use Libadalang.Common;
 with Libadalang.Expr_Eval; use Libadalang.Expr_Eval;
 
-with TGen.LAL_Utils;            use TGen.LAL_Utils;
-with TGen.Types.Discrete_Types; use TGen.Types.Discrete_Types;
-with TGen.Types.Int_Types;      use TGen.Types.Int_Types;
-with TGen.Types.Real_Types;     use TGen.Types.Real_Types;
-with TGen.Types.Enum_Types;     use TGen.Types.Enum_Types;
-with TGen.Types.Array_Types;    use TGen.Types.Array_Types;
-with TGen.Types.Record_Types;   use TGen.Types.Record_Types;
-with TGen.Types.Constraints;    use TGen.Types.Constraints;
+with TGen.LAL_Utils;             use TGen.LAL_Utils;
+with TGen.Types.Array_Types;     use TGen.Types.Array_Types;
+with TGen.Types.Constraints;     use TGen.Types.Constraints;
+with TGen.Types.Discrete_Types;  use TGen.Types.Discrete_Types;
+with TGen.Types.Enum_Types;      use TGen.Types.Enum_Types;
+with TGen.Types.Int_Types;       use TGen.Types.Int_Types;
+with TGen.Types.Parameter_Types; use TGen.Types.Parameter_Types;
+with TGen.Types.Real_Types;      use TGen.Types.Real_Types;
+with TGen.Types.Record_Types;    use TGen.Types.Record_Types;
 with TGen.Numerics;
 
 package body TGen.Types.Translation is
@@ -1707,7 +1708,6 @@ package body TGen.Types.Translation is
             Match_Cur : Cursor := No_Element;
             Old_Variant : Variant_Part_Acc := Variant;
 
-            use type Big_Integer;
          begin
             while Has_Element (Choice_Cur) loop
                if not Has_Element (Match_Cur) then
@@ -1961,7 +1961,6 @@ package body TGen.Types.Translation is
       -------------
 
       function Overlap (L, R : Int_Range) return Boolean is
-         use Big_Int;
       begin
          return R.Min <= L.Max and then L.Min <= R.Max;
       end Overlap;
@@ -1971,7 +1970,6 @@ package body TGen.Types.Translation is
       ---------
 
       function "-" (L : Int_Range; R : Int_Range) return Subtraction_Result is
-         use Big_Int;
          One : constant Big_Integer := To_Big_Integer (1);
       begin
          if not Overlap (L, R) then
@@ -3135,6 +3133,67 @@ package body TGen.Types.Translation is
          end if;
          return Translate_Internal (N, Verbose_Diag, True);
    end Translate_Internal;
+
+   ---------------
+   -- Translate --
+   ---------------
+
+   function Translate
+     (N       : LAL.Subp_Spec;
+      Verbose : Boolean := False) return Translation_Result
+   is
+      F_Typ     : Function_Typ;
+      F_Typ_Ref : SP.Ref;
+      Result    : Translation_Result (Success => True);
+   begin
+      F_Typ.Name :=
+        Convert_Qualified_Name (N.F_Subp_Name.P_Fully_Qualified_Name_Array);
+      for Param of N.F_Subp_Params.F_Params loop
+         declare
+            Current_Typ : constant Translation_Result :=
+              Translate (Param.F_Type_Expr, Verbose);
+         begin
+            if Current_Typ.Success then
+               for Id of Param.F_Ids loop
+                  declare
+                     P_Typ      : Parameter_Typ;
+                     Param_Mode : constant Parameter_Mode_Type :=
+                       (case Kind (Param.F_Mode) is
+                           when Ada_Mode_Default | Ada_Mode_In => In_Mode,
+                           when Ada_Mode_In_Out => In_Out_Mode,
+                           when Ada_Mode_Out => Out_Mode,
+                           when others => Out_Mode);
+                     P_Typ_Ref  : SP.Ref;
+                  begin
+                     P_Typ.Name :=
+                       Convert_Qualified_Name
+                         (Id.P_Fully_Qualified_Name_Array);
+                     P_Typ.Parameter_Type := Current_Typ.Res;
+                     P_Typ.Parameter_Mode := Param_Mode;
+                     P_Typ_Ref.Set (P_Typ);
+
+                     F_Typ.Component_Types.Insert
+                       (Key      => +Id.As_Defining_Name.Text,
+                        New_Item => P_Typ_Ref);
+                  end;
+               end loop;
+            else
+               return Current_Typ;
+            end if;
+         end;
+      end loop;
+
+      --  Function type was successfully translated. Now we can append both
+      --  the parameters and the function to the translation cache.
+
+      for P_Typ of F_Typ.Component_Types loop
+         Translation_Cache.Insert (SP.Get (P_Typ).Name, P_Typ);
+      end loop;
+      F_Typ_Ref.Set (F_Typ);
+      Translation_Cache.Insert (F_Typ.Name, F_Typ_Ref);
+      Result.Res := F_Typ_Ref;
+      return Result;
+   end Translate;
 
    procedure Print_Cache_Stats is
    begin

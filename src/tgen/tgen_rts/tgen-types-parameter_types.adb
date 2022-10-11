@@ -2,7 +2,7 @@
 --                                                                          --
 --                                  TGen                                    --
 --                                                                          --
---                       Copyright (C) 2022, AdaCore                        --
+--                       Copyright (C) 2023, AdaCore                        --
 --                                                                          --
 -- TGen  is  free software; you can redistribute it and/or modify it  under --
 -- under  terms of  the  GNU General  Public License  as  published by  the --
@@ -20,11 +20,19 @@
 -- the files COPYING3 and COPYING.RUNTIME respectively.  If not, see        --
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
---
---  Library for value generation and marshalling of Ada types
 
-package TGen is
-   pragma Preelaborate;
+package body TGen.Types.Parameter_Types is
 
-   Version : constant String := "0.0";
-end TGen;
+   ------------------
+   -- Package_Name --
+   ------------------
+
+   function Package_Name (Self : Parameter_Typ) return Ada_Qualified_Name is
+      Parent_Package : Ada_Qualified_Name := Self.Name.Copy;
+   begin
+      Parent_Package.Delete_Last;
+      Parent_Package.Delete_Last;
+      return Parent_Package;
+   end Package_Name;
+
+end TGen.Types.Parameter_Types;

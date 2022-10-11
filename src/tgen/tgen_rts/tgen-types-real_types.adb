@@ -77,7 +77,6 @@ package body TGen.Types.Real_Types is
 
    function Low_Bound_Or_Default (Self : Decimal_Fixed_Typ) return Big_Real
    is
-      use Big_Reals;
    begin
       return (if Self.Has_Range
               then Self.Range_Value.Min
@@ -87,7 +86,6 @@ package body TGen.Types.Real_Types is
 
    function High_Bound_Or_Default (Self : Decimal_Fixed_Typ) return Big_Real
    is
-      use Big_Reals;
    begin
       return (if Self.Has_Range
               then Self.Range_Value.Max
@@ -105,13 +103,13 @@ package body TGen.Types.Real_Types is
       return Rand (Generator_Instance);
    end Gen;
 
-   function Generate_Float_Typ (Ty : Typ'Class) return Value_Type'Class;
+   function Generate_Float_Typ (Ty : Typ'Class) return JSON_Value;
 
-   --------------
-   -- Generate --
-   --------------
+   ------------------------
+   -- Generate_Float_Typ --
+   ------------------------
 
-   function Generate_Float_Typ (Ty : Typ'Class) return Value_Type'Class
+   function Generate_Float_Typ (Ty : Typ'Class) return JSON_Value
    is
       Self : constant Float_Typ := Float_Typ (Ty);
 
@@ -119,14 +117,13 @@ package body TGen.Types.Real_Types is
 
       HB : constant Big_Real := Self.High_Bound_Or_Default;
 
-      type T is new Long_Float
+      subtype T is Long_Float
       range LF_Conversions.From_Big_Real (LB)
         .. LF_Conversions.From_Big_Real (HB);
 
       function Rand is new Gen (T);
    begin
-      return Base_Static_Value'
-        (Value => +Long_Float'Image (Long_Float (Rand)));
+      return Create (T'Image (Rand));
    end Generate_Float_Typ;
 
    ----------------------
@@ -150,19 +147,18 @@ package body TGen.Types.Real_Types is
    end Default_Strategy;
 
    function Generate_Ordinary_Fixed_Typ
-     (Ty : Typ'Class) return Value_Type'Class;
+     (Ty : Typ'Class) return JSON_Value;
 
    function Generate_Decimal_Fixed_Typ
-     (Ty : Typ'Class) return Value_Type'Class;
+     (Ty : Typ'Class) return JSON_Value;
 
    ---------------------------------
    -- Generate_Ordinary_Fixed_Typ --
    ---------------------------------
 
    function Generate_Ordinary_Fixed_Typ
-     (Ty : Typ'Class) return Value_Type'Class
+     (Ty : Typ'Class) return JSON_Value
    is
-      use Big_Reals;
       Self : constant Ordinary_Fixed_Typ := Ordinary_Fixed_Typ (Ty);
 
       High_Bound : constant Long_Long_Long_Integer :=
@@ -176,14 +172,9 @@ package body TGen.Types.Real_Types is
 
       Rand_Val : constant Long_Long_Long_Integer :=
         Rand_LLLI (Low_Bound, High_Bound);
+
    begin
-      return Base_Static_Value'
-        (Value => +(
-           To_String (Self.Delta_Value)
-           & " * "
-           & (if Rand_Val >= 0
-              then Rand_Val'Image
-              else "(" & Rand_Val'Image & ")")));
+      return Create (Long_Long_Long_Integer'Image (Rand_Val));
    end Generate_Ordinary_Fixed_Typ;
 
    --------------------------------
@@ -191,9 +182,8 @@ package body TGen.Types.Real_Types is
    --------------------------------
 
    function Generate_Decimal_Fixed_Typ
-     (Ty : Typ'Class) return Value_Type'Class
+     (Ty : Typ'Class) return JSON_Value
    is
-      use Big_Reals;
       Self : constant Decimal_Fixed_Typ := Decimal_Fixed_Typ (Ty);
 
       --  TODO: Using High/Low_Bound_Or_Default ignores the digits value, which
@@ -213,13 +203,7 @@ package body TGen.Types.Real_Types is
       Rand_Val : constant Long_Long_Long_Integer :=
         Rand_LLLI (Low_Bound, High_Bound);
    begin
-      return Base_Static_Value'
-        (Value => +(
-           Self.Delta_Value'Image
-           & " * "
-           & (if Rand_Val >= 0
-              then Rand_Val'Image
-              else "(" & Rand_Val'Image & ")")));
+      return Create (Long_Long_Long_Integer'Image (Rand_Val));
    end Generate_Decimal_Fixed_Typ;
 
    overriding function Default_Strategy

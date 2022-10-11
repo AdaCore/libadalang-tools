@@ -49,52 +49,58 @@ package body TGen.Marshalling is
    -- Template Files --
    --------------------
 
-   Template_Folder               : constant String :=
-     "marshalling_templates/";
-   Array_Read_Write_Template     : constant String :=
-     Template_Folder & "array_read_write.tmplt";
-   Component_Read_Write_Template : constant String :=
-     Template_Folder & "component_read_write.tmplt";
-   Component_Size_Max_Template   : constant String :=
-     Template_Folder & "component_size_max.tmplt";
-   Component_Size_Template       : constant String :=
-     Template_Folder & "component_size.tmplt";
-   Composite_Base_Spec_Template  : constant String :=
-     Template_Folder & "composite_base_spec.tmplt";
-   Default_Header_Spec_Template  : constant String :=
-     Template_Folder & "default_header_spec.tmplt";
-   Header_Body_Template          : constant String :=
-     Template_Folder & "header_body.tmplt";
-   Header_Spec_Template          : constant String :=
-     Template_Folder & "header_spec.tmplt";
-   Header_Wrappers_Body_Template : constant String :=
-     Template_Folder & "header_wrappers_body.tmplt";
-   Header_Wrappers_Spec_Template : constant String :=
-     Template_Folder & "header_wrappers_spec.tmplt";
-   In_Out_Body_Template          : constant String :=
-     Template_Folder & "in_out_body.tmplt";
-   In_Out_Spec_Template          : constant String :=
-     Template_Folder & "in_out_spec.tmplt";
-   Record_Read_Write_Template    : constant String :=
-     Template_Folder & "record_read_write.tmplt";
-   Record_Size_Max_Template      : constant String :=
-     Template_Folder & "record_size_max.tmplt";
-   Record_Size_Template          : constant String :=
-     Template_Folder & "record_size.tmplt";
-   Scalar_Base_Spec_Template     : constant String :=
-     Template_Folder & "scalar_base_spec.tmplt";
-   Scalar_Read_Write_Template    : constant String :=
-     Template_Folder & "scalar_read_write.tmplt";
-   Variant_Read_Write_Template   : constant String :=
-     Template_Folder & "variant_read_write.tmplt";
-   Variant_Size_Max_Template     : constant String :=
-     Template_Folder & "variant_size_max.tmplt";
-   Variant_Size_Template         : constant String :=
-     Template_Folder & "variant_size.tmplt";
-   Array_Size_Max_Template       : constant String :=
-     Template_Folder & "array_size_max.tmplt";
-   Array_Size_Template           : constant String :=
-     Template_Folder & "array_size.tmplt";
+   generic
+      Template_Folder :  String;
+   package Template_Files is
+      Array_Read_Write_Template     : constant String :=
+        Template_Folder & "array_read_write.tmplt";
+      Component_Read_Write_Template : constant String :=
+        Template_Folder & "component_read_write.tmplt";
+      Component_Read_Template : constant String :=
+        Template_Folder & "component_read.tmplt";
+      Component_Write_Template : constant String :=
+        Template_Folder & "component_write.tmplt";
+      Component_Size_Max_Template   : constant String :=
+        Template_Folder & "component_size_max.tmplt";
+      Component_Size_Template       : constant String :=
+        Template_Folder & "component_size.tmplt";
+      Composite_Base_Spec_Template  : constant String :=
+        Template_Folder & "composite_base_spec.tmplt";
+      Default_Header_Spec_Template  : constant String :=
+        Template_Folder & "default_header_spec.tmplt";
+      Header_Body_Template          : constant String :=
+        Template_Folder & "header_body.tmplt";
+      Header_Spec_Template          : constant String :=
+        Template_Folder & "header_spec.tmplt";
+      Header_Wrappers_Body_Template : constant String :=
+        Template_Folder & "header_wrappers_body.tmplt";
+      Header_Wrappers_Spec_Template : constant String :=
+        Template_Folder & "header_wrappers_spec.tmplt";
+      In_Out_Body_Template          : constant String :=
+        Template_Folder & "in_out_body.tmplt";
+      In_Out_Spec_Template          : constant String :=
+        Template_Folder & "in_out_spec.tmplt";
+      Record_Read_Write_Template    : constant String :=
+        Template_Folder & "record_read_write.tmplt";
+      Record_Size_Max_Template      : constant String :=
+        Template_Folder & "record_size_max.tmplt";
+      Record_Size_Template          : constant String :=
+        Template_Folder & "record_size.tmplt";
+      Scalar_Base_Spec_Template     : constant String :=
+        Template_Folder & "scalar_base_spec.tmplt";
+      Scalar_Read_Write_Template    : constant String :=
+        Template_Folder & "scalar_read_write.tmplt";
+      Variant_Read_Write_Template   : constant String :=
+        Template_Folder & "variant_read_write.tmplt";
+      Variant_Size_Max_Template     : constant String :=
+        Template_Folder & "variant_size_max.tmplt";
+      Variant_Size_Template         : constant String :=
+        Template_Folder & "variant_size.tmplt";
+      Array_Size_Max_Template       : constant String :=
+        Template_Folder & "array_size_max.tmplt";
+      Array_Size_Template           : constant String :=
+        Template_Folder & "array_size.tmplt";
+   end Template_Files;
 
    -----------------------
    -- Local Subprograms --
@@ -104,10 +110,6 @@ package body TGen.Marshalling is
      (Global_Prefix & "_" & Ty_Name);
    --  Construct a prefix that will be shared by all entities generated for a
    --  given type.
-
-   function Needs_Header (Typ : TGen.Types.Typ'Class) return Boolean;
-   --  Return True for types which have constraints (bounds of unconstrained
-   --  array types, and discriminants of unconstrained record types).
 
    function Needs_Wrappers (Typ : TGen.Types.Typ'Class) return Boolean;
    --  Return True for types with headers when they can occur nested in the
@@ -144,11 +146,30 @@ package body TGen.Marshalling is
      (Intervals : Alternatives_Set; Typ : TGen.Types.Typ'Class) return Tag;
    --  Return as a tag the choices represented by a set of intervals
 
+   generic
+      with function Component_Read
+        (Assocs : Translate_Table) return Unbounded_String;
+      with function Component_Write
+        (Assocs : Translate_Table) return Unbounded_String;
+      with function Component_Size
+        (Assocs : Translate_Table) return Unbounded_String;
+      with function Component_Size_Max
+        (Assocs : Translate_Table) return Unbounded_String;
+      with function Variant_Read_Write
+        (Assocs : Translate_Table) return Unbounded_String;
+      with function Variant_Size
+        (Assocs : Translate_Table) return Unbounded_String;
+      with function Variant_Size_Max
+        (Assocs : Translate_Table) return Unbounded_String;
+      with procedure Print_Header (Assocs : Translate_Table);
+      with procedure Print_Default_Header (Assocs : Translate_Table);
+      with procedure Print_Scalar (Assocs : Translate_Table);
+      with procedure Print_Array (Assocs : Translate_Table);
+      with procedure Print_Record (Assocs : Translate_Table);
+      with procedure Print_Header_Wrappers (Assocs : Translate_Table);
+
    procedure Generate_Base_Functions_For_Typ
-     (F_Spec             : File_Type;
-      F_Body             : File_Type;
-      Typ                : TGen.Types.Typ'Class;
-      Templates_Root_Dir : String;
+     (Typ                : TGen.Types.Typ'Class;
       For_Base           : Boolean := False)
    with Pre => (if For_Base then Typ in Scalar_Typ'Class)
      and then Typ not in Anonymous_Typ'Class;
@@ -313,7 +334,8 @@ package body TGen.Marshalling is
 
       function Bound_To_String
         (C      : Discrete_Constraint_Value;
-         Typ    : TGen.Types.Typ'Class;
+         Typ
+         : TGen.Types.Typ'Class;
          Is_Min : Boolean := True) return String
       is
         (case C.Kind is
@@ -595,19 +617,15 @@ package body TGen.Marshalling is
    -------------------------------------
 
    procedure Generate_Base_Functions_For_Typ
-     (F_Spec             : File_Type;
-      F_Body             : File_Type;
-      Typ                : TGen.Types.Typ'Class;
-      Templates_Root_Dir : String;
-      For_Base           : Boolean := False)
+     (Typ      : TGen.Types.Typ'Class;
+      For_Base : Boolean := False)
    is
-      TRD : constant String :=
-        Templates_Root_Dir & GNAT.OS_Lib.Directory_Separator;
-
       B_Name         : constant String := Typ.Fully_Qualified_Name;
       Ty_Prefix      : constant String := Prefix_For_Typ (Typ.Slug);
       Ty_Name        : constant String :=
         (if For_Base then B_Name & "'Base" else B_Name);
+
+      type Component_Kind is (Array_Component, Record_Component);
 
       --  Function computing the indentation for component handling
 
@@ -633,9 +651,13 @@ package body TGen.Marshalling is
       function Size_Spacing (Spacing : Natural) return String is
         (if Typ in Array_Typ'Class then [1 .. Size_Arr_Spacing => ' ']
          else [1 .. Size_Init_Spacing + Spacing * Var_Incr_Spacing => ' ']);
+      --  Tags for the components of the header if any, their types, their
+      --  prefix and the corresponding Ada Value.
 
       procedure Collect_Info_For_Component
-        (Comp_Name    : String;
+        (Comp_Kind    : Component_Kind;
+         Comp_Name    : String;
+         Comp         : String;
          Comp_Ty      : TGen.Types.Typ'Class;
          Read_Tag     : out Unbounded_String;
          Write_Tag    : out Unbounded_String;
@@ -681,7 +703,9 @@ package body TGen.Marshalling is
       --------------------------------
 
       procedure Collect_Info_For_Component
-        (Comp_Name    : String;
+        (Comp_Kind    : Component_Kind;
+         Comp_Name    : String;
+         Comp         : String;
          Comp_Ty      : TGen.Types.Typ'Class;
          Read_Tag     : out Unbounded_String;
          Write_Tag    : out Unbounded_String;
@@ -702,28 +726,24 @@ package body TGen.Marshalling is
          Assocs           : constant Translate_Table :=
            [1 => Assoc ("GLOBAL_PREFIX", Global_Prefix),
             2 => Assoc ("COMP_PREFIX", Comp_Prefix),
-            3 => Assoc ("COMPONENT", Comp_Name),
+            3 => Assoc ("COMPONENT", Comp),
             4 => Assoc ("CONSTRAINTS", Comp_Constraints),
             5 => Assoc ("COMP_SCALAR", Comp_Scalar),
-            6 => Assoc ("NEEDS_HEADER", Needs_Header (Named_Comp_Ty))];
+            6 => Assoc ("NEEDS_HEADER", Needs_Header (Named_Comp_Ty)),
+            7 => Assoc ("COMPONENT_KIND", Component_Kind'Image (Comp_Kind)),
+            8 => Assoc ("COMPONENT_NAME", Comp_Name)];
+         Comp_Kind_Str : constant String :=
+           Component_Kind'Image (Comp_Kind);
+         pragma Unreferenced (Comp_Kind_Str);
       begin
-
-         Read_Tag := Parse
-           (TRD & Component_Read_Write_Template,
-            Assocs &
-            [1 => Assoc ("SPACING", RW_Spacing (Spacing)),
-             2 => Assoc ("ACTION", "Read")]);
-         Write_Tag := Parse
-           (TRD & Component_Read_Write_Template,
-            Assocs &
-            [1 => Assoc ("SPACING", RW_Spacing (Spacing)),
-             2 => Assoc ("ACTION", "Write")]);
-         Size_Tag := Parse
-           (TRD & Component_Size_Template,
-            Assocs & Assoc ("SPACING", Size_Spacing (Spacing)));
-         Size_Max_Tag := Parse
-           (TRD & Component_Size_Max_Template,
-            Assocs & Assoc ("SPACING", Max_Spacing (Spacing)));
+         Read_Tag := Component_Read
+           (Assocs & Assoc ("SPACING", RW_Spacing (Spacing)));
+         Write_Tag := Component_Write
+           (Assocs & Assoc ("SPACING", RW_Spacing (Spacing)));
+         Size_Tag := Component_Size
+           (Assocs & Assoc ("SPACING", Size_Spacing (Spacing)));
+         Size_Max_Tag := Component_Size_Max
+           (Assocs & Assoc ("SPACING", Max_Spacing (Spacing)));
       end Collect_Info_For_Component;
 
       ---------------------------------
@@ -753,7 +773,8 @@ package body TGen.Marshalling is
                Size_Max  : Unbounded_String;
             begin
                Collect_Info_For_Component
-                 (Object_Name & "." & Comp_Name, Comp_Ty,
+                 (Record_Component, Comp_Name,
+                  Object_Name & "." & Comp_Name, Comp_Ty,
                   Read, Write, Size, Size_Max, Spacing);
                Read_Tag := Read_Tag & Read;
                Write_Tag := Write_Tag & Write;
@@ -857,31 +878,28 @@ package body TGen.Marshalling is
                4 => Assoc ("CHOICES", Choices_Tag)];
 
          begin
-            Read_Tag := +String'
-              (Parse (TRD & Variant_Read_Write_Template, Assocs &
-                      [1 => Assoc ("COMPONENT_ACTION", Comp_Read_Tag),
-                       2 => Assoc ("VARIANT_PART", Variant_Read_Tag),
-                       3 => Assoc ("SPACING", RW_Spacing (Spacing))]));
-            Write_Tag := +String'
-              (Parse (TRD & Variant_Read_Write_Template, Assocs &
-                      [1 => Assoc ("COMPONENT_ACTION", Comp_Write_Tag),
-                       2 => Assoc ("VARIANT_PART", Variant_Write_Tag),
-                       3 => Assoc ("SPACING", RW_Spacing (Spacing))]));
-            Size_Tag := +String'
-              (Parse (TRD & Variant_Size_Template, Assocs &
-                      [1 => Assoc ("COMPONENT_SIZE", Comp_Size_Tag),
-                       2 => Assoc ("VARIANT_PART", Variant_Size_Tag),
-                       3 => Assoc ("SPACING", Size_Spacing (Spacing))]));
-            Size_Max_Tag := +String'
-              (Parse (TRD & Variant_Size_Max_Template, Assocs &
-                      [1 => Assoc ("COMPONENT_SIZE_MAX", Comp_Size_Max_Tag),
-                       2 => Assoc ("VARIANT_PART", Variant_Size_Max_Tag),
-                       3 => Assoc ("SPACING", Max_Spacing (Spacing))]));
+            Read_Tag := +Variant_Read_Write
+              (Assocs &
+               [1 => Assoc ("COMPONENT_ACTION", Comp_Read_Tag),
+                2 => Assoc ("VARIANT_PART", Variant_Read_Tag),
+                3 => Assoc ("SPACING", RW_Spacing (Spacing))]);
+            Write_Tag := +Variant_Read_Write
+              (Assocs &
+               [1 => Assoc ("COMPONENT_ACTION", Comp_Write_Tag),
+                2 => Assoc ("VARIANT_PART", Variant_Write_Tag),
+                3 => Assoc ("SPACING", RW_Spacing (Spacing))]);
+            Size_Tag := +Variant_Size
+              (Assocs &
+               [1 => Assoc ("COMPONENT_SIZE", Comp_Size_Tag),
+                2 => Assoc ("VARIANT_PART", Variant_Size_Tag),
+                3 => Assoc ("SPACING", Size_Spacing (Spacing))]);
+            Size_Max_Tag := +Variant_Size_Max
+              (Assocs &
+               [1 => Assoc ("COMPONENT_SIZE_MAX", Comp_Size_Max_Tag),
+                2 => Assoc ("VARIANT_PART", Variant_Size_Max_Tag),
+                3 => Assoc ("SPACING", Max_Spacing (Spacing))]);
          end;
       end Collect_Info_For_Variants;
-
-      --  Tags for the components of the header if any, their types, their
-      --  prefix and the corresponding Ada Value.
 
       Discr_Name_Tag : Tag;
       First_Name_Tag : Tag;
@@ -892,7 +910,6 @@ package body TGen.Marshalling is
         (if Typ in Array_Typ'Class
          then Create_Tags_For_Array_Dims (Array_Typ'Class (Typ))
          else +"");
-
    begin
       --  1. Generate operations for the header if needed
 
@@ -937,7 +954,7 @@ package body TGen.Marshalling is
          --  Generate the header
 
          declare
-            Assocs      : constant Translate_Table :=
+            Assocs : constant Translate_Table :=
               [1  => Assoc ("TY_NAME", Ty_Name),
                2  => Assoc ("TY_PREFIX", Ty_Prefix),
                3  => Assoc ("GLOBAL_PREFIX", Global_Prefix),
@@ -949,11 +966,7 @@ package body TGen.Marshalling is
                9  => Assoc ("ADA_DIM", Ada_Dim_Tag)];
 
          begin
-            Put_Line (F_Spec, Parse (TRD & Header_Spec_Template, Assocs));
-            New_Line (F_Spec);
-
-            Put_Line (F_Body, Parse (TRD & Header_Body_Template, Assocs));
-            New_Line (F_Body);
+            Print_Header (Assocs);
          end;
 
       --  If the type does not need a header, still generate definitions for
@@ -966,36 +979,11 @@ package body TGen.Marshalling is
                2  => Assoc ("TY_PREFIX", Ty_Prefix)];
 
          begin
-            Put_Line
-              (F_Spec, Parse (TRD & Default_Header_Spec_Template, Assocs));
-            New_Line (F_Spec);
+            Print_Default_Header (Assocs);
          end;
       end if;
 
-      --  2. Generate the specifications of the base operations
-
-      declare
-         Spec_Template : constant String :=
-           (if Typ in Scalar_Typ'Class then Scalar_Base_Spec_Template
-            else Composite_Base_Spec_Template);
-         Assocs        : constant Translate_Table :=
-           [1  => Assoc ("TY_NAME", Ty_Name),
-            2  => Assoc ("TY_PREFIX", Ty_Prefix),
-            3  => Assoc ("GLOBAL_PREFIX", Global_Prefix),
-            4  => Assoc ("DISCR_NAME", Discr_Name_Tag),
-            5  => Assoc ("FIRST_NAME", First_Name_Tag),
-            6  => Assoc ("LAST_NAME", Last_Name_Tag),
-            7  => Assoc ("COMP_TYP", Comp_Typ_Tag),
-            8  => Assoc ("COMP_PREFIX", Comp_Pref_Tag),
-            9  => Assoc ("ADA_DIM", Ada_Dim_Tag),
-            10 => Assoc ("FOR_BASE", For_Base)];
-
-      begin
-         Put_Line (F_Spec, Parse (TRD & Spec_Template, Assocs));
-         New_Line (F_Spec);
-      end;
-
-      --  3. Generate the body of the base operations
+      --  3. Generate the body and spec of the base operations
       --  3.1. For scalar types, we generate clones. We need to provide the
       --       name of the appropriate generic unit depending on the scalar
       --       kind (Discrete, Fixed, or Float).
@@ -1020,9 +1008,7 @@ package body TGen.Marshalling is
                7 => Assoc ("FOR_BASE", For_Base)];
 
          begin
-            Put_Line
-              (F_Body, Parse (TRD & Scalar_Read_Write_Template, Assocs));
-            New_Line (F_Body);
+            Print_Scalar (Assocs);
          end;
 
       --  3.2 For array types, we generate the calls for the components and we
@@ -1044,7 +1030,8 @@ package body TGen.Marshalling is
             --  Contruct the calls for the components
 
             Collect_Info_For_Component
-              (Global_Prefix & "_E", Comp_Ty,
+              (Array_Component, Global_Prefix & "_E",
+               Global_Prefix & "_E", Comp_Ty,
                Component_Read, Component_Write,
                Component_Size, Component_Size_Max, 1);
 
@@ -1066,14 +1053,7 @@ package body TGen.Marshalling is
                   12 => Assoc ("BOUND_TYP", Comp_Typ_Tag)];
 
             begin
-               Put_Line
-                 (F_Body, Parse (TRD & Array_Read_Write_Template, Assocs));
-               New_Line (F_Body);
-               Put_Line (F_Body, Parse (TRD & Array_Size_Template, Assocs));
-               New_Line (F_Body);
-               Put_Line
-                 (F_Body, Parse (TRD & Array_Size_Max_Template, Assocs));
-               New_Line (F_Body);
+               Print_Array (Assocs);
             end;
          end;
 
@@ -1144,15 +1124,7 @@ package body TGen.Marshalling is
                   13 => Assoc ("DISCR_TYP", Comp_Typ_Tag)];
 
             begin
-               Put_Line
-                 (F_Body, Parse (TRD & Record_Read_Write_Template, Assocs));
-               New_Line (F_Body);
-               Put_Line
-                 (F_Body, Parse (TRD & Record_Size_Template, Assocs));
-               New_Line (F_Body);
-               Put_Line
-                 (F_Body, Parse (TRD & Record_Size_Max_Template, Assocs));
-               New_Line (F_Body);
+               Print_Record (Assocs);
             end;
          end;
       end if;
@@ -1171,12 +1143,7 @@ package body TGen.Marshalling is
                6 => Assoc ("DISCR_PREFIX", Comp_Pref_Tag)];
 
          begin
-            Put_Line
-              (F_Spec, Parse (TRD & Header_Wrappers_Spec_Template, Assocs));
-            New_Line (F_Spec);
-            Put_Line
-              (F_Body, Parse (TRD & Header_Wrappers_Body_Template, Assocs));
-            New_Line (F_Body);
+            Print_Header_Wrappers (Assocs);
          end;
       end if;
    end Generate_Base_Functions_For_Typ;
@@ -1190,6 +1157,15 @@ package body TGen.Marshalling is
       Typ                : TGen.Types.Typ'Class;
       Templates_Root_Dir : String)
    is
+      TRD : constant String :=
+        Templates_Root_Dir
+        & GNAT.OS_Lib.Directory_Separator
+        & "marshalling_templates"
+        & GNAT.OS_Lib.Directory_Separator;
+
+      package Templates is new Template_Files (TRD);
+      use Templates;
+
       Ty_Name       : constant String := Typ.Fully_Qualified_Name;
       Ty_Prefix     : constant String := Prefix_For_Typ (Typ.Slug);
       Generic_Name  : constant String :=
@@ -1203,19 +1179,226 @@ package body TGen.Marshalling is
          6 => Assoc ("NEEDS_HEADER", Needs_Header (Typ)),
          7 => Assoc ("IS_SCALAR", Typ in Scalar_Typ'Class)];
 
+      function Component_Read
+        (Assocs : Translate_Table) return Unbounded_String;
+      function Component_Write
+        (Assocs : Translate_Table) return Unbounded_String;
+      function Component_Size
+        (Assocs : Translate_Table) return Unbounded_String;
+      function Component_Size_Max
+        (Assocs : Translate_Table) return Unbounded_String;
+      function Variant_Read_Write
+        (Assocs : Translate_Table) return Unbounded_String;
+      function Variant_Size
+        (Assocs : Translate_Table) return Unbounded_String;
+      function Variant_Size_Max
+        (Assocs : Translate_Table) return Unbounded_String;
+      procedure Print_Header (Assocs : Translate_Table);
+      procedure Print_Default_Header (Assocs : Translate_Table);
+      procedure Print_Scalar (Assocs : Translate_Table);
+      procedure Print_Array (Assocs : Translate_Table);
+      procedure Print_Record (Assocs : Translate_Table);
+      procedure Print_Header_Wrappers (Assocs : Translate_Table);
+
+      --------------------
+      -- Component_Read --
+      --------------------
+
+      function Component_Read
+        (Assocs : Translate_Table) return Unbounded_String
+      is
+      begin
+         return Parse
+           (Component_Read_Write_Template,
+            Assocs & Assoc ("ACTION", "Read"));
+      end Component_Read;
+
+      ---------------------
+      -- Component_Write --
+      ---------------------
+
+      function Component_Write
+        (Assocs : Translate_Table) return Unbounded_String
+      is
+      begin
+         return Parse
+           (Component_Read_Write_Template,
+            Assocs & Assoc ("ACTION", "Write"));
+      end Component_Write;
+
+      --------------------
+      -- Component_Size --
+      --------------------
+
+      function Component_Size
+        (Assocs : Translate_Table) return Unbounded_String
+      is
+      begin
+         return Parse (Component_Size_Template, Assocs);
+      end Component_Size;
+
+      ------------------------
+      -- Component_Size_Max --
+      ------------------------
+
+      function Component_Size_Max
+        (Assocs : Translate_Table) return Unbounded_String
+      is
+      begin
+         return Parse (Component_Size_Max_Template, Assocs);
+      end Component_Size_Max;
+
+      ------------------------
+      -- Variant_Read_Write --
+      ------------------------
+
+      function Variant_Read_Write
+        (Assocs : Translate_Table) return Unbounded_String
+      is
+      begin
+         return Parse (Variant_Read_Write_Template, Assocs);
+      end Variant_Read_Write;
+
+      ------------------
+      -- Variant_Size --
+      ------------------
+
+      function Variant_Size
+        (Assocs : Translate_Table) return Unbounded_String
+      is
+      begin
+         return Parse (Variant_Size_Template, Assocs);
+      end Variant_Size;
+
+      ----------------------
+      -- Variant_Size_Max --
+      ----------------------
+
+      function Variant_Size_Max
+        (Assocs : Translate_Table) return Unbounded_String
+      is
+      begin
+         return Parse (Variant_Size_Max_Template, Assocs);
+      end Variant_Size_Max;
+
+      ------------------
+      -- Print_Header --
+      ------------------
+
+      procedure Print_Header (Assocs : Translate_Table) is
+      begin
+         Put_Line (F_Spec, Parse (Header_Spec_Template, Assocs));
+         New_Line (F_Spec);
+         Put_Line (F_Body, Parse (Header_Body_Template, Assocs));
+         New_Line (F_Body);
+      end Print_Header;
+
+      --------------------------
+      -- Print_Default_Header --
+      --------------------------
+      procedure Print_Default_Header (Assocs : Translate_Table) is
+      begin
+         Put_Line (F_Spec, Parse (Default_Header_Spec_Template, Assocs));
+         New_Line (F_Spec);
+      end Print_Default_Header;
+
+      ------------------
+      -- Print_Scalar --
+      ------------------
+
+      procedure Print_Scalar (Assocs : Translate_Table) is
+      begin
+         Put_Line (F_Spec, Parse (Scalar_Base_Spec_Template, Assocs));
+         New_Line (F_Spec);
+         Put_Line
+           (F_Body, Parse (Scalar_Read_Write_Template, Assocs));
+         New_Line (F_Body);
+      end Print_Scalar;
+
+      -----------------
+      -- Print_Array --
+      -----------------
+
+      procedure Print_Array (Assocs : Translate_Table) is
+      begin
+         Put_Line (F_Spec, Parse (Composite_Base_Spec_Template, Assocs));
+         New_Line (F_Spec);
+         Put_Line
+           (F_Body, Parse (Array_Read_Write_Template, Assocs));
+         New_Line (F_Body);
+         Put_Line (F_Body, Parse (Array_Size_Template, Assocs));
+         New_Line (F_Body);
+         Put_Line
+           (F_Body, Parse (Array_Size_Max_Template, Assocs));
+         New_Line (F_Body);
+      end Print_Array;
+
+      ------------------
+      -- Print_Record --
+      ------------------
+
+      procedure Print_Record (Assocs : Translate_Table) is
+         Size_Max : constant String :=
+           Parse (Record_Size_Max_Template, Assocs);
+         pragma Unreferenced (Size_Max);
+      begin
+         Put_Line (F_Spec, Parse (Composite_Base_Spec_Template, Assocs));
+         New_Line (F_Spec);
+         Put_Line
+           (F_Body, Parse (Record_Read_Write_Template, Assocs));
+         New_Line (F_Body);
+         Put_Line
+           (F_Body, Parse (Record_Size_Template, Assocs));
+         New_Line (F_Body);
+         Put_Line
+           (F_Body, Parse (Record_Size_Max_Template, Assocs));
+         New_Line (F_Body);
+      end Print_Record;
+
+      ---------------------------
+      -- Print_Header_Wrappers --
+      ---------------------------
+
+      procedure Print_Header_Wrappers (Assocs : Translate_Table) is
+         Header_Wrapper : constant String :=
+           Parse (Header_Wrappers_Spec_Template, Assocs);
+         pragma Unreferenced (Header_Wrapper);
+      begin
+         Put_Line
+           (F_Spec, Parse (Header_Wrappers_Spec_Template, Assocs));
+         New_Line (F_Spec);
+         Put_Line
+           (F_Body, Parse (Header_Wrappers_Body_Template, Assocs));
+         New_Line (F_Body);
+      end Print_Header_Wrappers;
+
+      procedure Generate_Base_Functions_For_Typ_Instance is new
+        Generate_Base_Functions_For_Typ
+          (Component_Read        => Component_Read,
+           Component_Write       => Component_Write,
+           Component_Size        => Component_Size,
+           Component_Size_Max    => Component_Size_Max,
+           Variant_Read_Write    => Variant_Read_Write,
+           Variant_Size          => Variant_Size,
+           Variant_Size_Max      => Variant_Size_Max,
+           Print_Header          => Print_Header,
+           Print_Default_Header  => Print_Default_Header,
+           Print_Scalar          => Print_Scalar,
+           Print_Array           => Print_Array,
+           Print_Record          => Print_Record,
+           Print_Header_Wrappers => Print_Header_Wrappers);
    begin
       --  Generate the base functions for Typ
 
-      Generate_Base_Functions_For_Typ
-        (F_Spec, F_Body, Typ, Templates_Root_Dir);
+      Generate_Base_Functions_For_Typ_Instance (Typ);
 
       --  If the type can be used as an array index constraint, also generate
       --  the functions for Typ'Base. TODO: we probably should do that iff
       --  the type actually constrains an array.
 
       if Typ in Scalar_Typ'Class then
-         Generate_Base_Functions_For_Typ
-           (F_Spec, F_Body, Typ, Templates_Root_Dir, For_Base => True);
+         Generate_Base_Functions_For_Typ_Instance
+           (Typ, For_Base => True);
       end if;
 
       --  Generate the Input and Output subprograms
@@ -1223,17 +1406,251 @@ package body TGen.Marshalling is
       Put_Line
         (F_Spec,
          Parse
-           (Templates_Root_Dir & GNAT.OS_Lib.Directory_Separator
-            & In_Out_Spec_Template, Assocs));
+           (In_Out_Spec_Template, Assocs));
       New_Line (F_Spec);
 
       Put_Line
         (F_Body,
          Parse
-           (Templates_Root_Dir & GNAT.OS_Lib.Directory_Separator
-            & In_Out_Body_Template, Assocs));
+           (In_Out_Body_Template, Assocs));
       New_Line (F_Body);
    end Generate_Marshalling_Functions_For_Typ;
+
+   -------------------------------------------------
+   -- Generate_JSON_Marshalling_Functions_For_Typ --
+   -------------------------------------------------
+
+   procedure Generate_JSON_Marshalling_Functions_For_Typ
+     (F_Spec, F_Body     : File_Type;
+      Typ                : TGen.Types.Typ'Class;
+      Templates_Root_Dir : String)
+   is
+      TRD : constant String :=
+        Templates_Root_Dir
+        & GNAT.OS_Lib.Directory_Separator
+        & "json_templates"
+        & GNAT.OS_Lib.Directory_Separator;
+      package Templates is new Template_Files (TRD);
+      use Templates;
+
+      Ty_Name       : constant String := Typ.Fully_Qualified_Name;
+      Ty_Prefix     : constant String := Prefix_For_Typ (Typ.Slug);
+      Generic_Name  : constant String :=
+        (if Needs_Header (Typ) then "In_Out_Unconstrained" else "In_Out");
+      Assocs        : constant Translate_Table :=
+        [1 => Assoc ("TY_NAME", Ty_Name),
+         2 => Assoc ("TY_PREFIX", Ty_Prefix),
+         3 => Assoc ("MARSHALLING_LIB", Marshalling_Lib),
+         4 => Assoc ("GENERIC_NAME", Generic_Name),
+         5 => Assoc ("GLOBAL_PREFIX", Global_Prefix),
+         6 => Assoc ("NEEDS_HEADER", Needs_Header (Typ)),
+         7 => Assoc ("IS_SCALAR", Typ in Scalar_Typ'Class)];
+
+      function Component_Read
+        (Assocs : Translate_Table) return Unbounded_String;
+      function Component_Write
+        (Assocs : Translate_Table) return Unbounded_String;
+      function Component_Size
+        (Assocs : Translate_Table) return Unbounded_String;
+      function Component_Size_Max
+        (Assocs : Translate_Table) return Unbounded_String;
+      function Variant_Read_Write
+        (Assocs : Translate_Table) return Unbounded_String;
+      function Variant_Size
+        (Assocs : Translate_Table) return Unbounded_String;
+      function Variant_Size_Max
+        (Assocs : Translate_Table) return Unbounded_String;
+      procedure Print_Header (Assocs : Translate_Table);
+      procedure Print_Default_Header (Assocs : Translate_Table) is null;
+      procedure Print_Scalar (Assocs : Translate_Table);
+      procedure Print_Array (Assocs : Translate_Table);
+      procedure Print_Record (Assocs : Translate_Table);
+      procedure Print_Header_Wrappers (Assocs : Translate_Table);
+
+      ---------------------
+      -- Component_Write --
+      ---------------------
+
+      function Component_Write
+        (Assocs : Translate_Table) return Unbounded_String
+      is
+      begin
+         return Parse (Component_Write_Template, Assocs);
+      end Component_Write;
+
+      --------------------
+      -- Component_Read --
+      --------------------
+
+      function Component_Read
+        (Assocs : Translate_Table) return Unbounded_String
+      is
+      begin
+         return Parse (Component_Read_Template, Assocs);
+      end Component_Read;
+
+      --------------------
+      -- Component_Size --
+      --------------------
+
+      function Component_Size
+        (Assocs : Translate_Table with Unreferenced) return Unbounded_String
+      is
+      begin
+         return +"";
+      end Component_Size;
+
+      ------------------------
+      -- Component_Size_Max --
+      ------------------------
+
+      function Component_Size_Max
+        (Assocs : Translate_Table with Unreferenced) return Unbounded_String
+      is
+      begin
+         return +"";
+      end Component_Size_Max;
+
+      ------------------------
+      -- Variant_Read_Write --
+      ------------------------
+
+      function Variant_Read_Write
+        (Assocs : Translate_Table) return Unbounded_String
+      is
+      begin
+         return Parse (Variant_Read_Write_Template, Assocs);
+      end Variant_Read_Write;
+
+      ------------------
+      -- Variant_Size --
+      ------------------
+
+      function Variant_Size
+        (Assocs : Translate_Table with Unreferenced) return Unbounded_String
+      is
+      begin
+         return +"";
+      end Variant_Size;
+
+      ----------------------
+      -- Variant_Size_Max --
+      ----------------------
+
+      function Variant_Size_Max
+        (Assocs : Translate_Table with Unreferenced) return Unbounded_String
+      is
+      begin
+         return +"";
+      end Variant_Size_Max;
+
+      ------------------
+      -- Print_Header --
+      ------------------
+
+      procedure Print_Header (Assocs : Translate_Table) is
+      begin
+         Put_Line (F_Spec, Parse (Header_Spec_Template, Assocs));
+         New_Line (F_Spec);
+         Put_Line (F_Body, Parse (Header_Body_Template, Assocs));
+         New_Line (F_Body);
+      end Print_Header;
+
+      ------------------
+      -- Print_Scalar --
+      ------------------
+
+      procedure Print_Scalar (Assocs : Translate_Table) is
+      begin
+         Put_Line (F_Spec, Parse (Scalar_Base_Spec_Template, Assocs));
+         New_Line (F_Spec);
+         Put_Line
+           (F_Body, Parse (Scalar_Read_Write_Template, Assocs));
+         New_Line (F_Body);
+      end Print_Scalar;
+
+      -----------------
+      -- Print_Array --
+      -----------------
+
+      procedure Print_Array (Assocs : Translate_Table) is
+      begin
+         Put_Line (F_Spec, Parse (Composite_Base_Spec_Template, Assocs));
+         New_Line (F_Spec);
+         Put_Line
+           (F_Body, Parse (Array_Read_Write_Template, Assocs));
+         New_Line (F_Body);
+      end Print_Array;
+
+      ------------------
+      -- Print_Record --
+      ------------------
+
+      procedure Print_Record (Assocs : Translate_Table) is
+      begin
+         Put_Line (F_Spec, Parse (Composite_Base_Spec_Template, Assocs));
+         New_Line (F_Spec);
+         Put_Line
+           (F_Body, Parse (Record_Read_Write_Template, Assocs));
+         New_Line (F_Body);
+      end Print_Record;
+
+      ---------------------------
+      -- Print_Header_Wrappers --
+      ---------------------------
+
+      procedure Print_Header_Wrappers (Assocs : Translate_Table) is
+      begin
+         Put_Line
+           (F_Spec, Parse (Header_Wrappers_Spec_Template, Assocs));
+         New_Line (F_Spec);
+         Put_Line
+           (F_Body, Parse (Header_Wrappers_Body_Template, Assocs));
+         New_Line (F_Body);
+      end Print_Header_Wrappers;
+
+      procedure Generate_Base_Functions_For_Typ_Instance is new
+        Generate_Base_Functions_For_Typ
+          (Component_Read        => Component_Read,
+           Component_Write       => Component_Write,
+           Component_Size        => Component_Size,
+           Component_Size_Max    => Component_Size_Max,
+           Variant_Read_Write    => Variant_Read_Write,
+           Variant_Size          => Variant_Size,
+           Variant_Size_Max      => Variant_Size_Max,
+           Print_Header          => Print_Header,
+           Print_Default_Header  => Print_Default_Header,
+           Print_Scalar          => Print_Scalar,
+           Print_Array           => Print_Array,
+           Print_Record          => Print_Record,
+           Print_Header_Wrappers => Print_Header_Wrappers);
+   begin
+      --  Generate the base functions for Typ
+
+      Generate_Base_Functions_For_Typ_Instance (Typ);
+
+      --  If the type can be used as an array index constraint, also generate
+      --  the functions for Typ'Base. TODO: we probably should do that iff
+      --  the type actually constrains an array.
+
+      if Typ in Scalar_Typ'Class then
+         Generate_Base_Functions_For_Typ_Instance (Typ, For_Base => True);
+      end if;
+
+      --  Generate the Input and Output subprograms
+
+      Put_Line
+        (F_Spec,
+         Parse
+           (In_Out_Spec_Template, Assocs));
+      New_Line (F_Spec);
+
+      Put_Line
+        (F_Body,
+         Parse
+           (In_Out_Body_Template, Assocs));
+      New_Line (F_Body);
+   end Generate_JSON_Marshalling_Functions_For_Typ;
 
    -----------------------
    -- Is_Supported_Type --
@@ -1381,5 +1798,45 @@ package body TGen.Marshalling is
          return Trim (To_String (V), Left);
       end if;
    end String_Value;
+
+   --------------------------
+   -- Output_Fname_For_Typ --
+   --------------------------
+
+   function Output_Fname_For_Typ (Typ : TGen.Types.Typ'Class) return String
+   is
+   begin
+      return Prefix_For_Typ (Typ.Slug) & "Output";
+   end Output_Fname_For_Typ;
+
+   -------------------------
+   -- Input_Fname_For_Typ --
+   -------------------------
+
+   function Input_Fname_For_Typ (Typ : TGen.Types.Typ'Class) return String is
+   begin
+      return Prefix_For_Typ (Typ.Slug) & "_Input";
+   end Input_Fname_For_Typ;
+
+   ---------------------------------
+   -- Output_Header_Fname_For_Typ --
+   ---------------------------------
+
+   function Output_Header_Fname_For_Typ
+     (Typ : TGen.Types.Typ'Class) return String
+   is
+   begin
+      return Prefix_For_Typ (Typ.Slug) & "Output_Header";
+   end Output_Header_Fname_For_Typ;
+
+   --------------------------------
+   -- Input_Header_Fname_For_Typ --
+   --------------------------------
+
+   function Input_Header_Fname_For_Typ
+     (Typ : TGen.Types.Typ'Class) return String is
+   begin
+      return Prefix_For_Typ (Typ.Slug) & "_Input_Header";
+   end Input_Header_Fname_For_Typ;
 
 end TGen.Marshalling;
