@@ -959,7 +959,7 @@ package body Pp.Actions is
            when Ada_Case_Expr =>
              L ("case ! is[# ?#~,# ~~]"),
            when Ada_Case_Expr_Alternative =>
-             L ("when[ ?~ ^|# ~~] ^=>[# !]"),
+             L ("when[ ?~ |# ~~] =>[# !]"),
            when Ada_Box_Expr =>
              L ("<>"),
            when Ada_If_Expr =>
@@ -1024,9 +1024,9 @@ package body Pp.Actions is
            when Ada_Component_List =>
              L ("{?~;$~;$~}", "{?~~;$~}"),
            when Ada_Variant =>
-             L ("when[ ?~ ^|# ~~] ^=>$", "!"),
+             L ("when[ ?~ |# ~~] =>$", "!"),
            when Ada_Case_Stmt_Alternative =>
-             L ("when[ ?~ ^|# ~~] ^=>$", "{?~;$~;$~}"),
+             L ("when[ ?~ |# ~~] =>$", "{?~;$~;$~}"),
            when Ada_Variant_Part =>
              L ("case !# is$", "{!}", "end case"),
            when Ada_Case_Stmt =>
@@ -2308,18 +2308,18 @@ package body Pp.Actions is
 
       declare
          subtype When_Kinds is Ada_Node_Kind_Type with
-           Predicate => When_Kinds in Ada_Case_Stmt_Alternative |
-                                      Ada_Case_Expr_Alternative |
-                                      Ada_Variant;
+           Predicate => When_Kinds in Ada_Variant |
+                                      Ada_Case_Stmt_Alternative |
+                                      Ada_Case_Expr_Alternative;
          --  Things that start with "when" that we want to treat
          --  alike here.
       begin
          if Arg (Cmd, Vertical_Case_Alternatives) then
             for X in When_Kinds loop
-               Replace_One (X, "when[ ?~ ^|# ~~]", "when{ ?~$| ~~}");
-               --  Perhaps this should be unconditional, not just for
-               --  Vertical_Case_Alternatives.
+               Replace_One (X, "when[ ?~ |# ~~]", "when{ ?~$| ~~}");
             end loop;
+            --  Perhaps this should be unconditional, not just for
+            --  Vertical_Case_Alternatives.
 
             Replace_One (Ada_Case_Expr,
                          "case ! is[# ?#~,# ~~]", "case ! is?[$~,$~~]");

@@ -21,11 +21,14 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Containers.Indefinite_Hashed_Maps;
 with Ada.Finalization;
 with Ada.Strings.Unbounded;
 with Ada.Text_IO;
 
 with GNATCOLL.Paragraph_Filling;
+
+with Libadalang.Common;
 
 with Utils.Command_Lines.Common;
 with Utils.Err_Out;
@@ -4934,6 +4937,35 @@ package body Pp.Formatting is
          Ignore : constant Boolean :=
            Scanner.Move_Tokns (Target => Saved_New_Tokns, Source => New_Tokns);
 
+         package Paragraphs_Maps is new
+           Ada.Containers.Indefinite_Hashed_Maps
+             (Key_Type        => Ada_Node,
+              Element_Type    => Tab_In_Line_Vector_Vectors.Vector,
+              Hash            => Libadalang.Analysis.Hash,
+              Equivalent_Keys => Libadalang.Analysis."=",
+              "="             => Tab_In_Line_Vector_Vectors."=");
+
+         subtype Paragraphs_Map is Paragraphs_Maps.Map;
+
+         All_Paragraphs : Paragraphs_Map;
+         --  Because lines are processed one by one, we must cache paragraphs
+         --  in case we need to continue with one after lines that do not
+         --  match with the previous one.
+         --  Example:
+         --
+         --  Some_Subprogram_Call
+         --    (First_Parameter =>
+         --       First_Parameter_Value,
+         --     Second_Parameter =>
+         --       Frist_Parameter_Value);
+         --
+         --  The arrow after First_Parameter must be aligned with the arrow
+         --  after Second_Parameter. However, there is a line with
+         --  First_Parameter_Value between them, therefore, the a different
+         --  paragraph after First_Parameter.
+         --  This map enables use to reuse the First_Parameter paragraph
+         --  when processing the Second_Parameter paragraph.
+
          procedure Assign_Insertion_Points;
          --  Assign the Insertion_Point component of each Tab_Rec to point to
          --  the corresponding token in Saved_New_Tokns.
@@ -4982,10 +5014,11 @@ package body Pp.Formatting is
             --  After the call to Calculate_Num_Blanks, Num_Blanks is used to
             --  insert the correct number of ' ' characters. Thus, Col is
             --  temporary, used only within Calculate_Num_Blanks, to
-            --  communicate information from Process_Line to Flush_Para.
+            --  communicate information from Process_Line to Flush_Paragraphs.
 
-            Paragraph_Tabs : Tab_In_Line_Vector_Vectors.Vector;
+            Paragraph_Tabs           : Tab_In_Line_Vector_Vectors.Vector;
             --  One Tab_In_Line_Vector for each line in the current paragraph
+            Allow_Joining_Paragraphs : Boolean := True;
 
             New_Tok : Tokn_Cursor := First (Saved_New_Tokns'Access);
 
@@ -5002,10 +5035,20 @@ package body Pp.Formatting is
             function Cur_Tab return Tab_Rec is (Tabs (Cur_Tab_Index));
             pragma Assert (not Cur_Tab.Deleted);
 
-            procedure Flush_Para;
+            procedure Flush_Paragraph
+              (Paragraph : Tab_In_Line_Vector_Vectors.Vector);
             --  Called at the end of a "tabbing paragraph", i.e. a group of one
             --  or more lines that each represents similar constructs that
             --  should be treated together for alignment purposes.
+
+            procedure Flush_Paragraphs;
+            --  Called at the end of Calculate_Num_Blanks and delegates to
+            --  Flush_Paragraph for every paragraphs of All_Paragraphs.
+
+            procedure Process_Current_Paragraph;
+            --  Depending if Allow_Joining_Paragraphs and if Paragraph_Tabs
+            --  parent node has already been seens, processes Paragraph_Tabs
+            --  or adds it to All_Paragraphs.
 
             procedure Process_Line;
             --  Process a single line. Collect together all relevant tabs in
@@ -5068,13 +5111,12 @@ package body Pp.Formatting is
             --  just an example to show how "&" works. "&" is actually used in
             --  Do_Component_Clause.)
 
-            procedure Put_Paragraph_Tabs;
-            --  TODO
+            procedure Put_Paragraph
+              (Paragraph : Tab_In_Line_Vector_Vectors.Vector);
 
             procedure Put_Tab_In_Line_Vector
               (Name : String;
                X    : Tab_In_Line_Vector);
-            --  TODO
 
             ------------------------
             -- Check_Tokens_Match --
@@ -5107,18 +5149,20 @@ package body Pp.Formatting is
                end loop;
             end Check_Tokens_Match;
 
-            ----------------
-            -- Flush_Para --
-            ----------------
+            ---------------------
+            -- Flush_Paragraph --
+            ---------------------
 
-            procedure Flush_Para is
+            procedure Flush_Paragraph
+              (Paragraph : Tab_In_Line_Vector_Vectors.Vector)
+            is
                Num_Lines : constant Tab_In_Line_Vector_Index'Base :=
-                 Last_Index (Paragraph_Tabs);
-            begin
+                 Last_Index (Paragraph);
 
-               --  Here we have Paragraph_Tabs set to a sequence of lines (or
-               --  the tabs in those lines, really). For example, if the input
-               --  text was (*1):
+            begin
+               --  Here we have Paragraph set to a sequence of lines (or the
+               --  tabs in those lines, really). For example, if the input text
+               --  was (*1):
                --
                --     package P is
                --
@@ -5194,70 +5238,170 @@ package body Pp.Formatting is
                --  always have at least one tab per line, and all lines have
                --  the same number of tabs.
 
-               if Num_Lines = 0 then
+               if Num_Lines < 2 then
                   return;
                end if;
 
-               if Num_Lines = 1 then
-                  Clear (Paragraph_Tabs);
-                  return;
-               end if;
+               pragma Debug (Put_Paragraph (Paragraph));
+               pragma Assert (Last_Index (Paragraph (1)) /= 0);
 
-               pragma Debug (Put_Paragraph_Tabs);
-               pragma Assert (Last_Index (Paragraph_Tabs (1)) /= 0);
-
-               for Index_In_Line in 1 .. Last_Index (Paragraph_Tabs (1)) loop
+               for Index_In_Line in 1 .. Last_Index (Paragraph (1)) loop
                   declare
                      Max_Col : Positive := 1;
                   begin
 
-                     for Line of Paragraph_Tabs loop
-
-                        declare
-                           Tab_I : constant Tab_Index := Line (Index_In_Line);
-                           Tab : Tab_Rec renames Tabs (Tab_I);
-                        begin
-                           Max_Col := Positive'Max (Max_Col, Tab.Col);
-                        end;
+                     for Line of Paragraph loop
+                        if Index_In_Line <= Last_Index (Line) then
+                           declare
+                              Tab_I : constant Tab_Index :=
+                                Line (Index_In_Line);
+                              Tab   : Tab_Rec renames Tabs (Tab_I);
+                           begin
+                              Max_Col := Positive'Max (Max_Col, Tab.Col);
+                           end;
+                        end if;
                      end loop;
 
-                     for Line of Paragraph_Tabs loop
-                        declare
-                           Tab_I : constant Tab_Index := Line (Index_In_Line);
-                           Tab : Tab_Rec renames Tabs (Tab_I);
-                        begin
-                           if Tab.Is_Fake then
-                              Tab.Col := Max_Col;
-                           end if;
-                           Tab.Num_Blanks := Max_Col - Tab.Col;
-                           pragma Assert
-                                    (if Tab.Is_Fake then Tab.Num_Blanks = 0);
+                     for Line of Paragraph loop
+                        if Index_In_Line <= Last_Index (Line) then
+                           declare
+                              Tab_I : constant Tab_Index :=
+                                Line (Index_In_Line);
+                              Tab   : Tab_Rec renames Tabs (Tab_I);
+                           begin
+                              if Tab.Is_Fake then
+                                 Tab.Col := Max_Col;
+                              end if;
+                              Tab.Num_Blanks := Max_Col - Tab.Col;
+                              pragma Assert
+                                (if Tab.Is_Fake then Tab.Num_Blanks = 0);
 
-                           for X_In_Line in Index_In_Line .. Last_Index (Line)
-                           loop
-                              declare
-                                 Tab_J : constant Tab_Index :=
-                                   Line (X_In_Line);
-                                 Tab_2 : Tab_Rec renames Tabs (Tab_J);
-                              begin
-                                 Tab_2.Col := Tab_2.Col + Tab.Num_Blanks;
-                              end;
-                           end loop;
+                              for X_In_Line in
+                                    Index_In_Line .. Last_Index (Line)
+                              loop
+                                 declare
+                                    Tab_J : constant Tab_Index :=
+                                      Line (X_In_Line);
+                                    Tab_2 : Tab_Rec renames Tabs (Tab_J);
+                                 begin
+                                    Tab_2.Col := Tab_2.Col + Tab.Num_Blanks;
+                                 end;
+                              end loop;
 
-                           pragma Assert (Tab.Col = Max_Col);
+                              pragma Assert (Tab.Col = Max_Col);
 
-                           pragma Assert
-                             (if Num_Lines = 1 then Tab.Num_Blanks = 0);
-                           --  Because of that fact, we can skip all this for
-                           --  1-line paragraphs.
-                        end;
+                              pragma Assert
+                                (if Num_Lines = 1 then Tab.Num_Blanks = 0);
+                              --  Because of that fact, we can skip all this
+                              --  for 1-line paragraphs.
+                           end;
+                        end if;
                      end loop;
                   end;
                end loop;
-               pragma Debug (Put_Paragraph_Tabs);
 
-               Clear (Paragraph_Tabs);
-            end Flush_Para;
+               pragma Debug (Put_Paragraph (Paragraph));
+            end Flush_Paragraph;
+
+            ----------------------
+            -- Flush_Paragraphs --
+            ----------------------
+
+            procedure Flush_Paragraphs is
+               Num_Lines : Tab_In_Line_Vector_Index'Base;
+
+               All_Paragraphs_Cursor : Paragraphs_Maps.Cursor :=
+                 All_Paragraphs.First;
+
+            begin
+               while Paragraphs_Maps.Has_Element (All_Paragraphs_Cursor) loop
+                  Num_Lines :=
+                    Last_Index
+                      (Paragraphs_Maps.Element (All_Paragraphs_Cursor));
+
+                  if Num_Lines > 1 then
+                     pragma Debug
+                              (Put_Paragraph
+                                 (Paragraphs_Maps.Element
+                                    (All_Paragraphs_Cursor)));
+                     pragma
+                       Assert
+                         (Last_Index
+                            (Paragraphs_Maps.Element
+                               (All_Paragraphs_Cursor) (1)) /= 0);
+
+                     for Index_In_Line in
+                           1 .. Last_Index
+                                  (Paragraphs_Maps.Element
+                                     (All_Paragraphs_Cursor) (1))
+                     loop
+                        declare
+                           Max_Col : Positive := 1;
+
+                        begin
+                           for Line of
+                             Paragraphs_Maps.Element (All_Paragraphs_Cursor)
+                           loop
+                              if Index_In_Line <= Last_Index (Line) then
+                                 declare
+                                    Tab_I : constant Tab_Index :=
+                                      Line (Index_In_Line);
+                                    Tab   : Tab_Rec renames Tabs (Tab_I);
+
+                                 begin
+                                    Max_Col := Positive'Max (Max_Col, Tab.Col);
+                                 end;
+                              end if;
+                           end loop;
+
+                           for Line of
+                             Paragraphs_Maps.Element (All_Paragraphs_Cursor)
+                           loop
+                              if Index_In_Line <= Last_Index (Line) then
+                                 declare
+                                    Tab_I : constant Tab_Index :=
+                                      Line (Index_In_Line);
+                                    Tab   : Tab_Rec renames Tabs (Tab_I);
+
+                                 begin
+                                    if Tab.Is_Fake then
+                                       Tab.Col := Max_Col;
+                                    end if;
+                                    Tab.Num_Blanks := Max_Col - Tab.Col;
+                                    pragma Assert
+                                      (if Tab.Is_Fake then Tab.Num_Blanks = 0);
+
+                                    for X_In_Line in
+                                      Index_In_Line .. Last_Index (Line)
+                                    loop
+                                       declare
+                                          Tab_J : constant Tab_Index :=
+                                            Line (X_In_Line);
+                                          Tab_2 : Tab_Rec renames Tabs (Tab_J);
+
+                                       begin
+                                          Tab_2.Col :=
+                                            Tab_2.Col + Tab.Num_Blanks;
+                                       end;
+                                    end loop;
+
+                                    pragma Assert (Tab.Col = Max_Col);
+
+                                    pragma Assert
+                                      (if Num_Lines = 1 then
+                                          Tab.Num_Blanks = 0);
+                                    --  Because of that fact, we can skip all
+                                    --  this for 1-line paragraphs.
+                                 end;
+                              end if;
+                           end loop;
+                        end;
+                     end loop;
+                  end if;
+
+                  Paragraphs_Maps.Next (All_Paragraphs_Cursor);
+               end loop;
+            end Flush_Paragraphs;
 
             ------------------
             -- Process_Line --
@@ -5266,7 +5410,7 @@ package body Pp.Formatting is
             procedure Process_Line is
                Tab_Mismatch : Boolean := False;
                First_Time   : Boolean := True;
-               Tree         : Ada_Node;
+               Tree         : Ada_Node := Libadalang.Analysis.No_Ada_Node;
 
             begin
                while Kind (New_Tok) not in End_Of_Input | Enabled_LB_Token loop
@@ -5296,6 +5440,8 @@ package body Pp.Formatting is
                              Last_Index (Cur_Line_Tabs)
                            then
                               Tab_Mismatch := True;
+                           else
+                              Tab_Mismatch := False;
                            end if;
 
                            Tabs (Cur_Tab_Index).Col := Sloc (New_Tok).Col;
@@ -5316,21 +5462,80 @@ package body Pp.Formatting is
                end if;
             end Process_Line;
 
-            ------------------------
-            -- Put_Paragraph_Tabs --
-            ------------------------
+            -------------------------------
+            -- Process_Current_Paragraph --
+            -------------------------------
 
-            procedure Put_Paragraph_Tabs is
+            procedure Process_Current_Paragraph is
+            begin
+               if not Paragraph_Tabs.Is_Empty
+                 and then not Is_Empty (Last_Element (Paragraph_Tabs))
+               then
+                  declare
+                     use Libadalang.Common;
+
+                     Tab    : constant Tab_Rec :=
+                       Tabs (Last_Element (Last_Element (Paragraph_Tabs)));
+                     Parent : constant Ada_Node := Tab.Parent;
+
+                     Last_Tab  : Tab_Rec;
+
+                  begin
+                     if All_Paragraphs.Contains (Parent) then
+                        Last_Tab :=
+                          Tabs
+                            (Last_Element
+                               (Last_Element
+                                  (All_Paragraphs.Element (Parent))));
+                        if not Tab.Tree.Is_Null
+                          and then not Last_Tab.Tree.Is_Null
+                          and then Tab.Tree.Kind = Last_Tab.Tree.Kind
+                          and then not Last_Tab.Tree.Next_Sibling.Is_Null
+                          and then Last_Tab.Tree.Next_Sibling.Kind =
+                                     Tab.Tree.Kind
+                          and then (Allow_Joining_Paragraphs or else
+                                    Tab.Tree.Kind in
+                                      Ada_Case_Stmt_Alternative_Range)
+                        then
+                           for Line of Paragraph_Tabs loop
+                              All_Paragraphs.Reference (Parent).Append (Line);
+                           end loop;
+
+                        else
+                           --  Flush the previously seen paragraph,
+                           --  replace it by the new one and allow
+                           --  joining paragraphs again.
+                           Flush_Paragraph (All_Paragraphs.Reference (Parent));
+                           All_Paragraphs.Replace (Parent, Paragraph_Tabs);
+                           Allow_Joining_Paragraphs := True;
+                        end if;
+
+                     else
+                        All_Paragraphs.Include (Parent, Paragraph_Tabs);
+                        Allow_Joining_Paragraphs := True;
+                     end if;
+
+                     Clear (Paragraph_Tabs);
+                  end;
+               end if;
+            end Process_Current_Paragraph;
+
+            -------------------
+            -- Put_Paragraph --
+            -------------------
+
+            procedure Put_Paragraph
+              (Paragraph : Tab_In_Line_Vector_Vectors.Vector) is
             begin
                Dbg_Out.Put
-                 ("\1 Paragraph_Tabs\n",
-                  Image (Integer (Last_Index (Paragraph_Tabs))));
+                 ("\1 Put_Paragraph\n",
+                  Image (Integer (Last_Index (Paragraph))));
 
-               for X of Paragraph_Tabs loop
+               for X of Paragraph loop
                   Put_Tab_In_Line_Vector ("", X);
                end loop;
-               Dbg_Out.Put ("end Paragraph_Tabs\n");
-            end Put_Paragraph_Tabs;
+               Dbg_Out.Put ("end Put_Paragraph\n");
+            end Put_Paragraph;
 
             ----------------------------
             -- Put_Tab_In_Line_Vector --
@@ -5357,7 +5562,7 @@ package body Pp.Formatting is
                --  Dbg_Out.Put ("\n");
             end Put_Tab_In_Line_Vector;
 
-            F_Tab, C_Tab : Tab_Rec;
+            F_Tab, C_Tab             : Tab_Rec;
 
          --  Start of processing for Calculate_Num_Blanks
 
@@ -5387,21 +5592,9 @@ package body Pp.Formatting is
                   --  Put_Tab_In_Line_Vector ("First", First_Line_Tabs);
                   --  Put_Tab_In_Line_Vector ("Cur", Cur_Line_Tabs);
 
-                  if Partial_Gnatpp and then Kind (New_Tok) = End_Of_Input
-                  then
-                     --  In order to avoid constraint errors, in partial
-                     --  gnatpp mode, when a selection needs to be reformatted
-                     --  the end of input might be reached after process line
-                     --  and no next token is present.
-                     null;
-                  else
-                     Next_ss (New_Tok);
-                  end if;
-
                   --  Consume the newline
                   if Is_Empty (Cur_Line_Tabs) then
-                     --  Dbg_Out.Put ("Flush_Para -- no tabs\n");
-                     Flush_Para;
+                     Process_Current_Paragraph;
                      --  Leave tabs from this line with Num_Blanks = 0.
                      Clear (First_Line_Tabs);
 
@@ -5431,7 +5624,7 @@ package body Pp.Formatting is
                                  First_Line_Tabs));
                         else
                            --  Dbg_Out.Put ("Flush_Para -- parent mismatch\n");
-                           Flush_Para;
+                           Process_Current_Paragraph;
                            First_Line_Tabs := Cur_Line_Tabs;
 
                         end if;
@@ -5445,6 +5638,23 @@ package body Pp.Formatting is
                      Clear (Cur_Line_Tabs);
                   end if;
 
+                  if Kind (New_Tok) in Enabled_LB_Token
+                    and then Kind (Prev (New_Tok)) in Enabled_LB_Token
+                  then
+                     Allow_Joining_Paragraphs := False;
+                  end if;
+
+                  if Partial_Gnatpp and then Kind (New_Tok) = End_Of_Input
+                  then
+                     --  In order to avoid constraint errors, in partial
+                     --  gnatpp mode, when a selection needs to be reformatted
+                     --  the end of input might be reached after process line
+                     --  and no next token is present.
+                     null;
+                  else
+                     Next_ss (New_Tok);
+                  end if;
+
                   --  This is to handle last line of the selection in partial
                   --  mode and compute accurately the alignment spaces.
                   if Partial_Gnatpp and then Kind (New_Tok) = End_Of_Input then
@@ -5453,14 +5663,16 @@ package body Pp.Formatting is
                      --  Recompute the tabs taking into account all the lines,
                      --  namely the last line which in case of the partial
                      --  formatting might be omitted.
-                     Flush_Para;
-                     Clear (First_Line_Tabs);
+                     Process_Current_Paragraph;
                      Append (Paragraph_Tabs, Cur_Line_Tabs);
+                     Clear (First_Line_Tabs);
                      Clear (Cur_Line_Tabs);
                   end if;
                end;
                --  Dbg_Out.Put ("\n");
             end loop;
+
+            Flush_Paragraphs;
 
             pragma Assert (Cur_Tab_Index = Last_Index (Tabs));
          end Calculate_Num_Blanks;
