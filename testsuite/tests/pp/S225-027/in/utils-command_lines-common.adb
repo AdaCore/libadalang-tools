@@ -15,10 +15,10 @@ package body Utils.Command_Lines.Common is
    --  Return the single-character encoding letter
 
    function WCEM (Cmd : Command_Line) return Character is
-      WCEM : constant String :=
+      WCEM : constant String    :=
         (if Arg (Cmd, Wide_Character_Encoding) = null then "b"
          else Arg (Cmd, Wide_Character_Encoding).all);
-      C : constant Character := WCEM (1);
+      C    : constant Character := WCEM (1);
    begin
       --  We actually only support -Ws, -W8, and -Wb.
 
@@ -53,9 +53,9 @@ package body Utils.Command_Lines.Common is
    begin
       return
         (case WCEM (Cmd) is when 'h' => WCEM_Hex, when 'u' => WCEM_Upper,
-           when 's'                  => WCEM_Shift_JIS, when 'e' => WCEM_EUC,
-           when '8'                  => WCEM_UTF8, when 'b' => WCEM_Brackets,
-           when others               => raise Program_Error);
+           when 's' => WCEM_Shift_JIS, when 'e' => WCEM_EUC,
+           when '8' => WCEM_UTF8, when 'b' => WCEM_Brackets,
+           when others => raise Program_Error);
    end Wide_Character_Encoding;
 
 end Utils.Command_Lines.Common;

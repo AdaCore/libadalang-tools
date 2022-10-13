@@ -140,9 +140,9 @@ package Utils.Predefined_Symbols is
 
    Name_Tab_Insertion_Point : constant Symbol :=
      Intern ("tab insertion point");
-   Name_Tab_In_Out : constant Symbol := Intern ("tab in out");
-   Name_Dot_Dot    : constant Symbol := Intern ("..");
-   Name_R_Sq       : constant Symbol := Intern ("]");
+   Name_Tab_In_Out          : constant Symbol := Intern ("tab in out");
+   Name_Dot_Dot             : constant Symbol := Intern ("..");
+   Name_R_Sq                : constant Symbol := Intern ("]");
 
    Name_Page  : constant Symbol := Intern ("page");
    Name_Space : constant Symbol := Intern (" ");

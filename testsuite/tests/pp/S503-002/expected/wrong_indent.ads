@@ -19,7 +19,7 @@ package wrong_indent is
       Long_Name : in Natural);
 
    procedure Bar
-     (S : in Natural;
+     (S         : in Natural;
       -- This argument has a comment
       Long_Name : in Natural
       -- This one too

@@ -194,14 +194,14 @@ package body ada_main is
       Task_Dispatching_Policy       := ' ';
       Priority_Specific_Dispatching :=
         Local_Priority_Specific_Dispatching'Address;
-      Num_Specific_Dispatching := 0;
-      Main_CPU                 := -1;
-      Interrupt_States         := Local_Interrupt_States'Address;
-      Num_Interrupt_States     := 0;
-      Unreserve_All_Interrupts := 0;
-      Detect_Blocking          := 0;
-      Default_Stack_Size       := 50_176;
-      Leap_Seconds_Support     := 0;
+      Num_Specific_Dispatching      := 0;
+      Main_CPU                      := -1;
+      Interrupt_States              := Local_Interrupt_States'Address;
+      Num_Interrupt_States          := 0;
+      Unreserve_All_Interrupts      := 0;
+      Detect_Blocking               := 0;
+      Default_Stack_Size            := 50_176;
+      Leap_Seconds_Support          := 0;
 
       Runtime_Initialize (1);
 
@@ -901,14 +901,14 @@ package body ada_main is
       Task_Dispatching_Policy       := ' ';
       Priority_Specific_Dispatching :=
         Local_Priority_Specific_Dispatching'Address;
-      Num_Specific_Dispatching := 0;
-      Main_CPU                 := -1;
-      Interrupt_States         := Local_Interrupt_States'Address;
-      Num_Interrupt_States     := 0;
-      Unreserve_All_Interrupts := 0;
-      Detect_Blocking          := 0;
-      Default_Stack_Size       := 50_176;
-      Leap_Seconds_Support     := 0;
+      Num_Specific_Dispatching      := 0;
+      Main_CPU                      := -1;
+      Interrupt_States              := Local_Interrupt_States'Address;
+      Num_Interrupt_States          := 0;
+      Unreserve_All_Interrupts      := 0;
+      Detect_Blocking               := 0;
+      Default_Stack_Size            := 50_176;
+      Leap_Seconds_Support          := 0;
 
       Runtime_Initialize (1);
 

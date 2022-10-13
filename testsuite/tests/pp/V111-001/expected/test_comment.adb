@@ -1,6 +1,6 @@
 procedure test_comment is
 
-  t_var : array (1 .. 5) of Boolean := (1 => True,
+  t_var  : array (1 .. 5) of Boolean := (1 => True,
                                         -- whole line comment 1
                                         2 | 4 => False,
                                         -- whole line comment 2
@@ -22,7 +22,7 @@ begin
      --  whole line comment
      Y => False, Z => True);
 
-  A (X => 1,
+  A (X        => 1,
      --  whole line comment
      False, Z => True);
 

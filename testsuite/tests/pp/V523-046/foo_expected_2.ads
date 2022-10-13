@@ -20,7 +20,7 @@ package Foo is
       Y : out Integer)
       return Integer with
      --  Something about Pre
-     Pre => X < 10,
+     Pre  => X < 10,
      --  Something about Post
      Post => Y > X;
    --  An awesome function

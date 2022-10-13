@@ -11,7 +11,7 @@ PROCEDURE test_bis IS
 
    Empty_Matrix : CONSTANT Matrix := [];
 
-   A : Table :=
+   A    : Table :=
      (7,
       9,
       5,
@@ -41,7 +41,7 @@ PROCEDURE test_bis IS
      [2 | 4 | 10 => 1,
      OTHERS => 0];
 
-   C : CONSTANT Matrix :=
+   C     : CONSTANT Matrix :=
      (1 .. 5 =>
         (1 .. 8 => 0.0));
    Cbis1 : CONSTANT Matrix :=

@@ -29,7 +29,7 @@ package body Utils.Generic_Symbols is
       --  these to do case-insensitive equality comparisons.
       --  One of them (presumably the first one created) will point to
       --  itself.
-      Chars : aliased String_Rec (Length);
+      Chars              : aliased String_Rec (Length);
    end record;
 
    type Symbol_Ptr is access Symbol_Rec;

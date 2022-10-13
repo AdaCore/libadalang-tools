@@ -5,9 +5,9 @@ package Examples is
    --  My Function F1
    function F1
      (-- 1st EOL comment for V1
-      V1 : Integer;
+      V1  : Integer;
       --  whole line comment for V2
-      V2 : Integer;
+      V2  : Integer;
       --  whole line comment for Str
       Str : String)
       --  Is Length of Str between V1 and V2?
@@ -20,7 +20,7 @@ package Examples is
      (  -- 1st EOL comment for V1
       V1,
       --  whole line comment for V2
-      V2 : Integer;
+      V2  : Integer;
       --  whole line comment for Str
       Str : String)
       --  Is Length of Str between V1 and V2?

@@ -508,9 +508,9 @@ package body METRICS.Actions is
       return Result : constant Metrix_Ref := new Metrix (Kind => K) do
          Push (Tool.Metrix_Stack, Result);
 
-         Result.Node := Node;
-         Result.Knd  := Get_Fine_Kind (Node);
-         Result.Sloc :=
+         Result.Node                   := Node;
+         Result.Knd                    := Get_Fine_Kind (Node);
+         Result.Sloc                   :=
            (if Node.Is_Null then Slocs.No_Source_Location_Range
             else Sloc_Range (Node));
          Result.Is_Private_Lib_Unit    := Is_Private (Node);
@@ -530,7 +530,7 @@ package body METRICS.Actions is
                      Outer_Unit : constant Ada_Node := Get_Outer_Unit (Node);
                      Is_Subunit : constant Boolean  :=
                        Unit_Is_Subunit (Outer_Unit);
-                     Sub_Str : constant String :=
+                     Sub_Str    : constant String   :=
                        (if Is_Subunit then "subunit " else "");
                      Dot : constant String := (if Is_Subunit then "." else "");
                   begin
@@ -541,11 +541,11 @@ package body METRICS.Actions is
                                (Node.As_Compilation_Unit.F_Body.As_Subunit
                                   .F_Name))
                         else Empty_CU_Sym);
-                     Result.Text_Name :=
+                     Result.Text_Name      :=
                        Intern
                          (Sub_Str & Str (Result.Subunit_Parent).S & Dot &
                           Get_Name (Outer_Unit));
-                     Result.CU_Name :=
+                     Result.CU_Name        :=
                        Intern
                          (Str (Result.Subunit_Parent).S & Dot &
                           Get_Name (Outer_Unit));
@@ -633,7 +633,7 @@ package body METRICS.Actions is
                      declare
                         Prefix : constant W_Str :=
                           L_Name (Id.As_Attribute_Ref.F_Prefix);
-                        Attr : constant W_Str :=
+                        Attr   : constant W_Str :=
                           L_Name (Id.As_Attribute_Ref.F_Attribute);
                      begin
                         if Attr = Class then
@@ -743,7 +743,7 @@ package body METRICS.Actions is
             return
               (case Ada_Subp_Kind'
                  (Kind (Node.As_Generic_Subp_Instantiation.F_Kind)) is
-                 when Ada_Subp_Kind_Function  => Function_Instantiation_Knd,
+                 when Ada_Subp_Kind_Function => Function_Instantiation_Knd,
                  when Ada_Subp_Kind_Procedure => Procedure_Instantiation_Knd);
          when Ada_Generic_Subp_Decl =>
             declare
@@ -1043,7 +1043,7 @@ package body METRICS.Actions is
                else M.Num_With_Complexity);
             --  Number of items (divide by this to compute average)
             pragma Assert (Num > 0);
-            Adjust : constant Metric_Nat :=
+            Adjust           : constant Metric_Nat   :=
               (if
                  Metric in Complexity_Statement | Complexity_Cyclomatic |
                      Complexity_Essential
@@ -1056,9 +1056,9 @@ package body METRICS.Actions is
             --  average. For complexity metrics, that is the Metric itself, but
             --  for Lines_Average, we need to divide Lines_Code_In_Bodies by
             --  something.
-            Av : constant Float :=
+            Av               : constant Float        :=
               Float (M.Vals (Numerator_Metric) + Adjust) / Float (Num);
-            Img : constant String := Fixed (Av)'Img;
+            Img              : constant String       := Fixed (Av)'Img;
          begin
             pragma Assert (Img'First = 1 and then Img (1) = ' ');
             return (if XML or else Metric = Lines_Average then "" else " ") &
@@ -1071,7 +1071,7 @@ package body METRICS.Actions is
             Comments : constant Float :=
               Float (M.Vals (Lines_Comment)) +
               Float (M.Vals (Lines_Eol_Comment));
-            Code : constant Float :=
+            Code     : constant Float :=
               Float (M.Vals (Lines_Comment)) + Float (M.Vals (Lines_Code));
          begin
             if Code = 0.0 then
@@ -1126,11 +1126,11 @@ package body METRICS.Actions is
          if Should_Print (I, Metrics_To_Compute, M, Depth, XML => False) then
             if True or else M.Vals (I) /= 0 then -- ???
                declare
-                  Metric_Name : constant String :=
+                  Metric_Name        : constant String   :=
                     (if Name = Average_Complexity_Metrics then
                        XML_Metric_Name_String (I)
                      else Metric_Name_String (I));
-                  Indentation_Amount : constant Natural :=
+                  Indentation_Amount : constant Natural  :=
                     (if I = Lines_Average then 0 elsif Depth = 1 then 2
                      elsif Depth = 2 and then First in Lines_Metrics then 2
                      elsif Name = Average_Complexity_Metrics then
@@ -1139,7 +1139,7 @@ package body METRICS.Actions is
                   --  Indentation_Amount, and Tab below, are
                   --  intended to mimic some partially arbitrary
                   --  behavior of gnatmetric.
-                  Tab : constant Positive :=
+                  Tab                : constant Positive :=
                     (if Depth = 1 and then I in Lines_Metrics then 22
                      elsif Depth = 1 or else I in Lines_Metrics then 21
                      else 26);
@@ -1833,7 +1833,7 @@ package body METRICS.Actions is
                    (Coupling_Metrics | Computed_Metrics | Contract_Metrics |
                     Lines_Spark =>
                       False,
-                    others => True);
+                    others      => True);
             end if;
          end return;
       end To_Compute;
@@ -2046,11 +2046,11 @@ package body METRICS.Actions is
          begin
             if Debug_Flag_8 and then Metrics_To_Compute (Metric) then
                declare
-                  Metric_Name : constant String :=
+                  Metric_Name         : constant String :=
                     XML_Metric_Name_String (Metric);
                   Longest_Metric_Name : constant String :=
                     XML_Metric_Name_String (Hierarchy_Coupling_Out);
-                  Spaces : constant String :=
+                  Spaces              : constant String :=
                     (Metric_Name'Length .. Longest_Metric_Name'Length => ' ');
                begin
                   Put
@@ -2233,10 +2233,10 @@ package body METRICS.Actions is
       Metrics_To_Compute : Metrics_Set renames Tool.Metrics_To_Compute;
       Without_Coupling   : constant Metrics_Set :=
         Metrics_To_Compute and not Coupling_Only;
-      With_Coupling : constant Metrics_Set :=
+      With_Coupling      : constant Metrics_Set :=
         Metrics_To_Compute and Coupling_Only;
-      Metrix_Stack : Metrix_Vectors.Vector renames Tool.Metrix_Stack;
-      Summed       : constant String :=
+      Metrix_Stack       : Metrix_Vectors.Vector renames Tool.Metrix_Stack;
+      Summed             : constant String      :=
         "summed over " & Image (Num_File_Names (Cmd)) & " units";
       pragma Assert (Length (Metrix_Stack) = 1);
       Global_M : Metrix_Ref := Element (Metrix_Stack, 1);
@@ -2527,7 +2527,7 @@ package body METRICS.Actions is
       --  libadalang supports multiple compilation units per file,
       --  but gnatmetric does not, and lalmetric does not yet.
 
-      Cumulative : constant Cumulative_Counts_Array :=
+      Cumulative   : constant Cumulative_Counts_Array :=
         Get_Cumulative_Counts (Unit);
       Metrix_Stack : Metrix_Vectors.Vector renames Tool.Metrix_Stack;
 
@@ -2860,12 +2860,12 @@ package body METRICS.Actions is
 
             when Ada_Select_Stmt =>
                declare
-                  S        : constant Select_Stmt := Node.As_Select_Stmt;
-                  Num_Alts : constant Metric_Nat  :=
+                  S         : constant Select_Stmt := Node.As_Select_Stmt;
+                  Num_Alts  : constant Metric_Nat  :=
                     Children_Count (F_Guards (S));
-                  Num_Else : constant Metric_Nat :=
+                  Num_Else  : constant Metric_Nat  :=
                     (if Children_Count (F_Else_Stmts (S)) = 0 then 0 else 1);
-                  Num_Abort : constant Metric_Nat :=
+                  Num_Abort : constant Metric_Nat  :=
                     (if Children_Count (F_Abort_Stmts (S)) = 0 then 0 else 1);
                begin
                   Inc_Cyc
@@ -3493,9 +3493,9 @@ package body METRICS.Actions is
          elsif Kind (Node) = Ada_Generic_Subp_Instantiation then
             declare
                pragma Assert (Node = M.Node);
-               G : constant Basic_Decl :=
+               G    : constant Basic_Decl :=
                  Node.As_Generic_Instantiation.P_Designated_Generic_Decl;
-               Spec : constant Subp_Spec :=
+               Spec : constant Subp_Spec  :=
                  G.As_Generic_Subp_Decl.F_Subp_Decl.P_Subp_Spec_Or_Null
                    .As_Subp_Spec;
             begin
@@ -3762,13 +3762,13 @@ package body METRICS.Actions is
 
             when Ada_Generic_Subp_Instantiation |
               Ada_Generic_Package_Instantiation |
-              Ada_Generic_Renaming_Decl         |
-              Ada_Package_Renaming_Decl         |
-              Ada_Subp_Renaming_Decl            |
-              Ada_Package_Decl                  |
-              Ada_Generic_Package_Decl          |
-              Ada_Subp_Decl                     |
-              Ada_Subp_Body                     | -- could be acting as spec
+              Ada_Generic_Renaming_Decl |
+              Ada_Package_Renaming_Decl |
+              Ada_Subp_Renaming_Decl |
+              Ada_Package_Decl |
+              Ada_Generic_Package_Decl |
+              Ada_Subp_Decl |
+              Ada_Subp_Body | -- could be acting as spec
 
               Ada_Generic_Subp_Decl =>
                declare
@@ -3826,9 +3826,9 @@ package body METRICS.Actions is
 
          if Node = Outer_Unit or else Kind (Node) in Eligible then
             declare
-               Global_M : Metrix renames Element (Metrix_Stack, 1).all;
-               File_M   : Metrix renames Element (Metrix_Stack, 2).all;
-               Parent   : Metrix renames
+               Global_M         : Metrix renames Element (Metrix_Stack, 1).all;
+               File_M           : Metrix renames Element (Metrix_Stack, 2).all;
+               Parent           : Metrix renames
                  Element (Metrix_Stack, Last_Index (Metrix_Stack)).all;
                M : constant Metrix_Ref := Push_New_Metrix (Tool, Node);
                Saved_Loop_Count : constant Natural    := Loop_Count;

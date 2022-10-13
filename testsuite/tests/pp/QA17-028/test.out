@@ -19,7 +19,7 @@ PACKAGE BODY pp_reproducer IS
          recording_manager          => "recording_manager");
 
       ibusiness_unit.synthetic_target_manager.initialize
-        (obj =>
+        (obj                        =>
            ibusiness_unit.synthetic_target_manager.object
              (synth_tar_manager_ref.ALL),
          gunking_mode               => "gk_mode_manager",

@@ -293,7 +293,7 @@ package body Stub.Actions is
    function Get_Pp_Cmd return Command_Line;
    --  Return a command line for passing to the pretty printer.
 
-   Syntax_Only_Arg : aliased String := "--syntax-only";
+   Syntax_Only_Arg      : aliased String := "--syntax-only";
    --  --syntax-only makes it easier to debug, because we don't get so many
    --  Property_Errors.
    Comments_Fill_Arg    : aliased String := "--comments-fill";
@@ -318,8 +318,8 @@ package body Stub.Actions is
    function Overriding_String (Overrides : Ada_Overriding_Node) return W_Str is
      (case Overrides is
         when Ada_Overriding_Not_Overriding => "not overriding ",
-        when Ada_Overriding_Overriding     => "overriding ",
-        when Ada_Overriding_Unspecified    => "");
+        when Ada_Overriding_Overriding => "overriding ",
+        when Ada_Overriding_Unspecified => "");
 
    function Intersperse_Spaces (S : W_Str) return W_Str is
       use WChar_Vectors;
@@ -469,14 +469,14 @@ package body Stub.Actions is
         Root_Node.Kind in Ada_Body_Node
         and then Root_Node.Kind not in Ada_Body_Stub;
       Parent_Name : constant W_Str := Get_Parent_Name (Parent_Body_Of_Subunit);
-      Root_Node_Name : constant W_Str :=
+      Root_Node_Name        : constant W_Str   :=
         (if not Parent_Body_Of_Subunit.Is_Null then Parent_Name & "."
          else "") &
         Full_Name (Get_Def_Name (Root_Node).As_Name);
-      UC_Root_Node_Name : constant W_Str := To_Upper (Root_Node_Name);
-      LC_Root_Node_Name : constant W_Str := To_Lower (Root_Node_Name);
+      UC_Root_Node_Name     : constant W_Str   := To_Upper (Root_Node_Name);
+      LC_Root_Node_Name     : constant W_Str   := To_Lower (Root_Node_Name);
 
-      Wide_Char_Encoding : constant System.WCh_Con.WC_Encoding_Method :=
+      Wide_Char_Encoding  : constant System.WCh_Con.WC_Encoding_Method :=
         Wide_Character_Encoding (Cmd);
       Out_Vec, Pp_Out_Vec : Char_Vector;
 
@@ -565,10 +565,10 @@ package body Stub.Actions is
 
          if Arg (Cmd, Comment_Header_Sample) then
             declare
-               With_Spaces : constant W_Str :=
+               With_Spaces : constant W_Str   :=
                  Intersperse_Spaces (UC_Root_Node_Name);
-               Len    : constant Natural := Arg (Cmd, Max_Line_Length);
-               Dashes : constant W_Str   := (1 .. Len => '-');
+               Len         : constant Natural := Arg (Cmd, Max_Line_Length);
+               Dashes      : constant W_Str   := (1 .. Len => '-');
                Spaces : constant W_Str := "--" & (1 .. Len - 4 => ' ') & "--";
             begin
                Put ("\1\n", Dashes);
@@ -944,10 +944,10 @@ package body Stub.Actions is
       end Walk;
 
       procedure Format is
-         Context : constant Analysis_Context :=
+         Context  : constant Analysis_Context :=
            Create_Context (Charset => Wide_Character_Encoding (Cmd));
          Out_Str  : String renames Elems (Out_Vec) (1 .. Last_Index (Out_Vec));
-         Out_Unit : constant Analysis_Unit :=
+         Out_Unit : constant Analysis_Unit    :=
            Get_From_Buffer (Context, Filename => "", Buffer => Out_Str);
       begin
          if Has_Diagnostics (Out_Unit) then
@@ -1016,11 +1016,11 @@ package body Stub.Actions is
          function Name_From_Project return String is
             Arg_Virt_File : constant Virtual_File :=
               Create (Tool.Project_Tree.all, +File_Name);
-            Arg_File_Info : constant File_Info :=
+            Arg_File_Info : constant File_Info    :=
               Info (Tool.Project_Tree.all, Arg_Virt_File);
-            Unit_Name : constant String := To_UTF8 (LC_Root_Node_Name);
+            Unit_Name     : constant String := To_UTF8 (LC_Root_Node_Name);
             --  Unit_Name is correct for both library units and Ada stubs
-            Part : constant Unit_Parts :=
+            Part          : constant Unit_Parts   :=
               (if Root_Node.Kind in Ada_Body_Stub then Unit_Separate
                else Unit_Body);
          begin
@@ -1065,11 +1065,11 @@ package body Stub.Actions is
       Output_Name : constant String := Get_Output_Name (Resolve_Links => True);
 
       procedure Write_Output_File is
-         Out_File : constant File_Descriptor :=
+         Out_File   : constant File_Descriptor :=
            Create_File (Output_Name, Fmode => Binary);
          Out_String : String renames
            Elems (Pp_Out_Vec) (1 .. Last_Index (Pp_Out_Vec));
-         Status : Boolean;
+         Status     : Boolean;
 
          --  Start of Processing for Write_Output_File
 
@@ -1126,7 +1126,7 @@ package body Stub.Actions is
          Subp_Decl : Ada_Node := No_Ada_Node;
          --  The Subp_Decl at Search_Line
 
-         Body_Line : Line_Number;
+         Body_Line     : Line_Number;
          --  The line number in the body file after which the new subprogram
          --  body should be inserted.
          Body_Line_Set : Boolean := False;
@@ -1328,7 +1328,7 @@ package body Stub.Actions is
          pragma Assert (Body_Line_Set);
 
          declare
-            Name : constant W_Str :=
+            Name            : constant W_Str    :=
               Full_Name (Get_Def_Name (Subp_Decl).As_Name);
             Level           : constant Natural  := 1;
             Insertion_Index : constant Positive :=
@@ -1488,7 +1488,7 @@ package body Stub.Actions is
    is
       Lib_Item_Or_Subunit : constant Ada_Node :=
         Root (Unit).As_Compilation_Unit.F_Body;
-      Root_Node : constant Ada_Node :=
+      Root_Node           : constant Ada_Node :=
         (case Lib_Item_Or_Subunit.Kind is
            when Ada_Library_Item =>
              Lib_Item_Or_Subunit.As_Library_Item.F_Item.As_Ada_Node,

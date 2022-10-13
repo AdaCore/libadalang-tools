@@ -347,9 +347,9 @@ package body Utils.Projects is
          Files : File_Array_Access;
          --         Success  : Boolean := False;
 
-         Num_Names : constant Natural := Num_File_Names (Cmd);
+         Num_Names               : constant Natural := Num_File_Names (Cmd);
          --  Number of File_Names on the command line
-         Num_Files_Switches : constant Natural :=
+         Num_Files_Switches      : constant Natural :=
            Arg_Length (Cmd, Common.Files);
          --  Number of "-files=..." switches on the command line
          Argument_File_Specified : constant Boolean :=
@@ -529,7 +529,7 @@ package body Utils.Projects is
                declare
                Dirs : constant File_Array :=
                  Project_Env.Predefined_Object_Path;
-               Idx : Natural;
+               Idx  : Natural;
             begin
                for J in Dirs'Range loop
                   Idx := Index (Dirs (J).Display_Full_Name, "adalib");
@@ -570,7 +570,7 @@ package body Utils.Projects is
 
          Proj : constant Project_Type := Root_Project (My_Project_Tree);
 
-         Attr_Switches : constant Attribute_Pkg_List :=
+         Attr_Switches     : constant Attribute_Pkg_List :=
            Build (Tool_Package_Name, "Switches");
          Attr_Def_Switches : constant Attribute_Pkg_List :=
            Build (Tool_Package_Name, "Default_Switches");

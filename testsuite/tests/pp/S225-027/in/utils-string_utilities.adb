@@ -511,7 +511,7 @@ package body Utils.String_Utilities is
       loop
          This_Read :=
            Read (FD, A => Buffer.all'Address, N => Length + 1 - Read_Ptr);
-         Read_Ptr := Read_Ptr + Integer'Max (This_Read, 0);
+         Read_Ptr  := Read_Ptr + Integer'Max (This_Read, 0);
          exit when This_Read <= 0 or else Read_Ptr = Length + 1;
       end loop;
 
@@ -551,7 +551,7 @@ package body Utils.String_Utilities is
    end Write_File;
 
    procedure Write_File (File_Name : String; S : String) is
-      FD : constant File_Descriptor :=
+      FD     : constant File_Descriptor :=
         Create_File (File_Name, Fmode => Binary);
       Status : Boolean;
    begin

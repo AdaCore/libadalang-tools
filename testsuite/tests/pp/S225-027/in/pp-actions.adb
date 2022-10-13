@@ -353,12 +353,12 @@ package body Pp.Actions is
    Cur_Indentation           : Natural renames Lines_Data.Cur_Indentation;
    Next_Line_Break_Unique_Id : Modular renames
      Lines_Data.Next_Line_Break_Unique_Id;
-   All_LB           : Line_Break_Vector renames Lines_Data.All_LB;
-   All_LBI          : Line_Break_Index_Vector renames Lines_Data.All_LBI;
-   Tabs             : Tab_Vector renames Lines_Data.Tabs;
-   Src_Tokns        : Scanner.Tokn_Vec renames Lines_Data.Src_Tokns;
-   New_Tokns        : Scanner.Tokn_Vec renames Lines_Data.New_Tokns;
-   Check_Whitespace : Boolean renames Lines_Data.Check_Whitespace;
+   All_LB                    : Line_Break_Vector renames Lines_Data.All_LB;
+   All_LBI : Line_Break_Index_Vector renames Lines_Data.All_LBI;
+   Tabs                      : Tab_Vector renames Lines_Data.Tabs;
+   Src_Tokns                 : Scanner.Tokn_Vec renames Lines_Data.Src_Tokns;
+   New_Tokns                 : Scanner.Tokn_Vec renames Lines_Data.New_Tokns;
+   Check_Whitespace          : Boolean renames Lines_Data.Check_Whitespace;
 
    procedure Tree_To_Ada_2
      (Root    : Ada_Node; Cmd : Utils.Command_Lines.Command_Line;
@@ -555,26 +555,26 @@ package body Pp.Actions is
    begin
       return
         (case Kind is
-           when Ada_Discrete_Base_Subtype_Decl  => null,
-           when Ada_Discrete_Subtype_Name       => null,
-           when Ada_Unconstrained_Array_Index   => null,
-           when Ada_Contract_Case_Assoc         => null,
-           when Ada_Contract_Cases              => null,
-           when Ada_Multi_Dim_Array_Assoc       => null,
+           when Ada_Discrete_Base_Subtype_Decl => null,
+           when Ada_Discrete_Subtype_Name => null,
+           when Ada_Unconstrained_Array_Index => null,
+           when Ada_Contract_Case_Assoc => null,
+           when Ada_Contract_Cases => null,
+           when Ada_Multi_Dim_Array_Assoc => null,
            when Ada_Unconstrained_Array_Indices => null,
-           when Ada_Error_Decl                  => null,
-           when Ada_Error_Stmt                  => null,
-           when Ada_Enum_Subp_Spec              => null,
-           when Ada_Enum_Lit_Synth_Type_Expr    => null,
+           when Ada_Error_Decl => null,
+           when Ada_Error_Stmt => null,
+           when Ada_Enum_Subp_Spec => null,
+           when Ada_Enum_Lit_Synth_Type_Expr => null,
            --  ???The above are not used
 
-           when Ada_Ada_List        => null,
-           when Ada_Subp_Spec       => null,
+           when Ada_Ada_List => null,
+           when Ada_Subp_Spec => null,
            when Ada_Aggregate_Assoc => null,
 
            when Ada_Constrained_Array_Indices => L ("(?~,# ~~)"),
-           when Ada_Aspect_Assoc              => L ("!? ^=> ~~~"),
-           when Ada_At_Clause                 => L ("for ! use at !"),
+           when Ada_Aspect_Assoc => L ("!? ^=> ~~~"),
+           when Ada_At_Clause => L ("for ! use at !"),
            when Ada_Attribute_Def_Clause | Ada_Enum_Rep_Clause =>
              L ("for ! use [!]"),
            when Ada_Record_Rep_Clause =>
@@ -585,29 +585,29 @@ package body Pp.Actions is
 
            when Ada_Component_Decl => L ("?~,# ~~ ^: !? ^2:=[# ~~]~", Aspects),
            when Ada_Discriminant_Spec => L ("?~,# ~~ ^: !? ^2:=[# ~~]~"),
-           when Ada_Params            => null,
-           when Ada_Param_Spec        => null,
+           when Ada_Params => null,
+           when Ada_Param_Spec => null,
            when Ada_Base_Package_Decl =>
              L ("package !#", Aspects_Is, " is$", "!", "!", "end !1/"),
            when Ada_Abstract_Subp_Decl =>
              L ("?~~ ~!", " is abstract", Aspects),
            when Ada_Expr_Function => L ("?~~ ~!", " is[# !]", Aspects),
            when Ada_Null_Subp_Decl => L ("?~~ ~!", " is null", Aspects),
-           when Ada_Subp_Renaming_Decl        => L ("?~~ ~!!", Aspects),
-           when Ada_Subp_Decl                 => L ("?~~ ~!" & Aspects),
+           when Ada_Subp_Renaming_Decl => L ("?~~ ~!!", Aspects),
+           when Ada_Subp_Decl => L ("?~~ ~!" & Aspects),
            when Ada_Subp_Body_Stub => L ("?~~ ~! is separate" & Aspects),
            when Ada_Concrete_Formal_Subp_Decl =>
              L ("?~~ ~with !? is ~~~" & Aspects),
            when Ada_Abstract_Formal_Subp_Decl =>
              L ("?~~ ~with ! is abstract? ~~~" & Aspects),
-           when Ada_Subp_Kind_Function  => L ("function"),
+           when Ada_Subp_Kind_Function => L ("function"),
            when Ada_Subp_Kind_Procedure => L ("procedure"),
-           when Ada_Package_Body_Stub   =>
+           when Ada_Package_Body_Stub =>
              L ("package body ! is separate", Aspects),
            when Ada_Protected_Body_Stub =>
              L ("protected body ! is separate", Aspects),
            when Ada_Task_Body_Stub => L ("task body ! is separate", Aspects),
-           when Ada_Package_Body   =>
+           when Ada_Package_Body =>
              L ("package body !", Aspects_Is, " is$", "!", "!", "end !1/"),
            when Ada_Protected_Body =>
              L ("protected body !", Aspects_Is, " is$", "!", "end !1/"),
@@ -629,22 +629,22 @@ package body Pp.Actions is
              L ("entry !?[# (~~)]~?~~~[# when !# is]$",
                 --  ???Perhaps "# is]" should be "#+1 is]" or "# ]is".
                 "!", "!", "end !1/"),
-           when Ada_Enum_Literal_Decl             => L ("!"),
+           when Ada_Enum_Literal_Decl => L ("!"),
            when Ada_Exception_Decl => L ("?~,# ~~ ^: exception!", Aspects),
            when Ada_Generic_Package_Instantiation =>
              L ("package ! is new !?[# (~,# ~)]~", Aspects),
            when Ada_Generic_Subp_Instantiation =>
              L ("?~~ ~! ! is new !?[# (~,# ~)]~", Aspects),
            when Ada_Generic_Package_Decl => L ("generic$", "!", "!"),
-           when Ada_Generic_Formal_Part  => L ("{?~;$~;$~}"),
+           when Ada_Generic_Formal_Part => L ("{?~;$~;$~}"),
            when Ada_Generic_Formal_Obj_Decl | Ada_Generic_Formal_Subp_Decl |
-             Ada_Generic_Formal_Type_Decl         => L ("!"),
-           when Ada_Generic_Formal_Package        => L ("with !"),
+             Ada_Generic_Formal_Type_Decl => L ("!"),
+           when Ada_Generic_Formal_Package => L ("with !"),
            when Ada_Generic_Package_Renaming_Decl =>
              L ("generic package ! renames !", Aspects),
            when Ada_Generic_Subp_Renaming_Decl =>
              L ("generic ! ! renames !", Aspects),
-           when Ada_Generic_Subp_Decl     => L ("generic$", "!", "!"),
+           when Ada_Generic_Subp_Decl => L ("generic$", "!", "!"),
            when Ada_Generic_Subp_Internal => L ("!", Aspects),
            when Ada_Number_Decl => L ("?~,# ~~ ^: constant ^2:=[# !]"),
            when Ada_Object_Decl | Ada_Extended_Return_Stmt_Object_Decl =>
@@ -660,8 +660,8 @@ package body Pp.Actions is
            --  Ada_Single_Protected_Decl and Ada_Protected_Type_Decl to
            --  Ada_Protected_Def.
 
-           when Ada_Protected_Def         => L ("!$", "!$/"),
-           when Ada_Single_Task_Decl      => L ("!"),
+           when Ada_Protected_Def => L ("!$", "!$/"),
+           when Ada_Single_Task_Decl => L ("!"),
            when Ada_Single_Task_Type_Decl =>
              L ("task !!", Aspects_Is, "? is$~~~"),
            when Ada_Task_Type_Decl =>
@@ -672,8 +672,8 @@ package body Pp.Actions is
            --  replaces the F_End_Id (see Do_Task_Def). This is necessary
            --  because the name of the task is buried in a subtree.
 
-           when Ada_Enum_Type_Def        => L ("(?~,#1 ~~)"),
-           when Ada_Type_Decl            => null,
+           when Ada_Enum_Type_Def => L ("(?~,#1 ~~)"),
+           when Ada_Type_Decl => null,
            when Ada_Incomplete_Type_Decl => L ("type !!"), -- Aspects?
 
            when Ada_Incomplete_Tagged_Type_Decl => L ("type !! is /tagged"),
@@ -682,85 +682,85 @@ package body Pp.Actions is
 
            when Ada_Classwide_Type_Decl => null,
            when Ada_Subtype_Decl => L ("subtype ! is[# !", Aspects, "]"),
-           when Ada_Compilation_Unit    => null,
-           when Ada_Component_Def       => L ("?~~ ~?~~ ~!"),
+           when Ada_Compilation_Unit => null,
+           when Ada_Component_Def => L ("?~~ ~?~~ ~!"),
            --  The second "?~~ ~" is for Has_Constant, which should never
            --  print anything.
 
-           when Ada_Delta_Constraint   => L ("delta !? ~~~"),
-           when Ada_Digits_Constraint  => L ("digits !? ~~~"),
+           when Ada_Delta_Constraint => L ("delta !? ~~~"),
+           when Ada_Digits_Constraint => L ("digits !? ~~~"),
            when Ada_Discriminant_Assoc => null,
            when Ada_Discriminant_Constraint | Ada_Index_Constraint =>
              L ("?[#(~,# ~)]~"),
-           when Ada_Range_Constraint  => L ("!"),
-           when Ada_Declarative_Part  => L ("?${~;$~};$$~"),
-           when Ada_Private_Part      => L ("?$private${~;$~};$~"),
-           when Ada_Public_Part       => L ("?{~;$~};$~"),
-           when Ada_Elsif_Expr_Part   => L ("elsif[# !]# then[# !]"),
-           when Ada_Entry_Index_Spec  => L ("for ! in[# !]"),
+           when Ada_Range_Constraint => L ("!"),
+           when Ada_Declarative_Part => L ("?${~;$~};$$~"),
+           when Ada_Private_Part => L ("?$private${~;$~};$~"),
+           when Ada_Public_Part => L ("?{~;$~};$~"),
+           when Ada_Elsif_Expr_Part => L ("elsif[# !]# then[# !]"),
+           when Ada_Entry_Index_Spec => L ("for ! in[# !]"),
            when Ada_Exception_Handler =>
              L ("when[? ~~ :~ ?~ ^|# ~~] ^=>$", "{?~;$~;$~}"),
-           when Ada_Explicit_Deref        => L ("!.all"),
-           when Ada_Aggregate             => null,
+           when Ada_Explicit_Deref => L ("!.all"),
+           when Ada_Aggregate => null,
            when Ada_Null_Record_Aggregate =>
              L ("#(?~~ with #~" & "null record/)"),
-           when Ada_Allocator     => L ("new? #(~~)~ !"),
+           when Ada_Allocator => L ("new? #(~~)~ !"),
            when Ada_Attribute_Ref => L ("!'[#1!?# (~,# ~)~]"),
            --  ???This includes function calls to attributes, such as
            --  T'Max(X, Y), which isn't really right.
 
            when Ada_Update_Attribute_Ref => L ("!'[#1!# !]"),
            when Ada_Bin_Op | Ada_Relation_Op => null,
-           when Ada_Call_Expr             => null,
-           when Ada_Case_Expr             => L ("case ! is[# ?#~,# ~~]"),
+           when Ada_Call_Expr => null,
+           when Ada_Case_Expr => L ("case ! is[# ?#~,# ~~]"),
            when Ada_Case_Expr_Alternative => L ("when[ ?~ |# ~~] ^=>[# !]"),
            --  ???Ada_Case_Stmt_Alternative has a "^" just before the "|"
 
            when Ada_Box_Expr => L ("<>"),
-           when Ada_If_Expr  =>
+           when Ada_If_Expr =>
              L ("if[#1 !]#1 then[#1 !]", "? #~ #~~", "?# else[ ~~]~"),
            when Ada_Membership_Expr => L ("! ![# ?[#~ ^|# ~]~]"),
-           when Ada_Dotted_Name     => L ("![#.!]"),
-           when Ada_End_Name        => L ("!"),
-           when Ada_Defining_Name   => L ("!"),
-           when Ada_Char_Literal    => null,
-           when Ada_Identifier      => null,
-           when Ada_String_Literal  => null,
-           when Ada_Null_Literal    => L ("null"),
-           when Ada_Real_Literal    => null,
-           when Ada_Int_Literal     => null,
-           when Ada_Qual_Expr       => L ("!'[#!]"),
+           when Ada_Dotted_Name => L ("![#.!]"),
+           when Ada_End_Name => L ("!"),
+           when Ada_Defining_Name => L ("!"),
+           when Ada_Char_Literal => null,
+           when Ada_Identifier => null,
+           when Ada_String_Literal => null,
+           when Ada_Null_Literal => L ("null"),
+           when Ada_Real_Literal => null,
+           when Ada_Int_Literal => null,
+           when Ada_Qual_Expr => L ("!'[#!]"),
            --  ???There are no parentheses here, because the subexpression
            --  is either a parenthesized expression or an aggregate.
 
-           when Ada_Quantified_Expr       => L ("for ! ! ^=>[# !]"),
-           when Ada_Raise_Expr            => L ("raise !?[# with ~~]~"),
-           when Ada_Un_Op                 => null,
-           when Ada_Handled_Stmts         => null,
-           when Ada_Library_Item          => L ("?~~ ~!"),
-           when Ada_Null_Component_Decl   => L ("null"),
-           when Ada_Others_Designator     => L ("others"),
-           when Ada_Param_Assoc           => null,
+           when Ada_Quantified_Expr => L ("for ! ! ^=>[# !]"),
+           when Ada_Raise_Expr => L ("raise !?[# with ~~]~"),
+           when Ada_Un_Op => null,
+           when Ada_Handled_Stmts => null,
+           when Ada_Library_Item => L ("?~~ ~!"),
+           when Ada_Null_Component_Decl => L ("null"),
+           when Ada_Others_Designator => L ("others"),
+           when Ada_Param_Assoc => null,
            when Ada_Pragma_Argument_Assoc => null,
-           when Ada_Pragma_Node           => null,
-           when Ada_Component_Clause      => null, -- ?
+           when Ada_Pragma_Node => null,
+           when Ada_Component_Clause => null, -- ?
 
            when Ada_Renaming_Clause => L ("? renames[# ~~]~"),
-           when Ada_Select_Stmt     =>
+           when Ada_Select_Stmt =>
              L ("select", "!", "?else$", "{~;$~;$}~", "?then abort$",
                 "{~;$~;$}~", "end select"),
-           when Ada_Select_When_Part       => null,
-           when Ada_Accept_Stmt            => L ("accept !? #(~~)~?~~~"),
+           when Ada_Select_When_Part => null,
+           when Ada_Accept_Stmt => L ("accept !? #(~~)~?~~~"),
            when Ada_Accept_Stmt_With_Stmts =>
              L ("accept !? #(~~)~?~~~", "!", "end !1/"),
            when Ada_Null_Record_Def => L ("null record/"),
            --  Null_Record_Def inherits F_Components from
            --  Base_Record_Def_Type, and it returns null.
 
-           when Ada_Record_Def            => L ("record$", "!", "end record"),
-           when Ada_Record_Type_Def       => L ("?~~ ~?~~ ~?~~ ~!"),
-           when Ada_Component_List        => L ("{?~;$~;$~}", "{?~~;$~}"),
-           when Ada_Variant               => L ("when[ ?~ ^|# ~~] ^=>$", "!"),
+           when Ada_Record_Def => L ("record$", "!", "end record"),
+           when Ada_Record_Type_Def => L ("?~~ ~?~~ ~?~~ ~!"),
+           when Ada_Component_List => L ("{?~;$~;$~}", "{?~~;$~}"),
+           when Ada_Variant => L ("when[ ?~ ^|# ~~] ^=>$", "!"),
            when Ada_Case_Stmt_Alternative =>
              L ("when[ ?~ ^|# ~~] ^=>$", "{?~;$~;$~}"),
            when Ada_Case_Stmt | Ada_Variant_Part =>
@@ -771,115 +771,115 @@ package body Pp.Actions is
              L ("if[ !]# then$", "{?~;$~;$~}", "?~~~", "?else$", "{~;$~;$}~",
                 "end if"),
            when Ada_Elsif_Stmt_Part => L ("elsif[ !]# then$", "{?~;$~;$~}"),
-           when Ada_Named_Stmt      => L ("! :$! !1"),
+           when Ada_Named_Stmt => L ("! :$! !1"),
            when Ada_Named_Stmt_Decl => L ("!"),
-           when Ada_Begin_Block     => L ("!", "end/"),
-           when Ada_Decl_Block      => L ("?declare$", "~~~", "!", "end/"),
+           when Ada_Begin_Block => L ("!", "end/"),
+           when Ada_Decl_Block => L ("?declare$", "~~~", "!", "end/"),
            --  For Ada_Begin_Block and Ada_Decl_Block, the "begin" comes
            --  from Do_Handled_Stmts.
 
            when Ada_Loop_Stmt | Ada_For_Loop_Stmt | Ada_While_Loop_Stmt =>
              L ("?~~# ~loop$", "{?~;$~;$~}", "end loop/"),
-           when Ada_For_Loop_Spec         => null,
-           when Ada_For_Loop_Var_Decl     => L ("!? : ~~~"),
-           when Ada_While_Loop_Spec       => L ("while[ !]"),
-           when Ada_Abort_Stmt            => L ("abort ?~, ~~"),
-           when Ada_Assign_Stmt           => L ("! ^:=[# !]"),
+           when Ada_For_Loop_Spec => null,
+           when Ada_For_Loop_Var_Decl => L ("!? : ~~~"),
+           when Ada_While_Loop_Spec => L ("while[ !]"),
+           when Ada_Abort_Stmt => L ("abort ?~, ~~"),
+           when Ada_Assign_Stmt => L ("! ^:=[# !]"),
            when Ada_Target_Name => L ("@"), when Ada_Call_Stmt => L ("!"),
-           when Ada_Delay_Stmt            => L ("delay? ~~~ !"),
-           when Ada_Exit_Stmt             => L ("exit? ~~~? when[ ~~]~"),
+           when Ada_Delay_Stmt => L ("delay? ~~~ !"),
+           when Ada_Exit_Stmt => L ("exit? ~~~? when[ ~~]~"),
            when Ada_Goto_Stmt => L ("goto !"), when Ada_Label => L ("<<!>>"),
            when Ada_Label_Decl => L ("!"), when Ada_Null_Stmt => L ("null"),
-           when Ada_Raise_Stmt            => L ("raise? ~~~?[# with ~~]~"),
-           when Ada_Requeue_Stmt          => L ("requeue !? ~~~"),
-           when Ada_Return_Stmt           => L ("return[? ~~~]"),
+           when Ada_Raise_Stmt => L ("raise? ~~~?[# with ~~]~"),
+           when Ada_Requeue_Stmt => L ("requeue !? ~~~"),
+           when Ada_Return_Stmt => L ("return[? ~~~]"),
            when Ada_Terminate_Alternative => L ("terminate"),
-           when Ada_Subunit               => L ("separate (!)$", "!"),
-           when Ada_Type_Access_Def       => L ("?~~ ~access? ~~~? ~~~ !"),
-           when Ada_Array_Type_Def        => L ("array[# !] of !"),
-           when Ada_Derived_Type_Def      =>
+           when Ada_Subunit => L ("separate (!)$", "!"),
+           when Ada_Type_Access_Def => L ("?~~ ~access? ~~~? ~~~ !"),
+           when Ada_Array_Type_Def => L ("array[# !] of !"),
+           when Ada_Derived_Type_Def =>
              L ("?~~ ~?~~ ~?~~ ~new !? and[# ~ and# ~]~? with# ~~~? ~~~"),
 
            when Ada_Formal_Discrete_Type_Def => L ("#(<>)"),
-           when Ada_Interface_Type_Def       =>
+           when Ada_Interface_Type_Def =>
              L ("?~~ ~interface? and[# ~ and# ~]~"),
-           when Ada_Mod_Int_Type_Def         => L ("mod !"),
-           when Ada_Private_Type_Def         => L ("?~~ ~?~~ ~?~~ ~private"),
-           when Ada_Range_Spec               => L ("range !"),
-           when Ada_Decimal_Fixed_Point_Def  => L ("delta ! digits !? ~~~"),
-           when Ada_Floating_Point_Def       => L ("digits !? ~~~"),
+           when Ada_Mod_Int_Type_Def => L ("mod !"),
+           when Ada_Private_Type_Def => L ("?~~ ~?~~ ~?~~ ~private"),
+           when Ada_Range_Spec => L ("range !"),
+           when Ada_Decimal_Fixed_Point_Def => L ("delta ! digits !? ~~~"),
+           when Ada_Floating_Point_Def => L ("digits !? ~~~"),
            when Ada_Ordinary_Fixed_Point_Def => L ("delta !? ~~~"),
 
-           when Ada_Signed_Int_Type_Def       => L ("!"),
-           when Ada_Known_Discriminant_Part   => L ("?[# (~;# ~)]~#"),
+           when Ada_Signed_Int_Type_Def => L ("!"),
+           when Ada_Known_Discriminant_Part => L ("?[# (~;# ~)]~#"),
            when Ada_Unknown_Discriminant_Part => L (" #(<>)"),
-           when Ada_Access_To_Subp_Def        => L ("?~~ ~access? ~~~ !"),
-           when Ada_Anonymous_Type_Decl       => L ("//!", Aspects),
+           when Ada_Access_To_Subp_Def => L ("?~~ ~access? ~~~ !"),
+           when Ada_Anonymous_Type_Decl => L ("//!", Aspects),
            when Ada_Synth_Anonymous_Type_Decl => null,
            when Ada_Anonymous_Type_Access_Def => null,
            when Ada_Subtype_Indication | Ada_Constrained_Subtype_Indication |
              Ada_Discrete_Subtype_Indication => L ("?~~ ~!? ~~~"),
-           when Ada_Anonymous_Type           => L ("!"),
-           when Ada_Use_Package_Clause       => L ("use[# ?~,# ~~]"),
-           when Ada_Use_Type_Clause          => L ("use? ~~~ type[# ?~,# ~~]"),
-           when Ada_With_Clause              => L ("?~~ ~?~~ ~with ^?~, ~~"),
+           when Ada_Anonymous_Type => L ("!"),
+           when Ada_Use_Package_Clause => L ("use[# ?~,# ~~]"),
+           when Ada_Use_Type_Clause => L ("use? ~~~ type[# ?~,# ~~]"),
+           when Ada_With_Clause => L ("?~~ ~?~~ ~with ^?~, ~~"),
            --  Note: the tab ('^') is ignored for limited/private 'with's
            --  (see Append_Tab).
 
            when Ada_Paren_Expr => L ("#(!)"), when Ada_Abort_Absent => null,
-           when Ada_Abort_Present               => L ("with abort"),
-           when Ada_Abstract_Absent             => null,
-           when Ada_Abstract_Present            => L ("abstract"),
-           when Ada_Aliased_Absent              => null,
-           when Ada_Aliased_Present             => L ("aliased"),
+           when Ada_Abort_Present => L ("with abort"),
+           when Ada_Abstract_Absent => null,
+           when Ada_Abstract_Present => L ("abstract"),
+           when Ada_Aliased_Absent => null,
+           when Ada_Aliased_Present => L ("aliased"),
            when Ada_All_Absent => null, when Ada_All_Present => L ("all"),
-           when Ada_Constant_Absent             => null,
-           when Ada_Constant_Present            => L ("constant"),
+           when Ada_Constant_Absent => null,
+           when Ada_Constant_Present => L ("constant"),
            when Ada_Mode_Default => null, when Ada_Mode_In => L ("in"),
-           when Ada_Mode_In_Out                 => L ("in out"),
-           when Ada_Mode_Out                    => L ("out"),
-           when Ada_Interface_Kind_Limited      => L ("limited"),
-           when Ada_Interface_Kind_Protected    => L ("protected"),
+           when Ada_Mode_In_Out => L ("in out"),
+           when Ada_Mode_Out => L ("out"),
+           when Ada_Interface_Kind_Limited => L ("limited"),
+           when Ada_Interface_Kind_Protected => L ("protected"),
            when Ada_Interface_Kind_Synchronized => L ("synchronized"),
-           when Ada_Interface_Kind_Task         => L ("task"),
-           when Ada_Iter_Type_In                => L ("in"),
+           when Ada_Interface_Kind_Task => L ("task"),
+           when Ada_Iter_Type_In => L ("in"),
            when Ada_Iter_Type_Of => L ("of"), when Ada_Limited_Absent => null,
-           when Ada_Limited_Present             => L ("limited"),
-           when Ada_Not_Null_Absent             => null,
-           when Ada_Not_Null_Present            => L ("not null"),
+           when Ada_Limited_Present => L ("limited"),
+           when Ada_Not_Null_Absent => null,
+           when Ada_Not_Null_Present => L ("not null"),
 
            when Ada_Op_In => L ("in"), when Ada_Op_Not_In => L ("not in"),
 
-           when Ada_Op_And     => null, when Ada_Op_Or => null,
+           when Ada_Op_And => null, when Ada_Op_Or => null,
            when Ada_Op_Or_Else => null, when Ada_Op_And_Then => null,
-           when Ada_Op_Concat  => null, when Ada_Op_Xor => null,
-           when Ada_Op_Abs     => null, when Ada_Op_Not => null,
-           when Ada_Op_Pow     => null, when Ada_Op_Mult => null,
-           when Ada_Op_Div     => null, when Ada_Op_Mod => null,
-           when Ada_Op_Rem     => null, when Ada_Op_Plus => null,
-           when Ada_Op_Minus   => null, when Ada_Op_Eq => null,
-           when Ada_Op_Neq     => null, when Ada_Op_Lt => null,
-           when Ada_Op_Lte     => null, when Ada_Op_Gt => null,
-           when Ada_Op_Gte     => null, when Ada_Op_Double_Dot => null,
+           when Ada_Op_Concat => null, when Ada_Op_Xor => null,
+           when Ada_Op_Abs => null, when Ada_Op_Not => null,
+           when Ada_Op_Pow => null, when Ada_Op_Mult => null,
+           when Ada_Op_Div => null, when Ada_Op_Mod => null,
+           when Ada_Op_Rem => null, when Ada_Op_Plus => null,
+           when Ada_Op_Minus => null, when Ada_Op_Eq => null,
+           when Ada_Op_Neq => null, when Ada_Op_Lt => null,
+           when Ada_Op_Lte => null, when Ada_Op_Gt => null,
+           when Ada_Op_Gte => null, when Ada_Op_Double_Dot => null,
 
            when Ada_Overriding_Not_Overriding => L ("not overriding"),
-           when Ada_Overriding_Overriding     => L ("overriding"),
-           when Ada_Overriding_Unspecified    => null,
-           when Ada_Private_Absent            => null,
-           when Ada_Private_Present           => L ("private"),
-           when Ada_Protected_Absent          => null,
-           when Ada_Protected_Present         => L ("protected"),
-           when Ada_Quantifier_All            => L ("all"),
-           when Ada_Quantifier_Some           => L ("some"),
-           when Ada_Reverse_Absent            => null,
-           when Ada_Reverse_Present           => L ("reverse"),
-           when Ada_Synchronized_Absent       => null,
-           when Ada_Synchronized_Present      => L ("synchronized"),
-           when Ada_Tagged_Absent             => null,
-           when Ada_Tagged_Present            => L ("tagged"),
-           when Ada_Until_Absent              => null,
-           when Ada_Until_Present             => L ("until"),
-           when Ada_With_Private_Absent       => null,
+           when Ada_Overriding_Overriding => L ("overriding"),
+           when Ada_Overriding_Unspecified => null,
+           when Ada_Private_Absent => null,
+           when Ada_Private_Present => L ("private"),
+           when Ada_Protected_Absent => null,
+           when Ada_Protected_Present => L ("protected"),
+           when Ada_Quantifier_All => L ("all"),
+           when Ada_Quantifier_Some => L ("some"),
+           when Ada_Reverse_Absent => null,
+           when Ada_Reverse_Present => L ("reverse"),
+           when Ada_Synchronized_Absent => null,
+           when Ada_Synchronized_Present => L ("synchronized"),
+           when Ada_Tagged_Absent => null,
+           when Ada_Tagged_Present => L ("tagged"),
+           when Ada_Until_Absent => null,
+           when Ada_Until_Present => L ("until"),
+           when Ada_With_Private_Absent => null,
            when Ada_With_Private_Present => L ("with private")); -- end case
    end Template_For_Kind;
 
@@ -1288,10 +1288,10 @@ package body Pp.Actions is
             Obj_Decl_Vertical_Agg_Alt   =>
               L (Replace_One
                    (Ada_Object_Decl, From => ":=[# ~~]~!", To => ":=[$~~]~!")),
-            Assign_Vertical_Agg_Alt =>
+            Assign_Vertical_Agg_Alt     =>
               L (Replace_One
                    (Ada_Assign_Stmt, From => ":=[# !]", To => ":=[$!]")),
-            Pos_Notation_Assoc_Alt =>
+            Pos_Notation_Assoc_Alt      =>
               L ("?~~~!"), -- The "?~~~" generates nothing.
 
             Single_Name_Vertical_Assoc_Alt => L ("?~~ ^=>[$~!]"),
@@ -1526,11 +1526,11 @@ package body Pp.Actions is
                         end if;
 
                         declare
-                           Pre : constant Tok_Template :=
+                           Pre     : constant Tok_Template :=
                              Compile_Tokens (Cur, Stop => '~');
                            Between : constant Tok_Template :=
                              Compile_Tokens (Cur, Stop => '~');
-                           Post : constant Tok_Template :=
+                           Post    : constant Tok_Template :=
                              Compile_Tokens (Cur, Stop => '~');
                         begin
                            Result :=
@@ -1602,11 +1602,11 @@ package body Pp.Actions is
            (Str : Str_Template_Ptr) return Tok_Template
          is
             Tokens  : aliased Tokn_Vec;
-            Buf     : Buffer  := String_To_Buffer (W_Str (Str.all));
-            Ignored : Boolean :=
+            Buf     : Buffer      := String_To_Buffer (W_Str (Str.all));
+            Ignored : Boolean     :=
               Get_Tokns
                 (Buf, Tokens, Utils.Ada_Version, Lang => Template_Lang);
-            Cur : Tokn_Cursor := First (Tokens'Unchecked_Access);
+            Cur     : Tokn_Cursor := First (Tokens'Unchecked_Access);
          begin
             pragma Assert (Kind (Cur) = Start_Of_Input);
             Next (Cur);
@@ -2085,7 +2085,7 @@ package body Pp.Actions is
               (case Kind is
                  when Ada_Attribute_Ref | Ada_Update_Attribute_Ref =>
                    PP_Attribute_Casing (Cmd),
-                 when Ada_Pragma_Node       => PP_Pragma_Casing (Cmd),
+                 when Ada_Pragma_Node => PP_Pragma_Casing (Cmd),
                  when Ada_Enum_Literal_Decl => PP_Enum_Casing (Cmd),
                  when Ada_Type_Decl | Ada_Incomplete_Type_Decl |
                    Ada_Incomplete_Tagged_Type_Decl | Ada_Subtype_Decl |
@@ -2093,7 +2093,7 @@ package body Pp.Actions is
                    Ada_Protected_Type_Decl | Ada_Generic_Formal_Type_Decl =>
                    PP_Type_Casing (Cmd),
                  when Ada_Number_Decl => PP_Number_Casing (Cmd),
-                 when Null_Kind       =>
+                 when Null_Kind =>
                    --                   (if PP_Name_Casing (Cmd) = As_Declared then Mixed
 --                    else PP_Name_Casing (Cmd)),
          PP_Name_Casing (Cmd),
@@ -2264,7 +2264,7 @@ package body Pp.Actions is
             declare
                Last_LBI : constant Line_Break_Index :=
                  All_LBI (Last (All_LBI));
-               Last_LB : Line_Break renames All_LB (Last_LBI);
+               Last_LB  : Line_Break renames All_LB (Last_LBI);
             begin
                if Hard
                  and then Scanner.Kind (Last (New_Tokns'Access)) =
@@ -2652,9 +2652,9 @@ package body Pp.Actions is
 
                      declare
                         pragma Assert (Prev_With.Kind = Ada_With_Clause);
-                        With_Names : constant Name_List :=
+                        With_Names   : constant Name_List :=
                           F_Packages (Prev_With);
-                        Next_Subtree : constant Ada_Tree :=
+                        Next_Subtree : constant Ada_Tree  :=
                           Subtree (Tree, Index + 1);
                      begin
                         if Next_Subtree.Kind = Ada_Use_Package_Clause then
@@ -2974,13 +2974,13 @@ package body Pp.Actions is
             end if;
 
             case Tree.Kind is
-               when Ada_Type_Decl          |
-                 Ada_Task_Type_Decl        |
-                 Ada_Protected_Type_Decl   |
-                 Ada_Single_Task_Decl      |
+               when Ada_Type_Decl |
+                 Ada_Task_Type_Decl |
+                 Ada_Protected_Type_Decl |
+                 Ada_Single_Task_Decl |
                  Ada_Single_Protected_Decl |
-                 Ada_Subp_Body             |
-                 Ada_Package_Decl          | -- ???(non lib unit)
+                 Ada_Subp_Body |
+                 Ada_Package_Decl | -- ???(non lib unit)
 
                  Ada_Package_Body | Ada_Task_Body | Ada_Protected_Body |
                  Ada_Entry_Body | Ada_Generic_Subp_Decl |
@@ -3153,7 +3153,7 @@ package body Pp.Actions is
             pragma Assert
               (Subtree (Tree, 3).As_Range_Spec.F_Range.As_Bin_Op.F_Op =
                Ada_Op_Double_Dot);
-            R : constant Ada_Tree :=
+            R     : constant Ada_Tree       :=
               Subtree (Tree, 3).As_Range_Spec.F_Range.As_Ada_Node;
             Subts : constant Ada_Tree_Array :=
               Subtrees (Tree) (1 .. 2) & Subtrees (R);
@@ -3274,7 +3274,7 @@ package body Pp.Actions is
                        Subtree_Count (Tree.As_Aggregate_Assoc.F_Designators) =
                        1
                      else True);
-                  Vertical : constant Boolean :=
+                  Vertical    : constant Boolean :=
                     Tree.Kind = Ada_Aggregate_Assoc
                     and then Is_Vertical_Aggregate
                       (Tree.As_Aggregate_Assoc.F_R_Expr);
@@ -3340,12 +3340,12 @@ package body Pp.Actions is
          procedure Do_Bin_Op
            (Tree : Ada_Tree; Is_Right : Boolean; Cur_Level : Nesting_Level)
          is
-            Expr       : constant Bin_Op  := Tree.As_Bin_Op;
-            Oper       : constant Ada_Op  := F_Op (Expr);
-            Is_Short_C : constant Boolean :=
+            Expr       : constant Bin_Op   := Tree.As_Bin_Op;
+            Oper       : constant Ada_Op   := F_Op (Expr);
+            Is_Short_C : constant Boolean  :=
               Oper in Ada_Op_And_Then | Ada_Op_Or_Else;
-            Arg1 : constant Ada_Tree := F_Left (Expr).As_Ada_Node;
-            Arg2 : constant Ada_Tree := F_Right (Expr).As_Ada_Node;
+            Arg1       : constant Ada_Tree := F_Left (Expr).As_Ada_Node;
+            Arg2       : constant Ada_Tree := F_Right (Expr).As_Ada_Node;
 
          --  The arguments can't have lower precedence than the expression as
          --  a whole; that's what precedence means -- you need parens to put
@@ -3554,7 +3554,7 @@ package body Pp.Actions is
 
                when Ada_Int_Literal | Ada_Real_Literal =>
                   declare
-                     Sharp : constant Natural :=
+                     Sharp      : constant Natural :=
                        (if Find (S, "#") /= 0 then Find (S, "#")
                         else Find (S, ":"));
                      Underscore : constant Natural := Find (S, "_");
@@ -3734,7 +3734,7 @@ package body Pp.Actions is
                      Ada_Accept_Stmt | Ada_Accept_Stmt_With_Stmts
                then False
                else Present (Parent_Tree.As_Subp_Spec.F_Subp_Returns));
-            Param_Count : Query_Count :=
+            Param_Count : Query_Count      :=
               Subtree_Count (Tree.As_Params.F_Params);
          begin
             if Is_Function then
@@ -3751,13 +3751,13 @@ package body Pp.Actions is
          end Do_Params;
 
          procedure Do_Subp_Spec is
-            Params : constant Param_Spec_List :=
+            Params      : constant Param_Spec_List :=
               (if Present (Tree.As_Subp_Spec.F_Subp_Params) then
                  F_Params (Tree.As_Subp_Spec.F_Subp_Params)
                else No_Param_Spec_List);
-            Is_Function : constant Boolean :=
+            Is_Function : constant Boolean         :=
               Present (Tree.As_Subp_Spec.F_Subp_Returns);
-            Param_Count : Query_Count := Subtree_Count (Params);
+            Param_Count : Query_Count              := Subtree_Count (Params);
          begin
             if Is_Function then
                Param_Count :=
@@ -3967,16 +3967,16 @@ package body Pp.Actions is
          procedure Do_Def_Or_Usage_Name is
             Def : constant Boolean := Is_Def_Name (Tree.As_Base_Id);
 
-            Decl : constant Basic_Decl :=
+            Decl     : constant Basic_Decl :=
               (if Def then Tree.Parent.As_Basic_Decl
                elsif Arg (Cmd, Syntax_Only) then No_Basic_Decl
                else Denoted_Decl (Tree.As_Base_Id));
-            Def_Name : constant Base_Id :=
+            Def_Name : constant Base_Id    :=
               Denoted_Def_Name (Decl, Tree.As_Base_Id);
             pragma Assert (if Def then Def_Name = Tree.As_Base_Id);
-            K : constant Ada_Node_Kind_Type :=
+            K           : constant Ada_Node_Kind_Type :=
               (if Decl.Is_Null then Null_Kind else Decl.Kind);
-            With_Casing : constant W_Str :=
+            With_Casing : constant W_Str              :=
               Id_With_Casing
                 (Id_Name (Def_Name), Kind => K, Is_Predef => False);
          --  ???Is_Predef is wrong.
@@ -4437,10 +4437,10 @@ package body Pp.Actions is
               Remove_Extra_Line_Breaks (Add_CR => Out_File_Format = CRLF);
             Out_Buf : Buffer renames Lines_Data.Out_Buf;
             Junk1 : W_Str renames Elems (Out_Vec) (1 .. Last_Index (Out_Vec));
-            Last2   : constant Natural :=
+            Last2   : constant Natural      :=
               Last_Position (Out_Buf) -
               (if Last_Element (Input) = ASCII.LF then 0 else 1);
-            Junk2 : W_Str renames Elements (Out_Buf) (1 .. Last2);
+            Junk2   : W_Str renames Elements (Out_Buf) (1 .. Last2);
             pragma Assert -- ????????????????Won't work on windows
               (if Arg (Cmd, Source_Line_Breaks) then
                  (if Out_File_Format /= CRLF then Junk1 = Junk2));
@@ -4514,8 +4514,8 @@ package body Pp.Actions is
            (case Output_Mode is
               when Pipe => "", -- not used
 
-              when Output        => Arg (Cmd, Output).all,
-              when Output_Force  => Arg (Cmd, Output_Force).all,
+              when Output => Arg (Cmd, Output).all,
+              when Output_Force => Arg (Cmd, Output_Force).all,
               when Replace_Modes =>
                 Normalize_Pathname
                   (File_Name, Resolve_Links => Resolve_Links,
@@ -4643,7 +4643,7 @@ package body Pp.Actions is
          Out_File   : File_Descriptor := Standout;
          Out_String : String renames
            Elems (Out_Vec) (1 .. Last_Index (Out_Vec));
-         Status : Boolean;
+         Status     : Boolean;
          use System.WCh_Con;
       begin
          --  ???
@@ -4717,7 +4717,7 @@ package body Pp.Actions is
                else Compose
                    (Arg (Cmd, Output_Directory).all,
                     Simple_Name (Backup_Simple_Name)));
-            Success : Boolean;
+            Success            : Boolean;
             use Wide_Text_IO;
          begin
             if Output_Mode = Replace_Backup
@@ -4751,7 +4751,7 @@ package body Pp.Actions is
          Messages : Scanner.Source_Message_Vector;
          use Scanner.Source_Message_Vectors;
          use type Ada.Containers.Count_Type;
-         In_Range : constant Char_Subrange :=
+         In_Range          : constant Char_Subrange :=
            Utils.Char_Vectors.Char_Vectors.Full_Range (In_Vec);
          Ignored_Out_Range : Char_Subrange;
       begin

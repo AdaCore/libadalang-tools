@@ -54,7 +54,7 @@ package Pp.Formatting is
      Nesting_Level'Base range 0 .. Nesting_Level'Last;
 
    type Line_Break is record
-      Tok : Scanner.Tokn_Cursor;
+      Tok      : Scanner.Tokn_Cursor;
       --  Cursor in New_Tokns or Saved_New_Tokns of the Line_Break_Token. These
       --  become invalid as soon as New_Tokns is modified.
       Tokn_Val : Scanner.Token;
@@ -63,21 +63,21 @@ package Pp.Formatting is
       --  invalidated because the token stream was modified. This can be
       --  removed for better efficiency.
 
-      Hard : Boolean;
+      Hard                      : Boolean;
       --  True for a hard line break, False for a soft one
-      Affects_Comments : Boolean;
+      Affects_Comments          : Boolean;
       --  True if the indentation of this Line_Break should affect the
       --  indentation of surrounding comments. For example, True for '$' but
       --  False for '$1' (see type Ada_Template).
-      Enabled : Boolean;
+      Enabled                   : Boolean;
       --  True if this line break will appear in the final output
       Source_Line_Breaks_Kludge : Boolean; -- ????????????????
       Level                     : Nesting_Level := 1_000;
       --  Nesting level of [...] (continuation-line indentation, mainly for
       --  soft line breaks).
-      Indentation : Natural := 1_000;
+      Indentation               : Natural       := 1_000;
       --  Indentation level of this line break
-      Length : Natural := Natural'Last;
+      Length                    : Natural       := Natural'Last;
       --  Number of characters in line, not counting NL. Calculated by
       --  Split_Lines. Valid only for enabled line breaks.
 
@@ -143,23 +143,23 @@ package Pp.Formatting is
    --  templates, as in "^2".
 
    type Tab_Rec is record
-      Parent, Tree : Libadalang.Analysis.Ada_Node;
+      Parent, Tree       : Libadalang.Analysis.Ada_Node;
       --  Tree is the tree whose template generated this tab, and Parent is its
       --  parent. Tree is used to ensure that the relevant tabs within a single
       --  line all come from the same tree; other tabs in the line are ignored.
       --  Parent is used across lines to ensure that all lines within a
       --  paragraph to be aligned together all come from the same parent tree.
-      Token : Syms.Symbol := Name_Empty;
+      Token              : Syms.Symbol       := Name_Empty;
       --  This is some text associated with the Tab. Usually, it is the text of
       --  the token that follows the Tab in the template.
-      Insertion_Point : Scanner.Tokn_Cursor;
+      Insertion_Point    : Scanner.Tokn_Cursor;
       --  Position in Saved_New_Tokns of the tab token
-      Index_In_Line : Tab_Index_In_Line := Tab_Index_In_Line'Last;
-      Col           : Positive          := Positive'Last;
+      Index_In_Line      : Tab_Index_In_Line := Tab_Index_In_Line'Last;
+      Col                : Positive          := Positive'Last;
       --  Column number of the tab
-      Num_Blanks : Natural := 0;
+      Num_Blanks         : Natural           := 0;
       --  Number of blanks this tab should expand into
-      Is_Fake : Boolean;
+      Is_Fake            : Boolean;
       --  True if this is a "fake tab", which means that it doesn't actually
       --  insert any blanks (Num_Blanks = 0). See Append_Tab for more
       --  explanation.
@@ -171,7 +171,7 @@ package Pp.Formatting is
       --  right-justification.
       --  See Tree_To_Ada.Insert_Alignment.Calculate_Num_Blanks.Process_Line in
       --  pp-formatting.adb for more information.
-      Deleted : Boolean := False;
+      Deleted            : Boolean           := False;
    --  True if this tab has been logically deleted. This happens when a real
    --  tab replaces a fake tab.
    end record;
@@ -232,7 +232,7 @@ package Pp.Formatting is
 
       Enabled_LBI : Line_Break_Index_Vector;
       --  All enabled line breaks
-      Syntax_LBI : Line_Break_Index_Vector;
+      Syntax_LBI  : Line_Break_Index_Vector;
       --  All (enabled) nonblank hard line breaks. These are called
       --  "Syntax_..."  because they are determined by the syntax (e.g. we
       --  always put a line break after a statement).

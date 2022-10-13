@@ -49,7 +49,7 @@ private
      (Complexity_Statement | Complexity_Cyclomatic | Complexity_Essential |
       Contract_Complexity =>
         1,
-      others => 0);
+      others              => 0);
 
    type Metrix;
    type Metrix_Ref is access all Metrix;
@@ -138,9 +138,9 @@ private
 
       Text_Name : Symbol;
       --  Name of the unit, as printed in text output
-      XML_Name : Symbol;
+      XML_Name  : Symbol;
       --  Name of the unit, as printed in XML output
-      LI_Sub : Symbol;
+      LI_Sub    : Symbol;
       --  For the outermost unit, this is a string indicating whether the unit
       --  is a subunit or a library unit. For other units, this is the empty
       --  string.

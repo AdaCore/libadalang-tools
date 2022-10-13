@@ -158,7 +158,7 @@ package body Pp.Buffers is
 --         else
 --            Buf.Cur_Column := Buf.Cur_Column + 1;
 --         end if;
-      Buf.Cur_Char :=
+      Buf.Cur_Char   :=
         (if From_First > Last_Index (Buf.From) then W_NUL
          else Buf.From (From_First));
       Maybe_Move_Marker (Buf);
@@ -288,7 +288,7 @@ package body Pp.Buffers is
             declare
                Mark : constant Marker :=
                  Buf.From_Markers (Buf.From_Markers_First);
-               Rec : Marker_Rec renames Buf.Markers (Mark);
+               Rec  : Marker_Rec renames Buf.Markers (Mark);
 
             begin
                pragma Assert
@@ -344,7 +344,7 @@ package body Pp.Buffers is
 --         else
 --            Buf.Cur_Column := Buf.Cur_Column + 1;
 --         end if;
-      Result :=
+      Result       :=
         (if From_First > Last_Index (Buf.From) then W_NUL
          else Buf.From (From_First));
       Buf.Cur_Char := Result;
@@ -782,7 +782,7 @@ package body Pp.Buffers is
      (Buf                     : in out Buffer; File_Name : String;
       Wide_Character_Encoding :        System.WCh_Con.WC_Encoding_Method :=
         System.WCh_Con.WCEM_Brackets;
-      BOM_Seen : out Boolean; Expand_Tabs : Boolean := False)
+      BOM_Seen                :    out Boolean; Expand_Tabs : Boolean := False)
    is
       --  We read the file into a String, and convert to wide characters
       --  according to the encoding method.
@@ -872,7 +872,7 @@ package body Pp.Buffers is
       Buf.Cur_Char           :=
         (if Buf.From_First > Last_Index (Buf.From) then W_NUL
          else Buf.From (Buf.From_First));
-      Buf.Cur_Column := 1;
+      Buf.Cur_Column         := 1;
 
       --  If there is a Marker pointing to the first character, we need to move
       --  it to To to preserve the invariant.

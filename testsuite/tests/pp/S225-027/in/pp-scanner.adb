@@ -315,7 +315,7 @@ package body Pp.Scanner is
          --  2 is for CR/LF
             if Check_Comment_Length and then K in Comment_Kind then
             declare
-               L : constant Positive :=
+               L            : constant Positive :=
                  (if K in Whole_Line_Comment then X.Num_Lines else 1);
                --  Number of lines in comment
                Expected_Len : constant Positive :=
@@ -487,7 +487,7 @@ package body Pp.Scanner is
             pragma Assert (Kind (Last (V'Unrestricted_Access)) /= Spaces);
             Tok.Sloc.Last :=
               Tok.Sloc.Last - (Tok.Num_Lines - 1) * (Tok.Sloc.Col - 1);
-            Tok.Sloc.Col := 1;
+            Tok.Sloc.Col  := 1;
       end case;
       Append_Tokn (V, Tok, Org);
    end Append_Comment;
@@ -561,7 +561,7 @@ package body Pp.Scanner is
    is
       Tok : Token (X);
    begin
-      Tok.Sloc :=
+      Tok.Sloc  :=
         (First  => 1, Last => (if X = Enabled_LB_Token then 1 else 0),
          others => <>);
       Tok.Index := Index;
@@ -1425,9 +1425,9 @@ package body Pp.Scanner is
 
                   if Preceding_Lexeme /= ''' then
                      declare
-                        RW : constant Reserved_Word_Or_Id :=
+                        RW       : constant Reserved_Word_Or_Id :=
                           Lookup_Reserved_Word (Tok_Text, Ada_Version);
-                        Old_Sloc : constant Source_Location := Tok.Sloc;
+                        Old_Sloc : constant Source_Location     := Tok.Sloc;
                      begin
                         case RW is
                            when Reserved_Word =>
@@ -1461,7 +1461,7 @@ package body Pp.Scanner is
 
          if Assert_Enabled then
             declare
-               Inp : constant W_Str :=
+               Inp  : constant W_Str       :=
                  Buffers.Slice (Input, Tok.Sloc.First, Tok.Sloc.Last);
                L : constant Tokn_Cursor := Last (Result'Unrestricted_Access);
                Outp : constant W_Str       := To_W_Str (Text (L));
@@ -1469,12 +1469,12 @@ package body Pp.Scanner is
                --  Can't assert for comments because block comments
                pragma Assert
                  (case Tok.Kind is when Comment_Kind => True,
-                    when EOL_Token                   =>
+                    when EOL_Token =>
                       Inp in (1 => W_LF) | (W_CR, W_LF) | (1 => W_FF) |
                           (1 => W_VT)
                       and then Outp = (1 => NL),
                     when Reserved_Word => To_Lower (Inp) = Outp,
-                    when others        => Inp = Outp);
+                    when others => Inp = Outp);
             end;
          end if;
       end Append_To_Result;

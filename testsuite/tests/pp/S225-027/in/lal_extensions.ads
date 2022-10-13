@@ -27,7 +27,7 @@ package LAL_Extensions is
      (Node      : Ada_Node'Class;
       Predicate : not null access function
         (Node : Ada_Node'Class) return Boolean;
-      Visit : not null access procedure (Node : Ada_Node'Class));
+      Visit     : not null access procedure (Node : Ada_Node'Class));
    --  Iterate over the tree in depth-first search order, calling Visit for
    --  each node that satisfies the Predicate.
 

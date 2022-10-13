@@ -772,11 +772,11 @@ package body Utils.Fast_Vectors is
    begin
       if Container.Elements = Empty_Elements'Access then
          pragma Assert (Container.Last = 0);
-         New_Elts :=
+         New_Elts           :=
            new Elements_Type (Last => Index_Type'Max (New_Last, 2**10));
          Container.Elements := New_Elts;
       elsif New_Last > Container.Elements.Last then
-         New_Elts :=
+         New_Elts                          :=
            new Elements_Type
              (Last => Index_Type'Max (New_Last, 2 * Container.Last));
          New_Elts.EA (1 .. Container.Last) := Container.Elements.EA;

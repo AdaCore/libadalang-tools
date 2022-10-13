@@ -7,7 +7,7 @@ package Examples is
      (-- minimum value
       Min,
       -- maximum value
-      Max : Integer;
+      Max    : Integer;
       -- Prefix
       Prefix : String)
       --  Is Length of Prefix between Min and Max?

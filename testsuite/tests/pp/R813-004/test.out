@@ -8,10 +8,10 @@ package body P is
        Dsfdsfs     =>
         (Ueirost => Osijdfojarijforjaoggjg.Jsggg,
          Asdfx   => Asdf.Oasfdff),
-       Oijrfsrr  => Uiop.Oijrfsrr,
-       Sdfosf    => Uiop.Sdfosf,
-       Sdfiaosdf => Uiop.Sdfiaosdf,
-       Ddddd     => Uiop.Ddddd);
+       Oijrfsrr    => Uiop.Oijrfsrr,
+       Sdfosf      => Uiop.Sdfosf,
+       Sdfiaosdf   => Uiop.Sdfiaosdf,
+       Ddddd       => Uiop.Ddddd);
   end F;
 
 end P;

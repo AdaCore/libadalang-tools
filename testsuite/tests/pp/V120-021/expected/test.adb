@@ -6,16 +6,16 @@ procedure test is
 
   my_long_named_array_variable : constant my_long_named_type_array :=
    (others => False);
-  my_very_long_long_named_array_aliased_variable :
+  my_very_long_long_named_array_aliased_variable  :
    aliased my_very_long_long_named_type_array :=
    (others => (others => False));
   my_very_long_long_named_array_constant_variable :
    constant my_very_long_long_named_type_array :=
    (others => (others => False));
-  my_very_long_long_named_array_simple_variable :
+  my_very_long_long_named_array_simple_variable   :
    my_very_long_long_named_type_array :=
    (others => (others => False));
-  my_very_long_long_named_array_all_variable :
+  my_very_long_long_named_array_all_variable      :
    aliased constant my_very_long_long_named_type_array :=
    (others => (others => False));
 

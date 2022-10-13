@@ -13,7 +13,7 @@ package Records is
   -- another comment, aligned with 'record' here
   record
     -- yet another comment, aligned with record fields here
-    Nav_Status : Nav_Status_Type;
+    Nav_Status  : Nav_Status_Type;
     -- still another comment, aligned with record fields here
     Test_Status : Test_Status_Type;
   end record;
@@ -36,7 +36,7 @@ package Records is
     -- another comment, aligned with 'record' here
     record
       -- yet another comment, aligned with record fields here
-      Nav_Status : Nav_Status_Type;
+      Nav_Status  : Nav_Status_Type;
       -- still another comment, aligned with record fields here
       Test_Status : Test_Status_Type;
     end record;

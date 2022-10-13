@@ -213,7 +213,7 @@ package body Utils.Drivers is
       procedure Process_Files is
          N_File_Names : constant Natural :=
            Num_File_Names (Cmd) - Arg_Length (Cmd, Ignore);
-         Counter : Natural := N_File_Names;
+         Counter      : Natural          := N_File_Names;
          use Text_IO, Directories;
       begin
          --  First compute the Ignored set by looking at all the --ignored
@@ -351,7 +351,7 @@ package body Utils.Drivers is
       Utils.Main_Done := True;
 
    exception
-      when X : File_Not_Found =>
+      when X : File_Not_Found                                =>
          declare
             use Text_IO, Ada.Exceptions, Utils.Tool_Names;
          begin
@@ -360,7 +360,7 @@ package body Utils.Drivers is
          end;
          Environment.Clean_Up;
          GNAT.OS_Lib.OS_Exit (1);
-      when Utils.Command_Lines.Command_Line_Error =>
+      when Utils.Command_Lines.Command_Line_Error            =>
          --  Error message has already been printed.
          GNAT.Command_Line.Try_Help;
          Environment.Clean_Up;

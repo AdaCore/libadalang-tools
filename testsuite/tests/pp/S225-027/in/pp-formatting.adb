@@ -290,7 +290,7 @@ package body Pp.Formatting is
       Cur_Indentation           : Natural renames Lines_Data.Cur_Indentation;
       Next_Line_Break_Unique_Id : Modular renames
         Lines_Data.Next_Line_Break_Unique_Id;
-      All_LB   : Line_Break_Vector renames Lines_Data.All_LB;
+      All_LB                    : Line_Break_Vector renames Lines_Data.All_LB;
       Temp_LBI : Line_Break_Index_Vector renames Lines_Data.Temp_LBI;
    begin
       Append
@@ -356,10 +356,10 @@ package body Pp.Formatting is
          else Scanner.Leading_Blanks (Comment_Tok));
       --  In Comments_Only mode, we need to indent "by hand" here. In normal
       --  mode, Cur_Indentation will be heeded by the line breaks.
-      Do_Filling : constant Boolean :=
+      Do_Filling     : constant Boolean :=
         Comment_Filling_Enabled (Cmd)
         and then Kind (Comment_Tok) = Fillable_Comment;
-      Text : constant W_Str :=
+      Text           : constant W_Str   :=
         (if Do_Filling then Filled_Text (Comment_Tok, Leading_Blanks)
          else To_W_Str (Scanner.Text (Comment_Tok)));
 
@@ -433,7 +433,7 @@ package body Pp.Formatting is
       Do_Filling : constant Boolean :=
         Arg (Cmd, Comments_Only) and then Comment_Filling_Enabled (Cmd)
         and then Kind (Comment_Tok) = Fillable_Comment;
-      Text_NL : constant W_Str :=
+      Text_NL    : constant W_Str   :=
         (if Do_Filling then Filled_Text (Comment_Tok)
          else To_W_Str (Scanner.Text (Comment_Tok)));
       pragma Assert (Text_NL (Text_NL'Last) = NL);
@@ -589,9 +589,9 @@ package body Pp.Formatting is
                Lines_Data : Lines_Data_Rec renames Lines_Data_P.all;
                Out_Buf    : Buffer renames Lines_Data.Out_Buf;
                Out_Tokns  : Scanner.Tokn_Vec renames Lines_Data.Out_Tokns;
-               Ignored    : Boolean :=
+               Ignored    : Boolean     :=
                  Get_Tokns (Out_Buf, Out_Tokns, Utils.Ada_Version);
-               Out_Tok : Tokn_Cursor := First (Out_Tokns'Access);
+               Out_Tok    : Tokn_Cursor := First (Out_Tokns'Access);
             begin
                Outer_Loop :
                while not After_Last (Out_Tok) loop
@@ -912,7 +912,7 @@ package body Pp.Formatting is
       if Enable_Token_Mismatch then
          declare
             use Scanner;
-            Num_Toks : constant Tokn_Index := 8;
+            Num_Toks      : constant Tokn_Index  := 8;
             --  Number of tokens before and after the mismatch to print
             First_Src_Tok : constant Tokn_Cursor := Pred (Src_Tok, Num_Toks);
             Last_Src_Tok  : constant Tokn_Cursor := Succ (Src_Tok, Num_Toks);
@@ -1650,7 +1650,7 @@ package body Pp.Formatting is
                declare
                   LBI : constant Line_Break_Index :=
                     Line_Break_Token_Index (P);
-                  LB : Line_Break renames All_LB (LBI);
+                  LB  : Line_Break renames All_LB (LBI);
                begin
                   Append_Tokn (Tokns, P);
                   LB.Tok      := Last (Tokns'Unrestricted_Access);
@@ -1725,7 +1725,7 @@ package body Pp.Formatting is
          F_Pos : constant Natural := Sloc_First (Next (LB_Tok (First)));
          L_Pos : constant Natural := Sloc_First (LB_Tok (Last));
 
-         Leading_Blank : constant Natural :=
+         Leading_Blank  : constant Natural :=
            (if
               not First.Hard and then L_Pos > F_Pos + 1
               and then Kind (Next (LB_Tok (First))) = Spaces
@@ -2450,11 +2450,11 @@ package body Pp.Formatting is
             if Kind (New_Tok) = '(' then
                if Is_Empty (Paren_Stack) then
                   declare
-                     LB : Line_Break renames
+                     LB                     : Line_Break renames
                        All_LB (Enabled_LBI (Enabled_Cur_Line - 1));
                      New_Enabled_Line_Start : constant Positive :=
                        Sloc_First (LB_Tok (LB)) + 1;
-                     New_This_Line_Start : constant Positive :=
+                     New_This_Line_Start    : constant Positive :=
                        Sloc_First (New_Line_Start_Out);
                   begin
                      if New_Enabled_Line_Start = New_This_Line_Start then
@@ -2586,7 +2586,7 @@ package body Pp.Formatting is
 
          procedure Insert_End_Of_Line_Comment is
             pragma Assert (Enabled_Cur_Line > 1);
-            Prev_LB : Line_Break renames
+            Prev_LB              : Line_Break renames
               All_LB (Enabled_LBI (Enabled_Cur_Line - 1));
             LB : Line_Break renames All_LB (Enabled_LBI (Enabled_Cur_Line));
             Indentation          : constant Natural     := Prev_LB.Indentation;
@@ -2613,7 +2613,7 @@ package body Pp.Formatting is
                At_LB         :=
                  Kind (Prev (New_Tok)) = Disabled_LB_Token
                  or else Kind (Prev (New_Tok)) = Tab_Token;
-               New_Space_NL := Pending_Space and At_LB;
+               New_Space_NL  := Pending_Space and At_LB;
             end if;
 
          --  If we're just before a blank followed by NL, move past the blank,
@@ -2630,7 +2630,7 @@ package body Pp.Formatting is
                   New_Pending_Tokns : Tokn_Vec;
                   Pending           : Tokn_Cursor :=
                     First (Pending_Tokns'Unchecked_Access);
-                  Spaces_Found : Boolean := False;
+                  Spaces_Found      : Boolean     := False;
                begin
                   while not After_Last (Pending) loop
                      if Kind (Pending) = Spaces then
@@ -2703,7 +2703,7 @@ package body Pp.Formatting is
             Next_ss (Src_Tok);
          end Insert_End_Of_Line_Comment;
 
-         Pp_On : Boolean := True;
+         Pp_On          : Boolean     := True;
          --  True initially, and if the most recently encountered Pp_Off_Comment
          --  or Pp_On_Comment was Pp_On_Comment.
          Last_Pp_Off_On : Tokn_Cursor := First (Src_Tokns'Access);
@@ -3314,7 +3314,7 @@ package body Pp.Formatting is
                         end if;
 
                         if Kind (New_Tok) /= Enabled_LB_Token then
-                           Indentation :=
+                           Indentation     :=
                              Indentation + L_Paren_Indentation_For_Preserve;
                            Cur_Indentation := Indentation;
                            Append_Temp_Line_Break
@@ -3483,9 +3483,9 @@ package body Pp.Formatting is
          Saved_New_Tokns : Scanner.Tokn_Vec renames Lines_Data.Saved_New_Tokns;
 
          New_Tokns : Scanner.Tokn_Vec renames Lines_Data.New_Tokns;
-         Ignore    : Boolean :=
+         Ignore    : Boolean     :=
            Scanner.Move_Tokns (Target => Saved_New_Tokns, Source => New_Tokns);
-         New_Tok : Tokn_Cursor := First (Saved_New_Tokns'Access);
+         New_Tok   : Tokn_Cursor := First (Saved_New_Tokns'Access);
 
       begin
          pragma Assert (Is_Empty (New_Tokns));
@@ -3500,7 +3500,7 @@ package body Pp.Formatting is
                   declare
                      Index : constant Line_Break_Index :=
                        Line_Break_Token_Index (New_Tok);
-                     LB : Line_Break renames All_LB (Index);
+                     LB    : Line_Break renames All_LB (Index);
                   begin
                      if LB.Enabled then
                         Append_Line_Break_Tokn
@@ -4063,7 +4063,7 @@ package body Pp.Formatting is
             --  Sloc_Col of this is the length of the current line, not
             --  counting any spaces we have inserted.
             pragma Assert (Kind (Next_Line_Break) = Enabled_LB_Token);
-            Num_Spaces : Natural := 0;
+            Num_Spaces   : Natural  := 0;
             --  Number of spaces inserted in the current line so far
             Cur_Line_Num : Positive := 1; -- for errors
          begin
@@ -4084,7 +4084,7 @@ package body Pp.Formatting is
 
                   when Tab_Token =>
                      declare
-                        Tab_X : constant Tab_Index :=
+                        Tab_X    : constant Tab_Index :=
                           Tab_Token_Index (New_Tok);
                         Tab      : Tab_Rec renames Tabs (Tab_X);
                         Next_Tab : Tab_Rec renames Tabs (Tab_X + 1);
@@ -4101,7 +4101,7 @@ package body Pp.Formatting is
                            end if;
 
                            declare
-                              Line_Len : constant Natural :=
+                              Line_Len     : constant Natural :=
                                 Sloc_Col (Next_Line_Break) + Num_Spaces - 1;
                               --  Current length of current line
                               New_Line_Len : constant Natural :=

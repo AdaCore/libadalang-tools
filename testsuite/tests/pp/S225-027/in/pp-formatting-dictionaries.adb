@@ -240,7 +240,7 @@ package body Pp.Formatting.Dictionaries is
       C  : constant Name_Sets.Cursor :=
         (case Exception_Kind is
            when Whole_Word => Find (Whole_Word_Exceptions, Id),
-           when Subword    => Find (Subword_Exceptions, Id));
+           when Subword => Find (Subword_Exceptions, Id));
    begin
       return (if Has_Element (C) then Element (C) else Syms.No_Symbol);
    end Find_In_Dictionary;

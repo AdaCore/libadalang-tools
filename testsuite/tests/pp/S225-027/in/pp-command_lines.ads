@@ -356,8 +356,8 @@ package Pp.Command_Lines is
    function PP_Pragma_Casing
      (Cmd : Cmd_Line) return Lower_Upper_Mixed_PP_Casing is
      (case Pragma_Casing'(Arg (Cmd)) is when Pragma_Mixed_Case => Mixed,
-        when Pragma_Lower_Case                                 => Lower_Case,
-        when Pragma_Upper_Case                                 => Upper_Case);
+        when Pragma_Lower_Case => Lower_Case,
+        when Pragma_Upper_Case => Upper_Case);
    --  Specifies the casing of pragma names and identifiers specific to
    --  pragmas
 
@@ -365,7 +365,7 @@ package Pp.Command_Lines is
      (case Name_Casing'(Arg (Cmd)) is
         when Name_Case_As_Declared => As_Declared,
         when Name_Mixed_Case => Mixed, when Name_Lower_Case => Lower_Case,
-        when Name_Upper_Case       => Upper_Case);
+        when Name_Upper_Case => Upper_Case);
    --  Defines the casing for both defining and usage occurrences of the
    --  names
 
@@ -373,7 +373,7 @@ package Pp.Command_Lines is
      (case Enum_Casing'(Arg (Cmd)) is
         when Enum_Case_As_Declared => PP_Name_Casing (Cmd),
         when Enum_Mixed_Case => Mixed, when Enum_Lower_Case => Lower_Case,
-        when Enum_Upper_Case       => Upper_Case);
+        when Enum_Upper_Case => Upper_Case);
    --  Defines the casing for both defining and usage occurrences of the
    --  enumeration literals.
 
@@ -381,7 +381,7 @@ package Pp.Command_Lines is
      (case Type_Casing'(Arg (Cmd)) is
         when Type_Case_As_Declared => PP_Name_Casing (Cmd),
         when Type_Mixed_Case => Mixed, when Type_Lower_Case => Lower_Case,
-        when Type_Upper_Case       => Upper_Case);
+        when Type_Upper_Case => Upper_Case);
    --  Defines the casing for both defining and usage occurrences of the
    --  type (and subtype???) names.
 
@@ -389,7 +389,7 @@ package Pp.Command_Lines is
      (case Number_Casing'(Arg (Cmd)) is
         when Number_Case_As_Declared => PP_Name_Casing (Cmd),
         when Number_Mixed_Case => Mixed, when Number_Lower_Case => Lower_Case,
-        when Number_Upper_Case       => Upper_Case);
+        when Number_Upper_Case => Upper_Case);
    --  Defines the casing for both defining and usage occurrences of the
    --  named numbers names.
 

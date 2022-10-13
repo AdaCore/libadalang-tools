@@ -23,7 +23,7 @@ package body LAL_Extensions is
      (Node      : Ada_Node'Class;
       Predicate : not null access function
         (Node : Ada_Node'Class) return Boolean;
-      Visit : not null access procedure (Node : Ada_Node'Class))
+      Visit     : not null access procedure (Node : Ada_Node'Class))
    is
 
       function Visit_If_Predicate (Node : Ada_Node'Class) return Visit_Status;
@@ -186,14 +186,14 @@ package body LAL_Extensions is
            when Ada_Expr_Function => Decl.As_Expr_Function.F_Aspects,
            when Ada_Null_Subp_Decl => Decl.As_Null_Subp_Decl.F_Aspects,
            when Ada_Subp_Renaming_Decl => Decl.As_Subp_Renaming_Decl.F_Aspects,
-           when Ada_Subp_Decl                  => Decl.As_Subp_Decl.F_Aspects,
+           when Ada_Subp_Decl => Decl.As_Subp_Decl.F_Aspects,
            when Ada_Package_Body_Stub => Decl.As_Package_Body_Stub.F_Aspects,
            when Ada_Subp_Body_Stub => Decl.As_Subp_Body_Stub.F_Aspects,
            when Ada_Task_Body_Stub => Decl.As_Task_Body_Stub.F_Aspects,
            when Ada_Package_Body => Decl.As_Package_Body.F_Aspects,
            when Ada_Protected_Body => Decl.As_Protected_Body.F_Aspects,
-           when Ada_Subp_Body                  => Decl.As_Subp_Body.F_Aspects,
-           when Ada_Task_Body                  => Decl.As_Task_Body.F_Aspects,
+           when Ada_Subp_Body => Decl.As_Subp_Body.F_Aspects,
+           when Ada_Task_Body => Decl.As_Task_Body.F_Aspects,
            when Ada_Exception_Decl => Decl.As_Exception_Decl.F_Aspects,
            when Ada_Generic_Subp_Instantiation =>
              Decl.As_Generic_Subp_Instantiation.F_Aspects,
@@ -205,7 +205,7 @@ package body LAL_Extensions is
              Decl.As_Generic_Subp_Renaming_Decl.F_Aspects,
            when Ada_Generic_Subp_Decl =>
              Decl.As_Generic_Subp_Decl.F_Subp_Decl.F_Aspects,
-           when Ada_Object_Decl           => Decl.As_Object_Decl.F_Aspects,
+           when Ada_Object_Decl => Decl.As_Object_Decl.F_Aspects,
            when Ada_Package_Renaming_Decl =>
              Decl.As_Package_Renaming_Decl.F_Aspects,
            when Ada_Single_Protected_Decl =>
@@ -217,8 +217,8 @@ package body LAL_Extensions is
            --  The aspects are on the anonymous task type.
 
            when Ada_Task_Type_Decl => Decl.As_Task_Type_Decl.F_Aspects,
-           when Ada_Type_Decl      => Decl.As_Type_Decl.F_Aspects,
-           when Ada_Subtype_Decl   => Decl.As_Subtype_Decl.F_Aspects,
+           when Ada_Type_Decl => Decl.As_Type_Decl.F_Aspects,
+           when Ada_Subtype_Decl => Decl.As_Subtype_Decl.F_Aspects,
            --  See P415-048:
 --         when ada_Component_Decl =>
 --            F_Aspects (Component_Decl (Decl)),

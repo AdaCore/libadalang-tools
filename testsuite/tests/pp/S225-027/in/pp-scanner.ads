@@ -546,7 +546,7 @@ private
                         --  The following are used to compute the Sloc of the
                         --  EOL_Token token that follows the comment.
 
-                        Num_Lines : Positive;
+                        Num_Lines     : Positive;
                         --  Number of lines in the comment; this can be greater
                         --  than one for comments combined into a fillable
                         --  comment "paragraph".

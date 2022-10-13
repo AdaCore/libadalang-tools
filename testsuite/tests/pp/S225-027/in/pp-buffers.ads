@@ -236,7 +236,7 @@ package Pp.Buffers is
      (Buf                     : in out Buffer; File_Name : String;
       Wide_Character_Encoding :        System.WCh_Con.WC_Encoding_Method :=
         System.WCh_Con.WCEM_Brackets;
-      BOM_Seen : out Boolean; Expand_Tabs : Boolean := False);
+      BOM_Seen                : out Boolean; Expand_Tabs : Boolean := False);
    --  Read an Ada source file into Buf. BOM_Seen is set to True if a UTF8_All
    --  BOM was seen; False otherwise.
 

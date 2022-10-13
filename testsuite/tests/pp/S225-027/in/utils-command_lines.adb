@@ -917,7 +917,7 @@ package body Utils.Command_Lines is
                   declare
                      Arg : String renames
                        Text_Args (Cur) (First .. Text_Args (Cur)'Last);
-                     S : constant String (1 .. Arg'Length) := Arg;
+                     S   : constant String (1 .. Arg'Length) := Arg;
                   --  Slide it to start at 1
                      begin
                      case Descriptor.Allowed_Switches (Switch).Kind is
