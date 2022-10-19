@@ -1021,8 +1021,7 @@ package body Laltools.Partial_GNATPP is
         or else Pp_Boolean_Switches.Arg
                   (PP_Options, Pp.Command_Lines.Source_Line_Breaks);
 
-      Final_PP_Options : Pp.Command_Lines.Cmd_Line :=
-        Copy_Command_Line (PP_Options);
+      Final_PP_Options : Pp.Command_Lines.Cmd_Line := PP_Options;
 
       procedure Set_Source_Line_Breaks_Switches
         (PP_Options : in out Command_Line);
@@ -1131,8 +1130,6 @@ package body Laltools.Partial_GNATPP is
          Output         => Output,
          Messages       => PP_Messages,
          Partial_Gnatpp => True);
-
-      Clear (Final_PP_Options);
 
       --  In the case of preserving source line breaks switch usage, get the
       --  filtered output of the significant lines based on the initial

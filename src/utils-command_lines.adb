@@ -41,6 +41,113 @@ with Utils.String_Utilities;
 package body Utils.Command_Lines is
    use Ada.Text_IO;
 
+   ----------
+   -- Copy --
+   ----------
+
+   function Copy (String_Refs : String_Ref_Vector)
+                  return String_Ref_Vector is
+   begin
+      return Result : String_Ref_Vector do
+         Result.Set_Length (String_Refs.Length);
+         for J in Positive'First .. String_Refs.Last_Index loop
+            if String_Refs (J) /= null then
+               Result (J) := new String'(String_Refs (J).all);
+            else
+               Result (J) := null;
+            end if;
+         end loop;
+      end return;
+   end Copy;
+
+   -------------
+   -- Destroy --
+   -------------
+
+   procedure Destroy (Vector : in out String_Ref_Vector) is
+   begin
+      for Item of Vector loop
+         if Item /= null then
+            Free (Item);
+         end if;
+      end loop;
+
+      Free (Vector);
+   end Destroy;
+
+   ----------
+   -- Copy --
+   ----------
+
+   function Copy
+     (Switch : Dynamically_Typed_Switch)
+      return Dynamically_Typed_Switch is
+   begin
+      return Result : Dynamically_Typed_Switch := Switch do
+         if Result.Text /= null then
+            Result.Text := new String'(Result.Text.all);
+         end if;
+         case Result.Kind is
+            when String_Switch =>
+               if Result.String_Val /= null then
+                  Result.String_Val := new String'(Result.String_Val.all);
+               end if;
+            when String_Seq_Switch =>
+               Result.Seq_Val := Copy (Result.Seq_Val);
+            when others =>
+               null;
+         end case;
+      end return;
+   end Copy;
+
+   -------------
+   -- Destroy --
+   -------------
+
+   procedure Destroy (Object : in out Dynamically_Typed_Switch) is
+   begin
+      if Object.Text /= null then
+         Free (Object.Text);
+      end if;
+      case Object.Kind is
+         when String_Switch =>
+            if Object.String_Val /= null then
+               Free (Object.String_Val);
+            end if;
+         when String_Seq_Switch =>
+            Destroy (Object.Seq_Val);
+         when others =>
+            null;
+      end case;
+   end Destroy;
+
+   ----------
+   -- Copy --
+   ----------
+
+   function Copy
+     (Switches : Dynamically_Typed_Switches)
+      return Dynamically_Typed_Switches is
+   begin
+      return Result : Dynamically_Typed_Switches (Switches'Range) do
+         for J in Result'First .. Result'Last loop
+            Result (J) := Copy (Switches (J));
+         end loop;
+      end return;
+   end Copy;
+
+   ----------
+   -- Copy --
+   ----------
+
+   procedure Destroy
+     (Switches : in out Dynamically_Typed_Switches) is
+   begin
+      for J in Switches'First .. Switches'Last loop
+         Destroy (Switches (J));
+      end loop;
+   end Destroy;
+
    procedure Free is new Ada.Unchecked_Deallocation (String, String_Ref);
 
    procedure Free is new Ada.Unchecked_Deallocation
@@ -586,11 +693,7 @@ package body Utils.Command_Lines is
          if Cmd.Sw (To_All (Switch)).String_Val = null
            or else Cmd.Sw (To_All (Switch)).String_Val.all /= S
          then
-            --  We don't Free the old value, here, because that
-            --  would require Copy_Command_Line to do a deep copy,
-            --  which would probably waste more memory than we're
-            --  leaking here; this procedure is called very rarely.
-
+            Free (Cmd.Sw (To_All (Switch)).String_Val);
             Cmd.Sw (To_All (Switch)).String_Val := new String'(S);
          end if;
       end Set_Arg;
@@ -790,15 +893,31 @@ package body Utils.Command_Lines is
       end return;
    end Copy_Descriptor;
 
-   function Copy_Command_Line (Cmd : Command_Line) return Command_Line is
+   ------------
+   -- Adjust --
+   ------------
+
+   procedure Adjust (Object : in out Command_Line) is
    begin
-      return Result : Command_Line (Cmd.Descriptor) do
-         Result.File_Names := Cmd.File_Names;
-         Result.Current_Position := Cmd.Current_Position;
-         Result.Sw := new Dynamically_Typed_Switches'(Cmd.Sw.all);
-         Result.Error_Detected := Cmd.Error_Detected;
-      end return;
-   end Copy_Command_Line;
+      Object.File_Names := Copy (Object.File_Names);
+      if Object.Sw /= null then
+         Object.Sw := new Dynamically_Typed_Switches'(Copy (Object.Sw.all));
+      end if;
+   end Adjust;
+
+   --------------
+   -- Finalize --
+   --------------
+
+   procedure Finalize (Object : in out Command_Line) is
+   begin
+      Destroy (Object.File_Names);
+
+      if Object.Sw /= null then
+         Destroy (Object.Sw.all);
+         Free (Object.Sw);
+      end if;
+   end Finalize;
 
    function Text_To_Switch
      (Descriptor : Command_Line_Descriptor;
@@ -1221,39 +1340,6 @@ package body Utils.Command_Lines is
    begin
       Sorting.Sort (Cmd.File_Names);
    end Sort_File_Names;
-
-   procedure Clear (Cmd : in out Command_Line) is
-      procedure Destroy (Vector : in out String_Ref_Vector);
-      --  Free contained strings and the Vector
-
-      procedure Destroy (Vector : in out String_Ref_Vector) is
-      begin
-         for Item of Vector loop
-            Free (Item);
-         end loop;
-
-         Free (Vector);
-      end Destroy;
-   begin
-      Destroy (Cmd.File_Names);
-
-      if Cmd.Sw = null then
-         return;
-      end if;
-
-      for Switch in Cmd.Sw'Range loop
-         case Cmd.Sw (Switch).Kind is
-            when String_Switch =>
-               Free (Cmd.Sw (Switch).String_Val);
-            when String_Seq_Switch =>
-               Destroy (Cmd.Sw (Switch).Seq_Val);
-            when others =>
-               null;
-         end case;
-      end loop;
-
-      Free (Cmd.Sw);
-   end Clear;
 
    procedure Clear_File_Names (Cmd : in out Command_Line) is
    begin

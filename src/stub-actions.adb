@@ -562,7 +562,7 @@ package body Stub.Actions is
         Wide_Character_Encoding (Cmd);
       Out_Vec, Pp_Out_Vec : Char_Vector;
 
-      Pp_Cmd : Cmd_Line := Copy_Command_Line (Pp_Base_Cmd);
+      Pp_Cmd : Cmd_Line := Pp_Base_Cmd;
       --  Make a local copy so we can modify it per file
 
       function Get_EOL_Switch return String;
@@ -1211,7 +1211,7 @@ package body Stub.Actions is
       end Write_Output_File;
 
       procedure Process_New_Body is
-         Body_Cmd       : Cmd_Line := Copy_Command_Line (Cmd);
+         Body_Cmd       : Cmd_Line := Cmd;
          Has_Syntax_Err : Boolean := False;
       begin
          Clear_File_Names (Body_Cmd);

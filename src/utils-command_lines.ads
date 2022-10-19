@@ -21,11 +21,13 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Finalization;
+with Ada.Containers.Hashed_Sets; use Ada.Containers;
+
 with GNAT.OS_Lib; use GNAT.OS_Lib;
+with GNAT.String_Hash;
 
 with Utils.Vectors;
-with Ada.Containers.Hashed_Sets; use Ada.Containers;
-with GNAT.String_Hash;
 
 package Utils.Command_Lines is
 
@@ -109,12 +111,12 @@ package Utils.Command_Lines is
    --  adding tool-specific switches. Descriptor must be frozen; the result
    --  is not.
 
-   type Command_Line (Descriptor : Descriptor_Access) is limited private;
+   type Command_Line (Descriptor : Descriptor_Access) is
+     new Ada.Finalization.Controlled with private;
    --  Result of Parse (Step 2). Depends on the command line typed by the user.
 
-   function Copy_Command_Line (Cmd : Command_Line) return Command_Line;
-
-   --  Warn about mixing the wrong Command_Line????
+   procedure Adjust (Object : in out Command_Line);
+   procedure Finalize (Object : in out Command_Line);
 
    type All_Switches is private;
    --  This is conceptually an enumeration type that is the union of all the
@@ -165,6 +167,14 @@ package Utils.Command_Lines is
       String_Ref_Array);
    use String_Ref_Vectors;
    subtype String_Ref_Vector is String_Ref_Vectors.Vector;
+
+   function Copy
+     (String_Refs : String_Ref_Vector)
+      return String_Ref_Vector;
+   --  Returns a deep copy of String_Refs
+
+   procedure Destroy (Vector : in out String_Ref_Vector);
+   --  Free contained strings and the Vector
 
    function Hash_String  is new GNAT.String_Hash.Hash
      (Character, String, Hash_Type);
@@ -534,21 +544,27 @@ package Utils.Command_Lines is
             null; -- Can't happen
          when True_Switch =>
             Boolean_Val : Boolean;
-         --  For Flag_Switches, True if the switch was given. For
-         --  Boolean_Switches, True if the switch was given, False if
-         --  its negation was given (last one wins).
+            --  For Flag_Switches, True if the switch was given. For
+            --  Boolean_Switches, True if the switch was given, False if
+            --  its negation was given (last one wins).
          when Enum_Switch =>
-            Position : Logical_Position;
-         --  If the switch was given, this is its index in the sequence of
-         --  switches processed. If Parse is called multiple times, the current
-         --  position keeps increasing. Within a given Enum switch, the one
-         --  with the last position wins.
+            Position    : Logical_Position;
+            --  If the switch was given, this is its index in the sequence of
+            --  switches processed. If Parse is called multiple times, the
+            --  current position keeps increasing. Within a given Enum switch,
+            --  the one with the last position wins.
          when String_Switch =>
-            String_Val : String_Ref;
+            String_Val  : String_Ref;
          when String_Seq_Switch =>
-            Seq_Val : String_Ref_Vector;
+            Seq_Val     : String_Ref_Vector;
       end case;
    end record; -- Dynamically_Typed_Switch
+
+   function Copy
+     (Switch : Dynamically_Typed_Switch)
+      return Dynamically_Typed_Switch;
+
+   procedure Destroy (Object : in out Dynamically_Typed_Switch);
 
    type Parse_Callback is access procedure
      (Phase : Parse_Phase;
@@ -578,9 +594,6 @@ package Utils.Command_Lines is
    --  Command_Line_Error to be raised. The caller should print the "try
    --  --help" message and exit the program.
 
-   procedure Clear (Cmd : in out Command_Line);
-   --  Reset Cmd to empty value and release used memory
-
    procedure Clear_File_Names (Cmd : in out Command_Line);
    --  Sets the File_Names of Cmd to empty
 
@@ -606,13 +619,13 @@ package Utils.Command_Lines is
    --  'in out'; the caller can modify the file name. This is necessary for
    --  Process_Project. The names are sorted to provide a predictable order.
 
+   procedure Dump_Cmd (Cmd : Command_Line; Verbose : Boolean := False);
+   --  Debugging printout. Without Verbose, skips defaulted args.
+
    function Switch_Text
      (Descriptor : Command_Line_Descriptor;
       Switch     : All_Switches) return String_Ref;
    --  Switch_Text (To_All (Some_Switch)) --> "--some-switch"
-
-   procedure Dump_Cmd (Cmd : Command_Line; Verbose : Boolean := False);
-   --  Debugging printout. Without Verbose, skips defaulted args.
 
    procedure Dump_Descriptor (Descriptor : Command_Line_Descriptor);
 
@@ -735,16 +748,27 @@ private
      array (All_Switches range <>) of Dynamically_Typed_Switch;
    type Dynamically_Typed_Switches_Access is access Dynamically_Typed_Switches;
 
-   type Command_Line (Descriptor : Descriptor_Access) is limited record
-      File_Names       : String_Ref_Vector;
-      Current_Position : Logical_Position                  := 0;
-      Sw               : Dynamically_Typed_Switches_Access := null;
-      Error_Detected   : Boolean                           := False;
+   function Copy
+     (Switches : Dynamically_Typed_Switches)
+      return Dynamically_Typed_Switches;
+   --  Returns a copy of a Dynamically_Typed_Switches
 
-      --  File_Names is the sequence of non-switch arguments. Current_Position
-      --  counts the number of switches encountered. Sw is the switches.
+   procedure Destroy
+     (Switches : in out Dynamically_Typed_Switches);
+
+   type Command_Line (Descriptor : Descriptor_Access) is
+     new Ada.Finalization.Controlled with
+      record
+         File_Names       : String_Ref_Vector;
+         Current_Position : Logical_Position                  := 0;
+         Sw               : Dynamically_Typed_Switches_Access := null;
+         Error_Detected   : Boolean                           := False;
+
+      --  File_Names is the sequence of non-switch arguments.
+      --  Current_Position counts the number of switches encountered.
+      --  Sw is the switches.
       --  Error_Detected is True if Parse detected an error, whether or
       --  not Ignore_Errors is set.
-   end record;
+      end record;
 
 end Utils.Command_Lines;
