@@ -1030,7 +1030,7 @@ package body TGen.Types.Translation is
             if Node.F_Range.As_Bin_Op.F_Right.P_Is_Static_Expr then
                declare
                   Max_Eval : constant Eval_Result :=
-                  Expr_Eval (Node.F_Range.As_Bin_Op.F_Right);
+                    Expr_Eval (Node.F_Range.As_Bin_Op.F_Right);
                begin
                   if Max_Eval.Kind /= Real then
                      raise Translation_Error with
@@ -2852,7 +2852,12 @@ package body TGen.Types.Translation is
 
    begin
       Verbose_Diag := Verbose;
-      Is_Static := Is_Static and then N.P_Is_Static_Decl;
+      Is_Static := Is_Static
+        and then N.P_Is_Static_Decl
+
+      --  The T'Base of a discrete type T has unknown bounds
+
+        and then not (Kind (N) in Ada_Discrete_Base_Subtype_Decl);
 
       if Is_Null (Type_Name) then
 
