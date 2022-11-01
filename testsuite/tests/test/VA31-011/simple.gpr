@@ -1,0 +1,6 @@
+project simple is
+   package gnattest is
+      for skeletons_default use "pass";
+      for Gnattest_Switches use ("--passed-tests=hide");
+   end gnattest;
+end simple;

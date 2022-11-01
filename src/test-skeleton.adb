@@ -2061,6 +2061,22 @@ package body Test.Skeleton is
 
             if not OSub.Is_Null then
 
+               --  We need to go to original declaration of the inherited
+               --  subprogram to have same controlling type as specified
+               --  for the parameter to properly compute inheritance depth.
+               declare
+                  Arr : constant Basic_Decl_Array :=
+                    P_Base_Subp_Declarations (OSub);
+               begin
+                  for J in reverse Arr'Range loop
+                     if Arr (J).Kind /= Ada_Synthetic_Subp_Decl then
+                        OSub := Arr (J);
+                        exit;
+                     end if;
+                  end loop;
+
+               end;
+
                if OSub.Kind = Ada_Expr_Function then
                   Ancestor_Type :=
                     P_Primitive_Subp_Tagged_Type
