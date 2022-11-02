@@ -1,7 +1,7 @@
 abstract project LAL_Tools_Common is
 
-   type Target_type is ("Windows_NT", "unix", "osx");
-   Target : Target_Type := external ("OS", "UNIX");
+   type Target_Type is ("Windows_NT", "unix", "osx");
+   Target : Target_Type := external ("OS", "unix");
 
    type Build_Mode_Type is ("dev", "prod", "AddressSanitizer");
    Build_Mode : Build_Mode_Type := external ("BUILD_MODE", "dev");
