@@ -114,7 +114,7 @@ package body TGen.Types.Int_Types is
          --  that we create to not have empty ranges.
          --  TODO: Remove when V307-012 is closed
 
-         while Low_Bound < LLI_Last and then Low_Bound < R.Max loop
+         while Low_Bound < LLI_Last and then Low_Bound <= R.Max loop
             Result.Append (Int_Range'(Min => Low_Bound, Max => High_Bound));
             Low_Bound := High_Bound + 1;
             Number_Of_Digits := Number_Of_Digits + 1;
@@ -131,7 +131,7 @@ package body TGen.Types.Int_Types is
          Low_Bound        : Big_Integer :=
            Big_Int.Max (-10 ** Number_Of_Digits + 1, R.Min);
       begin
-         while High_Bound > LLI_First and then High_Bound > R.Min loop
+         while High_Bound > LLI_First and then High_Bound >= R.Min loop
             Result.Append (Int_Range'(Min => Low_Bound, Max => High_Bound));
             High_Bound := Low_Bound - 1;
             Number_Of_Digits := Number_Of_Digits + 1;
