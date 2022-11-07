@@ -1026,7 +1026,8 @@ package body Utils.Command_Lines is
          pragma Assert (Descriptor.Allowed_Switches (Alias).Enabled);
          Dyn : Dynamically_Typed_Switch renames Cmd.Sw (Alias);
       begin
-         Dyn.Text := Descriptor.Allowed_Switches (Switch).Text;
+         Dyn.Text :=
+           new String'(Descriptor.Allowed_Switches (Switch).Text.all);
          Dyn.Explicit := True;
 
          case Descriptor.Allowed_Switches (Switch).Kind is
