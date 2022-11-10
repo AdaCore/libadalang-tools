@@ -22,7 +22,6 @@
 ------------------------------------------------------------------------------
 
 with Ada.Assertions;
-with Ada.Characters.Latin_1;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -30,6 +29,8 @@ with GNAT.OS_Lib;
 with GNAT.Strings;
 with GNATCOLL.Opt_Parse; use GNATCOLL.Opt_Parse;
 with GNATCOLL.Projects;
+
+with Laltools.Refactor;
 
 with Langkit_Support.Slocs; use Langkit_Support.Slocs;
 
@@ -44,7 +45,6 @@ with Utils.Command_Lines;
 with Utils.Command_Lines.Common;
 
 with Laltools.Partial_GNATPP;
-with Laltools.Refactor;
 
 --  This procedure defines the partial gnatpp formatting tool
 
@@ -137,6 +137,10 @@ procedure Partial_GNATpp is
      (Context : App_Context;
       Jobs    : App_Job_Context_Array)
    is
+      use Pp.Command_Lines;
+      use Utils.Command_Lines;
+      use Laltools.Partial_GNATPP;
+
       procedure Setup_Pretty_Printer_Switches;
 
       --  Setups PP_Options by doing the first pass and then checks if this
@@ -145,24 +149,16 @@ procedure Partial_GNATpp is
 
       Source_File : constant String := To_String (Args.Source.Get);
 
-      Selection_Range      : constant Source_Location_Range :=
+      Selection_Range : constant Source_Location_Range :=
         (Line_Number (Args.Start_Line.Get),
          Line_Number (Args.End_Line.Get),
          Column_Number (Args.Start_Column.Get),
          Column_Number (Args.End_Column.Get));
 
-      Main_Unit            : Analysis_Unit;
-      Enclosing_Node       : Ada_Node;
+      Unit : constant Analysis_Unit :=
+        Jobs (1).Analysis_Ctx.Get_From_File (Source_File);
 
-      use Pp.Command_Lines;
-      use Utils.Char_Vectors;
-      use Utils.Command_Lines;
-      use Laltools.Partial_GNATPP;
-
-      PP_Options      : Command_Line (Pp.Command_Lines.Descriptor'Access);
-      Output          : Char_Vector;
-      Output_SL_Range : Source_Location_Range;
-      Messages        : Pp.Scanner.Source_Message_Vector;
+      PP_Options : Command_Line (Pp.Command_Lines.Descriptor'Access);
 
       -----------------------------------
       -- Setup_Pretty_Printer_Switches --
@@ -231,49 +227,65 @@ procedure Partial_GNATpp is
    begin
       Setup_Pretty_Printer_Switches;
 
-      Main_Unit := Jobs (1).Analysis_Ctx.Get_From_File (Source_File);
+      if Args.Source_Line_Breaks.Get then
 
-      --  Format the selected range of the text. If the --source-line-breaks
-      --  switch is passed then the formetted text will be filtered and only
-      --  the reformatted initial selected lines will be returned. Otherwise,
-      --  the enclosing parent node will be rewritten, the node is returned
-      --  as value of Formatted_Node parameter in this call.
-      --  This is based on the gnatpp engine and has as entry point the
-      --  Format_Vector of PP.Actions.
+         --  Format the selected range of the text. If the --source-line-breaks
+         --  switch is passed then the formetted text will be filtered and only
+         --  the reformatted initial selected lines will be returned.
+         --  Otherwise, the enclosing parent node will be rewritten, the node
+         --  is returned as value of Formatted_Node parameter in this call.
+         --  This is based on the gnatpp engine and has as entry point the
+         --  Format_Vector of PP.Actions.
 
-      Format_Selection
-        (Main_Unit                => Main_Unit,
-         Input_Selection_Range    => Selection_Range,
-         Output                   => Output,
-         Output_Selection_Range   => Output_SL_Range,
-         PP_Messages              => Messages,
-         Formatted_Node           => Enclosing_Node,
-         PP_Options               => PP_Options,
-         Force_Source_Line_Breaks => Args.Source_Line_Breaks.Get);
+         declare
+            Enclosing_Node  : Ada_Node;
+            Output          : Utils.Char_Vectors.Char_Vector;
+            Output_SL_Range : Source_Location_Range;
+            Messages        : Pp.Scanner.Source_Message_Vector;
 
-      --  Create the text edits to be passed to the IDE related to the
-      --  rewritten selection.
+         begin
 
-      declare
-         Output_Str : constant String :=
-           Char_Vectors.Elems (Output)
-           (1 .. Char_Vectors.Last_Index (Output));
+            Format_Selection
+              (Main_Unit                => Unit,
+               Input_Selection_Range    => Selection_Range,
+               Output                   => Output,
+               Output_Selection_Range   => Output_SL_Range,
+               PP_Messages              => Messages,
+               Formatted_Node           => Enclosing_Node,
+               PP_Options               => PP_Options,
+               Force_Source_Line_Breaks => Args.Source_Line_Breaks.Get);
 
-         Edits : Partial_Select_Edits;
+            --  Create the text edits to be passed to the IDE related to the
+            --  rewritten selection.
 
-         use Laltools.Refactor;
-      begin
-         Edits := Partial_Select_Edits'
-           (Unit => Main_Unit,
-            Node => Enclosing_Node,
-            Edit => Text_Edit'
-              (Location => Output_SL_Range,
-               Text     => Ada.Strings.Unbounded.To_Unbounded_String
-                 ('^' & Ada.Characters.Latin_1.LF & Output_Str & '$')));
-         Print (Edits);
-      end;
+            declare
+               Output_Str : constant String :=
+                 Utils.Char_Vectors.Char_Vectors.Elems (Output)
+                   (1 .. Utils.Char_Vectors.Char_Vectors.Last_Index (Output));
 
-      New_Line;
+               Edit : Partial_Formatting_Edit;
+
+               use Laltools.Refactor;
+            begin
+               Edit := Partial_Formatting_Edit'
+                 (Diagnostics    => Messages,
+                  Formatted_Node => Enclosing_Node,
+                  Edit           =>
+                    Text_Edit'
+                      (Location => Output_SL_Range,
+                       Text     =>
+                         Ada.Strings.Unbounded.To_Unbounded_String
+                           (Output_Str)));
+               Ada.Text_IO.Put_Line (Image (Edit));
+               New_Line;
+            end;
+         end;
+      else
+         Ada.Text_IO.Put_Line
+           (Image (Format_Selection (Unit, Selection_Range, PP_Options)));
+         New_Line;
+      end if;
+
    end Partial_GNATpp_App_Setup;
 
 begin

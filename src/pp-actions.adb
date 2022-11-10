@@ -21,8 +21,9 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Containers;
 with Ada.Characters.Handling; use Ada.Characters.Handling;
+with Ada.Characters.Latin_1;
+with Ada.Containers;
 with Ada.Exceptions;
 with Ada.Finalization;
 with Ada.Strings.Fixed;
@@ -137,22 +138,22 @@ package body Pp.Actions is
    function Mimic_gcc (Cmd : Command_Line) return Boolean is
      (Arg (Cmd, Outer_Dir) /= null);
 
-   Partial_Gnatpp_Offset : Natural := 0;
+   Partial_GNATPP_Offset : Natural := 0;
    --  This global variable defines an offset for partial-gnatpp based on the
    --  offsets of previous/next sibling of the formatted node.
-   --  This value is set in partial formatting mode by partial_gnatpp by
+   --  This value is set in partial formatting mode by Partial_GNATPP by
    --  get/set accessors defined in the public part of this package and used
    --  later by the indentation pass of the formatting phases.
 
-   procedure Set_Partial_Gnatpp_Offset (Val : Natural) is
+   procedure Set_Partial_GNATPP_Offset (Val : Natural) is
    begin
-      Partial_Gnatpp_Offset := Val;
-   end Set_Partial_Gnatpp_Offset;
+      Partial_GNATPP_Offset := Val;
+   end Set_Partial_GNATPP_Offset;
 
-   function Get_Partial_Gnatpp_Offset return Natural is
+   function Get_Partial_GNATPP_Offset return Natural is
    begin
-      return Partial_Gnatpp_Offset;
-   end Get_Partial_Gnatpp_Offset;
+      return Partial_GNATPP_Offset;
+   end Get_Partial_GNATPP_Offset;
 
    ----------
    -- Init --
@@ -554,10 +555,12 @@ package body Pp.Actions is
    New_Tokns : Scanner.Tokn_Vec renames Lines_Data.New_Tokns;
 
    procedure Tree_To_Ada_2
-     (Root      : Ada_Node;
-      Cmd       : Utils.Command_Lines.Command_Line;
-      Partial   : Boolean;
-      Partial_Gnatpp : Boolean := False);
+     (Root              : Ada_Node;
+      Cmd               : Utils.Command_Lines.Command_Line;
+      Partial           : Boolean;
+      Partial_GNATPP    : Boolean := False;
+      Start_Child_Index : Natural := 0;
+      End_Child_Index   : Natural := 0);
    --  Partial is True if we are not processing an entire file.
 
    --  Hard and soft line breaks:
@@ -1691,6 +1694,7 @@ package body Pp.Actions is
       type Alt_Templates is
         (Empty_Alt,
          Hard_Break_Alt,
+         Semi_Alt,
          Semi_LB_Alt,
          Semi_LB_LB_Alt,
          Semi_Soft,
@@ -1878,6 +1882,7 @@ package body Pp.Actions is
          Str_Alt_Table :=
            [Empty_Alt => L (""),
             Hard_Break_Alt => L ("$"),
+            Semi_Alt => L (";"),
             Semi_LB_Alt => L (";$"),
             Semi_LB_LB_Alt => L (";$$"),
             Semi_Soft => L (";# "),
@@ -2688,10 +2693,12 @@ package body Pp.Actions is
 
    pragma Style_Checks ("M85");
    procedure Tree_To_Ada_2
-     (Root      : Ada_Node;
-      Cmd       : Utils.Command_Lines.Command_Line;
-      Partial   : Boolean;
-      Partial_Gnatpp : Boolean := False)
+     (Root              : Ada_Node;
+      Cmd               : Utils.Command_Lines.Command_Line;
+      Partial           : Boolean;
+      Partial_GNATPP    : Boolean := False;
+      Start_Child_Index : Natural := 0;
+      End_Child_Index   : Natural := 0)
    is
       function Id_With_Casing
         (Id          : W_Str;
@@ -3125,7 +3132,9 @@ package body Pp.Actions is
       is
          procedure Subtrees_To_Ada
            (Tree               : Ada_Tree;
-            Pre, Between, Post : Tok_Template);
+            Pre, Between, Post : Tok_Template;
+            Start_Child_Index  : Natural := 0;
+            End_Child_Index    : Natural := 0);
 
          procedure Interpret_Template
            (TT        : Tok_Template   := Tok_Template_Table (Tree.Kind);
@@ -3425,11 +3434,19 @@ package body Pp.Actions is
 
          procedure Subtrees_To_Ada
            (Tree               : Ada_Tree;
-            Pre, Between, Post : Tok_Template)
+            Pre, Between, Post : Tok_Template;
+            Start_Child_Index  : Natural := 0;
+            End_Child_Index    : Natural := 0)
          is
             pragma Assert (Tree.Kind in Ada_Ada_List);
             Prev_With : With_Clause := No_With_Clause;
             --  See Use_Same_Line below
+
+            Real_Start_Index : constant Natural :=
+              (if Start_Child_Index = 0 then 1 else Start_Child_Index);
+            Real_End_Index   : constant Natural :=
+              (if End_Child_Index = 0 then Subtree_Count (Tree)
+               else End_Child_Index);
          begin
             if Subtree_Count (Tree) = 0 then
                return;
@@ -3437,7 +3454,7 @@ package body Pp.Actions is
 
             Interpret_Template (Pre, Subtrees => Empty_Tree_Array);
 
-            for Index in 1 .. Subtree_Count (Tree) loop
+            for Index in Real_Start_Index .. Real_End_Index loop
                declare
                   Subt : constant Ada_Tree := Subtree (Tree, Index);
 
@@ -3535,7 +3552,7 @@ package body Pp.Actions is
                            Prev_With := No_With_Clause;
                      end case;
 
-                     if Index < Subtree_Count (Tree) then
+                     if Index < Real_End_Index then
                         declare
                            Same_Line : constant Boolean := Use_Same_Line;
                            use Alternative_Templates;
@@ -3562,7 +3579,7 @@ package body Pp.Actions is
                         end;
 
                      else
-                        pragma Assert (Index = Subtree_Count (Tree));
+                        pragma Assert (Index = Real_End_Index);
                         Interpret_Template (Post, Subtrees => Empty_Tree_Array);
                      end if;
                   end if;
@@ -3909,7 +3926,7 @@ package body Pp.Actions is
                   declare
                      Parent : constant Ada_Tree := Parent_Tree;
                   begin
-                     if Partial_Gnatpp then
+                     if Partial_GNATPP then
                         null; --  Insert_Blank_Line_Before := True;
                      else
                         if Parent.Kind in Ada_Ada_List then
@@ -4224,7 +4241,7 @@ package body Pp.Actions is
                  Ada_Begin_Block |
                  Ada_Decl_Block =>
 
-                  if Partial_Gnatpp then
+                  if Partial_GNATPP then
                      Interpret_Alt_Template
                        (Handled_Stmts_With_Begin_Alt_Partial_Mode);
                   else
@@ -4369,11 +4386,12 @@ package body Pp.Actions is
          function Depends_Hack (Tree : Ada_Tree) return Boolean is
          --  True if Tree is an Aspect_Assoc of the form "Depends => (A =>+ B)"
          --  or the same for Refined_Depends.
-           (Tree.Kind = Ada_Aspect_Assoc
-             and then W_Intern (Id_Name (Subtree (Tree, 1))) in
-               Name_Depends | Name_Refined_Depends
-             and then Depends_RHS (Tree).Kind = Ada_Un_Op
-             and then Subtree (Depends_RHS (Tree), 1).Kind = Ada_Op_Plus);
+           (not Tree.Is_Null
+            and then Tree.Kind = Ada_Aspect_Assoc
+            and then W_Intern (Id_Name (Subtree (Tree, 1)))
+                       in Name_Depends | Name_Refined_Depends
+            and then Depends_RHS (Tree).Kind = Ada_Un_Op
+            and then Subtree (Depends_RHS (Tree), 1).Kind = Ada_Op_Plus);
 
          procedure Do_Assoc is
             --  Some have a single name before the "=>", and some have a list
@@ -4495,7 +4513,12 @@ package body Pp.Actions is
          begin
             if Oper = Ada_Op_Double_Dot then
                --  Old gnatpp did this separately from Do_Bin_Op.
-               if Ancestor_Tree (3).Kind = Ada_Derived_Type_Def then
+               if (declare
+                      Ancestor_3 : constant Ada_Node := Ancestor_Tree (3);
+                   begin
+                      not Ancestor_3.Is_Null
+                      and then Ancestor_3.Kind = Ada_Derived_Type_Def)
+               then
                   Interpret_Alt_Template (Dot_Dot_Wrong_Alt);
                elsif Parent_Tree.Kind = Ada_For_Loop_Spec then
                   Interpret_Alt_Template (Dot_Dot_For_Alt);
@@ -4653,11 +4676,34 @@ package body Pp.Actions is
          --  of one element, in which case the Between doesn't matter (e.g.
          --  Defining_Name_List, where there is only one).
          begin
-            Subtrees_To_Ada
-              (Tree,
-               Pre => Tok_Alt_Table (Empty_Alt),
-               Between => Tok_Alt_Table (Hard_Break_Alt),
-               Post => Tok_Alt_Table (Empty_Alt));
+            --  This is a partial format of an Ada_Node_List.
+            if Root = Tree
+              and then Partial_GNATPP
+            then
+               pragma
+                 Assert
+                   (Tree.Parent.Kind in
+                      Ada_Handled_Stmts_Range
+                      | Ada_Declarative_Part_Range
+                      | Ada_Base_Loop_Stmt);
+
+               Subtrees_To_Ada
+                 (Tree,
+                  Pre               => Tok_Alt_Table (Empty_Alt),
+                  Between           => Tok_Alt_Table (Semi_LB_Alt),
+                  Post              => Tok_Alt_Table (Semi_Alt),
+                  Start_Child_Index => Start_Child_Index,
+                  End_Child_Index   => End_Child_Index);
+
+            else
+               pragma
+                 Assert (Start_Child_Index = 0 and End_Child_Index = 0);
+               Subtrees_To_Ada
+                 (Tree,
+                  Pre     => Tok_Alt_Table (Empty_Alt),
+                  Between => Tok_Alt_Table (Hard_Break_Alt),
+                  Post    => Tok_Alt_Table (Empty_Alt));
+            end if;
          end Do_List;
 
          procedure Do_Literal is
@@ -5213,26 +5259,20 @@ package body Pp.Actions is
          begin
             return Id.P_Referenced_Decl;
          exception
-            --  ???At least some of these exceptions are bugs or
-            --  not-yet-implemented features of libadalang.
-
-            when Property_Error =>
-               return No_Basic_Decl;
---  Uncomment the following to recover from libadalang failures:
---            when others =>
---               return No_Basic_Decl;
+            when Property_Error => return No_Basic_Decl;
          end Denoted_Decl;
 
          function Denoted_Def_Name
-           (Decl : Basic_Decl; Id : Base_Id) return Base_Id
-         is
+           (Decl : Basic_Decl;
+            Id   : Base_Id)
+            return Base_Id is
          begin
             if not Decl.Is_Null then
                --  Search through the defining names of the declaration to find
                --  one with the same name.
                --  ???Use Xref instead (see metrics-actions.adb)?
                for Def_Name of Decl.P_Defining_Names
-                 when not Def_Name.Is_Synthetic
+                 when not Def_Name.Is_Null and not Def_Name.Is_Synthetic
                loop
                   if L_Name (Def_Name.P_Relative_Name) = L_Name (Id) then
                      return Def_Name.P_Relative_Name.As_Base_Id;
@@ -5244,10 +5284,8 @@ package body Pp.Actions is
             --  find the defining id, which is why we fallback from the if
             --  above to this return.
             return Id;
---  Uncomment the following to recover from libadalang failures:
---         exception
---            when others =>
---               return Id;
+         exception
+            when Property_Error => return Id;
          end Denoted_Def_Name;
 
          procedure Do_Def_Or_Usage_Name is
@@ -5439,7 +5477,7 @@ package body Pp.Actions is
          --  In Partial Gnatpp mode when the input node is in the list below
          --  the last ';' is not generated and should be added here.
 
-         if Partial_Gnatpp then
+         if Partial_GNATPP then
             declare
                function Needs_Completion return Boolean is
                  (Kind (Tree) in
@@ -5468,12 +5506,12 @@ package body Pp.Actions is
 
          --  In Partial mode, we might need to add a line break. Same for
          --  Source_Line_Breaks.
-         --  No need to add line break in partial_gnatpp mode
+         --  No need to add line break in Partial_GNATPP mode
 
          if Partial or else Arg (Cmd, Source_Line_Breaks)
          then
             if Kind (Last (New_Tokns'Access)) not in Line_Break_Token
-              and then not Partial_Gnatpp
+              and then not Partial_GNATPP
             then
                Append_Line_Break
                  (Hard     => True,
@@ -5494,6 +5532,13 @@ package body Pp.Actions is
             --  there is always one more. We don't need the sentinel in the
             --  token stream.
          end if;
+
+         --  Append last line break. The Kind here doesn't matter.
+         Append_Line_Break
+           (Hard             => True,
+            Affects_Comments => True,
+            Level            => 1,
+            Kind             => Null_Kind);
 
          Scanner.Append_Tokn (New_Tokns, Scanner.End_Of_Input);
 
@@ -5557,12 +5602,14 @@ package body Pp.Actions is
    end Clear_Template_Tables;
 
    procedure Format_Vector
-     (Cmd            : Command_Line;
-      Input          : Char_Vector;
-      Node           : Ada_Node;
-      Output         : out Char_Vector;
-      Messages       : out Pp.Scanner.Source_Message_Vector;
-      Partial_Gnatpp : Boolean := False)
+     (Cmd               : Command_Line;
+      Input             : Char_Vector;
+      Node              : Ada_Node;
+      Output            : out Char_Vector;
+      Messages          : out Pp.Scanner.Source_Message_Vector;
+      Partial_GNATPP    : Boolean := False;
+      Start_Child_Index : Natural := 0;
+      End_Child_Index   : Natural := 0)
    is
       Partial : constant Boolean := Is_Empty (Input);
 
@@ -5643,7 +5690,13 @@ package body Pp.Actions is
          else
             --  Otherwise, convert the tree to text, and then run all the
             --  text-based passes.
-            Tree_To_Ada_2 (Node, Cmd, Partial, Partial_Gnatpp);
+            Tree_To_Ada_2
+              (Node,
+               Cmd,
+               Partial,
+               Partial_GNATPP,
+               Start_Child_Index,
+               End_Child_Index);
             Post_Tree_Phases
               (Input          => Input,
                Lines_Data_P   => Lines_Data'Access,
@@ -5651,7 +5704,7 @@ package body Pp.Actions is
                Src_Buf        => Src_Buf,
                Cmd            => Cmd,
                Partial        => Partial,
-               Partial_Gnatpp => Partial_Gnatpp);
+               Partial_GNATPP => Partial_GNATPP);
          end if;
       end Tree_To_Ada;
 
@@ -5783,13 +5836,10 @@ package body Pp.Actions is
                  --  newline, delete the last LF from the output to match the
                  --  input.
 
-               if not Partial_Gnatpp then
-                  pragma Assert (Last_Element (Result) = W_LF);
-                  if Last_Element (Input) /= ASCII.LF then
-                     Delete_Last (Result);
-                  end if;
+               pragma Assert (Last_Element (Result) = W_LF);
+               if Last_Element (Input) /= ASCII.LF then
+                  Delete_Last (Result);
                end if;
-
             end if;
 
          else
@@ -5841,7 +5891,7 @@ package body Pp.Actions is
 
             --  In partial formatting mode no need to add a last LB at the end
             --  as expected for a whole file formatting.
-            if not Inside_Pp_Off_Region and then not Partial_Gnatpp then
+            if not Inside_Pp_Off_Region and then not Partial_GNATPP then
                if Add_CR then
                   Append (Result, W_CR);
                end if;
@@ -5936,18 +5986,42 @@ package body Pp.Actions is
       Clear_Lines_Data;
 
    exception
-      --  In partial formatting mode whenever an exception is raised we need
-      --  to keep at least the same output as the initial selection in order
-      --  to be able to provide an output even it is not the expected one.
+      --  Whenever an exception is raised we need to keep at least the same
+      --  output as the initial selection in order to be able to provide an
+      --  output even if it is not the expected one.
       --  The clean up should be done in any cases when an exception is issued.
-      when Partial_Gnatpp_Error =>
-         if Partial_Gnatpp then
+      when E : others =>
+         declare
+            Location : constant Langkit_Support.Slocs.Source_Location :=
+              Langkit_Support.Slocs.Start_Sloc (Node.Sloc_Range);
+            Message  : Utils.Char_Vectors.Char_Vector;
+
+            use type Langkit_Support.Slocs.Line_Number;
+            use type Langkit_Support.Slocs.Column_Number;
+         begin
+            Utils.Char_Vectors.Char_Vectors.Append
+              (Message,
+               "GNATPP_Error: Keeping the initial input selection unchanged"
+               & Ada.Characters.Latin_1.LF
+               & Ada.Exceptions.Exception_Information (E));
+            Pp.Scanner.Source_Message_Vectors.Append
+              (Messages,
+               Pp.Scanner.Source_Message'
+                 (Pp.Scanner.Source_Location'
+                      (Line => Positive (Location.Line + 1),
+                       Col  => Positive (Location.Column + 1),
+                       First => 1,
+                       Last => 1),
+                  Message));
+         end;
+
+         if Partial_GNATPP then
             Err_Out.Put
-              ("Partial_Gnatpp_Error: \1 \2\n",
+              ("Partial_GNATPP_Error: \1 \2\n",
                "Keeping the initial input selection unchanged for",
                Node.Image);
-            Output := Input;
          end if;
+         Output := Input;
          Clear_Lines_Data;
    end Format_Vector;
 

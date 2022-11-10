@@ -21,7 +21,8 @@ generic_instantiation.ads(<GenericSubpInstantiation ["Square"] generic_instantia
 *************************************
 generic_instantiation.ads(<GenericPackageInstantiation ["Int_Vectors"] generic_instantiation.ads:29:4-29:81>) - 29:1-29:81
 ^
-   package Int_Vectors is new Generic_Package_Declaration (Integer, Table, "+");$
+   package Int_Vectors is new Generic_Package_Declaration
+     (Integer, Table, "+");$
 *************************************
 
 
