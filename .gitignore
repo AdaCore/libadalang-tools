@@ -11,12 +11,11 @@ testsuite/out
 # Python artifacts
 *.pyc
 
-# External ASIS testsuite
+# Internal testsuite
 asis-testsuite
 testsuite/tests/asis
-
-# Internal testsuite
 internal_testsuite
+testsuite/tests/internal
 
 # Clang artifacts
 .clang-format
