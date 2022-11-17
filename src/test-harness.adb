@@ -3594,7 +3594,7 @@ package body Test.Harness is
          ASCII.HT
          & "$(GPRBUILD) $(BUILDERFLAGS) -P$*.gpr $(GPRFLAGS)"
          & " -o $(notdir $*)$(EXE_EXT) --src-subdirs=gnatcov-instr "
-         & (if Target_Native then "--implicit-with=gnatcov_rts_full" else ""));
+         & "--implicit-with=gnatcov_rts");
       Put_New_Line;
       Put_New_Line;
 
