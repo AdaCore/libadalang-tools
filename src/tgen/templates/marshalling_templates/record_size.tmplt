@@ -13,10 +13,14 @@
    is
    begin
       return @_GLOBAL_PREFIX_@_Nb_Bits : Natural := 0 do
+@@IF@@ @_COMPONENT_SIZE_@ /= ""
 @@TABLE@@
          @_GLOBAL_PREFIX_@_Nb_Bits := @_GLOBAL_PREFIX_@_Nb_Bits +
 @_COMPONENT_SIZE_@
 @@END_TABLE@@
+@@ELSE@@
+         null;
+@@END_IF@@
 @@IF@@ @_VARIANT_SIZE_@ /= ""
 @_VARIANT_SIZE_@
 @@END_IF@@

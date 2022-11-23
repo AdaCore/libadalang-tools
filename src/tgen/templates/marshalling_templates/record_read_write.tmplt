@@ -19,9 +19,13 @@
       @_GLOBAL_PREFIX_@_V      : @_TY_NAME_@)
    is
    begin
+@@IF@@ @_COMPONENT_WRITE_@ /= ""
 @@TABLE@@
 @_COMPONENT_WRITE_@
 @@END_TABLE@@
+@@ELSE@@
+      null;
+@@END_IF@@
 @@IF@@ @_VARIANT_WRITE_@ /= ""
 @_VARIANT_WRITE_@
 @@END_IF@@
@@ -34,9 +38,13 @@
       @_GLOBAL_PREFIX_@_V      : out @_TY_NAME_@)
    is
    begin
+@@IF@@ @_COMPONENT_READ_@ /= ""
 @@TABLE@@
 @_COMPONENT_READ_@
 @@END_TABLE@@
+@@ELSE@@
+      null;
+@@END_IF@@
 @@IF@@ @_VARIANT_READ_@ /= ""
 @_VARIANT_READ_@
 @@END_IF@@

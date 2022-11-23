@@ -82,5 +82,8 @@ package My_File is
 
    function Actual_Ident is new Ident (T => T_Gen);
 
+   type T_Null is null record;
+
+   procedure Use_Null_Rec (X : T_Null) with Import;
 
 end My_File;
