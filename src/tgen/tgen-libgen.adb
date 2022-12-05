@@ -197,6 +197,11 @@ package body TGen.Libgen is
       Put_Line (F_Spec, "use Interfaces;");
       Put_Line (F_Spec, "with Ada.Streams; use Ada.Streams;");
 
+      Put_Line (F_Spec, "package " & Ada_Pack_Name & " is");
+      New_Line (F_Spec);
+
+      Create (F_Body, Out_File, File_Name & ".adb");
+
       --  Also include the needed library support package dependencies, as
       --  the types marshalling / unmarshalling functions may depend on
       --  m / u functions defined in other library support packages.
@@ -215,26 +220,24 @@ package body TGen.Libgen is
       begin
          for T of Typ_Dependencies loop
             Package_Dependency :=
-              Support_Library_Package (T.Get.Package_Name);
-            if Package_Dependency /= Pack_Name
-              and then T.Get.Kind /= Anonymous_Kind
-            then
+              Support_Library_Package
+                (if T.Get.Kind in Anonymous_Kind
+                 then TGen.Types.Constraints.As_Anonymous_Typ (T)
+                        .Named_Ancestor.Get.Package_Name
+                 else T.Get.Package_Name);
+            if Package_Dependency /= Pack_Name then
                Package_Dependencies.Include (Package_Dependency);
             end if;
          end loop;
 
          for Pack_Name of Package_Dependencies loop
             Put_Line
-              (F_Spec,
+              (F_Body,
                "with " & To_Ada (Pack_Name) & "; use " & To_Ada (Pack_Name)
                & ";");
          end loop;
       end;
 
-      Put_Line (F_Spec, "package " & Ada_Pack_Name & " is");
-      New_Line (F_Spec);
-
-      Create (F_Body, Out_File, File_Name & ".adb");
       Put_Line
         (F_Body, "package body " & Ada_Pack_Name & " is");
             New_Line (F_Body);

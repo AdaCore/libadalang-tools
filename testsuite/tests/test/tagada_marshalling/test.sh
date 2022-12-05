@@ -9,6 +9,6 @@ else
     export GPR_PROJECT_PATH=$RTS_PATH:$GPR_PROJECT_PATH
 fi
 mkdir -p test/obj obj
-tgen_marshalling -P test/test.gpr --templates-dir=$TEMPLATES_PATH -o test/tgen_support test/my_file.ads
+tgen_marshalling -P test/test.gpr --templates-dir=$TEMPLATES_PATH -o test/tgen_support test/my_file.ads test/show_date.ads
 gprbuild -q -P test_gen.gpr
 ./obj/example_gen

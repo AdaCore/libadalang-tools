@@ -8,6 +8,8 @@ with Interfaces;                  use Interfaces;
 with My_File;                     use My_File;
 with My_File.TGen_Support;        use My_File.TGen_Support;
 with TGen.TGen_Support;           use TGen.TGen_Support;
+with Show_Date;                   use Show_Date;
+with Show_Date.TGen_Support;      use Show_Date.TGen_Support;
 
 procedure Example_Gen is
 
@@ -156,6 +158,9 @@ procedure Example_Gen is
                 begin
                 Small_Shape_Array'(L => L, Content => (1 .. L => Random_Shape))));
       V2        : R;
+
+      D1 : constant Date := (Year => 2033, Month => January, Day => 23);
+      D2 : Date;
    begin
       if Debug then
          Put_R (V1);
@@ -164,11 +169,13 @@ procedure Example_Gen is
       Create (F, Out_File, File_Name);
       S := Stream (F);
       TGen_Marshalling_R_Output (S, V1);
+      TGen_Marshalling_Date_Output (S, D1);
       Close (F);
 
       Open (F, In_File, File_Name);
       S := Stream (F);
       V2 := TGen_Marshalling_R_Input (S);
+      D2 := TGen_Marshalling_Date_Input (S);
       Close (F);
 
       if Debug then
@@ -177,6 +184,9 @@ procedure Example_Gen is
 
       if V1 /= V2 then
          Ada.Text_IO.Put_Line ("V1 FAIL");
+      end if;
+      if D1 /= D2 then
+         Ada.Text_IO.Put_Line ("D1 FAIL");
       end if;
    end Test;
 
