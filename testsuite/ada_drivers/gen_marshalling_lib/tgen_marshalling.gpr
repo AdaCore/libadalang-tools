@@ -1,7 +1,5 @@
-with "../../../src/tgen/tgen_rts/tgen_rts.gpr";
 with "../../../src/lal_tools.gpr";
 with "libadalang.gpr";
-
 
 project TGen_Marshalling is
     
