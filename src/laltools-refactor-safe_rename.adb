@@ -33,6 +33,8 @@ with Ada.Strings.Unbounded.Text_IO; use Ada.Strings.Unbounded.Text_IO;
 with Ada.Strings.UTF_Encoding; use Ada.Strings.UTF_Encoding;
 with Ada.Text_IO; use Ada.Text_IO;
 
+with GPR2.Project.Registry.Attribute;
+
 with Libadalang.Common; use Libadalang.Common;
 
 package body Laltools.Refactor.Safe_Rename is
@@ -46,25 +48,24 @@ package body Laltools.Refactor.Safe_Rename is
      (Source : String)
       return Unbounded_String renames To_Unbounded_String;
 
+   function Create_Naming_Scheme
+     (Casing          : String;
+      Dot_Replacement : String;
+      Spec_Suffix     : String;
+      Body_Suffix     : String)
+      return Naming_Scheme_Type;
+
    --------------------------
    -- Create_Naming_Scheme --
    --------------------------
 
    function Create_Naming_Scheme
-     (Attribute_Value_Provider : not null Attribute_Value_Provider_Access)
+     (Casing          : String;
+      Dot_Replacement : String;
+      Spec_Suffix     : String;
+      Body_Suffix     : String)
       return Naming_Scheme_Type
    is
-      use GNATCOLL.Projects;
-
-      Casing          : constant String :=
-        Attribute_Value_Provider.all (Casing_Attribute);
-      Dot_Replacement : constant String :=
-        Attribute_Value_Provider.all (Dot_Replacement_Attribute);
-      Spec_Suffix     : constant String :=
-        Attribute_Value_Provider.all (Spec_Suffix_Attribute, "Ada");
-      Body_Suffix     : constant String :=
-        Attribute_Value_Provider.all (Impl_Suffix_Attribute, "Ada");
-
    begin
       return
         Naming_Scheme_Type'
@@ -84,6 +85,33 @@ package body Laltools.Refactor.Safe_Rename is
    exception
       when others => return Invalid_Naming_Scheme;
    end Create_Naming_Scheme;
+
+   function Create_Naming_Scheme
+     (Attribute_Value_Provider : not null GPR2_Attribute_Value_Provider_Access)
+      return Naming_Scheme_Type
+   is (Create_Naming_Scheme
+       (Casing          => Attribute_Value_Provider.all
+          (GPR2.Project.Registry.Attribute.Naming.Casing),
+        Dot_Replacement => Attribute_Value_Provider.all
+          (GPR2.Project.Registry.Attribute.Naming.Dot_Replacement),
+        Spec_Suffix     => Attribute_Value_Provider.all
+          (GPR2.Project.Registry.Attribute.Naming.Spec_Suffix, "Ada"),
+        Body_Suffix     => Attribute_Value_Provider.all
+          (GPR2.Project.Registry.Attribute.Naming.Implementation_Suffix,
+           "Ada")));
+
+   function Create_Naming_Scheme
+     (Attribute_Value_Provider : not null Attribute_Value_Provider_Access)
+      return Naming_Scheme_Type
+   is (Create_Naming_Scheme
+       (Casing          => Attribute_Value_Provider.all
+          (GNATCOLL.Projects.Casing_Attribute),
+        Dot_Replacement => Attribute_Value_Provider.all
+          (GNATCOLL.Projects.Dot_Replacement_Attribute),
+        Spec_Suffix     => Attribute_Value_Provider.all
+          (GNATCOLL.Projects.Spec_Suffix_Attribute, "Ada"),
+        Body_Suffix     => Attribute_Value_Provider.all
+          (GNATCOLL.Projects.Impl_Suffix_Attribute, "Ada")));
 
    --------------
    -- Is_Valid --
@@ -2323,13 +2351,30 @@ package body Laltools.Refactor.Safe_Rename is
       Attribute_Value_Provider : Attribute_Value_Provider_Access := null)
       return Safe_Renamer
    is (((Definition.P_Canonical_Part,
-          New_Name,
-          Algorithm,
-          (if Attribute_Value_Provider = null then
-            Default_Naming_Scheme
-          else
-            Create_Naming_Scheme (Attribute_Value_Provider)),
-          Attribute_Value_Provider)));
+       New_Name,
+       Algorithm,
+       (if Attribute_Value_Provider = null then
+           Default_Naming_Scheme
+        else
+           Create_Naming_Scheme (Attribute_Value_Provider)),
+       Attribute_Value_Provider,
+       null)));
+
+   function Create_Safe_Renamer
+     (Definition               : Defining_Name'Class;
+      New_Name                 : Unbounded_Text_Type;
+      Algorithm                : Problem_Finder_Algorithm_Kind;
+      Attribute_Value_Provider : GPR2_Attribute_Value_Provider_Access := null)
+      return Safe_Renamer
+   is (((Definition.P_Canonical_Part,
+       New_Name,
+       Algorithm,
+       (if Attribute_Value_Provider = null then
+           Default_Naming_Scheme
+        else
+           Create_Naming_Scheme (Attribute_Value_Provider)),
+       null,
+       Attribute_Value_Provider)));
 
    --------------
    -- Refactor --
@@ -2687,12 +2732,21 @@ package body Laltools.Refactor.Safe_Rename is
               and then Enclosing_Basic_Decl.Unit.Root.Kind in
                 Ada_Compilation_Unit_Range
               and then
-                (Self.Attribute_Value_Provider = null
-                 or else Self.Attribute_Value_Provider.all
-                          (GNATCOLL.Projects.Spec_Attribute,
-                           To_UTF8
-                             (Enclosing_Basic_Decl.P_Defining_Name.Text)) =
-                           "")
+                  ((Self.Attribute_Value_Provider = null
+                    and Self.GPR2_Attribute_Value_Provider = null)
+                   or else (Self.Attribute_Value_Provider /= null
+                            and then Self.Attribute_Value_Provider.all
+                              (GNATCOLL.Projects.Spec_Attribute,
+                               To_UTF8
+                                 (Enclosing_Basic_Decl.P_Defining_Name.Text)) =
+                                "")
+                   or else (Self.GPR2_Attribute_Value_Provider /= null
+                            and then Self.GPR2_Attribute_Value_Provider.all
+                              (GPR2.Project.Registry.Attribute.Naming.Spec,
+                               To_UTF8
+                                 (Enclosing_Basic_Decl.P_Defining_Name.Text)) =
+                                ""))
+
             then
                File_Rename.Filepath :=
                  To_Unbounded_String (Reference.Unit.Get_Filename);

@@ -33,6 +33,8 @@ with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
 
 with GNATCOLL.Projects;
 
+with GPR2;
+
 with Langkit_Support.Text; use Langkit_Support.Text;
 
 package Laltools.Refactor.Safe_Rename is
@@ -66,7 +68,22 @@ package Laltools.Refactor.Safe_Rename is
         Default      : String := "";
         Use_Extended : Boolean := False) return String;
 
+   type GPR2_Attribute_Value_Provider_Access is access
+     function
+       (Attribute    : GPR2.Q_Attribute_Id;
+        Index        : String := "";
+        Default      : String := "";
+        Use_Extended : Boolean := False) return String;
+
    type Safe_Renamer is new Refactoring_Tool with private;
+
+   function Create_Safe_Renamer
+     (Definition               : Defining_Name'Class;
+      New_Name                 : Unbounded_Text_Type;
+      Algorithm                : Problem_Finder_Algorithm_Kind;
+      Attribute_Value_Provider : GPR2_Attribute_Value_Provider_Access := null)
+      return Safe_Renamer
+     with Pre => not Definition.Is_Null;
 
    function Create_Safe_Renamer
      (Definition               : Defining_Name'Class;
@@ -111,6 +128,10 @@ private
          Spec_Suffix     : Unbounded_String;
          Body_Suffix     : Unbounded_String;
       end record;
+
+   function Create_Naming_Scheme
+     (Attribute_Value_Provider : not null GPR2_Attribute_Value_Provider_Access)
+      return Naming_Scheme_Type;
 
    function Create_Naming_Scheme
      (Attribute_Value_Provider : not null Attribute_Value_Provider_Access)
@@ -437,11 +458,12 @@ private
    type Safe_Renamer is new Refactoring_Tool with
       record
          --  Canonical Defining_Name that we want to rename
-         Canonical_Definition     : Defining_Name;
-         New_Name                 : Unbounded_Text_Type;
-         Algorithm                : Problem_Finder_Algorithm_Kind;
-         Naming_Scheme            : Naming_Scheme_Type;
-         Attribute_Value_Provider : Attribute_Value_Provider_Access;
+         Canonical_Definition          : Defining_Name;
+         New_Name                      : Unbounded_Text_Type;
+         Algorithm                     : Problem_Finder_Algorithm_Kind;
+         Naming_Scheme                 : Naming_Scheme_Type;
+         Attribute_Value_Provider      : Attribute_Value_Provider_Access;
+         GPR2_Attribute_Value_Provider : GPR2_Attribute_Value_Provider_Access;
       end record;
 
    procedure Add_References_To_Edits
