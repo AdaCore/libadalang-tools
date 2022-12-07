@@ -2,3 +2,5 @@ description:
     basic test for marshalling lib
 
 driver: shell_script
+control:
+    - [XFAIL, '32bits', 'Marshalling not working for 32bits (UB03-008)']

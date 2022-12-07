@@ -90,7 +90,8 @@ class BaseDriver(DiffTestDriver):
     @property
     def test_control_creator(self):
         return YAMLTestControlCreator(
-            {"windows": self.env.target.os.name == "windows"}
+            {"windows": self.env.target.os.name == "windows",
+             "32bits" : self.env.target.cpu.bits == 32}
         )
 
     def set_up(self):
