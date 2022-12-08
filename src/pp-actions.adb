@@ -969,7 +969,9 @@ package body Pp.Actions is
            , Aspects),
            when Ada_Extended_Return_Stmt_Object_Decl =>
              L ("?~,# ~~ ^:? ~~~? ~~~? ~~~ !? ^2:=[# ~~]~!", Aspects),
-           when Ada_No_Type_Object_Renaming_Decl => null,
+            when Ada_No_Type_Object_Renaming_Decl => null,
+              --  TO BE DONE: add support for this node
+              --  L ("! renames ? ~~~? ~~~? ~~~ !", Aspects),
            when Ada_Package_Renaming_Decl =>
              L ("package !!", Aspects),
            when Ada_Single_Protected_Decl =>
@@ -5434,15 +5436,31 @@ package body Pp.Actions is
          --  In Partial Gnatpp mode when the input node is in the list below
          --  the last ';' is not generated and should be added here.
 
-         if Partial_Gnatpp and then
-           Kind (Tree) in Ada_Decl_Block | Ada_Type_Decl | Ada_Object_Decl
-             | Ada_Subp_Body | Ada_Subp_Decl
-             | Ada_Task_Body | Ada_Entry_Decl | Ada_Single_Task_Decl
-             | Ada_Package_Decl | Ada_Package_Body | Ada_Stmt
-         then
-            if Kind (Last (New_Tokns'Access)) not in ';' then
-               Append_And_Put (New_Tokns, ';');
-            end if;
+         if Partial_Gnatpp then
+            declare
+               function Needs_Completion return Boolean is
+                 (Kind (Tree) in
+                      Ada_Decl_Block | Ada_Type_Decl | Ada_Object_Decl
+                    | Ada_Subp_Body | Ada_Subp_Decl | Ada_Subp_Renaming_Decl
+                    | Ada_Abstract_Subp_Decl | Ada_Null_Subp_Decl
+                    | Ada_Generic_Subp_Decl | Ada_Generic_Subp_Instantiation
+                    | Ada_Subtype_Decl | Ada_Incomplete_Type_Decl
+                    | Ada_Incomplete_Tagged_Type_Decl
+                    | Ada_Task_Body | Ada_Entry_Decl | Ada_Single_Task_Decl
+                    | Ada_Package_Decl | Ada_Package_Body
+                    | Ada_Generic_Package_Decl | Ada_Package_Renaming_Decl
+                    | Ada_Generic_Package_Renaming_Decl
+                    | Ada_Generic_Package_Instantiation
+                    | Ada_Exception_Decl | Ada_Number_Decl
+                    | Ada_Stmt);
+               pragma Inline (Needs_Completion);
+            begin
+               if Needs_Completion then
+                  if Kind (Last (New_Tokns'Access)) not in ';' then
+                     Append_And_Put (New_Tokns, ';');
+                  end if;
+               end if;
+            end;
          end if;
 
          --  In Partial mode, we might need to add a line break. Same for

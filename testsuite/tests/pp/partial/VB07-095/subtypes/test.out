@@ -1,0 +1,38 @@
+-----------------------------------------------------------------
+       Subtype declarations testing
+*************************************
+subtype_declarations.ads(<SubtypeDecl ["Red_Blue"] subtype_declarations.ads:25:4-25:32>) - 25:1-25:32
+^
+   subtype Red_Blue is Rainbow;$
+*************************************
+
+*************************************
+subtype_declarations.ads(<SubtypeDecl ["Small_Int"] subtype_declarations.ads:29:4-29:49>) - 29:1-29:49
+^
+   subtype Small_Int is Integer range -10 .. 10;$
+*************************************
+
+*************************************
+subtype_declarations.ads(<SubtypeDecl ["Up_To_K"] subtype_declarations.ads:33:4-33:43>) - 33:1-33:43
+^
+   subtype Up_To_K is Column range 1 .. K;$
+*************************************
+
+*************************************
+subtype_declarations.ads(<SubtypeDecl ["Square"] subtype_declarations.ads:37:4-37:47>) - 37:1-37:47
+^
+   subtype Square is Matrix (1 .. 10, 1 .. 10);$
+*************************************
+
+*************************************
+subtype_declarations.ads(<SubtypeDecl ["Male"] subtype_declarations.ads:60:4-60:37>) - 60:1-60:37
+^
+   subtype Male is Person (Sex => M);$
+*************************************
+
+*************************************
+subtype_declarations.ads(<SubtypeDecl ["Binop_Ref"] subtype_declarations.ads:70:4-70:44>) - 70:1-70:44
+^
+   subtype Binop_Ref is not null Binop_Ptr;$
+*************************************
+

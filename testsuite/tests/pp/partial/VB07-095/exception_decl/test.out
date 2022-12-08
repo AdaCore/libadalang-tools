@@ -1,0 +1,45 @@
+-----------------------------------------------------------------
+       Exception declarations testing
+*************************************
+exception_declaration.ads(<ExceptionDecl ["Singular"] exception_declaration.ads:21:1-21:22>) - 21:1-21:22
+^
+Singular : exception;$
+*************************************
+
+*************************************
+exception_declaration.ads(<ExceptionDecl ["Error"] exception_declaration.ads:22:1-22:22>) - 22:1-22:22
+^
+Error : exception;$
+*************************************
+
+*************************************
+exception_declaration.ads(<ExceptionDecl ["Overflow", "Underflow"] exception_declaration.ads:23:1-23:33>) - 23:1-23:33
+^
+Overflow, Underflow : exception;$
+*************************************
+
+*************************************
+exception_declaration.ads(<PackageDecl ["Exception_Declaration"] exception_declaration.ads:19:1-25:27>) - 21:1-22:22
+^
+   Singular            : exception;
+   Error               : exception;$
+*************************************
+
+*************************************
+exception_declaration.ads(<PackageDecl ["Exception_Declaration"] exception_declaration.ads:19:1-25:27>) - 21:1-23:33
+^
+   Singular            : exception;
+   Error               : exception;
+   Overflow, Underflow : exception;$
+*************************************
+
+*************************************
+exception_declaration.ads(<PackageDecl ["Exception_Declaration"] exception_declaration.ads:19:1-25:27>) - 21:1-24:1
+^
+   Singular            : exception;
+   Error               : exception;
+   Overflow, Underflow : exception;
+
+$
+*************************************
+

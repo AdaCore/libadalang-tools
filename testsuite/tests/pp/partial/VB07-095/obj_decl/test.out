@@ -1,0 +1,214 @@
+-----------------------------------------------------------------
+       Object declarations testing
+    *  Multiple object declarations
+*************************************
+object_declarations.ads(<ObjectDecl ["John", "Paul"] object_declarations.ads:56:4-56:62>) - 56:1-56:62
+^
+   John, Paul : not null Person_Name := new Person (Sex => M);$
+*************************************
+
+*************************************
+object_declarations.ads(<ObjectDecl ["Max"] object_declarations.ads:57:4-57:55>) - 57:1-57:55
+^
+   Max : not null Person_Name := new Person (Sex => M);$
+*************************************
+
+
+    *  Variables declarations
+*************************************
+object_declarations.ads(<ObjectDecl ["Count", "Sum"] object_declarations.ads:63:4-63:26>) - 63:1-63:26
+^
+   Count, Sum : Integer;$
+*************************************
+
+*************************************
+object_declarations.ads(<ObjectDecl ["Size"] object_declarations.ads:64:4-64:49>) - 64:1-64:49
+^
+   Size : Integer range 0 .. 10_000 := 0;$
+*************************************
+
+*************************************
+object_declarations.ads(<ObjectDecl ["Sorted"] object_declarations.ads:65:4-65:35>) - 65:1-65:35
+^
+   Sorted : Boolean := False;$
+*************************************
+
+*************************************
+object_declarations.ads(<ObjectDecl ["Color_Table"] object_declarations.ads:69:4-69:43>) - 69:1-69:43
+^
+   Color_Table : array (1 .. Max) of Color;$
+*************************************
+
+*************************************
+object_declarations.ads(<ObjectDecl ["Option"] object_declarations.ads:72:4-72:58>) - 72:1-72:58
+^
+   Option : Bit_Vector (1 .. 10) := (others => True);$
+*************************************
+
+*************************************
+object_declarations.ads(<ObjectDecl ["Hello"] object_declarations.ads:74:4-74:49>) - 74:1-74:49
+^
+   Hello : aliased String := "Hi, world.";$
+*************************************
+
+*************************************
+object_declarations.ads(<ObjectDecl ["Teta", "Phi"] object_declarations.ads:75:4-75:41>) - 75:1-75:41
+^
+   Teta, Phi : Float range -Pi .. +Pi;$
+*************************************
+
+
+    *  Constants declarations
+*************************************
+object_declarations.ads(<ObjectDecl ["Limit"] object_declarations.ads:81:4-81:43>) - 81:1-81:43
+^
+   Limit : constant Integer := 10_000;$
+*************************************
+
+*************************************
+object_declarations.ads(<ObjectDecl ["Low_Limit"] object_declarations.ads:82:4-82:45>) - 82:1-82:45
+^
+   Low_Limit : constant Integer := Limit / 10;$
+*************************************
+
+*************************************
+object_declarations.ads(<ObjectDecl ["Tolerance"] object_declarations.ads:83:4-83:50>) - 83:1-83:50
+^
+   Tolerance : constant Real := Dispersion (1.15);$
+*************************************
+
+*************************************
+object_declarations.ads(<ObjectDecl ["A_String"] object_declarations.ads:84:4-84:39>) - 84:1-84:39
+^
+   A_String : constant String := "A";$
+*************************************
+
+*************************************
+object_declarations.ads(<ObjectDecl ["Hello_Msg"] object_declarations.ads:85:4-85:55>) - 85:1-85:55
+^
+   Hello_Msg : constant access String := Hello'Access;$
+*************************************
+
+
+-----------------------------------------------------------------
+       Single protected declarations testing
+*************************************
+single_protected_decl.adb(<SingleProtectedDecl ["Obj"] single_protected_decl.adb:36:4-43:12>) - 36:1-43:12
+^
+   protected Obj is
+      --  Operations go here (only subprograms)
+      procedure Set (V : Integer);
+      function Get return Integer;
+   private
+      --  Data goes here
+      Local : Integer := 0;
+   end Obj$
+*************************************
+
+*************************************
+single_protected_decl.adb(<ProtectedBody ["Obj"] single_protected_decl.adb:45:4-57:12>) - 45:1-57:12
+^
+   protected body Obj is
+      --  procedures can modify the data
+      procedure Set (V : Integer) is
+      begin
+         Local := V;
+      end Set;
+
+      --  functions cannot modify the data
+      function Get return Integer is
+      begin
+         return Local;
+      end Get;
+   end Obj$
+*************************************
+
+*************************************
+single_protected_decl.adb(<SingleProtectedDecl ["Shared_Array"] single_protected_decl.adb:59:4-65:21>) - 59:1-65:21
+^
+   protected Shared_Array is
+      --  Index, Item, and Item_Array are global types
+      function Component (N : in Index) return Item;
+      procedure Set_Component (N : in Index; E : in Item);
+   private
+      Table : Item_Array (Index) := (others => Null_Item);
+   end Shared_Array$
+*************************************
+
+*************************************
+single_protected_decl.adb(<ProtectedBody ["Shared_Array"] single_protected_decl.adb:67:4-77:21>) - 67:1-77:21
+^
+   protected body Shared_Array is
+      function Component (N : in Index) return Item is
+      begin
+         return Table (N);
+      end Component;
+
+      procedure Set_Component (N : in Index; E : in Item) is
+      begin
+         Table (N) := E;
+      end Set_Component;
+   end Shared_Array$
+*************************************
+
+
+-----------------------------------------------------------------
+       Single task declarations testing
+*************************************
+single_task_declaration.adb(<SingleTaskDecl ["T"] single_task_declaration.adb:33:4-33:11>) - 33:1-33:11
+^
+   task T;$
+*************************************
+
+*************************************
+single_task_declaration.adb(<TaskBody ["T"] single_task_declaration.adb:35:4-38:10>) - 35:1-38:10
+^
+   task body T is
+   begin
+      Put_Line ("In task T");
+   end T;$
+*************************************
+
+
+-----------------------------------------------------------------
+       Single task declarations package testing
+*************************************
+single_task_decl_pckg.ads(<SingleTaskDecl ["T"] single_task_decl_pckg.ads:32:4-32:11>) - 32:1-32:11
+^
+   task T;$
+*************************************
+
+*************************************
+single_task_decl_pckg.ads(<SingleTaskDecl ["Controller"] single_task_decl_pckg.ads:34:4-36:19>) - 34:1-36:19
+^
+   task Controller is
+      entry Request (Level) (D : Item);  --  a family of entries
+   end Controller;$
+*************************************
+
+*************************************
+single_task_decl_pckg.ads(<SingleTaskDecl ["Parser"] single_task_decl_pckg.ads:38:4-41:8>) - 38:1-41:8
+^
+   task Parser is
+      entry Next_Lexeme (L : in Lexical_Element);
+      entry Next_Action (A : out Parser_Action);
+   end Parser;$
+*************************************
+
+*************************************
+single_task_decl_pckg.ads(<SingleTaskDecl ["User"] single_task_decl_pckg.ads:43:4-43:14>) - 43:1-43:14
+^
+   task User;$
+*************************************
+
+*************************************
+single_task_decl_pckg.adb(<TaskBody ["T"] single_task_decl_pckg.adb:34:4-39:10>) - 34:1-39:10
+^
+   task body T is
+   begin
+      for I in 1 .. 10 loop
+         Put_Line ("hello");
+      end loop;
+   end T;$
+*************************************
+

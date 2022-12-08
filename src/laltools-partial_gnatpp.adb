@@ -379,14 +379,8 @@ package body Laltools.Partial_GNATPP is
       function Is_Relevant_Parent_Kind (Kind : Ada_Node_Kind_Type)
                                         return Boolean
       is
-        (Kind in Ada_Decl_Block |
-         Ada_Package_Body | Ada_Package_Decl |
-         Ada_Subp_Body | Ada_Subp_Decl |
-         Ada_Type_Decl | Ada_Object_Decl |
-         Ada_Entry_Decl |   --  Ada_Entry_Body |
-         Ada_Task_Body | Ada_Single_Task_Decl |
-         Ada_Compilation_Unit |
-         Ada_Stmt);
+        (Kind in Ada_Decl_Block | Ada_Type_Decl | Ada_Compilation_Unit
+           | Ada_Stmt | Ada_Basic_Decl);
 
       function Is_Relevant_Parent_Node
         (Node : Ada_Node'Class) return Boolean is
@@ -716,7 +710,10 @@ package body Laltools.Partial_GNATPP is
          Offset := Natural (Prev_Sibling.Sloc_Range.Start_Column);
 
       elsif Prev_Sibling /= No_Ada_Node then
-         if Kind (Node) in Ada_Subp_Body | Ada_Package_Body then
+         if Kind (Node) in
+               Ada_Subp_Body | Ada_Package_Body | Ada_Package_Decl
+             | Ada_Generic_Package_Renaming_Decl
+         then
             if Prev_Sibling /= No_Ada_Node
               and then Kind (Prev_Sibling) = Ada_Private_Absent
               and then Next_Sibling = No_Ada_Node
@@ -752,8 +749,6 @@ package body Laltools.Partial_GNATPP is
    procedure Filter_Initially_Selected_Lines_From_Output
      (Unit              : Analysis_Unit;
       Initial_SL_Range  : Source_Location_Range;
-      --  Enclosing_Node    : Ada_Node;
-      --  Input_Sel         : Utils.Char_Vectors.Char_Vector;
       Output            : Utils.Char_Vectors.Char_Vector;
       Output_SL_Range   : Source_Location_Range;
       New_Output        : out Utils.Char_Vectors.Char_Vector;
@@ -762,10 +757,6 @@ package body Laltools.Partial_GNATPP is
       use Utils.Char_Vectors;
       use Ada.Characters.Latin_1;
       use Ada.Strings.Unbounded;
-      --
-      --  Output_Str : constant String :=
-      --    Char_Vectors.Elems (Output)
-      --    (1 .. Char_Vectors.Last_Index (Output));
 
       type Selected_Line_Record is
          record
@@ -1088,21 +1079,6 @@ package body Laltools.Partial_GNATPP is
                                           Formatted_Node,
                                           Input_Sel,
                                           Output_Selection_Range);
-      --  Ada.Text_IO.Put_Line
-      --    ("MKU Enclosing_Node = " & Enclosing_Node.Image);
-      --
-      --  Ada.Text_IO.Put_Line
-      --    ("MKU Enclosing_Node START SLOC = ("
-      --     & Enclosing_Node.Sloc_Range.Start_Line'Img & ","
-      --     & Enclosing_Node.Sloc_Range.Start_Column'Img
-      --     & ")");
-      --
-      --  Ada.Text_IO.Put_Line
-      --    ("MKU Enclosing_Node END SLOC = ("
-      --     & Enclosing_Node.Sloc_Range.End_Line'Img & ","
-      --     & Enclosing_Node.Sloc_Range.End_Column'Img
-      --     & ")");
-
       pragma Assert (Formatted_Node /= No_Ada_Node);
 
       --  Determine the offset for the indentation of the enclosing node

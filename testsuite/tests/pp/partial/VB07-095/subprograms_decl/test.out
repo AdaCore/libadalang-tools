@@ -1,0 +1,139 @@
+-----------------------------------------------------------------
+       Subprogram declarations testing
+*************************************
+subprogram_declaration.ads(<SubpDecl ["Traverse_Tree"] subprogram_declaration.ads:23:4-23:28>) - 23:1-23:28
+^
+   procedure Traverse_Tree;$
+*************************************
+
+*************************************
+subprogram_declaration.ads(<SubpDecl ["Increment"] subprogram_declaration.ads:24:4-24:44>) - 24:1-24:44
+^
+   procedure Increment (X : in out Integer);$
+*************************************
+
+*************************************
+subprogram_declaration.ads(<SubpDecl ["Right_Indent"] subprogram_declaration.ads:25:4-25:51>) - 25:1-25:51
+^
+   procedure Right_Indent (Margin : out Line_Size);$
+*************************************
+
+*************************************
+subprogram_declaration.ads(<SubpDecl ["Switch"] subprogram_declaration.ads:26:4-26:45>) - 26:1-26:45
+^
+   procedure Switch (From, To : in out Link);$
+*************************************
+
+*************************************
+subprogram_declaration.ads(<SubpDecl ["Random"] subprogram_declaration.ads:28:4-28:39>) - 28:1-28:39
+^
+   function Random return Probability;$
+*************************************
+
+*************************************
+subprogram_declaration.ads(<SubpDecl ["Min_Cell"] subprogram_declaration.ads:30:4-30:44>) - 30:1-30:44
+^
+   function Min_Cell (X : Link) return Cell;$
+*************************************
+
+*************************************
+subprogram_declaration.ads(<SubpDecl ["Next_Frame"] subprogram_declaration.ads:31:4-31:51>) - 31:1-31:51
+^
+   function Next_Frame (K : Positive) return Frame;$
+*************************************
+
+*************************************
+subprogram_declaration.ads(<SubpDecl ["Dot_Product"] subprogram_declaration.ads:32:4-32:59>) - 32:1-32:59
+^
+   function Dot_Product (Left, Right : Vector) return Real;$
+*************************************
+
+*************************************
+subprogram_declaration.ads(<SubpDecl ["Find"] subprogram_declaration.ads:33:4-33:71>) - 33:1-33:71
+^
+   function Find (B : aliased in out Barrel; Key : String) return Real;$
+*************************************
+
+*************************************
+subprogram_declaration.ads(<SubpDecl [""*""] subprogram_declaration.ads:35:4-35:53>) - 35:1-35:53
+^
+   function "*" (Left, Right : Matrix) return Matrix;$
+*************************************
+
+*************************************
+subprogram_declaration.ads(<SubpDecl ["Print_Header"] subprogram_declaration.ads:38:4-40:42>) - 37:1-40:42
+^
+   --  Subprogram having parameters with default expressions:
+   procedure Print_Header
+     (Pages  : in Natural; Header : in Line := (1 .. Line'Last => ' ');
+      Center : in Boolean := True);$
+*************************************
+
+-----------------------------------------------------------------
+       Null procedure declaration testing
+*************************************
+null_procedure_declaration.ads(<NullSubpDecl ["Simplify"] null_procedure_declaration.ads:23:4-23:57>) - 23:1-23:57
+^
+   procedure Simplify (Expr : in out Expression) is null;$
+*************************************
+
+-----------------------------------------------------------------
+       Abstract subprogram declaration testing
+*************************************
+abstract_subprogram_declaration.ads(<SubtypeDecl ["Element_Type"] abstract_subprogram_declaration.ads:22:5-22:37>) - 22:1-22:37
+^
+    subtype Element_Type is Natural;$
+*************************************
+
+*************************************
+abstract_subprogram_declaration.ads(<ConcreteTypeDecl ["Set"] abstract_subprogram_declaration.ads:23:5-23:45>) - 23:1-23:45
+^
+    type Set is abstract tagged null record;$
+*************************************
+
+*************************************
+abstract_subprogram_declaration.ads(<AbstractSubpDecl ["Empty"] abstract_subprogram_declaration.ads:25:5-25:43>) - 25:1-25:43
+^
+    function Empty return Set is abstract;$
+*************************************
+
+*************************************
+abstract_subprogram_declaration.ads(<AbstractSubpDecl ["Union"] abstract_subprogram_declaration.ads:26:5-26:62>) - 26:1-26:62
+^
+    function Union (Left, Right : Set) return Set is abstract;$
+*************************************
+
+*************************************
+abstract_subprogram_declaration.ads(<AbstractSubpDecl ["Intersection"] abstract_subprogram_declaration.ads:27:5-27:69>) - 27:1-27:69
+^
+    function Intersection (Left, Right : Set) return Set is abstract;$
+*************************************
+
+*************************************
+abstract_subprogram_declaration.ads(<AbstractSubpDecl ["Unit_Set"] abstract_subprogram_declaration.ads:28:5-28:70>) - 28:1-28:70
+^
+    function Unit_Set (Element : Element_Type) return Set is abstract;$
+*************************************
+
+*************************************
+abstract_subprogram_declaration.ads(<AbstractSubpDecl ["Take"] abstract_subprogram_declaration.ads:29:5-30:51>) - 29:1-30:51
+^
+    procedure Take (Element : out Element_Type; From : in out Set) is abstract;$
+*************************************
+
+-----------------------------------------------------------------
+       Expression function declaration testing
+*************************************
+expression_function_declaration.ads(<ConcreteTypeDecl ["Point"] expression_function_declaration.ads:28:4-30:15>) - 28:1-30:15
+^
+   type Point is tagged record
+      X, Y : Real := 0.0;
+   end record;$
+*************************************
+
+*************************************
+expression_function_declaration.ads(<ExprFunction ["Is_Origin"] expression_function_declaration.ads:32:4-33:30>) - 32:1-33:30
+^
+   function Is_Origin (P : in Point) return Boolean is (P.X = 0.0 and P.Y = 0.0)$
+*************************************
+

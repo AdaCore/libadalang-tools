@@ -1,0 +1,445 @@
+*************************************
+main.adb(<SubpBody ["Main"] main.adb:1:1-10:10>) - 1:1-10:10
+^
+procedure Main is
+
+begin
+   declare
+      A : Integer;
+   begin
+      null;
+   end;
+
+end Main;$
+*************************************
+
+-----------------------------------------------------------------
+       Type declarations testing
+    **   Full type declarations
+*************************************
+type_declarations.ads(<ConcreteTypeDecl ["Color"] type_declarations.ads:35:4-35:67>) - 35:1-35:67
+^
+   type Color is (White, Red, Yellow, Green, Blue, Brown, Black);$
+*************************************
+
+*************************************
+type_declarations.ads(<ConcreteTypeDecl ["Column"] type_declarations.ads:36:4-36:33>) - 36:1-36:33
+^
+   type Column is range 1 .. 72;$
+*************************************
+
+*************************************
+type_declarations.ads(<ConcreteTypeDecl ["Table"] type_declarations.ads:37:4-37:45>) - 37:1-37:45
+^
+   type Table is array (1 .. 10) of Integer;$
+*************************************
+
+*************************************
+type_declarations.ads(<ConcreteTypeDecl ["My_Int"] type_declarations.ads:39:4-39:35>) - 39:1-39:35
+^
+   type My_Int is range 0 .. 1_000;$
+*************************************
+
+*************************************
+type_declarations.ads(<ConcreteTypeDecl ["Index"] type_declarations.ads:40:4-40:31>) - 40:1-40:31
+^
+   type Index is range 1 .. 5;$
+*************************************
+
+*************************************
+type_declarations.ads(<ConcreteTypeDecl ["My_Int_Array"] type_declarations.ads:43:4-44:30>) - 42:1-46:34
+^
+   --  My before comment
+   type My_Int_Array is array (Index) of My_Int;
+   --                 ^ Type of elements
+   --       ^ Bounds of the array$
+*************************************
+
+*************************************
+type_declarations.ads(<ObjectDecl ["Arr"] type_declarations.ads:48:4-48:43>) - 48:1-50:39
+^
+   Arr : My_Int_Array := (2, 3, 5, 7, 11);
+   --                    ^ Array literal
+   --                      (aggregate)$
+*************************************
+
+*************************************
+type_declarations.ads(<ObjectDecl ["V"] type_declarations.ads:51:4-51:15>) - 51:1-51:15
+^
+   V : My_Int;$
+*************************************
+
+
+    **   Incomplete type declarations: Recursive type example
+*************************************
+type_declarations.ads(<IncompleteTypeDecl ["Cell"] type_declarations.ads:58:4-58:14>) - 58:1-58:14
+^
+   type Cell;$
+*************************************
+
+*************************************
+type_declarations.ads(<ConcreteTypeDecl ["Link"] type_declarations.ads:59:4-59:29>) - 59:1-59:29
+^
+   type Link is access Cell;$
+*************************************
+
+*************************************
+type_declarations.ads(<PackageDecl ["Type_Declarations"] type_declarations.ads:29:1-149:23>) - 57:1-60:1
+^
+   --  Recursive type example
+   type Cell;
+   type Link is access Cell;
+
+$
+*************************************
+
+*************************************
+type_declarations.ads(<ConcreteTypeDecl ["Cell"] type_declarations.ads:61:4-65:15>) - 61:1-65:15
+^
+   type Cell is record
+      Value : Integer;
+      Succ  : Link;
+      Pred  : Link;
+   end record;$
+*************************************
+
+*************************************
+type_declarations.ads(<ObjectDecl ["Head"] type_declarations.ads:67:4-67:47>) - 67:1-67:47
+^
+   Head : Link := new Cell'(0, null, null);$
+*************************************
+
+*************************************
+type_declarations.ads(<ObjectDecl ["Next"] type_declarations.ads:68:4-68:32>) - 68:1-68:32
+^
+   Next : Link := Head.Succ;$
+*************************************
+
+
+    **   Incomplete type declarations: Mutually dependent acces type example
+*************************************
+type_declarations.ads(<IncompleteTypeDecl ["Person"] type_declarations.ads:73:4-73:20>) - 73:1-73:20
+^
+   type Person (<>);$
+*************************************
+
+*************************************
+type_declarations.ads(<IncompleteTaggedTypeDecl ["Car"] type_declarations.ads:74:4-74:23>) - 74:1-74:23
+^
+   type Car is tagged;$
+*************************************
+
+*************************************
+type_declarations.ads(<ConcreteTypeDecl ["Person_Name"] type_declarations.ads:76:4-76:38>) - 76:1-76:38
+^
+   type Person_Name is access Person;$
+*************************************
+
+*************************************
+type_declarations.ads(<ConcreteTypeDecl ["Car_Name"] type_declarations.ads:77:4-77:45>) - 77:1-77:45
+^
+   type Car_Name is access all Car'Class;$
+*************************************
+
+*************************************
+type_declarations.ads(<ConcreteTypeDecl ["Person"] type_declarations.ads:84:4-93:15>) - 84:1-93:15
+^
+   type Person (Sex : Gender) is record
+      Name    : String (1 .. 20);
+      Birth   : Date;
+      Age     : Integer range 0 .. 130;
+      Vehicle : Car_Name;
+      case Sex is
+         when M =>
+            Wife : Person_Name (Sex => F);
+         when F =>
+            Husband : Person_Name (Sex => M);
+      end case;
+   end record;$
+*************************************
+
+*************************************
+type_declarations.ads(<ObjectDecl ["My_Car", "Your_Car", "Next_Car"] type_declarations.ads:95:4-95:53>) - 95:1-95:53
+^
+   My_Car, Your_Car, Next_Car : Car_Name := new Car;$
+*************************************
+
+*************************************
+type_declarations.ads(<ObjectDecl ["Someone"] type_declarations.ads:96:4-96:43>) - 96:1-96:43
+^
+   Someone : Person_Name := new Person (M);$
+*************************************
+
+
+    **   Private type declarations
+*************************************
+type_declarations.ads(<ConcreteTypeDecl ["Key"] type_declarations.ads:102:4-102:24>) - 102:1-102:24
+^
+   type Key is private;$
+*************************************
+
+*************************************
+type_declarations.ads(<ConcreteTypeDecl ["File_Name"] type_declarations.ads:103:4-103:38>) - 103:1-103:38
+^
+   type File_Name is limited private;$
+*************************************
+
+
+    **   Private extension declarations
+*************************************
+type_declarations.ads(<ConcreteTypeDecl ["List"] type_declarations.ads:109:4-109:62>) - 109:1-109:62
+^
+   type List is new Ada.Finalization.Controlled with private;$
+*************************************
+
+
+    **   Task type declarations
+*************************************
+type_declarations.ads(<TaskTypeDecl ["Server"] type_declarations.ads:115:4-118:15>) - 115:1-118:15
+^
+   task type Server is
+      entry Next_Work_Item (WI : in Work_Item);
+      entry Shut_Down;
+   end Server$
+*************************************
+
+*************************************
+type_declarations.ads(<TaskTypeDecl ["Keyboard_Driver"] type_declarations.ads:119:4-123:24>) - 119:1-123:24
+^
+   task type Keyboard_Driver (ID : Keyboard_ID := New_ID)
+   is new Serial_Device with
+      entry Read (C : out Character);
+      entry Write (C : in Character);
+   end Keyboard_Driver$
+*************************************
+
+
+    **   Single task declarations
+*************************************
+type_declarations.ads(<SingleTaskDecl ["Controller"] type_declarations.ads:129:4-131:19>) - 129:1-131:19
+^
+   task Controller is
+      entry Request (Level) (D : Item);  --  a family of entries
+   end Controller;$
+*************************************
+
+*************************************
+type_declarations.ads(<SingleTaskDecl ["Parser"] type_declarations.ads:133:4-136:8>) - 133:1-136:8
+^
+   task Parser is
+      entry Next_Lexeme (L : in Lexical_Element);
+      entry Next_Action (A : out Parser_Action);
+   end Parser;$
+*************************************
+
+*************************************
+type_declarations.ads(<SingleTaskDecl ["User"] type_declarations.ads:138:4-138:14>) - 138:1-138:14
+^
+   task User;$
+*************************************
+
+*************************************
+type_declarations.ads(<ObjectDecl ["Agent"] type_declarations.ads:141:4-141:22>) - 141:1-141:22
+^
+   Agent : Server;$
+*************************************
+
+*************************************
+type_declarations.ads(<ObjectDecl ["Teletype"] type_declarations.ads:142:4-142:39>) - 142:1-142:39
+^
+   Teletype : Keyboard_Driver (TTY_ID);$
+*************************************
+
+*************************************
+type_declarations.ads(<ObjectDecl ["Pool"] type_declarations.ads:143:4-143:49>) - 143:1-143:49
+^
+   Pool : array (1 .. 10) of Keyboard_Driver;$
+*************************************
+
+*************************************
+type_declarations.ads(<PackageDecl ["Type_Declarations"] type_declarations.ads:29:1-149:23>) - 140:1-144:1
+^
+   --  Task objects examples
+   Agent    : Server;
+   Teletype : Keyboard_Driver (TTY_ID);
+   Pool     : array (1 .. 10) of Keyboard_Driver;
+
+$
+*************************************
+
+*************************************
+type_declarations.ads(<ConcreteTypeDecl ["Keyboard"] type_declarations.ads:146:4-146:44>) - 146:1-146:44
+^
+   type Keyboard is access Keyboard_Driver;$
+*************************************
+
+*************************************
+type_declarations.ads(<ObjectDecl ["Terminal"] type_declarations.ads:147:4-147:56>) - 147:1-147:56
+^
+   Terminal : Keyboard := new Keyboard_Driver (Term_ID);$
+*************************************
+
+
+-----------------------------------------------------------------
+       Task type declarations
+*************************************
+task_type_arr.adb(<TaskTypeDecl ["TT"] task_type_arr.adb:30:4-32:11>) - 30:1-32:11
+^
+   task type TT is
+      entry Start (N : Integer);
+   end TT$
+*************************************
+
+*************************************
+task_type_arr.adb(<TaskBody ["TT"] task_type_arr.adb:34:4-42:11>) - 34:1-42:11
+^
+   task body TT is
+      Task_N : Integer;
+   begin
+      accept Start (N : Integer) do
+         Task_N := N;
+      end Start;
+      Put_Line ("In task T: " & Integer'Image (Task_N));
+   end TT;$
+*************************************
+
+*************************************
+task_type_arr.adb(<ObjectDecl ["My_Tasks"] task_type_arr.adb:44:4-44:36>) - 44:1-44:36
+^
+   My_Tasks : array (1 .. 5) of TT;$
+*************************************
+
+
+-----------------------------------------------------------------
+       Simple task type declarations
+*************************************
+simple_task_type_decl.adb(<TaskTypeDecl ["TT"] simple_task_type_decl.adb:29:4-29:17>) - 29:1-29:17
+^
+   task type TT$
+*************************************
+
+*************************************
+simple_task_type_decl.adb(<TaskBody ["TT"] simple_task_type_decl.adb:31:4-34:11>) - 31:1-34:11
+^
+   task body TT is
+   begin
+      Put_Line ("In task TT");
+   end TT;$
+*************************************
+
+*************************************
+simple_task_type_decl.adb(<ObjectDecl ["A_Task"] simple_task_type_decl.adb:36:4-36:16>) - 36:1-36:16
+^
+   A_Task : TT;$
+*************************************
+
+
+-----------------------------------------------------------------
+       Protected type declarations
+*************************************
+protected_obj_type_decl.adb(<ProtectedTypeDecl ["P_Obj_Type"] protected_obj_type_decl.adb:31:4-36:19>) - 31:1-36:19
+^
+   protected type P_Obj_Type is
+      procedure Set (V : Integer);
+      function Get return Integer;
+   private
+      Local : Integer := 0;
+   end P_Obj_Type$
+*************************************
+
+*************************************
+protected_obj_type_decl.adb(<ProtectedBody ["P_Obj_Type"] protected_obj_type_decl.adb:38:4-48:19>) - 38:1-48:19
+^
+   protected body P_Obj_Type is
+      procedure Set (V : Integer) is
+      begin
+         Local := V;
+      end Set;
+
+      function Get return Integer is
+      begin
+         return Local;
+      end Get;
+   end P_Obj_Type$
+*************************************
+
+*************************************
+protected_obj_type_decl.adb(<ObjectDecl ["Obj"] protected_obj_type_decl.adb:50:4-50:21>) - 50:1-50:21
+^
+   Obj : P_Obj_Type;$
+*************************************
+
+
+-----------------------------------------------------------------
+       Protected object entries
+*************************************
+protected_objects_entries.adb(<SingleProtectedDecl ["Obj"] protected_objects_entries.adb:30:4-36:12>) - 30:1-36:12
+^
+   protected Obj is
+      procedure Set (V : Integer);
+      entry Get (V : out Integer);
+   private
+      Local  : Integer;
+      Is_Set : Boolean := False;
+   end Obj$
+*************************************
+
+*************************************
+protected_objects_entries.adb(<ProtectedBody ["Obj"] protected_objects_entries.adb:38:4-57:12>) - 38:1-57:12
+^
+   protected body Obj is
+      procedure Set (V : Integer) is
+      begin
+         Local  := V;
+         Is_Set := True;
+      end Set;
+
+      entry Get (V : out Integer) when Is_Set is
+      --  Entry is blocked until the
+      --  condition is true. The barrier
+      --  is evaluated at call of entries
+      --  and at exits of procedures and
+      --  entries. The calling task sleeps
+      --  until the barrier is released.
+      begin
+         V      := Local;
+         Is_Set := False;
+      end Get;
+   end Obj$
+*************************************
+
+*************************************
+protected_objects_entries.adb(<EntryBody ["Get"] protected_objects_entries.adb:45:7-56:15>) - 45:1-56:15
+^
+      entry Get (V : out Integer) when Is_Set is
+      --  Entry is blocked until the
+      --  condition is true. The barrier
+      --  is evaluated at call of entries
+      --  and at exits of procedures and
+      --  entries. The calling task sleeps
+      --  until the barrier is released.
+      begin
+         V      := Local;
+         Is_Set := False;
+      end Get$
+*************************************
+
+*************************************
+protected_objects_entries.adb(<SingleTaskDecl ["T"] protected_objects_entries.adb:61:4-61:11>) - 61:1-61:11
+^
+   task T;$
+*************************************
+
+*************************************
+protected_objects_entries.adb(<TaskBody ["T"] protected_objects_entries.adb:63:4-70:10>) - 63:1-70:10
+^
+   task body T is
+   begin
+      Put_Line ("Task T will delay for 4 seconds...");
+      delay 4.0;
+      Put_Line ("Task T will set Obj...");
+      Obj.Set (5);
+      Put_Line ("Task T has just set Obj...");
+   end T;$
+*************************************
+

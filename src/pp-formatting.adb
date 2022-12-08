@@ -2448,11 +2448,14 @@ package body Pp.Formatting is
 
                      if Kind (Src_Tok) = ';'
                        and then Kind (Prev (Src_Tok)) in
-                         Res_End | Res_Record | Res_Loop | Ident | ')'
+                             Res_End | Res_Record | Res_Loop | Ident
+                           | Res_Tagged | Res_Abstract | Res_Null
+                           | Numeric_Literal | String_Lit | ')'
                        and then Kind (New_Tok) = End_Of_Input
                      then
                         Next_ss (Src_Tok);
                      else
+
                         --  When enter here mostly an infinite loop situation
                         --  is detected in partial mode
                         raise Partial_Gnatpp_Error;
@@ -2888,6 +2891,8 @@ package body Pp.Formatting is
          end New_To_Newer;
 
          procedure Insert_End_Of_Line_Comment is
+            --  In partial formatting mode we can have only one line selected
+            --  and an end of line comment contained in it.
             pragma Assert (Enabled_Cur_Line > 1);
 
             function New_Space_NL return Boolean;
@@ -4370,7 +4375,9 @@ package body Pp.Formatting is
                   if Partial_Gnatpp then
                      if Kind (Src_Tok) = ';'
                        and then Kind (Prev (Src_Tok)) in
-                         Res_End | Res_Record | Res_Loop | Ident | ')'
+                           Res_End | Res_Record | Res_Loop | Ident
+                         | Res_Tagged | Res_Abstract | Res_Null
+                         | Numeric_Literal | String_Lit | ')'
                        and then Kind (New_Tok) = End_Of_Input
                      then
                         Next_ss (Src_Tok);

@@ -1,0 +1,125 @@
+-----------------------------------------------------------------
+       Renaming declarations testing
+*************************************
+renaming_declaration.adb(<SubtypeDecl ["Degrees"] renaming_declaration.adb:27:4-27:51>) - 27:1-27:51
+^
+   subtype Degrees is Measurements.Degree_Celsius;$
+*************************************
+
+*************************************
+renaming_declaration.adb(<ObjectDecl ["T"] renaming_declaration.adb:29:4-29:57>) - 29:1-29:57
+^
+   T : Degrees renames Measurements.Current_Temperature;$
+*************************************
+
+
+-----------------------------------------------------------------
+       Object renaming declarations testing
+*************************************
+object_renaming_declaration.ads(<ObjectDecl ["Head"] object_renaming_declaration.ads:41:4-41:47>) - 41:1-41:47
+^
+   Head : Link := new Cell'(0, null, null);$
+*************************************
+
+*************************************
+object_renaming_declaration.ads(<ObjectDecl ["Next"] object_renaming_declaration.ads:42:4-42:32>) - 42:1-42:32
+^
+   Next : Link := Head.Succ;$
+*************************************
+
+*************************************
+object_renaming_declaration.ads(<ObjectDecl ["Renamed_Head"] object_renaming_declaration.ads:44:4-44:37>) - 44:1-44:37
+^
+   Renamed_Head : Link renames Head;$
+*************************************
+
+*************************************
+object_renaming_declaration.ads(<ObjectDecl ["One_Cell"] object_renaming_declaration.ads:46:4-46:69>) - 46:1-46:69
+^
+   One_Cell : Cell := Cell'(Value => 1, Succ => null, Pred => null);$
+*************************************
+
+*************************************
+object_renaming_declaration.ads(<ObjectDecl ["Same_Cell"] object_renaming_declaration.ads:47:4-47:38>) - 47:1-47:38
+^
+   Same_Cell : Cell renames One_Cell;$
+*************************************
+
+*************************************
+object_renaming_declaration.ads(<NumberDecl ["One"] object_renaming_declaration.ads:49:4-49:24>) - 49:1-49:24
+^
+   One : constant := 1;$
+*************************************
+
+*************************************
+object_renaming_declaration.ads(<ConcreteTypeDecl ["Acc_I"] object_renaming_declaration.ads:52:4-52:33>) - 52:1-52:33
+^
+   type Acc_I is access Integer;$
+*************************************
+
+*************************************
+object_renaming_declaration.ads(<SubtypeDecl ["Acc_NN_I"] object_renaming_declaration.ads:53:4-53:39>) - 53:1-53:39
+^
+   subtype Acc_NN_I is not null Acc_I;$
+*************************************
+
+*************************************
+object_renaming_declaration.ads(<ObjectDecl ["Obj"] object_renaming_declaration.ads:54:4-54:24>) - 54:1-54:24
+^
+   Obj : Acc_I := null;$
+*************************************
+
+*************************************
+object_renaming_declaration.ads(<ObjectDecl ["B"] object_renaming_declaration.ads:56:4-56:17>) - 56:1-56:17
+^
+   B : Acc_NN_I;$
+*************************************
+
+*************************************
+object_renaming_declaration.ads(<ObjectDecl ["D"] object_renaming_declaration.ads:57:4-57:33>) - 57:1-57:33
+^
+   D : not null Acc_I renames B;$
+*************************************
+
+
+-----------------------------------------------------------------
+       Package renaming declarations testing
+*************************************
+package_renaming_declaration.ads(<PackageRenamingDecl ["Package_Renaming_Declaration"] package_renaming_declaration.ads:26:1-26:67>) - 26:1-26:67
+^
+package Package_Renaming_Declaration renames Renaming_Declaration;$
+*************************************
+
+
+-----------------------------------------------------------------
+       Subprogram renaming declarations testing
+*************************************
+subprogram_renaming_declaration.ads(<ConcreteTypeDecl ["T"] subprogram_renaming_declaration.ads:31:4-31:33>) - 31:1-31:33
+^
+   type T is tagged null record;$
+*************************************
+
+*************************************
+subprogram_renaming_declaration.ads(<SubpRenamingDecl ["Predefined_Equal"] subprogram_renaming_declaration.ads:32:4-32:67>) - 32:1-32:67
+^
+   function Predefined_Equal (X, Y : T) return Boolean renames "=";$
+*************************************
+
+
+-----------------------------------------------------------------
+       Generic renaming declarations testing
+*************************************
+generic_renaming_declaration.ads(<GenericPackageRenamingDecl ["Generic_Renaming_Declaration"] generic_renaming_declaration.ads:31:1-31:81>) - 31:1-31:81
+^
+generic package Generic_Renaming_Declaration renames Ada.Text_IO.Enumeration_IO;$
+*************************************
+
+
+-----------------------------------------------------------------
+       Exception renaming declarations testing
+*************************************
+exception_renaming_declaration.ads(<ExceptionDecl ["EOF"] exception_renaming_declaration.ads:30:4-30:56>) - 30:1-30:56
+^
+   EOF : exception renames Ada.IO_Exceptions.End_Error;$
+*************************************
+
