@@ -3,4 +3,4 @@ description:
 
 driver: shell_script
 control:
-    - [XFAIL, '32bits', 'Marshalling not working for 32bits (UB03-008)']
+    - [XFAIL, 'x86', 'Marshalling not working for 32bits (UB03-008)']
