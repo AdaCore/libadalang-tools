@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2011-2021, AdaCore                    --
+--                      Copyright (C) 2011-2022, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -702,10 +702,13 @@ package body Test.Skeleton.Source_Table is
                   & P.Name);
             else
                PR.Stub_Dir := new String'
-                 (P.Object_Dir.Display_Full_Name
-                  & Stub_Dir_Name.all
-                  & Directory_Separator
-                  & P.Name);
+                 (Normalize_Pathname
+                    (P.Object_Dir.Display_Full_Name
+                     & Stub_Dir_Name.all
+                     & Directory_Separator
+                     & P.Name,
+                     Resolve_Links  => False,
+                     Case_Sensitive => False));
             end if;
 
             Increase_Indent (Me, "imported projects:");
@@ -1166,10 +1169,13 @@ package body Test.Skeleton.Source_Table is
                & Project.Name);
          else
             SF_Rec.Stub_Destination := new String'
-              (Project.Object_Dir.Display_Full_Name
-               & Stub_Dir_Name.all
-               & Directory_Separator
-               & Project.Name);
+              (Normalize_Pathname
+                 (Project.Object_Dir.Display_Full_Name
+                  & Stub_Dir_Name.all
+                  & Directory_Separator
+                  & Project.Name,
+                  Resolve_Links  => False,
+                  Case_Sensitive => False));
          end if;
 
          Replace (SF_Table, SF_Rec_Key.all, SF_Rec);

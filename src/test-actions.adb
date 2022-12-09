@@ -1658,7 +1658,11 @@ package body Test.Actions is
             exit when Project = No_Project;
 
             Obj_Dir := new String'(Project.Object_Dir.Display_Full_Name);
-            Tmp := new String'(Obj_Dir.all & Stub_Dir_Name.all);
+            Tmp := new String'
+              (Normalize_Pathname
+                 (Obj_Dir.all & Stub_Dir_Name.all,
+                  Resolve_Links  => False,
+                  Case_Sensitive => False));
             Append (Future_Dirs, GNATCOLL.VFS.Create (+Tmp.all));
             Free (Tmp);
             Free (Obj_Dir);
