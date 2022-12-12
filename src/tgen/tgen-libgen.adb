@@ -308,14 +308,15 @@ package body TGen.Libgen is
         (if Root_Templates_Dir = ""
          then Ada.Directories.Containing_Directory
                 (GNAT.OS_Lib.Locate_Exec_On_Path
-                               (Ada.Command_Line.Command_Name).all)
-         else Root_Templates_Dir) & "/../share/tgen/templates";
+                               (Ada.Command_Line.Command_Name).all
+              & "/../share/tgen/templates")
+         else Root_Templates_Dir);
       --  Try to find the templates in the canonical installation path if not
       --  supplied.
 
    begin
       return (Output_Dir         => To_Unbounded_String (Output_Dir),
-              Root_Templates_Dir => To_Unbounded_String (Root_Templates_Dir),
+              Root_Templates_Dir => To_Unbounded_String (Actual_Templates_Dir),
               User_Project_Path  => To_Unbounded_String (User_Project_Path),
               others             => <>);
    end Create;
