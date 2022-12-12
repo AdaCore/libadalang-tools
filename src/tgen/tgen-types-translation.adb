@@ -90,35 +90,41 @@ package body TGen.Types.Translation is
 
    function Translate_Int_Decl
      (Decl      : Base_Type_Decl;
-      Type_Name : Defining_Name) return Translation_Result with
+      Type_Name : Defining_Name;
+      Cmp_Idx   : Positive) return Translation_Result with
       Pre => Decl.P_Is_Static_Decl and then Decl.P_Is_Int_Type;
 
    function Translate_Enum_Decl
      (Decl           : Base_Type_Decl;
       Root_Enum_Decl : Base_Type_Decl;
-      Type_Name      : Defining_Name)
+      Type_Name      : Defining_Name;
+      Cmp_Idx        : Positive)
       return Translation_Result with
       Pre => Decl.P_Is_Static_Decl and then Decl.P_Is_Enum_Type;
 
    function Translate_Char_Decl
      (Decl      : Base_Type_Decl;
-      Type_Name : Defining_Name)
+      Type_Name : Defining_Name;
+      Cmp_Idx   : Positive)
       return Translation_Result with
      Pre => Decl.P_Is_Static_Decl and then Decl.P_Is_Enum_Type;
 
    function Translate_Float_Decl
      (Decl      : Base_Type_Decl;
-      Type_Name : Defining_Name) return Translation_Result with
+      Type_Name : Defining_Name;
+      Cmp_Idx   : Positive) return Translation_Result with
       Pre => Decl.P_Is_Static_Decl and then Decl.P_Is_Float_Type;
 
    function Translate_Ordinary_Fixed_Decl
      (Decl      : Base_Type_Decl;
-      Type_Name : Defining_Name) return Translation_Result with
+      Type_Name : Defining_Name;
+      Cmp_Idx   : Positive) return Translation_Result with
       Pre => Decl.P_Is_Static_Decl and then Decl.P_Is_Fixed_Point;
 
    function Translate_Decimal_Fixed_Decl
      (Decl      : Base_Type_Decl;
-      Type_Name : Defining_Name) return Translation_Result with
+      Type_Name : Defining_Name;
+      Cmp_Idx   : Positive) return Translation_Result with
       Pre => Decl.P_Is_Static_Decl and then Decl.P_Is_Fixed_Point;
 
    procedure Translate_Float_Range
@@ -140,7 +146,8 @@ package body TGen.Types.Translation is
 
    function Translate_Array_Decl
      (Decl      : Base_Type_Decl;
-      Type_Name : Defining_Name) return Translation_Result with
+      Type_Name : Defining_Name;
+      Cmp_Idx   : Positive) return Translation_Result with
       Pre => Decl.P_Is_Array_Type;
 
    function Translate_Component_Decl_List
@@ -176,7 +183,8 @@ package body TGen.Types.Translation is
 
    function Translate_Record_Decl
      (Decl      : Base_Type_Decl;
-      Type_Name : Defining_Name) return Translation_Result with
+      Type_Name : Defining_Name;
+      Cmp_Idx   : Positive) return Translation_Result with
       Pre => Decl.P_Is_Record_Type;
 
    procedure Apply_Record_Subtype_Decl
@@ -305,7 +313,8 @@ package body TGen.Types.Translation is
 
    function Translate_Int_Decl
      (Decl      : Base_Type_Decl;
-      Type_Name : Defining_Name) return Translation_Result
+      Type_Name : Defining_Name;
+      Cmp_Idx   : Positive) return Translation_Result
    is
       Rang : constant Discrete_Range := Decl.P_Discrete_Range;
 
@@ -317,21 +326,25 @@ package body TGen.Types.Translation is
    begin
       if Is_Null (Low_Bound (Rang)) then
          Res.Res.Set
-           (Mod_Int_Typ'(Is_Static => True,
-                         Name      => Convert_Qualified_Name
-                           (Type_Name.P_Fully_Qualified_Name_Array),
-                         Mod_Value => Max));
+           (Mod_Int_Typ'(Is_Static          => True,
+                         Name               =>
+                           Convert_Qualified_Name
+                             (Type_Name.P_Fully_Qualified_Name_Array),
+                         Last_Comp_Unit_Idx => Cmp_Idx,
+                         Mod_Value          => Max));
       else
          declare
             Min : constant Big_Integer :=
               Big_Int.From_String (New_Eval_As_Int (Low_Bound (Rang)).Image);
          begin
             Res.Res.Set
-              (Signed_Int_Typ'(Is_Static   => True,
-                               Name        =>
+              (Signed_Int_Typ'(Is_Static          => True,
+                               Name               =>
                                  Convert_Qualified_Name
                                    (Type_Name.P_Fully_Qualified_Name_Array),
-                               Range_Value => (Min => Min, Max => Max)));
+                               Last_Comp_Unit_Idx => Cmp_Idx,
+                               Range_Value        =>
+                                 (Min => Min, Max => Max)));
          end;
       end if;
       return Res;
@@ -343,7 +356,8 @@ package body TGen.Types.Translation is
 
    function Translate_Char_Decl
      (Decl      : Base_Type_Decl;
-      Type_Name : Defining_Name)
+      Type_Name : Defining_Name;
+      Cmp_Idx   : Positive)
       return Translation_Result
    is
       Rang : constant Discrete_Range := Decl.P_Discrete_Range;
@@ -352,11 +366,12 @@ package body TGen.Types.Translation is
       if Is_Null (Low_Bound (Rang)) then
          return Res : Translation_Result (Success => True) do
             Res.Res.Set (Char_Typ'
-                           (Is_Static => True,
-                            Has_Range => False,
-                            Name      =>
+                           (Is_Static         => True,
+                            Has_Range         => False,
+                            Name              =>
                               Convert_Qualified_Name
-                                (Type_Name.P_Fully_Qualified_Name_Array)));
+                                (Type_Name.P_Fully_Qualified_Name_Array),
+                           Last_Comp_Unit_Idx => Cmp_Idx));
          end return;
       else
          declare
@@ -381,24 +396,26 @@ package body TGen.Types.Translation is
             if LB.Kind = Static and then HB.Kind = Static then
                return Res : Translation_Result (Success => True) do
                   Res.Res.Set
-                    (Char_Typ'(Is_Static   => True,
-                               Has_Range   => True,
-                               Name        =>
+                    (Char_Typ'(Is_Static         => True,
+                               Has_Range         => True,
+                               Name              =>
                                  Convert_Qualified_Name
                                    (Type_Name.P_Fully_Qualified_Name_Array),
-                               Range_Value =>
+                              Last_Comp_Unit_Idx => Cmp_Idx,
+                               Range_Value       =>
                                  (Low_Bound => LB, High_Bound => HB)));
 
                end return;
             else
                return Res : Translation_Result (Success => True) do
                   Res.Res.Set
-                    (Char_Typ'(Is_Static   => False,
-                               Has_Range   => True,
-                               Name        =>
+                    (Char_Typ'(Is_Static          => False,
+                               Has_Range          => True,
+                               Name               =>
                                  Convert_Qualified_Name
                                    (Type_Name.P_Fully_Qualified_Name_Array),
-                               Range_Value =>
+                               Last_Comp_Unit_Idx => Cmp_Idx,
+                               Range_Value        =>
                                  (Low_Bound => LB, High_Bound => HB)));
 
                end return;
@@ -414,7 +431,8 @@ package body TGen.Types.Translation is
    function Translate_Enum_Decl
      (Decl           : Base_Type_Decl;
       Root_Enum_Decl : Base_Type_Decl;
-      Type_Name      : Defining_Name)
+      Type_Name      : Defining_Name;
+      Cmp_Idx        : Positive)
       return Translation_Result
    is
       package Long_Long_Conversion is
@@ -457,10 +475,12 @@ package body TGen.Types.Translation is
 
       return Res : Translation_Result (Success => True) do
          Res.Res.Set
-           (Other_Enum_Typ'(Is_Static => True,
-                            Name      => Convert_Qualified_Name
-                              (Type_Name.P_Fully_Qualified_Name_Array),
-                            Literals  => Enum_Lits));
+           (Other_Enum_Typ'(Is_Static          => True,
+                            Name               =>
+                              Convert_Qualified_Name
+                                (Type_Name.P_Fully_Qualified_Name_Array),
+                            Last_Comp_Unit_Idx => Cmp_Idx,
+                            Literals           => Enum_Lits));
       end return;
    end Translate_Enum_Decl;
 
@@ -470,7 +490,8 @@ package body TGen.Types.Translation is
 
    function Translate_Float_Decl
      (Decl      : Base_Type_Decl;
-      Type_Name : Defining_Name) return Translation_Result
+      Type_Name : Defining_Name;
+      Cmp_Idx   : Positive) return Translation_Result
    is
 
       procedure Find_Digits
@@ -553,19 +574,23 @@ package body TGen.Types.Translation is
       Translate_Float_Range (Decl, Has_Range, Min, Max);
       if Has_Range then
          Res.Res.Set
-           (Float_Typ'(Is_Static    => True,
-                       Has_Range    => True,
-                       Name         => Convert_Qualified_Name
-                         (Type_Name.P_Fully_Qualified_Name_Array),
-                       Digits_Value => Digits_Value,
-                       Range_Value  => (Min => Min, Max => Max)));
+           (Float_Typ'(Is_Static          => True,
+                       Has_Range          => True,
+                       Name               =>
+                         Convert_Qualified_Name
+                           (Type_Name.P_Fully_Qualified_Name_Array),
+                       Last_Comp_Unit_Idx => Cmp_Idx,
+                       Digits_Value       => Digits_Value,
+                       Range_Value        => (Min => Min, Max => Max)));
       else
          Res.Res.Set
-           (Float_Typ'(Is_Static    => True,
-                       Has_Range    => False,
-                       Name         => Convert_Qualified_Name
-                         (Type_Name.P_Fully_Qualified_Name_Array),
-                       Digits_Value => Digits_Value));
+           (Float_Typ'(Is_Static          => True,
+                       Has_Range          => False,
+                       Name               =>
+                         Convert_Qualified_Name
+                           (Type_Name.P_Fully_Qualified_Name_Array),
+                       Last_Comp_Unit_Idx => Cmp_Idx,
+                       Digits_Value       => Digits_Value));
       end if;
       return Res;
    exception
@@ -576,10 +601,12 @@ package body TGen.Types.Translation is
                Decl.Image & " : " & Ada.Exceptions.Exception_Message (Exc));
          end if;
          Res.Res.Set
-           (Float_Typ'(Is_Static => False,
-                       Has_Range => False,
-                       Name      => Convert_Qualified_Name
-                         (Type_Name.P_Fully_Qualified_Name_Array)));
+           (Float_Typ'(Is_Static          => False,
+                       Has_Range          => False,
+                       Name               =>
+                         Convert_Qualified_Name
+                           (Type_Name.P_Fully_Qualified_Name_Array),
+                       Last_Comp_Unit_Idx => Cmp_Idx));
          return Res;
    end Translate_Float_Decl;
 
@@ -589,7 +616,8 @@ package body TGen.Types.Translation is
 
    function Translate_Ordinary_Fixed_Decl
      (Decl      : Base_Type_Decl;
-      Type_Name : Defining_Name) return Translation_Result
+      Type_Name : Defining_Name;
+      Cmp_Idx   : Positive) return Translation_Result
    is
       Min, Max    : Big_Real;
       Delta_Value : Big_Real;
@@ -698,12 +726,14 @@ package body TGen.Types.Translation is
       Find_Delta (Decl, Delta_Value);
       return Res : Translation_Result (Success => True) do
          Res.Res.Set
-           (Ordinary_Fixed_Typ'(Is_Static   => True,
-                                Name        =>
+           (Ordinary_Fixed_Typ'(Is_Static          => True,
+                                Name               =>
                                   Convert_Qualified_Name
                                     (Type_Name.P_Fully_Qualified_Name_Array),
-                                Delta_Value => Delta_Value,
-                                Range_Value => (Min => Min, Max => Max)));
+                                Last_Comp_Unit_Idx => Cmp_Idx,
+                                Delta_Value        => Delta_Value,
+                                Range_Value        =>
+                                  (Min => Min, Max => Max)));
       end return;
    exception
       when Exc : Translation_Error =>
@@ -718,10 +748,11 @@ package body TGen.Types.Translation is
          return Res : Translation_Result (Success => True) do
             Res.Res.Set
               (Ordinary_Fixed_Typ'
-                 (Is_Static => False,
-                  Name      =>
+                 (Is_Static          => False,
+                  Name               =>
                     Convert_Qualified_Name
-                      (Type_Name.P_Fully_Qualified_Name_Array)));
+                      (Type_Name.P_Fully_Qualified_Name_Array),
+                  Last_Comp_Unit_Idx => Cmp_Idx));
          end return;
    end Translate_Ordinary_Fixed_Decl;
 
@@ -731,7 +762,8 @@ package body TGen.Types.Translation is
 
    function Translate_Decimal_Fixed_Decl
      (Decl      : Base_Type_Decl;
-      Type_Name : Defining_Name) return Translation_Result
+      Type_Name : Defining_Name;
+      Cmp_Idx   : Positive) return Translation_Result
    is
       Delta_Val  : Big_Real;
       Digits_Val : Natural;
@@ -789,7 +821,7 @@ package body TGen.Types.Translation is
             return;
          end if;
 
-         --  Constraints are a digits contraint from this point on
+         --  Constraints are a digits constraint from this point on
          Digits_Val := Natural'Value
            (New_Eval_As_Int
               (Parent_Subtype.F_Constraint.As_Digits_Constraint.F_Digits)
@@ -811,7 +843,7 @@ package body TGen.Types.Translation is
       begin
          if Eval_Res.Kind /= Real then
             raise Translation_Error with
-              "Evalutation of delta value for a decimal fixed point did not"
+              "Evaluation of delta value for a decimal fixed point did not"
               & " return a real type";
          end if;
          Delta_Val := TGen.Numerics.From_Universal_Image
@@ -826,26 +858,28 @@ package body TGen.Types.Translation is
       if Has_Range then
          return Res : Translation_Result (Success => True) do
             Res.Res.Set
-            (Decimal_Fixed_Typ'(Is_Static    => True,
-                                Has_Range    => True,
-                                Digits_Value => Digits_Val,
-                                Delta_Value  => Delta_Val,
-                                Range_Value  =>
+            (Decimal_Fixed_Typ'(Is_Static          => True,
+                                Has_Range          => True,
+                                Digits_Value       => Digits_Val,
+                                Delta_Value        => Delta_Val,
+                                Range_Value        =>
                                   (Min => Range_Min, Max => Range_Max),
-                                Name         =>
+                                Name               =>
                                   Convert_Qualified_Name
-                                    (Type_Name.P_Fully_Qualified_Name_Array)));
+                                    (Type_Name.P_Fully_Qualified_Name_Array),
+                                Last_Comp_Unit_Idx => Cmp_Idx));
          end return;
       else
          return Res : Translation_Result (Success => True) do
             Res.Res.Set
-            (Decimal_Fixed_Typ'(Is_Static    => True,
-                                Has_Range    => False,
-                                Digits_Value => Digits_Val,
-                                Delta_Value  => Delta_Val,
-                                Name         =>
+            (Decimal_Fixed_Typ'(Is_Static          => True,
+                                Has_Range          => False,
+                                Digits_Value       => Digits_Val,
+                                Delta_Value        => Delta_Val,
+                                Name               =>
                                   Convert_Qualified_Name
-                                    (Type_Name.P_Fully_Qualified_Name_Array)));
+                                    (Type_Name.P_Fully_Qualified_Name_Array),
+                                Last_Comp_Unit_Idx => Cmp_Idx));
          end return;
       end if;
    end Translate_Decimal_Fixed_Decl;
@@ -1125,23 +1159,21 @@ package body TGen.Types.Translation is
 
    function Translate_Array_Decl
     (Decl      : Base_Type_Decl;
-     Type_Name : Defining_Name) return Translation_Result
+     Type_Name : Defining_Name;
+     Cmp_Idx   : Positive) return Translation_Result
    is
       function Translate_Constrained
-        (Decl      : Base_Type_Decl;
-         Type_Name : Defining_Name) return Translation_Result;
+        (Decl : Base_Type_Decl) return Translation_Result;
 
       function Translate_Unconstrained
-        (Def : Array_Type_Def;
-         Type_Name : Defining_Name) return Translation_Result;
+        (Def : Array_Type_Def) return Translation_Result;
 
       ---------------------------
       -- Translate_Constrained --
       ---------------------------
 
       function Translate_Constrained
-         (Decl      : Base_Type_Decl;
-          Type_Name : Defining_Name) return Translation_Result
+        (Decl : Base_Type_Decl) return Translation_Result
       is
          Cmp_Typ_Def : constant Component_Def :=
             Decl.P_Root_Type.As_Type_Decl.F_Type_Def.As_Array_Type_Def
@@ -1318,6 +1350,7 @@ package body TGen.Types.Translation is
 
             Res_Typ.Name :=
               Convert_Qualified_Name (Type_Name.P_Fully_Qualified_Name_Array);
+            Res_Typ.Last_Comp_Unit_Idx := Cmp_Idx;
 
             --  For constrained arrays, even if some index type is not
             --  statically known, as long as the matching index constraints
@@ -1342,8 +1375,7 @@ package body TGen.Types.Translation is
       -----------------------------
 
       function Translate_Unconstrained
-        (Def       : Array_Type_Def;
-         Type_Name : Defining_Name) return Translation_Result
+        (Def       : Array_Type_Def) return Translation_Result
       is
          Indices_List : constant Unconstrained_Array_Index_List :=
            Def.F_Indices.As_Unconstrained_Array_Indices.F_Types;
@@ -1386,6 +1418,7 @@ package body TGen.Types.Translation is
 
          Res_Typ.Name :=
            Convert_Qualified_Name (Type_Name.P_Fully_Qualified_Name_Array);
+         Res_Typ.Last_Comp_Unit_Idx := Cmp_Idx;
 
          Res_Typ.Static_Gen :=
            Res_Typ.Component_Type.Get.Supports_Static_Gen
@@ -1399,7 +1432,7 @@ package body TGen.Types.Translation is
          <<Failed_Translation>>
          return (Success => False,
                  Diagnostics => "Failed to translate the type of the"
-                                & Current_Index_Type'Image & "index dimention"
+                                & Current_Index_Type'Image & "index dimension"
                                 & ": " & Failure_Reason);
 
       end Translate_Unconstrained;
@@ -1412,9 +1445,9 @@ package body TGen.Types.Translation is
             if Is_Null (Decl.As_Subtype_Decl.F_Subtype.F_Constraint) then
                return Translate_Array_Decl
                  (Decl.As_Subtype_Decl.F_Subtype.P_Designated_Type_Decl,
-                  Type_Name);
+                  Type_Name, Cmp_Idx);
             else
-               return Translate_Constrained (Decl, Type_Name);
+               return Translate_Constrained (Decl);
             end if;
 
          when Ada_Type_Decl =>
@@ -1427,20 +1460,21 @@ package body TGen.Types.Translation is
                then
                   return Translate_Array_Decl
                     (Decl.As_Type_Decl.F_Type_Def.As_Derived_Type_Def
-                     .F_Subtype_Indication.P_Designated_Type_Decl, Type_Name);
+                     .F_Subtype_Indication.P_Designated_Type_Decl,
+                     Type_Name,
+                     Cmp_Idx);
                else
-                  return Translate_Constrained (Decl, Type_Name);
+                  return Translate_Constrained (Decl);
                end if;
             else
                case Kind (Decl.As_Type_Decl.F_Type_Def
                         .As_Array_Type_Def.F_Indices) is
                   when Ada_Constrained_Array_Indices_Range =>
-                     return Translate_Constrained (Decl, Type_Name);
+                     return Translate_Constrained (Decl);
 
                   when Ada_Unconstrained_Array_Indices_Range =>
                      return Translate_Unconstrained
-                     (Decl.As_Type_Decl.F_Type_Def.As_Array_Type_Def,
-                        Type_Name);
+                     (Decl.As_Type_Decl.F_Type_Def.As_Array_Type_Def);
 
                   when others =>
                      return
@@ -1605,7 +1639,7 @@ package body TGen.Types.Translation is
          --  If it does (there should only be one possible match), update
          --  the possibly nested variant parts, otherwise, free the possibly
          --  nested variant as the choice will be deleted.
-         --  Once this is done, merge the components in the only remaning
+         --  Once this is done, merge the components in the only remaining
          --  Choice to the top level components, and the the variant access
          --  to point to the nested variant part of the choice, if it exists.
 
@@ -1736,7 +1770,7 @@ package body TGen.Types.Translation is
                               .P_Referenced_Defining_Name.Parent.Parent) in
                         Ada_Discriminant_Spec_Range
             then
-               --  Case of a Discriminant correspondance
+               --  Case of a Discriminant correspondence
 
                Discr_Renaming_Map.Insert
                  (Key      => +Param (Pair).As_Defining_Name.Text,
@@ -1815,6 +1849,8 @@ package body TGen.Types.Translation is
             end if;
             Next (Constraint_Cur);
          end loop;
+         New_Typ.Name := From.Name;
+         New_Typ.Last_Comp_Unit_Idx := From.Last_Comp_Unit_Idx;
       end return;
    end Apply_Record_Derived_Type_Decl;
 
@@ -1945,7 +1981,7 @@ package body TGen.Types.Translation is
 
                   --  Single element from the difference, it is either before
                   --  the current alternative range or after.
-                  --  If it is after however, it will be befor what we
+                  --  If it is after however, it will be before what we
                   --  currently have in Cur_Others_Segment, so it needs to be
                   --  the next range to to be checked against the next
                   --  alternative range.
@@ -1975,7 +2011,7 @@ package body TGen.Types.Translation is
    end Subtract_Choice_From_Other;
 
    -----------------------------------
-   -- Transalte_Component_Decl_List --
+   -- Translate_Component_Decl_List --
    -----------------------------------
 
    function Translate_Component_Decl_List
@@ -2083,8 +2119,8 @@ package body TGen.Types.Translation is
                           "Unknown discriminant name";
                      end if;
 
-                     --  This is not realy accurate for enum types if the
-                     --  various enum litteral positions are not contiguous.
+                     --  This is not really accurate for enum types if the
+                     --  various enum literal positions are not contiguous.
 
                      Choice_Trans.Alt_Set.Insert
                        ((Min => As_Discrete_Typ
@@ -2126,7 +2162,8 @@ package body TGen.Types.Translation is
 
    function Translate_Record_Decl
      (Decl      : Base_Type_Decl;
-      Type_Name : Defining_Name) return Translation_Result
+      Type_Name : Defining_Name;
+      Cmp_Idx   : Positive) return Translation_Result
    is
 
       procedure Apply_Constraints
@@ -2178,7 +2215,7 @@ package body TGen.Types.Translation is
                Apply_Record_Subtype_Decl (Decl.As_Subtype_Decl.F_Subtype, Res);
 
             when others =>
-               --  This should not be rechable
+               --  This should not be reachable
                null;
          end case;
       end Apply_Constraints;
@@ -2219,6 +2256,7 @@ package body TGen.Types.Translation is
                Trans_Res.Name :=
                  Convert_Qualified_Name
                    (Type_Name.P_Fully_Qualified_Name_Array);
+               Trans_Res.Last_Comp_Unit_Idx := Cmp_Idx;
 
                Trans_Res.Static_Gen :=
                  (for all Comp_Ref of Trans_Res.Component_Types
@@ -2307,6 +2345,7 @@ package body TGen.Types.Translation is
 
             Trans_Res.Name :=
               Convert_Qualified_Name (Type_Name.P_Fully_Qualified_Name_Array);
+            Trans_Res.Last_Comp_Unit_Idx := Cmp_Idx;
 
             Trans_Res.Static_Gen :=
               (for all Comp_Ref of Trans_Res.Component_Types
@@ -2341,9 +2380,10 @@ package body TGen.Types.Translation is
 
                   return Res : Translation_Result (Success => True) do
                      Res.Res.Set (Nondiscriminated_Record_Typ'
-                       (Name            => Trans_Res.Name,
-                        Component_Types => Trans_Res.Component_Types,
-                        Static_Gen      => Trans_Res.Static_Gen));
+                       (Name               => Trans_Res.Name,
+                        Last_Comp_Unit_Idx => Trans_Res.Last_Comp_Unit_Idx,
+                        Component_Types    => Trans_Res.Component_Types,
+                        Static_Gen         => Trans_Res.Static_Gen));
                   end return;
 
                else
@@ -2358,6 +2398,8 @@ package body TGen.Types.Translation is
                           (Trans_Res.Discriminant_Types);
                         Rec_Typ.Variant := Trans_Res.Variant;
                         Rec_Typ.Name := Trans_Res.Name;
+                        Rec_Typ.Last_Comp_Unit_Idx :=
+                          Trans_Res.Last_Comp_Unit_Idx;
                         Rec_Typ.Mutable := Trans_Res.Mutable;
                         Rec_Typ.Static_Gen := Trans_Res.Static_Gen;
                         Res.Res.Set (Rec_Typ);
@@ -2546,11 +2588,11 @@ package body TGen.Types.Translation is
             --  according to RM 3.5.9 (5/4).
 
             raise Translation_Error with
-              "Non static digits constraints are forbiden:" & Node.Image;
+              "Non static digits constraints are forbidden:" & Node.Image;
 
          when Ada_Delta_Constraint_Range =>
             raise Translation_Error with
-              "Delta contraints for anonymous types not implemented yet";
+              "Delta constraints for anonymous types not implemented yet";
          when others =>
             raise Translation_Error with
               "Unexpected expression for a real type constraint: "
@@ -2708,6 +2750,7 @@ package body TGen.Types.Translation is
             return Res : Translation_Result (Success => True) do
                Res.Res.Set (Anonymous_Typ'
                  (Name                => Ada_Identifier_Vectors.Empty_Vector,
+                  Last_Comp_Unit_Idx  => 1,
                   Named_Ancestor      => Intermediate_Result.Res,
                   Subtype_Constraints => new Discrete_Range_Constraint'
                     (Translate_Discrete_Range_Constraint
@@ -2718,6 +2761,7 @@ package body TGen.Types.Translation is
             return Res : Translation_Result (Success => True) do
                Res.Res.Set (Anonymous_Typ'
                  (Name                => Ada_Identifier_Vectors.Empty_Vector,
+                  Last_Comp_Unit_Idx  => 1,
                   Named_Ancestor      => Intermediate_Result.Res,
                   Subtype_Constraints =>
                     new TGen.Types.Constraints.Constraint'Class'
@@ -2728,6 +2772,7 @@ package body TGen.Types.Translation is
             return Res : Translation_Result (Success => True) do
                Res.Res.Set (Anonymous_Typ'
                  (Name                => Ada_Identifier_Vectors.Empty_Vector,
+                  Last_Comp_Unit_Idx  => 1,
                   Named_Ancestor      => Intermediate_Result.Res,
                   Subtype_Constraints => new Index_Constraints'
                     (Translate_Index_Constraints
@@ -2744,6 +2789,7 @@ package body TGen.Types.Translation is
                                      .P_Is_Discriminant_Constraint));
                Res.Res.Set (Anonymous_Typ'
                  (Name                => Ada_Identifier_Vectors.Empty_Vector,
+                  Last_Comp_Unit_Idx  => 1,
                   Named_Ancestor      => Intermediate_Result.Res,
                   Subtype_Constraints => new Discriminant_Constraints'
                     (Translate_Discriminant_Constraints
@@ -2803,7 +2849,7 @@ package body TGen.Types.Translation is
 
          Cache_Miss := Cache_Miss + 1;
 
-         --  Otherwise, compute the type tranlsation and store it in the cache
+         --  Otherwise, compute the type translation and store it in the cache
 
          declare
             Trans_Res : constant Translation_Result :=
@@ -2839,6 +2885,10 @@ package body TGen.Types.Translation is
          then N.P_Defining_Name
          else No_Defining_Name);
 
+      Comp_Unit_Idx : constant Positive :=
+        Unbounded_Text_Type_Array'(N.P_Enclosing_Compilation_Unit.P_Decl
+                                   .P_Fully_Qualified_Name_Array)'Last;
+
    begin
       Verbose_Diag := Verbose;
       Is_Static := Is_Static
@@ -2858,7 +2908,8 @@ package body TGen.Types.Translation is
             Res.Res.Set
               (Unsupported_Typ'
                 (Name => TGen.Strings.Ada_Identifier_Vectors.To_Vector
-                           (To_Unbounded_String (N.Image), 1)));
+                           (To_Unbounded_String (N.Image), 1),
+                 Last_Comp_Unit_Idx => 1));
          end return;
       elsif Text.Image (Type_Name.P_Fully_Qualified_Name) = "System.Address"
       then
@@ -2869,25 +2920,30 @@ package body TGen.Types.Translation is
 
          return Res : Translation_Result (Success => True) do
             Res.Res.Set (Unsupported_Typ'
-              (Name =>
+              (Name               =>
                  Convert_Qualified_Name
-                   (Type_Name.P_Fully_Qualified_Name_Array)));
+                   (Type_Name.P_Fully_Qualified_Name_Array),
+               Last_Comp_Unit_Idx => Comp_Unit_Idx));
          end return;
       elsif N.P_Is_Formal then
          return Res : Translation_Result (Success => True) do
             Res.Res.Set (Formal_Typ'
-              (Name => Convert_Qualified_Name
-                 (Type_Name.P_Fully_Qualified_Name_Array)));
+              (Name               =>
+                 Convert_Qualified_Name
+                   (Type_Name.P_Fully_Qualified_Name_Array),
+               Last_Comp_Unit_Idx => Comp_Unit_Idx));
          end return;
       elsif N.P_Is_Int_Type then
          if Is_Static then
-            return Translate_Int_Decl (N, Type_Name);
+            return Translate_Int_Decl (N, Type_Name, Comp_Unit_Idx);
          else
             return Res : Translation_Result (Success => True) do
                Res.Res.Set (Int_Typ'
-                 (Is_Static => False,
-                  Name      => Convert_Qualified_Name
-                    (Type_Name.P_Fully_Qualified_Name_Array)));
+                 (Is_Static          => False,
+                  Name               =>
+                    Convert_Qualified_Name
+                      (Type_Name.P_Fully_Qualified_Name_Array),
+                  Last_Comp_Unit_Idx => Comp_Unit_Idx));
             end return;
          end if;
 
@@ -2897,19 +2953,21 @@ package body TGen.Types.Translation is
       then
          return Res : Translation_Result (Success => True) do
             Res.Res.Set (Bool_Typ'
-              (Is_Static => True,
-               Name      => Convert_Qualified_Name
-                 (Type_Name.P_Fully_Qualified_Name_Array)));
+              (Is_Static          => True,
+               Name               => Convert_Qualified_Name
+                 (Type_Name.P_Fully_Qualified_Name_Array),
+               Last_Comp_Unit_Idx => Comp_Unit_Idx));
          end return;
       elsif N.P_Is_Enum_Type then
 
          if not Is_Static then
             return Res : Translation_Result (Success => True) do
                Res.Res.Set (Other_Enum_Typ'
-                 (Is_Static => False,
-                  Name      =>
+                 (Is_Static          => False,
+                  Name               =>
                     Convert_Qualified_Name
-                      (Type_Name.P_Fully_Qualified_Name_Array)));
+                      (Type_Name.P_Fully_Qualified_Name_Array),
+                  Last_Comp_Unit_Idx => Comp_Unit_Idx));
             end return;
          end if;
          declare
@@ -2920,24 +2978,26 @@ package body TGen.Types.Translation is
               or else Root_Type_Name = "standard.wide_character"
               or else Root_Type_Name = "standard.wide_wide_character"
             then
-               return Translate_Char_Decl (N, Type_Name);
+               return Translate_Char_Decl (N, Type_Name, Comp_Unit_Idx);
             else
-               return Translate_Enum_Decl (N, Root_Type, Type_Name);
+               return Translate_Enum_Decl
+                 (N, Root_Type, Type_Name, Comp_Unit_Idx);
             end if;
          end;
 
       elsif N.P_Is_Float_Type then
          if Is_Static then
-            return Translate_Float_Decl (N, Type_Name);
+            return Translate_Float_Decl (N, Type_Name, Comp_Unit_Idx);
          else
             return Res : Translation_Result (Success => True) do
                Res.Res.Set
                  (Float_Typ'
-                    (Is_Static => False,
-                     Has_Range => False,
-                     Name      =>
+                    (Is_Static          => False,
+                     Has_Range          => False,
+                     Name               =>
                        Convert_Qualified_Name
-                         (Type_Name.P_Fully_Qualified_Name_Array)));
+                         (Type_Name.P_Fully_Qualified_Name_Array),
+                     Last_Comp_Unit_Idx => Comp_Unit_Idx));
             end return;
          end if;
 
@@ -2946,63 +3006,71 @@ package body TGen.Types.Translation is
              Ada_Ordinary_Fixed_Point_Def_Range
          then
             if Is_Static then
-               return Translate_Ordinary_Fixed_Decl (N, Type_Name);
+               return Translate_Ordinary_Fixed_Decl
+                        (N, Type_Name, Comp_Unit_Idx);
             else
                return Res : Translation_Result (Success => True) do
                   Res.Res.Set
                     (Ordinary_Fixed_Typ'
-                       (Is_Static => False,
-                        Name      =>
+                       (Is_Static          => False,
+                        Name               =>
                           Convert_Qualified_Name
-                            (Type_Name.P_Fully_Qualified_Name_Array)));
+                            (Type_Name.P_Fully_Qualified_Name_Array),
+                        Last_Comp_Unit_Idx => Comp_Unit_Idx));
                end return;
             end if;
          else
             if Is_Static then
-               return Translate_Decimal_Fixed_Decl (N, Type_Name);
+               return Translate_Decimal_Fixed_Decl
+                        (N, Type_Name, Comp_Unit_Idx);
             else
                return Res : Translation_Result (Success => True) do
                   Res.Res.Set
                     (Decimal_Fixed_Typ'
-                       (Is_Static => False,
-                        Has_Range => False,
-                        Name      =>
+                       (Is_Static          => False,
+                        Has_Range          => False,
+                        Name               =>
                           Convert_Qualified_Name
-                            (Type_Name.P_Fully_Qualified_Name_Array)));
+                            (Type_Name.P_Fully_Qualified_Name_Array),
+                        Last_Comp_Unit_Idx => Comp_Unit_Idx));
                end return;
             end if;
          end if;
 
       elsif N.P_Is_Array_Type then
-         return Translate_Array_Decl (N, Type_Name);
+         return Translate_Array_Decl (N, Type_Name, Comp_Unit_Idx);
 
       elsif N.P_Is_Record_Type then
          if N.P_Is_Tagged_Type then
             return Res : Translation_Result (Success => True) do
                Res.Res.Set
                  (Unsupported_Typ'
-                    (Name =>
+                    (Name               =>
                        Convert_Qualified_Name
-                         (Type_Name.P_Fully_Qualified_Name_Array)));
+                         (Type_Name.P_Fully_Qualified_Name_Array),
+                     Last_Comp_Unit_Idx => Comp_Unit_Idx));
             end return;
          else
-            return Translate_Record_Decl (N, Type_Name);
+            return Translate_Record_Decl (N, Type_Name, Comp_Unit_Idx);
          end if;
 
       elsif N.P_Is_Access_Type then
          return Res : Translation_Result (Success => True) do
             Res.Res.Set
               (Access_Typ'
-                 (Name =>
+                 (Name               =>
                     Convert_Qualified_Name
-                      (Type_Name.P_Fully_Qualified_Name_Array)));
+                      (Type_Name.P_Fully_Qualified_Name_Array),
+                  Last_Comp_Unit_Idx => Comp_Unit_Idx));
          end return;
       end if;
 
       return Res : Translation_Result (Success => True) do
          Res.Res.Set (Unsupported_Typ'
-           (Name => Convert_Qualified_Name
-            (Type_Name.P_Fully_Qualified_Name_Array)));
+           (Name               =>
+              Convert_Qualified_Name
+                (Type_Name.P_Fully_Qualified_Name_Array),
+            Last_Comp_Unit_Idx => Comp_Unit_Idx));
       end return;
 
    exception

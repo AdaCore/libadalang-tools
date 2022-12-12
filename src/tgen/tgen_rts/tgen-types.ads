@@ -43,6 +43,10 @@ package TGen.Types is
       Name : Ada_Qualified_Name;
       --  Fully qualified name of the type
 
+      Last_Comp_Unit_Idx : Positive;
+      --  Index, in Name, of the last identifier of the compilation unit in
+      --  which this type is declared.
+
    end record;
 
    function Template return String is ("");
@@ -108,6 +112,10 @@ package TGen.Types is
    function Package_Name (Self : Typ) return String;
    function Package_Name (Self : Typ) return Ada_Qualified_Name;
    --  Return the package name this type belongs to
+
+   function Compilation_Unit_Name (Self : Typ) return String;
+   function Compilation_Unit_Name (Self : Typ) return Ada_Qualified_Name;
+   --  Return the name of the compilation unit this type belongs to
 
    function Is_Constrained (Self : Typ) return Boolean is (False);
    --  An array type with indefinite bounds must be constrained, a discriminant

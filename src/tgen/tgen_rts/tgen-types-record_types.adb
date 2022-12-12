@@ -808,9 +808,10 @@ package body TGen.Types.Record_Types is
          Components : constant Component_Map :=
            Disc_Record.Components (Current_Context);
          R          : constant Record_Typ :=
-           (Name            => Disc_Record.Name,
-            Component_Types => Components,
-            Static_Gen      => Disc_Record.Static_Gen);
+           (Name               => Disc_Record.Name,
+            Last_Comp_Unit_Idx => Disc_Record.Last_Comp_Unit_Idx,
+            Component_Types    => Components,
+            Static_Gen         => Disc_Record.Static_Gen);
       begin
          Append
            (Res,

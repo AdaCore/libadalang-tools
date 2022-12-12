@@ -223,8 +223,8 @@ package body TGen.Libgen is
               Support_Library_Package
                 (if T.Get.Kind in Anonymous_Kind
                  then TGen.Types.Constraints.As_Anonymous_Typ (T)
-                        .Named_Ancestor.Get.Package_Name
-                 else T.Get.Package_Name);
+                        .Named_Ancestor.Get.Compilation_Unit_Name
+                 else T.Get.Compilation_Unit_Name);
             if Package_Dependency /= Pack_Name then
                Package_Dependencies.Include (Package_Dependency);
             end if;
@@ -281,7 +281,7 @@ package body TGen.Libgen is
             declare
                use Types_Per_Package_Maps;
                Pack_Name      : constant Ada_Qualified_Name :=
-                 Support_Library_Package (T.Get.Package_Name);
+                 Support_Library_Package (T.Get.Compilation_Unit_Name);
                Cur            : Cursor := Dest.Find (Pack_Name);
                Dummy_Inserted : Boolean;
             begin
