@@ -1,0 +1,35 @@
+stages:
+  - build_and_test
+
+#########
+# BUILD #
+#########
+
+build_and_test:
+  services:
+     - image:sandbox
+     - cpu:8
+     - mem:16
+  stage: build_and_test
+  script:
+    - . ~/.aws_container_credentials
+    - export PATH=/it/e3/bin:$PATH
+
+    # Tell the anod sandbox to use our repository
+    - cd /it/wave
+    - anod vcs --add-repo libadalang-tools $CI_PROJECT_DIR
+
+    # Build and test
+    - anod build libadalang-tools
+    - anod test libadalang-tools
+    - e3-testsuite-report
+        --failure-exit-code 1
+        --xunit-output $CI_PROJECT_DIR/xunit_output.xml
+        x86_64-linux/laltools-test/results/new/
+
+  artifacts:
+    when: always
+    paths:
+      - xunit_output.xml
+    reports:
+      junit: xunit_output.xml
