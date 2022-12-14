@@ -38,7 +38,9 @@ package Pp.Actions is
       Node           : Ada_Node;
       Output         : out Char_Vector;
       Messages       : out Pp.Scanner.Source_Message_Vector;
-      Partial_Gnatpp : Boolean := False) with
+      Partial_GNATPP : Boolean := False;
+      Start_Child_Index : Natural := 0;
+      End_Child_Index   : Natural := 0) with
      Pre => Pp.Scanner.Source_Message_Vectors.Is_Empty (Messages);
    --  This pretty prints the given source. Parameters:
    --
@@ -61,7 +63,7 @@ package Pp.Actions is
    --
    --     Messages -- Error messages.
    --
-   --     Partial_Gnatpp -- Boolean parameterset when Format_Vector is called
+   --     Partial_GNATPP -- Boolean parameterset when Format_Vector is called
    --     in a context of code snippet reformatting (from partial-gnatpp).
    --
    --  If Messages is not empty, then the client should notify the user
@@ -77,10 +79,10 @@ package Pp.Actions is
    --  Per_File_Action. Format_Vector is for calling from text editors and
    --  the like. Format_Vector is called from lalstub and partial-gnatpp.
 
-   procedure Set_Partial_Gnatpp_Offset (Val : Natural);
-   function Get_Partial_Gnatpp_Offset return Natural;
-   --  These two accessors are used by partial_gnatpp to write/read
-   --  global Partial_Gnatpp_Offset variable value. They are used exclusively
+   procedure Set_Partial_GNATPP_Offset (Val : Natural);
+   function Get_Partial_GNATPP_Offset return Natural;
+   --  These two accessors are used by Partial_GNATPP to write/read
+   --  global Partial_GNATPP_Offset variable value. They are used exclusively
    --  for the partial formatting of the code.
 
    procedure Clear_Template_Tables;

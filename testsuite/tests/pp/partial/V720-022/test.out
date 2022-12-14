@@ -23,17 +23,15 @@ main.adb(<IfStmt main.adb:5:11-11:17>) - 5:1-11:17
 *************************************
 
 *************************************
-main.adb(<ForLoopStmt main.adb:4:4-12:16>) - 4:1-12:16
+main.adb(<IfStmt main.adb:5:11-11:17>) - 5:1-11:17
 ^
-   for Item of Result loop
       if Item.kind = Snippet then
          declare
             X : Integer;
          begin
             null;
          end;
-      end if;
-   end loop;$
+      end if;$
 *************************************
 
 *************************************

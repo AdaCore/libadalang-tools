@@ -42,7 +42,7 @@ package Pp.Formatting is
    Token_Mismatch : exception;
    --  Raised by Tree_To_Ada if it detects a bug in itself that causes the
    --  output tokens to not match the input properly.
-   Partial_Gnatpp_Error : exception;
+   Partial_GNATPP_Error : exception;
    --  Raised in partial gnatpp formatting mode when infinite loops are
    --  detected.
 
@@ -286,7 +286,7 @@ package Pp.Formatting is
       Src_Buf        : in out Buffer;
       Cmd            : Utils.Command_Lines.Command_Line;
       Partial        : Boolean;
-      Partial_Gnatpp : Boolean := False);
+      Partial_GNATPP : Boolean := False);
    --  Input is the original source without any processing. This is needed
    --  for copying the pp off regions.
    --  The first pretty-printing pass walks the tree and produces text,

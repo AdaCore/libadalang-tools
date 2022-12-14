@@ -15,7 +15,7 @@ partial_gnatpp -P default.gpr -S src/type_declarations.ads -SL 51 -EL 52
 
 echo "" 
 echo "    **   Incomplete type declarations: Recursive type example"
-partial_gnatpp -P default.gpr -S src/type_declarations.ads -SL 58 -EL 59
+partial_gnatpp -P default.gpr -S src/type_declarations.ads -SL 58 -SC 3 -EL 58 -EC 4
 partial_gnatpp -P default.gpr -S src/type_declarations.ads -SL 59 -EL 60
 
 partial_gnatpp -P default.gpr -S src/type_declarations.ads -SL 57 -EL 60 --source-line-breaks

@@ -23,22 +23,96 @@
 --
 --  Common GNATpp partial selection utilities
 
+with Ada.Assertions;
+with Ada.Characters.Latin_1;
 with Ada.Directories;
-with Ada.Text_IO;
 with Ada.Strings.Unbounded;
 with Ada.Strings.Wide_Wide_Fixed;
-with Ada.Characters.Latin_1;
+with Ada.Text_IO;
 
 with GNAT.Strings;
 
-with Libadalang.Common; use Libadalang.Common;
 with Laltools.Common;   use Laltools.Common;
+with Laltools.Refactor; use Laltools.Refactor;
+
 with Langkit_Support.Text; use Langkit_Support.Text;
-with Utils.Command_Lines;
+
+with Libadalang.Common; use Libadalang.Common;
 
 with Pp.Actions;
 
+with Utils.Command_Lines;
+
 package body Laltools.Partial_GNATPP is
+
+   function "+"
+     (S : Utils.Char_Vectors.Char_Vector)
+      return Ada.Strings.Unbounded.Unbounded_String
+   is (Ada.Strings.Unbounded.To_Unbounded_String
+         (Utils.Char_Vectors.Char_Vectors.Elems (S)
+            (1 .. Utils.Char_Vectors.Char_Vectors.Last_Index (S))));
+   --  Converts a Char_Vector into an Unbounded_String
+
+   type Partial_Select_Edits is
+      record
+         Unit : Analysis_Unit;
+         Node : Ada_Node;
+         Edit : Text_Edit;
+      end record;
+   --  Stores the selected region related information
+
+   procedure Print (E : Partial_Select_Edits);
+   pragma Unreferenced (Print);
+   --  Print an E in an human readable format to the standard output
+
+   procedure Get_Selected_Region_Enclosing_Node
+     (Unit             :     Analysis_Unit;
+      SL_Range         : Source_Location_Range;
+      Start_Node       : out Ada_Node;
+      End_Node         : out Ada_Node;
+      Enclosing_Node   : out Ada_Node;
+      Input_Sel        : out Utils.Char_Vectors.Char_Vector;
+      Output_Sel_Range : out Source_Location_Range);
+   --  Retrieves the first and the last Ada node of a given selection range.
+   --  These might be the same relevant node or different nodes depending on
+   --  the initial text selection.
+   --  The closest enclosing parent is also computed. It will be the start or
+   --  end node when these are identical and the first common parent when
+   --  these are different.
+   --  Input_Sel will contain the selected region of the file to be rewritten.
+   --  Output_Sel_Range contains the Source_Location_Range to be rewritten.
+
+   function Get_Previous_Sibling (Node : Ada_Node) return Ada_Node;
+   --  Returns the node's previous sibling or No_Ada_Node if no sibling found
+
+   function Get_Next_Sibling (Node : Ada_Node) return Ada_Node;
+   --  Returns the node's next sibling or No_Ada_Node if no sibling found
+
+   function Get_Starting_Offset
+     (Node                   : Ada_Node;
+      PP_Indent              : Natural;
+      PP_Indent_Continuation : Natural) return Natural;
+   --  Returns the starting offset that needs to be used for the selected Node
+   --  formatting
+
+   procedure Filter_Initially_Selected_Lines_From_Output
+     (Unit              : Analysis_Unit;
+      Initial_SL_Range  : Source_Location_Range;
+      Output            : Utils.Char_Vectors.Char_Vector;
+      Output_SL_Range   : Source_Location_Range;
+      New_Output        : out Utils.Char_Vectors.Char_Vector;
+      New_SL_Range      : out Source_Location_Range);
+   --  Retrieves the initial selected line(s) from the Output and returns
+   --  the related Char_Vector with the associated new selection range.
+   --  This will be used only for the case when the initial sourece line breaks
+   --  are preserved.
+   --  The Initial_SL_Range contains the initial source location range selected
+   --  in the source file related to the given Unit.
+   --  The Enclosing_Node is the enclosing parent that was reformatted.
+   --  Input_Sel will contain the initial text selection of the enclosing node.
+   --  Output and Output_SL_Range contains the results of Format_Vector.
+   --  New_Output and New_SL_Range will contain the filtered lines of the
+   --  reformatted selection.
 
    -----------
    -- Print --
@@ -73,7 +147,7 @@ package body Laltools.Partial_GNATPP is
    --  controls the lookup direction. Returns No_Token if no whitespace
    --  is found or if Token = No_Token.
 
-   function Get_Selection
+   function Get_Selection_Text
      (Unit : Analysis_Unit; Node : Ada_Node;
       Start_Tok, End_Tok : Token_Reference)
       return Utils.Char_Vectors.Char_Vector;
@@ -180,11 +254,11 @@ package body Laltools.Partial_GNATPP is
       return No_Token;
    end Next_Non_Whitespace;
 
-   ---------------------
-   --  Get_Selection  --
-   ---------------------
+   --------------------------
+   --  Get_Selection_Text  --
+   --------------------------
 
-   function Get_Selection
+   function Get_Selection_Text
      (Unit               : Analysis_Unit;
       Node               : Ada_Node;
       Start_Tok, End_Tok : Token_Reference)
@@ -346,7 +420,7 @@ package body Laltools.Partial_GNATPP is
       end loop;
 
       return Selection;
-   end Get_Selection;
+   end Get_Selection_Text;
 
    ------------------------------------------
    --  Get_Selected_Region_Enclosing_Node  --
@@ -557,9 +631,9 @@ package body Laltools.Partial_GNATPP is
                    (Enclosing_Node.Sloc_Range.End_Line,
                     Enclosing_Node.Sloc_Range.End_Column - 1)));
 
-         Input_Sel := Get_Selection (Unit,
-                                     Enclosing_Node,
-                                     True_Start_Tok, True_End_Tok);
+         Input_Sel := Get_Selection_Text (Unit,
+                                          Enclosing_Node,
+                                          True_Start_Tok, True_End_Tok);
 
          --  Start_Line/Start_Col stores the starting line/column information
          --  for the current selection.
@@ -703,7 +777,9 @@ package body Laltools.Partial_GNATPP is
       Next_Sibling : constant Ada_Node := Get_Next_Sibling (Node);
       Offset       : Natural := 0;
    begin
-      if Prev_Sibling /= No_Ada_Node and then Next_Sibling /= No_Ada_Node
+      if Node.Kind in Ada_Ada_List then
+         Offset := Natural (Node.Sloc_Range.Start_Column);
+      elsif Prev_Sibling /= No_Ada_Node and then Next_Sibling /= No_Ada_Node
         and then Prev_Sibling.Sloc_Range.Start_Column =
           Next_Sibling.Sloc_Range.Start_Column
       then
@@ -840,10 +916,15 @@ package body Laltools.Partial_GNATPP is
          Start_Line   : constant Line_Number := SL_Range.Start_Line;
          Line_Nb      : Natural := 0;
          Crt_Line_Nb  : Line_Number := 0;
+
+         Last_Was_Split_Char : Boolean := False;
+
       begin
          for Idx in Str'Range loop
+            Last_Was_Split_Char := False;
             Append (Crt_Line, Str (Idx));
             if Str (Idx) = Split_Char then
+               Last_Was_Split_Char := True;
                Line_Nb := Line_Nb + 1;
                Crt_Line_Nb := Line_Number (Line_Nb + Natural (Start_Line) - 1);
                Sel_Lines_Arr (Line_Nb) := Selected_Line_Record'
@@ -858,6 +939,18 @@ package body Laltools.Partial_GNATPP is
             end if;
          end loop;
 
+         if not Last_Was_Split_Char then
+            Line_Nb := Line_Nb + 1;
+            Crt_Line_Nb := Line_Number (Line_Nb + Natural (Start_Line) - 1);
+            Sel_Lines_Arr (Line_Nb) := Selected_Line_Record'
+              (Line_Nb => Crt_Line_Nb,
+               Line    => Crt_Line,
+               SLOC    => Source_Location_Range'
+                 (Start_Line   => Crt_Line_Nb,
+                  End_Line     => Crt_Line_Nb,
+                  Start_Column => 1,
+                  End_Column   => Column_Number (Length (Crt_Line) - 1)));
+         end if;
       end Split_Lines;
 
       ----------------------------------------------
@@ -906,6 +999,7 @@ package body Laltools.Partial_GNATPP is
             begin
                if Idx = Filtered_Arr'Last
                  and then S'Last > S'First
+                 and then S.all (S'Last) = LF
                then
                   Sel.Append (S.all (S'First .. S'Last - 1));
                   GNAT.Strings.Free (S);
@@ -1091,7 +1185,7 @@ package body Laltools.Partial_GNATPP is
                                      PP_Indent_Continuation (PP_Options));
 
       if Offset /= 0 then
-         Set_Partial_Gnatpp_Offset (Offset - 1);
+         Set_Partial_GNATPP_Offset (Offset - 1);
       end if;
 
       --  Format_Vector will rewrite the input selection and returns the
@@ -1105,7 +1199,7 @@ package body Laltools.Partial_GNATPP is
          Node           => Formatted_Node,
          Output         => Output,
          Messages       => PP_Messages,
-         Partial_Gnatpp => True);
+         Partial_GNATPP => True);
 
       --  In the case of preserving source line breaks switch usage, get the
       --  filtered output of the significant lines based on the initial
@@ -1129,6 +1223,479 @@ package body Laltools.Partial_GNATPP is
          end;
       end if;
 
+   end Format_Selection;
+
+   type Formatting_Region_Type (List_Slice : Boolean) is
+      record
+         Start_Token    : Libadalang.Common.Token_Reference;
+         End_Token      : Libadalang.Common.Token_Reference;
+         Enclosing_Node : Ada_Node;
+         case List_Slice is
+            when True =>
+               Start_Child_Index : Positive;
+               End_Child_Index : Positive;
+            when False =>
+               null;
+         end case;
+      end record;
+
+   function Get_Formatting_Region
+     (Unit        : Analysis_Unit;
+      Input_Range : Source_Location_Range)
+      return Formatting_Region_Type;
+   --  Given an Unit and an Input_Range, returns a Formatting_Region_Type
+   --  which:
+   --    - Start_Token is the first token to be formatted
+   --    - End_Token is the last token to be formatted
+   --    - Enclosing_Node is the node to be formatted
+   --    - List_Slice is set to True if Enclosing_Node is a list and only a
+   --      slice of its elements is to be formatted
+   --      - First_Child_Index is the first element of enclosing node to be
+   --        formatted
+   --      - End_Child_Index is the second element of enclosing node to be
+   --        formatted
+
+   -----------
+   -- Image --
+   -----------
+
+   function Image (Edit : Partial_Formatting_Edit) return String is
+      use Ada.Characters.Latin_1;
+      use Ada.Directories;
+
+   begin
+      return
+        "*************************************"
+        & LF
+        & Simple_Name (Edit.Formatted_Node.Unit.Get_Filename)
+        & "("
+        & Edit.Formatted_Node.Image
+        & ") - "
+        & Image (Edit.Edit.Location)
+        & LF
+        & '^'
+        & LF
+        & Ada.Strings.Unbounded.To_String (Edit.Edit.Text)
+        & '$'
+        & LF
+        & "*************************************";
+   end Image;
+
+   subtype Relevant_Parent is Ada_Node_Kind_Type with
+     Predicate => Relevant_Parent in
+       Ada_Compilation_Unit
+       | Ada_Declarative_Part_Range
+       | Ada_Handled_Stmts_Range
+       | Ada_Stmt_List
+       | Ada_Stmt
+       | Ada_Decl_Block_Range
+       | Ada_Package_Decl_Range
+       | Ada_Package_Body_Range
+       | Ada_Subp_Decl_Range
+       | Ada_Subp_Body_Range
+       | Ada_Type_Decl
+       | Ada_Object_Decl_Range
+       | Ada_Entry_Decl_Range
+       | Ada_Entry_Body_Range
+       | Ada_Task_Body_Range
+       | Ada_Single_Task_Decl_Range
+       | Ada_Generic_Package_Decl_Range
+       | Ada_Generic_Package_Renaming_Decl_Range
+       | Ada_Package_Renaming_Decl_Range
+       | Ada_Exception_Decl_Range
+       | Ada_Null_Subp_Decl_Range;
+   ---------------------------
+   -- Get_Formatting_Region --
+   ---------------------------
+
+   function Get_Formatting_Region
+     (Unit        : Analysis_Unit;
+      Input_Range : Source_Location_Range)
+      return Formatting_Region_Type
+   is
+      function Is_Relevant_Parent_Node
+        (Node : Ada_Node'Class)
+         return Boolean
+      is (not Node.Is_Null and then Node.Kind in Relevant_Parent);
+      --  Checks if Node is not null and if its Kind is in Relevant_Parent
+
+      procedure Get_First_Common_Relevant_Parent
+        (Parents_A : Ada_Node_Array;
+         Parents_B : Ada_Node_Array;
+         Parent    : out Ada_Node;
+         Index     : out Natural)
+        with Post => (if Parent.Is_Null then Index = 0);
+      --  Given Parents_A and Parents_B, sets Parent to the first common parent
+      --  which has Is_Relevant_Parent_Node as True. Also sets Index to the
+      --  array index which is the same in both Parents_A and Parents_B.
+      --  If the first common relevant parent is not found, then Parent will
+      --  be set to null and Index to 0.
+
+      --------------------------------------
+      -- Get_First_Common_Relevant_Parent --
+      --------------------------------------
+
+      procedure Get_First_Common_Relevant_Parent
+        (Parents_A : Ada_Node_Array;
+         Parents_B : Ada_Node_Array;
+         Parent    : out Ada_Node;
+         Index     : out Natural) is
+      begin
+         Parent := No_Ada_Node;
+         Index := 0;
+
+         declare
+            Max_Length : constant Natural :=
+              Positive'Min (Parents_A'Length, Parents_B'Length);
+         begin
+            if Max_Length = 0 then
+               return;
+            end if;
+
+            for J in 0 .. Max_Length - 1 loop
+               declare
+                  Parent_A : Ada_Node renames Parents_A (Parents_A'Last - J);
+                  Parent_B : Ada_Node renames Parents_B (Parents_B'Last - J);
+
+               begin
+                  exit when Parent_A /= Parent_B;
+
+                  if Is_Relevant_Parent_Node (Parent_A) then
+                     Parent := Parent_A;
+                     Index := J;
+                  end if;
+               end;
+            end loop;
+         end;
+      end Get_First_Common_Relevant_Parent;
+
+      Start_Token_First_Estimate  : constant Token_Reference :=
+        Unit.Lookup_Token
+          (Source_Location'
+             (Line => Input_Range.Start_Line,
+              Column => Input_Range.Start_Column));
+      Start_Token_Second_Estimate : constant Token_Reference :=
+        (if Kind (Data (Start_Token_First_Estimate)) = Ada_Whitespace then
+            Next_Non_Whitespace (Start_Token_First_Estimate, Forward)
+         else
+            Start_Token_First_Estimate);
+
+      End_Token_First_Estimate  : constant Token_Reference :=
+        Unit.Lookup_Token
+          (Sloc =>
+             Source_Location'
+               (Line => Input_Range.End_Line,
+                Column => Input_Range.End_Column));
+      End_Token_Second_Estimate : constant Token_Reference :=
+        (if Input_Range.Start_Line = Input_Range.End_Line
+           and Input_Range.Start_Column = Input_Range.End_Column
+         then
+            Start_Token_Second_Estimate
+         else
+            (if Kind (Data (End_Token_First_Estimate)) = Ada_Whitespace then
+                Next_Non_Whitespace (End_Token_First_Estimate, Backward)
+             else
+                End_Token_First_Estimate));
+
+      Start_Node_Estimate         : constant Ada_Node :=
+        Lookup (Unit, Start_Token_Second_Estimate, Forward);
+      Start_Node_Estimate_Parents : constant Ada_Node_Array :=
+        Start_Node_Estimate.Parents;
+      End_Node_Estimate           : constant Ada_Node :=
+        Lookup (Unit, End_Token_Second_Estimate, Backward);
+      End_Node_Estimate_Parents   : constant Ada_Node_Array :=
+        End_Node_Estimate.Parents;
+
+      Enclosing_Parent       : Ada_Node := No_Ada_Node;
+      Enclosing_Parent_Index : Natural := 0;
+
+      Start_Token : Token_Reference;
+      End_Token   : Token_Reference;
+
+   begin
+      Get_First_Common_Relevant_Parent
+        (Parents_A => Start_Node_Estimate_Parents,
+         Parents_B => End_Node_Estimate_Parents,
+         Parent    => Enclosing_Parent,
+         Index     => Enclosing_Parent_Index);
+
+      Ada.Assertions.Assert (not Enclosing_Parent.Is_Null);
+
+      if Enclosing_Parent.Kind in Ada_Declarative_Part_Range then
+         --  This if statment can in the future be removed.
+         --  This is to deal with Ada_Node_List nodes children of an
+         --  Declarative_Part nodes. This rule can in the future be relaxed
+         --  to simply Ada_Ada_List and this branch removed.
+
+         declare
+            Start_Node       : constant Ada_Node :=
+              Start_Node_Estimate_Parents
+                (Start_Node_Estimate_Parents'Last
+                 - Enclosing_Parent_Index
+                 - 2);
+            Start_Node_Index : constant Positive := Start_Node.Child_Index + 1;
+            End_Node         : constant Ada_Node :=
+              End_Node_Estimate_Parents
+                (End_Node_Estimate_Parents'Last
+                 - Enclosing_Parent_Index
+                 - 2);
+            End_Node_Index   : constant Positive := End_Node.Child_Index + 1;
+
+            Is_Slice : constant Boolean :=
+              (Start_Node_Index /= End_Node_Index)
+              and then (Start_Node_Index /= 1
+                        or End_Node_Index /= End_Node.Parent.Last_Child_Index);
+
+         begin
+            Ada.Assertions.Assert (Start_Node.Parent = End_Node.Parent);
+            Ada.Assertions.Assert (Start_Node.Parent.Kind in Ada_Ada_List);
+
+            Start_Token :=
+              (if Start_Node.Compare
+                    (Start_Sloc
+                       (Sloc_Range (Data (Start_Token_Second_Estimate))))
+                  = Before
+               then
+                  Start_Token_Second_Estimate
+               else
+                  Start_Node.Token_Start);
+            End_Token :=
+              (if End_Node.Compare
+                    (Start_Sloc
+                       (Sloc_Range (Data (End_Token_Second_Estimate))))
+                  = After
+               then
+                  End_Token_Second_Estimate
+               else
+                  Unit.Lookup_Token
+                    (Source_Location'
+                       (End_Node.Sloc_Range.End_Line,
+                        End_Node.Sloc_Range.End_Column - 1)));
+            return
+              (if Is_Slice or else
+                 (Start_Node_Index = 1
+                   and then End_Node_Index = End_Node.Parent.Last_Child_Index)
+               then
+                  Formatting_Region_Type'
+                    (Start_Token       => Start_Token,
+                     End_Token         => End_Token,
+                     Enclosing_Node    => Start_Node.Parent,
+                     List_Slice        => True,
+                     Start_Child_Index => Start_Node_Index,
+                     End_Child_Index   => End_Node_Index)
+               else
+                  Formatting_Region_Type'
+                    (Start_Token       => Start_Token,
+                     End_Token         => End_Token,
+                     Enclosing_Node    => Start_Node,
+                     List_Slice        => False));
+         end;
+
+      elsif Enclosing_Parent.Kind in Ada_Stmt_List then
+         declare
+            Start_Node       : constant Ada_Node :=
+              Start_Node_Estimate_Parents
+                (Start_Node_Estimate_Parents'Last
+                 - Enclosing_Parent_Index
+                 - 1);
+            Start_Node_Index : constant Positive := Start_Node.Child_Index + 1;
+            End_Node         : constant Ada_Node :=
+              End_Node_Estimate_Parents
+                (End_Node_Estimate_Parents'Last
+                 - Enclosing_Parent_Index
+                 - 1);
+            End_Node_Index   : constant Positive := End_Node.Child_Index + 1;
+
+            Is_Slice : constant Boolean :=
+              (Start_Node_Index /= End_Node_Index)
+               and then (Start_Node_Index /= 1
+                         or End_Node_Index /=
+                              End_Node.Parent.Last_Child_Index);
+
+         begin
+            Ada.Assertions.Assert (Start_Node.Parent = End_Node.Parent);
+            Ada.Assertions.Assert (Start_Node.Parent.Kind in Ada_Ada_List);
+
+            Start_Token :=
+              (if Start_Node.Compare
+                    (Start_Sloc
+                       (Sloc_Range (Data (Start_Token_Second_Estimate))))
+                  = Before
+               then
+                  Start_Token_Second_Estimate
+               else
+                  Start_Node.Token_Start);
+            End_Token :=
+              (if End_Node.Compare
+                    (Start_Sloc
+                       (Sloc_Range (Data (End_Token_Second_Estimate))))
+                  = After
+               then
+                  End_Token_Second_Estimate
+               else
+                  Unit.Lookup_Token
+                    (Source_Location'
+                       (End_Node.Sloc_Range.End_Line,
+                        End_Node.Sloc_Range.End_Column - 1)));
+            return
+              (if Is_Slice or else
+                 (Start_Node_Index = 1
+                   and then End_Node_Index = End_Node.Parent.Last_Child_Index)
+               then
+                  Formatting_Region_Type'
+                    (Start_Token       => Start_Token,
+                     End_Token         => End_Token,
+                     Enclosing_Node    => Start_Node.Parent,
+                     List_Slice        => True,
+                     Start_Child_Index => Start_Node_Index,
+                     End_Child_Index   => End_Node_Index)
+               else
+                  Formatting_Region_Type'
+                    (Start_Token       => Start_Token,
+                     End_Token         => End_Token,
+                     Enclosing_Node    => Start_Node,
+                     List_Slice        => False));
+         end;
+      else
+         Start_Token :=
+           (if Enclosing_Parent.Compare
+                 (Start_Sloc (Sloc_Range (Data (Start_Token_Second_Estimate))))
+               = Before
+            then
+               Start_Token_Second_Estimate
+            else
+               Enclosing_Parent.Token_Start);
+         End_Token :=
+           (if Enclosing_Parent.Compare
+                 (Start_Sloc (Sloc_Range (Data (End_Token_Second_Estimate))))
+               = After
+            then
+               End_Token_Second_Estimate
+            else
+               Enclosing_Parent.Token_End);
+
+         return
+           Formatting_Region_Type'
+             (Start_Token    => Start_Token,
+              End_Token      => End_Token,
+              Enclosing_Node => Enclosing_Parent,
+              List_Slice     => False);
+      end if;
+   end Get_Formatting_Region;
+
+   ------------------------
+   --  Format_Selection  --
+   ------------------------
+
+   function Format_Selection
+     (Unit                  : Analysis_Unit;
+      Input_Selection_Range : Source_Location_Range;
+      PP_Options            : Pp.Command_Lines.Cmd_Line)
+      return Partial_Formatting_Edit
+   is
+      use Pp.Actions;
+      use Pp.Command_Lines;
+      use Utils.Command_Lines;
+
+      Formatting_Region  : constant Formatting_Region_Type :=
+        Get_Formatting_Region (Unit, Input_Selection_Range);
+      Offset             : constant Natural :=
+        Get_Starting_Offset
+          (Formatting_Region.Enclosing_Node,
+           PP_Indentation (PP_Options),
+           PP_Indent_Continuation (PP_Options));
+
+   begin
+      if Offset /= 0 then
+         Set_Partial_GNATPP_Offset (Offset - 1);
+      end if;
+
+      declare
+         Input_Text      : constant Utils.Char_Vectors.Char_Vector :=
+           Get_Selection_Text
+             (Formatting_Region.Enclosing_Node.Unit,
+              Formatting_Region.Enclosing_Node,
+              Formatting_Region.Start_Token,
+              Formatting_Region.End_Token);
+         Formatted_Text  : Utils.Char_Vectors.Char_Vector;
+         Diagnostics     : Pp.Scanner.Source_Message_Vector;
+
+      begin
+         if Formatting_Region.List_Slice then
+            Format_Vector
+              (Cmd               => PP_Options,
+               Input             => Input_Text,
+               Node              => Formatting_Region.Enclosing_Node,
+               Output            => Formatted_Text,
+               Messages          => Diagnostics,
+               Partial_GNATPP    => True,
+               Start_Child_Index => Formatting_Region.Start_Child_Index,
+               End_Child_Index   => Formatting_Region.End_Child_Index);
+         else
+            Format_Vector
+              (Cmd            => PP_Options,
+               Input          => Input_Text,
+               Node           => Formatting_Region.Enclosing_Node,
+               Output         => Formatted_Text,
+               Messages       => Diagnostics,
+               Partial_GNATPP => True);
+         end if;
+
+         declare
+            Start_Line, End_Line : Line_Number;
+            Start_Col, End_Col   : Column_Number;
+            Formatted_Range      : Source_Location_Range;
+
+         begin
+            Start_Line :=
+              Sloc_Range (Data (Formatting_Region.Start_Token)).Start_Line;
+
+            declare
+               use Ada.Strings.Wide_Wide_Fixed;
+
+               Line                   : constant Text_Type :=
+                 Formatting_Region.Enclosing_Node.Unit.Get_Line
+                   (Positive (Start_Line));
+               First_Non_Blank_Index  : constant Natural :=
+                 Index_Non_Blank (Line);
+               First_Non_Blank_Column : constant Natural :=
+                 (if First_Non_Blank_Index = 0 then
+                     0
+                  else
+                     Index_Non_Blank (Line) - Line'First + 1);
+
+            begin
+               Start_Col :=
+                 (if First_Non_Blank_Column /= 0
+                  and then First_Non_Blank_Column =
+                    Integer
+                      (Sloc_Range
+                           (Data
+                              (Formatting_Region.Start_Token)).Start_Column)
+                  then
+                     1
+                  else
+                     Sloc_Range
+                    (Data (Formatting_Region.Start_Token)).Start_Column);
+            end;
+
+            End_Line :=
+              Sloc_Range (Data (Formatting_Region.End_Token)).End_Line;
+            End_Col :=
+              Sloc_Range (Data (Formatting_Region.End_Token)).End_Column;
+
+            Formatted_Range :=
+              Source_Location_Range'
+                (Start_Line, End_Line, Start_Col, End_Col);
+
+            return
+              Partial_Formatting_Edit'
+                (Edit           =>
+                   Text_Edit'(Formatted_Range, +Formatted_Text),
+                 Formatted_Node => Formatting_Region.Enclosing_Node,
+                 Diagnostics    => Diagnostics);
+         end;
+      end;
    end Format_Selection;
 
 end Laltools.Partial_GNATPP;

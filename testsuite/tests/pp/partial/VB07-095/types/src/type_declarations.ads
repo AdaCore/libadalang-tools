@@ -27,15 +27,15 @@
 with Ada.Finalization;
 
 package Type_Declarations is
-   
+
    ------------------------------
    --  Full type declarations  -- 
    ------------------------------
-   
+
    type Color  is (White, Red, Yellow, Green, Blue, Brown, Black);
    type Column is range 1 .. 72;   
    type Table  is array(1 .. 10) of Integer; 
-   
+
    type My_Int is range 0 .. 1000;
    type Index is range 1 .. 5;
 
@@ -49,12 +49,12 @@ package Type_Declarations is
    --                    ^ Array literal
    --                      (aggregate)
    V : My_Int;
-   
+
    -----------------------------------
    --  Incomplete type declaration  --
    -----------------------------------
-   
-   --  Recursive type example   
+
+   --  Recursive type example
    type Cell;
    type Link is access Cell;
 
@@ -66,16 +66,16 @@ package Type_Declarations is
 
    Head   : Link  := new Cell'(0, null, null);
    Next   : Link  := Head.Succ;
-   
-   
+
+
    --  Mutually dependent access types examples
-   
-   type Person(<>);      
+
+   type Person(<>);
    type Car is tagged;
-   
+
    type Person_Name is access Person;
    type Car_Name    is access all Car'Class;
-   
+
    type Car is tagged record
       Number  : Integer;
       Owner   : Person_Name;
@@ -91,23 +91,23 @@ package Type_Declarations is
          when F => Husband        : Person_Name(Sex => M);
       end case;
    end record;
-   
+
    My_Car, Your_Car, Next_Car : Car_Name := new Car;
    Someone : Person_Name := new Person(M);
-   
-   
+
+
    --------------------------------- 
    --  Private type declarations  --
    ---------------------------------
    type Key is private;   
    type File_Name is limited private;
-   
+
    -------------------------------------
    --  Private extension declaration  --
    -------------------------------------
 
    type List is new Ada.Finalization.Controlled with private;
-   
+
    ------------------------------
    --  Task types declarations --
    ------------------------------
@@ -145,5 +145,5 @@ package Type_Declarations is
    --  Access type designating task objects example 
    type Keyboard is access Keyboard_Driver;
    Terminal : Keyboard := new Keyboard_Driver(Term_ID);
-   
+
 end Type_Declarations;

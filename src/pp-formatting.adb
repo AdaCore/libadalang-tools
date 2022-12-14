@@ -315,7 +315,7 @@ package body Pp.Formatting is
          end;
       end loop;
 
-      pragma Assert (Last_Element (V) = NL);
+      --  pragma Assert (Last_Element (V) = NL);
    end Assert_No_Trailing_Blanks;
 
    procedure Append_Temp_Line_Break
@@ -518,6 +518,7 @@ package body Pp.Formatting is
          declare
             Cur : Tokn_Cursor := Next (First (Tokns'Unrestricted_Access));
          begin
+            --  Skip the last LB sentinel
             while not After_Last (Cur) loop
                if Kind (Cur) in Comment_Kind then
                   Comment_Tokn_To_Buf (Buf, Cur, Cmd);
@@ -951,7 +952,7 @@ package body Pp.Formatting is
         (Lines_Data_P : Lines_Data_Ptr;
          Cmd : Command_Line;
          First_Time : Boolean;
-         Partial_Gnatpp : Boolean := False);
+         Partial_GNATPP : Boolean := False);
       --  Enable soft line breaks as necessary to prevent too-long lines.
       --  First_Time is for debugging.
 
@@ -959,7 +960,7 @@ package body Pp.Formatting is
         (Src_Buf : in out Buffer;
          Lines_Data_P : Lines_Data_Ptr;
          Cmd : Command_Line;
-         Partial_Gnatpp : Boolean := False);
+         Partial_GNATPP : Boolean := False);
       --  For all end-of-line comments that occur at a soft line break, enable
       --  the line break. Note that this does not modify the output.
 
@@ -969,7 +970,7 @@ package body Pp.Formatting is
          Lines_Data_P : Lines_Data_Ptr;
          Cmd : Command_Line;
          Pp_Off_Present : in out Boolean;
-         Partial_Gnatpp : Boolean := False);
+         Partial_GNATPP : Boolean := False);
       --  New_Tokns doesn't contain any comments; they are inserted into the
       --  output from Src_Tokns. Blank lines are also copied from Src_Tokns to
       --  New_Tokns. The output is also patched up in miscellaneous other ways,
@@ -982,12 +983,12 @@ package body Pp.Formatting is
 
       procedure Insert_Indentation (Lines_Data_P : Lines_Data_Ptr;
                                     Cmd : Command_Line;
-                                    Partial_Gnatpp : Boolean := False);
+                                    Partial_GNATPP : Boolean := False);
 
       procedure Insert_Alignment
         (Lines_Data_P   : Lines_Data_Ptr;
          Cmd            : Command_Line;
-         Partial_Gnatpp : Boolean := False);
+         Partial_GNATPP : Boolean := False);
       --  Expand tabs as necessary to align things
 
    end Tok_Phases;
@@ -999,7 +1000,7 @@ package body Pp.Formatting is
       Src_Buf        : in out Buffer;
       Cmd            : Command_Line;
       Partial        : Boolean;
-      Partial_Gnatpp : Boolean := False)
+      Partial_GNATPP : Boolean := False)
    is
       Lines_Data : Lines_Data_Rec renames Lines_Data_P.all;
       All_LB : Line_Break_Vector renames Lines_Data.All_LB;
@@ -1015,7 +1016,7 @@ package body Pp.Formatting is
    begin
       --  ????We probably want to do more, but this is for gnatstub
       --  for now.
-      if Partial and then not Partial_Gnatpp then
+      if Partial and then not Partial_GNATPP then
          Clear (All_LB);
          Clear (All_LBI);
          Clear (Lines_Data.Tabs);
@@ -1023,7 +1024,7 @@ package body Pp.Formatting is
          return;
       end if;
 
-      if not Partial_Gnatpp then
+      if not Partial_GNATPP then
          Tok_Phases.Split_Lines
            (Lines_Data_P, Cmd,
             First_Time => True);
@@ -1057,24 +1058,24 @@ package body Pp.Formatting is
          Tok_Phases.Split_Lines
            (Lines_Data_P, Cmd,
             First_Time => True,
-            Partial_Gnatpp => Partial_Gnatpp);
+            Partial_GNATPP => Partial_GNATPP);
 
          Tok_Phases.Enable_Line_Breaks_For_EOL_Comments
-           (Src_Buf, Lines_Data_P, Cmd, Partial_Gnatpp);
+           (Src_Buf, Lines_Data_P, Cmd, Partial_GNATPP);
 
          Tok_Phases.Insert_Comments_And_Blank_Lines
            (Src_Buf, Messages, Lines_Data_P, Cmd,
             Pp_Off_Present,
-            Partial_Gnatpp);
+            Partial_GNATPP);
 
          Tok_Phases.Split_Lines
            (Lines_Data_P, Cmd,
             First_Time => False,
-            Partial_Gnatpp => Partial_Gnatpp);
+            Partial_GNATPP => Partial_GNATPP);
 
-         Tok_Phases.Insert_Indentation (Lines_Data_P, Cmd, Partial_Gnatpp);
+         Tok_Phases.Insert_Indentation (Lines_Data_P, Cmd, Partial_GNATPP);
 
-         Tok_Phases.Insert_Alignment (Lines_Data_P, Cmd, Partial_Gnatpp);
+         Tok_Phases.Insert_Alignment (Lines_Data_P, Cmd, Partial_GNATPP);
 
          Tokns_To_Buffer (Lines_Data.Out_Buf, Lines_Data.New_Tokns, Cmd);
 
@@ -1817,6 +1818,7 @@ package body Pp.Formatting is
          Clear (Syntax_LBI);
 
          while not After_Last (Tok) loop
+
             if Kind (P) in Line_Break_Token then
                pragma Assert
                  (not (Kind (Prev (Tok)) = Spaces and then Kind (Tok) = Spaces));
@@ -1931,7 +1933,7 @@ package body Pp.Formatting is
         (Lines_Data_P : Lines_Data_Ptr;
          Cmd : Command_Line;
          First_Time : Boolean;
-         Partial_Gnatpp : Boolean := False)
+         Partial_GNATPP : Boolean := False)
       is
          Lines_Data : Lines_Data_Rec renames Lines_Data_P.all;
          All_LB : Line_Break_Vector renames Lines_Data.All_LB;
@@ -2037,14 +2039,15 @@ package body Pp.Formatting is
             end loop;
             return;
          end if;
-
          while F /= Last_Index (All_LBI) loop -- through line breaks
             Level       := 1;
             More_Levels := True;
 
             loop -- through levels
                L   := Next_Enabled (Lines_Data, F);
-               Len := Line_Len (All_LB, All_LBI (F), All_LBI (L));
+               Len :=
+                 Line_Len (All_LB, All_LBI (F), All_LBI (L))
+                   + Pp.Actions.Get_Partial_GNATPP_Offset;
 
                exit when Len <= Arg (Cmd, Max_Line_Length); -- short enough
                exit when not More_Levels; -- no more line breaks to enable
@@ -2091,10 +2094,11 @@ package body Pp.Formatting is
                      --  level, except that we don't do that within binary
                      --  operators.
 
-                     elsif Line_Len (All_LB, FF, LB (X + 1)) >
-                         Arg (Cmd, Max_Line_Length)
+                     elsif (Line_Len (All_LB, FF, LB (X + 1))
+                            + Pp.Actions.Get_Partial_GNATPP_Offset)
+                           > Arg (Cmd, Max_Line_Length)
                        or else (not Arg (Cmd, Compact)
-                                  and then All_LB (LL).Bin_Op_Count = 0)
+                                and then All_LB (LL).Bin_Op_Count = 0)
                      then
                         pragma Assert (not All_LB (LL).Enabled);
                         All_LB (LL).Enabled := True;
@@ -2124,9 +2128,10 @@ package body Pp.Formatting is
 
             All_LB (All_LBI (F)).Length := Len;
             pragma Assert
-              (All_LB (All_LBI (F)).Length =
-                 Line_Len (All_LB, All_LBI (F),
-                              All_LBI (Next_Enabled (Lines_Data, F))));
+              (All_LB (All_LBI (F)).Length
+               = Line_Len (All_LB, All_LBI (F),
+                           All_LBI (Next_Enabled (Lines_Data, F)))
+                 + Pp.Actions.Get_Partial_GNATPP_Offset);
             F := L;
          end loop; -- through line breaks
 
@@ -2139,7 +2144,7 @@ package body Pp.Formatting is
          --  In case of partial reformatting of an enum type makes that the
          --  last LB is not always enabled. This is why this assertion will
          --  fail.
-         if not Partial_Gnatpp then
+         if not Partial_GNATPP then
             pragma Debug (Assertions);
          end if;
       end Split_Lines;
@@ -2148,7 +2153,7 @@ package body Pp.Formatting is
         (Src_Buf : in out Buffer;
          Lines_Data_P : Lines_Data_Ptr;
          Cmd : Command_Line;
-         Partial_Gnatpp : Boolean := False)
+         Partial_GNATPP : Boolean := False)
       is
          Lines_Data : Lines_Data_Rec renames Lines_Data_P.all;
          All_LB : Line_Break_Vector renames Lines_Data.All_LB;
@@ -2444,7 +2449,7 @@ package body Pp.Formatting is
                else
                   --  Partial mode formatting specific tokens synchronisations
                   --  where no token mismatch is supposed to be raised
-                  if Partial_Gnatpp then
+                  if Partial_GNATPP then
 
                      if Kind (Src_Tok) = ';'
                        and then Kind (Prev (Src_Tok)) in
@@ -2458,7 +2463,7 @@ package body Pp.Formatting is
 
                         --  When enter here mostly an infinite loop situation
                         --  is detected in partial mode
-                        raise Partial_Gnatpp_Error;
+                        raise Partial_GNATPP_Error;
                      end if;
 
                   else
@@ -2484,7 +2489,7 @@ package body Pp.Formatting is
          Lines_Data_P : Lines_Data_Ptr;
          Cmd : Command_Line;
          Pp_Off_Present : in out Boolean;
-         Partial_Gnatpp : Boolean := False)
+         Partial_GNATPP : Boolean := False)
       is
          pragma Assert (not Pp_Off_Present); -- initialized by caller
          Lines_Data : Lines_Data_Rec renames Lines_Data_P.all;
@@ -2734,7 +2739,7 @@ package body Pp.Formatting is
 
             if Kind (New_Tok) = '(' then
                if Is_Empty (Paren_Stack) then
-                  if Partial_Gnatpp and then Enabled_Cur_Line = 1 then
+                  if Partial_GNATPP and then Enabled_Cur_Line = 1 then
                      Extra_Indent_For_Preserved_Line := False;
                   else
                      declare
@@ -3135,7 +3140,7 @@ package body Pp.Formatting is
                return All_LB (Syntax_LBI (X)).Indentation;
             else
                pragma Assert (Arg (Cmd, Source_Line_Breaks)
-                              or else Partial_Gnatpp);
+                              or else Partial_GNATPP);
                return 0;
             end if;
          end After_Indentation;
@@ -3599,7 +3604,7 @@ package body Pp.Formatting is
                  (if LB_Tok (LB) = New_Tok then
                     Kind (New_Tok) = Enabled_LB_Token);
                pragma Assert
-                 (if not Partial_Gnatpp then
+                 (if not Partial_GNATPP then
                     (if LB_Tok (LB) = Prev (New_Tok) then
                          (if not Arg (Cmd, Source_Line_Breaks) then
                                  Kind (Prev (New_Tok)) = Disabled_LB_Token)));
@@ -3690,7 +3695,7 @@ package body Pp.Formatting is
                   null;
 
                elsif Arg (Cmd, Source_Line_Breaks)
-                 and then not Partial_Gnatpp
+                 and then not Partial_GNATPP
                  and then
                    ((Kind (Src_Tok) in True_End_Of_Line
                      and then Kind (Prev (Src_Tok)) in True_End_Of_Line
@@ -3767,7 +3772,7 @@ package body Pp.Formatting is
                else
                   Cur_Indentation := Indentation;
 
-                  if Partial_Gnatpp
+                  if Partial_GNATPP
                     and then Kind (New_Tok) = End_Of_Input
                     and then Kind (Src_Tok) = End_Of_Input
                   then
@@ -4372,7 +4377,7 @@ package body Pp.Formatting is
                else
                   --  Handle specific cases in partial formatting where no
                   --  token mismatch raise is needed
-                  if Partial_Gnatpp then
+                  if Partial_GNATPP then
                      if Kind (Src_Tok) = ';'
                        and then Kind (Prev (Src_Tok)) in
                            Res_End | Res_Record | Res_Loop | Ident
@@ -4384,7 +4389,7 @@ package body Pp.Formatting is
                      else
                         --  When enter here mostly an infinite loop situation
                         --  is detected in partial mode
-                        raise Partial_Gnatpp_Error;
+                        raise Partial_GNATPP_Error;
                      end if;
 
                   else
@@ -4414,7 +4419,7 @@ package body Pp.Formatting is
          Clear (Saved_New_Tokns);
          pragma Assert (Syntax_Cur_Line = Last_Index (Syntax_LBI) + 1);
 
-         if not Partial_Gnatpp then
+         if not Partial_GNATPP then
             pragma Assert (Enabled_Cur_Line = Last_Index (Enabled_LBI));
          end if;
 
@@ -4430,7 +4435,7 @@ package body Pp.Formatting is
 
       procedure Insert_Indentation (Lines_Data_P : Lines_Data_Ptr;
                                     Cmd : Command_Line;
-                                    Partial_Gnatpp : Boolean := False)
+                                    Partial_GNATPP : Boolean := False)
       is
          function Is_Action_Call_Parameter (Tok : Tokn_Cursor) return Boolean;
          --  Returns true if the line break token is part of an action call
@@ -4870,16 +4875,18 @@ package body Pp.Formatting is
                      Adjust_Indentation_After_Comma (New_Tok);
                   end if;
 
-                  --  If partial formatting (called from partial_gnatpp) then
+                  --  If partial formatting (called from Partial_GNATPP) then
                   --  use an offset picked from the previous/next sibling of
                   --  the reformatted node to add spaces at the begining of
                   --  each line.
-                  if Kind (Next (New_Tok)) not in Line_Break_Token then
+                  if Kind (Next (New_Tok))
+                    not in Line_Break_Token | End_Of_Input
+                  then
                      declare
                         Offset     : constant Natural :=
-                          Pp.Actions.Get_Partial_Gnatpp_Offset;
+                          Pp.Actions.Get_Partial_GNATPP_Offset;
                         Crt_Indent : constant Natural :=
-                          (if Partial_Gnatpp then (LB.Indentation + Offset)
+                          (if Partial_GNATPP then (LB.Indentation + Offset)
                            else LB.Indentation);
                      begin
                         Append_Spaces (New_Tokns, Crt_Indent);
@@ -4909,7 +4916,7 @@ package body Pp.Formatting is
       procedure Insert_Alignment_Helper
         (Lines_Data_P   : Lines_Data_Ptr;
          Cmd            : Command_Line;
-         Partial_Gnatpp : Boolean := False);
+         Partial_GNATPP : Boolean := False);
       --  Expand tabs as necessary to align things
 
       ----------------------
@@ -4919,10 +4926,10 @@ package body Pp.Formatting is
       procedure Insert_Alignment
         (Lines_Data_P   : Lines_Data_Ptr;
          Cmd            : Command_Line;
-         Partial_Gnatpp : Boolean := False) is
+         Partial_GNATPP : Boolean := False) is
       begin
          if Alignment_Enabled (Cmd) then
-            Insert_Alignment_Helper (Lines_Data_P, Cmd, Partial_Gnatpp);
+            Insert_Alignment_Helper (Lines_Data_P, Cmd, Partial_GNATPP);
          end if;
       end Insert_Alignment;
 
@@ -4933,7 +4940,7 @@ package body Pp.Formatting is
       procedure Insert_Alignment_Helper
         (Lines_Data_P   : Lines_Data_Ptr;
          Cmd            : Command_Line;
-         Partial_Gnatpp : Boolean := False)
+         Partial_GNATPP : Boolean := False)
       is
          Lines_Data : Lines_Data_Rec renames Lines_Data_P.all;
          Tabs       : Tab_Vector renames Lines_Data.Tabs;
@@ -5651,8 +5658,7 @@ package body Pp.Formatting is
                      Allow_Joining_Paragraphs := False;
                   end if;
 
-                  if Partial_Gnatpp and then Kind (New_Tok) = End_Of_Input
-                  then
+                  if Partial_GNATPP and then Kind (New_Tok) = End_Of_Input then
                      --  In order to avoid constraint errors, in partial
                      --  gnatpp mode, when a selection needs to be reformatted
                      --  the end of input might be reached after process line
@@ -5664,7 +5670,7 @@ package body Pp.Formatting is
 
                   --  This is to handle last line of the selection in partial
                   --  mode and compute accurately the alignment spaces.
-                  if Partial_Gnatpp and then Kind (New_Tok) = End_Of_Input then
+                  if Partial_GNATPP and then Kind (New_Tok) = End_Of_Input then
                      Set_Length (Cur_Line_Tabs, 0);
 
                      --  Recompute the tabs taking into account all the lines,
@@ -5675,6 +5681,7 @@ package body Pp.Formatting is
                      Clear (First_Line_Tabs);
                      Clear (Cur_Line_Tabs);
                   end if;
+
                end;
                --  Dbg_Out.Put ("\n");
             end loop;
