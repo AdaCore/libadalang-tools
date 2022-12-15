@@ -837,8 +837,7 @@ package body Pp.Actions is
            when Ada_Subp_Spec => null,
            when Ada_Aggregate_Assoc => null,
 
-           when Ada_Accept_Stmt_Body => null,
-           --  empty accept stmt body
+           when Ada_Accept_Stmt_Body => L ("!"),
 
            when Ada_Entry_Completion_Formal_Params => L ("!"),
 
