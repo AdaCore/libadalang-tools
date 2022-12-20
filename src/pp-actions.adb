@@ -6002,7 +6002,7 @@ package body Pp.Actions is
               (Message,
                "GNATPP_Error: Keeping the initial input selection unchanged"
                & Ada.Characters.Latin_1.LF
-               & Ada.Exceptions.Exception_Information (E));
+               & Ada.Exceptions.Exception_Message (E));
             Pp.Scanner.Source_Message_Vectors.Append
               (Messages,
                Pp.Scanner.Source_Message'
