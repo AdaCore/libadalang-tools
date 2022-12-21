@@ -1,0 +1,43 @@
+Default layout
+procedure Main is
+   type My_Enum is (One, Two, Three, Four);
+begin
+   null;
+end Main;
+Minimal layout
+procedure Main is
+   type My_Enum is (One, Two, Three,
+      Four);
+begin
+   null;
+end Main;
+Compact layout
+procedure Main is
+   type My_Enum is (One, Two, Three, Four);
+begin
+   null;
+end Main;
+Tall layout
+procedure Main is
+
+   type My_Enum is
+     (One,
+      Two,
+      Three,
+      Four);
+
+begin
+   null;
+end Main;
+Shorthand Tall layout with space syntax
+procedure Main is
+
+   type My_Enum is
+     (One,
+      Two,
+      Three,
+      Four);
+
+begin
+   null;
+end Main;
