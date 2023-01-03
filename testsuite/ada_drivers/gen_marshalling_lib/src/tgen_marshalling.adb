@@ -121,6 +121,42 @@ procedure TGen_Marshalling is
    is
       pragma Unreferenced (Job_Ctx);
       Diags : Unbounded_String;
+
+      function Traverse_Helper
+        (Node : LAL.Ada_Node'Class) return LALCO.Visit_Status;
+
+      function Traverse_Helper
+        (Node : LAL.Ada_Node'Class) return LALCO.Visit_Status
+      is
+      begin
+         --  Collect all types used as parameters in subprogram declarations.
+         --  Skip generic subprogram declarations as we only care about the
+         --  instantiations.
+
+         if Node.Kind in Ada_Basic_Decl
+           and then Node.As_Basic_Decl.P_Is_Subprogram
+           and then not (Node.Kind in Ada_Enum_Literal_Decl)
+         then
+            if Node.As_Basic_Decl.P_Canonical_Part.Kind in Ada_Generic_Decl
+            then
+               return LALCO.Over;
+            end if;
+
+            if not Include_Subp (Gen_Ctx, Node.As_Basic_Decl, Diags) then
+               Libadalang.Helpers.Abort_App
+                  ("Error during parameter translation:"
+                  & To_String (Diags));
+            end if;
+            return LALCO.Over;
+         end if;
+         if Node.Kind in Ada_Generic_Package_Instantiation then
+            Node.As_Generic_Package_Instantiation.P_Designated_Generic_Decl
+            .As_Generic_Package_Decl.Traverse (Traverse_Helper'Access);
+            return Over;
+         end if;
+         return LALCO.Into;
+      end Traverse_Helper;
+
    begin
       --  Report parsing errors, if any
 
@@ -137,25 +173,8 @@ procedure TGen_Marshalling is
       elsif Unit.Root.As_Compilation_Unit.P_Decl.Kind /= LALCO.Ada_Package_Decl
       then
          Put_Line ("Unit does not contain a package declaration");
-
-      --  Collect all types used as parameters in subprogram declarations.
-      --  Skip generic subprogram declarations as we only care about the
-      --  instantiations.
       else
-         for Decl of Unit.Root.As_Compilation_Unit.P_Decl.As_Package_Decl.
-           F_Public_Part.F_Decls
-         loop
-            if Decl.As_Basic_Decl.P_Is_Subprogram
-              and then not
-                (Decl.As_Basic_Decl.P_Canonical_Part.Kind in Ada_Generic_Decl)
-            then
-               if not Include_Subp (Gen_Ctx, Decl.As_Basic_Decl, Diags) then
-                  Libadalang.Helpers.Abort_App
-                    ("Error during parameter translation:"
-                     & To_String (Diags));
-               end if;
-            end if;
-         end loop;
+         LAL.Traverse (Unit.Root, Traverse_Helper'Access);
       end if;
    end Process_Unit;
 

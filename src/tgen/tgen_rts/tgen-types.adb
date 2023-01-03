@@ -21,6 +21,7 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Containers;
 with Ada.Strings.Fixed;
 
 with TGen.Strategies; use TGen.Strategies;
@@ -64,19 +65,33 @@ package body TGen.Types is
    -- Package_Name --
    ------------------
 
-   function Package_Name (Self : Typ) return String is
-      Parent_Package : Ada_Qualified_Name := Self.Name.Copy;
-   begin
-      Parent_Package.Delete_Last;
-      return To_Ada (Parent_Package);
-   end Package_Name;
-
    function Package_Name (Self : Typ) return Ada_Qualified_Name is
       Pack_Name : Ada_Qualified_Name := Self.Name.Copy;
    begin
       Pack_Name.Delete_Last;
       return Pack_Name;
    end Package_Name;
+
+   function Package_Name (Self : Typ) return String is
+    (To_Ada (Self.Package_Name));
+
+   ---------------------------
+   -- Compilation_Unit_Name --
+   ---------------------------
+
+   function Compilation_Unit_Name (Self : Typ) return Ada_Qualified_Name is
+      use Ada_Identifier_Vectors;
+      use Ada.Containers;
+      Pack_Name : Ada_Qualified_Name := Self.Name.Copy;
+   begin
+      Pack_Name.Delete
+        (Index => Self.Last_Comp_Unit_Idx + 1,
+         Count => Count_Type (Self.Name.Last_Index - Self.Last_Comp_Unit_Idx));
+      return Pack_Name;
+   end Compilation_Unit_Name;
+
+   function Compilation_Unit_Name (Self : Typ) return String is
+    (To_Ada (Self.Compilation_Unit_Name));
 
    -----------------------
    -- Dot_To_Underscore --

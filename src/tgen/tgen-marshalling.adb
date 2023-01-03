@@ -174,7 +174,7 @@ package body TGen.Marshalling is
    --     TAGAda_Marshalling_Last   : Typ := Typ'Last)
    --     return Natural;
    --
-   --  The addtional First and Last parameters are used to handle anonymous
+   --  The additional First and Last parameters are used to handle anonymous
    --  subtypes in record or array components.
    --
    --  For composite types with no headers, we generate:
@@ -515,8 +515,9 @@ package body TGen.Marshalling is
       for I in U_Typ.Index_Types'Range loop
          declare
             Index_Type : constant String :=
-              U_Typ.Index_Types (I).Get.Type_Name;
-            Index_Pref : constant String := Prefix_For_Typ (Index_Type);
+              U_Typ.Index_Types (I).Get.Fully_Qualified_Name;
+            Index_Pref : constant String := Prefix_For_Typ
+              (U_Typ.Index_Types (I).Get.Slug);
             Assocs     : constant Translate_Table :=
               [1 => Assoc ("DIM", I)];
          begin
@@ -571,9 +572,9 @@ package body TGen.Marshalling is
          declare
             Discr_Name : constant String := (+Component_Maps.Key (Cu));
             Discr_Typ  : constant String :=
-              (Component_Maps.Element (Cu).Get.Type_Name);
+              (Component_Maps.Element (Cu).Get.Fully_Qualified_Name);
             Discr_Pref : constant String :=
-              Prefix_For_Typ (Discr_Typ);
+              Prefix_For_Typ (Component_Maps.Element (Cu).Get.Slug);
          begin
             Name_Tag := Name_Tag & Discr_Name;
             Typ_Tag := Typ_Tag & Discr_Typ;
@@ -596,8 +597,8 @@ package body TGen.Marshalling is
       TRD : constant String :=
         Templates_Root_Dir & GNAT.OS_Lib.Directory_Separator;
 
-      B_Name         : constant String := Typ.Type_Name;
-      Ty_Prefix      : constant String := Prefix_For_Typ (B_Name);
+      B_Name         : constant String := Typ.Fully_Qualified_Name;
+      Ty_Prefix      : constant String := Prefix_For_Typ (Typ.Slug);
       Ty_Name        : constant String :=
         (if For_Base then B_Name & "'Base" else B_Name);
 
@@ -688,7 +689,7 @@ package body TGen.Marshalling is
          Comp_Scalar      : constant Boolean :=
            Named_Comp_Ty in Scalar_Typ'Class;
          Comp_Prefix      : constant String :=
-           Prefix_For_Typ (Named_Comp_Ty.Type_Name);
+           Prefix_For_Typ (Named_Comp_Ty.Slug);
          Comp_Constraints : constant Tag :=
            Create_Tag_For_Constraints (Comp_Ty);
          Assocs           : constant Translate_Table :=
@@ -1165,8 +1166,8 @@ package body TGen.Marshalling is
       Typ                : TGen.Types.Typ'Class;
       Templates_Root_Dir : String)
    is
-      Ty_Name       : constant String := Typ.Type_Name;
-      Ty_Prefix     : constant String := Prefix_For_Typ (Ty_Name);
+      Ty_Name       : constant String := Typ.Fully_Qualified_Name;
+      Ty_Prefix     : constant String := Prefix_For_Typ (Typ.Slug);
       Generic_Name  : constant String :=
         (if Needs_Header (Typ) then "In_Out_Unconstrained" else "In_Out");
       Assocs        : constant Translate_Table :=

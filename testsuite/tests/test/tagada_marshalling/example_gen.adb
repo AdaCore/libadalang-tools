@@ -168,14 +168,14 @@ procedure Example_Gen is
 
       Create (F, Out_File, File_Name);
       S := Stream (F);
-      TGen_Marshalling_R_Output (S, V1);
-      TGen_Marshalling_Date_Output (S, D1);
+      TGen_Marshalling_my_file_R_Output (S, V1);
+      TGen_Marshalling_show_date_Date_Output (S, D1);
       Close (F);
 
       Open (F, In_File, File_Name);
       S := Stream (F);
-      V2 := TGen_Marshalling_R_Input (S);
-      D2 := TGen_Marshalling_Date_Input (S);
+      V2 := TGen_Marshalling_my_file_R_Input (S);
+      D2 := TGen_Marshalling_show_date_Date_Input (S);
       Close (F);
 
       if Debug then
@@ -202,16 +202,16 @@ procedure Example_Gen is
 
       Create (F, Out_File, File_Name);
       S := Stream (F);
-      TGen_Marshalling_Shape_Output_Header (S, V1);
-      TGen_Marshalling_Shape_Output (S, V1);
+      TGen_Marshalling_my_file_Shape_Output_Header (S, V1);
+      TGen_Marshalling_my_file_Shape_Output (S, V1);
       Close (F);
 
       Open (F, In_File, File_Name);
       S := Stream (F);
       declare
-         Header : TGen_Marshalling_Shape_Header_Type :=
-           TGen_Marshalling_Shape_Input_Header (S);
-         V2     : Shape := TGen_Marshalling_Shape_Input (S, Header);
+         Header : TGen_Marshalling_my_file_Shape_Header_Type :=
+           TGen_Marshalling_my_file_Shape_Input_Header (S);
+         V2     : Shape := TGen_Marshalling_my_file_Shape_Input (S, Header);
       begin
          Close (F);
 
@@ -242,16 +242,16 @@ procedure Example_Gen is
 
       Create (F, Out_File, File_Name);
       S := Stream (F);
-      TGen_Marshalling_String_Output_Header (S, V1);
-      TGen_Marshalling_String_Output (S, V1);
+      TGen_Marshalling_standard_String_Output_Header (S, V1);
+      TGen_Marshalling_standard_String_Output (S, V1);
       Close (F);
 
       Open (F, In_File, File_Name);
       S := Stream (F);
       declare
-         Header : TGen_Marshalling_String_Header_Type :=
-           TGen_Marshalling_String_Input_Header (S);
-         V2     : String := TGen_Marshalling_String_Input (S, Header);
+         Header : TGen_Marshalling_standard_String_Header_Type :=
+           TGen_Marshalling_standard_String_Input_Header (S);
+         V2     : String := TGen_Marshalling_standard_String_Input (S, Header);
       begin
          Close (F);
 
@@ -276,12 +276,12 @@ procedure Example_Gen is
    begin
       Create (F, Out_File, File_Name);
       S := Stream (F);
-      TGen_Marshalling_R2_Output (S, V);
+      TGen_Marshalling_my_file_R2_Output (S, V);
       Close (F);
 
       Open (F, In_File, File_Name);
       S := Stream (F);
-      W := TGen_Marshalling_R2_Input (S);
+      W := TGen_Marshalling_my_file_R2_Input (S);
 
       if V /= W then
          Ada.Text_IO.Put_Line ("Preds FAIL");
@@ -324,16 +324,16 @@ begin
 
    Ada.Text_IO.Put_Line
      ("Size of String headers in bytes:"
-      & TGen_Marshalling_String_Byte_Size_Header'Image);
+      & TGen_Marshalling_standard_String_Byte_Size_Header'Image);
    Ada.Text_IO.Put_Line
      ("Size of Matrix headers in bytes:"
-      & TGen_Marshalling_Matrix_Byte_Size_Header'Image);
+      & TGen_Marshalling_my_file_Matrix_Byte_Size_Header'Image);
    Ada.Text_IO.Put_Line
      ("Size of Shape headers in bytes:"
-      & TGen_Marshalling_Shape_Byte_Size_Header'Image);
+      & TGen_Marshalling_my_file_Shape_Byte_Size_Header'Image);
    Ada.Text_IO.Put_Line
      ("Size used by the compiler for Small_Shape_Array (Small_Shape_Array'Size):" & Small_Shape_Array'Size'Image);
    Ada.Text_IO.Put_Line
      ("Maximal size computed (Small_Shape_Array_Max_All):"
-      & TGen_Marshalling_Small_Shape_Array_Size_Max_All'Image);
+      & TGen_Marshalling_my_file_Small_Shape_Array_Size_Max_All'Image);
 end;

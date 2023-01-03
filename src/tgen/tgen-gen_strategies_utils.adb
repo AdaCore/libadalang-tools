@@ -341,6 +341,7 @@ package body TGen.Gen_Strategies_Utils is
                           (Discriminated_Record_Typ'
                                (Constrained        => False,
                                 Name               => R.Name,
+                                Last_Comp_Unit_Idx => R.Last_Comp_Unit_Idx,
                                 Static_Gen         => R.Static_Gen,
                                 Component_Types    => V.Components,
                                 Mutable            => False,
