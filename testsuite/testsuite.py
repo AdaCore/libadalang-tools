@@ -63,13 +63,6 @@ class Testsuite(e3.testsuite.Testsuite):
             os.pathsep,
             os.environ["PATH"],
         )
-        os.environ["PATH"] = "{}{}{}".format(
-            os.path.abspath(
-                os.path.join(script_dir, "..", "src", "rejuvenate", "obj")
-            ),
-            os.pathsep,
-            os.environ["PATH"],
-        )
 
         if self.env.valgrind:
             # The --valgrind switch was given. Set the PATH to point to the

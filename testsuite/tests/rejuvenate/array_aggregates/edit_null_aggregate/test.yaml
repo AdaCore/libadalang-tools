@@ -1,6 +1,0 @@
-title: edit_null_aggregate
-
-description: edit aggregate with no elements, i.e. (1..0 => v) => []
-
-driver: shell_script
-

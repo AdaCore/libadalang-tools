@@ -1,5 +1,0 @@
-title: move_to_body
-
-description: move the decls to body part
-
-driver: shell_script

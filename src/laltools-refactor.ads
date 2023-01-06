@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                    Copyright (C) 2021-2022, AdaCore                      --
+--                      Copyright (C) 2021-2023, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -67,6 +67,9 @@ package Laltools.Refactor is
          Location : Source_Location_Range;
          Text     : Unbounded_String;
       end record;
+
+   No_Text_Edit : constant Text_Edit :=
+     (No_Source_Location_Range, Null_Unbounded_String);
 
    function "<" (L, R : Text_Edit) return Boolean is (L.Location < R.Location);
    --  Checks if L is < than R, first based on the line number and then on

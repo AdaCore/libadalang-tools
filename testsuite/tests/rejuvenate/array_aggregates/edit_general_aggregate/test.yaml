@@ -1,6 +1,0 @@
-title: edit_general_aggregate
-
-description: edit aggregate general cases, which only change the parenthese to bracket i.e. () => []
-
-driver: shell_script
-

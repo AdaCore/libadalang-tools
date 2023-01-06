@@ -43,7 +43,7 @@ class BaseDriver(DiffTestDriver):
         "refactoring_suppress_separate",
         "refactoring_sort_dependencies",
         "refactoring_replace_type",
-        "rejuvenate"
+        "lint"
     } | WIP_TOOLS
 
     @property

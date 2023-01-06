@@ -1,5 +1,5 @@
 [gerrit]
 host = git.adacore.com
 project = libadalang-tools
-defaultbranch = topic/rejuvenate
+defaultbranch = master
 defaultremote = origin

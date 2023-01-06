@@ -9,7 +9,7 @@ library project LAL_Tools is
    type Library_Type_Type is ("static", "static-pic", "relocatable");
    Library_Type : Library_Type_Type := external ("LIBRARY_TYPE", "static");
 
-   for Source_Dirs use (".", "tgen", "tgen/tgen_rts", "rejuvenate");
+   for Source_Dirs use (".", "tgen", "tgen/tgen_rts", "lint");
    for Object_Dir use "../obj/" & LAL_Tools_Common.Superproject & "/lib";
    for Library_Kind use Library_Type;
    for Library_Dir use "../lib";
@@ -21,7 +21,7 @@ library project LAL_Tools is
       "stub-main.adb",
       "test-main.adb",
       "utils-var_length_ints-test.adb",
-      "rejuvenate-main.adb");
+      "lint-main.adb");
 
    package Compiler renames LAL_Tools_Common.Compiler;
 

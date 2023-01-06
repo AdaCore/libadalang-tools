@@ -1,5 +1,0 @@
-title: delete_middle_name
-
-description: delete the middle component, test also the case of reference of return of function with if else case.
-
-driver: shell_script

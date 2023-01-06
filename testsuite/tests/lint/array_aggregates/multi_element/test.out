@@ -1,0 +1,35 @@
+/main.adb
+with Ada.Text_IO; use Ada.Text_IO;
+procedure Main is
+   type My_Int is range 0 .. 1000;
+   type Index is range 1 .. 5;
+   type My_Int_Array is array (Index) of My_Int;
+   type Record_With_Array is record
+      Fred : My_Int_Array := [1, 2, 3, 4, 5];
+   end record;
+   Arr : My_Int_Array := [2, 3, 5, 7, 11];
+   V : My_Int := 8;
+   Arr2 : My_Int_Array := [1 .. 5 => 11];
+   Arr3 : array (Index) of My_Int := [1 => 2, 2 => V, 3 => 5, 4 => 7, 5 => 11];
+   Arr4, Arr5 : My_Int_Array;
+   Arr6 : array (Index) of My_Int;
+   Rec : Record_With_Array := (Fred => [1, 2, 3, 4, 5]);
+   procedure Modify_Array (A, B : in out My_Int_Array) is
+   begin
+      A := [A(1)+1, A(2), A(3), A(4), A(5)];
+      Put_Line (B(1)'Image);
+   end;
+   subtype My_Other_Int_Array is My_Int_Array;
+   function Generate_My_Array return My_Int_Array is ([1, 2, 3, 4, 5]);
+   function Generate_My_Array2 return My_Int_Array is
+   begin
+      return (My_Int_Array'[1, 2, 3, 4, 5]);
+   end;
+begin
+   Arr4 := [1 => 2, 2 => V, 3 => 5, 4 => 7, 5 => 11];
+   Arr4 := My_Int_Array'[1, 2, 3, 4, 5];
+   Arr5 := [1,2,3,4,5];
+   Arr6 := [1, 2, 3, 4, 5];
+end Main;
+
+

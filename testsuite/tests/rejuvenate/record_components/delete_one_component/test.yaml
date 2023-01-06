@@ -1,5 +1,0 @@
-title: delete_one_component
-
-description: delete the whole component, cases "others" with part read (not deleted) and all unread (deleted) test.
-
-driver: shell_script

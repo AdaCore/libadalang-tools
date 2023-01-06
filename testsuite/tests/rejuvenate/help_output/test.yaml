@@ -1,3 +1,0 @@
-description: Checks the output of the --help flag
-
-driver: shell_script

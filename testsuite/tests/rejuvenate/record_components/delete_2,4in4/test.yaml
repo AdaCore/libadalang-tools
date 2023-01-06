@@ -1,5 +1,0 @@
-title: delete_2,4in4
-
-description: delete the 2,4th component in the record with 4 components in total
-
-driver: shell_script

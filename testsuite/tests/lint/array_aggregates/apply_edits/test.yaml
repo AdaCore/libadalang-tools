@@ -1,0 +1,9 @@
+title: apply_edits
+
+description: |4
+    Tests that array aggregates with multiple elements using parentheses
+    syntax are converted to square brackets syntax and that edits are
+    applied correctly to the source file.
+
+driver: shell_script
+

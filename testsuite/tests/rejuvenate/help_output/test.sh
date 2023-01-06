@@ -1,1 +1,0 @@
-gnatrejuvenate --help

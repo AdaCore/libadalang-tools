@@ -1,0 +1,8 @@
+title: one_element
+
+description: |4
+    Tests that array aggregates with one element using parentheses
+    syntax are converted to square brackets syntax.
+
+driver: shell_script
+
