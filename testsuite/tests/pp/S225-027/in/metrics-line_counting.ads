@@ -13,7 +13,7 @@ package METRICS.Line_Counting is
 
    subtype Cumulative_Metrics is Lines_Metrics with
        Predicate => Cumulative_Metrics in Lines_Code | Lines_Comment |
-            Lines_Eol_Comment | Lines_Blank;
+          Lines_Eol_Comment | Lines_Blank;
 
    type Cumulative_Counts_Array (<>) is private;
    function Last (Counts : Cumulative_Counts_Array) return Slocs.Line_Number;

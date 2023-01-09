@@ -9,8 +9,8 @@ procedure Utils.Var_Length_Ints.Test is
 
    subtype Test_Cases is My_Int with
        Predicate => Test_Cases in 1 .. 1_000 | 16_000 .. 17_000 |
-              2_097_100 .. 2_097_200 | 268_435_400 .. 268_435_500 |
-              My_Int'Last - 100 .. My_Int'Last;
+            2_097_100 .. 2_097_200 | 268_435_400 .. 268_435_500 |
+            My_Int'Last - 100 .. My_Int'Last;
 
 begin
    for X in Test_Cases loop

@@ -293,7 +293,7 @@ package body Pp.Buffers is
             begin
                pragma Assert
                  (Rec.Position in
-                        Buf.From_First + 1 .. Last_Index (Buf.From) + 1);
+                      Buf.From_First + 1 .. Last_Index (Buf.From) + 1);
             end;
 
          else
@@ -1114,7 +1114,7 @@ package body Pp.Buffers is
                Fail ("Bad From_Marker flag");
             end if;
             if Rec.Position not in
-                    Buf.From_First + 1 .. Last_Index (Buf.From) + 1
+                  Buf.From_First + 1 .. Last_Index (Buf.From) + 1
             then
                Fail ("Bad From_Marker position");
             end if;

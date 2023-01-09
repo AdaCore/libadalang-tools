@@ -2778,7 +2778,7 @@ package body Pp.Formatting is
 
                --  Should the following list include "exception"???
                return Kind (New_Tok) not in Res_Begin | Res_Else | Res_Elsif |
-                     Res_When;
+                   Res_When;
             end Look_Before;
 
             Indentation : Natural;
@@ -2922,7 +2922,7 @@ package body Pp.Formatting is
                      P : Tokn_Cursor := Last (New_Tokns'Access);
                   begin
                      while Kind (P) in Line_Break_Token | End_Of_Line_Comment |
-                           Spaces
+                         Spaces
                      loop
                         Prev (P);
                      end loop;
@@ -2954,7 +2954,7 @@ package body Pp.Formatting is
                Next_ss (Src_Tok);
 
                exit when Kind (Src_Tok) not in Special_Comment |
-                     Fillable_Comment | Other_Whole_Line_Comment;
+                   Fillable_Comment | Other_Whole_Line_Comment;
 
                Set_Cur_Indent;
                if True or else not Arg (Cmd, Source_Line_Breaks) then
@@ -4079,7 +4079,7 @@ package body Pp.Formatting is
                      loop
                         Next (Next_Line_Break);
                         exit when Kind (Next_Line_Break) in Enabled_LB_Token |
-                              End_Of_Input;
+                            End_Of_Input;
                      end loop;
 
                   when Tab_Token =>

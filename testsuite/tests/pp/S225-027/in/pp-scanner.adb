@@ -784,8 +784,8 @@ package body Pp.Scanner is
       Normalized : constant Symbol := Same_Ignoring_Case (Text);
    begin
       if Normalized in
-              Potential_Reserved_Word_Sym'First ..
-                Last_Reserved_For_Ada_Version (Ada_Version)
+            Potential_Reserved_Word_Sym'First ..
+              Last_Reserved_For_Ada_Version (Ada_Version)
       then
          return Symbol_To_Reserved_Word_Map (Normalized);
       else
@@ -1215,7 +1215,7 @@ package body Pp.Scanner is
                   --  as opposed to Ada code.
 
                   if Preceding_Lexeme in Ident | String_Lit | Res_Access |
-                        Res_All | ')' | '!'
+                      Res_All | ')' | '!'
                   then -- it's a tick
                      pragma Assert
                        (if Preceding_Lexeme = '!' then Lang = Template_Lang);
@@ -1471,7 +1471,7 @@ package body Pp.Scanner is
                  (case Tok.Kind is when Comment_Kind => True,
                     when EOL_Token =>
                       Inp in (1 => W_LF) | (W_CR, W_LF) | (1 => W_FF) |
-                          (1 => W_VT)
+                        (1 => W_VT)
                       and then Outp = (1 => NL),
                     when Reserved_Word => To_Lower (Inp) = Outp,
                     when others => Inp = Outp);
