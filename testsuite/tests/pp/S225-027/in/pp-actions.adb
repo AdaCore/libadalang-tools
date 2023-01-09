@@ -314,7 +314,7 @@ package body Pp.Actions is
    pragma Unreferenced (Create_Modes);
    subtype Replace_Modes is Output_Modes with
        Predicate => Replace_Modes in Replace_Backup | Replace_Force_Backup |
-            Replace;
+          Replace;
 
    function Get_Output_Mode (Cmd : Command_Line) return Output_Modes;
    function Get_Output_Mode (Cmd : Command_Line) return Output_Modes is
@@ -1207,10 +1207,10 @@ package body Pp.Actions is
 
       subtype Subp_Decl_Body_Kind is Ada_Tree_Kind with
           Predicate => Subp_Decl_Body_Kind in Ada_Subp_Decl |
-               Ada_Subp_Renaming_Decl | Ada_Access_To_Subp_Def |
-               Ada_Entry_Decl | Ada_Formal_Subp_Decl | Ada_Generic_Subp_Decl |
-               Ada_Subp_Body_Stub | Ada_Subp_Body | Ada_Abstract_Subp_Decl |
-               Ada_Expr_Function | Ada_Null_Subp_Decl | Ada_Entry_Body;
+             Ada_Subp_Renaming_Decl | Ada_Access_To_Subp_Def |
+             Ada_Entry_Decl | Ada_Formal_Subp_Decl | Ada_Generic_Subp_Decl |
+             Ada_Subp_Body_Stub | Ada_Subp_Body | Ada_Abstract_Subp_Decl |
+             Ada_Expr_Function | Ada_Null_Subp_Decl | Ada_Entry_Body;
 
       Str_Subp_Decl_With_Hard_Breaks_Alt_Table : array
         (Ada_Tree_Kind) of Str_Template_Ptr;
@@ -1408,14 +1408,14 @@ package body Pp.Actions is
                   for X of Result.Between.Instructions.all loop
                      pragma Assert
                        (X.Kind in Hard_Break | Hard_Break_No_Comment |
-                            Soft_Break | Tab | Verbatim);
+                          Soft_Break | Tab | Verbatim);
                   end loop;
                end if;
             end Check_Between;
 
             subtype Illegal_Chars is Character with
                 Predicate => Illegal_Chars in '~' | '"' | '\' | '%' |
-                       '0' .. '9';
+                     '0' .. '9';
             pragma Assert (Str (Text (Cur)).S (1) not in Illegal_Chars);
 
             --  Start of processing for Parse_Instruction
@@ -1735,9 +1735,9 @@ package body Pp.Actions is
       declare
          subtype When_Kinds is Ada_Node_Kind_Type with
              Predicate => When_Kinds in Ada_Case_Stmt_Alternative |
-                  --  ???                                  Ada_Case_Expr_Alternative |
+                --  ???                                  Ada_Case_Expr_Alternative |
 
-                  Ada_Variant;
+                Ada_Variant;
       --  Things that start with "when" that we want to treat
       --  alike here.
          begin
@@ -1788,7 +1788,7 @@ package body Pp.Actions is
                               pragma Warnings (Off, "if it is invalid");
                               pragma Assert
                                 (Query_Index (Char_To_Digit (T (J + 1))) in
-                                     Constrained_Query_Count);
+                                   Constrained_Query_Count);
                               pragma Warnings (On, "if it is invalid");
                            else
                               Subtree_Count := Subtree_Count + 1;
@@ -1800,11 +1800,11 @@ package body Pp.Actions is
 
                         when '{' =>
                            if Kind in Ada_Component_List | Ada_Public_Part |
-                                 Ada_Generic_Formal_Part | Ada_Array_Type_Def |
-                                 Ada_Constrained_Array_Indices |
+                               Ada_Generic_Formal_Part | Ada_Array_Type_Def |
+                               Ada_Constrained_Array_Indices |
 
-                                 Ada_Case_Stmt_Alternative |
-                                 Ada_Case_Expr_Alternative | Ada_Variant
+                               Ada_Case_Stmt_Alternative |
+                               Ada_Case_Expr_Alternative | Ada_Variant
                            then
                               null;
                            else
@@ -2117,7 +2117,7 @@ package body Pp.Actions is
 
                when Mixed =>
                   if Kind in Ada_Attribute_Ref | Ada_Update_Attribute_Ref |
-                        Ada_Pragma_Node
+                      Ada_Pragma_Node
                   then
                      --  Handle pragma and attribute names that are special cases
                      --  (some portion should be in ALL CAPS).
@@ -2232,7 +2232,7 @@ package body Pp.Actions is
       procedure Indent (Amount : Integer) is
          pragma Assert
            (abs Amount in 0 | 1 | PP_Indentation (Cmd) |
-                PP_Indent_Continuation (Cmd) | Arg (Cmd, Initial_Indentation));
+              PP_Indent_Continuation (Cmd) | Arg (Cmd, Initial_Indentation));
          Last_LBI : constant Line_Break_Index := All_LBI (Last (All_LBI));
          Last_LB  : Line_Break renames All_LB (Last_LBI);
       begin
@@ -2451,8 +2451,8 @@ package body Pp.Actions is
          is
             pragma Assert
               (Token_Text in Name_Tab_Insertion_Point | Name_With | Name_Use |
-                   Name_Tab_In_Out | Name_Assign | Name_Colon | Name_Arrow |
-                   Name_Bar | Name_At | Name_Range | Name_Dot_Dot | Name_R_Sq);
+                 Name_Tab_In_Out | Name_Assign | Name_Colon | Name_Arrow |
+                 Name_Bar | Name_At | Name_Range | Name_Dot_Dot | Name_R_Sq);
 
             Pa : Ada_Tree_Base := Parent;
             Tr : Ada_Tree_Base := Tree;
@@ -2775,15 +2775,15 @@ package body Pp.Actions is
 
             subtype Absent_Kinds is Ada_Node_Kind_Type with
                 Predicate => Absent_Kinds in Ada_Abort_Absent |
-                     Ada_Abstract_Absent | Ada_Aliased_Absent |
-                     Ada_All_Absent | Ada_Constant_Absent |
-                     Ada_Limited_Absent | Ada_Not_Null_Absent |
-                     Ada_Private_Absent | Ada_Protected_Absent |
-                     Ada_Reverse_Absent | Ada_Synchronized_Absent |
-                     Ada_Tagged_Absent | Ada_Until_Absent |
-                     Ada_With_Private_Absent |
-                     Ada_Mode_Default        |
-                     Ada_Overriding_Unspecified;
+                   Ada_Abstract_Absent | Ada_Aliased_Absent |
+                   Ada_All_Absent | Ada_Constant_Absent |
+                   Ada_Limited_Absent | Ada_Not_Null_Absent |
+                   Ada_Private_Absent | Ada_Protected_Absent |
+                   Ada_Reverse_Absent | Ada_Synchronized_Absent |
+                   Ada_Tagged_Absent | Ada_Until_Absent |
+                   Ada_With_Private_Absent |
+                   Ada_Mode_Default |
+                   Ada_Overriding_Unspecified;
             --  This is needed because we have templates like "?~~ ~", which
             --  inserts a space after the subtree, which might be
             --  "private". But if "private" is not present, we don't want the
@@ -2851,7 +2851,7 @@ package body Pp.Actions is
                   elsif Inst_Index = TT.Instructions'Last then
                      pragma Assert
                        (Tree.Kind in Ada_Param_Spec | Ada_Object_Decl |
-                            Ada_Extended_Return_Stmt_Object_Decl);
+                          Ada_Extended_Return_Stmt_Object_Decl);
                      return Name_Tab_In_Out;
 
                      --  Except for the above special cases, we return
@@ -3077,7 +3077,7 @@ package body Pp.Actions is
                  and then X.Kind = Ada_Aggregate and then All_Named
                then
                   if X.Parent.Kind in Ada_Object_Decl | Ada_Assign_Stmt |
-                        Ada_Enum_Rep_Clause
+                      Ada_Enum_Rep_Clause
                   then
                      Result := True;
                   elsif X.Parent.Kind = Ada_Aggregate_Assoc then
@@ -3245,7 +3245,7 @@ package body Pp.Actions is
 
            (Tree.Kind = Ada_Aspect_Assoc
             and then W_Intern (Id_Name (Subtree (Tree, 1))) in Name_Depends |
-                Name_Refined_Depends
+              Name_Refined_Depends
             and then Depends_RHS (Tree).Kind = Ada_Un_Op
             and then Subtree (Depends_RHS (Tree), 1).Kind = Ada_Op_Plus);
 
@@ -3709,7 +3709,7 @@ package body Pp.Actions is
          procedure Do_Qual_Expr is
          begin
             if Subtree (Tree, 2).Kind in Ada_Aggregate |
-                  Ada_Null_Record_Aggregate
+                Ada_Null_Record_Aggregate
             then
                Interpret_Alt_Template (Qualified_Aggr_Alt);
             else
@@ -3731,7 +3731,7 @@ package body Pp.Actions is
               (if
                  Is_Nil (Parent_Tree)
                  or else Parent_Tree.Kind in Ada_Entry_Spec | Ada_Entry_Body |
-                     Ada_Accept_Stmt | Ada_Accept_Stmt_With_Stmts
+                   Ada_Accept_Stmt | Ada_Accept_Stmt_With_Stmts
                then False
                else Present (Parent_Tree.As_Subp_Spec.F_Subp_Returns));
             Param_Count : Query_Count      :=

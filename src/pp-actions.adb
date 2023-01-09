@@ -324,7 +324,7 @@ package body Pp.Actions is
             Set_Arg (Cmd, Indent_Named_Statements, False);
             Set_Arg (Cmd, Insert_Blank_Lines, False);
             Set_Arg (Cmd, Preserve_Blank_Lines, True);
-            Set_Arg (Cmd, Source_Line_Breaks, True);
+            Set_Arg (Cmd, Source_Line_Breaks, False);
             Set_Arg (Cmd, Comments_Unchanged, True);
             Set_Arg (Cmd, Comments_Gnat_Beginning, False);
             Set_Arg (Cmd, Comments_Fill, False);
@@ -1081,7 +1081,7 @@ package body Pp.Actions is
            when Ada_If_Expr =>
              L ("if[#1 !]#1 then[#1 !]", "? #~ #~~", "?# else[ ~~]~"),
            when Ada_Membership_Expr =>
-             L ("! ![# ?[#~ ^|# ~]~]"),
+             L ("! ![# ?~ #| ~~]"),
            when Ada_Dotted_Name =>
              L ("![#1.!]"),
            when Ada_End_Name => L ("!"),

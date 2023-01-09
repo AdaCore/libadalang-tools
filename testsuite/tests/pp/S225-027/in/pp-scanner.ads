@@ -190,7 +190,7 @@ package Pp.Scanner is
 
    subtype Whole_Line_Comment is Token_Kind with
        Predicate => Whole_Line_Comment in Pp_Off_Comment | Pp_On_Comment |
-            Special_Comment | Fillable_Comment | Other_Whole_Line_Comment;
+          Special_Comment | Fillable_Comment | Other_Whole_Line_Comment;
 
    subtype Comment_Kind is Token_Kind with
        Predicate => Comment_Kind in Whole_Line_Comment | End_Of_Line_Comment;

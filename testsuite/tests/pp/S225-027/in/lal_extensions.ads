@@ -55,11 +55,11 @@ package LAL_Extensions is
 
    function Id_Name (Nm : Ada_Node'Class) return W_Str with
      Pre => Kind (Nm) in Ada_Defining_Name | Ada_Identifier |
-          Ada_Int_Literal | Ada_Real_Literal | Ada_String_Literal |
-          Ada_Char_Literal;
+        Ada_Int_Literal | Ada_Real_Literal | Ada_String_Literal |
+        Ada_Char_Literal;
    function L_Name (Nm : Ada_Node'Class) return W_Str with
      Pre => Kind (Nm) in Ada_Defining_Name | Ada_Identifier |
-          Ada_String_Literal;
+        Ada_String_Literal;
    --  Text name of an identifier. The L_Name is converted to lower
    --  case.
 

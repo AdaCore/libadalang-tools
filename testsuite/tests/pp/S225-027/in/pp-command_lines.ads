@@ -339,7 +339,7 @@ package Pp.Command_Lines is
 
    subtype Lower_Upper_Mixed_PP_Casing is PP_Casing with
        Predicate => Lower_Upper_Mixed_PP_Casing in Lower_Case | Upper_Case |
-            Mixed;
+          Mixed;
 
    subtype Cmd_Line is Command_Line;
 

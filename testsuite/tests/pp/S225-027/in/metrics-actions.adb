@@ -269,11 +269,11 @@ package body METRICS.Actions is
 
    subtype Gnatmetric_Eligible is Ada_Node_Kind_Type with
        Predicate => Gnatmetric_Eligible in Ada_Expr_Function |
-            Ada_Generic_Package_Decl | Ada_Package_Body | Ada_Package_Decl |
-            Ada_Protected_Body | Ada_Single_Protected_Decl |
-            Ada_Protected_Type_Decl | Ada_Entry_Body | Ada_Subp_Body |
-            Ada_Subp_Body_Stub | Ada_Generic_Subp_Instantiation |
-            Ada_Task_Body | Ada_Single_Task_Decl | Ada_Task_Type_Decl;
+          Ada_Generic_Package_Decl | Ada_Package_Body | Ada_Package_Decl |
+          Ada_Protected_Body | Ada_Single_Protected_Decl |
+          Ada_Protected_Type_Decl | Ada_Entry_Body | Ada_Subp_Body |
+          Ada_Subp_Body_Stub | Ada_Generic_Subp_Instantiation |
+          Ada_Task_Body | Ada_Single_Task_Decl | Ada_Task_Type_Decl;
    --  These are the node kinds that the gnatmetric documentation calls
    --  "eligible local units". We compute metrics for the outermost node (the
    --  compilation unit, for the file-level metrics), and the library item or
@@ -283,15 +283,15 @@ package body METRICS.Actions is
 
    subtype Contract_Complexity_Eligible is Ada_Node_Kind_Type with
        Predicate => Contract_Complexity_Eligible in Ada_Generic_Subp_Decl |
-            Ada_Abstract_Subp_Decl | Ada_Null_Subp_Decl |
-            Ada_Subp_Renaming_Decl | Ada_Subp_Decl;
+          Ada_Abstract_Subp_Decl | Ada_Null_Subp_Decl |
+          Ada_Subp_Renaming_Decl | Ada_Subp_Decl;
    --  For the new lalmetric tool, we have the --contract-complexity
    --  metric, which is on subprogram declarations, so we need
    --  additional "eligible" nodes.
 
    subtype Eligible is Ada_Node_Kind_Type with
        Predicate => Eligible in Gnatmetric_Eligible |
-            Contract_Complexity_Eligible;
+          Contract_Complexity_Eligible;
 
    function Q (S : String) return String is -- quote
      ("""" & S & """");
@@ -671,8 +671,8 @@ package body METRICS.Actions is
             begin
                return Has_Complexity_Metrics (Outer_Unit)
                  or else Kind (Outer_Unit) in Ada_Package_Decl |
-                     Ada_Generic_Package_Decl | Ada_Package_Body |
-                     Ada_Protected_Body;
+                   Ada_Generic_Package_Decl | Ada_Package_Body |
+                   Ada_Protected_Body;
             end;
 
          when Ada_Expr_Function | Ada_Entry_Body | Ada_Subp_Body |
@@ -869,14 +869,14 @@ package body METRICS.Actions is
 
       if Depth > 3 and then M.Kind in Contract_Complexity_Eligible
         and then Metric not in Contract_Complexity | Param_Number |
-            In_Parameters | Out_Parameters | In_Out_Parameters
+          In_Parameters | Out_Parameters | In_Out_Parameters
       then
          return False;
       end if;
 
       if M.Kind in Ada_Subp_Body_Stub | Ada_Generic_Subp_Instantiation
         and then Metric not in Param_Number | In_Parameters | Out_Parameters |
-            In_Out_Parameters
+          In_Out_Parameters
       then
          return False;
       end if;
@@ -896,7 +896,7 @@ package body METRICS.Actions is
             return
               (Depth = 3
                and then M.Kind in Ada_Package_Body | Ada_Subp_Body |
-                   Ada_Task_Body | Ada_Protected_Body)
+                 Ada_Task_Body | Ada_Protected_Body)
               or else (XML and then Depth = 1);
          when All_Types | Public_Types =>
             return (Depth = 3 or else (XML and then Depth = 1))
@@ -917,7 +917,7 @@ package body METRICS.Actions is
 
             if Depth = 3 then
                if M.Kind in Ada_Package_Decl | Ada_Generic_Package_Decl |
-                     Ada_Subp_Decl | Ada_Generic_Subp_Decl
+                   Ada_Subp_Decl | Ada_Generic_Subp_Decl
                then
                   return True;
                end if;
@@ -937,7 +937,7 @@ package body METRICS.Actions is
             return False;
          when Param_Number =>
             if M.Kind in Ada_Subp_Decl | Ada_Generic_Subp_Instantiation |
-                  Ada_Expr_Function | Ada_Null_Subp_Decl
+                Ada_Expr_Function | Ada_Null_Subp_Decl
             then
                return True;
             end if;
@@ -1046,7 +1046,7 @@ package body METRICS.Actions is
             Adjust           : constant Metric_Nat   :=
               (if
                  Metric in Complexity_Statement | Complexity_Cyclomatic |
-                     Complexity_Essential
+                   Complexity_Essential
                then Num - 1
                else 0);
             Numerator_Metric : constant Metrics_Enum :=
@@ -2617,7 +2617,7 @@ package body METRICS.Actions is
       function In_Visible_Part return Boolean is
         (Last_Index (Metrix_Stack) >= 3
          and then Element (Metrix_Stack, 3).Kind in Ada_Package_Decl |
-             Ada_Generic_Package_Decl
+           Ada_Generic_Package_Decl
          and then not Element (Metrix_Stack, 3).Is_Private_Lib_Unit
          and then Private_Part_Count = 0);
       --  True if we're within only visible parts. Note that it is possible to
@@ -2952,8 +2952,8 @@ package body METRICS.Actions is
          --  Push the stack if appropriate
 
          if Kind (Node) in Gnatmetric_Eligible | Ada_If_Stmt | Ada_Case_Stmt |
-               Ada_For_Loop_Stmt | Ada_Loop_Stmt | Ada_While_Loop_Stmt |
-               Ada_Select_Stmt
+             Ada_For_Loop_Stmt | Ada_Loop_Stmt | Ada_While_Loop_Stmt |
+             Ada_Select_Stmt
          then
             Push (EC_Stack, EC_Rec'(Node, Counted => False));
          --  (The corresponding Pop is at the end of
@@ -2963,8 +2963,8 @@ package body METRICS.Actions is
          --  If this is a jump, increment appropriate counts
 
          if Kind (Node) in -- Not Ada_Extended_Return_Stmt
-               Ada_Return_Stmt | Ada_Raise_Stmt |
-               Ada_Terminate_Alternative | Ada_Goto_Stmt
+             Ada_Return_Stmt | Ada_Raise_Stmt |
+             Ada_Terminate_Alternative | Ada_Goto_Stmt
            or else
            (Kind (Node) = Ada_Exit_Stmt and then Tool.Treat_Exit_As_Goto)
          then
@@ -2986,7 +2986,7 @@ package body METRICS.Actions is
                   exit when X = 1;
                   exit when Kind (Node) = Ada_Exit_Stmt
                     and then K in Ada_For_Loop_Stmt | Ada_Loop_Stmt |
-                        Ada_While_Loop_Stmt;
+                      Ada_While_Loop_Stmt;
 
                   X := X - 1;
                end loop;
@@ -3476,8 +3476,8 @@ package body METRICS.Actions is
          --  Param_Number and friends
 
          if Kind (Node) in Ada_Subp_Decl | Ada_Expr_Function |
-               Ada_Abstract_Subp_Decl | Ada_Null_Subp_Decl |
-               Ada_Subp_Renaming_Decl | Ada_Subp_Body | Ada_Subp_Body_Stub
+             Ada_Abstract_Subp_Decl | Ada_Null_Subp_Decl |
+             Ada_Subp_Renaming_Decl | Ada_Subp_Body | Ada_Subp_Body_Stub
          then
             declare
                pragma Assert (Node = M.Node);
@@ -3508,7 +3508,7 @@ package body METRICS.Actions is
          if Last_Index (Metrix_Stack) = 3 or else In_Visible_Part then
             if Node = M.Node and then not M.Is_Private_Lib_Unit then
                if M.Kind in Ada_Subp_Decl | Ada_Abstract_Subp_Decl |
-                     Ada_Generic_Subp_Decl
+                   Ada_Generic_Subp_Decl
                --  Not Ada_Subp_Renaming_Decl
 
                then
@@ -3558,12 +3558,12 @@ package body METRICS.Actions is
 
          if Kind (Node) in Ada_Basic_Decl | Ada_Entry_Index_Spec
            and then Kind (Node) not in Ada_Generic_Formal |
-               Ada_Generic_Formal_Obj_Decl | Ada_Generic_Formal_Package |
-               Ada_Generic_Formal_Subp_Decl | Ada_Generic_Formal_Type_Decl |
-               Ada_Generic_Package_Internal | Ada_Anonymous_Type_Decl |
-               Ada_Named_Stmt_Decl | Ada_Label_Decl |
-               Ada_Single_Task_Type_Decl | Ada_Generic_Subp_Internal |
-               Ada_Exception_Handler
+             Ada_Generic_Formal_Obj_Decl | Ada_Generic_Formal_Package |
+             Ada_Generic_Formal_Subp_Decl | Ada_Generic_Formal_Type_Decl |
+             Ada_Generic_Package_Internal | Ada_Anonymous_Type_Decl |
+             Ada_Named_Stmt_Decl | Ada_Label_Decl |
+             Ada_Single_Task_Type_Decl | Ada_Generic_Subp_Internal |
+             Ada_Exception_Handler
          then
             Inc_All (Declarations);
             Inc_All (Logical_Source_Lines);
@@ -3580,8 +3580,8 @@ package body METRICS.Actions is
          if In_Visible_Part then
             if not M.Is_Private_Lib_Unit and not In_Generic_Formal_Part then
                if Kind (Node) in Ada_Type_Decl | Ada_Protected_Type_Decl |
-                     Ada_Task_Type_Decl | Ada_Incomplete_Type_Decl |
-                     Ada_Incomplete_Tagged_Type_Decl
+                   Ada_Task_Type_Decl | Ada_Incomplete_Type_Decl |
+                   Ada_Incomplete_Tagged_Type_Decl
                then
                   Inc_All (Public_Types);
                end if;
@@ -3605,8 +3605,8 @@ package body METRICS.Actions is
          --  All_Types
 
          if Kind (Node) in Ada_Type_Decl | Ada_Protected_Type_Decl |
-               Ada_Task_Type_Decl | Ada_Incomplete_Type_Decl |
-               Ada_Incomplete_Tagged_Type_Decl
+             Ada_Task_Type_Decl | Ada_Incomplete_Type_Decl |
+             Ada_Incomplete_Tagged_Type_Decl
          then
             if P_Previous_Part (Node.As_Base_Type_Decl).Is_Null
               and then Node.Parent.Kind /= Ada_Generic_Formal_Type_Decl
@@ -3640,15 +3640,15 @@ package body METRICS.Actions is
          --  Construct_Nesting
 
          if Kind (Node) in Ada_Subp_Decl | Ada_Expr_Function |
-               Ada_Generic_Subp_Decl | Ada_Task_Type_Decl |
-               Ada_Single_Task_Decl | Ada_Protected_Type_Decl |
-               Ada_Single_Protected_Decl | Ada_Generic_Package_Instantiation |
-               Ada_Generic_Subp_Instantiation
+             Ada_Generic_Subp_Decl | Ada_Task_Type_Decl |
+             Ada_Single_Task_Decl | Ada_Protected_Type_Decl |
+             Ada_Single_Protected_Decl | Ada_Generic_Package_Instantiation |
+             Ada_Generic_Subp_Instantiation
          then
             pragma Assert
               (M.Vals (Construct_Nesting) = 0
                or else Kind (Node) in Ada_Generic_Package_Instantiation |
-                   Ada_Generic_Subp_Instantiation);
+                 Ada_Generic_Subp_Instantiation);
             if M.Vals (Construct_Nesting) = 0 then
                M.Vals (Construct_Nesting) := 1;
             end if;
@@ -3934,7 +3934,7 @@ package body METRICS.Actions is
             Gather_Syntax_Metrics (Node, M);
 
             if Kind (Node) in Ada_Package_Decl | Ada_Generic_Package_Decl |
-                  Ada_Task_Def | Ada_Protected_Def
+                Ada_Task_Def | Ada_Protected_Def
               and then In_Visible_Part
             then
                --  We gather contract metrics only for public subprograms
@@ -3961,7 +3961,7 @@ package body METRICS.Actions is
             begin
                if not Cur_Child.Is_Null then
                   if Kind (Node) in Ada_Generic_Package_Decl |
-                        Ada_Generic_Subp_Decl
+                      Ada_Generic_Subp_Decl
                   then
                      pragma Assert
                        ((I = 1) =

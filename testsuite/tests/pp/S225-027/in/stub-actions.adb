@@ -392,7 +392,7 @@ package body Stub.Actions is
                begin
                   if Needs_Completion (Subtree)
                     or else Subtree.Kind in Ada_Incomplete_Type_Decl |
-                        Ada_Incomplete_Tagged_Type_Decl
+                      Ada_Incomplete_Tagged_Type_Decl
                   then
                      return True;
                   end if;
@@ -769,7 +769,7 @@ package body Stub.Actions is
                   Subtree : constant Ada_Node := Childx (Decls, X);
                begin
                   if Subtree.Kind in Ada_Incomplete_Type_Decl |
-                        Ada_Incomplete_Tagged_Type_Decl
+                      Ada_Incomplete_Tagged_Type_Decl
                   then
                      declare
                         Next_Part : constant Base_Type_Decl :=
