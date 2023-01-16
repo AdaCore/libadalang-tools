@@ -327,10 +327,10 @@ CompilationUnit
       -->Walk: <PrivateAbsent foo.adb:1:1-1:1>
       <--Walk: <PrivateAbsent foo.adb:1:1-1:1>
       -->Walk: <PackageBody ["Foo"] foo.adb:1:1-8:9>
-         -->Walk: <DefiningName foo.adb:1:14-1:17>
+         -->Walk: <DefiningName "Foo" foo.adb:1:14-1:17>
             -->Walk: <Id "Foo" foo.adb:1:14-1:17>
             <--Walk: <Id "Foo" foo.adb:1:14-1:17>
-         <--Walk: <DefiningName foo.adb:1:14-1:17>
+         <--Walk: <DefiningName "Foo" foo.adb:1:14-1:17>
          -->Walk: <DeclarativePart foo.adb:1:20-8:1>
             -->Walk: <AdaNodeList foo.adb:3:4-6:12>
                -->Walk: <SubpBody ["Bar"] foo.adb:3:4-6:12>
@@ -339,18 +339,18 @@ CompilationUnit
                   -->Walk: <SubpSpec foo.adb:3:4-3:44>
                      -->Walk: <SubpKindProcedure foo.adb:3:4-3:13>
                      <--Walk: <SubpKindProcedure foo.adb:3:4-3:13>
-                     -->Walk: <DefiningName foo.adb:3:14-3:17>
+                     -->Walk: <DefiningName "Bar" foo.adb:3:14-3:17>
                         -->Walk: <Id "Bar" foo.adb:3:14-3:17>
                         <--Walk: <Id "Bar" foo.adb:3:14-3:17>
-                     <--Walk: <DefiningName foo.adb:3:14-3:17>
+                     <--Walk: <DefiningName "Bar" foo.adb:3:14-3:17>
                      -->Walk: <Params foo.adb:3:18-3:44>
                         -->Walk: <ParamSpecList foo.adb:3:19-3:43>
                            -->Walk: <ParamSpec ["P1"] foo.adb:3:19-3:31>
                               -->Walk: <DefiningNameList foo.adb:3:19-3:21>
-                                 -->Walk: <DefiningName foo.adb:3:19-3:21>
+                                 -->Walk: <DefiningName "P1" foo.adb:3:19-3:21>
                                     -->Walk: <Id "P1" foo.adb:3:19-3:21>
                                     <--Walk: <Id "P1" foo.adb:3:19-3:21>
-                                 <--Walk: <DefiningName foo.adb:3:19-3:21>
+                                 <--Walk: <DefiningName "P1" foo.adb:3:19-3:21>
                               <--Walk: <DefiningNameList foo.adb:3:19-3:21>
                               -->Walk: <AliasedAbsent foo.adb:3:23-3:23>
                               <--Walk: <AliasedAbsent foo.adb:3:23-3:23>
@@ -365,10 +365,10 @@ CompilationUnit
                            <--Walk: <ParamSpec ["P1"] foo.adb:3:19-3:31>
                            -->Walk: <ParamSpec ["P2"] foo.adb:3:33-3:43>
                               -->Walk: <DefiningNameList foo.adb:3:33-3:35>
-                                 -->Walk: <DefiningName foo.adb:3:33-3:35>
+                                 -->Walk: <DefiningName "P2" foo.adb:3:33-3:35>
                                     -->Walk: <Id "P2" foo.adb:3:33-3:35>
                                     <--Walk: <Id "P2" foo.adb:3:33-3:35>
-                                 <--Walk: <DefiningName foo.adb:3:33-3:35>
+                                 <--Walk: <DefiningName "P2" foo.adb:3:33-3:35>
                               <--Walk: <DefiningNameList foo.adb:3:33-3:35>
                               -->Walk: <AliasedAbsent foo.adb:3:37-3:37>
                               <--Walk: <AliasedAbsent foo.adb:3:37-3:37>
@@ -685,10 +685,10 @@ CompilationUnit
       -->Walk: <PrivateAbsent foo.ads:1:1-1:1>
       <--Walk: <PrivateAbsent foo.ads:1:1-1:1>
       -->Walk: <PackageDecl ["Foo"] foo.ads:1:1-5:9>
-         -->Walk: <DefiningName foo.ads:1:9-1:12>
+         -->Walk: <DefiningName "Foo" foo.ads:1:9-1:12>
             -->Walk: <Id "Foo" foo.ads:1:9-1:12>
             <--Walk: <Id "Foo" foo.ads:1:9-1:12>
-         <--Walk: <DefiningName foo.ads:1:9-1:12>
+         <--Walk: <DefiningName "Foo" foo.ads:1:9-1:12>
          -->Walk: <PublicPart foo.ads:1:15-5:1>
             -->Walk: <AdaNodeList foo.ads:3:4-3:45>
                -->Walk: <SubpDecl ["Bar"] foo.ads:3:4-3:45>
@@ -697,18 +697,18 @@ CompilationUnit
                   -->Walk: <SubpSpec foo.ads:3:4-3:44>
                      -->Walk: <SubpKindProcedure foo.ads:3:4-3:13>
                      <--Walk: <SubpKindProcedure foo.ads:3:4-3:13>
-                     -->Walk: <DefiningName foo.ads:3:14-3:17>
+                     -->Walk: <DefiningName "Bar" foo.ads:3:14-3:17>
                         -->Walk: <Id "Bar" foo.ads:3:14-3:17>
                         <--Walk: <Id "Bar" foo.ads:3:14-3:17>
-                     <--Walk: <DefiningName foo.ads:3:14-3:17>
+                     <--Walk: <DefiningName "Bar" foo.ads:3:14-3:17>
                      -->Walk: <Params foo.ads:3:18-3:44>
                         -->Walk: <ParamSpecList foo.ads:3:19-3:43>
                            -->Walk: <ParamSpec ["P1"] foo.ads:3:19-3:31>
                               -->Walk: <DefiningNameList foo.ads:3:19-3:21>
-                                 -->Walk: <DefiningName foo.ads:3:19-3:21>
+                                 -->Walk: <DefiningName "P1" foo.ads:3:19-3:21>
                                     -->Walk: <Id "P1" foo.ads:3:19-3:21>
                                     <--Walk: <Id "P1" foo.ads:3:19-3:21>
-                                 <--Walk: <DefiningName foo.ads:3:19-3:21>
+                                 <--Walk: <DefiningName "P1" foo.ads:3:19-3:21>
                               <--Walk: <DefiningNameList foo.ads:3:19-3:21>
                               -->Walk: <AliasedAbsent foo.ads:3:23-3:23>
                               <--Walk: <AliasedAbsent foo.ads:3:23-3:23>
@@ -723,10 +723,10 @@ CompilationUnit
                            <--Walk: <ParamSpec ["P1"] foo.ads:3:19-3:31>
                            -->Walk: <ParamSpec ["P2"] foo.ads:3:33-3:43>
                               -->Walk: <DefiningNameList foo.ads:3:33-3:35>
-                                 -->Walk: <DefiningName foo.ads:3:33-3:35>
+                                 -->Walk: <DefiningName "P2" foo.ads:3:33-3:35>
                                     -->Walk: <Id "P2" foo.ads:3:33-3:35>
                                     <--Walk: <Id "P2" foo.ads:3:33-3:35>
-                                 <--Walk: <DefiningName foo.ads:3:33-3:35>
+                                 <--Walk: <DefiningName "P2" foo.ads:3:33-3:35>
                               <--Walk: <DefiningNameList foo.ads:3:33-3:35>
                               -->Walk: <AliasedAbsent foo.ads:3:37-3:37>
                               <--Walk: <AliasedAbsent foo.ads:3:37-3:37>
@@ -1024,10 +1024,10 @@ CompilationUnit
          -->Walk: <SubpSpec main.adb:3:1-3:15>
             -->Walk: <SubpKindProcedure main.adb:3:1-3:10>
             <--Walk: <SubpKindProcedure main.adb:3:1-3:10>
-            -->Walk: <DefiningName main.adb:3:11-3:15>
+            -->Walk: <DefiningName "Main" main.adb:3:11-3:15>
                -->Walk: <Id "Main" main.adb:3:11-3:15>
                <--Walk: <Id "Main" main.adb:3:11-3:15>
-            <--Walk: <DefiningName main.adb:3:11-3:15>
+            <--Walk: <DefiningName "Main" main.adb:3:11-3:15>
          <--Walk: <SubpSpec main.adb:3:1-3:15>
          -->Walk: <DeclarativePart main.adb:3:18-4:1>
             -->Walk: <AdaNodeList main.adb:3:18-3:18>
@@ -1364,10 +1364,10 @@ CompilationUnit
          -->Walk: <SubpSpec playground_0.adb:3:1-3:23>
             -->Walk: <SubpKindProcedure playground_0.adb:3:1-3:10>
             <--Walk: <SubpKindProcedure playground_0.adb:3:1-3:10>
-            -->Walk: <DefiningName playground_0.adb:3:11-3:23>
+            -->Walk: <DefiningName "Playground_0" playground_0.adb:3:11-3:23>
                -->Walk: <Id "Playground_0" playground_0.adb:3:11-3:23>
                <--Walk: <Id "Playground_0" playground_0.adb:3:11-3:23>
-            <--Walk: <DefiningName playground_0.adb:3:11-3:23>
+            <--Walk: <DefiningName "Playground_0" playground_0.adb:3:11-3:23>
          <--Walk: <SubpSpec playground_0.adb:3:1-3:23>
          -->Walk: <DeclarativePart playground_0.adb:3:26-4:1>
             -->Walk: <AdaNodeList playground_0.adb:3:26-3:26>
@@ -3032,19 +3032,19 @@ CompilationUnitList
          -->Walk: <SubpSpec playground_1.adb:3:1-3:23>
             -->Walk: <SubpKindProcedure playground_1.adb:3:1-3:10>
             <--Walk: <SubpKindProcedure playground_1.adb:3:1-3:10>
-            -->Walk: <DefiningName playground_1.adb:3:11-3:23>
+            -->Walk: <DefiningName "Playground_1" playground_1.adb:3:11-3:23>
                -->Walk: <Id "Playground_1" playground_1.adb:3:11-3:23>
                <--Walk: <Id "Playground_1" playground_1.adb:3:11-3:23>
-            <--Walk: <DefiningName playground_1.adb:3:11-3:23>
+            <--Walk: <DefiningName "Playground_1" playground_1.adb:3:11-3:23>
          <--Walk: <SubpSpec playground_1.adb:3:1-3:23>
          -->Walk: <DeclarativePart playground_1.adb:3:26-7:1>
             -->Walk: <AdaNodeList playground_1.adb:4:4-6:39>
                -->Walk: <ObjectDecl ["Buf"] playground_1.adb:4:4-4:32>
                   -->Walk: <DefiningNameList playground_1.adb:4:4-4:7>
-                     -->Walk: <DefiningName playground_1.adb:4:4-4:7>
+                     -->Walk: <DefiningName "Buf" playground_1.adb:4:4-4:7>
                         -->Walk: <Id "Buf" playground_1.adb:4:4-4:7>
                         <--Walk: <Id "Buf" playground_1.adb:4:4-4:7>
-                     <--Walk: <DefiningName playground_1.adb:4:4-4:7>
+                     <--Walk: <DefiningName "Buf" playground_1.adb:4:4-4:7>
                   <--Walk: <DefiningNameList playground_1.adb:4:4-4:7>
                   -->Walk: <AliasedAbsent playground_1.adb:4:9-4:9>
                   <--Walk: <AliasedAbsent playground_1.adb:4:9-4:9>
@@ -3063,10 +3063,10 @@ CompilationUnitList
                <--Walk: <ObjectDecl ["Buf"] playground_1.adb:4:4-4:32>
                -->Walk: <ObjectDecl ["Full_Name"] playground_1.adb:6:4-6:39>
                   -->Walk: <DefiningNameList playground_1.adb:6:4-6:13>
-                     -->Walk: <DefiningName playground_1.adb:6:4-6:13>
+                     -->Walk: <DefiningName "Full_Name" playground_1.adb:6:4-6:13>
                         -->Walk: <Id "Full_Name" playground_1.adb:6:4-6:13>
                         <--Walk: <Id "Full_Name" playground_1.adb:6:4-6:13>
-                     <--Walk: <DefiningName playground_1.adb:6:4-6:13>
+                     <--Walk: <DefiningName "Full_Name" playground_1.adb:6:4-6:13>
                   <--Walk: <DefiningNameList playground_1.adb:6:4-6:13>
                   -->Walk: <AliasedAbsent playground_1.adb:6:15-6:15>
                   <--Walk: <AliasedAbsent playground_1.adb:6:15-6:15>
@@ -3960,19 +3960,19 @@ CompilationUnitList
          -->Walk: <SubpSpec playground_1.adb:17:1-17:25>
             -->Walk: <SubpKindProcedure playground_1.adb:17:1-17:10>
             <--Walk: <SubpKindProcedure playground_1.adb:17:1-17:10>
-            -->Walk: <DefiningName playground_1.adb:17:11-17:25>
+            -->Walk: <DefiningName "Playground_1_X" playground_1.adb:17:11-17:25>
                -->Walk: <Id "Playground_1_X" playground_1.adb:17:11-17:25>
                <--Walk: <Id "Playground_1_X" playground_1.adb:17:11-17:25>
-            <--Walk: <DefiningName playground_1.adb:17:11-17:25>
+            <--Walk: <DefiningName "Playground_1_X" playground_1.adb:17:11-17:25>
          <--Walk: <SubpSpec playground_1.adb:17:1-17:25>
          -->Walk: <DeclarativePart playground_1.adb:17:28-21:1>
             -->Walk: <AdaNodeList playground_1.adb:18:4-20:39>
                -->Walk: <ObjectDecl ["Buf"] playground_1.adb:18:4-18:32>
                   -->Walk: <DefiningNameList playground_1.adb:18:4-18:7>
-                     -->Walk: <DefiningName playground_1.adb:18:4-18:7>
+                     -->Walk: <DefiningName "Buf" playground_1.adb:18:4-18:7>
                         -->Walk: <Id "Buf" playground_1.adb:18:4-18:7>
                         <--Walk: <Id "Buf" playground_1.adb:18:4-18:7>
-                     <--Walk: <DefiningName playground_1.adb:18:4-18:7>
+                     <--Walk: <DefiningName "Buf" playground_1.adb:18:4-18:7>
                   <--Walk: <DefiningNameList playground_1.adb:18:4-18:7>
                   -->Walk: <AliasedAbsent playground_1.adb:18:9-18:9>
                   <--Walk: <AliasedAbsent playground_1.adb:18:9-18:9>
@@ -3991,10 +3991,10 @@ CompilationUnitList
                <--Walk: <ObjectDecl ["Buf"] playground_1.adb:18:4-18:32>
                -->Walk: <ObjectDecl ["Full_Name"] playground_1.adb:20:4-20:39>
                   -->Walk: <DefiningNameList playground_1.adb:20:4-20:13>
-                     -->Walk: <DefiningName playground_1.adb:20:4-20:13>
+                     -->Walk: <DefiningName "Full_Name" playground_1.adb:20:4-20:13>
                         -->Walk: <Id "Full_Name" playground_1.adb:20:4-20:13>
                         <--Walk: <Id "Full_Name" playground_1.adb:20:4-20:13>
-                     <--Walk: <DefiningName playground_1.adb:20:4-20:13>
+                     <--Walk: <DefiningName "Full_Name" playground_1.adb:20:4-20:13>
                   <--Walk: <DefiningNameList playground_1.adb:20:4-20:13>
                   -->Walk: <AliasedAbsent playground_1.adb:20:15-20:15>
                   <--Walk: <AliasedAbsent playground_1.adb:20:15-20:15>
@@ -4888,19 +4888,19 @@ CompilationUnitList
          -->Walk: <SubpSpec playground_1.adb:31:1-31:25>
             -->Walk: <SubpKindProcedure playground_1.adb:31:1-31:10>
             <--Walk: <SubpKindProcedure playground_1.adb:31:1-31:10>
-            -->Walk: <DefiningName playground_1.adb:31:11-31:25>
+            -->Walk: <DefiningName "Playground_1_Y" playground_1.adb:31:11-31:25>
                -->Walk: <Id "Playground_1_Y" playground_1.adb:31:11-31:25>
                <--Walk: <Id "Playground_1_Y" playground_1.adb:31:11-31:25>
-            <--Walk: <DefiningName playground_1.adb:31:11-31:25>
+            <--Walk: <DefiningName "Playground_1_Y" playground_1.adb:31:11-31:25>
          <--Walk: <SubpSpec playground_1.adb:31:1-31:25>
          -->Walk: <DeclarativePart playground_1.adb:31:28-35:1>
             -->Walk: <AdaNodeList playground_1.adb:32:4-34:39>
                -->Walk: <ObjectDecl ["Buf"] playground_1.adb:32:4-32:32>
                   -->Walk: <DefiningNameList playground_1.adb:32:4-32:7>
-                     -->Walk: <DefiningName playground_1.adb:32:4-32:7>
+                     -->Walk: <DefiningName "Buf" playground_1.adb:32:4-32:7>
                         -->Walk: <Id "Buf" playground_1.adb:32:4-32:7>
                         <--Walk: <Id "Buf" playground_1.adb:32:4-32:7>
-                     <--Walk: <DefiningName playground_1.adb:32:4-32:7>
+                     <--Walk: <DefiningName "Buf" playground_1.adb:32:4-32:7>
                   <--Walk: <DefiningNameList playground_1.adb:32:4-32:7>
                   -->Walk: <AliasedAbsent playground_1.adb:32:9-32:9>
                   <--Walk: <AliasedAbsent playground_1.adb:32:9-32:9>
@@ -4919,10 +4919,10 @@ CompilationUnitList
                <--Walk: <ObjectDecl ["Buf"] playground_1.adb:32:4-32:32>
                -->Walk: <ObjectDecl ["Full_Name"] playground_1.adb:34:4-34:39>
                   -->Walk: <DefiningNameList playground_1.adb:34:4-34:13>
-                     -->Walk: <DefiningName playground_1.adb:34:4-34:13>
+                     -->Walk: <DefiningName "Full_Name" playground_1.adb:34:4-34:13>
                         -->Walk: <Id "Full_Name" playground_1.adb:34:4-34:13>
                         <--Walk: <Id "Full_Name" playground_1.adb:34:4-34:13>
-                     <--Walk: <DefiningName playground_1.adb:34:4-34:13>
+                     <--Walk: <DefiningName "Full_Name" playground_1.adb:34:4-34:13>
                   <--Walk: <DefiningNameList playground_1.adb:34:4-34:13>
                   -->Walk: <AliasedAbsent playground_1.adb:34:15-34:15>
                   <--Walk: <AliasedAbsent playground_1.adb:34:15-34:15>
