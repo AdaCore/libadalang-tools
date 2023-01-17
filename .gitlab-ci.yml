@@ -1,3 +1,7 @@
+variables:
+   # The common part of the URL for cloning from within a CI
+   GIT_CLONE_BASE: https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}:${CI_SERVER_PORT}
+
 stages:
   - build_and_test
 
@@ -18,6 +22,32 @@ build_and_test:
     # Tell the anod sandbox to use our repository
     - cd /it/wave
     - anod vcs --add-repo libadalang-tools $CI_PROJECT_DIR
+
+    # Figure out if we're on a sync branch
+    - BRANCH=master
+    - if [[ $CI_COMMIT_BRANCH =~ ^sync/ ]]; then
+         BRANCH=$CI_COMMIT_BRANCH;
+      elif [[ $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ ^sync/ ]]; then
+         BRANCH=$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME;
+      fi
+
+    # Setup the 'anod vcs' for the other repos.
+    # Get them from the default branch, or from the same
+    # branch as this if it exists.
+    - for subproject in laltools-testsuite ; do
+         cd /tmp ;
+         git clone $GIT_CLONE_BASE/eng/ide/$subproject ;
+         cd $subproject ;
+         echo "#### for project $subproject..." ;
+         if `git show-ref $BRANCH > /dev/null` ; then
+             echo "### ...using branch $BRANCH" ;
+             git checkout $BRANCH ;
+         else
+             echo "### ...using the default branch" ;
+         fi ;
+         cd /it/wave ;
+         anod vcs --add-repo $subproject /tmp/$subproject ;
+      done ;
 
     # Build and test
     - anod build libadalang-tools
