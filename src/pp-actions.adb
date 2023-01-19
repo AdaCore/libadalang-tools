@@ -1055,7 +1055,7 @@ package body Pp.Actions is
            when Ada_Entry_Index_Spec =>
              L ("for ! in[# !]"),
            when Ada_Exception_Handler =>
-             L ("when[? ~~ :~ ?~ ^|# ~~] ^=>$", "{?~;$~;$~}"),
+             L ("when[? ~~ :~ ?~ #| ~~] ^=>$", "{?~;$~;$~}"),
            when Ada_Explicit_Deref =>
              L ("!.all"),
            when Ada_Aggregate => null,
@@ -1075,13 +1075,13 @@ package body Pp.Actions is
            when Ada_Case_Expr =>
              L ("case ! is[# ?#~,# ~~]"),
            when Ada_Case_Expr_Alternative =>
-             L ("when[ ?~ |# ~~] =>[# !]"),
+             L ("when[ ?~ #| ~~] =>[# !]"),
            when Ada_Box_Expr =>
              L ("<>"),
            when Ada_If_Expr =>
              L ("if[#1 !]#1 then[#1 !]", "? #~ #~~", "?# else[ ~~]~"),
            when Ada_Membership_Expr =>
-             L ("! ![# ?~ #| ~~]"),
+             L ("! ![# ?~ #1| ~~]"),
            when Ada_Dotted_Name =>
              L ("![#1.!]"),
            when Ada_End_Name => L ("!"),
@@ -1140,9 +1140,9 @@ package body Pp.Actions is
            when Ada_Component_List =>
              L ("{?~;$~;$~}", "{?~~;$~}"),
            when Ada_Variant =>
-             L ("when[ ?~ |# ~~] =>$", "!"),
+             L ("when[ ?~ #| ~~] =>$", "!"),
            when Ada_Case_Stmt_Alternative =>
-             L ("when[ ?~ |# ~~] =>$", "{?~;$~;$~}"),
+             L ("when[ ?~ #| ~~] =>$", "{?~;$~;$~}"),
            when Ada_Variant_Part =>
              L ("case !# is$", "{!}", "end case"),
            when Ada_Case_Stmt =>
@@ -2438,7 +2438,7 @@ package body Pp.Actions is
       begin
          if Arg (Cmd, Vertical_Case_Alternatives) then
             for X in When_Kinds loop
-               Replace_One (X, "when[ ?~ |# ~~]", "when{ ?~$| ~~}");
+               Replace_One (X, "when[ ?~ #| ~~]", "when{ ?~$| ~~}");
             end loop;
             --  Perhaps this should be unconditional, not just for
             --  Vertical_Case_Alternatives.
@@ -4572,7 +4572,7 @@ package body Pp.Actions is
             if (Is_Short_C or Arg (Cmd, Split_Line_Before_Op))
               and Oper /= Ada_Op_Pow
             then
-               Interpret_Alt_Template (Soft_Alt, Empty_Tree_Array, Cur_Level);
+                  Interpret_Alt_Template (Soft_Alt, Empty_Tree_Array, Cur_Level);
             end if;
 
             if Oper = Ada_Op_Pow then
@@ -4630,9 +4630,9 @@ package body Pp.Actions is
                declare
                   Arg2 : constant Ada_Tree := F_Operand (Operand).As_Ada_Node;
                begin
-
                   if Arg (Cmd, Split_Line_Before_Op) then
-                     Interpret_Alt_Template (Soft_Alt, Empty_Tree_Array, Cur_Level);
+                     Interpret_Alt_Template
+                       (Soft_Alt, Empty_Tree_Array, Cur_Level);
                   end if;
 
                   Append_And_Put (New_Tokns, Spaces, Name_Space);

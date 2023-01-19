@@ -351,7 +351,7 @@ package body Utils.Drivers is
       Utils.Main_Done := True;
 
    exception
-      when X : File_Not_Found                                =>
+      when X : File_Not_Found                               =>
          declare
             use Text_IO, Ada.Exceptions, Utils.Tool_Names;
          begin
@@ -360,13 +360,13 @@ package body Utils.Drivers is
          end;
          Environment.Clean_Up;
          GNAT.OS_Lib.OS_Exit (1);
-      when Utils.Command_Lines.Command_Line_Error            =>
+      when Utils.Command_Lines.Command_Line_Error           =>
          --  Error message has already been printed.
          GNAT.Command_Line.Try_Help;
          Environment.Clean_Up;
       --         GNAT.OS_Lib.OS_Exit (1);
          when Utils.Command_Lines.Command_Line_Error_No_Help |
-        Utils.Command_Lines.Command_Line_Error_No_Tool_Name  =>
+        Utils.Command_Lines.Command_Line_Error_No_Tool_Name =>
          --  Error message has already been printed.
          Environment.Clean_Up;
          GNAT.OS_Lib.OS_Exit (1);
