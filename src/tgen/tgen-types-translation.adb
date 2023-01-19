@@ -148,7 +148,7 @@ package body TGen.Types.Translation is
      (Decl      : Base_Type_Decl;
       Type_Name : Defining_Name;
       Cmp_Idx   : Positive) return Translation_Result with
-      Pre => Decl.P_Is_Array_Type;
+      Pre => Decl.P_Root_Type.P_Full_View.P_Is_Array_Type;
 
    function Translate_Component_Decl_List
      (Decl_List : Ada_Node_List;
@@ -185,7 +185,7 @@ package body TGen.Types.Translation is
      (Decl      : Base_Type_Decl;
       Type_Name : Defining_Name;
       Cmp_Idx   : Positive) return Translation_Result with
-      Pre => Decl.P_Is_Record_Type;
+      Pre => Decl.P_Root_Type.P_Full_View.P_Is_Record_Type;
 
    procedure Apply_Record_Subtype_Decl
      (Decl : Subtype_Indication;
@@ -837,7 +837,8 @@ package body TGen.Types.Translation is
          --  There can be no delta constraints on a decimal fixed point type
          --  as per RM J.3 (5) so lets work on the type definition directly.
 
-         Root_Typ : constant Type_Decl := Decl.P_Root_Type.As_Type_Decl;
+         Root_Typ : constant Type_Decl :=
+           Decl.P_Root_Type.P_Full_View.As_Type_Decl;
          Eval_Res : constant Eval_Result :=
            Expr_Eval (Root_Typ.F_Type_Def.As_Decimal_Fixed_Point_Def.F_Delta);
       begin
@@ -892,7 +893,8 @@ package body TGen.Types.Translation is
      (Decl     :     Base_Type_Decl; Has_Range : out Boolean;
       Min, Max : out Big_Reals.Big_Real)
    is
-      Root           : constant Type_Decl := Decl.P_Root_Type.As_Type_Decl;
+      Root           : constant Type_Decl :=
+        Decl.P_Root_Type.P_Full_View.As_Type_Decl;
       Parent_Type    : Subtype_Indication := No_Subtype_Indication;
       Range_Spec_Val : Range_Spec         := No_Range_Spec;
    begin
@@ -1176,8 +1178,8 @@ package body TGen.Types.Translation is
         (Decl : Base_Type_Decl) return Translation_Result
       is
          Cmp_Typ_Def : constant Component_Def :=
-            Decl.P_Root_Type.As_Type_Decl.F_Type_Def.As_Array_Type_Def
-            .F_Component_Type;
+            Decl.P_Root_Type.P_Full_View.As_Type_Decl.F_Type_Def
+            .As_Array_Type_Def.F_Component_Type;
          Num_Indices : Natural := 0;
       begin
          --  Compute the number of indices
@@ -2235,12 +2237,13 @@ package body TGen.Types.Translation is
 
       --  First the simple case of an undiscriminated record
 
-      if Kind (Decl.P_Root_Type) in Ada_Type_Decl
-        and then Kind (Decl.P_Root_Type.As_Type_Decl.F_Type_Def)
+      if Kind (Decl.P_Root_Type.P_Full_View) in Ada_Type_Decl
+        and then Kind (Decl.P_Root_Type.P_Full_View.As_Type_Decl.F_Type_Def)
                    in Ada_Record_Type_Def_Range
-        and then Is_Null (Decl.P_Root_Type.As_Type_Decl.F_Discriminants)
+        and then Is_Null
+                   (Decl.P_Root_Type.P_Full_View.As_Type_Decl.F_Discriminants)
       then
-         Actual_Decl := Decl.P_Root_Type.As_Type_Decl;
+         Actual_Decl := Decl.P_Root_Type.P_Full_View.As_Type_Decl;
 
          declare
             Trans_Res : Nondiscriminated_Record_Typ;
@@ -2275,7 +2278,7 @@ package body TGen.Types.Translation is
       else
          --  Now the rest
 
-         Actual_Decl := Decl.P_Root_Type.As_Type_Decl;
+         Actual_Decl := Decl.P_Root_Type.P_Full_View.As_Type_Decl;
 
          declare
             Trans_Res : Discriminated_Record_Typ
@@ -2875,7 +2878,7 @@ package body TGen.Types.Translation is
       Verbose           : Boolean := False;
       Assume_Non_Static : Boolean := False) return Translation_Result
    is
-      Root_Type : constant Base_Type_Decl := N.P_Root_Type;
+      Root_Type : constant Base_Type_Decl := N.P_Root_Type.P_Full_View;
       Is_Static : Boolean := not Assume_Non_Static;
       --  Relevant only for Scalar types / array bounds
       --  / discriminant constraints.
@@ -2925,7 +2928,7 @@ package body TGen.Types.Translation is
                    (Type_Name.P_Fully_Qualified_Name_Array),
                Last_Comp_Unit_Idx => Comp_Unit_Idx));
          end return;
-      elsif N.P_Is_Formal then
+      elsif Root_Type.P_Is_Formal then
          return Res : Translation_Result (Success => True) do
             Res.Res.Set (Formal_Typ'
               (Name               =>
@@ -2933,7 +2936,7 @@ package body TGen.Types.Translation is
                    (Type_Name.P_Fully_Qualified_Name_Array),
                Last_Comp_Unit_Idx => Comp_Unit_Idx));
          end return;
-      elsif N.P_Is_Int_Type then
+      elsif Root_Type.P_Is_Int_Type then
          if Is_Static then
             return Translate_Int_Decl (N, Type_Name, Comp_Unit_Idx);
          else
@@ -2958,7 +2961,7 @@ package body TGen.Types.Translation is
                  (Type_Name.P_Fully_Qualified_Name_Array),
                Last_Comp_Unit_Idx => Comp_Unit_Idx));
          end return;
-      elsif N.P_Is_Enum_Type then
+      elsif Root_Type.P_Is_Enum_Type then
 
          if not Is_Static then
             return Res : Translation_Result (Success => True) do
@@ -2985,7 +2988,7 @@ package body TGen.Types.Translation is
             end if;
          end;
 
-      elsif N.P_Is_Float_Type then
+      elsif Root_Type.P_Is_Float_Type then
          if Is_Static then
             return Translate_Float_Decl (N, Type_Name, Comp_Unit_Idx);
          else
@@ -3001,7 +3004,7 @@ package body TGen.Types.Translation is
             end return;
          end if;
 
-      elsif N.P_Is_Fixed_Point then
+      elsif Root_Type.P_Is_Fixed_Point then
          if Kind (Root_Type.As_Type_Decl.F_Type_Def) in
              Ada_Ordinary_Fixed_Point_Def_Range
          then
@@ -3037,11 +3040,11 @@ package body TGen.Types.Translation is
             end if;
          end if;
 
-      elsif N.P_Is_Array_Type then
+      elsif Root_Type.P_Is_Array_Type then
          return Translate_Array_Decl (N, Type_Name, Comp_Unit_Idx);
 
-      elsif N.P_Is_Record_Type then
-         if N.P_Is_Tagged_Type then
+      elsif Root_Type.P_Is_Record_Type then
+         if Root_Type.P_Is_Tagged_Type then
             return Res : Translation_Result (Success => True) do
                Res.Res.Set
                  (Unsupported_Typ'
@@ -3054,7 +3057,7 @@ package body TGen.Types.Translation is
             return Translate_Record_Decl (N, Type_Name, Comp_Unit_Idx);
          end if;
 
-      elsif N.P_Is_Access_Type then
+      elsif Root_Type.P_Is_Access_Type then
          return Res : Translation_Result (Success => True) do
             Res.Res.Set
               (Access_Typ'

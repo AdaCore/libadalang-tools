@@ -31,6 +31,7 @@ TESTSUITE_PROJECTS = \
    testsuite/ada_drivers/refactoring_change_parameters_default_value/change_parameters_default_value.gpr \
    testsuite/ada_drivers/refactoring_introduce_parameter/introduce_parameter.gpr \
    testsuite/ada_drivers/refactoring_sort_dependencies/sort_dependencies.gpr \
+   testsuite/ada_drivers/refactoring_replace_type/replace_type.gpr \
    testsuite/ada_drivers/gen_marshalling_lib/tgen_marshalling.gpr
 
 ALL_PROJECTS = \
