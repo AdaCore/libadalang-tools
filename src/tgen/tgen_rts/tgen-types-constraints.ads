@@ -215,9 +215,8 @@ package TGen.Types.Constraints is
       and then Self.Subtype_Constraints.Static);
    --  Wether values for this Typ can be statically generated
 
-   overriding function Generate_Static
-     (Self    : Anonymous_Typ;
-      Context : in out Generation_Context) return Static_Strategy_Type'Class;
+   overriding function Default_Strategy
+     (Self : Anonymous_Typ) return Strategy_Type'Class;
 
    procedure Free_Content (Self : in out Anonymous_Typ);
 

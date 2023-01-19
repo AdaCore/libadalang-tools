@@ -65,9 +65,8 @@ package TGen.Types.Array_Types is
    function Kind (Self : Unconstrained_Array_Typ) return Typ_Kind is
      (Unconstrained_Array_Kind);
 
-   function Generate_Static
-     (Self    : Unconstrained_Array_Typ;
-      Context : in out Generation_Context) return Static_Strategy_Type'Class;
+   function Default_Strategy
+     (Self    : Unconstrained_Array_Typ) return Strategy_Type'Class;
    --  Generate a strategy for static (single pass) generation for an
    --  Unconstrained_Array_Typ
 
@@ -89,11 +88,9 @@ package TGen.Types.Array_Types is
    function Kind (Self : Constrained_Array_Typ) return Typ_Kind is
      (Constrained_Array_Kind);
 
-   overriding function Generate_Static
-     (Self    : Constrained_Array_Typ;
-      Context : in out Generation_Context) return Static_Strategy_Type'Class;
-   --  Generate a strategy for static (single pass) generation for a
-   --  Constrained_Array_Typ
+   overriding function Default_Strategy
+     (Self : Constrained_Array_Typ) return Strategy_Type'Class;
+   --  Generate a strategy for the generation for a Constrained_Array_Typ
 
    procedure Is_Constrained_By_Variable
      (Self       : Constrained_Array_Typ;

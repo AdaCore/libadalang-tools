@@ -26,8 +26,8 @@ with Ada.Containers.Vectors;
 with GNAT.Random_Numbers;
 
 with TGen.Numerics; use TGen.Numerics;
-with TGen.Strings; use TGen.Strings;
-with TGen.Random; use TGen.Random;
+with TGen.Strings;  use TGen.Strings;
+with TGen.Random;   use TGen.Random;
 
 package body TGen.Types.Int_Types is
 
@@ -154,12 +154,12 @@ package body TGen.Types.Int_Types is
 
       use LLLI_Conversions;
 
-      function Draw (T : SP.Ref; R : Int_Range) return Static_Value'Class;
+      function Draw (T : SP.Ref; R : Int_Range) return Value_Type'Class;
 
    end Equivalence_Classes_Strategy_Int_Typ;
 
    package body Equivalence_Classes_Strategy_Int_Typ is
-      function Draw (T : SP.Ref; R : Int_Range) return Static_Value'Class is
+      function Draw (T : SP.Ref; R : Int_Range) return Value_Type'Class is
          use Big_Int;
 
          --  Constrain the range of possible values to
@@ -188,14 +188,14 @@ package body TGen.Types.Int_Types is
    end Equivalence_Classes_Strategy_Int_Typ;
 
    function Generate_Equivalence_Class_Digit_Strategy
-     (T : Signed_Int_Typ'Class) return Static_Strategy_Type'Class;
+     (T : Signed_Int_Typ'Class) return Strategy_Type'Class;
 
    -----------------------------------------------
    -- Generate_Equivalence_Class_Digit_Strategy --
    -----------------------------------------------
 
    function Generate_Equivalence_Class_Digit_Strategy
-     (T : Signed_Int_Typ'Class) return Static_Strategy_Type'Class is
+     (T : Signed_Int_Typ'Class) return Strategy_Type'Class is
       Strat : Equivalence_Classes_Strategy_Int_Typ.Strategy;
    begin
       SP.From_Element (Strat.T, T'Unrestricted_Access);
@@ -204,31 +204,30 @@ package body TGen.Types.Int_Types is
       return Strat;
    end Generate_Equivalence_Class_Digit_Strategy;
 
-   ---------------------
-   -- Generate_Static --
-   ---------------------
+   ----------------------
+   -- Default_Strategy --
+   ----------------------
 
-   function Generate_Static
-     (Self    : Signed_Int_Typ;
-      Context : in out Generation_Context) return Static_Strategy_Type'Class
+   function Default_Strategy
+     (Self    : Signed_Int_Typ) return Strategy_Type'Class
    is
-      Strat_Random : constant Static_Strategy_Type'Class :=
-        Generate_Static_Common (Discrete_Typ'Class (Self), Context);
+      Strat_Random : constant Strategy_Type'Class :=
+        Generate_Static_Common (Discrete_Typ'Class (Self));
 
-      Strat_Equivalence_Classes : constant Static_Strategy_Type'Class :=
+      Strat_Equivalence_Classes : constant Strategy_Type'Class :=
         Generate_Equivalence_Class_Digit_Strategy (Self);
    begin
       return Make_Dispatching_Strat
         (Strat_Random, Strat_Equivalence_Classes, 0.5);
-   end Generate_Static;
+   end Default_Strategy;
 
-   ---------------------------
-   -- Generate_Static_Value --
-   ---------------------------
+   --------------
+   -- Generate --
+   --------------
 
-   function Generate_Static_Value
+   function Generate
      (Strat : in out Static_Array_Constraint_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return Static_Value'Class
+      Disc_Context : Disc_Value_Map) return Value_Type'Class
    is
       package N_Conversions is
         new Big_Int.Signed_Conversions (Int => Natural);
@@ -247,7 +246,7 @@ package body TGen.Types.Int_Types is
          null;
       end loop;
       return Base_Static_Value'(Value => +Natural'Image (Elements.Count));
-   end Generate_Static_Value;
+   end Generate;
 
    ----------------------------------------
    -- Generate_Array_Constraint_Strategy --

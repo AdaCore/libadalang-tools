@@ -340,17 +340,15 @@ package body TGen.Types.Constraints is
       return Res;
    end As_Named_Typ;
 
-   ---------------------
-   -- Generate_Static --
-   ---------------------
+   ----------------------
+   -- Default_Strategy --
+   ----------------------
 
-   function Generate_Static
-     (Self    : Anonymous_Typ;
-      Context : in out Generation_Context) return Static_Strategy_Type'Class
+   function Default_Strategy (Self : Anonymous_Typ) return Strategy_Type'Class
    is
    begin
-      return Self.As_Named_Typ.Get.Generate_Static (Context);
-   end Generate_Static;
+      return Self.As_Named_Typ.Get.Default_Strategy;
+   end Default_Strategy;
 
    ------------------
    -- Free_Content --

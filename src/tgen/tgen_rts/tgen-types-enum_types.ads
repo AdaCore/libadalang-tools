@@ -62,10 +62,9 @@ package TGen.Types.Enum_Types is
 
    function Kind (Self : Char_Typ) return Typ_Kind is (Char_Kind);
 
-   function Generate_Static
-     (Self    : Char_Typ;
-      Context : in out Generation_Context)
-      return Static_Strategy_Type'Class;
+   function Default_Strategy
+     (Self    : Char_Typ)
+      return Strategy_Type'Class;
    --  Generate a strategy to statically generate (in one pass) values for Self
 
    function As_Char_Typ (Self : SP.Ref) return Char_Typ'Class is

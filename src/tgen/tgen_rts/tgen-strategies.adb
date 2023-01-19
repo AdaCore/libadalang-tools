@@ -22,90 +22,59 @@
 ------------------------------------------------------------------------------
 
 with Ada.Containers; use Ada.Containers;
-with Ada.Tags;       use Ada.Tags;
 
 with TGen.Random; use TGen.Random;
 
 package body TGen.Strategies is
 
-   ---------------------------
-   -- Generate_Static_Value --
-   ---------------------------
+   --------------
+   -- Generate --
+   --------------
 
-   function Generate_Static_Value
-     (S            : in out Dispatching_Static_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return Static_Value'Class
+   function Generate
+     (S            : in out Dispatching_Strategy_Type;
+      Disc_Context : Disc_Value_Map) return Value_Type'Class
    is
       Rnd : constant Float := Rand_Float;
    begin
       if Rnd <= S.Bias then
-         return S.S1.Generate_Static_Value (Disc_Context);
+         return S.S1.Generate (Disc_Context);
       else
-         return S.S2.Generate_Static_Value (Disc_Context);
+         return S.S2.Generate (Disc_Context);
       end if;
-   end Generate_Static_Value;
+   end Generate;
 
    ----------------------------
    -- Make_Dispatching_Strat --
    ----------------------------
 
    function Make_Dispatching_Strat
-     (S1, S2 : Static_Strategy_Type'Class;
-      Bias   : Float := 0.5) return Dispatching_Static_Strategy_Type
+     (S1, S2 : Strategy_Type'Class;
+      Bias   : Float := 0.5) return Dispatching_Strategy_Type
    is
-      Strat : Dispatching_Static_Strategy_Type;
+      Strat : Dispatching_Strategy_Type;
    begin
       Strat.Bias := Bias;
-      Strat.S1 := new Static_Strategy_Type'Class'(S1);
-      Strat.S2 := new Static_Strategy_Type'Class'(S2);
+      Strat.S1 := new Strategy_Type'Class'(S1);
+      Strat.S2 := new Strategy_Type'Class'(S2);
       return Strat;
    end Make_Dispatching_Strat;
 
    package body Equivalence_Classes_Strategy_Package is
 
-      ---------------------------
-      -- Generate_Static_Value --
-      ---------------------------
+      --------------
+      -- Generate --
+      --------------
 
-      function Generate_Static_Value
+      function Generate
         (S            : in out Equivalence_Class_Strategy_Type;
-         Disc_Context : Disc_Value_Map) return Static_Value'Class
+         Disc_Context : Disc_Value_Map) return Value_Type'Class
       is
          Idx : constant Integer := Rand_Int (1, Integer (S.Classes.Length));
       begin
          return S.Draw (S.T, S.Classes.Element (Idx));
-      end Generate_Static_Value;
+      end Generate;
 
    end Equivalence_Classes_Strategy_Package;
-
-   ---------
-   -- "<" --
-   ---------
-
-   function "<" (L, R : Strategy_Type'Class) return Boolean is
-   begin
-
-      --  TODO: code properly this function
-
-      if L'Tag = R'Tag then
-         if L'Tag = Dispatching_Static_Strategy_Type'Tag then
-            if Dispatching_Static_Strategy_Type (L).S1.all <
-              Dispatching_Static_Strategy_Type (R).S1.all
-            then
-               return True;
-            else
-               return Dispatching_Static_Strategy_Type (L).S1.all <
-                 Dispatching_Static_Strategy_Type (R).S1.all;
-            end if;
-         elsif L'Tag = Basic_Static_Strategy_Type'Tag then
-            return Basic_Static_Strategy_Type (L).T <
-              Basic_Static_Strategy_Type (R).T;
-         else
-            return False;
-         end if;
-      else
-         return Expanded_Name (L'Tag) < Expanded_Name (R'Tag);
-      end if;
-   end "<";
 
 end TGen.Strategies;

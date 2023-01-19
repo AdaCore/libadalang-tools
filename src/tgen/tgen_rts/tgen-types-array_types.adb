@@ -190,33 +190,35 @@ package body TGen.Types.Array_Types is
       type Element_Type is private;
       with function Generate_Value (Data : Data_Type) return Element_Type;
    package Array_Generation_Package is
-      type Array_Type is array (Positive range <>) of Element_Type;
+      type Generic_Array_Type is array (Positive range <>) of Element_Type;
 
-      type Array_Strategy_Type (Dimensions : Natural) is tagged record
+      type Generic_Array_Strategy_Type (Dimensions : Natural) is tagged record
          Size_Intervals : Size_Interval_Array (1 .. Dimensions);
          Average_Sizes  : Nat_Array (1 .. Dimensions);
       end record;
 
-      function Array_Strategy
-        (Size_Intervals : Size_Interval_Array) return Array_Strategy_Type;
+      function Generic_Array_Strategy
+        (Size_Intervals : Size_Interval_Array)
+         return Generic_Array_Strategy_Type;
 
       function Draw
-        (Self : Array_Strategy_Type;
-         Data : Data_Type;
-         Dimension_Sizes : out Nat_Array) return Array_Type;
+        (Self            : Generic_Array_Strategy_Type;
+         Data            : Data_Type;
+         Dimension_Sizes : out Nat_Array) return Generic_Array_Type;
 
    end Array_Generation_Package;
 
    package body Array_Generation_Package is
 
-      --------------------
-      -- Array_Strategy --
-      --------------------
+      ----------------------------
+      -- Generic_Array_Strategy --
+      ----------------------------
 
-      function Array_Strategy
-        (Size_Intervals : Size_Interval_Array) return Array_Strategy_Type
+      function Generic_Array_Strategy
+        (Size_Intervals : Size_Interval_Array)
+         return Generic_Array_Strategy_Type
       is
-         Result : Array_Strategy_Type (Size_Intervals'Length);
+         Result        : Generic_Array_Strategy_Type (Size_Intervals'Length);
          Average_Sizes : Nat_Array (Size_Intervals'Range);
       begin
          Result.Size_Intervals := Size_Intervals;
@@ -232,12 +234,12 @@ package body TGen.Types.Array_Types is
          end loop;
          Result.Average_Sizes := Average_Sizes;
          return Result;
-      end Array_Strategy;
+      end Generic_Array_Strategy;
 
       function Draw
-        (Self : Array_Strategy_Type;
+        (Self : Generic_Array_Strategy_Type;
          Data : Data_Type;
-         Dimension_Sizes : out Nat_Array) return Array_Type is
+         Dimension_Sizes : out Nat_Array) return Generic_Array_Type is
          Arr_Length : Natural := 0;
       begin
 
@@ -271,7 +273,7 @@ package body TGen.Types.Array_Types is
          end if;
 
          declare
-            Arr : Array_Type (1 .. Arr_Length);
+            Arr : Generic_Array_Type (1 .. Arr_Length);
          begin
             for I in 1 .. Arr_Length loop
                Arr (I) := Generate_Value (Data);
@@ -281,74 +283,6 @@ package body TGen.Types.Array_Types is
       end Draw;
 
    end Array_Generation_Package;
-
-   generic
-      type Element_Type is private;
-      type Index_Type_1 is (<>);
-      type Array_Type is array (Positive range <>) of Element_Type;
-      type Reshaped_Array_Type is array (Index_Type_1 range <>)
-        of Element_Type;
-
-   function Reshape_1
-     (Arr : Array_Type) return Reshaped_Array_Type with Unreferenced;
-
-   ---------------
-   -- Reshape_1 --
-   ---------------
-
-   function Reshape_1
-     (Arr : Array_Type) return Reshaped_Array_Type
-   is
-      Res : Reshaped_Array_Type
-        (Index_Type_1'First .. Index_Type_1'Val (Arr'Last));
-      I : Index_Type_1 := Index_Type_1'First;
-   begin
-      for Orig in Arr'Range loop
-         Res (I) := Arr (Orig);
-         I := Index_Type_1'Succ (I);
-      end loop;
-      return Res;
-   end Reshape_1;
-
-   generic
-      type Element_Type is private;
-      type Index_Type_1 is (<>);
-      type Index_Type_2 is (<>);
-      type Array_Type is array (Positive) of Element_Type;
-      type Reshaped_Array_Type is array
-        (Index_Type_1 range <>, Index_Type_2 range <>)
-        of Element_Type;
-
-   function Reshape_2
-     (Arr  : Array_Type;
-      Dim1 : Positive) return Reshaped_Array_Type;
-
-   pragma Unreferenced (Reshape_2);
-
-   ---------------
-   -- Reshape_2 --
-   ---------------
-
-   function Reshape_2
-     (Arr  : Array_Type;
-      Dim1 : Positive) return Reshaped_Array_Type
-   is
-      Res : Reshaped_Array_Type
-        (Index_Type_1'First .. Index_Type_1'Val (Arr'Last / Dim1),
-         Index_Type_2'First .. Index_Type_2'Val (Arr'Last mod Dim1));
-      I : Index_Type_1 := Index_Type_1'First;
-      J : Index_Type_2 := Index_Type_2'First;
-   begin
-      for Orig in Arr'Range loop
-         Res (I, J) := Arr (Orig);
-         J := Index_Type_2'Succ (J);
-         if Orig mod Dim1 = 0 then
-            I := Index_Type_1'Succ (I);
-            J := Index_Type_2'First;
-         end if;
-      end loop;
-      return Res;
-   end Reshape_2;
 
    function Length
      (I_Constraint : TGen.Types.Constraints.Index_Constraint;
@@ -364,31 +298,31 @@ package body TGen.Types.Array_Types is
 
    type Index_Strategies_Type is
       record
-         Low_Bound_Strat, High_Bound_Strat : Static_Strategy_Acc;
+         Low_Bound_Strat, High_Bound_Strat : Strategy_Acc;
       end record;
 
-   type Index_Static_Strategy_Array is array (Positive range <>)
+   type Index_Strategy_Array is array (Positive range <>)
      of Index_Strategies_Type;
 
-   type Array_Static_Strategy_Type (Num_Dims : Positive) is
-     new Static_Strategy_Type with
+   type Array_Strategy_Type (Num_Dims : Positive) is
+     new Strategy_Type with
       record
          T                         : SP.Ref;
-         Generate_Element_Strategy : Static_Strategy_Acc;
-         Generate_Index_Strategies : Index_Static_Strategy_Array
+         Generate_Element_Strategy : Strategy_Acc;
+         Generate_Index_Strategies : Index_Strategy_Array
            (1 .. Num_Dims);
       end record;
 
-   overriding function Generate_Static_Value
-     (S            : in out Array_Static_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return Static_Value'Class;
+   overriding function Generate
+     (S            : in out Array_Strategy_Type;
+      Disc_Context : Disc_Value_Map) return Value_Type'Class;
 
    function Generate_Static_Common
      (Self                   : Array_Typ'Class;
       Disc_Context           : Disc_Value_Map;
-      Generate_Element_Strat : in out Static_Strategy_Type'Class;
-      Generate_Index_Strat   : in out Index_Static_Strategy_Array)
-      return Static_Value'Class;
+      Generate_Element_Strat : in out Strategy_Type'Class;
+      Generate_Index_Strat   : in out Index_Strategy_Array)
+      return Value_Type'Class;
 
    ------------
    -- Length --
@@ -431,9 +365,9 @@ package body TGen.Types.Array_Types is
    function Generate_Static_Common
      (Self                   : Array_Typ'Class;
       Disc_Context           : Disc_Value_Map;
-      Generate_Element_Strat : in out Static_Strategy_Type'Class;
-      Generate_Index_Strat   : in out Index_Static_Strategy_Array)
-      return Static_Value'Class
+      Generate_Element_Strat : in out Strategy_Type'Class;
+      Generate_Index_Strat   : in out Index_Strategy_Array)
+      return Value_Type'Class
    is
       use type Big_Int.Big_Integer;
 
@@ -444,7 +378,7 @@ package body TGen.Types.Array_Types is
         (Data : Data_Type) return Unbounded_String is
          pragma Unreferenced (Data);
       begin
-         return (+Generate_Element_Strat.Generate_Static_Value
+         return (+Generate_Element_Strat.Generate
                     (Disc_Context).To_String);
       end Generate_Component_Wrapper;
 
@@ -467,7 +401,7 @@ package body TGen.Types.Array_Types is
 
       Index_Values : Index_Values_Array (1 .. Self.Num_Dims);
 
-      Strat : Array_Strategy_Type (Self.Num_Dims);
+      Strat : Generic_Array_Strategy_Type (Self.Num_Dims);
 
       Dimension_Sizes : Nat_Array (1 .. Self.Num_Dims);
 
@@ -475,7 +409,7 @@ package body TGen.Types.Array_Types is
         (Value : Big_Integer; Current_Index : Positive) return String;
 
       procedure Pp_Arr
-        (Arr           : Array_Type;
+        (Arr           : Generic_Array_Type;
          Current_Index : in out Positive;
          Indexes       : Index_Values_Array);
 
@@ -496,7 +430,7 @@ package body TGen.Types.Array_Types is
       ------------
 
       procedure Pp_Arr
-        (Arr           : Array_Type;
+        (Arr           : Generic_Array_Type;
          Current_Index : in out Positive;
          Indexes       : Index_Values_Array)
       is
@@ -559,7 +493,7 @@ package body TGen.Types.Array_Types is
       end Pp_Arr;
 
       procedure Pp_Arr_Wrapper
-        (Arr     : Array_Type;
+        (Arr     : Generic_Array_Type;
          Indexes : Index_Values_Array);
 
       --------------------
@@ -567,7 +501,7 @@ package body TGen.Types.Array_Types is
       --------------------
 
       procedure Pp_Arr_Wrapper
-        (Arr     : Array_Type;
+        (Arr     : Generic_Array_Type;
          Indexes : Index_Values_Array)
       is
          Ignore : Positive := 1;
@@ -588,7 +522,7 @@ package body TGen.Types.Array_Types is
 
             Low_Bound : constant Discrete_Static_Value :=
               Discrete_Static_Value
-                (Index_Strat.Low_Bound_Strat.Generate_Static_Value
+                (Index_Strat.Low_Bound_Strat.Generate
                    (Disc_Context));
             High_Bound : Discrete_Static_Value;
          begin
@@ -603,7 +537,7 @@ package body TGen.Types.Array_Types is
 
             High_Bound :=
               Discrete_Static_Value
-                (Index_Strat.High_Bound_Strat.Generate_Static_Value
+                (Index_Strat.High_Bound_Strat.Generate
                    (Disc_Context_With_Low_Bound));
 
             Index_Values (I).High_Bound := High_Bound.Value;
@@ -624,10 +558,10 @@ package body TGen.Types.Array_Types is
 
       --  Ready to generate our array. Yay! \o/
 
-      Strat := Array_Strategy (Sizes);
+      Strat := Generic_Array_Strategy (Sizes);
 
       declare
-         Random_Arr : constant Array_Type :=
+         Random_Arr : constant Generic_Array_Type :=
            Strat.Draw (Data, Dimension_Sizes);
 
       begin
@@ -640,13 +574,13 @@ package body TGen.Types.Array_Types is
       return Base_Static_Value'(Value => Res);
    end Generate_Static_Common;
 
-   ---------------------------
-   -- Generate_Static_Value --
-   ---------------------------
+   --------------
+   -- Generate --
+   --------------
 
-   function Generate_Static_Value
-     (S            : in out Array_Static_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return Static_Value'Class
+   function Generate
+     (S            : in out Array_Strategy_Type;
+      Disc_Context : Disc_Value_Map) return Value_Type'Class
    is
       T : constant Array_Typ'Class := As_Array_Typ (S.T);
    begin
@@ -655,22 +589,21 @@ package body TGen.Types.Array_Types is
          Disc_Context,
          S.Generate_Element_Strategy.all,
          S.Generate_Index_Strategies);
-   end Generate_Static_Value;
+   end Generate;
 
-   ---------------------
-   -- Generate_Static --
-   ---------------------
+   ----------------------
+   -- Default_Strategy --
+   ----------------------
 
-   function Generate_Static
-     (Self    : Constrained_Array_Typ;
-      Context : in out Generation_Context) return Static_Strategy_Type'Class
+   function Default_Strategy
+     (Self : Constrained_Array_Typ) return Strategy_Type'Class
    is
-      Strat            : Array_Static_Strategy_Type (Self.Num_Dims);
-      Element_Strategy : constant Static_Strategy_Type'Class :=
-        Self.Component_Type.Get.Generate_Static (Context);
+      Strat            : Array_Strategy_Type (Self.Num_Dims);
+      Element_Strategy : constant Strategy_Type'Class :=
+        Self.Component_Type.Get.Default_Strategy;
    begin
       Strat.Generate_Element_Strategy :=
-        new Static_Strategy_Type'Class'(Element_Strategy);
+        new Strategy_Type'Class'(Element_Strategy);
       SP.From_Element (Strat.T, Self'Unrestricted_Access);
 
       for I in Self.Index_Types'Range loop
@@ -695,7 +628,7 @@ package body TGen.Types.Array_Types is
             --  This one is for the lower bound of the array
 
             Strat.Generate_Index_Strategies (I).Low_Bound_Strat :=
-              new Static_Strategy_Type'Class'
+              new Strategy_Type'Class'
                 (Discrete_Typ'Class
                    (Self.Index_Types (I).Unchecked_Get.all).
                      Generate_Identity_Constraint_Strategy
@@ -704,7 +637,7 @@ package body TGen.Types.Array_Types is
             --  This one is for the upper bound
 
             Strat.Generate_Index_Strategies (I).High_Bound_Strat :=
-              new Static_Strategy_Type'Class'
+              new Strategy_Type'Class'
                 (Discrete_Typ'Class
                    (Self.Index_Types (I).Unchecked_Get.all).
                      Generate_Identity_Constraint_Strategy
@@ -712,30 +645,29 @@ package body TGen.Types.Array_Types is
          end;
       end loop;
       return Strat;
-   end Generate_Static;
+   end Default_Strategy;
 
-   ---------------------
-   -- Generate_Static --
-   ---------------------
+   ----------------------
+   -- Default_Strategy --
+   ----------------------
 
-   function Generate_Static
-     (Self : Unconstrained_Array_Typ;
-      Context : in out Generation_Context) return Static_Strategy_Type'Class
+   function Default_Strategy
+     (Self : Unconstrained_Array_Typ) return Strategy_Type'Class
    is
-      Strat : Array_Static_Strategy_Type (Self.Num_Dims);
-      Element_Strategy : constant Static_Strategy_Type'Class :=
-        Self.Component_Type.Get.Generate_Static (Context);
+      Strat : Array_Strategy_Type (Self.Num_Dims);
+      Element_Strategy : constant Strategy_Type'Class :=
+        Self.Component_Type.Get.Default_Strategy;
    begin
       Strat.Generate_Element_Strategy :=
-        new Static_Strategy_Type'Class'(Element_Strategy);
+        new Strategy_Type'Class'(Element_Strategy);
       SP.From_Element (Strat.T, Self'Unrestricted_Access);
 
       for I in Self.Index_Types'Range loop
 
          Strat.Generate_Index_Strategies (I).Low_Bound_Strat :=
-           new Static_Strategy_Type'Class'
+           new Strategy_Type'Class'
              (Discrete_Typ'Class (Self.Index_Types (I).Unchecked_Get.all).
-                Generate_Static (Context));
+                Default_Strategy);
 
          declare
             --  HACK: we generate an artificial discrete constraint so that
@@ -762,16 +694,15 @@ package body TGen.Types.Array_Types is
          begin
 
             Strat.Generate_Index_Strategies (I).High_Bound_Strat :=
-              new Static_Strategy_Type'Class'
+              new Strategy_Type'Class'
                 (Discrete_Typ'Class
                    (Self.Index_Types (I).Unchecked_Get.all).
                      Generate_Array_Index_Constraint_Strategy
                       (Var_Name   => High_Bound_Disc_Name,
-                       Constraint => Artificial_Constraint,
-                       Context    => Context));
+                       Constraint => Artificial_Constraint));
          end;
       end loop;
       return Strat;
-   end Generate_Static;
+   end Default_Strategy;
 
 end TGen.Types.Array_Types;

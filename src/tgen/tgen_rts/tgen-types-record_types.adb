@@ -371,13 +371,13 @@ package body TGen.Types.Record_Types is
    end Free_Content;
 
    function "="
-     (L : Static_Strategy_Type'Class;
-      R : Static_Strategy_Type'Class)
+     (L : Strategy_Type'Class;
+      R : Strategy_Type'Class)
       return Boolean;
 
    function "="
-     (L : Static_Strategy_Type'Class;
-      R : Static_Strategy_Type'Class)
+     (L : Strategy_Type'Class;
+      R : Strategy_Type'Class)
       return Boolean
    is
       pragma Unreferenced (L);
@@ -391,39 +391,39 @@ package body TGen.Types.Record_Types is
 
    package Strategy_Maps is new Ada.Containers.Indefinite_Hashed_Maps
      (Key_Type        => Unbounded_String,
-      Element_Type    => Static_Strategy_Type'Class,
+      Element_Type    => Strategy_Type'Class,
       Hash            => Ada.Strings.Unbounded.Hash,
       Equivalent_Keys => "=",
       "="             => "=");
    subtype Strategy_Map is Strategy_Maps.Map;
 
-   type Record_Static_Strategy_Type is new Static_Strategy_Type with
+   type Record_Strategy_Type is new Strategy_Type with
       record
-         T : SP.Ref;
+         T                : SP.Ref;
          Component_Strats : Strategy_Map;
          Generate : access function
            (T                : Record_Typ'Class;
             Component_Strats : in out Strategy_Map;
-            Disc_Values      : Disc_Value_Map) return Static_Value'Class;
+            Disc_Values      : Disc_Value_Map) return Value_Type'Class;
       end record;
 
-   overriding function Generate_Static_Value
-     (S           : in out Record_Static_Strategy_Type;
-      Disc_Values : Disc_Value_Map) return Static_Value'Class;
+   overriding function Generate
+     (S           : in out Record_Strategy_Type;
+      Disc_Values : Disc_Value_Map) return Value_Type'Class;
 
-   ---------------------------
-   -- Generate_Static_Value --
-   ---------------------------
+   --------------
+   -- Generate --
+   --------------
 
-   function Generate_Static_Value
-     (S           : in out Record_Static_Strategy_Type;
-      Disc_Values : Disc_Value_Map) return Static_Value'Class
+   function Generate
+     (S           : in out Record_Strategy_Type;
+      Disc_Values : Disc_Value_Map) return Value_Type'Class
    is
       T : constant Typ'Class := S.T.Get;
    begin
       return
         S.Generate (Record_Typ (T), S.Component_Strats, Disc_Values);
-   end Generate_Static_Value;
+   end Generate;
 
    ------------------------
    -- Get_All_Components --
@@ -465,7 +465,7 @@ package body TGen.Types.Record_Types is
    function Generate_Record_Typ
      (Self        : Record_Typ'Class;
       Comp_Strats : in out Strategy_Map;
-      Disc_Values : Disc_Value_Map) return Static_Value'Class;
+      Disc_Values : Disc_Value_Map) return Value_Type'Class;
 
    -------------------------
    -- Generate_Record_Typ --
@@ -474,7 +474,7 @@ package body TGen.Types.Record_Types is
    function Generate_Record_Typ
      (Self        : Record_Typ'Class;
       Comp_Strats : in out Strategy_Map;
-      Disc_Values : Disc_Value_Map) return Static_Value'Class
+      Disc_Values : Disc_Value_Map) return Value_Type'Class
    is
       Res : Unbounded_String;
       use Component_Maps;
@@ -485,17 +485,17 @@ package body TGen.Types.Record_Types is
 
             procedure Generate_Val
               (Comp_Name  : Unbounded_String;
-               Comp_Strat : in out Static_Strategy_Type'Class);
+               Comp_Strat : in out Strategy_Type'Class);
 
             procedure Generate_Val
               (Comp_Name  : Unbounded_String;
-               Comp_Strat : in out Static_Strategy_Type'Class)
+               Comp_Strat : in out Strategy_Type'Class)
             is
                pragma Unreferenced (Comp_Name);
             begin
                Append
                  (Res,
-                  Comp_Strat.Generate_Static_Value (Disc_Values).To_String);
+                  Comp_Strat.Generate (Disc_Values).To_String);
             end Generate_Val;
          begin
             Append (Res, +Comp_Name);
@@ -567,9 +567,8 @@ package body TGen.Types.Record_Types is
    function Pick_Strat_For_Disc
      (Self      : Discriminated_Record_Typ;
       Disc_Name : Unbounded_String;
-      Disc_Type : Discrete_Typ'Class;
-      Context   : in out Generation_Context)
-      return Static_Strategy_Type'Class;
+      Disc_Type : Discrete_Typ'Class)
+      return Strategy_Type'Class;
    --  Return a generation strategy for the given discriminant
 
    -------------------------
@@ -579,13 +578,11 @@ package body TGen.Types.Record_Types is
    function Pick_Strat_For_Disc
      (Self      : Discriminated_Record_Typ;
       Disc_Name : Unbounded_String;
-      Disc_Type : Discrete_Typ'Class;
-      Context   : in out Generation_Context)
-      return Static_Strategy_Type'Class
+      Disc_Type : Discrete_Typ'Class)
+      return Strategy_Type'Class
    is
-      Default_Strategy : constant Static_Strategy_Type'Class :=
-        Self.Discriminant_Types.Element (Disc_Name).Get.Generate_Static
-        (Context);
+      Default_Strategy : constant Strategy_Type'Class :=
+        Self.Discriminant_Types.Element (Disc_Name).Get.Default_Strategy;
       Samples          : Alternatives_Set_Vector;
    begin
       --  TODO: special strategies when discriminant also is an array index
@@ -599,7 +596,7 @@ package body TGen.Types.Record_Types is
          Self.Disc_Constrains_Array (Disc_Name, Found, Constraint);
          if Found then
             return Disc_Type.Generate_Array_Index_Constraint_Strategy
-              (Disc_Name, Constraint, Context);
+              (Disc_Name, Constraint);
          end if;
       end;
 
@@ -609,12 +606,12 @@ package body TGen.Types.Record_Types is
 
       if not Samples.Is_Empty then
          declare
-            Sample_Strat      : Static_Strategy_Acc;
-            Dispatching_Strat : Dispatching_Static_Strategy_Type;
+            Sample_Strat      : Strategy_Acc;
+            Dispatching_Strat : Dispatching_Strategy_Type;
          begin
             if Disc_Type in Discrete_Typ'Class then
                Sample_Strat :=
-                 new Static_Strategy_Type'Class'
+                 new Strategy_Type'Class'
                    (Disc_Type.Generate_Sampling_Strategy (Samples));
             else
                raise Program_Error
@@ -623,7 +620,7 @@ package body TGen.Types.Record_Types is
             Dispatching_Strat.Bias := 0.5;
             Dispatching_Strat.S1   := Sample_Strat;
             Dispatching_Strat.S2   :=
-              new Static_Strategy_Type'Class'(Default_Strategy);
+              new Strategy_Type'Class'(Default_Strategy);
             return Dispatching_Strat;
          end;
       end if;
@@ -633,19 +630,19 @@ package body TGen.Types.Record_Types is
 
    --  Static strategy for record types
 
-   type Nondisc_Record_Static_Strategy_Type is
-     new Record_Static_Strategy_Type with null record;
-   overriding function Generate_Static_Value
-     (S            : in out Nondisc_Record_Static_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return Static_Value'Class;
+   type Nondisc_Record_Strategy_Type is
+     new Record_Strategy_Type with null record;
+   overriding function Generate
+     (S            : in out Nondisc_Record_Strategy_Type;
+      Disc_Context : Disc_Value_Map) return Value_Type'Class;
 
-   ---------------------------
-   -- Generate_Static_Value --
-   ---------------------------
+   --------------
+   -- Generate --
+   --------------
 
-   function Generate_Static_Value
-     (S            : in out Nondisc_Record_Static_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return Static_Value'Class
+   function Generate
+     (S            : in out Nondisc_Record_Strategy_Type;
+      Disc_Context : Disc_Value_Map) return Value_Type'Class
    is
       Res : Unbounded_String;
    begin
@@ -657,19 +654,18 @@ package body TGen.Types.Record_Types is
          .To_String);
       Append (Res, ")");
       return Base_Static_Value'(Value => Res);
-   end Generate_Static_Value;
+   end Generate;
 
-   ---------------------
-   -- Generate_Static --
-   ---------------------
+   ----------------------
+   -- Default_Strategy --
+   ----------------------
 
-   function Generate_Static
-     (Self    : Nondiscriminated_Record_Typ;
-      Context : in out Generation_Context) return Static_Strategy_Type'Class
+   function Default_Strategy
+     (Self : Nondiscriminated_Record_Typ) return Strategy_Type'Class
    is
       use Component_Maps;
 
-      Strat : Nondisc_Record_Static_Strategy_Type;
+      Strat : Nondisc_Record_Strategy_Type;
    begin
       SP.From_Element (Strat.T, Self'Unrestricted_Access);
       Strat.Generate := Generate_Record_Typ'Access;
@@ -678,30 +674,30 @@ package body TGen.Types.Record_Types is
             Comp_Name : constant Unbounded_String := Key (Component);
          begin
             Strat.Component_Strats.Insert
-              (Comp_Name, Element (Component).Get.Generate_Static (Context));
+              (Comp_Name, Element (Component).Get.Default_Strategy);
          end;
       end loop;
       return Strat;
-   end Generate_Static;
+   end Default_Strategy;
 
    --  Static strategy for discriminated record types
 
-   type Disc_Record_Static_Strategy_Type is
-     new Record_Static_Strategy_Type with
+   type Disc_Record_Strategy_Type is
+     new Record_Strategy_Type with
       record
          Disc_Strats : Strategy_Map;
       end record;
-   overriding function Generate_Static_Value
-     (S            : in out Disc_Record_Static_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return Static_Value'Class;
+   overriding function Generate
+     (S            : in out Disc_Record_Strategy_Type;
+      Disc_Context : Disc_Value_Map) return Value_Type'Class;
 
-   ---------------------------
-   -- Generate_Static_Value --
-   ---------------------------
+   --------------
+   -- Generate --
+   --------------
 
-   function Generate_Static_Value
-     (S            : in out Disc_Record_Static_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return Static_Value'Class
+   function Generate
+     (S            : in out Disc_Record_Strategy_Type;
+      Disc_Context : Disc_Value_Map) return Value_Type'Class
    is
       T           : constant Typ'Class := S.T.Get;
       Disc_Record : constant Discriminated_Record_Typ :=
@@ -759,15 +755,15 @@ package body TGen.Types.Record_Types is
 
                procedure Generate_Val
                  (Disc_Name  : Unbounded_String;
-                  Disc_Strat : in out Static_Strategy_Type'Class);
+                  Disc_Strat : in out Strategy_Type'Class);
 
                procedure Generate_Val
                  (Disc_Name  : Unbounded_String;
-                  Disc_Strat : in out Static_Strategy_Type'Class)
+                  Disc_Strat : in out Strategy_Type'Class)
                is
                   Val : constant Discrete_Static_Value'Class :=
                     Discrete_Static_Value'Class
-                      (Disc_Strat.Generate_Static_Value (Current_Context));
+                      (Disc_Strat.Generate (Current_Context));
                begin
                   Current_Context.Insert (Disc_Name, Val.Value);
                end Generate_Val;
@@ -825,17 +821,16 @@ package body TGen.Types.Record_Types is
       Append (Res, ")");
       return Base_Static_Value'(Value => Res);
 
-   end Generate_Static_Value;
+   end Generate;
 
-   ---------------------
-   -- Generate_Static --
-   ---------------------
+   ----------------------
+   -- Default_Strategy --
+   ----------------------
 
-   function Generate_Static
-     (Self    : Discriminated_Record_Typ;
-      Context : in out Generation_Context) return Static_Strategy_Type'Class
+   function Default_Strategy
+     (Self : Discriminated_Record_Typ) return Strategy_Type'Class
    is
-      Strat : Disc_Record_Static_Strategy_Type;
+      Strat : Disc_Record_Strategy_Type;
       use Component_Maps;
    begin
 
@@ -849,8 +844,7 @@ package body TGen.Types.Record_Types is
               (Disc_Name,
                Self.Pick_Strat_For_Disc
                  (Disc_Name, Discrete_Typ'Class
-                      (Element (Disc).Unchecked_Get.all),
-                  Context));
+                      (Element (Disc).Unchecked_Get.all)));
          end;
       end loop;
 
@@ -863,12 +857,12 @@ package body TGen.Types.Record_Types is
             Comp_Name : constant Unbounded_String := Key (Component);
          begin
             Strat.Component_Strats.Insert
-              (Comp_Name, Element (Component).Get.Generate_Static (Context));
+              (Comp_Name, Element (Component).Get.Default_Strategy);
          end;
       end loop;
 
       return Strat;
-   end Generate_Static;
+   end Default_Strategy;
 
    procedure Disc_Constrains_Array
      (Component_Types     : Component_Map;

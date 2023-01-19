@@ -79,55 +79,53 @@ package TGen.Types.Discrete_Types is
    --  types, this is simply Lit'Image, for enum types, this correponds to
    --  the image of the enum litteral at position Lit.
 
-   overriding function Generate_Static
-     (Self    : Discrete_Typ;
-      Context : in out Generation_Context) return Static_Strategy_Type'Class;
+   overriding function Default_Strategy
+     (Self : Discrete_Typ) return Strategy_Type'Class;
    --  Generate a strategy to statically generate (in one pass) values for Self
 
    function Generate_Static_Common
-     (Self    : Discrete_Typ'Class;
-      Context : in out Generation_Context) return Static_Strategy_Type'Class;
+     (Self    : Discrete_Typ'Class) return Strategy_Type'Class;
    --  Generate a strategy to statically generate (in one pass) values for Self
 
-   type Discrete_Static_Value is new Static_Value with record
+   type Discrete_Static_Value is new Value_Type with record
       T     : SP.Ref;
       Value : Big_Integer;
    end record;
 
    overriding function To_String (Self : Discrete_Static_Value) return String;
 
-   type Sample_Static_Strategy_Type is new Static_Strategy_Type
+   type Sample_Strategy_Type is new Strategy_Type
      with record
       T       : SP.Ref;
       Samples : Alternatives_Set_Vector;
    end record;
 
-   overriding function Generate_Static_Value
-     (S            : in out Sample_Static_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return Static_Value'Class;
+   overriding function Generate
+     (S            : in out Sample_Strategy_Type;
+      Disc_Context : Disc_Value_Map) return Value_Type'Class;
    --  Given a static sampling strategy, generate one single value from it
 
    function Generate_Sampling_Strategy
      (Self    : Discrete_Typ;
-      Samples : Alternatives_Set_Vector) return Static_Strategy_Type'Class;
+      Samples : Alternatives_Set_Vector) return Strategy_Type'Class;
    --  Generate a static (single pass generation) sampling strategy for Self
 
    type Index_Kind is (Start_Index, End_Index);
 
-   type Array_Index_Strategy_Type is new Static_Strategy_Type with
+   type Array_Index_Strategy_Type is new Strategy_Type with
       record
          T : SP.Ref;
          Average_Size, Min_Size, Max_Size : Natural;
          Index : Index_Kind;
          Other_Index_Constraint : Discrete_Constraint_Value;
-         Fallback_Strategy : Static_Strategy_Acc;
+         Fallback_Strategy : Strategy_Acc;
       end record;
 
-   overriding function Generate_Static_Value
+   overriding function Generate
      (S            : in out Array_Index_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return Static_Value'Class;
+      Disc_Context : Disc_Value_Map) return Value_Type'Class;
 
-   type Identity_Constraint_Strategy_Type is new Static_Strategy_Type with
+   type Identity_Constraint_Strategy_Type is new Strategy_Type with
       record
          T          : SP.Ref;
          Constraint : Discrete_Constraint_Value;
@@ -136,16 +134,15 @@ package TGen.Types.Discrete_Types is
    --  discriminant constraint, return the value of the discriminant, if it is
    --  a literal constraint, return the literal).
 
-   overriding function Generate_Static_Value
+   overriding function Generate
      (S            : in out Identity_Constraint_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return Static_Value'Class;
+      Disc_Context : Disc_Value_Map) return Value_Type'Class;
 
    function Generate_Array_Index_Constraint_Strategy
      (Self       : Discrete_Typ'Class;
       Var_Name   : Unbounded_String;
-      Constraint : TGen.Types.Constraints.Index_Constraint;
-      Context    : in out Generation_Context)
-      return Static_Strategy_Type'Class;
+      Constraint : TGen.Types.Constraints.Index_Constraint)
+      return Strategy_Type'Class;
    --  When the type appear as an array index constraint, we need to have a
    --  special strategy, as it will control the size of the array. We don't
    --  want to be generating huge array.
@@ -165,7 +162,7 @@ package TGen.Types.Discrete_Types is
    function Generate_Identity_Constraint_Strategy
      (Self       : Discrete_Typ'Class;
       Constraint : Discrete_Constraint_Value)
-      return Static_Strategy_Type'Class;
+      return Strategy_Type'Class;
 
    function As_Discrete_Typ (Self : SP.Ref) return Discrete_Typ'Class is
      (Discrete_Typ'Class (Self.Unchecked_Get.all));

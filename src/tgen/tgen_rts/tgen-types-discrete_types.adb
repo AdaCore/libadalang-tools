@@ -77,13 +77,13 @@ package body TGen.Types.Discrete_Types is
    --  Sampling strategy: draw an arbitrary value from an arbitrary sample in
    --  a list of samples.
 
-   ---------------------------
-   -- Generate_Static_Value --
-   ---------------------------
+   --------------
+   -- Generate --
+   --------------
 
-   function Generate_Static_Value
-     (S            : in out Sample_Static_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return Static_Value'Class
+   function Generate
+     (S            : in out Sample_Strategy_Type;
+      Disc_Context : Disc_Value_Map) return Value_Type'Class
    is
       Result        : Discrete_Static_Value;
       Picked_Index  : constant Positive :=
@@ -94,7 +94,7 @@ package body TGen.Types.Discrete_Types is
       Result.T := S.T;
       Result.Value := Draw (Picked_Sample);
       return Result;
-   end Generate_Static_Value;
+   end Generate;
 
    --------------------------------
    -- Generate_Sampling_Strategy --
@@ -102,9 +102,9 @@ package body TGen.Types.Discrete_Types is
 
    function Generate_Sampling_Strategy
      (Self    : Discrete_Typ;
-      Samples : Alternatives_Set_Vector) return Static_Strategy_Type'Class
+      Samples : Alternatives_Set_Vector) return Strategy_Type'Class
    is
-      Strat : Sample_Static_Strategy_Type;
+      Strat : Sample_Strategy_Type;
    begin
       SP.From_Element (Strat.T, Self'Unrestricted_Access);
       Strat.Samples := Samples;
@@ -127,14 +127,14 @@ package body TGen.Types.Discrete_Types is
    end Gen;
 
    function Generate_Static_Value_Random
-     (Ty : Typ'Class) return Static_Value'Class;
+     (Ty : Typ'Class) return Value_Type'Class;
 
    ----------------------------------
    -- Generate_Static_Value_Random --
    ----------------------------------
 
    function Generate_Static_Value_Random
-     (Ty : Typ'Class) return Static_Value'Class
+     (Ty : Typ'Class) return Value_Type'Class
    is
       Result : Discrete_Static_Value;
 
@@ -165,13 +165,13 @@ package body TGen.Types.Discrete_Types is
       return Result;
    end Generate_Static_Value_Random;
 
-   ---------------------------
-   -- Generate_Static_Value --
-   ---------------------------
+   --------------
+   -- Generate --
+   --------------
 
-   function Generate_Static_Value
+   function Generate
      (S            : in out Array_Index_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return Static_Value'Class
+      Disc_Context : Disc_Value_Map) return Value_Type'Class
    is
       T_Classwide : constant Typ'Class := S.T.Get;
       T_Discrete  : constant Discrete_Typ'Class :=
@@ -184,7 +184,7 @@ package body TGen.Types.Discrete_Types is
       if S.Other_Index_Constraint.Kind = TGen.Types.Constraints.Discriminant
         and then not Disc_Context.Contains (S.Other_Index_Constraint.Disc_Name)
       then
-         return S.Fallback_Strategy.Generate_Static_Value (Disc_Context);
+         return S.Fallback_Strategy.Generate (Disc_Context);
       end if;
 
       --  Pick the size. We have to be careful and restrain Max_Size here: we
@@ -322,15 +322,15 @@ package body TGen.Types.Discrete_Types is
 
          return Result;
       end;
-   end Generate_Static_Value;
+   end Generate;
 
-   ---------------------------
-   -- Generate_Static_Value --
-   ---------------------------
+   --------------
+   -- Generate --
+   --------------
 
-   function Generate_Static_Value
+   function Generate
      (S            : in out Identity_Constraint_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return Static_Value'Class
+      Disc_Context : Disc_Value_Map) return Value_Type'Class
    is
       Result : Discrete_Static_Value;
    begin
@@ -342,7 +342,7 @@ package body TGen.Types.Discrete_Types is
          raise Program_Error with "unsupported non static constraint";
       end if;
       return Result;
-   end Generate_Static_Value;
+   end Generate;
 
    ----------------------------------------------
    -- Generate_Array_Index_Constraint_Strategy --
@@ -351,9 +351,8 @@ package body TGen.Types.Discrete_Types is
    function Generate_Array_Index_Constraint_Strategy
      (Self       : Discrete_Typ'Class;
       Var_Name   : Unbounded_String;
-      Constraint : TGen.Types.Constraints.Index_Constraint;
-      Context    : in out Generation_Context)
-      return Static_Strategy_Type'Class
+      Constraint : TGen.Types.Constraints.Index_Constraint)
+      return Strategy_Type'Class
    is
       use TGen.Numerics.Nat_Conversions;
       use type Big_Int.Big_Integer;
@@ -400,7 +399,7 @@ package body TGen.Types.Discrete_Types is
       Strat.Max_Size := Max_Size;
 
       Strat.Fallback_Strategy :=
-        new Static_Strategy_Type'Class'(Self.Generate_Static (Context));
+        new Strategy_Type'Class'(Self.Default_Strategy);
       return Strat;
    end Generate_Array_Index_Constraint_Strategy;
 
@@ -410,7 +409,7 @@ package body TGen.Types.Discrete_Types is
 
    function Generate_Identity_Constraint_Strategy
      (Self       : Discrete_Typ'Class;
-      Constraint : Discrete_Constraint_Value) return Static_Strategy_Type'Class
+      Constraint : Discrete_Constraint_Value) return Strategy_Type'Class
    is
       Strat : Identity_Constraint_Strategy_Type;
    begin
@@ -419,32 +418,29 @@ package body TGen.Types.Discrete_Types is
       return Strat;
    end Generate_Identity_Constraint_Strategy;
 
-   ---------------------
-   -- Generate_Static --
-   ---------------------
+   ----------------------
+   -- Default_Strategy --
+   ----------------------
 
    function Generate_Static_Common
-     (Self    : Discrete_Typ'Class;
-      Context : in out Generation_Context) return Static_Strategy_Type'Class
+     (Self : Discrete_Typ'Class) return Strategy_Type'Class
    is
-      pragma Unreferenced (Context);
-      Strat : Basic_Static_Strategy_Type;
+      Strat : Basic_Strategy_Type;
    begin
       SP.From_Element (Strat.T, Self'Unrestricted_Access);
       Strat.F := Generate_Static_Value_Random'Access;
       return Strat;
    end Generate_Static_Common;
 
-   ---------------------
-   -- Generate_Static --
-   ---------------------
+   ----------------------
+   -- Default_Strategy --
+   ----------------------
 
-   function Generate_Static
-     (Self    : Discrete_Typ;
-      Context : in out Generation_Context) return Static_Strategy_Type'Class
+   function Default_Strategy
+     (Self : Discrete_Typ) return Strategy_Type'Class
    is
    begin
-      return Generate_Static_Common (Self, Context);
-   end Generate_Static;
+      return Generate_Static_Common (Self);
+   end Default_Strategy;
 
 end TGen.Types.Discrete_Types;

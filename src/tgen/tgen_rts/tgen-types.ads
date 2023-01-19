@@ -124,12 +124,9 @@ package TGen.Types is
    function Supports_Static_Gen (Self : Typ) return Boolean is (False);
    --  Wether values for this Typ can be statically generated
 
-   function Generate_Static
-     (Self    : Typ;
-      Context : in out TGen.Strategies.Generation_Context)
-      return TGen.Strategies.Static_Strategy_Type'Class;
-   --  Return a strategy statically generating (in a single pass) elements of
-   --  the given type
+   function Default_Strategy (Self : Typ)
+      return TGen.Strategies.Strategy_Type'Class;
+   --  Return a strategy generating elements of the given type
 
    function Kind (Self : Typ) return Typ_Kind;
 
@@ -156,9 +153,8 @@ package TGen.Types is
                 and then L.Get.Name = R.Get.Name));
 
    function Try_Generate_Static
-     (Self    : SP.Ref;
-      Context : in out TGen.Strategies.Generation_Context)
-      return TGen.Strategies.Static_Strategy_Type'Class;
+     (Self    : SP.Ref)
+      return TGen.Strategies.Strategy_Type'Class;
    --  Return a static strategy if the type supports it, otherwise return
    --  a Commented_Out_Strategy or raise program error depending on the
    --  behavior specified in the context.
