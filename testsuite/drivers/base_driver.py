@@ -41,7 +41,8 @@ class BaseDriver(DiffTestDriver):
         "refactoring_extract_subprogram",
         "refactoring_pull_up_declaration",
         "refactoring_suppress_separate",
-        "refactoring_replace_type",
+        "refactoring_sort_dependencies",
+        "refactoring_replace_type"
     } | WIP_TOOLS
 
     @property
