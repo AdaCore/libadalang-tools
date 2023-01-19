@@ -19,7 +19,6 @@ gnatpp\
     --number-case-as-declared\
     --par_threshold=0\
     --pragma-mixed-case\
-    --split-line-before-op\
     --split-line-before-record\
     --type-case-as-declared\
     --output-dir=actual examples_bis.ads
