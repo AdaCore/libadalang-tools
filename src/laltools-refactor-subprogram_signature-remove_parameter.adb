@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2022, AdaCore                        --
+--                      Copyright (C) 2022-2023, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -61,16 +61,6 @@ package body Laltools.Refactor.Subprogram_Signature.Remove_Parameter is
    --  Removes the parameters defined by 'Parameter_Indices'. The parameter is
    --  removed in the entire subprogram hierarchy, as well as, all renames
    --  hierarchy.
-
-   function Remove_Parameters
-     (Subp                     : Basic_Decl;
-      Parameter_Indices_Ranges : Parameter_Indices_Ranges_Type;
-      Units                    : Analysis_Unit_Array)
-      return Text_Edit_Map
-     with Pre => Is_Subprogram (Subp);
-   --  Removes the parameters defined by 'Parameter_Indices_Ranges'. The
-   --  parameter is removed in the entire subprogram hierarchy, as well as, all
-   --  renames hierarchy.
 
    -----------------------------------
    -- Is_Remove_Parameter_Available --

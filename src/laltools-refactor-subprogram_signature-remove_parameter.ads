@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2022, AdaCore                        --
+--                      Copyright (C) 2022-2023, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -26,6 +26,12 @@
 --  parameters on the subprogram calls.
 
 package Laltools.Refactor.Subprogram_Signature.Remove_Parameter is
+
+   function Remove_Parameters
+     (Subp                     : Basic_Decl;
+      Parameter_Indices_Ranges : Parameter_Indices_Ranges_Type;
+      Units                    : Analysis_Unit_Array)
+      return Text_Edit_Map;
 
    function Is_Remove_Parameter_Available
      (Node                    : Ada_Node'Class;

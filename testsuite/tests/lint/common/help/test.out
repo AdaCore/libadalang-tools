@@ -1,0 +1,17 @@
+usage: gnatrefactor [--help|-h] [--help|-h] tool [--verbose|-v] [--pipe|-p] 
+                   [--project|-P PROJECT] 
+
+Refactor tools
+
+positional arguments:
+   tool  array_aggregates
+   
+optional arguments:
+   --help, -h     Show this help message
+   --help, -h     Help
+   --verbose, -v  Print traces
+   --pipe, -p     Print the result to stdout instead of editing the files on 
+                  disk
+   --project, -P  Project
+   
+
