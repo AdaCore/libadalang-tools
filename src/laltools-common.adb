@@ -2370,13 +2370,8 @@ package body Laltools.Common is
 
    function Get_Used_Units
      (Node : Compilation_Unit'Class)
-         return Compilation_Unit_Array
+      return Compilation_Unit_Array
    is
-      package Compilation_Unit_Vectors is new Ada.Containers.Vectors
-        (Index_Type   => Natural,
-         Element_Type => Compilation_Unit,
-         "="          => "=");
-
       Used_Units : Compilation_Unit_Vectors.Vector;
 
    begin
@@ -2415,6 +2410,53 @@ package body Laltools.Common is
          end;
       end return;
    end Get_Used_Units;
+
+   ----------------------
+   -- Get_Withed_Units --
+   ----------------------
+
+   function Get_Withed_Units
+     (Node : Compilation_Unit'Class)
+      return Compilation_Unit_Array
+   is
+      Used_Units : Compilation_Unit_Vectors.Vector;
+
+   begin
+      if Node.Is_Null then
+         return [];
+      end if;
+
+      for Clause of Node.F_Prelude loop
+         if Clause.Kind in Ada_With_Clause_Range then
+            for Use_Clause of Clause.As_With_Clause.F_Packages loop
+               declare
+                  C_Unit : constant Compilation_Unit :=
+                    Get_Compilation_Unit (Use_Clause.P_Referenced_Decl);
+               begin
+                  if not C_Unit.Is_Null then
+                     Used_Units.Append (C_Unit);
+                  end if;
+               end;
+            end loop;
+         end if;
+      end loop;
+
+      --  Copy the Used_Units elements to an array
+
+      return R : Compilation_Unit_Array
+        (1 .. Integer (Used_Units.Length))
+      do
+         declare
+            Idx : Positive := 1;
+
+         begin
+            for U of Used_Units loop
+               R (Idx) := U;
+               Idx := Idx + 1;
+            end loop;
+         end;
+      end return;
+   end Get_Withed_Units;
 
    ------------
    -- Insert --

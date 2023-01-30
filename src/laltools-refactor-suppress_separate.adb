@@ -252,19 +252,19 @@ package body Laltools.Refactor.Suppress_Separate is
             else Separate_Decl.P_Parent_Basic_Decl.As_Package_Decl);
 
          Pkg_Spec_Withed_Units : constant Compilation_Unit_Array :=
-           Pkg_Spec.Unit.Root.As_Compilation_Unit.P_Withed_Units;
+           Get_Withed_Units (Pkg_Spec.Unit.Root.As_Compilation_Unit);
          Pkg_Spec_Used_Units : constant Compilation_Unit_Array :=
            Get_Used_Units (Pkg_Spec.Unit.Root.As_Compilation_Unit);
 
          --  Package Body
          Pkg_Body_Withed_Units : constant Compilation_Unit_Array :=
-           Separate_Stub.Unit.Root.As_Compilation_Unit.P_Withed_Units;
+           Get_Withed_Units (Separate_Stub.Unit.Root.As_Compilation_Unit);
          Pkg_Body_Used_Units   : constant Compilation_Unit_Array :=
            Get_Used_Units (Separate_Stub.Unit.Root.As_Compilation_Unit);
 
          --  Subunit
          Subunit_Withed_Units  : constant Compilation_Unit_Array :=
-           Separate_Body.Unit.Root.As_Compilation_Unit.P_Withed_Units;
+           Get_Withed_Units (Separate_Body.Unit.Root.As_Compilation_Unit);
          Subunit_Used_Units    : constant Compilation_Unit_Array :=
            Get_Used_Units (Separate_Body.Unit.Root.As_Compilation_Unit);
 
@@ -274,12 +274,12 @@ package body Laltools.Refactor.Suppress_Separate is
          Missing_With_Clauses :=
            (As_Compilation_Unit_Set (Subunit_Withed_Units)
             - (As_Compilation_Unit_Set (Pkg_Spec_Withed_Units)
-              or As_Compilation_Unit_Set (Pkg_Body_Withed_Units)));
+               or As_Compilation_Unit_Set (Pkg_Body_Withed_Units)));
 
          Missing_Used_Clauses :=
            (As_Compilation_Unit_Set (Subunit_Used_Units)
             - (As_Compilation_Unit_Set (Pkg_Spec_Used_Units)
-              or As_Compilation_Unit_Set (Pkg_Body_Used_Units)));
+               or As_Compilation_Unit_Set (Pkg_Body_Used_Units)));
       end;
 
       --  Compute the necessary edits for the prelude ('with' and 'use'
