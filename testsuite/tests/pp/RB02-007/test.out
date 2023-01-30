@@ -1,22 +1,22 @@
 out
 out.sep
 out.no-sep
-separate_thens.adb:15:19: (style) misplaced "then"
-separate_thens.adb:21:20: (style) misplaced "then"
-separate_thens.adb:27:21: (style) misplaced "then"
-separate_thens.adb:31:22: (style) misplaced "then"
-separate_thens.adb:34:22: (style) misplaced "then"
-separate_thens.adb:38:23: (style) misplaced "then"
-separate_thens.adb:41:23: (style) misplaced "then"
-separate_thens.adb:45:24: (style) misplaced "then"
-separate_thens.adb:48:24: (style) misplaced "then"
-separate_thens.adb:52:25: (style) misplaced "then"
-separate_thens.adb:55:25: (style) misplaced "then"
-separate_thens.adb:59:26: (style) misplaced "then"
-separate_thens.adb:62:26: (style) misplaced "then"
-separate_thens.adb:66:27: (style) misplaced "then"
-separate_thens.adb:69:27: (style) misplaced "then"
-separate_thens.adb:73:28: (style) misplaced "then"
-separate_thens.adb:76:28: (style) misplaced "then"
-separate_thens.adb:80:29: (style) misplaced "then"
-separate_thens.adb:83:29: (style) misplaced "then"
+separate_thens.adb:15:19: (style) misplaced "then" [-gnatyi]
+separate_thens.adb:21:20: (style) misplaced "then" [-gnatyi]
+separate_thens.adb:27:21: (style) misplaced "then" [-gnatyi]
+separate_thens.adb:31:22: (style) misplaced "then" [-gnatyi]
+separate_thens.adb:34:22: (style) misplaced "then" [-gnatyi]
+separate_thens.adb:38:23: (style) misplaced "then" [-gnatyi]
+separate_thens.adb:41:23: (style) misplaced "then" [-gnatyi]
+separate_thens.adb:45:24: (style) misplaced "then" [-gnatyi]
+separate_thens.adb:48:24: (style) misplaced "then" [-gnatyi]
+separate_thens.adb:52:25: (style) misplaced "then" [-gnatyi]
+separate_thens.adb:55:25: (style) misplaced "then" [-gnatyi]
+separate_thens.adb:59:26: (style) misplaced "then" [-gnatyi]
+separate_thens.adb:62:26: (style) misplaced "then" [-gnatyi]
+separate_thens.adb:66:27: (style) misplaced "then" [-gnatyi]
+separate_thens.adb:69:27: (style) misplaced "then" [-gnatyi]
+separate_thens.adb:73:28: (style) misplaced "then" [-gnatyi]
+separate_thens.adb:76:28: (style) misplaced "then" [-gnatyi]
+separate_thens.adb:80:29: (style) misplaced "then" [-gnatyi]
+separate_thens.adb:83:29: (style) misplaced "then" [-gnatyi]
