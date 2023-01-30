@@ -114,6 +114,13 @@ package Laltools.Common is
      (Element_Type => Defining_Name,
       "="          => "=");
 
+   package Compilation_Unit_Vectors is new Ada.Containers.Vectors
+     (Index_Type   => Natural,
+      Element_Type => Compilation_Unit,
+      "="          => "=");
+
+   subtype Compilation_Unit_Vector is Compilation_Unit_Vectors.Vector;
+
    package Declarative_Part_Vectors is new Ada.Containers.Indefinite_Vectors
      (Index_Type   => Natural,
       Element_Type => Declarative_Part'Class,
@@ -474,13 +481,6 @@ package Laltools.Common is
       return Compilation_Unit;
    --  Returns the Compilation_Unit associated to Node
 
-   package Compilation_Unit_Vectors is new Ada.Containers.Vectors
-     (Index_Type   => Natural,
-      Element_Type => Compilation_Unit,
-      "="          => "=");
-
-   subtype Compilation_Unit_Vector is Compilation_Unit_Vectors.Vector;
-
    function Get_Compilation_Units
      (Analysis_Unit : Libadalang.Analysis.Analysis_Unit)
       return Compilation_Unit_Vector;
@@ -721,6 +721,18 @@ package Laltools.Common is
      (Node : Ada_Node'Class)
       return Declarative_Part_Vectors.Vector;
    --  Gets all public Declarative_Parts of the units used by Node's unit
+
+   function Get_Withed_Units
+     (Node : Compilation_Unit'Class)
+      return Compilation_Unit_Array;
+   --  Returns a Compilation_Unit_Array with all the Compilation_Unit
+   --  whose Node has a with clause for. If Node is null, then returns an empty
+   --  Compilation_Unit_Array. The return array does not contain null
+   --  Compilation_Units. This function differs from P_Withed_Units since
+   --  the latter will also return the parent packages of the withed
+   --  package. As an example, for 'with Ada.Assertions;', this function will
+   --  return only 'Ada.Assertions' while P_Withed_Units will return 'Ada' and
+   --  'Ada.Assertions'.
 
    function Get_Used_Units
      (Node : Compilation_Unit'Class)
