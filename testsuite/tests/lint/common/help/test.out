@@ -1,5 +1,5 @@
-usage: gnatrefactor [--help|-h] [--help|-h] tool [--verbose|-v] [--pipe|-p] 
-                   [--project|-P PROJECT] 
+usage: gnatrefactor(?:\.exe)? \[--help\|-h] \[--help\|-h] tool \[--verbose\|-v] \[--pipe\|-p] 
+\s+\[--project\|-P PROJECT] 
 
 Refactor tools
 

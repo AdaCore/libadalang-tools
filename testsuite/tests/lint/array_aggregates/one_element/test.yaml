@@ -6,3 +6,4 @@ description: |4
 
 driver: shell_script
 
+canonicalize_backslashes: True
