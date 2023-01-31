@@ -456,7 +456,7 @@ package body Lint.Tools.Relocate_Decls_Tool is
             Tmp_Text := Null_Unbounded_String;
             declare
                Delete_Lenth : Integer;
-               Tmp_String : String := Text.Image (Obj.Text);
+               Tmp_String : constant String := Text.Image (Obj.Text);
             begin
                Delete_Lenth := Integer (Obj.F_Ids.Sloc_Range.End_Column -
                                           Obj.Sloc_Range.Start_Column) + 1;
