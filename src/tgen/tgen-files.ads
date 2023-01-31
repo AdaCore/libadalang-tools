@@ -27,53 +27,18 @@ with Ada.Directories;
 
 with TGen.Context;   use TGen.Context;
 with TGen.Strings;   use TGen.Strings;
-with TGen.Templates; use TGen.Templates;
 
 with GNATCOLL.VFS;      use GNATCOLL.VFS;
 with GNATCOLL.Projects; use GNATCOLL.Projects;
 
 package TGen.Files is
 
-   Prj_Tree : Project_Tree_Access;
-
-   Strat_ADB        : constant Filesystem_String :=
-     "strat.adb";
-
-   Strat_Template_ADB : constant Filesystem_String :=
-     "strat.adb.tmpl";
-
-   Type_Strat_Template_ADS : constant Filesystem_String :=
-     "type-strat.ads.tmpl";
-
-   Type_Strat_Template_ADB : constant Filesystem_String :=
-     "type-strat.adb.tmpl";
-
-   Test_Proc_Template_ADB : constant Filesystem_String :=
-     "test_procedure.adb.tmpl";
-
-   function Get_Tmpl_Directory return Virtual_File;
-
-   function Get_Template_Param_Strat_ADB return Virtual_File is
-     (Get_Tmpl_Directory / "strat.adb.tmpl");
-
-   function Get_Template_Param_Strat_ADS return Virtual_File is
-     (Get_Tmpl_Directory / "strat.ads.tmpl");
-
-   function Get_Template_Test_ADB return Virtual_File is
-      (Get_Tmpl_Directory / Test_Proc_Template_ADB);
-
-   function Get_Template_Type_Strat_ADS return Virtual_File is
-     (Get_Tmpl_Directory / Type_Strat_Template_ADS);
-
-   function Get_Template_Type_Strat_ADB return Virtual_File is
-     (Get_Tmpl_Directory / Type_Strat_Template_ADB);
-
    function Get_Output_Dir
-     (Context : TGen.Templates.Context'Class) return Virtual_File
+     (Context : Generation_Context) return Virtual_File
    is (GNATCOLL.VFS.Create (Filesystem_String (+Context.Output_Dir)));
 
    function Get_JSON_Name
-     (Context   : TGen.Templates.Context'Class;
+     (Context   : Generation_Context;
       Unit_Name : String) return Virtual_File
      is (Get_Output_Dir (Context) / Filesystem_String (Unit_Name & ".json"));
    --  Return the name of the JSON file that will hold the generation results
@@ -90,12 +55,8 @@ package TGen.Files is
    function Project_Output_Dir (Project : Project_Type) return String;
    --  Return the path to the output dir of Project
 
-   function Get_Strat_ADB (Ctx : Generation_Context) return Virtual_File is
-     (Get_Output_Dir (Ctx) / Strat_ADB);
-   --  Return the name of the "strat file"
-
    function Gen_File
-     (Ctx : TGen.Templates.Context'Class; File : String) return Virtual_File is
+     (Ctx : Generation_Context; File : String) return Virtual_File is
      (Get_Output_Dir (Ctx) / Filesystem_String (File));
 
 end TGen.Files;

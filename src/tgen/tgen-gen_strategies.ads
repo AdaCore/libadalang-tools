@@ -30,21 +30,20 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with GNATCOLL.JSON;     use GNATCOLL.JSON;
 with GNATCOLL.Projects; use GNATCOLL.Projects;
 
-with Libadalang.Analysis;  use Libadalang.Analysis;
+with Libadalang.Analysis; use Libadalang.Analysis;
 
-with TGen.Context;              use TGen.Context;
-with TGen.Strings;              use TGen.Strings;
-with TGen.Types;                use TGen.Types;
-with TGen.Subprograms;          use TGen.Subprograms;
+with TGen.Context;     use TGen.Context;
+with TGen.Strings;     use TGen.Strings;
+with TGen.Types;       use TGen.Types;
+with TGen.Subprograms; use TGen.Subprograms;
 
 package TGen.Gen_Strategies is
 
    procedure Initialize
      (Context    : in out Generation_Context;
-      Project    : Project_Type;
       Output_Dir : Unbounded_String);
-   --  Set the project and output dir of Context, and prepare output
-   --  directories. This does not clear the context.
+   --  Set the output dir of Context, and prepare output directories. This does
+   --  not clear the context.
 
    procedure Generate_Artifacts (Context : in out Generation_Context);
    --  Emit all artifacts after test generation is done. This includes the

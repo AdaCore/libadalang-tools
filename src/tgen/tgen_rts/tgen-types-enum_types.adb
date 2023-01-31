@@ -105,14 +105,14 @@ package body TGen.Types.Enum_Types is
    --  non printable characters as they need to be unparsable in sources.
 
    function Generate_Static_Value_Char_Typ
-     (Ty : Typ'Class) return Static_Value'Class;
+     (Ty : Typ'Class) return Value_Type'Class;
 
    ------------------------------------
    -- Generate_Static_Value_Char_Typ --
    ------------------------------------
 
    function Generate_Static_Value_Char_Typ
-     (Ty : Typ'Class) return Static_Value'Class
+     (Ty : Typ'Class) return Value_Type'Class
    is
       Result : Discrete_Static_Value;
 
@@ -141,21 +141,18 @@ package body TGen.Types.Enum_Types is
       return Result;
    end Generate_Static_Value_Char_Typ;
 
-   ---------------------
-   -- Generate_Static --
-   ---------------------
+   ----------------------
+   -- Default_Strategy --
+   ----------------------
 
-   function Generate_Static
-     (Self    : Char_Typ;
-      Context : in out Generation_Context)
-      return Static_Strategy_Type'Class
+   function Default_Strategy (Self : Char_Typ) return Strategy_Type'Class
    is
-      Strat : Basic_Static_Strategy_Type;
+      Strat : Basic_Strategy_Type;
    begin
       SP.From_Element (Strat.T, Self'Unrestricted_Access);
       Strat.F := Generate_Static_Value_Char_Typ'Access;
       return Strat;
-   end Generate_Static;
+   end Default_Strategy;
 
    function Image (Self : Other_Enum_Typ) return String is
    begin

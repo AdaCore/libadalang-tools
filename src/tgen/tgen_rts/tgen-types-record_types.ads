@@ -87,9 +87,8 @@ package TGen.Types.Record_Types is
    function Kind (Self : Nondiscriminated_Record_Typ) return Typ_Kind is
      (Non_Disc_Record_Kind);
 
-   overriding function Generate_Static
-     (Self    : Nondiscriminated_Record_Typ;
-      Context : in out Generation_Context) return Static_Strategy_Type'Class;
+   overriding function Default_Strategy
+     (Self : Nondiscriminated_Record_Typ) return Strategy_Type'Class;
    --  Generate a strategy to statically generate (in one pass) values for Self
 
    function As_Nondiscriminated_Record_Typ (Self : SP.Ref)
@@ -180,9 +179,8 @@ package TGen.Types.Record_Types is
 
    function Image (Self : Discriminated_Record_Typ) return String;
 
-   overriding function Generate_Static
-     (Self    : Discriminated_Record_Typ;
-      Context : in out Generation_Context) return Static_Strategy_Type'Class;
+   overriding function Default_Strategy
+     (Self : Discriminated_Record_Typ) return Strategy_Type'Class;
    --  Generate a strategy to statically generate (in one pass) values for Self
 
    function Get_All_Components

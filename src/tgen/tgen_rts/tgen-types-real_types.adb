@@ -105,13 +105,13 @@ package body TGen.Types.Real_Types is
       return Rand (Generator_Instance);
    end Gen;
 
-   function Generate_Float_Typ (Ty : Typ'Class) return Static_Value'Class;
+   function Generate_Float_Typ (Ty : Typ'Class) return Value_Type'Class;
 
    --------------
    -- Generate --
    --------------
 
-   function Generate_Float_Typ (Ty : Typ'Class) return Static_Value'Class
+   function Generate_Float_Typ (Ty : Typ'Class) return Value_Type'Class
    is
       Self : constant Float_Typ := Float_Typ (Ty);
 
@@ -129,39 +129,38 @@ package body TGen.Types.Real_Types is
         (Value => +Long_Float'Image (Long_Float (Rand)));
    end Generate_Float_Typ;
 
-   ---------------------
-   -- Generate_Static --
-   ---------------------
+   ----------------------
+   -- Default_Strategy --
+   ----------------------
 
-   function Generate_Static
-     (Self    : Float_Typ;
-      Context : in out Generation_Context) return Static_Strategy_Type'Class
+   function Default_Strategy
+     (Self    : Float_Typ) return Strategy_Type'Class
    is
       --  TODO: use Long_Long_Long_Integer (as it is the biggest possible type
       --  for which ranges can be defined), and add support to it in
       --  GNATCOLL.JSON.
 
       Type_Ref : SP.Ref;
-      Strat : Basic_Static_Strategy_Type;
+      Strat : Basic_Strategy_Type;
    begin
       SP.From_Element (Type_Ref, Self'Unrestricted_Access);
       Strat.T := Type_Ref;
       Strat.F := Generate_Float_Typ'Access;
       return Strat;
-   end Generate_Static;
+   end Default_Strategy;
 
    function Generate_Ordinary_Fixed_Typ
-     (Ty : Typ'Class) return Static_Value'Class;
+     (Ty : Typ'Class) return Value_Type'Class;
 
    function Generate_Decimal_Fixed_Typ
-     (Ty : Typ'Class) return Static_Value'Class;
+     (Ty : Typ'Class) return Value_Type'Class;
 
    ---------------------------------
    -- Generate_Ordinary_Fixed_Typ --
    ---------------------------------
 
    function Generate_Ordinary_Fixed_Typ
-     (Ty : Typ'Class) return Static_Value'Class
+     (Ty : Typ'Class) return Value_Type'Class
    is
       use Big_Reals;
       Self : constant Ordinary_Fixed_Typ := Ordinary_Fixed_Typ (Ty);
@@ -192,7 +191,7 @@ package body TGen.Types.Real_Types is
    --------------------------------
 
    function Generate_Decimal_Fixed_Typ
-     (Ty : Typ'Class) return Static_Value'Class
+     (Ty : Typ'Class) return Value_Type'Class
    is
       use Big_Reals;
       Self : constant Decimal_Fixed_Typ := Decimal_Fixed_Typ (Ty);
@@ -223,30 +222,28 @@ package body TGen.Types.Real_Types is
               else "(" & Rand_Val'Image & ")")));
    end Generate_Decimal_Fixed_Typ;
 
-   overriding function Generate_Static
-     (Self    : Ordinary_Fixed_Typ;
-      Context : in out Generation_Context) return Static_Strategy_Type'Class
+   overriding function Default_Strategy
+     (Self    : Ordinary_Fixed_Typ) return Strategy_Type'Class
    is
       Type_Ref : SP.Ref;
-      Strat    : Basic_Static_Strategy_Type;
+      Strat    : Basic_Strategy_Type;
    begin
       SP.From_Element (Type_Ref, Self'Unrestricted_Access);
       Strat.T := Type_Ref;
       Strat.F := Generate_Ordinary_Fixed_Typ'Access;
       return Strat;
-   end Generate_Static;
+   end Default_Strategy;
 
-   overriding function Generate_Static
-     (Self    : Decimal_Fixed_Typ;
-      Context : in out Generation_Context) return Static_Strategy_Type'Class
+   overriding function Default_Strategy
+     (Self    : Decimal_Fixed_Typ) return Strategy_Type'Class
    is
       Type_Ref : SP.Ref;
-      Strat    : Basic_Static_Strategy_Type;
+      Strat    : Basic_Strategy_Type;
    begin
       SP.From_Element (Type_Ref, Self'Unrestricted_Access);
       Strat.T := Type_Ref;
       Strat.F := Generate_Decimal_Fixed_Typ'Access;
       return Strat;
-   end Generate_Static;
+   end Default_Strategy;
 
 end TGen.Types.Real_Types;

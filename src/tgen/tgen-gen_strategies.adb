@@ -44,11 +44,9 @@ package body TGen.Gen_Strategies is
 
    procedure Initialize
      (Context    : in out Generation_Context;
-      Project    : Project_Type;
       Output_Dir : Unbounded_String) is
    begin
       Context.Output_Dir := Output_Dir;
-      Context.Project := Project;
       Prepare_Output_Dirs (Context);
    end Initialize;
 
@@ -104,6 +102,10 @@ package body TGen.Gen_Strategies is
       end loop;
       return S;
    end Distinct_Type_Parent_Package;
+
+   ------------
+   -- Indent --
+   ------------
 
    function Indent (Amount : Natural; Str : String) return String is
       Res    : Unbounded_String;
@@ -177,6 +179,10 @@ package body TGen.Gen_Strategies is
       end loop;
    end Collect_Type_Translations;
 
+   ---------------
+   -- Dump_JSON --
+   ---------------
+
    procedure Dump_JSON
      (Context : Generation_Context) is
       use Unit_To_JSON_Maps;
@@ -210,8 +216,7 @@ package body TGen.Gen_Strategies is
         Extract_Subprogram_Data (Subp);
       Function_JSON     : constant JSON_Value := Create_Object;
       Test_Vectors_JSON : JSON_Array := Empty_Array;
-      Test_Vector_JSON : JSON_Array;
-      Context_Strat : Strategies.Generation_Context;
+      Test_Vector_JSON  : JSON_Array;
    begin
       Collect_Type_Translations (Context, Subp);
       Subp_Data.All_Params_Static := True;
@@ -233,7 +238,7 @@ package body TGen.Gen_Strategies is
                then
                   Context.Type_And_Param_Strategies.Insert
                   (Param.Type_Fully_Qualified_Name,
-                     Try_Generate_Static (Param_Type, Context_Strat));
+                     Try_Generate_Static (Param_Type));
                end if;
             end;
          end if;
@@ -255,14 +260,14 @@ package body TGen.Gen_Strategies is
                Param_JSON.Set_Field ("type_name", Create (+Param.Type_Name));
                if Param.Mode in In_Mode | In_Out_Mode then
                   declare
-                     Strat : Strategies.Static_Strategy_Type'Class :=
-                        Strategies.Static_Strategy_Type
+                     Strat : Strategies.Strategy_Type'Class :=
+                        Strategies.Strategy_Type
                           (Context.Type_And_Param_Strategies.Element
                             (Param.Type_Fully_Qualified_Name));
                   begin
                      Param_JSON.Set_Field
                      ("value",
-                      Strat.Generate_Static_Value
+                      Strat.Generate
                         (Strategies.Disc_Value_Maps.Empty_Map).To_String);
                   end;
                end if;

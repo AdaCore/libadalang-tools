@@ -22,22 +22,9 @@
 ------------------------------------------------------------------------------
 
 with Ada.Characters.Handling;
-with Ada.Environment_Variables;
 with Ada.Text_IO;
 
 package body TGen.Files is
-
-   function Get_Tmpl_Directory return Virtual_File is
-   begin
-      if not Ada.Environment_Variables.Exists ("TGEN_TEMPLATE_PATH") then
-         raise Program_Error
-           with "Set the TGEN_TEMPLATE_PATH environment variable to point to"
-           & " tgen templates directory.";
-      end if;
-      return GNATCOLL.VFS.Create
-        (Filesystem_String
-           (Ada.Environment_Variables.Value ("TGEN_TEMPLATE_PATH")));
-   end Get_Tmpl_Directory;
 
    -------------------------
    -- Prepare_Output_Dirs --

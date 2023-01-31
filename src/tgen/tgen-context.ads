@@ -37,7 +37,6 @@ with Langkit_Support.Text; use Langkit_Support.Text;
 with TGen.Strategies;  use TGen.Strategies;
 with TGen.Strings;     use TGen.Strings;
 with TGen.Subprograms; use TGen.Subprograms;
-with TGen.Templates;
 with TGen.Types;       use TGen.Types;
 
 package TGen.Context is
@@ -80,7 +79,9 @@ package TGen.Context is
    subtype Fully_Qualified_Name_To_Strat_Map is
      Fully_Qualified_Name_To_Strat_Maps.Map;
 
-   type Generation_Context is new TGen.Templates.Context with record
+   type Generation_Context is record
+      Output_Dir : Unbounded_String;
+      --  Directory for generated artifacts
 
       Test_Vectors : Unit_To_JSON_Map;
       --  JSON holding the generated test vectors, one for each unit
@@ -96,9 +97,6 @@ package TGen.Context is
       --  The strategies to use for each type / component of type / parameter /
       --  god knows what.
 
-      Strategies : Strategy_Set;
-      --  Aggregation of all the strategies that have been asked for generation
-
       Packages_Data : Package_Data_Set;
       --  Data for all subprograms we want to test
 
@@ -113,6 +111,7 @@ package TGen.Context is
       --  filed in by the user.
 
    end record;
-   --  General purpose context for test value generation purposes
+   --  General purpose context for test value generation purposes. TODO:
+   --  merge this with TGen.Libgen.Libgen_Context.
 
 end TGen.Context;

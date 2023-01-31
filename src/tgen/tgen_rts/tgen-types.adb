@@ -100,30 +100,26 @@ package body TGen.Types is
    function Dot_To_Underscore (C : Character) return Character is
      ((if C = '.' then '_' else C));
 
-   ---------------------
-   -- Generate_Static --
-   ---------------------
+   ----------------------
+   -- Default_Strategy --
+   ----------------------
 
-   function Generate_Static
-     (Self    : Typ;
-      Context : in out Generation_Context) return Static_Strategy_Type'Class
+   function Default_Strategy (Self : Typ) return Strategy_Type'Class
    is
    begin
       return raise Program_Error with "Static strategy not implemented";
-   end Generate_Static;
+   end Default_Strategy;
 
    -------------------------
    -- Try_Generate_Static --
    -------------------------
 
    function Try_Generate_Static
-     (Self    : SP.Ref;
-      Context : in out Generation_Context)
-      return TGen.Strategies.Static_Strategy_Type'Class
+     (Self : SP.Ref) return TGen.Strategies.Strategy_Type'Class
    is
    begin
       if Self.Get.Supports_Static_Gen then
-         return Self.Get.Generate_Static (Context);
+         return Self.Get.Default_Strategy;
       else
          return raise Program_Error with
            "Type " & To_Ada (Self.Get.Name)
