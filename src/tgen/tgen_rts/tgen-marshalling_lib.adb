@@ -2,7 +2,7 @@
 --                                                                          --
 --                                  TGen                                    --
 --                                                                          --
---                       Copyright (C) 2022, AdaCore                        --
+--                    Copyright (C) 2022-2023, AdaCore                      --
 --                                                                          --
 -- TGen  is  free software; you can redistribute it and/or modify it  under --
 -- under  terms of  the  GNU General  Public License  as  published by  the --
@@ -796,6 +796,20 @@ package body TGen.Marshalling_Lib is
          end return;
       end Input;
 
+      -----------
+      -- Input --
+      -----------
+
+      function Input
+        (Header : not null access Ada.Streams.Root_Stream_Type'Class;
+         Stream : not null access Ada.Streams.Root_Stream_Type'Class)
+        return T
+      is
+         pragma Unreferenced (Header);
+      begin
+         return Input (Stream);
+      end Input;
+
       ------------
       -- Output --
       ------------
@@ -813,6 +827,20 @@ package body TGen.Marshalling_Lib is
          end if;
       end Output;
 
+      ------------
+      -- Output --
+      ------------
+
+      procedure Output
+        (Header : not null access Ada.Streams.Root_Stream_Type'Class;
+         Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+         V      : T)
+      is
+         pragma Unreferenced (Header);
+      begin
+         Output (Stream, V);
+      end Output;
+
    end In_Out;
 
    --------------------------
@@ -826,10 +854,28 @@ package body TGen.Marshalling_Lib is
       -----------
 
       function Input
-        (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-         H      : Header)
+        (Stream : not null access Ada.Streams.Root_Stream_Type'Class)
         return T
       is
+         H      : constant Header_Type := Input_Header (Stream);
+         Buffer : Unsigned_8 := 0;
+         Offset : Offset_Type := 0;
+      begin
+         return V : T := Init (H) do
+            Read (Stream, Buffer, Offset, V);
+         end return;
+      end Input;
+
+      -----------
+      -- Input --
+      -----------
+
+      function Input
+        (Header : not null access Ada.Streams.Root_Stream_Type'Class;
+         Stream : not null access Ada.Streams.Root_Stream_Type'Class)
+        return T
+      is
+         H      : constant Header_Type := Input_Header (Header);
          Buffer : Unsigned_8 := 0;
          Offset : Offset_Type := 0;
       begin
@@ -849,6 +895,26 @@ package body TGen.Marshalling_Lib is
          Buffer : Unsigned_8 := 0;
          Offset : Offset_Type := 0;
       begin
+         Output_Header (Stream, V);
+         Write (Stream, Buffer, Offset, V);
+         if Offset /= 0 then
+            Unsigned_8'Write (Stream, Buffer);
+         end if;
+      end Output;
+
+      ------------
+      -- Output --
+      ------------
+
+      procedure Output
+        (Header : not null access Ada.Streams.Root_Stream_Type'Class;
+         Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+         V      : T)
+      is
+         Buffer : Unsigned_8 := 0;
+         Offset : Offset_Type := 0;
+      begin
+         Output_Header (Header, V);
          Write (Stream, Buffer, Offset, V);
          if Offset /= 0 then
             Unsigned_8'Write (Stream, Buffer);

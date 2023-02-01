@@ -2,7 +2,7 @@
 --                                                                          --
 --                                  TGen                                    --
 --                                                                          --
---                      Copyright (C) 2021-2022, AdaCore                    --
+--                      Copyright (C) 2021-2023, AdaCore                    --
 --                                                                          --
 -- TGen  is  free software; you can redistribute it and/or modify it  under --
 -- under  terms of  the  GNU General  Public License  as  published by  the --
@@ -60,6 +60,8 @@ package body TGen.Marshalling is
      Template_Folder & "component_size.tmplt";
    Composite_Base_Spec_Template  : constant String :=
      Template_Folder & "composite_base_spec.tmplt";
+   Default_Header_Spec_Template  : constant String :=
+     Template_Folder & "default_header_spec.tmplt";
    Header_Body_Template          : constant String :=
      Template_Folder & "header_body.tmplt";
    Header_Spec_Template          : constant String :=
@@ -101,6 +103,10 @@ package body TGen.Marshalling is
      (Global_Prefix & "_" & Ty_Name);
    --  Construct a prefix that will be shared by all entities generated for a
    --  given type.
+
+   function Needs_Header (Typ : TGen.Types.Typ'Class) return Boolean;
+   --  Return True for types which have constraints (bounds of unconstrained
+   --  array types, and discriminants of unconstrained record types).
 
    function Needs_Wrappers (Typ : TGen.Types.Typ'Class) return Boolean;
    --  Return True for types with headers when they can occur nested in the
@@ -947,6 +953,21 @@ package body TGen.Marshalling is
 
             Put_Line (F_Body, Parse (TRD & Header_Body_Template, Assocs));
             New_Line (F_Body);
+         end;
+
+      --  If the type does not need a header, still generate definitions for
+      --  the size of the header.
+
+      elsif not For_Base then
+         declare
+            Assocs : constant Translate_Table :=
+              [1  => Assoc ("TY_NAME", Ty_Name),
+               2  => Assoc ("TY_PREFIX", Ty_Prefix)];
+
+         begin
+            Put_Line
+              (F_Spec, Parse (TRD & Default_Header_Spec_Template, Assocs));
+            New_Line (F_Spec);
          end;
       end if;
 

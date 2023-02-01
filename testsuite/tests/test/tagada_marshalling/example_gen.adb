@@ -168,14 +168,14 @@ procedure Example_Gen is
 
       Create (F, Out_File, File_Name);
       S := Stream (F);
-      TGen_Marshalling_my_file_R_Output (S, V1);
-      TGen_Marshalling_show_date_Date_Output (S, D1);
+      TGen_Marshalling_My_File_R_Output (S, V1);
+      TGen_Marshalling_Show_Date_Date_Output (S, D1);
       Close (F);
 
       Open (F, In_File, File_Name);
       S := Stream (F);
-      V2 := TGen_Marshalling_my_file_R_Input (S);
-      D2 := TGen_Marshalling_show_date_Date_Input (S);
+      V2 := TGen_Marshalling_My_File_R_Input (S);
+      D2 := TGen_Marshalling_Show_Date_Date_Input (S);
       Close (F);
 
       if Debug then
@@ -202,16 +202,13 @@ procedure Example_Gen is
 
       Create (F, Out_File, File_Name);
       S := Stream (F);
-      TGen_Marshalling_my_file_Shape_Output_Header (S, V1);
-      TGen_Marshalling_my_file_Shape_Output (S, V1);
+      TGen_Marshalling_My_File_Shape_Output (S, V1);
       Close (F);
 
       Open (F, In_File, File_Name);
       S := Stream (F);
       declare
-         Header : TGen_Marshalling_my_file_Shape_Header_Type :=
-           TGen_Marshalling_my_file_Shape_Input_Header (S);
-         V2     : Shape := TGen_Marshalling_my_file_Shape_Input (S, Header);
+         V2 : Shape := TGen_Marshalling_My_File_Shape_Input (S);
       begin
          Close (F);
 
@@ -242,16 +239,13 @@ procedure Example_Gen is
 
       Create (F, Out_File, File_Name);
       S := Stream (F);
-      TGen_Marshalling_standard_String_Output_Header (S, V1);
-      TGen_Marshalling_standard_String_Output (S, V1);
+      TGen_Marshalling_Standard_String_Output (S, V1);
       Close (F);
 
       Open (F, In_File, File_Name);
       S := Stream (F);
       declare
-         Header : TGen_Marshalling_standard_String_Header_Type :=
-           TGen_Marshalling_standard_String_Input_Header (S);
-         V2     : String := TGen_Marshalling_standard_String_Input (S, Header);
+         V2 : String := TGen_Marshalling_Standard_String_Input (S);
       begin
          Close (F);
 
@@ -276,12 +270,12 @@ procedure Example_Gen is
    begin
       Create (F, Out_File, File_Name);
       S := Stream (F);
-      TGen_Marshalling_my_file_R2_Output (S, V);
+      TGen_Marshalling_My_File_R2_Output (S, V);
       Close (F);
 
       Open (F, In_File, File_Name);
       S := Stream (F);
-      W := TGen_Marshalling_my_file_R2_Input (S);
+      W := TGen_Marshalling_My_File_R2_Input (S);
 
       if V /= W then
          Ada.Text_IO.Put_Line ("Preds FAIL");

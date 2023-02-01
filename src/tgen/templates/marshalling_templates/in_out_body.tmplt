@@ -44,13 +44,15 @@
 @@ELSE@@
    package @_TY_PREFIX_@_In_Out is
      new @_MARSHALLING_LIB_@.@_GENERIC_NAME_@
-       (T      => @_TY_NAME_@,
+       (T             => @_TY_NAME_@,
 @@IF@@ @_NEEDS_HEADER_@
-        Header => @_TY_PREFIX_@_Header_Type,
-        Init   => @_TY_PREFIX_@_Init_From_Header,
+        Header_Type   => @_TY_PREFIX_@_Header_Type,
+        Init          => @_TY_PREFIX_@_Init_From_Header,
+        Input_Header  => @_TY_PREFIX_@_Input_Header,
+        Output_Header => @_TY_PREFIX_@_Output_Header,
 @@END_IF@@
-        Read   => @_TY_PREFIX_@_Read,
-        Write  => @_TY_PREFIX_@_Write);
+        Read          => @_TY_PREFIX_@_Read,
+        Write         => @_TY_PREFIX_@_Write);
 @@END_IF@@
 
    procedure @_TY_PREFIX_@_Output
@@ -59,11 +61,18 @@
      renames @_TY_PREFIX_@_In_Out.Output;
 
    function @_TY_PREFIX_@_Input
-@@IF@@ @_NEEDS_HEADER_@
-     (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class;
-      @_GLOBAL_PREFIX_@_H      : @_TY_PREFIX_@_Header_Type)
-@@ELSE@@
      (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class)
-@@END_IF@@
+      return @_TY_NAME_@
+     renames @_TY_PREFIX_@_In_Out.Input;
+
+   procedure @_TY_PREFIX_@_Output
+     (@_GLOBAL_PREFIX_@_Header : not null access Root_Stream_Type'Class;
+      @_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class;
+      @_GLOBAL_PREFIX_@_V      : @_TY_NAME_@)
+     renames @_TY_PREFIX_@_In_Out.Output;
+
+   function @_TY_PREFIX_@_Input
+     (@_GLOBAL_PREFIX_@_Header : not null access Root_Stream_Type'Class;
+      @_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class)
       return @_TY_NAME_@
      renames @_TY_PREFIX_@_In_Out.Input;
