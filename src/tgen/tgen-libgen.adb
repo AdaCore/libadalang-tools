@@ -29,6 +29,8 @@ with Ada.Text_IO; use Ada.Text_IO;
 with GNAT.OS_Lib;
 
 with TGen.Marshalling;        use TGen.Marshalling;
+with TGen.Marshalling.Binary_Marshallers;
+with TGen.Marshalling.JSON_Marshallers;
 with TGen.Types.Array_Types;
 with TGen.Types.Constraints;
 with TGen.Types.Record_Types;
@@ -255,10 +257,12 @@ package body TGen.Libgen is
       if Part in Marshalling_Part | All_Parts then
          for T of Types loop
             if Is_Supported_Type (T.Get) then
-               Generate_Marshalling_Functions_For_Typ
-                 (F_Spec, F_Body, T.Get, To_String (Ctx.Root_Templates_Dir));
-               Generate_JSON_Marshalling_Functions_For_Typ
-                 (F_Spec, F_Body, T.Get, To_String (Ctx.Root_Templates_Dir));
+               TGen.Marshalling.Binary_Marshallers
+                 .Generate_Marshalling_Functions_For_Typ
+                   (F_Spec, F_Body, T.Get, To_String (Ctx.Root_Templates_Dir));
+               TGen.Marshalling.JSON_Marshallers
+                 .Generate_Marshalling_Functions_For_Typ
+                   (F_Spec, F_Body, T.Get, To_String (Ctx.Root_Templates_Dir));
             end if;
          end loop;
       end if;
