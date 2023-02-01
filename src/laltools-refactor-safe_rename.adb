@@ -1219,7 +1219,11 @@ package body Laltools.Refactor.Safe_Rename is
          --  a compilation unit and both share the same parent package.
 
          for Analysis_Unit of Self.Units loop
-            for Compilation_Unit of Get_Compilation_Units (Analysis_Unit) loop
+            --  Check for compilation units where the parent of the top level
+            --  declaration is not found. This can happen to separate bodies.
+            for Compilation_Unit of Get_Compilation_Units (Analysis_Unit)
+              when not Compilation_Unit.P_Decl.P_Parent_Basic_Decl.Is_Null
+            loop
                if Compilation_Unit.P_Decl.P_Parent_Basic_Decl.Unit =
                  Parent_Unit
                then

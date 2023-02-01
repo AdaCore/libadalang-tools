@@ -1,0 +1,20 @@
+library project Default is
+   for Library_Name use "test";
+   for Library_Dir  use "lib";
+   for Source_Dirs use (".");
+
+   type Config_Type is ("config_1", "config_2");
+   Config : Config_Type := external ("CONFIG", "config_1");
+
+   package Naming is
+      case Config is
+         when "config_1" =>
+            for Body ("Foo.Bar.Monitor.Initialize") use "initialize_1.ads";
+         when "config_2" =>
+            for Body ("Foo.Bar.Monitor.Initialize") use "initialize_2.ads";
+      end case;
+   end Naming;
+
+   for Excluded_Source_Files use ("foo-bar-monitor.ads");
+end Default;
+
