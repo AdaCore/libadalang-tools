@@ -2,7 +2,7 @@
 --                                                                          --
 --                                  TGen                                    --
 --                                                                          --
---                      Copyright (C) 2021-2022, AdaCore                    --
+--                      Copyright (C) 2021-2023, AdaCore                    --
 --                                                                          --
 -- TGen  is  free software; you can redistribute it and/or modify it  under --
 -- under  terms of  the  GNU General  Public License  as  published by  the --
@@ -32,17 +32,18 @@ package TGen.Marshalling is
    function Is_Supported_Type (Typ : TGen.Types.Typ'Class) return Boolean;
    --  Return True for types which are currently supported by the prototype
 
-   function Needs_Header (Typ : TGen.Types.Typ'Class) return Boolean;
-   --  Return True for types which have constraints (bounds of unconstrained
-   --  array types, and discriminants of unconstrained record types).
-
    procedure Generate_Marshalling_Functions_For_Typ
      (F_Spec, F_Body     : File_Type;
       Typ                : TGen.Types.Typ'Class;
       Templates_Root_Dir : String)
    with Pre => Is_Supported_Type (Typ);
    --  Generate marshalling and unmarshalling functions for Typ.
-   --  If the type does not need a header, we generate:
+   --
+   --  --  We generate:
+   --
+   --    function TAGAda_Marshalling_Typ_Size_Header return Natural;
+   --  or
+   --    TAGAda_Marshalling_Typ_Size_Header : constant := ...;
    --
    --  procedure TAGAda_Marshalling_Typ_Output
    --    (TAGAda_Marshalling_Stream : not null access Root_Stream_Type'Class;
@@ -52,29 +53,14 @@ package TGen.Marshalling is
    --    (TAGAda_Marshalling_Stream : not null access Root_Stream_Type'Class)
    --    return Typ;
    --
-   --  --  Otherwise, we generate:
-   --
-   --  type TAGAda_Marshalling_Typ_Header_Type is record
-   --     < Typ's array bound or record discriminants >
-   --  end record;
-   --
-   --  function TAGAda_Marshalling_Typ_Input_Header
-   --    (TAGAda_Marshalling_Stream : not null access Root_Stream_Type'Class)
-   --    return TAGAda_Marshalling_Typ_Header_Type;
-   --
-   --  procedure TAGAda_Marshalling_Typ_Output_Header
-   --    (TAGAda_Marshalling_Stream : not null access Root_Stream_Type'Class;
+   --  procedure TAGAda_Marshalling_Typ_Output
+   --    (TAGAda_Marshalling_Header : not null access Root_Stream_Type'Class;
+   --     TAGAda_Marshalling_Stream : not null access Root_Stream_Type'Class;
    --     TAGAda_Marshalling_V      : Typ);
    --
-   --  function TAGAda_Marshalling_Typ_Size_Header return Natural;
-   --
-   --  procedure TAGAda_Marshalling_Typ_Output
-   --    (TAGAda_Marshalling_Stream : not null access Root_Stream_Type'Class;
-   --     TAGAda_Marshalling_V      : Shape);
-   --
    --  function TAGAda_Marshalling_Typ_Input
-   --    (TAGAda_Marshalling_Stream : not null access Root_Stream_Type'Class;
-   --     TAGAda_Marshalling_H      : TAGAda_Marshalling_Typ_Header_Type)
+   --    (TAGAda_Marshalling_Header : not null access Root_Stream_Type'Class;
+   --     TAGAda_Marshalling_Stream : not null access Root_Stream_Type'Class)
    --    return Typ;
    --
    --  Templates_Root_Dir should be the path to the root directory in which all

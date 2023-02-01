@@ -2,7 +2,7 @@
 --                                                                          --
 --                                  TGen                                    --
 --                                                                          --
---                       Copyright (C) 2022, AdaCore                        --
+--                    Copyright (C) 2022-2023, AdaCore                      --
 --                                                                          --
 -- TGen  is  free software; you can redistribute it and/or modify it  under --
 -- under  terms of  the  GNU General  Public License  as  published by  the --
@@ -185,13 +185,31 @@ package TGen.Marshalling_Lib is
         (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
          V      : T);
 
+      function Input
+        (Header : not null access Ada.Streams.Root_Stream_Type'Class;
+         Stream : not null access Ada.Streams.Root_Stream_Type'Class)
+        return T;
+
+      procedure Output
+        (Header : not null access Ada.Streams.Root_Stream_Type'Class;
+         Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+         V      : T);
+
    end In_Out;
 
    generic
       type T (<>) is private;
-      type Header is private;
+      type Header_Type is private;
 
-      with function Init (H : Header) return T;
+      with function Init (H : Header_Type) return T;
+
+      with function Input_Header
+        (Stream : not null access Ada.Streams.Root_Stream_Type'Class)
+        return Header_Type;
+
+      with procedure Output_Header
+        (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+         V      : T);
 
       with procedure Write
         (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
@@ -208,12 +226,21 @@ package TGen.Marshalling_Lib is
    package In_Out_Unconstrained is
 
       function Input
-        (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-         H      : Header)
+        (Stream : not null access Ada.Streams.Root_Stream_Type'Class)
         return T;
 
       procedure Output
         (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+         V      : T);
+
+      function Input
+        (Header : not null access Ada.Streams.Root_Stream_Type'Class;
+         Stream : not null access Ada.Streams.Root_Stream_Type'Class)
+        return T;
+
+      procedure Output
+        (Header : not null access Ada.Streams.Root_Stream_Type'Class;
+         Stream : not null access Ada.Streams.Root_Stream_Type'Class;
          V      : T);
 
    end In_Out_Unconstrained;
