@@ -100,10 +100,12 @@ package body Laltools.Refactor.Suppress_Separate is
       end if;
 
       --  Confirm that this is really a separate
-      Is_Separate := S_Spec.Parent.Kind in Ada_Subp_Body_Stub
-        or else (not S_Spec.Parent.Is_Null
-                 and then not S_Spec.Parent.Parent.Is_Null
-                 and then S_Spec.Parent.Parent.Kind in Ada_Subunit_Range);
+      Is_Separate :=
+        not S_Spec.Parent.Is_Null
+        and then
+          (S_Spec.Parent.Kind in Ada_Subp_Body_Stub
+           or else (not S_Spec.Parent.Parent.Is_Null
+                    and then S_Spec.Parent.Parent.Kind in Ada_Subunit_Range));
 
       if not Is_Separate then
          return False;
