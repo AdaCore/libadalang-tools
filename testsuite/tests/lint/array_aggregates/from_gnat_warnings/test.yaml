@@ -1,0 +1,14 @@
+title: from_gnat_warnings
+
+description: |4
+    Tests that array aggregates can process the array aggregate obsolescent
+    syntax warnings produced by GNAT.
+    The gprbuild_log was generated using the following command
+    gprbuild -gnatef -P test.gpr > gprbuild_log 2>&1
+
+
+driver: shell_script
+
+canonicalize_backslashes: True
+
+

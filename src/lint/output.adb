@@ -779,10 +779,11 @@ package body Output is
       Writer.Start_Document (Success);
       Writer.Start_Array (Success);
       for Aggregate_Node in Edits_Info.Iterate loop
-         Write (Writer         => Writer,
-                Aggregate_Node => Aggregate_Node.Key,
-                Item           => Edits_Info (Aggregate_Node),
-                Success        => Success);
+         Write
+           (Writer         => Writer,
+            Aggregate_Node => Aggregate_Node.Key,
+            Item           => Edits_Info (Aggregate_Node),
+            Success        => Success);
       end loop;
       Writer.End_Array (Success);
       Writer.End_Document (Success);

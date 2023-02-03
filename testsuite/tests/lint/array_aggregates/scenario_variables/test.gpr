@@ -1,0 +1,30 @@
+project Test is
+
+   for Main use ("main.adb");
+
+   type Config_Type is ("one", "two");
+   Config : Config_Type := external ("CONFIG", "one");
+   Other_Config : Config_Type := external ("OTHER_CONFIG", "one");
+
+   package Naming is
+      case Config is
+         when "one" =>
+            for Specification ("My_Package") use "my_package1.ada";
+         when "two" =>
+            for Specification ("My_Package") use "my_package2.ada";
+      end case;
+
+      case Other_Config is
+         when "one" =>
+            for Specification ("Other_Package") use "other_package1.ada";
+         when "two" =>
+            for Specification ("Other_Package") use "other_package2.ada";
+      end case;
+   end Naming;
+
+   package Compiler is
+      for Default_Switches ("Ada") use ("-gnat2022", "-gnatwj");
+   end Compiler;
+
+end Test;
+

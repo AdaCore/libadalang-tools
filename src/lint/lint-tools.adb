@@ -27,13 +27,6 @@ with Ada.Containers.Indefinite_Hashed_Sets;
 with Ada.Strings.Hash;
 with Ada.Strings.Unbounded;
 
-with GNATCOLL.VFS;
-with GNATCOLL.Projects;
-
-with Langkit_Support.Diagnostics;
-
-with Libadalang.Project_Provider;
-
 package body Lint.Tools is
 
    -------------
@@ -99,76 +92,5 @@ package body Lint.Tools is
 
       return 0;
    end Find_First_Tool_Index;
-
-   --------------------------------
-   -- Get_Project_Analysis_Units --
-   --------------------------------
-
-   function Get_Project_Analysis_Units
-     (Project_Filename : String)
-      return Libadalang.Analysis.Analysis_Unit_Array
-   is
-      use Ada.Strings.Unbounded;
-      use GNATCOLL.Projects;
-      use GNATCOLL.VFS;
-      use Libadalang.Analysis;
-      use Libadalang.Project_Provider;
-
-      Project_Environment  : Project_Environment_Access;
-      Project_Tree         : constant Project_Tree_Access :=
-        new GNATCOLL.Projects.Project_Tree;
-      Project_Virtual_File : constant Virtual_File :=
-        Create (+Project_Filename);
-
-      Context       : Analysis_Context;
-      Unit_Provider : Unit_Provider_Reference;
-      Sources       : Filename_Vectors.Vector;
-
-   begin
-      Initialize (Project_Environment);
-      --  TODO: Use procedures in GNATCOLL.Projects to set scenario
-      --  variables (Change_Environment), set the target
-      --  and runtime (Set_Target_And_Runtime), etc.
-      Project_Tree.Load
-        (Root_Project_Path => Project_Virtual_File,
-         Env               => Project_Environment);
-
-      Unit_Provider :=
-        Create_Project_Unit_Provider
-          (Tree => Project_Tree,
-           Env  => Project_Environment);
-      Context := Create_Context (Unit_Provider => Unit_Provider);
-
-      Sources := Source_Files (Project_Tree.all);
-
-      return Units : Analysis_Unit_Array
-                       (Sources.First_Index .. Sources.Last_Index)
-      do
-         for J in Units'Range loop
-            declare
-               use Langkit_Support.Diagnostics;
-
-               Unit : constant Analysis_Unit :=
-                 Context.Get_From_File (To_String (Sources.Element (J)));
-
-            begin
-               if Unit.Has_Diagnostics then
-                  Logger.Trace
-                    ("WARNING: Source "
-                     & Unit.Get_Filename
-                     & " has diagnostics");
-                  for Diagnostic of Unit.Diagnostics loop
-                     Logger.Trace (To_Pretty_String (Diagnostic));
-                  end loop;
-
-               else
-                  Units (J) := Unit;
-               end if;
-            end;
-         end loop;
-
-         Lint.Logger.Trace ("Found" & Units'Length'Image & " units");
-      end return;
-   end Get_Project_Analysis_Units;
 
 end Lint.Tools;

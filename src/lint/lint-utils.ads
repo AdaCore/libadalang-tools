@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2022-2023, AdaCore                    --
+--                        Copyright (C) 2023, AdaCore                       --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -21,30 +21,31 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 --
---  Package with the definition of all tools
+--  Common utilities to all lint Lint.Tools
 
-package Lint.Tools is
+with Ada.Strings.Unbounded;
 
-   type Tool is (Array_Aggregates);
-   --  type Tool is
-   --    (Array_Aggregates,
-   --     Record_Components,
-   --     Suppress_Dead_Params,
-   --     Scope_Declarations,
-   --     Relocate_Decls);
+with Libadalang.Analysis;
 
-   function Convert (Arg : String) return Tool;
-   --  Returns Tool'Value of Arg. Raises Parse_Tool_Exception is Arg is
-   --  not a Tool.
+package Lint.Utils is
 
-   function Tool_List return String;
-   --  Returns all literals of Tool as a lower case string, concatenated with
-   --  LF.
+   function Get_Project_Analysis_Units
+     (Project_Filename : String)
+      return Libadalang.Analysis.Analysis_Unit_Array;
+   --  Gets all units of a project whose name is defined by Project_Filename.
+   --  Project_Filename can either be a full path or a filename in the current
+   --  directory.
 
-   function Find_First_Tool_Index return Natural;
-   --  Find the index of the first Tool in the arguments passed to the
-   --  command line.
+   type Sources_List is array (Positive range <>) of
+     Ada.Strings.Unbounded.Unbounded_String;
 
-   Parse_Tool_Exception : exception;
+   function Get_Analysis_Units_From_Sources_List
+     (Sources          : Sources_List;
+      Project_Filename : String := "")
+      return Libadalang.Analysis.Analysis_Unit_Array;
+   --  Gets all units defined by Sources.
+   --  If Project_Filename is defined, then uses it to create a unit provider.
+   --  Project_Filename can either be a full path or a filename in the current
+   --  directory.
 
-end Lint.Tools;
+end Lint.Utils;

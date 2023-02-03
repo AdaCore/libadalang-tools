@@ -1,0 +1,13 @@
+title: selected_sources_with_proj
+
+description: |4
+    Tests that array aggregates can process the --sources,-S and --project,-P
+    switches that defines the set of files to be refactored. The difference of
+    this test to the "selected_sources" one is that by passing the -P switch,
+    a common analysis context is created and used to analyse all sources.
+    This leads to not missing any case since we're able to resolve the
+    expression type of all aggregates.
+
+driver: shell_script
+
+canonicalize_backslashes: True

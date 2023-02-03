@@ -1,5 +1,7 @@
-usage: gnatrefactor(?:\.exe)? \[--help\|-h] \[--help\|-h] tool \[--verbose\|-v] \[--pipe\|-p] 
-\s+\[--project\|-P PROJECT] 
+usage: gnatrefactor(?:\.exe)? \[--help\|-h] \[--help\|-h] tool \[--verbose\|-v] \[--pipe\|-p]\s*
+\s*\[--project\|-P PROJECT] \[--sources\|-S SOURCES \[SOURCES\.\.\.]]\s*
+\s*\[-X nm=val \[nm=val\.\.\.]] \[--from-gnat-warnings\|-fgw\s*
+\s*<file_with_gnat_warnings>]\s*
 
 Refactor tools
 
@@ -7,11 +9,14 @@ positional arguments:
    tool  array_aggregates
    
 optional arguments:
-   --help, -h     Show this help message
-   --help, -h     Help
-   --verbose, -v  Print traces
-   --pipe, -p     Print the result to stdout instead of editing the files on 
-                  disk
-   --project, -P  Project
+   --help, -h                  Show this help message
+   --help, -h                  Help
+   --verbose, -v               Print traces
+   --pipe, -p                  Print the result to stdout instead of editing the
+                                files on disk
+   --project, -P               Project
+   --sources, -S               Source files to refactor
+   -X                          Specify an external reference for Project Files
+   --from-gnat-warnings, -fgw  File with all obsolescent syntax GNAT warnings
    
 

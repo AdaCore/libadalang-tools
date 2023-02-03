@@ -1,0 +1,9 @@
+title: selected_sources
+
+description: |4
+    Tests that array aggregates can process the scenarios variables
+    provided by the -X switch.
+
+driver: shell_script
+
+canonicalize_backslashes: True
