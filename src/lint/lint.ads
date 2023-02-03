@@ -27,10 +27,8 @@ with GNATCOLL.Traces;
 
 package Lint is
 
-   pragma Elaborate_Body;
-
    Logger : constant GNATCOLL.Traces.Logger :=
-     GNATCOLL.Traces.Create ("LINT", GNATCOLL.Traces.From_Config);
+     GNATCOLL.Traces.Create ("LINT");
 
    procedure Log_Progress
      (Current  : Natural;

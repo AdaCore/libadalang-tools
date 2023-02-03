@@ -33,6 +33,8 @@ with Lint.Tools.Array_Aggregates_Tool;
 
 procedure Lint.Main is
 begin
+   GNATCOLL.Traces.Parse_Config_File;
+
    if Lint.Command_Line.Parser.Parse then
       if Lint.Command_Line.Help.Get then
          Ada.Text_IO.Put_Line (Lint.Command_Line.Parser.Help);

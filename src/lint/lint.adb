@@ -44,6 +44,4 @@ package body Lint is
       Logger.Trace ("[" & Current_Image & "/" & Total & "] " & Message);
    end Log_Progress;
 
-begin
-   GNATCOLL.Traces.Parse_Config_File;
 end Lint;
