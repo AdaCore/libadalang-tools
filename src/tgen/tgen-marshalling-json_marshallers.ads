@@ -29,7 +29,9 @@ package TGen.Marshalling.JSON_Marshallers is
      (F_Spec, F_Body     : File_Type;
       Typ                : TGen.Types.Typ'Class;
       Templates_Root_Dir : String);
-   --  Generate marshalling and unmarshalling functions for Typ.
+   --  Generate JSON marshalling and unmarshalling functions for Typ. Note that
+   --  this function will not operate recursively. It will thus have to be
+   --  called for each of the component type of a record for instance.
    --
    --  We generate the following functions:
    --

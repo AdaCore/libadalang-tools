@@ -23,7 +23,7 @@
 
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 
-with TGen.Marshalling_Templates;
+with TGen.Templates;
 with TGen.Strings; use TGen.Strings;
 
 package body TGen.Marshalling.JSON_Marshallers is
@@ -42,8 +42,9 @@ package body TGen.Marshalling.JSON_Marshallers is
         & GNAT.OS_Lib.Directory_Separator
         & "json_templates"
         & GNAT.OS_Lib.Directory_Separator;
-      package Templates is new TGen.Marshalling_Templates (TRD);
-      use Templates;
+
+      package Templates is new TGen.Templates (TRD);
+      use Templates.JSON_Marshalling;
 
       Ty_Name       : constant String := Typ.Fully_Qualified_Name;
       Ty_Prefix     : constant String := Prefix_For_Typ (Typ.Slug);

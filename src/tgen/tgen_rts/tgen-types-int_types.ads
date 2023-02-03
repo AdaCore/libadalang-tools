@@ -96,7 +96,7 @@ package TGen.Types.Int_Types is
    function Gen return T;
 
    overriding function Default_Strategy
-     (Self    : Signed_Int_Typ) return Strategy_Type'Class;
+     (Self : Signed_Int_Typ) return Strategy_Type'Class;
    --  Generate a strategy to statically generate (in one pass) values for Self
 
    type Array_Constraint_Strategy_Type is new Strategy_Type with

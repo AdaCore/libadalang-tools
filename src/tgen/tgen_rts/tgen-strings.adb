@@ -26,11 +26,6 @@ with Ada.Characters.Latin_1;
 
 package body TGen.Strings is
 
-   function To_Symbol
-     (Name : Ada_Qualified_Name; Sep : Character) return String;
-   --  Turn the given qualified name to a symbol, using the given Sep to
-   --  separate identifiers.
-
    --------------
    -- New_Line --
    --------------

@@ -22,7 +22,6 @@
 ------------------------------------------------------------------------------
 
 with Ada.Containers;
-with Ada.Strings.Fixed;
 
 with TGen.Strategies; use TGen.Strategies;
 
@@ -90,13 +89,6 @@ package body TGen.Types is
    function Compilation_Unit_Name (Self : Typ) return String is
     (To_Ada (Self.Compilation_Unit_Name));
 
-   -----------------------
-   -- Dot_To_Underscore --
-   -----------------------
-
-   function Dot_To_Underscore (C : Character) return Character is
-     ((if C = '.' then '_' else C));
-
    ------------
    -- Encode --
    ------------
@@ -136,9 +128,7 @@ package body TGen.Types is
 
    function Slug (Self : Typ) return String is
    begin
-      return Ada.Strings.Fixed.Translate
-        (Source  => Self.Fully_Qualified_Name,
-         Mapping => Dot_To_Underscore'Access);
+      return To_Symbol (Self.Name, '_');
    end Slug;
 
    ------------------

@@ -28,13 +28,20 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with GNAT.OS_Lib;
 
+with Langkit_Support.Text; use Langkit_Support.Text;
+
+with Libadalang.Analysis; use Libadalang.Analysis;
+
+with Templates_Parser;
+
 with TGen.LAL_Utils;
 with TGen.Marshalling;        use TGen.Marshalling;
 with TGen.Marshalling.Binary_Marshallers;
 with TGen.Marshalling.JSON_Marshallers;
+with TGen.Type_Representation;
 with TGen.Types.Array_Types;
 with TGen.Types.Constraints;
-with TGen.Types.Record_Types;
+with TGen.Types.Record_Types; use TGen.Types.Record_Types;
 with TGen.Types.Translation;  use TGen.Types.Translation;
 with TGen.Types;              use TGen.Types;
 
@@ -76,7 +83,6 @@ package body TGen.Libgen is
    is
       use TGen.Types.Array_Types;
       use TGen.Types.Constraints;
-      use TGen.Types.Record_Types;
 
       Res : Typ_Set;
 
@@ -121,7 +127,7 @@ package body TGen.Libgen is
             for Idx_Typ of As_Array_Typ (T).Index_Types loop
                Res.Include (Idx_Typ);
             end loop;
-         when Non_Disc_Record_Kind =>
+         when Non_Disc_Record_Kind | Function_Kind =>
             for Comp_Typ of As_Nondiscriminated_Record_Typ (T).Component_Types
             loop
                Res.Include (Comp_Typ);
@@ -146,7 +152,8 @@ package body TGen.Libgen is
                Res.Include (Disc_Typ);
             end loop;
             Inspect_Variant (As_Discriminated_Record_Typ (T).Variant);
-         when others => null;
+         when others =>
+            Res.Include (T);
       end case;
       return Res;
    end Type_Dependencies;
@@ -181,6 +188,7 @@ package body TGen.Libgen is
       Pack_Name  : Ada_Qualified_Name;
       Part       : Any_Library_Part)
    is
+      use Templates_Parser;
       F_Spec           : File_Type;
       F_Body           : File_Type;
       Ada_Pack_Name    : constant String := To_Ada (Pack_Name);
@@ -192,6 +200,14 @@ package body TGen.Libgen is
 
       Types : constant Types_Per_Package_Maps.Constant_Reference_Type :=
         Ctx.Types_Per_Package.Constant_Reference (Pack_Name);
+
+      Types_Repr : constant Types_Per_Package_Maps.Constant_Reference_Type :=
+        Ctx.Strat_Types_Per_Package.Constant_Reference (Pack_Name);
+
+      Initialization_Code : Tag;
+      --  Code that should be put in the initialization section of the
+      --  package body.
+
    begin
       Create (F_Spec, Out_File, File_Name & ".ads");
       Put (F_Spec, "with TGen.Marshalling_Lib; ");
@@ -200,6 +216,11 @@ package body TGen.Libgen is
       Put (F_Spec, "with Interfaces; ");
       Put_Line (F_Spec, "use Interfaces;");
       Put_Line (F_Spec, "with Ada.Streams; use Ada.Streams;");
+      Put_Line (F_Spec, "with TGen.Strings;");
+      Put_Line (F_Spec, "with TGen.Big_Int;");
+      Put_Line (F_Spec, "with TGen.Types;");
+      Put_Line (F_Spec, "with TGen.Types.Discrete_Types;");
+      Put_Line (F_Spec, "with TGen.Types.Int_Types;");
 
       Put_Line (F_Spec, "package " & Ada_Pack_Name & " is");
       New_Line (F_Spec);
@@ -211,6 +232,9 @@ package body TGen.Libgen is
       --  m / u functions defined in other library support packages.
 
       for T of Types loop
+         Typ_Dependencies.Union (Type_Dependencies (T));
+      end loop;
+      for T of Types_Repr loop
          Typ_Dependencies.Union (Type_Dependencies (T));
       end loop;
 
@@ -265,6 +289,21 @@ package body TGen.Libgen is
                  .Generate_Marshalling_Functions_For_Typ
                    (F_Spec, F_Body, T.Get, To_String (Ctx.Root_Templates_Dir));
             end if;
+         end loop;
+      end if;
+
+      for T of Types_Repr loop
+         TGen.Type_Representation.Generate_Type_Representation_For_Typ
+           (F_Spec, F_Body, T.Get,
+            To_String (Ctx.Root_Templates_Dir), Initialization_Code);
+      end loop;
+
+      --  Print the initialization code, used for the type representation
+
+      if Size (Initialization_Code) /= 0 then
+         Put_Line (F_Body, "begin");
+         for I in 1 .. Size (Initialization_Code) loop
+            Put_Line (F_Body, Item (Initialization_Code, I));
          end loop;
       end if;
 
@@ -349,22 +388,17 @@ package body TGen.Libgen is
 
    function Include_Subp
      (Ctx  : in out Libgen_Context;
-      Subp : LAL.Basic_Decl'Class;
+      Subp : Basic_Decl'Class;
       Diag : out Unbounded_String) return Boolean
    is
-      use LAL;
-      use TGen.LAL_Utils;
-      use TGen.Strings.Ada_Qualified_Name_Sets_Maps;
-
-      Spec : constant Base_Subp_Spec := Subp.P_Subp_Spec_Or_Null;
-      --  Spec of the subprogram
+      use Ada_Qualified_Name_Sets_Maps;
 
       Subp_Types : Typ_Set;
       --  Transitive closure of required types for the parameters of the
       --  subprogram.
 
       Unit_Name : constant Ada_Qualified_Name :=
-        Convert_Qualified_Name
+        TGen.LAL_Utils.Convert_Qualified_Name
           (Subp.P_Enclosing_Compilation_Unit.P_Syntactic_Fully_Qualified_Name);
       --  Name of the compilation unit this subprogram belongs to.
 
@@ -374,7 +408,16 @@ package body TGen.Libgen is
 
       Dummy_Inserted : Boolean;
 
+      Spec : constant Subp_Spec := Subp.As_Subp_Decl.F_Subp_Spec;
+
+      Trans_Res : constant Translation_Result := Translate (Spec);
+
    begin
+      if not Trans_Res.Success then
+         Diag := Trans_Res.Diagnostics;
+         return False;
+      end if;
+
       if Support_Packs = No_Element then
          Ctx.Support_Packs_Per_Unit.Insert
            (Unit_Name,
@@ -383,50 +426,52 @@ package body TGen.Libgen is
             Dummy_Inserted);
       end if;
 
-      for Param of Spec.P_Params loop
-         declare
-            Trans_Res : constant Translation_Result :=
-              Translate (Param.F_Type_Expr);
-            --  Translated type of the parameter
+      declare
+         Fct_Typ : Function_Typ'Class :=
+           Function_Typ'Class (Trans_Res.Res.Unchecked_Get.all);
+      begin
+         --  Get the transitive closure of the types on which the parameters'
+         --  types depend, that need to be included in the support library.
+         --  Only do so if we actually inserted the type in the set to avoid
+         --  recomputing transitive closures and doing set unions.
 
-            Dummy_Cur : Typ_Sets.Cursor;
-            Inserted  : Boolean;
-            --  Whether the current type was already present in the set of
-            --  types for which we will generate the support library.
-
-         begin
-            if not Trans_Res.Success then
-               Diag := Trans_Res.Diagnostics;
-               return False;
-            end if;
+         for Param of Fct_Typ.Component_Types loop
 
             --  Fill out the support package map
+
             Ctx.Support_Packs_Per_Unit.Reference (Support_Packs).Include
-              (Support_Library_Package
-                 (Trans_Res.Res.Get.Compilation_Unit_Name));
+              (Support_Library_Package (Param.Get.Compilation_Unit_Name));
 
-            --  Include the param type in the set of types for which we want to
-            --  generate the support library.
+            Subp_Types.Union
+              (Type_Dependencies (Param, Transitive => True));
+         end loop;
 
-            Subp_Types.Insert (Trans_Res.Res, Dummy_Cur, Inserted);
+         --  Merge the set of types on which this subprogram's parameters
+         --  depend on to the rest of the generation context.
 
-            --  Get the transitive closure of the types on which this param's
-            --  type depends that need to be included in the support library.
-            --  Only do so if we actually inserted the type in the set to avoid
-            --  recomputing transitive closures and doing set unions.
+         Append_Types (Subp_Types, Ctx.Types_Per_Package);
 
-            if Inserted then
-               Subp_Types.Union
-                 (Type_Dependencies (Trans_Res.Res, Transitive => True));
-            end if;
-         end;
-      end loop;
+         --  Now analyze the strategies
 
-      --  Merge the set of types on which this subprogram's parameters depend
-      --  on to the rest of the generation context.
+         if Subp.P_Has_Aspect (To_Unbounded_Text (To_Text ("Generation")))
+         then
+            Parse_Strategy.Parse_Strategy
+              (Fct_Typ,
+               Subp.P_Get_Aspect_Assoc
+                 (To_Unbounded_Text (To_Text ("Generation"))),
+               Ctx.Strategy_Map);
+         end if;
 
-      Append_Types (Subp_Types, Ctx.Types_Per_Package);
-      return True;
+         Subp_Types.Clear;
+
+         for Param of Fct_Typ.Component_Types loop
+            Subp_Types.Union
+              (Type_Dependencies (Param, Transitive => True));
+         end loop;
+
+         Append_Types (Subp_Types, Ctx.Strat_Types_Per_Package);
+         return True;
+      end;
    end Include_Subp;
 
    --------------

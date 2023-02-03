@@ -1,0 +1,12 @@
+@@--  Template for the specification of a scalar type representation.
+@@--  @_TY_PREFIX_@ Prefix used to prefix all entities for the current type.
+@@--  @_TY_NAME_@ Name of the current type.
+@@--  @_RECORD_TYP_@ Kind of the record type
+
+   @_TY_PREFIX_@_Typ : constant TGen.Types.Record_Types.Function_Typ :=
+      (Name       => TGen.Strings.To_Qualified_Name ("@_TY_NAME_@"),
+       Is_Static  => True,
+       Static_Gen => True,
+       others     => <>);
+
+   @_TY_PREFIX_@_Typ_Ref : TGen.Types.SP.Ref;

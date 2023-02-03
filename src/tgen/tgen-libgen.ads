@@ -33,6 +33,7 @@ with Libadalang.Analysis;
 
 with TGen.Context;
 with TGen.Strings;
+with TGen.Parse_Strategy; use TGen.Parse_Strategy;
 
 package TGen.Libgen is
    package LAL renames Libadalang.Analysis;
@@ -133,6 +134,16 @@ private
 
       Support_Packs_Per_Unit : TGen.Strings.Ada_Qualified_Name_Sets_Map;
       --  Map of the required support packages for each processed unit
+
+      Strat_Types_Per_Package : Types_Per_Package_Map;
+      --  Map of package name to set of types for which we want to generate
+      --  the type introspection library.
+
+      Strategy_Map : Strategy_Maps_2.Map;
+      --  List of specified strategies. They map a fully qualified name (e.g.
+      --  a parameter / a parameter component, a type / a type component) to
+      --  its specified strategy.
+
    end record;
 
 end TGen.Libgen;

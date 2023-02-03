@@ -38,7 +38,6 @@ with TGen.Types.Constraints;     use TGen.Types.Constraints;
 with TGen.Types.Discrete_Types;  use TGen.Types.Discrete_Types;
 with TGen.Types.Enum_Types;      use TGen.Types.Enum_Types;
 with TGen.Types.Int_Types;       use TGen.Types.Int_Types;
-with TGen.Types.Parameter_Types; use TGen.Types.Parameter_Types;
 with TGen.Types.Real_Types;      use TGen.Types.Real_Types;
 with TGen.Types.Record_Types;    use TGen.Types.Record_Types;
 with TGen.Numerics;
@@ -2910,12 +2909,14 @@ package body TGen.Types.Translation is
 
          declare
             Trans_Res : constant Translation_Result :=
-            Translate_Internal (Full_Decl, Verbose);
+              Translate_Internal (Full_Decl, Verbose);
+            FQN       : constant Ada_Qualified_Name :=
+              Convert_Qualified_Name
+                (Full_Decl.P_Fully_Qualified_Name_Array);
          begin
             if Trans_Res.Success then
-               Translation_Cache.Insert
-                 (Convert_Qualified_Name
-                   (Full_Decl.P_Fully_Qualified_Name_Array), Trans_Res.Res);
+               Translation_Cache.Insert (FQN, Trans_Res.Res);
+               Type_Decl_Cache.Insert (FQN, Full_Decl);
             end if;
             return Trans_Res;
          end;
@@ -3148,42 +3149,23 @@ package body TGen.Types.Translation is
    begin
       F_Typ.Name :=
         Convert_Qualified_Name (N.F_Subp_Name.P_Fully_Qualified_Name_Array);
-      if not N.F_Subp_Params.Is_Null then
-         for Param of N.F_Subp_Params.F_Params loop
-            declare
-               Current_Typ : constant Translation_Result :=
-                 Translate (Param.F_Type_Expr, Verbose);
-            begin
-               if Current_Typ.Success then
-                  for Id of Param.F_Ids loop
-                     declare
-                        P_Typ      : Parameter_Typ;
-                        Param_Mode : constant Parameter_Mode_Type :=
-                        (case Kind (Param.F_Mode) is
-                           when Ada_Mode_Default | Ada_Mode_In => In_Mode,
-                           when Ada_Mode_In_Out => In_Out_Mode,
-                           when Ada_Mode_Out => Out_Mode,
-                           when others => Out_Mode);
-                        P_Typ_Ref  : SP.Ref;
-                     begin
-                        P_Typ.Name :=
-                        Convert_Qualified_Name
-                          (Id.P_Fully_Qualified_Name_Array);
-                        P_Typ.Parameter_Type := Current_Typ.Res;
-                        P_Typ.Parameter_Mode := Param_Mode;
-                        P_Typ_Ref.Set (P_Typ);
+      for Param of N.F_Subp_Params.F_Params loop
+         declare
+            Current_Typ : constant Translation_Result :=
+              Translate (Param.F_Type_Expr, Verbose);
+         begin
+            if Current_Typ.Success then
 
-                        F_Typ.Component_Types.Insert
-                          (Key      => +Id.As_Defining_Name.Text,
-                           New_Item => P_Typ_Ref);
-                     end;
-                  end loop;
-               else
-                  return Current_Typ;
-               end if;
-            end;
-         end loop;
-      end if;
+               for Id of Param.F_Ids loop
+                  F_Typ.Component_Types.Insert
+                    (Key      => +Id.As_Defining_Name.Text,
+                     New_Item => Current_Typ.Res);
+               end loop;
+            else
+               return Current_Typ;
+            end if;
+         end;
+      end loop;
 
       --  Function type was successfully translated. Now we can append both
       --  the parameters and the function to the translation cache.

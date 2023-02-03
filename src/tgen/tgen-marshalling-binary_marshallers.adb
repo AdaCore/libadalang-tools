@@ -23,7 +23,7 @@
 
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 
-with TGen.Marshalling_Templates;
+with TGen.Templates;
 
 package body TGen.Marshalling.Binary_Marshallers is
 
@@ -42,9 +42,8 @@ package body TGen.Marshalling.Binary_Marshallers is
         & "marshalling_templates"
         & GNAT.OS_Lib.Directory_Separator;
 
-      package Templates is new TGen.Marshalling_Templates (TRD);
-      use Templates;
-      use Templates.Binary;
+      package Templates is new TGen.Templates (TRD);
+      use Templates.Binary_Marshalling;
 
       Ty_Name       : constant String := Typ.Fully_Qualified_Name;
       Ty_Prefix     : constant String := Prefix_For_Typ (Typ.Slug);
@@ -176,6 +175,7 @@ package body TGen.Marshalling.Binary_Marshallers is
       --------------------------
       -- Print_Default_Header --
       --------------------------
+
       procedure Print_Default_Header (Assocs : Translate_Table) is
       begin
          Put_Line (F_Spec, Parse (Default_Header_Spec_Template, Assocs));

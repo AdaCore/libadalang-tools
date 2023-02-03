@@ -366,4 +366,12 @@ package body TGen.Types.Constraints is
       Free (Self.Subtype_Constraints);
    end Free_Content;
 
+   -----------
+   -- Image --
+   -----------
+
+   function Image (Self : Instance_Typ) return String is
+   begin
+      return Typ (Self.Orig_Typ.Unchecked_Get.all).Image;
+   end Image;
 end TGen.Types.Constraints;

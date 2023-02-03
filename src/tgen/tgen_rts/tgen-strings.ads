@@ -143,6 +143,11 @@ package TGen.Strings is
      with Pre => not Name.Is_Empty;
    --  Turn the given qualified name into a filename
 
+   function To_Symbol
+     (Name : Ada_Qualified_Name; Sep : Character) return String;
+   --  Turn the given qualified name to a symbol, using the given Sep to
+   --  separate identifiers.
+
    function "<" (L, R : Ada_Qualified_Name) return Boolean is
      (Ada.Strings.Less_Case_Insensitive (To_Ada (L), To_Ada (R)));
 
