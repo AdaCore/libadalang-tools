@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2023, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -25,7 +25,10 @@ with Utils.Generic_Formatted_Output;
 with Utils.String_Utilities; use Utils.String_Utilities;
 
 package Utils.Err_Out is new Utils.Generic_Formatted_Output
-  (Char_Type      => Character,
-   Str_Type       => String,
-   Basic_Put_Char => Std_Err_Put_Char);
---  All data is sent to standard error
+  (Char_Type                => Character,
+   Str_Type                 => String,
+   Basic_Put_Char           => Std_Err_Put_Char,
+   Output_Enabled_Initially => False);
+--  Data is not sent to stderr by default since tools can be used in library
+--  mode. It's the reponsibility of each tool driver to set
+--  Output_Enabled_Initially to True so that all data is sent of stderr.

@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2023, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -26,6 +26,7 @@ with Utils_Debug; use Utils_Debug;
 
 with Utils.Command_Lines; use Utils.Command_Lines;
 with Utils.Drivers;
+with Utils.Err_Out;
 
 with METRICS.Actions;
 with METRICS.Command_Lines;
@@ -63,6 +64,9 @@ procedure METRICS.Main is
    Cmd : Command_Line (METRICS.Command_Lines.Descriptor'Access);
 
 begin
+   --  By default, send errors to stdout
+   Utils.Err_Out.Output_Enabled := True;
+
    Utils.Drivers.Driver
      (Cmd,
       Tool,
