@@ -33,7 +33,6 @@ with Ada.Strings.Unbounded.Hash;
 with TGen.JSON;    use TGen.JSON;
 with TGen.Strings; use TGen.Strings;
 with TGen.Types;   use TGen.Types;
-with TGen.Big_Int;
 
 package TGen.Strategies is
 
@@ -46,10 +45,10 @@ package TGen.Strategies is
 
    package Disc_Value_Maps is new Ada.Containers.Indefinite_Hashed_Maps
      (Key_Type        => Unbounded_String,
-      Element_Type    => Big_Integer,
+      Element_Type    => JSON_Value,
       Hash            => Ada.Strings.Unbounded.Hash,
       Equivalent_Keys => "=",
-      "="             => Big_Int."=");
+      "="             => TGen.JSON."=");
    subtype Disc_Value_Map is Disc_Value_Maps.Map;
 
    type Strategy_Type is abstract tagged null record;

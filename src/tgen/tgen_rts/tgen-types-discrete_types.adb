@@ -191,7 +191,9 @@ package body TGen.Types.Discrete_Types is
          Other_Index_Value : constant Big_Integer :=
            (if S.Other_Index_Constraint.Kind =
               TGen.Types.Constraints.Discriminant
-            then Disc_Context (S.Other_Index_Constraint.Disc_Name)
+            then
+               TGen.Big_Int.From_String
+                 (Disc_Context (S.Other_Index_Constraint.Disc_Name).Get)
             else S.Other_Index_Constraint.Int_Val);
 
          Elements : Many_Type;
@@ -312,16 +314,17 @@ package body TGen.Types.Discrete_Types is
      (S            : in out Identity_Constraint_Strategy_Type;
       Disc_Context : Disc_Value_Map) return JSON_Value
    is
-      Result : Big_Integer;
+      Result : JSON_Value;
    begin
       if S.Constraint.Kind = Discriminant then
          Result := Disc_Context (S.Constraint.Disc_Name);
       elsif S.Constraint.Kind = Static then
-         Result := S.Constraint.Int_Val;
+         Result :=
+           Create (TGen.Big_Int.To_String (S.Constraint.Int_Val));
       else
          raise Program_Error with "unsupported non static constraint";
       end if;
-      return Create (Result);
+      return Result;
    end Generate;
 
    ----------------------------------------------

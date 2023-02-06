@@ -169,7 +169,8 @@ package body TGen.Types.Record_Types is
          if Element (Constraint_Cur).Kind = Static then
             Value_Cur := Discriminant_Values.Find (Key (Constraint_Cur));
             if Has_Element (Value_Cur)
-              and then Element (Value_Cur) /= Element (Constraint_Cur).Int_Val
+              and then TGen.Big_Int.From_String (Element (Value_Cur).Get)
+                /= Element (Constraint_Cur).Int_Val
             then
                return False;
             end if;
@@ -209,7 +210,9 @@ package body TGen.Types.Record_Types is
       Discr_Val : Big_Int.Big_Integer;
    begin
       if Disc_Value_Maps.Has_Element (Disc_Val_Cur) then
-         Discr_Val := Disc_Value_Maps.Element (Disc_Val_Cur);
+         Discr_Val :=
+           TGen.Big_Int.From_String
+             (Disc_Value_Maps.Element (Disc_Val_Cur).Get);
       end if;
       for Choice of Self.Variant_Choices loop
          declare
@@ -713,7 +716,9 @@ package body TGen.Types.Record_Types is
                case Constraint.Kind is
                   when Static =>
                      Current_Context.Insert
-                       (Discriminant_Name, Constraint.Int_Val);
+                       (Discriminant_Name,
+                        TGen.JSON.Create
+                          (TGen.Big_Int.To_String (Constraint.Int_Val)));
 
                   when Discriminant =>
 
@@ -745,7 +750,7 @@ package body TGen.Types.Record_Types is
                begin
                   Current_Context.Insert
                     (Disc_Name,
-                     Get (Disc_Strat.Generate (Current_Context)));
+                     Disc_Strat.Generate (Current_Context));
                end Generate_Val;
 
             begin
@@ -761,7 +766,8 @@ package body TGen.Types.Record_Types is
       for Disc_Cursor in Current_Context.Iterate loop
          declare
             Disc_Name  : constant Unbounded_String := Key (Disc_Cursor);
-            Disc_Value : constant Big_Integer := Element (Disc_Cursor);
+            Disc_Value : constant Big_Integer :=
+              TGen.Big_Int.From_String (Element (Disc_Cursor).Get);
          begin
             Set_Field
               (Val        => Res,

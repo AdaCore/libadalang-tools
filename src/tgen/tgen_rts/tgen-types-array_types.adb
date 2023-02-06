@@ -340,7 +340,8 @@ package body TGen.Types.Array_Types is
             when Static =>
                Constraint.Int_Val,
             when Discriminant =>
-               Disc_Context.Element (Constraint.Disc_Name),
+               TGen.Big_Int.From_String
+                 (Disc_Context.Element (Constraint.Disc_Name).Get),
             when others =>
                raise Program_Error with
                  "Dynamic constraint unsupported for static generation");
@@ -483,8 +484,10 @@ package body TGen.Types.Array_Types is
             Index_Strat : constant Index_Strategies_Type :=
               Generate_Index_Strat (I);
 
-            Low_Bound  : constant Big_Integer :=
-              Get (Index_Strat.Low_Bound_Strat.Generate (Disc_Context));
+            Low_Bound_JSON : constant JSON_Value :=
+              Index_Strat.Low_Bound_Strat.Generate (Disc_Context);
+            Low_Bound      : constant Big_Integer :=
+              TGen.Big_Int.From_String (Low_Bound_JSON.Get);
             High_Bound : Big_Integer;
          begin
             Index_Values (I).Low_Bound := Low_Bound;
@@ -494,7 +497,7 @@ package body TGen.Types.Array_Types is
             --  unconstrained array type. TODO: refactor.
 
             Disc_Context_With_Low_Bound.Include
-              (Low_Bound_Disc_Name, Low_Bound);
+              (Low_Bound_Disc_Name, Low_Bound_JSON);
 
             High_Bound :=
               Get
@@ -524,7 +527,6 @@ package body TGen.Types.Array_Types is
       declare
          Random_Arr : constant Generic_Array_Type :=
            Strat.Draw (Data, Dimension_Sizes);
-
       begin
          return Create (Pp_Arr_Wrapper (Random_Arr, Index_Values));
       end;
