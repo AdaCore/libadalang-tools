@@ -34,13 +34,14 @@ with Libadalang.Analysis; use Libadalang.Analysis;
 
 with Templates_Parser;
 
+with TGen.Dependency_Graph;   use TGen.Dependency_Graph;
 with TGen.LAL_Utils;
 with TGen.Marshalling;        use TGen.Marshalling;
 with TGen.Marshalling.Binary_Marshallers;
 with TGen.Marshalling.JSON_Marshallers;
 with TGen.Type_Representation;
 with TGen.Types.Array_Types;
-with TGen.Types.Constraints;
+with TGen.Types.Constraints;  use TGen.Types.Constraints;
 with TGen.Types.Record_Types; use TGen.Types.Record_Types;
 with TGen.Types.Translation;  use TGen.Types.Translation;
 with TGen.Types;              use TGen.Types;
@@ -61,7 +62,17 @@ package body TGen.Libgen is
    --  Generate the support library files (spec and body) for the types that
    --  are declared in Pack_Name.
 
+   procedure Generate_Value_Gen_Library
+     (Ctx        : Libgen_Context;
+      Pack_Name  : Ada_Qualified_Name;
+      Part       : Any_Library_Part) with
+     Pre => Ctx.Strat_Types_Per_Package.Contains (Pack_Name);
+   --  Generate the type representation library files (spec and body) for the
+   --  types that are declared in Pack_Name.
+
    function Support_Library_Package
+     (Pack_Name : Ada_Qualified_Name) return Ada_Qualified_Name;
+   function Value_Library_Package
      (Pack_Name : Ada_Qualified_Name) return Ada_Qualified_Name;
    --  Name of the support library package. Replace occurrences of reserved
    --  namespaces (such as standard) with our owns (tgen).
@@ -69,10 +80,10 @@ package body TGen.Libgen is
    procedure Append_Types
      (Source           : Typ_Set;
       Dest             : in out Types_Per_Package_Map;
-      Ignore_Anonymous : Boolean := True);
-   --  Include all the types in Source in the correct package key in Dest. If
-   --  Ignore_Anonymous is True, all type of kind Anonymous_Typ_Kind will be
-   --  filtered out.
+      Pack_Name_Fct    : access function (A : Ada_Qualified_Name)
+                            return Ada_Qualified_Name);
+   --  Include all the types in Source in the correct package key in Dest. All
+   --  anonymous types are ignored.
 
    -----------------------
    -- Type_Dependencies --
@@ -82,7 +93,6 @@ package body TGen.Libgen is
      (T : SP.Ref; Transitive : Boolean := False) return Typ_Set
    is
       use TGen.Types.Array_Types;
-      use TGen.Types.Constraints;
 
       Res : Typ_Set;
 
@@ -98,7 +108,7 @@ package body TGen.Libgen is
          for Choice of Var.Variant_Choices loop
             for Comp of Choice.Components loop
                Res.Include (Comp);
-               if Transitive then
+               if Transitive or else Comp.Get.Kind = Anonymous_Kind then
                   Res.Union (Type_Dependencies (Comp, Transitive));
                end if;
             end loop;
@@ -115,20 +125,34 @@ package body TGen.Libgen is
                             (As_Anonymous_Typ (T).Named_Ancestor, Transitive));
             end if;
          when Array_Typ_Range =>
-            Res.Include (As_Array_Typ (T).Component_Type);
-            if Transitive then
-               Res.Union (Type_Dependencies
-                            (As_Array_Typ (T).Component_Type, Transitive));
-            end if;
+            declare
+               Comp_Ty : constant SP.Ref := As_Array_Typ (T).Component_Type;
+            begin
+               Res.Include (Comp_Ty);
+               if Transitive or else Comp_Ty.Get.Kind = Anonymous_Kind then
+                  Res.Union (Type_Dependencies (Comp_Ty, Transitive));
+               end if;
+            end;
 
             --  Index type are discrete types, and thus do not depend on
             --  any type.
 
             for Idx_Typ of As_Array_Typ (T).Index_Types loop
-               Res.Include (Idx_Typ);
+                  Res.Include (Idx_Typ);
+               if Idx_Typ.Get.Kind = Anonymous_Kind then
+                  Res.Union (Type_Dependencies (Idx_Typ, Transitive));
+               end if;
             end loop;
-         when Non_Disc_Record_Kind | Function_Kind =>
+         when Non_Disc_Record_Kind =>
             for Comp_Typ of As_Nondiscriminated_Record_Typ (T).Component_Types
+            loop
+               Res.Include (Comp_Typ);
+               if Transitive or else Comp_Typ.Get.Kind = Anonymous_Kind then
+                  Res.Union (Type_Dependencies (Comp_Typ, Transitive));
+               end if;
+            end loop;
+         when Function_Kind =>
+            for Comp_Typ of As_Function_Typ (T).Component_Types
             loop
                Res.Include (Comp_Typ);
                if Transitive then
@@ -139,7 +163,7 @@ package body TGen.Libgen is
             for Comp_Typ of As_Discriminated_Record_Typ (T).Component_Types
             loop
                Res.Include (Comp_Typ);
-               if Transitive then
+               if Transitive or else Comp_Typ.Get.Kind = Anonymous_Kind then
                   Res.Union (Type_Dependencies (Comp_Typ, Transitive));
                end if;
             end loop;
@@ -150,10 +174,13 @@ package body TGen.Libgen is
             for Disc_Typ of As_Discriminated_Record_Typ (T).Discriminant_Types
             loop
                Res.Include (Disc_Typ);
+               if Transitive or else Disc_Typ.Get.Kind = Anonymous_Kind then
+                  Res.Union (Type_Dependencies (Disc_Typ, Transitive));
+               end if;
             end loop;
             Inspect_Variant (As_Discriminated_Record_Typ (T).Variant);
          when others =>
-            Res.Include (T);
+            null;
       end case;
       return Res;
    end Type_Dependencies;
@@ -179,6 +206,27 @@ package body TGen.Libgen is
       return Support_Pack_Name;
    end Support_Library_Package;
 
+   ---------------------------
+   -- Value_Library_Package --
+   ---------------------------
+
+   function Value_Library_Package
+     (Pack_Name : Ada_Qualified_Name) return Ada_Qualified_Name
+   is
+      use Ada.Containers;
+      Support_Pack_Name : Ada_Qualified_Name := Pack_Name.Copy;
+   begin
+      --  TODO: add particular cases for all reserved namespaces
+
+      if Support_Pack_Name.Length = 1
+         and then To_String (Support_Pack_Name.First_Element) = "standard"
+      then
+         Support_Pack_Name.Replace_Element (1, To_Unbounded_String ("TGen"));
+      end if;
+      Support_Pack_Name.Append (TGen.Strings.Ada_Identifier (+"TGen_Values"));
+      return Support_Pack_Name;
+   end Value_Library_Package;
+
    ------------------------------
    -- Generate_Support_Library --
    ------------------------------
@@ -188,7 +236,6 @@ package body TGen.Libgen is
       Pack_Name  : Ada_Qualified_Name;
       Part       : Any_Library_Part)
    is
-      use Templates_Parser;
       F_Spec           : File_Type;
       F_Body           : File_Type;
       Ada_Pack_Name    : constant String := To_Ada (Pack_Name);
@@ -200,13 +247,6 @@ package body TGen.Libgen is
 
       Types : constant Types_Per_Package_Maps.Constant_Reference_Type :=
         Ctx.Types_Per_Package.Constant_Reference (Pack_Name);
-
-      Types_Repr : constant Types_Per_Package_Maps.Constant_Reference_Type :=
-        Ctx.Strat_Types_Per_Package.Constant_Reference (Pack_Name);
-
-      Initialization_Code : Tag;
-      --  Code that should be put in the initialization section of the
-      --  package body.
 
    begin
       Create (F_Spec, Out_File, File_Name & ".ads");
@@ -232,9 +272,6 @@ package body TGen.Libgen is
       --  m / u functions defined in other library support packages.
 
       for T of Types loop
-         Typ_Dependencies.Union (Type_Dependencies (T));
-      end loop;
-      for T of Types_Repr loop
          Typ_Dependencies.Union (Type_Dependencies (T));
       end loop;
 
@@ -281,7 +318,14 @@ package body TGen.Libgen is
 
       if Part in Marshalling_Part | All_Parts then
          for T of Types loop
-            if Is_Supported_Type (T.Get) then
+            if Is_Supported_Type (T.Get)
+
+              --  We ignore instance types when generating marshallers as they
+              --  are not types per-se, but a convenient way of binding a type
+              --  to its strategy context.
+
+               and then T.Get not in Instance_Typ'Class
+            then
                TGen.Marshalling.Binary_Marshallers
                  .Generate_Marshalling_Functions_For_Typ
                    (F_Spec, F_Body, T.Get, To_String (Ctx.Root_Templates_Dir));
@@ -292,11 +336,183 @@ package body TGen.Libgen is
          end loop;
       end if;
 
-      for T of Types_Repr loop
-         TGen.Type_Representation.Generate_Type_Representation_For_Typ
-           (F_Spec, F_Body, T.Get,
-            To_String (Ctx.Root_Templates_Dir), Initialization_Code);
+      Put_Line (F_Body, "end " & Ada_Pack_Name & ";");
+      Close (F_Body);
+      Put_Line (F_Spec, "end " & Ada_Pack_Name & ";");
+      Close (F_Spec);
+   end Generate_Support_Library;
+
+   --------------------------------
+   -- Generate_Value_Gen_Library --
+   --------------------------------
+
+   procedure Generate_Value_Gen_Library
+     (Ctx        : Libgen_Context;
+      Pack_Name  : Ada_Qualified_Name;
+      Part       : Any_Library_Part with Unreferenced)
+   is
+      use Templates_Parser;
+      F_Spec           : File_Type;
+      F_Body           : File_Type;
+      Ada_Pack_Name    : constant String := To_Ada (Pack_Name);
+      Typ_Dependencies : Typ_Set;
+      File_Name        : constant String :=
+        Ada.Directories.Compose
+          (Containing_Directory => To_String (Ctx.Output_Dir),
+           Name                 => To_Filename (Pack_Name));
+
+      Types : constant Types_Per_Package_Maps.Constant_Reference_Type :=
+        Ctx.Strat_Types_Per_Package.Constant_Reference (Pack_Name);
+
+      Initialization_Code : Tag;
+      --  Code that should be put in the initialization section of the
+      --  package body.
+
+   begin
+      Create (F_Spec, Out_File, File_Name & ".ads");
+      Create (F_Body, Out_File, File_Name & ".adb");
+      Put (F_Spec, "with Interfaces; ");
+      Put_Line (F_Spec, "use Interfaces;");
+      Put_Line (F_Spec, "with Ada.Streams; use Ada.Streams;");
+      Put_Line (F_Spec, "with TGen.JSON;");
+      Put_Line (F_Spec, "with TGen.Strategies;");
+      Put_Line (F_Spec, "with TGen.Strings;");
+      Put_Line (F_Spec, "with TGen.Big_Int;");
+      Put_Line (F_Spec, "with TGen.Big_Reals;");
+      Put_Line (F_Spec, "with TGen.Types;");
+      Put_Line (F_Spec, "with TGen.Types.Array_Types;");
+      Put_Line (F_Spec, "with TGen.Types.Constraints;");
+      Put_Line (F_Spec, "with TGen.Types.Discrete_Types;");
+      Put_Line (F_Spec, "with TGen.Types.Enum_Types;");
+      Put_Line (F_Spec, "with TGen.Types.Int_Types;");
+      Put_Line (F_Spec, "with TGen.Types.Real_Types;");
+      Put_Line (F_Spec, "with TGen.Types.Record_Types;");
+
+      --  Also include the needed library support package dependencies, as
+      --  the type representation may depend on other types' representation.
+
+      for T of Types loop
+         Typ_Dependencies.Union (Type_Dependencies (T));
       end loop;
+
+      --  Add the with clauses resulting from type dependencies. We have to be
+      --  careful to remove the self dependency.
+
+      declare
+         use Ada_Identifier_Vectors;
+         Lib_Marshalling_Dependencies : Ada_Qualified_Name_Set;
+         --  All of the marshalling packages we should have access to, to
+         --  implement custom strategies. TODO: add dependencies only for
+         --  custom strategies types here.
+
+         Lib_Type_Dependencies : Ada_Qualified_Name_Set;
+         --  All of the type representation packages we should have access to,
+         --  to instantiate our type definitions.
+
+         Package_Dependency : Ada_Qualified_Name;
+      begin
+         for T of Typ_Dependencies loop
+            --  Ignore function type and anonymous named types
+
+            if T.Get.Kind /= Function_Kind then
+               Package_Dependency :=
+                 Support_Library_Package
+                   (if T.Get.Kind in Anonymous_Kind
+                    then TGen.Types.Constraints.As_Anonymous_Typ (T)
+                    .Named_Ancestor.Get.Compilation_Unit_Name
+                    else T.Get.Compilation_Unit_Name);
+               if Package_Dependency /= Pack_Name then
+                  Lib_Marshalling_Dependencies.Include (Package_Dependency);
+               end if;
+            end if;
+
+            --  Also include the value library package dependency
+
+            Package_Dependency :=
+              Value_Library_Package
+                (if T.Get.Kind in Anonymous_Kind
+                 then TGen.Types.Constraints.As_Anonymous_Typ (T)
+                        .Named_Ancestor.Get.Compilation_Unit_Name
+                 else T.Get.Compilation_Unit_Name);
+            if Package_Dependency /= Pack_Name then
+               Lib_Type_Dependencies.Include (Package_Dependency);
+            end if;
+         end loop;
+
+         for Pack_Name of Lib_Type_Dependencies loop
+            Put_Line
+              (F_Spec,
+               "with " & To_Ada (Pack_Name) & "; use " & To_Ada (Pack_Name)
+               & ";");
+         end loop;
+
+         for Pack_Name of Lib_Marshalling_Dependencies loop
+            Put_Line
+              (F_Body,
+               "with " & To_Ada (Pack_Name) & "; use " & To_Ada (Pack_Name)
+               & ";");
+         end loop;
+      end;
+
+      Put_Line (F_Spec, "package " & Ada_Pack_Name & " is");
+      New_Line (F_Spec);
+      Put_Line (F_Spec, "   pragma Elaborate_Body;");
+      New_Line (F_Spec);
+
+      Put_Line (F_Body, "package body " & Ada_Pack_Name & " is");
+      New_Line (F_Body);
+
+      --  We have to make sure to generate the initialization code in the
+      --  right order, as the type's component types representation
+      --  initialization code must be generated before the type. Sort the
+      --  types here.
+
+      declare
+         G : Graph_Type;
+         Sorted_Types : Typ_List;
+         procedure Append (T : SP.Ref);
+
+         ------------
+         -- Append --
+         ------------
+
+         procedure Append (T : SP.Ref) is
+         begin
+            Sorted_Types.Append (T);
+         end Append;
+      begin
+
+         --  Create the nodes of the graph
+
+         for T of Types loop
+            Create_Node (G, T);
+         end loop;
+
+         --  Create the edges
+
+         for T of Types loop
+            for Dep of Type_Dependencies (T) loop
+               --  Filter out type dependencies that don't belong to this
+               --  package
+
+               if Types.Contains (Dep) then
+                  Create_Edge (G, Dep, T);
+               end if;
+            end loop;
+         end loop;
+
+         --  Sort the types
+
+         Traverse (G, Append'Access);
+
+         for T of Sorted_Types loop
+            TGen.Type_Representation.Generate_Type_Representation_For_Typ
+              (F_Spec, F_Body, T.Get,
+               To_String (Ctx.Root_Templates_Dir),
+               Ctx.Strategy_Map,
+               Initialization_Code);
+         end loop;
+      end;
 
       --  Print the initialization code, used for the type representation
 
@@ -311,7 +527,7 @@ package body TGen.Libgen is
       Close (F_Body);
       Put_Line (F_Spec, "end " & Ada_Pack_Name & ";");
       Close (F_Spec);
-   end Generate_Support_Library;
+   end Generate_Value_Gen_Library;
 
    ------------------
    -- Append_Types --
@@ -320,17 +536,17 @@ package body TGen.Libgen is
    procedure Append_Types
      (Source           : Typ_Set;
       Dest             : in out Types_Per_Package_Map;
-      Ignore_Anonymous : Boolean := True)
+      Pack_Name_Fct    : access function (A : Ada_Qualified_Name)
+                            return Ada_Qualified_Name)
    is
    begin
       for T of Source loop
-         if not Ignore_Anonymous
-           or else not (T.Get.Kind in Anonymous_Kind)
+         if not (T.Get.Kind in Anonymous_Kind)
          then
             declare
                use Types_Per_Package_Maps;
                Pack_Name      : constant Ada_Qualified_Name :=
-                 Support_Library_Package (T.Get.Compilation_Unit_Name);
+                 Pack_Name_Fct (T.Get.Compilation_Unit_Name);
                Cur            : Cursor := Dest.Find (Pack_Name);
                Dummy_Inserted : Boolean;
             begin
@@ -408,7 +624,7 @@ package body TGen.Libgen is
 
       Dummy_Inserted : Boolean;
 
-      Spec : constant Subp_Spec := Subp.As_Subp_Decl.F_Subp_Spec;
+      Spec : constant Base_Subp_Spec := Subp.P_Subp_Spec_Or_Null;
 
       Trans_Res : constant Translation_Result := Translate (Spec);
 
@@ -429,7 +645,20 @@ package body TGen.Libgen is
       declare
          Fct_Typ : Function_Typ'Class :=
            Function_Typ'Class (Trans_Res.Res.Unchecked_Get.all);
+         Fct_Ref : SP.Ref;
       begin
+         --  Check strategies. TODO???: integrate it into the type translation
+         --  when this is more than a proof of concept.
+
+         if Subp.P_Has_Aspect (To_Unbounded_Text (To_Text ("Generation")))
+         then
+            Parse_Strategy.Parse_Strategy
+              (Fct_Typ,
+               Subp.P_Get_Aspect_Assoc
+                 (To_Unbounded_Text (To_Text ("Generation"))),
+               Ctx.Strategy_Map);
+         end if;
+
          --  Get the transitive closure of the types on which the parameters'
          --  types depend, that need to be included in the support library.
          --  Only do so if we actually inserted the type in the set to avoid
@@ -446,30 +675,24 @@ package body TGen.Libgen is
               (Type_Dependencies (Param, Transitive => True));
          end loop;
 
-         --  Merge the set of types on which this subprogram's parameters
-         --  depend on to the rest of the generation context.
+         --  Get the transitive closure of the types on which the parameters'
+         --  types depend, that need to be included in the support library.
+         --
+         --  Note that for now, we don't add function types to the mix, even
+         --  though we theoretically could, and should, to support enumerative
+         --  strategies.
 
-         Append_Types (Subp_Types, Ctx.Types_Per_Package);
+         Fct_Ref.Set (Fct_Typ);
+         Subp_Types := Type_Dependencies (Fct_Ref, Transitive => True);
 
-         --  Now analyze the strategies
-
-         if Subp.P_Has_Aspect (To_Unbounded_Text (To_Text ("Generation")))
-         then
-            Parse_Strategy.Parse_Strategy
-              (Fct_Typ,
-               Subp.P_Get_Aspect_Assoc
-                 (To_Unbounded_Text (To_Text ("Generation"))),
-               Ctx.Strategy_Map);
-         end if;
-
-         Subp_Types.Clear;
-
-         for Param of Fct_Typ.Component_Types loop
-            Subp_Types.Union
-              (Type_Dependencies (Param, Transitive => True));
-         end loop;
-
-         Append_Types (Subp_Types, Ctx.Strat_Types_Per_Package);
+         Append_Types
+           (Subp_Types,
+            Ctx.Types_Per_Package,
+            Support_Library_Package'Access);
+         Append_Types
+           (Subp_Types,
+            Ctx.Types_Per_Package,
+            Value_Library_Package'Access);
          return True;
       end;
    end Include_Subp;
@@ -530,8 +753,11 @@ package body TGen.Libgen is
          Put_Line (Prj_File, "   for Source_Dirs use (""."");");
          New_Line (Prj_File);
          Put_Line (Prj_File, "   package Compiler is");
-         Put_Line (Prj_File, "      for Default_Switches (""Ada"") use"
-                             & " (""-gnatg"", ""-gnatyN"", ""-gnatws"");");
+         Put_Line
+           (Prj_File,
+            "      for Default_Switches (""Ada"") use"
+            & " (""-g"", ""-gnatg"", ""-gnatyN"", ""-gnatws"")"
+            & ";");
          Put_Line (Prj_File, "   end Compiler;");
          Put_Line (Prj_File, "end TGen_support;");
          Close (Prj_File);
@@ -545,6 +771,15 @@ package body TGen.Libgen is
          if not (for all T of Element (Cur) => not Is_Supported_Type (T.Get))
          then
             Generate_Support_Library (Ctx, Key (Cur), Part);
+         end if;
+      end loop;
+
+      for Cur in Ctx.Strat_Types_Per_Package.Iterate loop
+         --  If all types are not supported, do not generate a support library
+
+         if not (for all T of Element (Cur) => not Is_Supported_Type (T.Get))
+         then
+            Generate_Value_Gen_Library (Ctx, Key (Cur), Part);
          end if;
       end loop;
    end Generate;

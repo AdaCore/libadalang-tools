@@ -26,12 +26,12 @@
 with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Hashed_Maps;
 with Ada.Containers.Vectors;
+with Ada.Strings.Unbounded.Equal_Case_Insensitive;
+with Ada.Strings.Unbounded.Hash;
 
 with TGen.Strategies;           use TGen.Strategies;
 with TGen.Types.Discrete_Types; use TGen.Types.Discrete_Types;
 with TGen.Types.Constraints;    use TGen.Types.Constraints;
-
-with Ada.Strings.Unbounded.Hash;
 
 package TGen.Types.Record_Types is
 
@@ -44,7 +44,7 @@ package TGen.Types.Record_Types is
      (Key_Type        => Unbounded_String,
       Element_Type    => SP.Ref,
       Hash            => Ada.Strings.Unbounded.Hash,
-      Equivalent_Keys => "=",
+      Equivalent_Keys => Ada.Strings.Unbounded.Equal_Case_Insensitive,
       "="             => SP."=");
    subtype Component_Map is Component_Maps.Map;
    --  Maps for discriminants and components, from their defining name to
@@ -56,7 +56,7 @@ package TGen.Types.Record_Types is
    package Component_Vectors is new Ada.Containers.Vectors
      (Index_Type   => Positive,
       Element_Type => Unbounded_String,
-      "="          => "=");
+      "="          => Ada.Strings.Unbounded.Equal_Case_Insensitive);
    subtype Component_Vector is Component_Vectors.Vector;
 
    type Record_Typ is new Composite_Typ with record
@@ -103,7 +103,7 @@ package TGen.Types.Record_Types is
 
    type Variant_Part;
 
-   type Variant_Part_Acc is access Variant_Part;
+   type Variant_Part_Acc is access all Variant_Part;
 
    type Variant_Choice is record
       Alt_Set    : Alternatives_Set;
@@ -228,6 +228,9 @@ package TGen.Types.Record_Types is
 
    function Kind (Self : Function_Typ) return Typ_Kind is
      (Function_Kind);
+
+   function Default_Strategy
+     (Self : Function_Typ) return Strategy_Type'Class;
 
    function As_Function_Typ
      (Self : SP.Ref) return Function_Typ'Class is

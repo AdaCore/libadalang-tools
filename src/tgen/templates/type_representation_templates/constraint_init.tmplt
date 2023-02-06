@@ -1,0 +1,24 @@
+@@--  Template for the initialization code of any kind of constraint. Only
+@@--  record constraints actually do require initialization code.
+
+@@--  Macro to instantiate a discrete constraint.
+@@--  @_$1_@: Kind of the constraint (STATIC, NON_STATIC, DISCRIMINANT)
+@@--  @_$2_@: Value of the constraint
+
+@@MACRO(DISCRETE_CONSTRAINT)@@
+@@IF@@ @_$1_@ = "STATIC"
+(Kind => TGen.Types.Constraints.Static, Int_Val => TGen.Big_Int.From_String ("@_$2_@"))
+@@ELSIF@@ @_$1_@ = "NON_STATIC"
+(Kind => TGen.Types.Constraints.Static, Int_Val => TGen.Big_Int.From_String (@_$2_@'Image))
+@@ELSE@@
+(Kind => TGen.Types.Constraints.Discriminant, Disc_Name => TGen.Strings."+" ("@_$2_@"))
+@@END_IF@@
+@@END_MACRO@@
+
+@@IF@@ @_CONSTRAINT_@ = "Discriminant_Constraints"
+@@TABLE@@
+@_TY_PREFIX_@_Constraint.Constraint_Map.Insert
+   (TGen.Strings."+" ("@_DISCR_NAME_@"),
+    @_DISCRETE_CONSTRAINT(@_CONSTRAINT_KIND_@, @_VALUE_@)_@);
+@@END_TABLE@@
+@@END_IF@@

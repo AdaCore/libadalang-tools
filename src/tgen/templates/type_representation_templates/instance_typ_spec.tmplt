@@ -1,0 +1,17 @@
+@@--  Template for the specification of an instane type representation.
+@@--  @_TY_PREFIX_@ Prefix used to prefix all entities for the current type.
+@@--  @_TY_NAME_@ Name of the current type.
+
+   type @_TY_PREFIX_@_Instance_Typ is new
+      TGen.Types.Constraints.Instance_Typ with null record;
+
+   overriding function Default_Strategy
+      (Self : @_TY_PREFIX_@_Instance_Typ)
+      return TGen.Strategies.Strategy_Type'Class
+   is (@_TY_PREFIX_@_Strategy'(others => <>));
+
+   @_TY_PREFIX_@_Typ : @_TY_PREFIX_@_Instance_Typ :=
+      (Name   => TGen.Strings.To_Qualified_Name ("@_TY_NAME_@"),
+       others => <>);
+
+   @_TY_PREFIX_@_Typ_Ref : TGen.Types.SP.Ref;

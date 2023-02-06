@@ -150,7 +150,8 @@ package TGen.Types.Constraints is
    --  Constraints for one index of an array. If the constraints are static
    --  then these contains the discrete range that constrain this index.
    --  If absent is true, this means that the index is constrained on the whole
-   --  range of the index type.
+   --  range of the index type. TODO: why can't we put the discrete range
+   --  constraint either way?
 
    function Static (Self : Index_Constraint) return Boolean is
       (if Self.Present then Self.Discrete_Range.Static);

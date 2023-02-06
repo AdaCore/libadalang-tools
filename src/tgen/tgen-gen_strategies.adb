@@ -144,7 +144,7 @@ package body TGen.Gen_Strategies is
    procedure Collect_Type_Translations (Subp : Basic_Decl'Class)
    is
       Subp_Translation_Res : constant Translation_Result :=
-        Translate (Subp.P_Subp_Spec_Or_Null.As_Subp_Spec);
+        Translate (Subp.P_Subp_Spec_Or_Null);
    begin
       if not Subp_Translation_Res.Success then
          raise Program_Error with To_String (Subp_Translation_Res.Diagnostics);

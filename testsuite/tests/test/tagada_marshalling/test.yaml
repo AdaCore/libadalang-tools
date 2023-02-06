@@ -1,5 +1,6 @@
 description:
-    basic test for marshalling lib
+    Test checking tgen support (dynamic type introspection and binary /
+    JSON marshallers) for all of the types supported by the library.
 
 driver: shell_script
 control:

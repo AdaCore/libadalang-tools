@@ -1,0 +1,42 @@
+@@--  Template for the initialization of a record type representation.
+@@--  @_TY_PREFIX_@ Prefix used to prefix all entities for the current type.
+@@--  @_TY_NAME_@ Name of the current type.
+@@--  @_RECORD_TYP_@ Kind of the record type. Can be either Function_Typ,
+@@--     Nondiscriminated_Record_Typ, or Discriminated_Record_Typ.
+@@--  @_HAS_VARIANT_PART_@ If this is a discriminated record typ, whether it
+@@--     has a variant part or not.
+@@--  @_HAS_CONSTRAINTS_@ If this is a discriminated record typ, whether it
+@@--     has constraints or not.
+@@--  @_VARIANT_INIT_@ Initialization code for variant parts.
+@@--  @_CONSTRAINT_INIT_@ Initialization code for constraints.
+@@--  @_ANONYMOUS_TYP_INIT_@ Initialization code for the record components
+@@--     that are of an anonymous type.
+@@--
+   @_ANONYMOUS_TYP_INIT_@
+@@--  Set the component types
+@@TABLE@@
+   @_TY_PREFIX_@_Typ.Component_Types.Insert
+      (TGen.Strings."+" ("@_COMP_NAME_@"),
+       @_COMP_TYPE_@_Typ_Ref);
+@@END_TABLE@@
+@@IF@@ @_RECORD_TYP_@ = "Discriminated_Record_Typ"
+@@IF@@ @_HAS_VARIANT_PART_@
+@@--  In this case, we need to initialize the variant parts
+   @_VARIANT_INIT_@
+   @_TY_PREFIX_@_Typ.Variant :=
+      @_TY_PREFIX_@_Variant_@_VARIANT_NUMBER_@'Access;
+@@END_IF@@
+@@IF@@ @_HAS_CONSTRAINTS_@
+   @_CONSTRAINT_INIT_@
+   @_TY_PREFIX_@_Typ.Discriminant_Constraint :=
+      @_TY_PREFIX_@_Constraint.Constraint_Map;
+@@END_IF@@
+@@--  Then we need to set the discriminant types
+@@TABLE@@
+   @_TY_PREFIX_@_Typ.Discriminant_Types.Insert
+      (TGen.Strings."+" ("@_DISCR_NAME_@"),
+       @_DISCR_TYPE_@_Typ_Ref);
+@@END_TABLE@@
+@@END_IF@@
+
+   @_TY_PREFIX_@_Typ_Ref.Set (@_TY_PREFIX_@_Typ);

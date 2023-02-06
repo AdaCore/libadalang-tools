@@ -1,0 +1,22 @@
+@@--  Template for a custom strategy body. This is the implementation of the
+@@--  Generate function that will call the user-specified function.
+@@--  @_TY_PREFIX_@ Prefix used to prefix all entities for the current type.
+@@--  @_ORIG_TY_PREFIX_@ Prefix used to prefix all entities for the current
+@@--  type.
+@@--  @_TO_JSON_FUNCTION_@ Name of the function implementing the JSON
+@@--     conversion.
+@@--  @_FUNCTION_NAME_@ Name of the function implementing the generation
+
+   function Generate
+      (S           : in out @_TY_PREFIX_@_Strategy;
+       Disc_Context : TGen.Strategies.Disc_Value_Map)
+         return TGen.JSON.JSON_Value
+    is
+       Res : constant TGen.JSON.JSON_Value :=
+          @_TO_JSON_FUNCTION_@ (@_FUNCTION_NAME_@);
+    begin
+@@--  TODO: insert the generated value in the discriminant context.
+@@--  Right now, this needs generalization of the Disc_Context to all
+@@--  values kind.
+       return Res;
+    end Generate;

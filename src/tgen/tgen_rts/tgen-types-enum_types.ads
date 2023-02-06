@@ -64,9 +64,7 @@ package TGen.Types.Enum_Types is
 
    function Encode (Self : Char_Typ; Val : JSON_Value) return JSON_Value;
 
-   function Default_Strategy
-     (Self    : Char_Typ)
-      return Strategy_Type'Class;
+   function Default_Strategy (Self : Char_Typ) return Strategy_Type'Class;
    --  Generate a strategy to statically generate (in one pass) values for Self
 
    function As_Char_Typ (Self : SP.Ref) return Char_Typ'Class is

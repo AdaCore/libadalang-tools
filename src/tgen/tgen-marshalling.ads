@@ -123,7 +123,8 @@ private
      (Typ                : TGen.Types.Typ'Class;
       For_Base           : Boolean := False)
    with Pre => (if For_Base then Typ in Scalar_Typ'Class)
-     and then Typ not in Anonymous_Typ'Class;
+     and then Typ not in Anonymous_Typ'Class
+     and then Typ not in Instance_Typ'Class;
    --  Generate base marshalling and unmarshalling functions for Typ. Note that
    --  this function will not operate recursively. It will thus have to be
    --  called for each of the component type of a record for instance.

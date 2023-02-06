@@ -1,11 +1,28 @@
-@@--  Template for the specification of a scalar type representation.
+@@--  Template for the specification of a record type representation.
 @@--  @_TY_PREFIX_@ Prefix used to prefix all entities for the current type.
 @@--  @_TY_NAME_@ Name of the current type.
-@@--  @_RECORD_TYP_@ Kind of the record type
-
-   @_TY_PREFIX_@_Typ : constant TGen.Types.Record_Types.Function_Typ :=
+@@--  @_RECORD_TYP_@ Kind of the record type. Can be either Function_Typ,
+@@--     Nondiscriminated_Record_Typ, or Discriminated_Record_Typ.
+@@--  @_HAS_CONSTRAINTS_@ If this is a discriminated record typ, whether it
+@@--     has constraints or not.
+@@--  @_VARIANT_SPEC_@ Specification code for variant parts.
+@@--  @_CONSTRAINT_SPEC_@ Specification code for constraints.
+@@--  @_ANONYMOUS_TYP_SPEC_@ Specification code for the record components
+@@--     that are of an anonymous type.
+@@--
+   @_ANONYMOUS_TYP_SPEC_@
+@@IF@@ @_RECORD_TYP_@ = "Discriminated_Record_Typ"
+@@--  In this case, we need to declare beforehand the variant parts
+@@--  constitutive of the record, and the possible constraints.
+   @_VARIANT_SPEC_@
+   @_CONSTRAINT_SPEC_@
+@@END_IF@@
+   @_TY_PREFIX_@_Typ : TGen.Types.Record_Types.@_RECORD_TYP_@ :=
       (Name       => TGen.Strings.To_Qualified_Name ("@_TY_NAME_@"),
-       Is_Static  => True,
+ @@IF@@ @_RECORD_TYP_@ = "Discriminated_Record_Typ"
+       Mutable     => @_MUTABLE_@,
+       Constrained => @_HAS_CONSTRAINTS_@,
+ @@END_IF@@
        Static_Gen => True,
        others     => <>);
 

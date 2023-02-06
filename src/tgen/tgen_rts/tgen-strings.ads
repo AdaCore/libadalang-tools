@@ -89,6 +89,9 @@ package TGen.Strings is
    --  Remove the trailing spaces and comma of the given Text, e.g. passing
    --  "[a, b, " will return "[a, b".
 
+   function Remove_Leading_Space (Text : String) return String is
+      (Trim (Text, Left));
+
    function Dot_To_Underscore (C : Character) return Character is
      ((if C = '.' then '_' else C));
 
@@ -150,6 +153,7 @@ package TGen.Strings is
 
    function "<" (L, R : Ada_Qualified_Name) return Boolean is
      (Ada.Strings.Less_Case_Insensitive (To_Ada (L), To_Ada (R)));
+   --  TODO: reimplement this function to make it more efficient
 
    function To_Qualified_Name (Name : String) return Ada_Qualified_Name;
    --  Turn the given string into our internal qualified name structure

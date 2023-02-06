@@ -22,6 +22,7 @@
 ------------------------------------------------------------------------------
 
 with Ada.Exceptions;
+with Ada.Strings.Wide_Wide_Hash;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with GNATCOLL.GMP.Integers;
@@ -60,17 +61,10 @@ package body TGen.Types.Translation is
    Verbose_Diag : Boolean := False;
    package Text renames Langkit_Support.Text;
 
-   procedure PP_Cache is
-      use Translation_Maps;
-      Cache_Cur : Cursor := Translation_Cache.First;
-   begin
-      while Has_Element (Cache_Cur) loop
-         Put_Line
-           (To_Ada (Key (Cache_Cur))
-            & " => " & Element (Cache_Cur).Get.Image);
-         Next (Cache_Cur);
-      end loop;
-   end PP_Cache;
+   function Get_From_Cache
+     (FQN : Ada_Qualified_Name; T : out SP.Ref) return Boolean;
+   --  Try to get a type named FQN from the cache. If the lookup is
+   --  succesful, return True and set T to the cached translation.
 
    Cache_Hits : Natural := 0;
    Cache_Miss : Natural := 0;
@@ -254,6 +248,44 @@ package body TGen.Types.Translation is
 
    function "+" (Text : Unbounded_Text_Type) return Unbounded_String is
      (TGen.Types.Translation."+" (+Text));
+
+   --------------
+   -- PP_Cache --
+   --------------
+
+   procedure PP_Cache is
+      use Translation_Maps;
+      Cache_Cur : Cursor := Translation_Cache.First;
+   begin
+      while Has_Element (Cache_Cur) loop
+         Put_Line
+           (To_Ada (Key (Cache_Cur))
+            & " => " & Element (Cache_Cur).Get.Image);
+         Next (Cache_Cur);
+      end loop;
+   end PP_Cache;
+
+   --------------------
+   -- Get_From_Cache --
+   --------------------
+
+   function Get_From_Cache
+     (FQN : Ada_Qualified_Name; T : out SP.Ref) return Boolean
+   is
+      use Translation_Maps;
+      Cache_Cur : constant Cursor := Translation_Cache.Find (FQN);
+   begin
+      --  If we have the type name in the cache, return it
+
+      if Cache_Cur /= No_Element then
+         Cache_Hits := Cache_Hits + 1;
+         T := Element (Cache_Cur);
+         return True;
+      end if;
+
+      Cache_Miss := Cache_Miss + 1;
+      return False;
+   end Get_From_Cache;
 
    ------------------------------------
    -- Var_Choice_Supports_Static_Gen --
@@ -2881,7 +2913,6 @@ package body TGen.Types.Translation is
 
       Full_Decl : constant Base_Type_Decl := N.P_Full_View;
    begin
-
       --  Do not memoize anonymous types
 
       if Is_Null (Full_Decl.F_Name) then
@@ -2889,21 +2920,18 @@ package body TGen.Types.Translation is
       end if;
 
       declare
-         Cache_Cur : constant Cursor :=
-           Translation_Cache.Find
-             (Convert_Qualified_Name
-                (Full_Decl.P_Fully_Qualified_Name_Array));
+         FQN     : constant Ada_Qualified_Name :=
+           Convert_Qualified_Name
+             (Full_Decl.P_Fully_Qualified_Name_Array);
+         Cache_T : SP.Ref;
       begin
          --  If we have the type name in the cache, return it
 
-         if Cache_Cur /= No_Element then
-            Cache_Hits := Cache_Hits + 1;
+         if Get_From_Cache (FQN, Cache_T) then
             return Res : Translation_Result (Success => True) do
-               Res.Res := Element (Cache_Cur);
+               Res.Res := Cache_T;
             end return;
          end if;
-
-         Cache_Miss := Cache_Miss + 1;
 
          --  Otherwise, compute the type translation and store it in the cache
 
@@ -3140,16 +3168,43 @@ package body TGen.Types.Translation is
    ---------------
 
    function Translate
-     (N       : LAL.Subp_Spec;
+     (N       : LAL.Base_Subp_Spec;
       Verbose : Boolean := False) return Translation_Result
    is
       F_Typ     : Function_Typ;
       F_Typ_Ref : SP.Ref;
       Result    : Translation_Result (Success => True);
+      Comp_Unit_Idx : constant Positive :=
+        Unbounded_Text_Type_Array'(N.P_Enclosing_Compilation_Unit.P_Decl
+                                   .P_Fully_Qualified_Name_Array)'Last;
+
+      --  TODO: investigate generics and what P_Parent_Basic_Decl returns in
+      --  this case.
+
+      Parent_Decl : constant Basic_Decl := N.P_Parent_Basic_Decl;
    begin
+
+      F_Typ.Last_Comp_Unit_Idx := Comp_Unit_Idx;
       F_Typ.Name :=
-        Convert_Qualified_Name (N.F_Subp_Name.P_Fully_Qualified_Name_Array);
-      for Param of N.F_Subp_Params.F_Params loop
+        Convert_Qualified_Name (Parent_Decl.P_Fully_Qualified_Name_Array)
+        & TGen.Strings.Ada_Identifier
+           (Ada.Strings.Unbounded.To_Unbounded_String
+              (Remove_Leading_Space
+                   (Ada.Strings.Wide_Wide_Hash
+                        (Parent_Decl.P_Unique_Identifying_Name)'Image)));
+
+      --  Check if we have already translated the function type
+
+      declare
+         Cache_T : SP.Ref;
+      begin
+         if Get_From_Cache (F_Typ.Name, Cache_T) then
+            Result.Res := Cache_T;
+            return Result;
+         end if;
+      end;
+
+      for Param of N.P_Params loop
          declare
             Current_Typ : constant Translation_Result :=
               Translate (Param.F_Type_Expr, Verbose);
@@ -3167,12 +3222,8 @@ package body TGen.Types.Translation is
          end;
       end loop;
 
-      --  Function type was successfully translated. Now we can append both
-      --  the parameters and the function to the translation cache.
+      --  Function type was successfully translated
 
-      for P_Typ of F_Typ.Component_Types loop
-         Translation_Cache.Insert (SP.Get (P_Typ).Name, P_Typ);
-      end loop;
       F_Typ_Ref.Set (F_Typ);
       Translation_Cache.Insert (F_Typ.Name, F_Typ_Ref);
       Result.Res := F_Typ_Ref;

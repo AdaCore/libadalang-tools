@@ -139,7 +139,7 @@ private
       --  Map of package name to set of types for which we want to generate
       --  the type introspection library.
 
-      Strategy_Map : Strategy_Maps_2.Map;
+      Strategy_Map : FQN_To_Parsed_Strat_Maps.Map;
       --  List of specified strategies. They map a fully qualified name (e.g.
       --  a parameter / a parameter component, a type / a type component) to
       --  its specified strategy.

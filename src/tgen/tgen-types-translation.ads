@@ -53,7 +53,7 @@ package TGen.Types.Translation is
    --  Translate N to TGen's internal type representation
 
    function Translate
-     (N       : LAL.Subp_Spec;
+     (N       : LAL.Base_Subp_Spec;
       Verbose : Boolean := False) return Translation_Result;
 
    package Translation_Maps is new Ada.Containers.Hashed_Maps
@@ -85,5 +85,10 @@ package TGen.Types.Translation is
 
    procedure Clear_Cache;
    --  Clear the translation cache
+
+private
+   Anonymous_Typ_Index : Positive := 1;
+   --  Index incremented each time we create an anonymous type, to uniquely
+   --  identify every anonymous type created.
 
 end TGen.Types.Translation;

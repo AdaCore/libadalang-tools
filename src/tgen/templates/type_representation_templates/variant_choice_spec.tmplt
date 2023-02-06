@@ -1,0 +1,9 @@
+@@--  Template for a variant choice specification
+@@--  @_TY_PREFIX_@ Prefix for all of the type declarations
+@@--  @_VARIANT_NUMBER_@ Index of the variant in the record
+@@--  @_VARIANT_CHOICE_NUMBER_@ Index of the variant choice number
+@@--  @_ANONYMOUS_TYP_SPEC_@ Specification code for the variant components
+@@--     that are of an anonymous type.
+
+   @_ANONYMOUS_TYP_SPEC_@
+   @_TY_PREFIX_@_Variant_Choice_@_VARIANT_NUMBER_@_@_VARIANT_CHOICE_NUMBER_@ : aliased TGen.Types.Record_Types.Variant_Choice;

@@ -15,4 +15,5 @@
                     (@_TY_NAME_@'First),
               Max =>
                  @_TY_PREFIX_@_Typ_Conversions.To_Big_Integer
-                    (@_TY_NAME_@'Last)));
+                    (@_TY_NAME_@'Last)),
+       others => <>);

@@ -6,3 +6,4 @@ mkdir -p test/obj obj
 tgen_marshalling -P test/test.gpr --templates-dir=$TEMPLATES_PATH -o test/tgen_support test/my_file.ads test/show_date.ads
 gprbuild -q -P test_gen.gpr
 ./obj/example_gen
+./obj/example_introspection

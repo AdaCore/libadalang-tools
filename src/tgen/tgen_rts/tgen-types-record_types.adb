@@ -1106,4 +1106,27 @@ package body TGen.Types.Record_Types is
          Constraint);
    end Disc_Constrains_Array;
 
+   ----------------------
+   -- Default_Strategy --
+   ----------------------
+
+   function Default_Strategy
+     (Self : Function_Typ) return Strategy_Type'Class
+   is
+      use Component_Maps;
+
+      Strat : Nondisc_Record_Strategy_Type;
+   begin
+      SP.From_Element (Strat.T, Self'Unrestricted_Access);
+      Strat.Generate := Generate_Record_Typ'Access;
+      for Component in Self.Component_Types.Iterate loop
+         declare
+            Comp_Name : constant Unbounded_String := Key (Component);
+         begin
+            Strat.Component_Strats.Insert
+              (Comp_Name, Element (Component).Get.Default_Strategy);
+         end;
+      end loop;
+      return Strat;
+   end Default_Strategy;
 end TGen.Types.Record_Types;

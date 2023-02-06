@@ -135,7 +135,7 @@ package body Test.Common is
       Root_Ignore : Basic_Decl;
 
       Subp_Depth : Natural := 0;
-      --  Indicates how deep in subprogrmam specs the analysis is.
+      --  Indicates how deep in subprogram specs the analysis is.
       --  Only first level parameters are subjects to substitution for root
       --  tagged type.
       --  Also, for compatibility reasons the last parameter on depth 1

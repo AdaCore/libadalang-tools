@@ -78,9 +78,9 @@ package TGen.Templates is
       Array_Read_Write_Template     : constant String :=
         Template_Folder & "array_read_write.tmplt";
       Component_Write_Template      : constant String :=
-        Template_Folder & "component_read_write.tmplt";
+        Template_Folder & "component_write.tmplt";
       Component_Read_Template       : constant String :=
-        Template_Folder & "component_read_write.tmplt";
+        Template_Folder & "component_read.tmplt";
       Composite_Base_Spec_Template  : constant String :=
         Template_Folder & "composite_base_spec.tmplt";
       Header_Body_Template          : constant String :=
@@ -106,14 +106,42 @@ package TGen.Templates is
    end JSON_Marshalling;
 
    package Type_Representation is
-      Signed_Int_Spec_Template : constant String :=
-        Template_Folder & "signed_int_spec.tmplt";
-      Signed_Int_Typ_Init_Template : constant String :=
-        Template_Folder & "signed_int_typ_init.tmplt";
-      Function_Typ_Spec_Template : constant String :=
+      Scalar_Typ_Spec_Template : constant String :=
+        Template_Folder & "scalar_typ_spec.tmplt";
+      Scalar_Typ_Init_Template : constant String :=
+        Template_Folder & "scalar_typ_init.tmplt";
+      Record_Typ_Spec_Template : constant String :=
         Template_Folder & "record_typ_spec.tmplt";
-      Function_Typ_Init_Template : constant String :=
-        Template_Folder & "function_typ_init.tmplt";
+      Record_Typ_Init_Template : constant String :=
+        Template_Folder & "record_typ_init.tmplt";
+      Anonymous_Typ_Spec_Template : constant String :=
+        Template_Folder & "anonymous_typ_spec.tmplt";
+      Anonymous_Typ_Init_Template : constant String :=
+        Template_Folder & "anonymous_typ_init.tmplt";
+      Custom_Strat_Spec_Template : constant String :=
+        Template_Folder & "custom_strat_spec.tmplt";
+      Custom_Strat_Body_Template : constant String :=
+        Template_Folder & "custom_strat_body.tmplt";
+      Variant_Choice_Spec_Template : constant String :=
+        Template_Folder & "variant_choice_spec.tmplt";
+      Variant_Choice_Init_Template : constant String :=
+        Template_Folder & "variant_choice_init.tmplt";
+      Variant_Spec_Template : constant String :=
+        Template_Folder & "variant_spec.tmplt";
+      Variant_Init_Template : constant String :=
+        Template_Folder & "variant_init.tmplt";
+      Constraint_Spec_Template : constant String :=
+        Template_Folder & "constraint_spec.tmplt";
+      Constraint_Init_Template : constant String :=
+        Template_Folder & "constraint_init.tmplt";
+      Instance_Spec_Template : constant String :=
+        Template_Folder & "instance_typ_spec.tmplt";
+      Instance_Init_Template : constant String :=
+        Template_Folder & "instance_typ_init.tmplt";
+      Array_Typ_Spec_Template : constant String :=
+        Template_Folder & "array_typ_spec.tmplt";
+      Array_Typ_Init_Template : constant String :=
+        Template_Folder & "array_typ_init.tmplt";
    end Type_Representation;
 
 end TGen.Templates;

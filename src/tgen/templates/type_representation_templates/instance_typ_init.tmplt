@@ -1,0 +1,6 @@
+@@--  Template for the initialization of an instance type representation.
+@@--  @_TY_PREFIX_@ Prefix used to prefix all entities for the current type.
+@@--  @_ORIG_TY_PREFIX_@ Prefix for the original type.
+
+   @_TY_PREFIX_@_Typ.Orig_Typ := @_ORIG_TY_PREFIX_@_Typ_Ref;
+   @_TY_PREFIX_@_Typ_Ref.Set (@_TY_PREFIX_@_Typ);

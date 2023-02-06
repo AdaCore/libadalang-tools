@@ -45,7 +45,7 @@ package body TGen.Parse_Strategy is
       Last_Comp_Unit_Index : Positive;
       T                    : Typ'Class;
       Strategy             : Expr'Class;
-      Strategies           : out Strategy_Maps_2.Map) return Typ'Class;
+      Strategies           : out FQN_To_Parsed_Strat_Map) return Typ'Class;
    --  Check the strategy that applies to the type T, and return a new type
    --  where the type of each parameter / parameter component this strategy
    --  applies to has been replaced by an instance type. The prefix keeps
@@ -58,7 +58,7 @@ package body TGen.Parse_Strategy is
       Last_Comp_Unit_Index : Positive;
       T                    : Scalar_Typ'Class;
       Strategy             : Expr'Class;
-      Strategies           : out Strategy_Maps_2.Map) return Typ'Class;
+      Strategies           : out FQN_To_Parsed_Strat_Map) return Typ'Class;
    --  Check the strategy that applies to a parameter / parameter component
    --  that is a scalar type. If this strategy is valid, add an entry in the
    --  Strategies map and return a new instance type that should replace this
@@ -70,7 +70,7 @@ package body TGen.Parse_Strategy is
       Last_Comp_Unit_Index : Positive;
       Rec_Typ              : Record_Typ'Class;
       Strategy             : Expr'Class;
-      Strategies            : out Strategy_Maps_2.Map) return Typ'Class;
+      Strategies           : out FQN_To_Parsed_Strat_Map) return Typ'Class;
    --  Same as Check_Strategy, but for a record type in tgen terminology
    --  (that is a function, a record or a discriminated record type).
 
@@ -113,7 +113,7 @@ package body TGen.Parse_Strategy is
       Last_Comp_Unit_Index : Positive;
       T                    : Scalar_Typ'Class;
       Strategy             : Expr'Class;
-      Strategies           : out Strategy_Maps_2.Map) return Typ'Class
+      Strategies           : out FQN_To_Parsed_Strat_Map) return Typ'Class
    is
       Result : Instance_Typ;
    begin
@@ -184,7 +184,7 @@ package body TGen.Parse_Strategy is
       Last_Comp_Unit_Index : Positive;
       Rec_Typ              : Record_Typ'Class;
       Strategy             : Expr'Class;
-      Strategies           : out Strategy_Maps_2.Map) return Typ'Class
+      Strategies           : out FQN_To_Parsed_Strat_Maps.Map) return Typ'Class
    is
       use type Ada_Qualified_Name;
       Result : Record_Typ'Class := Record_Typ'Class (Clone (Rec_Typ));
@@ -246,7 +246,7 @@ package body TGen.Parse_Strategy is
       Last_Comp_Unit_Index : Positive;
       T                    : Typ'Class;
       Strategy             : Expr'Class;
-      Strategies           : out Strategy_Maps_2.Map) return Typ'Class is
+      Strategies           : out FQN_To_Parsed_Strat_Map) return Typ'Class is
    begin
       pragma Warnings (Off);
       if T in Record_Typ'Class then
@@ -274,7 +274,7 @@ package body TGen.Parse_Strategy is
    procedure Parse_Strategy
      (Fct_Typ    : in out Function_Typ'Class;
       Aspect     : Libadalang.Analysis.Aspect_Assoc;
-      Strategies : out Strategy_Maps_2.Map)
+      Strategies : out FQN_To_Parsed_Strat_Maps.Map)
    is
    begin
       pragma Assert (To_Lower (+Aspect.F_Id.Text) = "generation");

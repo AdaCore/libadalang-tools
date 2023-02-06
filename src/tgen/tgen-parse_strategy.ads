@@ -30,6 +30,22 @@ with Libadalang.Analysis; use Libadalang.Analysis;
 
 with TGen.Types.Record_Types; use TGen.Types.Record_Types;
 
+--  This is a proof of concept for specification of strategies and by no
+--  means should be considered a full-fledged implementation. It supports
+--  only custom strategies for scalar types for now. The way to specify a
+--  strategy right now is best shown on an example:
+--
+--  function My_Random return Integer;
+--  procedure Foo (I : Integer)
+--     with Generation => (Strategies => (I => My_Random));
+--
+--  In the example above, we specify a custom strategy for I configuring the
+--  tool to use the My_Random function to generate values for I.
+--
+--  This strategy specification scheme should be extended to all of the
+--  supported types, and should also support built-in tgen strategies that are
+--  not the default.
+
 package TGen.Parse_Strategy is
 
    --  A strategy can be specified as an aspect at different spots.
@@ -69,16 +85,25 @@ package TGen.Parse_Strategy is
    end record;
 
    Strategy_Parsing_Error : exception;
+   --  Exception raised when a strategy expression is malformed
 
-   package Strategy_Maps_2 is new Ada.Containers.Hashed_Maps
-     (Key_Type => Unbounded_String,
-      Element_Type => Parsed_Strategy,
-      Hash => Ada.Strings.Unbounded.Hash_Case_Insensitive,
+   package FQN_To_Parsed_Strat_Maps is new Ada.Containers.Hashed_Maps
+     (Key_Type        => Unbounded_String,
+      Element_Type    => Parsed_Strategy,
+      Hash            => Ada.Strings.Unbounded.Hash_Case_Insensitive,
       Equivalent_Keys => Ada.Strings.Unbounded.Equal_Case_Insensitive);
+   subtype FQN_To_Parsed_Strat_Map is FQN_To_Parsed_Strat_Maps.Map;
 
    procedure Parse_Strategy
      (Fct_Typ    : in out Function_Typ'Class;
       Aspect     : Libadalang.Analysis.Aspect_Assoc;
-      Strategies : out Strategy_Maps_2.Map);
+      Strategies : out FQN_To_Parsed_Strat_Maps.Map);
+   --  Parse a strategy aspect. For each strategy that is specified for a
+   --  parameter / parameter component, put an entry in the Strategies map.
+   --
+   --  Also returns a function type where every parameter / parameter component
+   --  type to which a specified strategies applies to has been replaced by
+   --  an Instance_Typ, to identify it by its fully qualified name in the
+   --  specific function context.
 
 end TGen.Parse_Strategy;

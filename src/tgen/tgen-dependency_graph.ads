@@ -21,28 +21,33 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Containers.Ordered_Maps;
 
-with Templates_Parser; use Templates_Parser;
+with TGen.Context; use TGen.Context;
+with TGen.Types; use TGen.Types;
 
-with TGen.Types;             use TGen.Types;
-with TGen.Parse_Strategy; use TGen.Parse_Strategy;
+package TGen.Dependency_Graph is
 
-package TGen.Type_Representation is
+   package Typ_Maps is new Ada.Containers.Ordered_Maps
+     (Key_Type     => SP.Ref,
+      Element_Type => Typ_Set,
+      "="          => Typ_Sets."=");
+   subtype Typ_Map is Typ_Maps.Map;
 
-   procedure Generate_Type_Representation_For_Typ
-     (F_Spec, F_Body     : File_Type;
-      Typ                : TGen.Types.Typ'Class;
-      Templates_Root_Dir : String;
-      Strategies         : FQN_To_Parsed_Strat_Maps.Map;
-      Init_Package_Code  : in out Tag);
-   --  Generate the TGen type representation for the given type. Note that
-   --  this function is not recursive, and must thus be called for all of
-   --  the component types of this type that are not anonymous types.
-   --
-   --  For all of the component types that are anonymous types, type
-   --  type definitions will be generated (they still require the ancestor
-   --  type's type definition though).
+   type Graph_Type is record
+      Nodes : Typ_Set;
+      Succ, Pred : Typ_Map;
+   end record;
 
-end TGen.Type_Representation;
+   procedure Create_Node (G : in out Graph_Type; New_Node : SP.Ref);
+
+   procedure Create_Edge (G : in out Graph_Type; From, To : SP.Ref)
+     with Pre => G.Nodes.Contains (From) and then G.Nodes.Contains (To);
+
+   procedure Traverse
+     (G        : Graph_Type;
+      Callback : access procedure (N : SP.Ref));
+   --  Traverse the graph in the topological order and call callback on every
+   --  node.
+
+end TGen.Dependency_Graph;
