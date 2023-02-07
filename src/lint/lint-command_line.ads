@@ -26,6 +26,7 @@
 with Ada.Strings.Unbounded;
 
 with GNATCOLL.Opt_Parse; use GNATCOLL.Opt_Parse;
+with GNATCOLL.VFS;
 
 with Lint.Tools;
 
@@ -68,5 +69,36 @@ package Lint.Command_Line is
       Arg_Type    => Ada.Strings.Unbounded.Unbounded_String,
       Convert     => Ada.Strings.Unbounded.To_Unbounded_String,
       Default_Val => Ada.Strings.Unbounded.Null_Unbounded_String);
+
+   package Sources is new Parse_Option_List
+     (Parser      => Parser,
+      Short       => "-S",
+      Long        => "--sources",
+      Help        => "Source files to refactor",
+      Arg_Type    => Ada.Strings.Unbounded.Unbounded_String,
+      Convert     => Ada.Strings.Unbounded.To_Unbounded_String);
+
+   package Scenario_Variables is new Parse_Option_List
+     (Parser      => Parser,
+      Short       => "-X",
+      Help        => "Specify an external reference for Project Files",
+      Arg_Type    => Ada.Strings.Unbounded.Unbounded_String,
+      Convert     => Ada.Strings.Unbounded.To_Unbounded_String,
+      Name        => "nm=val");
+
+   function To_Virtual_File
+     (File_Name : String)
+      return GNATCOLL.VFS.Virtual_File
+   is (GNATCOLL.VFS.Create (GNATCOLL.VFS."+" (File_Name)));
+
+   package From_GNAT_Warnings is new Parse_Option
+     (Parser      => Parser,
+      Short       => "-fgw",
+      Long        => "--from-gnat-warnings",
+      Help        => "File with all obsolescent syntax GNAT warnings",
+      Arg_Type    => GNATCOLL.VFS.Virtual_File,
+      Convert     => To_Virtual_File,
+      Default_Val => GNATCOLL.VFS.No_File,
+      Name        => "<file_with_gnat_warnings>");
 
 end Lint.Command_Line;

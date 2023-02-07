@@ -1,0 +1,39 @@
+/main.adb
+with My_Package;
+
+procedure Main is
+   subtype Index_Number is Natural range 0 .. Natural'Last - 1;
+   type Main_Array is array (Index_Number range <>) of Positive;
+   A : constant Main_Array := [];
+   Z : constant array (1 .. 1) of Integer := [1];
+
+begin
+   null;
+end Main;
+
+/my_package2.ada
+with Other_Package;
+
+package My_Package is
+
+   type Y_Range is (One, Two, Three);
+   type Y_Range_Array is array (Y_Range) of Integer;
+
+   A : constant My_Package.Y_Range_Array :=
+     [One => 1, Two => 2, Three => 3];
+
+end My_Package;
+
+/other_package2.ada
+package Other_Package is
+
+   type Private_Array is private;
+
+private
+
+   type Private_Array is array (1 .. 10) of String (1 .. 2);
+
+   PA : constant Private_Array := [others => "ab"];
+
+end Other_Package;
+

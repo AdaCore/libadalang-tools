@@ -23,7 +23,7 @@
 --
 --  Lint array aggregates tool
 
-with Ada.Containers.Indefinite_Ordered_Maps;
+with Ada.Containers.Ordered_Maps;
 
 with Libadalang.Analysis;
 
@@ -36,7 +36,7 @@ package Lint.Tools.Array_Aggregates_Tool is
    --  Source_Location.
 
    package Aggregates_To_Text_Edit_Ordered_Set_Maps is new
-     Ada.Containers.Indefinite_Ordered_Maps
+     Ada.Containers.Ordered_Maps
        (Key_Type     => Libadalang.Analysis.Aggregate,
         Element_Type => Laltools.Refactor.Text_Edit_Ordered_Set,
         "<"          => "<",

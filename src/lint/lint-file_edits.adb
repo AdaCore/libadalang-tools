@@ -197,17 +197,6 @@ package body Lint.File_Edits is
                           Column_Number (C_It.Character_Index);
                         if Current_Text_Edit /= No_Text_Edit then
                            if Current_Line_Number =
-                                Current_Text_Edit.Location.Start_Line
-                             and then Current_Column_Number =
-                                        Current_Text_Edit.Location.Start_Column
-                           then
-                              Output_Buffer.Append
-                                (To_Virtual_String
-                                   (To_String (Current_Text_Edit.Text)));
-                              Inside_Text_Edit := True;
-                           end if;
-
-                           if Current_Line_Number =
                                 Current_Text_Edit.Location.End_Line
                              and then Current_Column_Number =
                                         Current_Text_Edit.Location.End_Column
@@ -221,6 +210,17 @@ package body Lint.File_Edits is
                                      Element (Text_Edits_Cursor);
                               end if;
                               Inside_Text_Edit := False;
+                           end if;
+
+                           if Current_Line_Number =
+                                Current_Text_Edit.Location.Start_Line
+                             and then Current_Column_Number =
+                                        Current_Text_Edit.Location.Start_Column
+                           then
+                              Output_Buffer.Append
+                                (To_Virtual_String
+                                   (To_String (Current_Text_Edit.Text)));
+                              Inside_Text_Edit := True;
                            end if;
                         end if;
 
