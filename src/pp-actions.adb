@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                    Copyright (C) 2021-2022, AdaCore                      --
+--                    Copyright (C) 2021-2023, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -23,7 +23,6 @@
 
 with Ada.Characters.Handling; use Ada.Characters.Handling;
 with Ada.Characters.Latin_1;
-with Ada.Containers;
 with Ada.Exceptions;
 with Ada.Finalization;
 with Ada.Strings.Fixed;
@@ -5600,6 +5599,10 @@ package body Pp.Actions is
       end loop;
    end Clear_Template_Tables;
 
+   -------------------
+   -- Format_Vector --
+   -------------------
+
    procedure Format_Vector
      (Cmd               : Command_Line;
       Input             : Char_Vector;
@@ -5910,9 +5913,9 @@ package body Pp.Actions is
          return Result;
       end Remove_Extra_Line_Breaks;
 
-   --  Start of processing for Format_Vector
-
    begin
+      --  Start of processing for Format_Vector
+
       Clear (Src_Buf);
       Insert_Ada_Source
         (Buf                     => Src_Buf,
@@ -5923,7 +5926,7 @@ package body Pp.Actions is
       --  Expand tabs unconditionally. This differs from the behavior of
       --  the old gnatpp, which has an option for that (but only for
       --  comments).
-      --  ???Encoding needs to match the call to libadalang.
+      --  ??? Encoding needs to match the call to libadalang.
       Reset (Src_Buf);
 
       Tree_To_Ada;
@@ -5931,6 +5934,7 @@ package body Pp.Actions is
       if Scanner.Source_Message_Vectors.Is_Empty (Messages) then
          declare
             use Scanner;
+
             Out_Vec : constant WChar_Vector :=
               Remove_Extra_Line_Breaks
                 (Add_CR => Out_File_Format = CRLF);
@@ -5945,6 +5949,7 @@ package body Pp.Actions is
             end Append_One;
             procedure Encode is new
               System.WCh_Cnv.Wide_Char_To_Char_Sequence (Append_One);
+
          begin
             pragma Assert (Is_Empty (Output));
 
@@ -5964,17 +5969,21 @@ package body Pp.Actions is
             declare
                I : String renames Elems (Input) (1 .. Last_Index (Input));
                O : String renames Elems (Output) (1 .. Last_Index (Output));
+
                Src_Lines : constant Natural := Count_Chars (I, ASCII.LF);
                Out_Lines : constant Natural := Count_Chars (O, ASCII.LF);
-               Comp : constant String :=
+
+               Comp   : constant String :=
                  (if Src_Lines < Out_Lines then "<" else ">");
                Src_CR : constant Natural := Count_Chars (I, ASCII.CR);
+
             begin
                if Src_Lines /= Out_Lines then
                   if Src_CR in 0 | Src_Lines
                     and then Count_Chars (I, ASCII.FF) = 0
                   then
-                     Err_Out.Put ("Incorrect line count: \1 \2 \3\n",
+                     Err_Out.Put
+                       ("Incorrect line count: \1 \2 \3\n",
                         Src_Lines'Image, Comp, Natural'(Out_Lines)'Image);
                      raise Program_Error;
                   end if;
@@ -5982,6 +5991,7 @@ package body Pp.Actions is
             end;
          end if;
       end if;
+
       Clear_Lines_Data;
 
    exception
@@ -5991,76 +6001,80 @@ package body Pp.Actions is
       --  The clean up should be done in any cases when an exception is issued.
       when E : others =>
          declare
-            Location : constant Langkit_Support.Slocs.Source_Location :=
-              Langkit_Support.Slocs.Start_Sloc (Node.Sloc_Range);
+            use Pp.Scanner;
+
             Message  : Utils.Char_Vectors.Char_Vector;
 
-            use type Langkit_Support.Slocs.Line_Number;
-            use type Langkit_Support.Slocs.Column_Number;
          begin
             Utils.Char_Vectors.Char_Vectors.Append
               (Message,
-               "GNATPP_Error: Keeping the initial input selection unchanged"
+               "Error formatting node ("
+               & Node.Kind_Name
+               & "). Keeping the initial input selection unchanged"
                & Ada.Characters.Latin_1.LF
                & Ada.Exceptions.Exception_Message (E));
-            Pp.Scanner.Source_Message_Vectors.Append
-              (Messages,
-               Pp.Scanner.Source_Message'
-                 (Pp.Scanner.Source_Location'
-                      (Line => Positive (Location.Line + 1),
-                       Col  => Positive (Location.Column + 1),
-                       First => 1,
-                       Last => 1),
-                  Message));
+
+            Messages.Append
+              (Source_Message'
+                 (Sloc  =>
+                    Source_Location'
+                      (Line  =>
+                         Positive (Slocs.Start_Sloc (Node.Sloc_Range).Line),
+                       Col   =>
+                         Positive (Slocs.Start_Sloc (Node.Sloc_Range).Column),
+                       First => <>,
+                       Last  => <>),
+                  Text => Message));
          end;
 
-         if Partial_GNATPP then
-            Err_Out.Put
-              ("Partial_GNATPP_Error: \1 \2\n",
-               "Keeping the initial input selection unchanged for",
-               Node.Image);
-         end if;
          Output := Input;
          Clear_Lines_Data;
    end Format_Vector;
 
+   ---------------------
+   -- Per_File_Action --
+   ---------------------
+
    procedure Per_File_Action
-     (Tool : in out Pp_Tool;
-      Cmd : Command_Line;
+     (Tool      : in out Pp_Tool;
+      Cmd       : Command_Line;
       File_Name : String;
-      Input : String;
-      BOM_Seen : Boolean;
-      Unit : Analysis_Unit)
+      Input     : String;
+      BOM_Seen  : Boolean;
+      Unit      : Analysis_Unit)
    is
       pragma Unreferenced (Tool);
 
       Output_Mode : constant Output_Modes := Get_Output_Mode (Cmd);
-      Do_Diff : constant Boolean := Output_Mode in Replace_Modes;
+      Do_Diff     : constant Boolean := Output_Mode in Replace_Modes;
 
       In_Vec, Out_Vec : Char_Vector;
 
-      --  We initially write the output to Temp_Output_Name, then later rename it
-      --  to Output_Name (except in Pipe mode). These are full pathnames. If we
-      --  are overwriting the Source_Name, and it's a link link-->file, we want to
-      --  overwrite file. But we put the temp file in the directory containing
-      --  link, in case the directory containing file is not writable.
+      --  We initially write the output to Temp_Output_Name, then later rename
+      --  it to Output_Name (except in Pipe mode). These are full pathnames. If
+      --  we are overwriting the Source_Name, and it's a link link-->file, we
+      --  want to overwrite file. But we put the temp file in the directory
+      --  constaining link, in case the directory containing file is not
+      --  writable.
 
       function Get_Output_Name (Resolve_Links : Boolean) return String;
+
       function Get_Output_Name (Resolve_Links : Boolean) return String is
       begin
          pragma Assert (Environment.Initial_Dir = Current_Directory);
-         return (case Output_Mode is
-           when Pipe => "", -- not used
-           when Output => Arg (Cmd, Output).all,
-           when Output_Force => Arg (Cmd, Output_Force).all,
-           when Replace_Modes => Normalize_Pathname
-                                   (File_Name,
-                                    Resolve_Links  => Resolve_Links,
-                                    Case_Sensitive => True),
+         return
+           (case Output_Mode is
+               when Pipe => "", -- not used
+               when Output => Arg (Cmd, Output).all,
+               when Output_Force => Arg (Cmd, Output_Force).all,
+               when Replace_Modes => Normalize_Pathname
+                                      (File_Name,
+                                       Resolve_Links  => Resolve_Links,
+                                       Case_Sensitive => True),
 
-           when Output_Directory =>
-             Compose (Arg (Cmd, Output_Directory).all,
-                      Simple_Name (File_Name)));
+               when Output_Directory =>
+                 Compose (Arg (Cmd, Output_Directory).all,
+                          Simple_Name (File_Name)));
       end Get_Output_Name;
 
       Output_Name : constant String := Get_Output_Name (Resolve_Links => True);
@@ -6084,8 +6098,8 @@ package body Pp.Actions is
 
          procedure Do_Writes;
          --  Write the two file names to the file name file. This is split out
-         --  into a procedure so we can call it with and without file locking, as
-         --  appropriate.
+         --  into a procedure so we can call it with and without file locking,
+         --  as appropriate.
 
          procedure Do_Writes is
             File_Name_File : File_Type;
@@ -6104,9 +6118,9 @@ package body Pp.Actions is
          if Output_Mode /= Pipe then
             --  In -r, -rf, and -rnb modes, if the output was identical to the
             --  input, Output_Written will be False, so there is no
-            --  Temp_Output_Name file, so we don't move it in that case. This can
-            --  also happen if the exception handler at the end of Tree_To_Ada is
-            --  executed.
+            --  Temp_Output_Name file, so we don't move it in that case. This
+            --  can also happen if the exception handler at the end of
+            --  Tree_To_Ada is executed.
 
             pragma Assert
               (if Output_Mode not in Replace_Modes then Output_Written);
@@ -6114,13 +6128,14 @@ package body Pp.Actions is
                return;
             end if;
 
---            if Mimic_gcc and then (Verbose_Mode or else Debug_Flag_V) then
---               Put_Line
---                 ((if Output_Mode in Replace_Modes
---                     then "updating "
---                     else "creating ") &
---                  (if Debug_Flag_V then Short_Source_Name (SF) else Output_Name));
---            end if;
+            --  if Mimic_gcc and then (Verbose_Mode or else Debug_Flag_V) then
+            --     Put_Line
+            --       ((if Output_Mode in Replace_Modes then
+            --           "updating "
+            --         else "creating ")
+            --              & (if Debug_Flag_V then Short_Source_Name (SF)
+            --                 else Output_Name));
+            --  end if;
 
             --  The temp file was created, so write a pair (Temp_Output_Name,
             --  Output_Name) of lines to the file name file, so Finalize will know
@@ -6134,11 +6149,11 @@ package body Pp.Actions is
                --  Retry for 5 minutes, every 100 milliseconds.
                declare
                   --  We create a dummy object whose finalization calls
-                  --  Unlock_File, so we don't leave stale lock files around even
-                  --  in case of unhandled exceptions.
+                  --  Unlock_File, so we don't leave stale lock files around
+                  --  even in case of unhandled exceptions.
 
-                  type Dummy_Type is new Ada.Finalization.Limited_Controlled with
-                    null record;
+                  type Dummy_Type is new Ada.Finalization.Limited_Controlled
+                    with null record;
                   procedure Finalize (Ignore : in out Dummy_Type);
                   procedure Finalize (Ignore : in out Dummy_Type) is
                   begin
@@ -6151,41 +6166,43 @@ package body Pp.Actions is
                   Do_Writes;
                end;
 
-            --  Otherwise, it's safe to do the writes without any locking. We want
-            --  to avoid locking when possible, because it reduces the likelihood
-            --  of stale locks left lying around. It's a little more efficient,
-            --  too.
+            --  Otherwise, it's safe to do the writes without any locking. We
+            --  want to avoid locking when possible, because it reduces the
+            --  likelihood of stale locks left lying around. It's a little more
+            --  efficient too.
 
             else
                Do_Writes;
             end if;
          end if;
---      exception
---         when Lock_Error =>
---            Utils.Output.Error ("cannot create " & Lock_File_Name);
---            Utils.Output.Error ("delete it by hand if stale");
---            raise;
+
+         --  exception
+         --     when Lock_Error =>
+         --        Utils.Output.Error ("cannot create " & Lock_File_Name);
+         --        Utils.Output.Error ("delete it by hand if stale");
+         --        raise;
       end Write_File_Name_File;
 
       procedure Write_Str (Out_Vec : Char_Vector);
       procedure Write_Out_Buf;
       procedure Write_Src_Buf;
       --  Write_Out_Buf writes Out_Buf to the output. This is the normal
-      --  case. Write_Src_Buf writes the Src_Buf to the output. Write_Str is the
-      --  code common to both Write_Out_Buf and Write_Src_Buf.
+      --  case. Write_Src_Buf writes the Src_Buf to the output. Write_Str is
+      --  the code common to both Write_Out_Buf and Write_Src_Buf.
 
       procedure Write_Str (Out_Vec : Char_Vector) is
-         Out_File : File_Descriptor := Standout;
-         Out_String : String renames Elems (Out_Vec) (1 .. Last_Index (Out_Vec));
-         Status : Boolean;
+         Out_File   : File_Descriptor := Standout;
+         Out_String : String renames
+           Elems (Out_Vec) (1 .. Last_Index (Out_Vec));
+         Status     : Boolean;
          use System.WCh_Con;
       begin
-   --  ???
-   --      if False then -- ???Messes up the diff's.
-   --         Formatted_Output.Put
-   --           ("--  ???Inner_Loop_Count = \1\n",
-   --            Image (Inner_Loop_Count));
-   --      end if;
+         --  ???
+         --  if False then -- ???Messes up the diff's.
+         --     Formatted_Output.Put
+         --       ("--  ???Inner_Loop_Count = \1\n",
+         --        Image (Inner_Loop_Count));
+         --  end if;
 
          Output_Written := True;
          if Temp_Output_Name /= "" then
@@ -6236,21 +6253,20 @@ package body Pp.Actions is
          Write_Str (In_Vec);
       end Write_Src_Buf;
 
-   --  Start of processing for Per_File_Action
-
    begin
-      if Debug_Mode then
-         Print (Unit);
-      end if;
+      --  Start of processing for Per_File_Action
+
+      Trace ("Processing " & File_Name, Info);
 
       if Output_Mode in Replace_Backup | Replace_Force_Backup then
          declare
             Backup_Simple_Name : constant String := File_Name & NPP_Suffix;
-            Backup_Name : constant String :=
+            Backup_Name        : constant String :=
               (if Arg (Cmd, Output_Directory) = null then Backup_Simple_Name
                else Compose (Arg (Cmd, Output_Directory).all,
                              Simple_Name (Backup_Simple_Name)));
-            Success : Boolean;
+            Success            : Boolean;
+
          begin
             if Output_Mode = Replace_Backup
               and then Is_Regular_File (Backup_Name)
@@ -6273,31 +6289,39 @@ package body Pp.Actions is
                  ("gnatpp: cannot create backup file \1\n", Backup_Name);
             end if;
          end;
-
       end if;
 
---      pragma Assert (Is_Empty (Symtab));
+      --  pragma Assert (Is_Empty (Symtab));
+
       Append (In_Vec, Input);
+
       declare
          Messages : Scanner.Source_Message_Vector;
-         use Scanner.Source_Message_Vectors;
-         use type Ada.Containers.Count_Type;
+
+         --  use Scanner.Source_Message_Vectors;
+
       begin
          Format_Vector
-           (Cmd, In_Vec, Root (Unit), Out_Vec, Messages);
---        (CU, Cmd, Output_Name, Form_String,
---         Do_Diff, Output_Written, To_Ada => True);
---      --  We have to flush the cache here, because Unit_Id's get reused between
---      --  runs of this.
---      Flush_Cache;
---      Clear (Symtab);
+           (Cmd      => Cmd,
+            Input    => In_Vec,
+            Node     => Root (Unit),
+            Output   => Out_Vec,
+            Messages => Messages);
 
-         if not Is_Empty (Messages) then
-            pragma Assert (Length (Messages) = 1);
-            --  We only handle one message for now.
-            Cmd_Error_No_Tool_Name
-              (Scanner.Message_Image (File_Name, Messages (1).Sloc) &
-                           ": " & String (To_Array (Messages (1).Text)));
+         if not Messages.Is_Empty then
+            for Message of Messages loop
+               declare
+                  Message_String : constant String :=
+                    Pp.Scanner.Message_Image (File_Name, Message.Sloc)
+                    & ": "
+                    & Message.Text.To_Array;
+
+               begin
+                  Trace (Message_String, Error);
+               end;
+            end loop;
+
+            raise Command_Line_Error_No_Tool_Name;
          end if;
       end;
 
@@ -6305,6 +6329,7 @@ package body Pp.Actions is
 
       Write_Out_Buf;
       Write_File_Name_File;
+
    exception
       --  If we got an error, don't produce output
 
@@ -6312,10 +6337,10 @@ package body Pp.Actions is
          raise;
 
       when others =>
-         --  In order to avoid damaging the user's source code, if there is a bug
-         --  (like a token mismatch in Final_Check), we avoid writing the output
-         --  file in Do_Diff mode; otherwise, we write the input to the output
-         --  unchanged. This happens only in production builds.
+         --  In order to avoid damaging the user's source code, if there is a
+         --  bug (like a token mismatch in Final_Check), we avoid writing the
+         --  output file in Do_Diff mode; otherwise, we write the input to the
+         --  output unchanged. This happens only in production builds.
          --
          --  Include the source location in the error message, if available.
 
@@ -6323,8 +6348,8 @@ package body Pp.Actions is
             declare
                use type Slocs.Source_Location;
                Loc : constant String :=
-                 (if Error_Sloc = Slocs.No_Source_Location
-                    then "" else ":" & Slocs.Image (Error_Sloc));
+                 (if Error_Sloc = Slocs.No_Source_Location then ""
+                  else ":" & Slocs.Image (Error_Sloc));
             begin
                Err_Out.Put ("\1\2: pretty printing failed; unable to format\n",
                            Simple_Name (File_Name), Loc);

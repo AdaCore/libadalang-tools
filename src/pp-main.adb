@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2021, AdaCore                        --
+--                    Copyright (C) 2021-2023, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -20,36 +20,39 @@
 -- the files COPYING3 and COPYING.RUNTIME respectively.  If not, see        --
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
+--
+--  Main procedure for GNATpp
+
 with GNAT.OS_Lib;
 
-with Utils.Command_Lines; use Utils.Command_Lines;
+with Utils.Command_Lines;
 with Utils.Drivers;
+with Utils.Err_Out;
 
 with Pp.Actions;
 with Pp.Command_Lines;
 
 procedure Pp.Main is
 
-   --  Main procedure for lalpp
-
-   procedure Callback (Phase : Parse_Phase; Swit : Dynamically_Typed_Switch);
-
-   procedure Callback (Phase : Parse_Phase; Swit : Dynamically_Typed_Switch) is
-     null;
-
    Tool : Actions.Pp_Tool;
-   Cmd : Command_Line (Pp.Command_Lines.Descriptor'Access);
+   Cmd  : Utils.Command_Lines.Command_Line
+            (Pp.Command_Lines.Descriptor'Access);
 
 begin
+   --  By default, send errors to stdout
+   Utils.Err_Out.Output_Enabled := True;
+
+   --  Override trace settings by parsing the config file
+   GNATCOLL.Traces.Parse_Config_File;
+
    Utils.Drivers.Driver
-     (Cmd,
-      Tool,
-      Tool_Package_Name     => "pretty_printer",
-      Callback              => Callback'Unrestricted_Access);
-   --  Should we pass Preprocessing_Allowed => False???
+     (Cmd               => Cmd,
+      Tool              => Tool,
+      Tool_Package_Name => "pretty_printer",
+      Callback          => null);
 
    --  If syntax errors are detected during the processing then return a
-   --  non zero exit code
+   --  non zero exit code.
    if Utils.Syntax_Errors then
       GNAT.OS_Lib.OS_Exit (1);
    end if;

@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2021-2022, AdaCore                   --
+--                    Copyright (C) 2021-2023, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -22,26 +22,29 @@
 ------------------------------------------------------------------------------
 
 with Libadalang.Analysis; use Libadalang.Analysis;
+
+with Pp.Scanner;
+
 with Utils.Char_Vectors; use Utils.Char_Vectors;
-use Utils.Char_Vectors.Char_Vectors;
 with Utils.Command_Lines; use Utils.Command_Lines;
 with Utils.Tools; use Utils.Tools;
-with Pp.Scanner;
+
+use Utils.Char_Vectors.Char_Vectors;
 
 package Pp.Actions is
 
    type Pp_Tool is new Tool_State with private;
 
    procedure Format_Vector
-     (Cmd            : Command_Line;
-      Input          : Char_Vector;
-      Node           : Ada_Node;
-      Output         : out Char_Vector;
-      Messages       : out Pp.Scanner.Source_Message_Vector;
-      Partial_GNATPP : Boolean := False;
+     (Cmd               : Command_Line;
+      Input             : Char_Vector;
+      Node              : Ada_Node;
+      Output            : out Char_Vector;
+      Messages          : out Pp.Scanner.Source_Message_Vector;
+      Partial_GNATPP    : Boolean := False;
       Start_Child_Index : Natural := 0;
-      End_Child_Index   : Natural := 0) with
-     Pre => Pp.Scanner.Source_Message_Vectors.Is_Empty (Messages);
+      End_Child_Index   : Natural := 0)
+     with Pre => Pp.Scanner.Source_Message_Vectors.Is_Empty (Messages);
    --  This pretty prints the given source. Parameters:
    --
    --     Cmd -- processed command line, or "command line" concocted by a tool
@@ -91,24 +94,34 @@ package Pp.Actions is
 
 private
 
-   overriding procedure Init
-     (Tool : in out Pp_Tool; Cmd : in out Command_Line);
-   overriding procedure Per_File_Action
+   overriding
+   procedure Init
      (Tool : in out Pp_Tool;
-      Cmd : Command_Line;
+      Cmd  : in out Command_Line);
+
+   overriding
+   procedure Per_File_Action
+     (Tool      : in out Pp_Tool;
+      Cmd       : Command_Line;
       File_Name : String;
-      Input : String;
-      BOM_Seen : Boolean;
-      Unit : Analysis_Unit);
-   overriding procedure Final (Tool : in out Pp_Tool; Cmd : Command_Line);
-   overriding procedure Tool_Help (Tool : Pp_Tool);
+      Input     : String;
+      BOM_Seen  : Boolean;
+      Unit      : Analysis_Unit);
+
+   overriding
+   procedure Final
+     (Tool : in out Pp_Tool;
+      Cmd  : Command_Line);
+
+   overriding
+   procedure Tool_Help (Tool : Pp_Tool);
 
    type Pp_Tool is new Tool_State with null record;
 
    --  For Debugging:
 
    procedure Dump
-     (Tool : in out Pp_Tool;
+     (Tool    : in out Pp_Tool;
       Message : String := "");
 
 end Pp.Actions;
