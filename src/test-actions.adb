@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2019-2022, AdaCore                    --
+--                      Copyright (C) 2019-2023, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -512,6 +512,7 @@ package body Test.Actions is
       Test.Common.Omit_Sloc := Arg (Cmd, Omit_Sloc);
       Test.Common.Show_Test_Duration := Arg (Cmd, Test_Duration);
       Test.Common.Relocatable_Harness := Arg (Cmd, Relocatable_Harness);
+      Test.Common.Test_Filtering := Arg (Cmd, Test_Filtering);
 
       Test.Common.Strict_Execution := Arg (Cmd, Strict)
         or else (Ada.Environment_Variables.Exists ("GNATTEST_STRICT")
@@ -536,6 +537,19 @@ package body Test.Actions is
             end loop;
 
             Test.Common.No_Command_Line := not A_Comlin_Found;
+
+            if A_Comlin_Found then
+               for I in Files'Range loop
+                  if Arg (Cmd, Test_Filtering_File_IO) and then
+                    Files (I).Display_Base_Name = "s-ficobl.ads"
+                  then
+                     Test.Common.Text_IO_Present := True;
+                  end if;
+                  if Files (I).Display_Base_Name = "g-os_lib.ads" then
+                     Test.Common.GNAT_OS_Lib_Present := True;
+                  end if;
+               end loop;
+            end if;
          end;
       end if;
 
@@ -1025,6 +1039,8 @@ package body Test.Actions is
       Put (" --omit-sloc                    - Don't record subprogram sloc in test package\n");
       Put (" --no-command-line              - Don't add command line support to test driver\n");
       Put (" --test-duration                - Show timing for each test\n");
+      Put (" --test-filtering               - Add test filtering option to generated driver\n");
+      Put (" --no-test-filtering            - Suppress test filtering in generated driver\n");
       Put ("\n");
 
       Put ("Tests execution mode options:\n");

@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2011-2022, AdaCore                    --
+--                      Copyright (C) 2011-2023, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -126,6 +126,10 @@ package body Test.Harness is
    procedure Generate_Gnattest_Common_Prj;
    --  Generates abstract project file gnattest_common that contains different
    --  attributes relevant to the harness.
+
+   procedure Generate_Filtering_Map;
+   --  Generates package responsible for filtering execution of tests by slocs
+   --  of corresponding subprograms under test.
 
    function Gnattest_Common_Prj_Name return String is
      (Harness_Dir.all & Directory_Separator & "gnattest_common.gpr");
@@ -355,6 +359,248 @@ package body Test.Harness is
       Close_File;
    end Generate_Gnattest_Common_Prj;
 
+   ----------------------------
+   -- Generate_Filtering_Map --
+   ----------------------------
+
+   procedure Generate_Filtering_Map is
+      Common_File_Subdir  : constant String :=
+        Harness_Dir.all & GNAT.OS_Lib.Directory_Separator & "common";
+
+      Filter_Package_Name : constant String :=
+        Common_Package_Name & ".Mapping";
+   begin
+      if not Is_Directory (Common_File_Subdir) then
+         Make_Dir (Common_File_Subdir);
+      end if;
+
+      --  Spec
+      Create (Common_File_Subdir
+              & Directory_Separator
+              & Unit_To_File_Name (Filter_Package_Name) & ".ads");
+
+      Put_Harness_Header;
+      S_Put (0, GT_Marker_Begin);
+      Put_New_Line;
+
+      S_Put (0, "with AUnit.Test_Filters;");
+      Put_New_Line;
+      S_Put (0, "with AUnit.Tests;");
+      Put_New_Line;
+      Put_New_Line;
+
+      S_Put (0, "package " & Filter_Package_Name & " is");
+      Put_New_Line;
+      S_Put
+        (3,
+         "type GT_Filter is new AUnit.Test_Filters.Test_Filter with private;");
+      Put_New_Line;
+      Put_New_Line;
+      S_Put (3, "function Is_Active");
+      Put_New_Line;
+      S_Put (6, "(Filter : GT_Filter;");
+      Put_New_Line;
+      S_Put (7, "T      : AUnit.Tests.Test'Class) return Boolean;");
+      Put_New_Line;
+      Put_New_Line;
+      S_Put (3, "procedure Set_Selection_Mode (Filter : in out GT_Filter);");
+      Put_New_Line;
+      Put_New_Line;
+      S_Put (3, "procedure Set_From_SLOC");
+      Put_New_Line;
+      S_Put (6, "(Filter : in out GT_Filter;");
+      Put_New_Line;
+      S_Put (7, "SLOC   : String;");
+      Put_New_Line;
+      S_Put (7, "Found  : out Boolean);");
+      Put_New_Line;
+      Put_New_Line;
+
+      S_Put (0, "private");
+      Put_New_Line;
+      Put_New_Line;
+
+      S_Put
+        (3,
+         "Test_Routines_Total : constant Positive :="
+         & Natural'Image (Subp_UT_Counter) & ";");
+      Put_New_Line;
+      Put_New_Line;
+
+      S_Put
+        (3,
+         "type Selection_Type is array "
+         & "(1 .. Test_Routines_Total) of Boolean;");
+      Put_New_Line;
+      Put_New_Line;
+
+      S_Put
+        (3,
+         "type GT_Filter is new AUnit.Test_Filters.Test_Filter with record");
+      Put_New_Line;
+      S_Put (6, "Selection : Selection_Type := (others => True);");
+      Put_New_Line;
+      S_Put (3, "end record;");
+      Put_New_Line;
+
+      Put_New_Line;
+      S_Put (0, "end " & Filter_Package_Name & ";");
+      Put_New_Line;
+
+      S_Put (0, GT_Marker_End);
+      Put_New_Line;
+
+      Close_File;
+
+      --  Body
+      Create (Common_File_Subdir
+              & Directory_Separator
+              & Unit_To_File_Name (Filter_Package_Name) & ".adb");
+
+      Put_Harness_Header;
+      S_Put (0, GT_Marker_Begin);
+      Put_New_Line;
+
+      S_Put (0, "with AUnit.Simple_Test_Cases;  use AUnit.Simple_Test_Cases;");
+      Put_New_Line;
+      S_Put (0, "with AUnit; use AUnit;");
+      Put_New_Line;
+      Put_New_Line;
+
+      S_Put (0, "package body " & Filter_Package_Name & " is");
+      Put_New_Line;
+      Put_New_Line;
+
+      S_Put (3, "Selection_Mode : Boolean := False;");
+      Put_New_Line;
+      Put_New_Line;
+
+      S_Put
+        (3, "function Starts_With (Str : String; "
+         & "Prefix : String) return Boolean;");
+      Put_New_Line;
+      Put_New_Line;
+
+      S_Put
+        (3, "function Starts_With (Str : String; "
+         & "Prefix : String) return Boolean is");
+      Put_New_Line;
+      S_Put (3, "begin");
+      Put_New_Line;
+      S_Put (6, "if Str'Length < Prefix'Length then");
+      Put_New_Line;
+      S_Put (9, "return False;");
+      Put_New_Line;
+      S_Put (6, "end if;");
+      Put_New_Line;
+      S_Put
+        (6,
+         "return Str (Str'First .. Str'First + Prefix'Length - 1) = Prefix;");
+      Put_New_Line;
+      S_Put (3, "end Starts_With;");
+      Put_New_Line;
+      Put_New_Line;
+
+      S_Put (3, "procedure Set_Selection_Mode (Filter : in out GT_Filter) is");
+      Put_New_Line;
+      S_Put (3, "begin");
+      Put_New_Line;
+      S_Put (6, "if Selection_Mode then");
+      Put_New_Line;
+      S_Put (9, "return;");
+      Put_New_Line;
+      S_Put (6, "end if;");
+      Put_New_Line;
+      S_Put (6, "Selection_Mode := True;");
+      Put_New_Line;
+      S_Put (6, "for J in Filter.Selection'Range loop");
+      Put_New_Line;
+      S_Put (9, "Filter.Selection (J) := False;");
+      Put_New_Line;
+      S_Put (6, "end loop;");
+      Put_New_Line;
+      S_Put (3, "end Set_Selection_Mode;");
+      Put_New_Line;
+      Put_New_Line;
+
+      S_Put (3, "function Is_Active");
+      Put_New_Line;
+      S_Put (6, "(Filter : GT_Filter;");
+      Put_New_Line;
+      S_Put (7, "T      : AUnit.Tests.Test'Class) return Boolean is");
+      Put_New_Line;
+      S_Put (3, "begin");
+      Put_New_Line;
+      Put_New_Line;
+      S_Put (6, "if not Selection_Mode then");
+      Put_New_Line;
+      S_Put (9, "return True;");
+      Put_New_Line;
+      S_Put (6, "end if;");
+      Put_New_Line;
+      S_Put (6, "if T not in AUnit.Simple_Test_Cases.Test_Case'Class");
+      Put_New_Line;
+      S_Put
+        (8,
+         "or else Name (AUnit.Simple_Test_Cases.Test_Case'Class (T)) = null");
+      Put_New_Line;
+      S_Put (6, "then");
+      Put_New_Line;
+      S_Put (9, "return False;");
+      Put_New_Line;
+      S_Put (6, "end if;");
+      Put_New_Line;
+      Put_New_Line;
+
+      S_Put (6, "declare");
+      Put_New_Line;
+      S_Put (9, "SLOC : constant String :=");
+      Put_New_Line;
+      S_Put (11, "Name (AUnit.Simple_Test_Cases.Test_Case'Class (T)).all;");
+      Put_New_Line;
+      S_Put (6, "begin");
+      Put_New_Line;
+      Put_New_Line;
+      Generate_Is_Active_For_Filter;
+      Put_New_Line;
+      Put_New_Line;
+      S_Put (6, "end;");
+      Put_New_Line;
+      Put_New_Line;
+      S_Put (6, "return False;");
+      Put_New_Line;
+      S_Put (3, "end Is_Active;");
+      Put_New_Line;
+      Put_New_Line;
+
+      S_Put (3, "procedure Set_From_SLOC");
+      Put_New_Line;
+      S_Put (6, "(Filter : in out GT_Filter;");
+      Put_New_Line;
+      S_Put (7, "SLOC   : String;");
+      Put_New_Line;
+      S_Put (7, "Found  : out Boolean) is");
+      Put_New_Line;
+      S_Put (3, "begin");
+      Put_New_Line;
+      S_Put (6, "Found := True;");
+      Put_New_Line;
+      Put_New_Line;
+      Generate_Set_Active_For_Filter;
+      Put_New_Line;
+      S_Put (3, "end Set_From_SLOC;");
+      Put_New_Line;
+      Put_New_Line;
+
+      Put_New_Line;
+      S_Put (0, "end " & Filter_Package_Name & ";");
+      Put_New_Line;
+      S_Put (0, GT_Marker_End);
+      Put_New_Line;
+
+      Close_File;
+   end Generate_Filtering_Map;
+
    -----------------------------
    --  Test_Runner_Generator  --
    -----------------------------
@@ -463,6 +709,8 @@ package body Test.Harness is
       S_Put (0, GT_Marker_Begin);
       Put_New_Line;
 
+      S_Put (0, "pragma Ada_2005;");
+      Put_New_Line;
       S_Put (0, "with AUnit.Reporter." & Reporter_Name.all & ";");
       Put_New_Line;
       S_Put (0, "with AUnit.Run;");
@@ -477,6 +725,20 @@ package body Test.Harness is
          Put_New_Line;
          S_Put (0, "with Ada.Command_Line;");
          Put_New_Line;
+         if not Harness_Only and then Test_Filtering then
+            S_Put (0, "with AUnit.IO;");
+            Put_New_Line;
+            if Text_IO_Present then
+               S_Put (0, "with Ada.Text_IO;");
+               Put_New_Line;
+            end if;
+            if GNAT_OS_Lib_Present then
+               S_Put (0, "with GNAT.OS_Lib;");
+               Put_New_Line;
+            end if;
+            S_Put (0, "with Gnattest_Generated.Mapping;");
+            Put_New_Line;
+         end if;
       end if;
       S_Put (0, "with Gnattest_Generated.Persistent;");
       Put_New_Line;
@@ -519,6 +781,109 @@ package body Test.Harness is
       Put_New_Line;
       S_Put (3, "GT_Options : AUnit_Options := Default_Options;");
       Put_New_Line;
+
+      if not No_Command_Line and then not Harness_Only and then Test_Filtering
+      then
+         S_Put (3, "Fil : aliased Gnattest_Generated.Mapping.GT_Filter;");
+         Put_New_Line;
+         S_Put (3, "SLOC_Found : Boolean;");
+         Put_New_Line;
+
+         if Text_IO_Present then
+            S_Put
+              (3,
+               "procedure Process_Routines "
+               & "(File : String; SLOC_Found : out Boolean);");
+            Put_New_Line;
+            S_Put
+              (3,
+               "procedure Process_Routines "
+               & "(File : String; SLOC_Found : out Boolean) is");
+            Put_New_Line;
+            S_Put (6, "use Ada.Text_IO;");
+            Put_New_Line;
+            S_Put (6, "F : File_Type;");
+            Put_New_Line;
+            S_Put (3, "begin");
+            if GNAT_OS_Lib_Present then
+               Put_New_Line;
+               S_Put
+                 (6,
+                  "Open (F, In_File, GNAT.OS_Lib.Normalize_Pathname (File));");
+            else
+               Put_New_Line;
+               S_Put (6, "Open (F, In_File, File);");
+            end if;
+            Put_New_Line;
+            S_Put (6, "while not End_Of_File (F) loop");
+            Put_New_Line;
+            S_Put (9, "declare");
+            Put_New_Line;
+            S_Put (12, "Line : constant String := Get_Line (F);");
+            Put_New_Line;
+            S_Put (9, "begin");
+            Put_New_Line;
+            S_Put
+              (12,
+               "if Line'Length < 2 or else (Line (Line'First .. Line'First"
+               & " + 1)) /= ""--"" then");
+            Put_New_Line;
+            S_Put
+              (15,
+               "Gnattest_Generated.Mapping.Set_From_SLOC "
+               & "(Fil, Line, SLOC_Found);");
+            Put_New_Line;
+            S_Put (15, "if not SLOC_Found then");
+            Put_New_Line;
+            S_Put (21, "AUnit.IO.Put_Line");
+            Put_New_Line;
+            S_Put
+              (24,
+               "(AUnit.IO.Standard_Output.all,");
+            Put_New_Line;
+            S_Put
+              (25,
+               """no subprogram corresponds to sloc "" & Line & "";"
+               & " aborting"");");
+            Put_New_Line;
+            S_Put (18, "return;");
+            Put_New_Line;
+            S_Put (15, "end if;");
+            Put_New_Line;
+            S_Put (12, "end if;");
+            Put_New_Line;
+            S_Put (9, "end;");
+            Put_New_Line;
+            S_Put (6, "end loop;");
+            Put_New_Line;
+            S_Put (6, "Close (F);");
+            Put_New_Line;
+            S_Put (3, "exception");
+            Put_New_Line;
+            S_Put (6, "when others =>");
+            Put_New_Line;
+            S_Put (9, "AUnit.IO.Put_Line");
+            Put_New_Line;
+            S_Put (12, "(AUnit.IO.Standard_Output.all,");
+            if GNAT_OS_Lib_Present then
+               Put_New_Line;
+               S_Put
+                 (13,
+                  """error opening "" & "
+                  & "GNAT.OS_Lib.Normalize_Pathname (File));");
+            else
+               Put_New_Line;
+               S_Put (13, """error opening "" & File);");
+            end if;
+            Put_New_Line;
+            S_Put (12, "raise;");
+            Put_New_Line;
+            S_Put (3, "end Process_Routines;");
+            Put_New_Line;
+         end if;
+
+      end if;
+
       S_Put (0, "begin");
       Put_New_Line;
       Put_New_Line;
@@ -547,7 +912,8 @@ package body Test.Harness is
               (11, "(""-passed-tests= -exit-status="")");
          else
             S_Put
-              (11, "(""-skeleton-default= -passed-tests= -exit-status="")");
+              (11, "(""-skeleton-default= -passed-tests= -exit-status="
+               & (if Test_Filtering then " -routines="")" else """)"));
          end if;
          Put_New_Line;
          S_Put (9, "is");
@@ -558,8 +924,9 @@ package body Test.Harness is
          Put_New_Line;
          S_Put (12, "when '-' =>");
          Put_New_Line;
-         --  --skeleton-default
+
          if not Harness_Only then
+            --  --skeleton-default
             S_Put (15, "if Full_Switch = ""-skeleton-default"" then");
             Put_New_Line;
             S_Put (18, "if Parameter = ""pass"" then");
@@ -574,7 +941,83 @@ package body Test.Harness is
             Put_New_Line;
             S_Put (15, "end if;");
             Put_New_Line;
+
+            --  --routines
+            if Test_Filtering then
+               S_Put (15, "if Full_Switch = ""-routines"" then");
+               Put_New_Line;
+
+               S_Put
+                 (18, "Gnattest_Generated.Mapping.Set_Selection_Mode (Fil);");
+               Put_New_Line;
+
+               if Text_IO_Present then
+                  S_Put (18, "if Parameter (Parameter'First) = '@' then");
+                  Put_New_Line;
+                  S_Put
+                    (21,
+                     "Process_Routines (Parameter (Parameter'First + 1 .. "
+                     & "Parameter'Last), SLOC_Found);");
+                  Put_New_Line;
+                  S_Put (18, "else");
+                  Put_New_Line;
+                  S_Put
+                    (21,
+                     "Gnattest_Generated.Mapping.Set_From_SLOC "
+                     & "(Fil, Parameter, SLOC_Found);");
+                  Put_New_Line;
+                  S_Put (21, "if not SLOC_Found then");
+                  Put_New_Line;
+                  S_Put (24, "AUnit.IO.Put_Line");
+                  Put_New_Line;
+                  S_Put
+                    (27,
+                     "(AUnit.IO.Standard_Output.all,");
+                  Put_New_Line;
+                  S_Put
+                    (28,
+                     """no subprogram corresponds to sloc "" & Parameter & "";"
+                     & " aborting"");");
+                  Put_New_Line;
+                  S_Put (21, "end if;");
+                  Put_New_Line;
+                  S_Put (18, "end if;");
+               else
+                  S_Put
+                    (18,
+                     "Gnattest_Generated.Mapping.Set_From_SLOC "
+                     & "(Fil, Parameter, SLOC_Found);");
+                  Put_New_Line;
+                  S_Put (18, "if not SLOC_Found then");
+                  Put_New_Line;
+                  S_Put (21, "AUnit.IO.Put_Line");
+                  Put_New_Line;
+                  S_Put
+                    (24,
+                     "(AUnit.IO.Standard_Output.all,");
+                  Put_New_Line;
+                  S_Put
+                    (25,
+                     """no subprogram corresponds to sloc "" & Parameter & "";"
+                     & " aborting"");");
+                  Put_New_Line;
+                  S_Put (18, "end if;");
+                  Put_New_Line;
+               end if;
+               Put_New_Line;
+
+               S_Put (18, "if not SLOC_Found then");
+               Put_New_Line;
+               S_Put (21, "return;");
+               Put_New_Line;
+               S_Put (18, "end if;");
+               Put_New_Line;
+
+               S_Put (15, "end if;");
+               Put_New_Line;
+            end if;
          end if;
+
          --  --passed-tests
          S_Put (15, "if Full_Switch = ""-passed-tests"" then");
          Put_New_Line;
@@ -619,6 +1062,7 @@ package body Test.Harness is
          Put_New_Line;
          Put_New_Line;
       end if;
+
       if No_Command_Line then
          S_Put (3, "Gnattest_Generated.Persistent.Global_Set_Up;");
          Put_New_Line;
@@ -627,6 +1071,10 @@ package body Test.Harness is
          S_Put (3, "Gnattest_Generated.Persistent.Global_Tear_Down;");
          Put_New_Line;
       else
+         if not Harness_Only and then Test_Filtering then
+            S_Put (3, "GT_Options.Filter := Fil'Unchecked_Access;");
+            Put_New_Line;
+         end if;
          S_Put (3, "Gnattest_Generated.Persistent.Global_Set_Up;");
          Put_New_Line;
          S_Put (3, "Exit_Status := Runner (Reporter, GT_Options);");
@@ -649,6 +1097,12 @@ package body Test.Harness is
       S_Put (0, GT_Marker_End);
       Put_New_Line;
       Close_File;
+
+      if not No_Command_Line and then not Harness_Only and then Test_Filtering
+      then
+         --  Creating filtering map
+         Generate_Filtering_Map;
+      end if;
 
    end Test_Runner_Generator;
 

@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2019-2022, AdaCore                    --
+--                      Copyright (C) 2019-2023, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -46,7 +46,9 @@ package Test.Command_Lines is
       Command_Line_Support,
       Test_Duration,
       Relocatable_Harness,
-      Gen_Test_Vectors);
+      Gen_Test_Vectors,
+      Test_Filtering,
+      Test_Filtering_File_IO);
 
    package Test_Boolean_Switches is new Boolean_Switches
      (Descriptor,
@@ -65,9 +67,11 @@ package Test.Command_Lines is
 
    package Test_Boolean_Defaults is new
      Test_Boolean_Switches.Set_Defaults
-       ([Inheritance_Check => True,
-         Command_Line_Support => True,
-         Harness_Only => False,
+       ([Inheritance_Check      => True,
+         Command_Line_Support   => True,
+         Harness_Only           => False,
+         Test_Filtering         => True,
+         Test_Filtering_File_IO => True,
          others => False]);
 
    type Test_Strings is

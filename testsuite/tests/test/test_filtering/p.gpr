@@ -1,0 +1,7 @@
+project P is
+   package GNATTest is
+      for Harness_Dir use "h";
+      for Skeletons_Default use "pass";
+      for Gnattest_Switches use ("--validate-type-extensions");
+   end GNATTest;
+end P;

@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2015-2021, AdaCore                    --
+--                      Copyright (C) 2015-2023, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -500,5 +500,126 @@ package body Test.Mapping is
       New_Line_Counter_Val := New_Line_Counter_Val + 1;
       Put_New_Line;
    end New_Line_Count;
+
+   ------------------------------------
+   -- Generate_Set_Active_For_Filter --
+   ------------------------------------
+
+   procedure Generate_Set_Active_For_Filter is
+      Index : Positive := 1;
+
+      SP_Cur  : SP_Mapping.Cursor;
+      TP_List : TP_Mapping_List.List;
+   begin
+      SP_Cur := Mapping.First;
+      loop
+         exit when SP_Cur = SP_Mapping.No_Element;
+
+         TP_List := SP_Mapping.Element (SP_Cur).Test_Info;
+
+         declare
+            Src : constant String := Base_Name (SP_Mapping.Key (SP_Cur));
+         begin
+
+            for TP of TP_List loop
+               for TR of TP.TR_List loop
+                  S_Put
+                    (6,
+                     (if Index = 1 then "if" else "elsif") & " SLOC = """
+                     & Src & ":" & Trim (TR.Decl_Line'Img, Both) & """ then");
+                  Put_New_Line;
+                  S_Put
+                    (9,
+                     "Filter.Selection ("
+                     & Trim (Index'Img, Both) & ") := True;");
+                  Put_New_Line;
+                  Index := Index + 1;
+               end loop;
+            end loop;
+
+            SP_Mapping.Next (SP_Cur);
+         end;
+      end loop;
+
+      S_Put (6, "else");
+      Put_New_Line;
+      S_Put (9, "Found := False;");
+      Put_New_Line;
+      S_Put (6, "end if;");
+      Put_New_Line;
+
+   end Generate_Set_Active_For_Filter;
+
+   -----------------------------------
+   -- Generate_Is_Active_For_Filter --
+   -----------------------------------
+
+   procedure Generate_Is_Active_For_Filter is
+      Index : Positive := 1;
+
+      SP_Cur  : SP_Mapping.Cursor;
+      TP_List : TP_Mapping_List.List;
+
+      First_TC_Ever : Boolean := True;
+
+      function Put_If return Boolean is (Index = 1 and First_TC_Ever);
+      --  Tells whether we should put IF instead of ELSIF
+   begin
+      SP_Cur := Mapping.First;
+      loop
+         exit when SP_Cur = SP_Mapping.No_Element;
+
+         TP_List := SP_Mapping.Element (SP_Cur).Test_Info;
+
+         declare
+            Src : constant String := Base_Name (SP_Mapping.Key (SP_Cur));
+         begin
+
+            for TP of TP_List loop
+               for TR of TP.TR_List loop
+
+                  if TR.Test = null then
+                     for TC of TR.TC_List loop
+                        S_Put
+                          (9,
+                           (if Put_If then "if" else "elsif")
+                           & " Starts_With (SLOC, """
+                           & Src & ":" & Trim (TC.Line'Img, Both)
+                           & """) then");
+                        First_TC_Ever := False;
+                        Put_New_Line;
+                        S_Put
+                          (12,
+                           "return Filter.Selection ("
+                           & Trim (Index'Img, Both) & ");");
+                        Put_New_Line;
+                     end loop;
+                     Index := Index + 1;
+                  else
+                     S_Put
+                       (9,
+                        (if Index = 1 then "if" else "elsif")
+                        & " Starts_With (SLOC, """
+                        & Src & ":" & Trim (TR.Decl_Line'Img, Both)
+                        & """) then");
+                     Put_New_Line;
+                     S_Put
+                       (12,
+                        "return Filter.Selection ("
+                        & Trim (Index'Img, Both) & ");");
+                     Put_New_Line;
+                     Index := Index + 1;
+                  end if;
+
+               end loop;
+            end loop;
+
+            SP_Mapping.Next (SP_Cur);
+         end;
+      end loop;
+
+      S_Put (9, "end if;");
+
+   end Generate_Is_Active_For_Filter;
 
 end Test.Mapping;
