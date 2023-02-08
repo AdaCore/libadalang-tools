@@ -1,0 +1,8 @@
+title: help
+
+description: Tests the output of the --help flag
+
+driver: shell_script
+
+control:
+    - ['SKIP', 'env.build.os.name != "windows"']

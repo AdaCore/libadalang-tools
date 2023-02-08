@@ -1,7 +1,7 @@
-usage: gnatrefactor(?:\.exe)? \[--help\|-h] \[--help\|-h] tool \[--verbose\|-v] \[--pipe\|-p]\s*
-\s*\[--project\|-P PROJECT] \[--sources\|-S SOURCES \[SOURCES\.\.\.]]\s*
-\s*\[-X nm=val \[nm=val\.\.\.]] \[--from-gnat-warnings\|-fgw\s*
-\s*<file_with_gnat_warnings>]\s*
+usage: gnatrefactor [--help|-h] [--help|-h] tool [--verbose|-v] [--pipe|-p] 
+                   [--project|-P PROJECT] [--sources|-S SOURCES [SOURCES...]] 
+                   [-X nm=val [nm=val...]] [--from-gnat-warnings|-fgw 
+                   <file_with_gnat_warnings>] 
 
 Refactor tools
 
