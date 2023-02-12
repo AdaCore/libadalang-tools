@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2011-2022, AdaCore                    --
+--                      Copyright (C) 2011-2023, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -861,7 +861,6 @@ package body Test.Common is
    procedure Generate_Common_File is
       Harness_Dir : GNAT.OS_Lib.String_Access renames Harness_Dir_Str;
 
-      Common_Package_Name : constant String := "Gnattest_Generated";
       Persistent_Package_Name : constant String :=
         Common_Package_Name & ".Persistent";
       Common_File_Subdir  : constant String :=

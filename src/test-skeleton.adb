@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2011-2022, AdaCore                    --
+--                      Copyright (C) 2011-2023, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -1504,6 +1504,9 @@ package body Test.Skeleton is
             return Over;
          end if;
 
+         if not Inside_Inst then
+            Subp_UT_Counter := Subp_UT_Counter + 1;
+         end if;
          Subp.Subp_Declaration := Node.As_Ada_Node;
          Subp.Subp_Text_Name   := new String'(Get_Subp_Name (Node));
          Subp.Subp_Name_Image   := new String'
@@ -7112,9 +7115,15 @@ package body Test.Skeleton is
       TR_Cur : TR_Mapping_List.Cursor;
       TP_Cur : TP_Mapping_List.Cursor := TP_List.First;
 
-      Subp_Span : constant Source_Location_Range :=
+      Subp_Name_Span : constant Source_Location_Range :=
         Subp.Subp_Declaration.As_Basic_Decl.P_Defining_Name.Sloc_Range;
-      TC_Span   : constant Source_Location_Range := No_Source_Location_Range;
+      Subp_Span : constant Source_Location_Range :=
+        Subp.Subp_Declaration.Sloc_Range;
+      TC_Span   : constant Source_Location_Range :=
+        (if Subp.Has_TC_Info then
+            Subp.TC_Info.Elem.Sloc_Range
+         else
+            No_Source_Location_Range);
    begin
 
       loop
@@ -7130,8 +7139,9 @@ package body Test.Skeleton is
       if TP_Cur = TP_Mapping_List.No_Element then
          TP.TP_Name := new String'(TPtarg);
          TR.TR_Name := new String'(Subp.Subp_Text_Name.all);
-         TR.Line := Natural (Subp_Span.Start_Line);
-         TR.Column := Natural (Subp_Span.Start_Column);
+         TR.Line := Natural (Subp_Name_Span.Start_Line);
+         TR.Decl_Line  := Natural (Subp_Span.Start_Line);
+         TR.Column := Natural (Subp_Name_Span.Start_Column);
          if Subp.Has_TC_Info then
             TC.T_Name := new String'(Subp.Subp_Mangle_Name.all);
             TC.TC_Name := new String'(Subp.TC_Info.Name.all);
@@ -7162,9 +7172,9 @@ package body Test.Skeleton is
 
          if
            TR_Mapping_List.Element (TR_Cur).Line =
-           Natural (Subp_Span.Start_Line) and then
+           Natural (Subp_Name_Span.Start_Line) and then
            TR_Mapping_List.Element (TR_Cur).Column =
-           Natural (Subp_Span.Start_Column)
+           Natural (Subp_Name_Span.Start_Column)
          then
             exit;
          end if;
@@ -7175,8 +7185,9 @@ package body Test.Skeleton is
       if TR_Cur = TR_Mapping_List.No_Element then
 
          TR.TR_Name := new String'(Subp.Subp_Text_Name.all);
-         TR.Line := Natural (Subp_Span.Start_Line);
-         TR.Column := Natural (Subp_Span.Start_Column);
+         TR.Line := Natural (Subp_Name_Span.Start_Line);
+         TR.Decl_Line := Natural (Subp_Span.Start_Line);
+         TR.Column := Natural (Subp_Name_Span.Start_Column);
          if Subp.Has_TC_Info then
             TC.T_Name := new String'(Subp.Subp_Mangle_Name.all);
             TC.TC_Name := new String'(Subp.TC_Info.Name.all);

@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2015-2021, AdaCore                    --
+--                      Copyright (C) 2015-2023, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -65,6 +65,12 @@ package Test.Mapping is
 
       TR_Line   : Natural;
       --  Only used in no separates mode.
+
+      Decl_Line : Natural;
+      --  Unlike Line, that is pointing to name of the tested routine,
+      --  this one points at the first line of declaration. This is needed
+      --  to properly support cases with "overriding/not overriding" decorators
+      --  in test filtering, as decorator usually takes an extra line.
    end record;
    --  Stores info on individual subprogram under test and collection of
    --  corresponding test cases (if any).
@@ -197,5 +203,13 @@ package Test.Mapping is
 
    procedure Generate_Mapping_File;
    --  Creates a mapping file for tested suprograms and tests.
+
+   procedure Generate_Set_Active_For_Filter;
+   --  Generates set of IF statements for
+   --  Gnattest_Generated..Mapping.Set_From_SLOC.
+
+   procedure Generate_Is_Active_For_Filter;
+   --  Generates set of IF statements for
+   --  Gnattest_Generated..Mapping.Is_Active.
 
 end Test.Mapping;

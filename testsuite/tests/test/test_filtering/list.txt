@@ -1,0 +1,2 @@
+simple.ads:5
+speed2.ads:10

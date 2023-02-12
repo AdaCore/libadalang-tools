@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2011-2022, AdaCore                    --
+--                      Copyright (C) 2011-2023, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -371,5 +371,20 @@ package Test.Common is
 
    TGen_Num_Tests : Positive := 5;
    --  Number of tests to be generated for each procedure
+
+   Common_Package_Name     : constant String := "Gnattest_Generated";
+   --  Root package name for common generated files
+
+   Subp_UT_Counter : Natural := 0;
+   --  Total ammount of processed subprograms
+
+   Text_IO_Present : Boolean := False;
+   --  Whether runtime has Ada.Text_IO
+
+   GNAT_OS_Lib_Present : Boolean := False;
+   --  Whether runtime has GNAT.OS_Lib
+
+   Test_Filtering : Boolean := True;
+   --  Generate test filtering in the test driver
 
 end Test.Common;
