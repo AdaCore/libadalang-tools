@@ -101,4 +101,10 @@ package Lint.Command_Line is
       Default_Val => GNATCOLL.VFS.No_File,
       Name        => "<file_with_gnat_warnings>");
 
+   package Remove_Indices is new Parse_Flag
+     (Parser   => Parser,
+      Short    => "-ri",
+      Long     => "--remove-indices",
+      Help     => "Removes the indices in empty and one element arrays");
+
 end Lint.Command_Line;
