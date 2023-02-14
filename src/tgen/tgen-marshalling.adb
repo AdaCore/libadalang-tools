@@ -36,6 +36,7 @@ with TGen.Types.Array_Types;       use TGen.Types.Array_Types;
 with TGen.Types.Constraints;       use TGen.Types.Constraints;
 with TGen.Types.Discrete_Types;    use TGen.Types.Discrete_Types;
 with TGen.Types.Enum_Types;        use TGen.Types.Enum_Types;
+with TGen.Types.Int_Types;         use TGen.Types.Int_Types;
 with TGen.Types.Real_Types;        use TGen.Types.Real_Types;
 with TGen.Types.Record_Types;      use TGen.Types.Record_Types;
 
@@ -1002,7 +1003,9 @@ package body TGen.Marshalling is
       if Typ in Scalar_Typ'Class then
          declare
             Generic_Name : constant String :=
-              (if Typ in Discrete_Typ'Class then "Read_Write_Discrete"
+              (if Typ in Signed_Int_Typ'Class then "Read_Write_Signed"
+               elsif Typ in Mod_Int_Typ'Class then "Read_Write_Unsigned"
+               elsif Typ in Enum_Typ'Class then "Read_Write_Enum"
                elsif Typ in Float_Typ'Class then "Read_Write_Float"
                elsif Typ in Ordinary_Fixed_Typ'Class
                then "Read_Write_Ordinary_Fixed"

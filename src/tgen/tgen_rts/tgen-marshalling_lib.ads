@@ -44,7 +44,7 @@ package TGen.Marshalling_Lib is
 
    generic
       type T is (<>);
-   package Read_Write_Discrete is
+   package Read_Write_Enum is
 
       function Size
         (First : T := T'First;
@@ -67,7 +67,61 @@ package TGen.Marshalling_Lib is
          First  : T := T'First;
          Last   : T := T'Last);
 
-   end Read_Write_Discrete;
+   end Read_Write_Enum;
+
+   generic
+      type T is range <>;
+   package Read_Write_Signed is
+
+      function Size
+        (First : T := T'First;
+         Last  : T := T'Last) return Natural;
+      --  Return the number of bits used for values of the type
+
+      procedure Write
+        (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+         Buffer : in out Unsigned_8;
+         Offset : in out Offset_Type;
+         V      : T;
+         First  : T := T'First;
+         Last   : T := T'Last);
+
+      procedure Read
+        (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+         Buffer : in out Unsigned_8;
+         Offset : in out Offset_Type;
+         V      : out T;
+         First  : T := T'First;
+         Last   : T := T'Last);
+
+   end Read_Write_Signed;
+
+   generic
+      type T is mod <>;
+   package Read_Write_Unsigned is
+
+      function Size
+        (First : T := T'First;
+         Last  : T := T'Last) return Natural;
+      --  Return the number of bits used for values of the type
+
+      procedure Write
+        (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+         Buffer : in out Unsigned_8;
+         Offset : in out Offset_Type;
+         V      : T;
+         First  : T := T'First;
+         Last   : T := T'Last);
+
+      procedure Read
+        (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+         Buffer : in out Unsigned_8;
+         Offset : in out Offset_Type;
+         V      : out T;
+         First  : T := T'First;
+         Last   : T := T'Last);
+
+   end Read_Write_Unsigned;
 
    generic
       type T is delta <> digits <>;
