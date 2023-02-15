@@ -161,6 +161,9 @@ procedure Example_Gen is
 
       D1 : constant Date := (Year => 2033, Month => January, Day => 23);
       D2 : Date;
+
+      M1 : constant Non_Static_Mod := Non_Static_Mod (Rand3.Random (Gen3));
+      M2 : Non_Static_Mod;
    begin
       if Debug then
          Put_R (V1);
@@ -170,12 +173,15 @@ procedure Example_Gen is
       S := Stream (F);
       TGen_Marshalling_My_File_R_Output (S, V1);
       TGen_Marshalling_Show_Date_Date_Output (S, D1);
+      TGen_Marshalling_My_File_Non_Static_Mod_Output (S, M1);
       Close (F);
 
       Open (F, In_File, File_Name);
       S := Stream (F);
       V2 := TGen_Marshalling_My_File_R_Input (S);
       D2 := TGen_Marshalling_Show_Date_Date_Input (S);
+      M2 := TGen_Marshalling_My_File_Non_Static_Mod_Input (S);
+
       Close (F);
 
       if Debug then
@@ -187,6 +193,9 @@ procedure Example_Gen is
       end if;
       if D1 /= D2 then
          Ada.Text_IO.Put_Line ("D1 FAIL");
+      end if;
+      if M1 /= M2 then
+         Ada.Text_IO.Put_Line ("M1 FAIl");
       end if;
    end Test;
 
