@@ -92,7 +92,7 @@ package body TGen.Types.Translation is
      (Decl      : Base_Type_Decl;
       Type_Name : Defining_Name;
       Cmp_Idx   : Positive) return Translation_Result with
-      Pre => Decl.P_Is_Static_Decl and then Decl.P_Is_Int_Type;
+      Pre => Decl.P_Is_Int_Type;
 
    function Translate_Enum_Decl
      (Decl           : Base_Type_Decl;
@@ -318,36 +318,92 @@ package body TGen.Types.Translation is
    is
       Rang : constant Discrete_Range := Decl.P_Discrete_Range;
 
-      Max : constant Big_Integer :=
-        Big_Int.From_String (New_Eval_As_Int (High_Bound (Rang)).Image);
-      --  Since Decl is a static subtype, its bounds are also static
-      --  expressions according to RM 4.9(26/2).
-      Res : Translation_Result (Success => True);
+      Max, Min : Big_Integer;
+      --  Static evaluations of the bounds, if available
+
+      Is_Actually_Static : Boolean := Decl.P_Is_Static_Decl;
+      --  Sometimes LAL reports a declaration as static, but isn't able to
+      --  evaluate the bounds of the type, we thus have to consider the type as
+      --  non static. To do so we have no choice but to try to evaluate the
+      --  bounds, and see if we get an exception.
+
+      Ada_Type_Name : constant Ada_Qualified_Name :=
+        Convert_Qualified_Name (Type_Name.P_Fully_Qualified_Name_Array);
+
+      Is_Mode_Typ : constant Boolean :=
+        Decl.P_Root_Type.P_Full_View.As_Concrete_Type_Decl.F_Type_Def.Kind
+          in Ada_Mod_Int_Type_Def;
    begin
-      if Is_Null (Low_Bound (Rang)) then
-         Res.Res.Set
-           (Mod_Int_Typ'(Is_Static          => True,
-                         Name               =>
-                           Convert_Qualified_Name
-                             (Type_Name.P_Fully_Qualified_Name_Array),
-                         Last_Comp_Unit_Idx => Cmp_Idx,
-                         Mod_Value          => Max));
-      else
-         declare
-            Min : constant Big_Integer :=
-              Big_Int.From_String (New_Eval_As_Int (Low_Bound (Rang)).Image);
+      if High_Bound (Rang).Is_Null then
+         Is_Actually_Static := False;
+      end if;
+      if Is_Actually_Static then
          begin
+            Max :=
+              Big_Int.From_String (New_Eval_As_Int (High_Bound (Rang)).Image);
+         exception
+            when Non_Static_Error =>
+               Max := Big_Int.To_Big_Integer (0);
+               Is_Actually_Static := False;
+         end;
+      end if;
+
+      if Is_Mode_Typ then
+         --  ???modular subtypes can actually have a lower bound different than
+         --  zero. We need to change the type representation to account for
+         --  this.
+
+         if Is_Actually_Static then
+            return Res : Translation_Result (Success => True) do
+               Res.Res.Set
+                 (Mod_Int_Typ'(Is_Static          => True,
+                               Name               => Ada_Type_Name,
+                               Last_Comp_Unit_Idx => Cmp_Idx,
+                               Mod_Value          => Max));
+            end return;
+         else
+            return Res : Translation_Result (Success => True) do
+               Res.Res.Set
+                 (Mod_Int_Typ'
+                    (Is_Static          => False,
+                     Name               => Ada_Type_Name,
+                     Last_Comp_Unit_Idx => Cmp_Idx));
+            end return;
+         end if;
+      end if;
+      --  We are not dealing with a mod type, let's evaluate the low bound
+
+      if Low_Bound (Rang).Is_Null then
+         Is_Actually_Static := False;
+      end if;
+      if Is_Actually_Static then
+         begin
+            Min := Big_Int.From_String
+               (New_Eval_As_Int (Low_Bound (Rang)).Image);
+         exception
+            when Non_Static_Error =>
+               Min := Big_Int.To_Big_Integer (0);
+               Is_Actually_Static := False;
+         end;
+      end if;
+      if Is_Actually_Static then
+         return Res : Translation_Result (Success => True) do
             Res.Res.Set
               (Signed_Int_Typ'(Is_Static          => True,
-                               Name               =>
-                                 Convert_Qualified_Name
-                                   (Type_Name.P_Fully_Qualified_Name_Array),
+                               Name               => Ada_Type_Name,
                                Last_Comp_Unit_Idx => Cmp_Idx,
                                Range_Value        =>
                                  (Min => Min, Max => Max)));
-         end;
+         end return;
+      else
+         return Res : Translation_Result (Success => True) do
+            Res.Res.Set
+              (Signed_Int_Typ'
+                 (Is_Static          => False,
+                  Name               => Ada_Type_Name,
+                  Last_Comp_Unit_Idx => Cmp_Idx));
+         end return;
       end if;
-      return Res;
    end Translate_Int_Decl;
 
    -------------------------
@@ -2937,18 +2993,7 @@ package body TGen.Types.Translation is
                Last_Comp_Unit_Idx => Comp_Unit_Idx));
          end return;
       elsif Root_Type.P_Is_Int_Type then
-         if Is_Static then
-            return Translate_Int_Decl (N, Type_Name, Comp_Unit_Idx);
-         else
-            return Res : Translation_Result (Success => True) do
-               Res.Res.Set (Int_Typ'
-                 (Is_Static          => False,
-                  Name               =>
-                    Convert_Qualified_Name
-                      (Type_Name.P_Fully_Qualified_Name_Array),
-                  Last_Comp_Unit_Idx => Comp_Unit_Idx));
-            end return;
-         end if;
+         return Translate_Int_Decl (N, Type_Name, Comp_Unit_Idx);
 
       elsif P_Is_Derived_Type
           (Node       => N,

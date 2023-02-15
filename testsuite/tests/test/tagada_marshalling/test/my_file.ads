@@ -4,6 +4,8 @@ package My_File is
    type T2 is new Integer range 0 .. 100;
    type T3 is mod 2 ** 16;
 
+   type Non_Static_Mod is mod 2 ** Long_Long_Integer'Size;
+
    type Constr_Array is array (Positive range 1 .. 10) of Integer range 0 .. Integer'Last;
 
    type Matrix is array (Natural range <>, Character range <>) of Boolean;
@@ -70,7 +72,7 @@ package My_File is
       F1, F2 : Boolean := False;
    end record with Predicate => F1 or F2;
 
-   procedure Test (X : in out R; Y : T2; A : String; M : Matrix; Z : R2; D : Shape; V : Shape_Array) with Import;
+   procedure Test (X : in out R; Y : T2; A : String; M : Matrix; Z : R2; D : Shape; V : Shape_Array; Mod_Val : Non_Static_Mod) with Import;
 
    generic
       type T is range <>;
