@@ -968,7 +968,6 @@ package body TGen.Marshalling is
 
                for Cu in V_Choice.Components.Iterate loop
                   if not Is_Supported_Type (Element (Cu).Get) then
-                     Put_Line (Element (Cu).Get.Image);
                      return False;
                   end if;
                end loop;
@@ -1007,7 +1006,6 @@ package body TGen.Marshalling is
 
                for Cu in D_Typ.Discriminant_Types.Iterate loop
                   if not Is_Supported_Type (Element (Cu).Get) then
-                     Ada.Text_IO.Put_Line (Element (Cu).Get.Image);
                      return False;
                   end if;
                end loop;
@@ -1024,7 +1022,6 @@ package body TGen.Marshalling is
 
          for Cu in Record_Typ'Class (Typ).Component_Types.Iterate loop
             if not Is_Supported_Type (Element (Cu).Get) then
-               Ada.Text_IO.Put_Line (Element (Cu).Get.Image);
                return False;
             end if;
          end loop;
@@ -1045,8 +1042,6 @@ package body TGen.Marshalling is
          end if;
 
       else
-         Ada.Text_IO.Put_Line (Typ.Image);
-         Ada.Text_IO.Put_Line (Kind (Typ)'Image);
          return False;
       end if;
    end Is_Supported_Type;

@@ -88,6 +88,27 @@ package body TGen.Types.Record_Types is
       return To_String (Str);
    end Image_Internal;
 
+   ------------
+   -- Encode --
+   ------------
+
+   function Encode
+     (Self : Nondiscriminated_Record_Typ; Val : JSON_Value) return JSON_Value
+   is
+      use Component_Maps;
+   begin
+      return Res : constant JSON_Value := Create_Object do
+         for Cur in Self.Component_Types.Iterate loop
+            declare
+               Comp_Name : constant String := To_String (Key (Cur));
+               Comp_Val  : constant JSON_Value := Val.Get (Comp_Name);
+            begin
+               Res.Set_Field (Comp_Name, Element (Cur).Get.Encode (Comp_Val));
+            end;
+         end loop;
+      end return;
+   end Encode;
+
    ------------------
    -- Free_Variant --
    ------------------
@@ -169,7 +190,7 @@ package body TGen.Types.Record_Types is
          if Element (Constraint_Cur).Kind = Static then
             Value_Cur := Discriminant_Values.Find (Key (Constraint_Cur));
             if Has_Element (Value_Cur)
-              and then TGen.Big_Int.From_String (Element (Value_Cur).Get)
+              and then Element (Value_Cur).Get
                 /= Element (Constraint_Cur).Int_Val
             then
                return False;
@@ -180,9 +201,9 @@ package body TGen.Types.Record_Types is
       return True;
    end Constraints_Respected;
 
-   ---------------------
-   -- Fill_Components --
-   ---------------------
+   ----------------
+   -- Components --
+   ----------------
 
    function Components
      (Self : Discriminated_Record_Typ; Discriminant_Values : Disc_Value_Map)
@@ -210,9 +231,7 @@ package body TGen.Types.Record_Types is
       Discr_Val : Big_Int.Big_Integer;
    begin
       if Disc_Value_Maps.Has_Element (Disc_Val_Cur) then
-         Discr_Val :=
-           TGen.Big_Int.From_String
-             (Disc_Value_Maps.Element (Disc_Val_Cur).Get);
+         Discr_Val := Disc_Value_Maps.Element (Disc_Val_Cur).Get;
       end if;
       for Choice of Self.Variant_Choices loop
          declare
@@ -356,6 +375,36 @@ package body TGen.Types.Record_Types is
       Str := Str & "end record";
       return To_String (Str);
    end Image_Internal;
+
+   ------------
+   -- Encode --
+   ------------
+
+   function Encode
+     (Self : Discriminated_Record_Typ; Val : JSON_Value) return JSON_Value
+   is
+      use Component_Maps;
+      Disc_Values : Disc_Value_Map;
+      Comp_Map    : Component_Map;
+      Res         : constant JSON_Value := Create_Object;
+   begin
+      for Cur in Self.Discriminant_Types.Iterate loop
+         declare
+            Disc_Val : constant JSON_Value := Val.Get (To_String (Key (Cur)));
+         begin
+            Disc_Values.Insert (Key (Cur), Disc_Val);
+            Res.Set_Field
+              (To_String (Key (Cur)), Element (Cur).Get.Encode (Disc_Val));
+         end;
+      end loop;
+      Comp_Map := Self.Components (Disc_Values);
+      for Cur in Comp_Map.Iterate loop
+         Res.Set_Field
+           (To_String (Key (Cur)),
+            Element (Cur).Get.Encode (Val.Get (To_String (Key (Cur)))));
+      end loop;
+      return Res;
+   end Encode;
 
    ------------------
    -- Free_Content --
@@ -717,8 +766,7 @@ package body TGen.Types.Record_Types is
                   when Static =>
                      Current_Context.Insert
                        (Discriminant_Name,
-                        TGen.JSON.Create
-                          (TGen.Big_Int.To_String (Constraint.Int_Val)));
+                        TGen.JSON.Create (Constraint.Int_Val));
 
                   when Discriminant =>
 
@@ -764,16 +812,10 @@ package body TGen.Types.Record_Types is
       --  generated record value.
 
       for Disc_Cursor in Current_Context.Iterate loop
-         declare
-            Disc_Name  : constant Unbounded_String := Key (Disc_Cursor);
-            Disc_Value : constant Big_Integer :=
-              TGen.Big_Int.From_String (Element (Disc_Cursor).Get);
-         begin
-            Set_Field
-              (Val        => Res,
-               Field_Name => +Disc_Name,
-               Field      => Create (Disc_Value));
-         end;
+         Set_Field
+            (Val       => Res,
+            Field_Name => +Key (Disc_Cursor),
+            Field      => Element (Disc_Cursor));
       end loop;
 
       --  Now, generate values for the components

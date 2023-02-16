@@ -62,6 +62,8 @@ package TGen.Types.Enum_Types is
 
    function Kind (Self : Char_Typ) return Typ_Kind is (Char_Kind);
 
+   function Encode (Self : Char_Typ; Val : JSON_Value) return JSON_Value;
+
    function Default_Strategy
      (Self    : Char_Typ)
       return Strategy_Type'Class;
@@ -86,6 +88,8 @@ package TGen.Types.Enum_Types is
      Pre => Self.Is_Static;
 
    function Kind (Self : Bool_Typ) return Typ_Kind is (Bool_Kind);
+
+   function Encode (Self : Bool_Typ; Val : JSON_Value) return JSON_Value;
 
    function As_Bool_Typ (Self : SP.Ref) return Bool_Typ'Class is
      (Bool_Typ'Class (Self.Unchecked_Get.all)) with
@@ -123,6 +127,8 @@ package TGen.Types.Enum_Types is
      Pre => Self.Is_Static;
 
    function Kind (Self : Other_Enum_Typ) return Typ_Kind is (Enum_Kind);
+
+   function Encode (Self : Other_Enum_Typ; Val : JSON_Value) return JSON_Value;
 
    function As_Other_Enum_Typ (Self : SP.Ref) return Other_Enum_Typ'Class is
      (Other_Enum_Typ'Class (Self.Unchecked_Get.all)) with

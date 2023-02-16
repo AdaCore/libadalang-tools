@@ -339,6 +339,14 @@ package body TGen.Types.Constraints is
       return Res;
    end As_Named_Typ;
 
+   ------------
+   -- Encode --
+   ------------
+
+   function Encode
+     (Self : Anonymous_Typ; Val : JSON_Value) return JSON_Value is
+     (Self.Named_Ancestor.Get.Encode (Val));
+
    ----------------------
    -- Default_Strategy --
    ----------------------

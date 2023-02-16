@@ -131,7 +131,7 @@ package body TGen.Types.Enum_Types is
       Lit : constant Integer :=
         Rand_Int (Min => LB, Max => HB);
    begin
-      return Create (To_Big_Integer (Lit));
+      return Create (Big_Int.To_Big_Integer (Lit));
    end Generate_Value_Char_Typ;
 
    ----------------------
@@ -167,5 +167,19 @@ package body TGen.Types.Enum_Types is
 
    function High_Bound (Self : Other_Enum_Typ) return Big_Integer is
      (Self.Literals.Last_Key);
+
+   ------------
+   -- Encode --
+   ------------
+
+   function Encode (Self : Char_Typ; Val : JSON_Value) return JSON_Value is
+     (Create (Self.Lit_Image (Val.Get)));
+
+   function Encode (Self : Bool_Typ; Val : JSON_Value) return JSON_Value is
+     (Create (Self.Lit_Image (Val.Get)));
+
+   function Encode
+     (Self : Other_Enum_Typ; Val : JSON_Value) return JSON_Value is
+     (Create (Self.Lit_Image (Val.Get)));
 
 end TGen.Types.Enum_Types;

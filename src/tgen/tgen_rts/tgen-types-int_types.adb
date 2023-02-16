@@ -172,7 +172,7 @@ package body TGen.Types.Int_Types is
              (Long_Long_Long_Integer (Long_Long_Integer'Last - 1));
       begin
          return (Create
-                 (Long_Long_Long_Integer'Image
+                 (LLLI_Conversions.To_Big_Integer
                     (Rand_LLLI
                        (From_Big_Integer
                           (if R.Min <= First_LLI
@@ -239,7 +239,7 @@ package body TGen.Types.Int_Types is
       while Elements.More loop
          null;
       end loop;
-      return Create (Natural'Image (Elements.Count));
+      return Create (Big_Int.To_Big_Integer (Elements.Count));
    end Generate;
 
    ----------------------------------------

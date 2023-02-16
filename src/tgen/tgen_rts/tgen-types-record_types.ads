@@ -91,6 +91,9 @@ package TGen.Types.Record_Types is
      (Self : Nondiscriminated_Record_Typ) return Strategy_Type'Class;
    --  Generate a strategy to statically generate (in one pass) values for Self
 
+   function Encode
+     (Self : Nondiscriminated_Record_Typ; Val : JSON_Value) return JSON_Value;
+
    function As_Nondiscriminated_Record_Typ (Self : SP.Ref)
      return Nondiscriminated_Record_Typ'Class is
      (Nondiscriminated_Record_Typ'Class (Self.Unchecked_Get.all)) with
@@ -210,6 +213,9 @@ package TGen.Types.Record_Types is
       Constraint : out TGen.Types.Constraints.Index_Constraint);
    --  Whether the discriminant Disc_Name constrains an array inside the
    --  record. Return the first occurrence found.
+
+   function Encode
+     (Self : Discriminated_Record_Typ; Val : JSON_Value) return JSON_Value;
 
    function As_Discriminated_Record_Typ
      (Self : SP.Ref) return Discriminated_Record_Typ'Class is

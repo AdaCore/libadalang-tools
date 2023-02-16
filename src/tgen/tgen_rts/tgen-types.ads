@@ -132,6 +132,10 @@ package TGen.Types is
 
    function Kind (Self : Typ) return Typ_Kind;
 
+   function Encode (Self : Typ; Val : JSON_Value) return JSON_Value;
+   --  Encore Val so that all internal representations get turned into actual
+   --  Ada values. i.e. Enum positions gets turned into enum literals.
+
    function JSON_Kind (Kind : Typ_Kind) return JSON_Value_Type is
      (case Kind is
          when Signed_Int_Kind | Mod_Int_Kind | Enum_Kind | Char_Kind =>

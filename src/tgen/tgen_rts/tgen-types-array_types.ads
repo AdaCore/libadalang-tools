@@ -47,6 +47,8 @@ package TGen.Types.Array_Types is
    end record;
    --  Represents an array type.
 
+   function Encode (Self : Array_Typ; Val : JSON_Value) return JSON_Value;
+
    function Supports_Static_Gen (Self : Array_Typ) return Boolean is
      (Self.Static_Gen);
    --  Wether values for this Typ can be statically generated
@@ -66,9 +68,12 @@ package TGen.Types.Array_Types is
      (Unconstrained_Array_Kind);
 
    function Default_Strategy
-     (Self    : Unconstrained_Array_Typ) return Strategy_Type'Class;
+     (Self : Unconstrained_Array_Typ) return Strategy_Type'Class;
    --  Generate a strategy for static (single pass) generation for an
    --  Unconstrained_Array_Typ
+
+   overriding function Encode
+     (Self : Unconstrained_Array_Typ; Val : JSON_Value) return JSON_Value;
 
    function As_Unconstrained_Array_Typ (Self : SP.Ref)
      return Unconstrained_Array_Typ'Class is

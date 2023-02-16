@@ -43,6 +43,8 @@ package TGen.Types.Parameter_Types is
 
    function Package_Name (Self : Parameter_Typ) return Ada_Qualified_Name;
 
+   function Encode (Self : Parameter_Typ; Val : JSON_Value) return JSON_Value;
+
    function Kind (Self : Parameter_Typ) return Typ_Kind is (Parameter_Kind);
 
    function As_Parameter_Typ (Self : SP.Ref)

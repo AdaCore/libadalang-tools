@@ -97,6 +97,12 @@ package body TGen.Types is
    function Dot_To_Underscore (C : Character) return Character is
      ((if C = '.' then '_' else C));
 
+   ------------
+   -- Encode --
+   ------------
+
+   function Encode (Self : Typ; Val : JSON_Value) return JSON_Value is (Val);
+
    ----------------------
    -- Default_Strategy --
    ----------------------

@@ -249,9 +249,9 @@ package body TGen.Gen_Strategies is
          for Param of Subp_Data.Parameters_Data loop
             declare
                Param_JSON : constant JSON_Value := Create_Object;
-               Param_Type : constant Typ'Class :=
+               Param_Type : constant SP.Ref :=
                  TGen.Types.Translation.Translation_Cache.Element
-                   (To_Qualified_Name (+Param.Type_Fully_Qualified_Name)).Get;
+                   (To_Qualified_Name (+Param.Type_Fully_Qualified_Name));
             begin
                Param_JSON.Set_Field ("name", Create (+Param.Name));
                Param_JSON.Set_Field ("type_name", Create (+Param.Type_Name));
@@ -268,8 +268,8 @@ package body TGen.Gen_Strategies is
                        JSON_String_Var & " : constant TGen.JSON.JSON_Value :="
                        & " TGen.JSON.Read ("""
                        & Escape
-                         (Strat.Generate
-                            (Strategies.Disc_Value_Maps.Empty_Map).Write)
+                         (Param_Type.Get.Encode (Strat.Generate
+                            (Strategies.Disc_Value_Maps.Empty_Map)).Write)
                        & """);";
 
                      Decls : JSON_Array;
@@ -279,7 +279,7 @@ package body TGen.Gen_Strategies is
 
                      Param_JSON.Set_Field
                        ("value",
-                        Input_Fname_For_Typ (Param_Type)
+                        Input_Fname_For_Typ (Param_Type.Get)
                         & "(" & JSON_String_Var
                         & (if Needs_Header (Param_Type)
                           then "," & Input_Header_Fname_For_Typ (Param_Type)

@@ -30,6 +30,9 @@ package TGen.Types.Int_Types is
 
    type Int_Typ is new Discrete_Typ with null record;
 
+   function Encode (Self : Int_Typ; Val : JSON_Value) return JSON_Value is
+     (Create (Self.Lit_Image (Val.Get)));
+
    type Signed_Int_Typ (Is_Static : Boolean) is new
      Int_Typ (Is_Static => Is_Static) with record
       case Is_Static is

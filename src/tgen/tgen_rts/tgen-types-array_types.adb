@@ -32,6 +32,26 @@ package body TGen.Types.Array_Types is
 
    use TGen.Types.SP;
 
+   ------------
+   -- Encode --
+   ------------
+
+   function Encode (Self : Array_Typ; Val : JSON_Value) return JSON_Value
+   is
+      Encoded_Elements : JSON_Array;
+      Result           : constant JSON_Value := Create_Object;
+   begin
+      for Elem of JSON_Array'(Val.Get ("array")) loop
+         Append (Encoded_Elements, Self.Component_Type.Get.Encode (Elem));
+      end loop;
+      Set_Field (Result, "array", Encoded_Elements);
+      return Result;
+   end Encode;
+
+   -----------
+   -- Image --
+   -----------
+
    function Image (Self : Unconstrained_Array_Typ) return String is
       Res : Unbounded_String :=
         To_Unbounded_String (Typ (Self).Image & " : array (");
@@ -340,8 +360,7 @@ package body TGen.Types.Array_Types is
             when Static =>
                Constraint.Int_Val,
             when Discriminant =>
-               TGen.Big_Int.From_String
-                 (Disc_Context.Element (Constraint.Disc_Name).Get),
+               Disc_Context.Element (Constraint.Disc_Name).Get,
             when others =>
                raise Program_Error with
                  "Dynamic constraint unsupported for static generation");
@@ -422,10 +441,8 @@ package body TGen.Types.Array_Types is
             Index_Strat : constant Index_Strategies_Type :=
               Generate_Index_Strat (I);
 
-            Low_Bound_JSON : constant JSON_Value :=
-              Index_Strat.Low_Bound_Strat.Generate (Disc_Context);
-            Low_Bound      : constant Big_Integer :=
-              TGen.Big_Int.From_String (Low_Bound_JSON.Get);
+            Low_Bound  : constant Big_Integer :=
+              Index_Strat.Low_Bound_Strat.Generate (Disc_Context).Get;
             High_Bound : Big_Integer;
          begin
             Index_Values (I).Low_Bound := Low_Bound;
@@ -435,13 +452,9 @@ package body TGen.Types.Array_Types is
             --  unconstrained array types. TODO: refactor.
 
             Disc_Context_With_Low_Bound.Include
-              (Low_Bound_Disc_Name, Low_Bound_JSON);
-
-            High_Bound :=
-              Get
-                (Index_Strat.High_Bound_Strat.Generate
-                   (Disc_Context_With_Low_Bound));
-
+              (Low_Bound_Disc_Name, Create (Low_Bound));
+            High_Bound := Index_Strat.High_Bound_Strat.Generate
+              (Disc_Context_With_Low_Bound).Get;
             Index_Values (I).High_Bound := High_Bound;
          end;
       end loop;
@@ -621,5 +634,47 @@ package body TGen.Types.Array_Types is
       end loop;
       return Strat;
    end Default_Strategy;
+
+   ------------
+   -- Encode --
+   ------------
+
+   function Encode
+     (Self : Unconstrained_Array_Typ; Val : JSON_Value) return JSON_Value
+   is
+      Result : constant JSON_Value := Encode (Array_Typ (Self), Val);
+      --  Encode the elements of the array
+
+   begin
+      --  Encode the generated index bounds, if they are present
+
+      if Val.Has_Field ("dimensions") then
+         declare
+            Dimensions         : constant JSON_Array :=
+              Val.Get ("dimensions");
+            Encoded_Dimensions : JSON_Array;
+            Dimension_Index    : Positive := 1;
+         begin
+            for T of Self.Index_Types loop
+               declare
+                  Dimension         : constant JSON_Value :=
+                    Array_Element (Dimensions, Dimension_Index);
+                  Encoded_Dimension : constant JSON_Value := Create_Object;
+               begin
+                  Set_Field
+                    (Encoded_Dimension, "First",
+                     T.Get.Encode (Dimension.Get ("First")));
+                  Set_Field
+                    (Encoded_Dimension, "Last",
+                     T.Get.Encode (Dimension.Get ("Last")));
+                  Dimension_Index := Array_Next (Dimensions, Dimension_Index);
+                  Append (Encoded_Dimensions, Encoded_Dimension);
+               end;
+            end loop;
+            Set_Field (Result, "dimensions", Encoded_Dimensions);
+         end;
+      end if;
+      return Result;
+   end Encode;
 
 end TGen.Types.Array_Types;

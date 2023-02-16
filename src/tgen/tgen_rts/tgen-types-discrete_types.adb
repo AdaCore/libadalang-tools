@@ -192,8 +192,7 @@ package body TGen.Types.Discrete_Types is
            (if S.Other_Index_Constraint.Kind =
               TGen.Types.Constraints.Discriminant
             then
-               TGen.Big_Int.From_String
-                 (Disc_Context (S.Other_Index_Constraint.Disc_Name).Get)
+               Disc_Context (S.Other_Index_Constraint.Disc_Name).Get
             else S.Other_Index_Constraint.Int_Val);
 
          Elements : Many_Type;
@@ -319,8 +318,7 @@ package body TGen.Types.Discrete_Types is
       if S.Constraint.Kind = Discriminant then
          Result := Disc_Context (S.Constraint.Disc_Name);
       elsif S.Constraint.Kind = Static then
-         Result :=
-           Create (TGen.Big_Int.To_String (S.Constraint.Int_Val));
+         Result := Create (S.Constraint.Int_Val);
       else
          raise Program_Error with "unsupported non static constraint";
       end if;

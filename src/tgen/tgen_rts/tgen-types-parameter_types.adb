@@ -35,4 +35,12 @@ package body TGen.Types.Parameter_Types is
       return Parent_Package;
    end Package_Name;
 
+   ------------
+   -- Encode --
+   ------------
+
+   function Encode
+     (Self : Parameter_Typ; Val : JSON_Value) return JSON_Value is
+     (Self.Parameter_Type.Get.Encode (Val));
+
 end TGen.Types.Parameter_Types;
