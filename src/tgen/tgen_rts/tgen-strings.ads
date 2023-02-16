@@ -157,4 +157,10 @@ package TGen.Strings is
       "="          => Ada_Identifier_Vectors."=");
    subtype Ada_Qualified_Name_Set is Ada_Qualified_Name_Sets.Set;
 
+   package Ada_Qualified_Name_Sets_Maps is new Ada.Containers.Ordered_Maps
+     (Key_Type     => Ada_Qualified_Name,
+      Element_Type => Ada_Qualified_Name_Set,
+      "="          => Ada_Qualified_Name_Sets."=");
+   subtype Ada_Qualified_Name_Sets_Map is Ada_Qualified_Name_Sets_Maps.Map;
+
 end TGen.Strings;

@@ -135,16 +135,16 @@ package body TGen.Gen_Strategies is
            (Ada.Characters.Latin_9.LF)) + 1;
    end Number_Of_Lines;
 
-   procedure Collect_Type_Translations (Subp : Subp_Decl'Class);
+   procedure Collect_Type_Translations (Subp : Basic_Decl'Class);
 
    -------------------------------
    -- Collect_Type_Translations --
    -------------------------------
 
-   procedure Collect_Type_Translations (Subp : Subp_Decl'Class)
+   procedure Collect_Type_Translations (Subp : Basic_Decl'Class)
    is
       Subp_Translation_Res : constant Translation_Result :=
-        Translate (Subp.F_Subp_Spec);
+        Translate (Subp.P_Subp_Spec_Or_Null.As_Subp_Spec);
    begin
       if not Subp_Translation_Res.Success then
          raise Program_Error with To_String (Subp_Translation_Res.Diagnostics);
@@ -181,7 +181,7 @@ package body TGen.Gen_Strategies is
    procedure Generate_Test_Vectors
      (Context  : in out Generation_Context;
       Nb_Tests : Positive;
-      Subp     : Subp_Decl'Class;
+      Subp     : Basic_Decl'Class;
       Subp_UID : Unbounded_String := Null_Unbounded_String)
    is
       Subp_Data : Subprogram_Data :=
@@ -280,12 +280,7 @@ package body TGen.Gen_Strategies is
                      Param_JSON.Set_Field
                        ("value",
                         Input_Fname_For_Typ (Param_Type.Get)
-                        & "(" & JSON_String_Var
-                        & (if Needs_Header (Param_Type)
-                          then "," & Input_Header_Fname_For_Typ (Param_Type)
-                               & "(" & (JSON_String_Var) & ")"
-                          else "")
-                        & ")");
+                        & "(" & JSON_String_Var & ")");
                   end;
                end if;
                Param_JSON.Set_Field

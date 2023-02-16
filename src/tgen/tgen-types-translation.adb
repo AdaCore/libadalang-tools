@@ -3148,40 +3148,42 @@ package body TGen.Types.Translation is
    begin
       F_Typ.Name :=
         Convert_Qualified_Name (N.F_Subp_Name.P_Fully_Qualified_Name_Array);
-      for Param of N.F_Subp_Params.F_Params loop
-         declare
-            Current_Typ : constant Translation_Result :=
-              Translate (Param.F_Type_Expr, Verbose);
-         begin
-            if Current_Typ.Success then
-               for Id of Param.F_Ids loop
-                  declare
-                     P_Typ      : Parameter_Typ;
-                     Param_Mode : constant Parameter_Mode_Type :=
-                       (case Kind (Param.F_Mode) is
+      if not N.F_Subp_Params.Is_Null then
+         for Param of N.F_Subp_Params.F_Params loop
+            declare
+               Current_Typ : constant Translation_Result :=
+                 Translate (Param.F_Type_Expr, Verbose);
+            begin
+               if Current_Typ.Success then
+                  for Id of Param.F_Ids loop
+                     declare
+                        P_Typ      : Parameter_Typ;
+                        Param_Mode : constant Parameter_Mode_Type :=
+                        (case Kind (Param.F_Mode) is
                            when Ada_Mode_Default | Ada_Mode_In => In_Mode,
                            when Ada_Mode_In_Out => In_Out_Mode,
                            when Ada_Mode_Out => Out_Mode,
                            when others => Out_Mode);
-                     P_Typ_Ref  : SP.Ref;
-                  begin
-                     P_Typ.Name :=
-                       Convert_Qualified_Name
-                         (Id.P_Fully_Qualified_Name_Array);
-                     P_Typ.Parameter_Type := Current_Typ.Res;
-                     P_Typ.Parameter_Mode := Param_Mode;
-                     P_Typ_Ref.Set (P_Typ);
+                        P_Typ_Ref  : SP.Ref;
+                     begin
+                        P_Typ.Name :=
+                        Convert_Qualified_Name
+                          (Id.P_Fully_Qualified_Name_Array);
+                        P_Typ.Parameter_Type := Current_Typ.Res;
+                        P_Typ.Parameter_Mode := Param_Mode;
+                        P_Typ_Ref.Set (P_Typ);
 
-                     F_Typ.Component_Types.Insert
-                       (Key      => +Id.As_Defining_Name.Text,
-                        New_Item => P_Typ_Ref);
-                  end;
-               end loop;
-            else
-               return Current_Typ;
-            end if;
-         end;
-      end loop;
+                        F_Typ.Component_Types.Insert
+                          (Key      => +Id.As_Defining_Name.Text,
+                           New_Item => P_Typ_Ref);
+                     end;
+                  end loop;
+               else
+                  return Current_Typ;
+               end if;
+            end;
+         end loop;
+      end if;
 
       --  Function type was successfully translated. Now we can append both
       --  the parameters and the function to the translation cache.

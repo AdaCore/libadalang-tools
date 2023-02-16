@@ -62,6 +62,7 @@ with Ada.Strings.Unbounded;
 
 with TGen.Context;
 with TGen.Gen_Strategies;
+with TGen.Libgen;
 
 package body Test.Actions is
 
@@ -778,6 +779,18 @@ package body Test.Actions is
            (Test.Common.TGen_Ctx,
             Ada.Strings.Unbounded.To_Unbounded_String
               (Test.Common.JSON_Test_Dir.all));
+
+         Test.Common.TGen_Libgen_Ctx := TGen.Libgen.Create
+           (Output_Dir         =>
+             Test.Common.Harness_Dir_Str.all & "tgen_support",
+            User_Project_Path  => Arg (Cmd, Project_File).all,
+            Root_Templates_Dir =>
+              (Containing_Directory
+                (Containing_Directory
+                   (GNAT.OS_Lib.Locate_Exec_On_Path ("gnattest").all))
+              & GNAT.OS_Lib.Directory_Separator & "share"
+              & GNAT.OS_Lib.Directory_Separator & "tgen"
+              & GNAT.OS_Lib.Directory_Separator & "templates"));
 
          if Arg (Cmd, Gen_Test_Num) /= null then
             begin

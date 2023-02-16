@@ -53,7 +53,7 @@ package TGen.Gen_Strategies is
    procedure Generate_Test_Vectors
      (Context  : in out Generation_Context;
       Nb_Tests : Positive;
-      Subp     : Subp_Decl'Class;
+      Subp     : Basic_Decl'Class;
       Subp_UID : Unbounded_String := Null_Unbounded_String);
    --  Generate values for all types that support static (single pass)
    --  generation.

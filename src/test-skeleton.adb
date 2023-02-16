@@ -64,7 +64,9 @@ with Utils.Command_Lines; use Utils.Command_Lines;
 with Utils.Environment;
 with Utils_Debug; use Utils_Debug;
 
+with TGen.Libgen;
 with TGen.Gen_Strategies;
+with TGen.Strings;
 
 package body Test.Skeleton is
    Me                : constant Trace_Handle :=
@@ -740,13 +742,27 @@ package body Test.Skeleton is
          if Generate_Test_Vectors and then not Data.Is_Generic then
             Subp_Cur := Data.Subp_List.First;
             while Subp_Cur /= Subp_Data_List.No_Element loop
+               declare
+                  Diags : Unbounded_String;
                begin
                   case Kind (Element (Subp_Cur).Subp_Declaration) is
                      when Ada_Basic_Decl =>
+                     if not TGen.Libgen.Include_Subp
+                          (Test.Common.TGen_Libgen_Ctx,
+                           Element (Subp_Cur).Subp_Declaration.As_Basic_Decl,
+                           Diags)
+                     then
+                        Report_Std
+                          ("Warning (tgen): Error while generating the"
+                           & "support library for "
+                           & Element (Subp_Cur).Subp_Name_Image.all & ":");
+                        Report_Std (To_String (Diags));
+                        Report_Std ("Test harness may not build.");
+                     end if;
                      TGen.Gen_Strategies.Generate_Test_Vectors
                      (TGen_Ctx,
                         Test.Common.TGen_Num_Tests,
-                        Element (Subp_Cur).Subp_Declaration.As_Subp_Decl,
+                        Element (Subp_Cur).Subp_Declaration.As_Basic_Decl,
                         Ada.Strings.Unbounded.To_Unbounded_String
                         (Element (Subp_Cur).Subp_Full_Hash.all));
                   when others =>
@@ -788,6 +804,8 @@ package body Test.Skeleton is
                Subp_Data_List.Next (Subp_Cur);
             end loop;
             TGen.Gen_Strategies.Generate_Artifacts (TGen_Ctx);
+            TGen.Libgen.Generate
+              (Test.Common.TGen_Libgen_Ctx, TGen.Libgen.All_Parts);
          end if;
 
          declare
@@ -6789,6 +6807,7 @@ package body Test.Skeleton is
    procedure Output_Generated_Tests
      (Data : Data_Holder; Suite_Data_List : in out Suites_Data_Type)
    is
+      use TGen.Strings;
 
       --  ??? TODO: Clean leftover generated tests if the hash of a given
       --  subprogram fails, also investigate possibility to have tests not be
@@ -6806,6 +6825,12 @@ package body Test.Skeleton is
 
       Output_Dir : constant String :=
         Get_Source_Output_Dir (Data.Unit_File_Name.all);
+
+      Support_Packs : constant Ada_Qualified_Name_Sets_Maps
+                               .Constant_Reference_Type :=
+        TGen.Libgen.Required_Support_Packages
+          (Ctx       => Test.Common.TGen_Libgen_Ctx,
+           Unit_Name => To_Qualified_Name (Data.Unit_Full_Name.all));
 
       procedure Pp_Subp_Call (F : File_Type; Initial_Pad : Natural := 0);
       --  Output a call to subp with the values in Single_Vec, indented by
@@ -6938,8 +6963,13 @@ package body Test.Skeleton is
             New_Line (Body_F);
             Put_Line (Body_F, "with Aunit.Assertions;");
             New_Line (Body_F);
-            Put_Line (Body_F, "package body " & Test_Unit_Name & " is");
+            Put_Line (Body_F, "with TGen.JSON;");
+            for Pack of Support_Packs loop
+               Put_Line (Body_F, "with " & To_Ada (Pack) & "; use "
+                                  & To_Ada (Pack) & ";");
+            end loop;
             New_Line (Body_F);
+            Put_Line (Body_F, "package body " & Test_Unit_Name & " is");
             New_Line (Body_F);
 
             for Test_Vec of Subp_Vectors loop
@@ -6959,9 +6989,11 @@ package body Test.Skeleton is
                   & " (Gnattest_T : in out Test) is");
 
                for Param of Single_Vec loop
-                  for Decl of JSON_Array'(Param.Get ("decls")) loop
-                     Put_Line (Body_F, Com & "   " & Decl.Get);
-                  end loop;
+                  if Param.Get ("mode") in 0 | 1 then
+                     for Decl of JSON_Array'(Param.Get ("decls")) loop
+                        Put_Line (Body_F, Com & "   " & Decl.Get);
+                     end loop;
+                  end if;
                   Put_Line
                     (Body_F,
                      Com & "   Param_" & Param.Get ("name") & " : "
@@ -8322,6 +8354,14 @@ package body Test.Skeleton is
       Put_New_Line;
       S_Put (0, "with ""gnattest_common.gpr"";");
       Put_New_Line;
+      if Test.Common.Generate_Test_Vectors then
+         S_Put
+           (0,
+            "with ""tgen_support" & GNAT.OS_Lib.Directory_Separator
+            & "tgen_support.gpr"";");
+         Put_New_Line;
+         S_Put (0, "with ""tgen_rts.gpr"";");
+      end if;
       S_Put (0, "with """);
       S_Put
         (0,
