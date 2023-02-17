@@ -1,1 +1,1 @@
-gnatrefactor array_aggregates --from-gnat-warnings gprbuild_log --pipe
+gnatrefactor array_aggregates --from-gnat-warnings gprbuild_log --remove-indices --pipe

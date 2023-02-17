@@ -1,1 +1,1 @@
-gnatrefactor array_aggregates -P test.gpr -X CONFIG=two OTHER_CONFIG=two --pipe
+gnatrefactor array_aggregates -P test.gpr -X CONFIG=two OTHER_CONFIG=two --remove-indices --pipe

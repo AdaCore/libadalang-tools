@@ -203,85 +203,101 @@ package body Lint.Tools.Array_Aggregates_Tool is
       end Process_Empty_Aggregate;
 
    begin
-      case Aggregate_Assoc_List.Children'Length is
-         when 1 =>
-            declare
-               Designator : constant Ada_Node :=
-                 Aggregate.F_Assocs.First_Child.As_Aggregate_Assoc.
-                   F_Designators.First_Child;
+      --  If --remove-indices flag is active then check if this aggregate only
+      --  has one element. If so, inspect the designator (array indices) to
+      --  determine if it can be removed.
 
-            begin
-               if Designator.Kind in Ada_Bin_Op_Range then
-                  declare
-                     Start_Val : constant Expr :=
-                       Designator.As_Bin_Op.F_Left;
-                     End_Val   : constant Expr :=
-                       Designator.As_Bin_Op.F_Right;
+      if Lint.Command_Line.Remove_Indices.Get
+        and Aggregate_Assoc_List.Children'Length = 1
+      then
+         declare
+            Designator : constant Ada_Node :=
+              Aggregate.F_Assocs.First_Child.As_Aggregate_Assoc.
+                F_Designators.First_Child;
 
-                  begin
-                     if Start_Val.Kind in Ada_Int_Literal_Range
-                       and End_Val.Kind in Ada_Int_Literal_Range
+         begin
+            if Designator.Kind in Ada_Bin_Op_Range then
+               --  For Ada_Bin_Op_Range designators, check if they're integer
+               --  literals. If so, evaluate them to check if the first index
+               --  is greater than the second. If so, it's an empty array.
+
+               declare
+                  Start_Val : constant Expr := Designator.As_Bin_Op.F_Left;
+                  End_Val   : constant Expr := Designator.As_Bin_Op.F_Right;
+
+               begin
+                  if Start_Val.Kind in Ada_Int_Literal_Range
+                    and End_Val.Kind in Ada_Int_Literal_Range
+                  then
+                     if Start_Val.P_Eval_As_Int
+                        > End_Val.P_Eval_As_Int
                      then
-                        if Start_Val.P_Eval_As_Int
-                          > End_Val.P_Eval_As_Int
-                        then
-                           Process_Empty_Aggregate;
-                        elsif Start_Val.P_Eval_As_Int
-                          < End_Val.P_Eval_As_Int
-                        then
-                           Process_Multi_Element_Aggregate;
-                        else
-                           Process_One_Element_Aggregate;
-                        end if;
-                     else
-                        Process_Multi_Element_Aggregate;
-                     end if;
-                  end;
-
-               elsif Designator.Kind in Ada_Others_Designator then
-                  Process_Multi_Element_Aggregate;
-
-               elsif Designator.Kind in
-                 Ada_Identifier | Ada_Dotted_Name_Range
-               then
-                  --  The designator can either be an index or the entire
-                  --  index type.
-                  --  Try to resolve it and check if it resolved to a
-                  --  Base_Type_Decl. If it was not able to resolve, play
-                  --  safe and simply change to square brackets but keep the
-                  --  index.
-                  declare
-                     Index_Decl : constant Basic_Decl :=
-                       Designator.As_Name.P_Referenced_Decl;
-
-                  begin
-                     if Index_Decl.Is_Null
-                       or else Index_Decl.Kind in Ada_Base_Type_Decl
+                        Process_Empty_Aggregate;
+                     elsif Start_Val.P_Eval_As_Int
+                           < End_Val.P_Eval_As_Int
                      then
                         Process_Multi_Element_Aggregate;
-
                      else
                         Process_One_Element_Aggregate;
                      end if;
-                  end;
 
-               else
-                  Process_One_Element_Aggregate;
-               end if;
+                  else
+                     Process_Multi_Element_Aggregate;
+                  end if;
+               end;
 
-            exception
-               when E : others =>
-                  Logger.Trace
-                    (E,
-                     "Failed to process array with a single association."
-                     & "Falling back to processing it as a multi element "
-                     & "array: ");
-                  Process_Multi_Element_Aggregate;
-            end;
+            elsif Designator.Kind in
+              Ada_Others_Designator_Range | Ada_Attribute_Ref_Range
+            then
+               --  If the designator is the others keyword or an attribute
+               --  (for instance 'Range), do not remove it.
 
-         when others =>
-            Process_Multi_Element_Aggregate;
-      end case;
+               Process_Multi_Element_Aggregate;
+
+            elsif Designator.Kind in
+              Ada_Identifier | Ada_Dotted_Name_Range
+            then
+               --  If the designator is an Identifier or Dotted_Name, then it
+               --  can either be an index or the entire index type.
+               --  Try to resolve it and check if it resolved to a
+               --  Base_Type_Decl. If it was not able to resolve, play
+               --  safe and simply change to square brackets but keep the
+               --  index.
+
+               declare
+                  Index_Decl : constant Basic_Decl :=
+                    Designator.As_Name.P_Referenced_Decl;
+
+               begin
+                  if Index_Decl.Is_Null
+                    or else Index_Decl.Kind in Ada_Base_Type_Decl
+                  then
+                     Process_Multi_Element_Aggregate;
+
+                  else
+                     Process_One_Element_Aggregate;
+                  end if;
+               end;
+
+            else
+               --  Any other case cna be removed
+
+               Process_One_Element_Aggregate;
+            end if;
+
+         exception
+            when E : others =>
+               Logger.Trace
+                 (E,
+                  "Failed to process array with a single association."
+                  & "Falling back to processing it as a multi element "
+                  & "array: ");
+               Process_Multi_Element_Aggregate;
+         end;
+
+      else
+         Process_Multi_Element_Aggregate;
+      end if;
    end Compute_Aggregate_Edits;
 
    -----------------
