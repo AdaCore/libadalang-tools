@@ -6820,7 +6820,9 @@ package body Test.Skeleton is
       begin
          Put (F, Pad_Str & Subp_Content.Get ("fully_qualified_name") & " (");
          for Param_Id in Single_Vec loop
-            Put (F, Array_Element (Single_Vec, Param_Id).Get ("name"));
+            Put
+              (F,
+               "Param_" & Array_Element (Single_Vec, Param_Id).Get ("name"));
             if Array_Has_Element (Single_Vec, Param_Id + 1) then
                Put (F, ", ");
             end if;
@@ -6959,7 +6961,7 @@ package body Test.Skeleton is
                for Param of Single_Vec loop
                   Put_Line
                     (Body_F,
-                     Com & "   " & Param.Get ("name") & " : "
+                     Com & "   Param_" & Param.Get ("name") & " : "
                      & Param.Get ("type_name")
                      & (if Param.Get ("mode") in 0 | 1
                         then " := " & Param.Get ("value") & ";"
