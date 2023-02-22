@@ -24,6 +24,9 @@
 with Ada.Unchecked_Conversion;
 with System.Unsigned_Types; use System.Unsigned_Types;
 
+with TGen.Big_Reals;     use TGen.Big_Reals;
+with TGen.Big_Reals_Aux; use TGen.Big_Reals_Aux;
+
 package body TGen.Marshalling_Lib is
 
    function Size (V : Unsigned_8) return Offset_Type is
@@ -1102,6 +1105,11 @@ package body TGen.Marshalling_Lib is
 
    package body Read_Write_Float_JSON is
 
+      package T_Conversions is new TGen.Big_Reals.Float_Conversions
+        (Num => T);
+      --  To avoid the loss of precision, we need to encode the float as a
+      --  Big_Real and then represent it as a fraction.
+
       -----------
       -- Write --
       -----------
@@ -1113,8 +1121,10 @@ package body TGen.Marshalling_Lib is
          Last   : T := T'Last)
       is
          pragma Unreferenced (First, Last);
+         V_Big_Real : constant TGen.Big_Reals.Big_Real :=
+           T_Conversions.To_Big_Real (V);
       begin
-         JSON := Create (T'Image (V));
+         JSON := Create (To_Quotient_String (V_Big_Real));
       end Write;
 
       ----------
@@ -1129,7 +1139,10 @@ package body TGen.Marshalling_Lib is
       is
          pragma Unreferenced (First, Last);
       begin
-         V := T'Value (Get (JSON));
+         --  Decode the big real from the string encoded as a quotient string
+
+         V := T_Conversions.From_Big_Real
+           (Big_Reals.From_Quotient_String (Get (JSON)));
       end Read;
 
    end Read_Write_Float_JSON;
