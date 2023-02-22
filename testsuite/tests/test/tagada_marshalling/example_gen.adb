@@ -201,15 +201,22 @@ procedure Example_Gen is
 
      --  Test JSON marshallers
 
-     declare
-        V1_JSON : constant TGen.JSON.JSON_value :=
+      declare
+         V1_JSON : constant TGen.JSON.JSON_value :=
            TGen_Marshalling_my_file_R_Output (V1);
-        D1_JSON : constant TGen.JSON.JSON_Value :=
+         D1_JSON : constant TGen.JSON.JSON_Value :=
            TGen_Marshalling_show_date_Date_Output (D1);
-     begin
-        V2 := TGen_Marshalling_My_file_R_Input (V1_JSON);
-        D2 := TGen_Marshalling_show_date_Date_Input (D1_JSON);
-     end;
+      begin
+         V2 := TGen_Marshalling_My_file_R_Input (V1_JSON);
+         D2 := TGen_Marshalling_show_date_Date_Input (D1_JSON);
+
+         if V1 /= V2 then
+            Ada.Text_IO.Put_Line ("V1 FAIL (JSON marshallers)");
+         end if;
+         if D1 /= D2 then
+            Ada.Text_IO.Put_Line ("D1 FAIL (JSON marshallers)");
+         end if;
+      end;
    end Test;
 
    procedure Test_Discr (Debug : Boolean := False) is
@@ -242,6 +249,18 @@ procedure Example_Gen is
             Ada.Text_IO.Put_Line ("Discr FAIL");
          end if;
       end;
+
+      --  Test JSON marshallers
+
+     declare
+        V1_JSON : constant TGen.JSON.JSON_value :=
+           TGen_Marshalling_My_File_Shape_Output (V1);
+         V2     : Shape := TGen_Marshalling_My_File_Shape_Input (V1_JSON);
+     begin
+         if V1 /= V2 then
+            Ada.Text_IO.Put_Line ("Discr FAIL (JSON marshallers)");
+         end if;
+     end;
    end Test_Discr;
 
    procedure Test_String (Debug : Boolean := False) is
@@ -279,6 +298,19 @@ procedure Example_Gen is
 
          if V1 /= V2 then
             Ada.Text_IO.Put_Line ("String FAIL");
+         end if;
+      end;
+
+      --  Test JSON marshallers
+
+      declare
+         V1_JSON : constant TGen.JSON.JSON_Value :=
+           TGen_Marshalling_Standard_String_Output (V1);
+         V2      : constant String :=
+           TGen_Marshalling_Standard_String_Input (V1_JSON);
+      begin
+         if V1 /= V2 then
+            Ada.Text_IO.Put_Line ("String FAIL (JSON marshallers)");
          end if;
       end;
    end Test_String;
