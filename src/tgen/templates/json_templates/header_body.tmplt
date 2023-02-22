@@ -31,8 +31,8 @@
       declare
          Dimension : constant TGen.JSON.JSON_Value :=
             TGen.JSON.Array_Element (Dimensions, Current_Dimension_Index);
-         Fst : TGen.JSON.JSON_Value;
-         Lst : TGen.JSON.JSON_Value;
+         Fst : constant TGen.JSON.JSON_Value := Dimension.Get ("First");
+         Lst : constant TGen.JSON.JSON_Value := Dimension.Get ("Last");
       begin
          @_COMP_PREFIX_@_Read_Base
            (Fst, @_GLOBAL_PREFIX_@_V.@_FIRST_NAME_@);

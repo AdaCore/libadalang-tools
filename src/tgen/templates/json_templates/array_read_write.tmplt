@@ -17,7 +17,8 @@
       for @_GLOBAL_PREFIX_@_E of @_GLOBAL_PREFIX_@_V loop
 @_COMPONENT_WRITE_@
       end loop;
-      @_GLOBAL_PREFIX_@_JSON := TGen.JSON.Create (@_GLOBAL_PREFIX_@_JSON_Array);
+      TGen.JSON.Set_Field
+         (@_GLOBAL_PREFIX_@_JSON, "array", @_GLOBAL_PREFIX_@_JSON_Array);
    end @_TY_PREFIX_@_Write;
 
    procedure @_TY_PREFIX_@_Read
@@ -25,7 +26,7 @@
       @_GLOBAL_PREFIX_@_V    : out @_TY_NAME_@)
    is
       @_GLOBAL_PREFIX_@_JSON_Array : constant TGen.JSON.JSON_Array :=
-         TGen.JSON.Get (@_GLOBAL_PREFIX_@_JSON);
+         TGen.JSON.Get (@_GLOBAL_PREFIX_@_JSON, "array");
       Current_Index : Positive :=
          TGen.JSON.Array_First (@_GLOBAL_PREFIX_@_JSON_Array);
    begin

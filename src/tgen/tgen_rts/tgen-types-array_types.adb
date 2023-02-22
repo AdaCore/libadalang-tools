@@ -384,8 +384,8 @@ package body TGen.Types.Array_Types is
 
       --  Let's use the somewhat generic Array_Strategy capabilities here,
       --  and pick a Min_Size of 0 and a Max_Size of (10 ** Nb_Dim). We will
-      --  generate flattened arrays, that we will then reshape to fit the
-      --  wanted dimensions.
+      --  generate flattened arrays, and put the dimensions in the dimension
+      --  field of the generated JSON.
 
       Data : Data_Type;
 
@@ -398,82 +398,20 @@ package body TGen.Types.Array_Types is
       Sizes : Size_Interval_Array (1 .. Self.Num_Dims);
 
       Index_Values : Index_Values_Array (1 .. Self.Num_Dims);
+      --  Generated index values
 
       Strat : Generic_Array_Strategy_Type (Self.Num_Dims);
+      --  Strategy to generate element. This is simply a wrapper around
+      --  Generate_Element_Strat.Generate.
 
       Dimension_Sizes : Nat_Array (1 .. Self.Num_Dims);
 
-      function Pp_Arr
-        (Arr           : Generic_Array_Type;
-         Current_Index : in out Positive;
-         Indexes       : Index_Values_Array) return JSON_Array;
-
-      ------------
-      -- Pp_Arr --
-      ------------
-
-      function Pp_Arr
-        (Arr           : Generic_Array_Type;
-         Current_Index : in out Positive;
-         Indexes       : Index_Values_Array) return JSON_Array
-      is
-         Sub_Array : JSON_Array;
-      begin
-         if Indexes'Length = 0 then
-            raise Program_Error with "Array dimension can't be 0";
-         end if;
-
-         declare
-            Index_Constraint : constant Index_Value :=
-              Indexes (Indexes'First);
-         begin
-            for I in 0 .. Big_Int.To_Integer
-              (Index_Constraint.High_Bound - Index_Constraint.Low_Bound)
-            loop
-
-               if Indexes'Length = 1 then
-               --  We have reached leafs of a possible multi-dimensional array
-               --  type. Time to print values \o/.
-
-                  Append
-                    (Sub_Array,
-                     JSON_Value (Arr (Current_Index)));
-                  Current_Index := @ + 1;
-
-               else
-                  --  Otherwise, generate the nested array recursively
-
-                  Append
-                    (Sub_Array,
-                     Create
-                       (Pp_Arr
-                          (Arr,
-                           Current_Index,
-                           Indexes (Indexes'First + 1 .. Indexes'Last))));
-               end if;
-            end loop;
-         end;
-         return Sub_Array;
-      end Pp_Arr;
-
-      function Pp_Arr_Wrapper
-        (Arr     : Generic_Array_Type;
-         Indexes : Index_Values_Array) return JSON_Array;
-
-      --------------------
-      -- Pp_Arr_Wrapper --
-      --------------------
-
-      function Pp_Arr_Wrapper
-        (Arr     : Generic_Array_Type;
-         Indexes : Index_Values_Array) return JSON_Array
-      is
-         Ignore : Positive := 1;
-      begin
-         return Pp_Arr (Arr, Ignore, Indexes);
-      end Pp_Arr_Wrapper;
-
       Disc_Context_With_Low_Bound : Disc_Value_Map := Disc_Context.Copy;
+      --  Discriminant context enhanced with the generated lower bound
+
+      Result : constant JSON_Value := Create_Object;
+      --  Generated array in our JSON format
+
    begin
       --  Draw indexes values. If the array is constrained, we already know
       --  them; it is the LB and the UB of each constraint. Otherwise, we need
@@ -494,7 +432,7 @@ package body TGen.Types.Array_Types is
 
             --  After having generated the low bound, we insert it in the
             --  discriminant map. This is a hack to generate index values for
-            --  unconstrained array type. TODO: refactor.
+            --  unconstrained array types. TODO: refactor.
 
             Disc_Context_With_Low_Bound.Include
               (Low_Bound_Disc_Name, Low_Bound_JSON);
@@ -508,7 +446,25 @@ package body TGen.Types.Array_Types is
          end;
       end loop;
 
-      --  Now that we have generated both index values, let's compute the sizes
+      --  Add them to the dimensions field of the JSON result
+
+      if Self in Unconstrained_Array_Typ'Class then
+         declare
+            Dimensions_JSON : JSON_Array;
+            Dimension_JSON : JSON_Value;
+         begin
+            for Index_Value of Index_Values loop
+               Dimension_JSON := Create_Object;
+               Set_Field (Dimension_JSON, "First", Index_Value.Low_Bound);
+               Set_Field (Dimension_JSON, "Last", Index_Value.High_Bound);
+            end loop;
+            Append (Dimensions_JSON, Dimension_JSON);
+            Set_Field (Result, "dimensions", Dimensions_JSON);
+         end;
+      end if;
+
+      --  Now that we have generated both index values, let's compute the
+      --  sizes.
 
       Sizes :=
         [for I in 1 .. Self.Num_Dims =>
@@ -520,17 +476,19 @@ package body TGen.Types.Array_Types is
              (Index_Values (I).High_Bound - Index_Values (I).Low_Bound + 1)
         )];
 
-      --  Ready to generate our array. Yay! \o/
-
       Strat := Generic_Array_Strategy (Sizes);
 
       declare
          Random_Arr : constant Generic_Array_Type :=
            Strat.Draw (Data, Dimension_Sizes);
+         JSON_Arr : JSON_Array;
       begin
-         return Create (Pp_Arr_Wrapper (Random_Arr, Index_Values));
+         for Elem of Random_Arr loop
+            Append (JSON_Arr, Elem);
+         end loop;
+         Set_Field (Result, "array", JSON_Arr);
       end;
-
+      return Result;
    end Generate_Static_Common;
 
    --------------
