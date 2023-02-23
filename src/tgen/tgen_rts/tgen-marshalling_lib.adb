@@ -527,6 +527,10 @@ package body TGen.Marshalling_Lib is
 
    package body Read_Write_Decimal_Fixed_JSON is
 
+      package T_Conversions is new Decimal_Fixed_Conversions (Num => T);
+      --  To avoid the loss of precision, we encode the fixed point as a
+      --  Big_Real and then represent it as a fraction.
+
       -----------
       -- Write --
       -----------
@@ -538,8 +542,10 @@ package body TGen.Marshalling_Lib is
          Last   : T := T'Last)
       is
          pragma Unreferenced (First, Last);
+         V_Big_Real : constant TGen.Big_Reals.Big_Real :=
+           T_Conversions.To_Big_Real (V);
       begin
-         JSON := Create (T'Image (V));
+         JSON := Create (To_Quotient_String (V_Big_Real));
       end Write;
 
       ----------
@@ -554,7 +560,10 @@ package body TGen.Marshalling_Lib is
       is
          pragma Unreferenced (First, Last);
       begin
-         V := T'Value (Get (JSON));
+         --  Decode the big real from the string encoded as a quotient string
+
+         V := T_Conversions.From_Big_Real
+           (Big_Reals.From_Quotient_String (Get (JSON)));
       end Read;
 
    end Read_Write_Decimal_Fixed_JSON;
@@ -636,6 +645,11 @@ package body TGen.Marshalling_Lib is
 
    package body Read_Write_Ordinary_Fixed_JSON is
 
+      package T_Conversions is new TGen.Big_Reals.Fixed_Conversions
+        (Num => T);
+      --  To avoid the loss of precision, we encode the fixed point as a
+      --  Big_Real and then represent it as a fraction.
+
       -----------
       -- Write --
       -----------
@@ -647,8 +661,10 @@ package body TGen.Marshalling_Lib is
          Last   : T := T'Last)
       is
          pragma Unreferenced (First, Last);
+         V_Big_Real : constant TGen.Big_Reals.Big_Real :=
+           T_Conversions.To_Big_Real (V);
       begin
-         JSON := Create (T'Image (V));
+         JSON := Create (To_Quotient_String (V_Big_Real));
       end Write;
 
       ----------
@@ -663,7 +679,10 @@ package body TGen.Marshalling_Lib is
       is
          pragma Unreferenced (First, Last);
       begin
-         V := T'Value (Get (JSON));
+         --  Decode the big real from the string encoded as a quotient string
+
+         V := T_Conversions.From_Big_Real
+           (Big_Reals.From_Quotient_String (Get (JSON)));
       end Read;
 
    end Read_Write_Ordinary_Fixed_JSON;

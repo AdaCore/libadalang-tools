@@ -159,22 +159,42 @@ package body TGen.Types.Real_Types is
    function Generate_Ordinary_Fixed_Typ
      (Ty : Typ'Class) return JSON_Value
    is
+      use LLLI_Conversions;
+
       Self : constant Ordinary_Fixed_Typ := Ordinary_Fixed_Typ (Ty);
 
-      High_Bound : constant Long_Long_Long_Integer :=
-        Long_Long_Long_Integer
-          (LF_Conversions.From_Big_Real
-             (Self.Range_Value.Max / Self.Delta_Value));
-      Low_Bound  : constant Long_Long_Long_Integer :=
-        Long_Long_Long_Integer
-          (LF_Conversions.From_Big_Real
-             (Self.Range_Value.Min / Self.Delta_Value));
+      --  Translate the fixed type to the integer type
 
-      Rand_Val : constant Long_Long_Long_Integer :=
-        Rand_LLLI (Low_Bound, High_Bound);
+      Low_Bound  : constant Big_Real :=
+        Self.Range_Value.Min / Self.Delta_Value;
+      High_Bound : constant Big_Real :=
+        Self.Range_Value.Max / Self.Delta_Value;
+
+      Low_Bound_Int  : Long_Long_Long_Integer;
+      High_Bound_Int : Long_Long_Long_Integer;
 
    begin
-      return Create (Long_Long_Long_Integer'Image (Rand_Val));
+      --  Check that the denominator is 1 for each of the integer bound
+
+      pragma Assert (Denominator (Low_Bound) = 1);
+      pragma Assert (Denominator (High_Bound) = 1);
+
+      Low_Bound_Int := From_Big_Integer (Numerator (Low_Bound));
+      High_Bound_Int := From_Big_Integer (Numerator (High_Bound));
+
+      --  Now, generate a random integer value
+
+      declare
+         Rand_Val : constant Big_Integer :=
+           LLLI_Conversions.To_Big_Integer
+             (Rand_LLLI (Low_Bound_Int, High_Bound_Int));
+      begin
+         --  Cast it back to a fixed point value
+
+         return Create
+           (To_Quotient_String
+              (To_Big_Real (Rand_Val) * Self.Delta_Value));
+      end;
    end Generate_Ordinary_Fixed_Typ;
 
    --------------------------------
@@ -184,6 +204,7 @@ package body TGen.Types.Real_Types is
    function Generate_Decimal_Fixed_Typ
      (Ty : Typ'Class) return JSON_Value
    is
+      use LLLI_Conversions;
       Self : constant Decimal_Fixed_Typ := Decimal_Fixed_Typ (Ty);
 
       --  TODO: Using High/Low_Bound_Or_Default ignores the digits value, which
@@ -191,19 +212,38 @@ package body TGen.Types.Real_Types is
       --  to generate some "sparse" integer ranges to ensure we do not go
       --  beyond the specified precision.
 
-      High_Bound : constant Long_Long_Long_Integer :=
-        Long_Long_Long_Integer
-          (LF_Conversions.From_Big_Real
-             (Self.High_Bound_Or_Default / Self.Delta_Value));
-      Low_Bound  : constant Long_Long_Long_Integer :=
-        Long_Long_Long_Integer
-          (LF_Conversions.From_Big_Real
-             (Self.Low_Bound_Or_Default / Self.Delta_Value));
+      --  Translate the fixed type to the integer type
 
-      Rand_Val : constant Long_Long_Long_Integer :=
-        Rand_LLLI (Low_Bound, High_Bound);
+      Low_Bound  : constant Big_Real :=
+        Self.Low_Bound_Or_Default / Self.Delta_Value;
+      High_Bound : constant Big_Real :=
+        Self.High_Bound_Or_Default / Self.Delta_Value;
+
+      Low_Bound_Int  : Long_Long_Long_Integer;
+      High_Bound_Int : Long_Long_Long_Integer;
+
    begin
-      return Create (Long_Long_Long_Integer'Image (Rand_Val));
+      --  Check that the denominator is 1 for each of the integer bound
+
+      pragma Assert (Denominator (Low_Bound) = 1);
+      pragma Assert (Denominator (High_Bound) = 1);
+
+      Low_Bound_Int := From_Big_Integer (Numerator (Low_Bound));
+      High_Bound_Int := From_Big_Integer (Numerator (High_Bound));
+
+      --  Now, generate a random integer value
+
+      declare
+         Rand_Val : constant Big_Integer :=
+           LLLI_Conversions.To_Big_Integer
+             (Rand_LLLI (Low_Bound_Int, High_Bound_Int));
+      begin
+         --  Cast it back to a fixed point value
+
+         return Create
+           (To_Quotient_String
+              (To_Big_Real (Rand_Val) * Self.Delta_Value));
+      end;
    end Generate_Decimal_Fixed_Typ;
 
    overriding function Default_Strategy
