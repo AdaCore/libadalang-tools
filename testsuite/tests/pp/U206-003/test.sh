@@ -1,6 +1,5 @@
 rm -rf actual
 
-
 gnatpp\
     --par-threshold=0\
     --call-threshold=0\
