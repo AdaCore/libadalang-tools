@@ -523,7 +523,7 @@ package body TGen.Type_Representation is
                    (Typ.Name,
                     Ada_Identifier
                       (Ada.Strings.Unbounded.To_Unbounded_String
-                         (Remove_Leading_Space (Anonymous_Ty_Index'Image))));
+                         (Trim (Anonymous_Ty_Index'Image))));
                Collect_Info_For_Anonymous_Typ
                  (Ano_Typ,
                   Anonymous_Typ_Spec_Template,

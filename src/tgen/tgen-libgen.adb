@@ -742,7 +742,11 @@ package body TGen.Libgen is
          Put_Line (Prj_File, "   type Any_Library_Type is (""static"","
                              & " ""relocatable"", ""static-pic"");");
          Put_Line (Prj_File, "   Library_Type : Any_Library_Type := external"
-                             & " (""LIBRARY_TYPE"", ""static"");");
+                   & " (""LIBRARY_TYPE"", ""static"");");
+         Put_Line (Prj_File, "   type Build_Mode_Type is (""dev"","
+                             & " ""prod"");");
+         Put_Line (Prj_File, "   Build_Mode : Build_Mode_Type := external"
+                             & " (""BUILD_MODE"", ""dev"");");
          Put_Line (Prj_File, "   for Library_Name use Lib_Name;");
          Put_Line (Prj_File, "   for Library_Kind use Library_Type;");
          Put_Line (Prj_File, "   for Object_Dir use ""obj-"" & Lib_Name & "
@@ -753,11 +757,14 @@ package body TGen.Libgen is
          Put_Line (Prj_File, "   for Source_Dirs use (""."");");
          New_Line (Prj_File);
          Put_Line (Prj_File, "   package Compiler is");
-         Put_Line
-           (Prj_File,
-            "      for Default_Switches (""Ada"") use"
-            & " (""-g"", ""-gnatg"", ""-gnatyN"", ""-gnatws"")"
-            & ";");
+         Put_Line (Prj_File, "      case Build_Mode is");
+         Put_Line (Prj_File, "         when ""dev"" =>");
+         Put_Line (Prj_File, "            for Default_Switches (""Ada"") use"
+                   & " (""-g"", ""-gnatg"", ""-gnatyN"", ""-gnatws"");");
+         Put_Line (Prj_File, "         when ""prod"" =>");
+         Put_Line (Prj_File, "            for Default_Switches (""Ada"") use"
+                   & " (""-gnatg"", ""-gnatyN"", ""-gnatws"");");
+         Put_Line (Prj_File, "      end case;");
          Put_Line (Prj_File, "   end Compiler;");
          Put_Line (Prj_File, "end TGen_support;");
          Close (Prj_File);

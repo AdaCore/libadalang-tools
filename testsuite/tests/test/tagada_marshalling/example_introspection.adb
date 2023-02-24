@@ -1,20 +1,8 @@
-with Ada.Containers; use Ada.Containers;
-with Ada.Directories;             use Ada.Directories;
-with Ada.Numerics.Discrete_Random;
-with Ada.Numerics.Float_Random;   use Ada.Numerics.Float_Random;
-with Ada.Streams;
-with Ada.Streams.Stream_IO;       use Ada.Streams.Stream_IO;
-with Ada.Text_IO;                 use Ada.Text_IO;
-with Interfaces;                  use Interfaces;
-with My_File;                     use My_File;
-with My_File.TGen_Values; use My_File.TGen_Values;
-with My_File.TGen_Support;        use My_File.TGen_Support;
-with TGen.JSON;
-with TGen.TGen_Support;           use TGen.TGen_Support;
-with Show_Date;                   use Show_Date;
-with Show_Date.TGen_Support;      use Show_Date.TGen_Support;
+with Ada.Containers;      use Ada.Containers;
 
-with GNAT.Traceback.Symbolic;
+with My_File;             use My_File;
+with My_File.TGen_Values; use My_File.TGen_Values;
+
 with TGen.Big_Int; use TGen.Big_Int;
 with TGen.Big_Reals; use TGen.Big_Reals;
 with TGen.Strings; use TGen.Strings;
@@ -25,7 +13,6 @@ with TGen.Types.Constraints; use TGen.Types.Constraints;
 with TGen.Types.Enum_Types; use TGen.Types.Enum_Types;
 with TGen.Types.Discrete_Types; use TGen.Types.Discrete_Types;
 with TGen.Types.Int_Types; use TGen.Types.Int_Types;
-with TGen.Types.Real_Types; use TGen.Types.Real_Types;
 with TGen.Types.Record_Types; use TGen.Types.Record_Types;
 
 procedure Example_Introspection is
@@ -38,7 +25,6 @@ procedure Example_Introspection is
          raise Program_Error;
       end if;
    end;
-
 
    --  Testing introspection over the following type:
    --  type T1 is range 1 - 2 ** 31 .. 2 ** 31 - 1;
@@ -334,7 +320,6 @@ procedure Example_Introspection is
 
       declare
          Variant_Choice_Index : Positive := 1;
-         Expected_Alt_Set : Alternatives_Sets.Set;
       begin
          for Choice of Rec_Typ.Variant.Variant_Choices loop
             if Variant_Choice_Index = 1 then
@@ -515,7 +500,4 @@ begin
    Test_Shape_Kind;
    Test_Name_Size_Ty;
    Test_Shape;
-exception
-   when E : others =>
-      Ada.Text_IO.Put_Line (GNAT.Traceback.Symbolic.Symbolic_Traceback (E));
 end;

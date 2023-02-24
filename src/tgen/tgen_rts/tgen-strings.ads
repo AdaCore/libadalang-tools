@@ -89,7 +89,7 @@ package TGen.Strings is
    --  Remove the trailing spaces and comma of the given Text, e.g. passing
    --  "[a, b, " will return "[a, b".
 
-   function Remove_Leading_Space (Text : String) return String is
+   function Trim (Text : String) return String is
       (Trim (Text, Left));
 
    function Dot_To_Underscore (C : Character) return Character is

@@ -3171,15 +3171,12 @@ package body TGen.Types.Translation is
      (N       : LAL.Base_Subp_Spec;
       Verbose : Boolean := False) return Translation_Result
    is
-      F_Typ     : Function_Typ;
-      F_Typ_Ref : SP.Ref;
-      Result    : Translation_Result (Success => True);
+      F_Typ         : Function_Typ;
+      F_Typ_Ref     : SP.Ref;
+      Result        : Translation_Result (Success => True);
       Comp_Unit_Idx : constant Positive :=
         Unbounded_Text_Type_Array'(N.P_Enclosing_Compilation_Unit.P_Decl
                                    .P_Fully_Qualified_Name_Array)'Last;
-
-      --  TODO: investigate generics and what P_Parent_Basic_Decl returns in
-      --  this case.
 
       Parent_Decl : constant Basic_Decl := N.P_Parent_Basic_Decl;
    begin
@@ -3189,7 +3186,7 @@ package body TGen.Types.Translation is
         Convert_Qualified_Name (Parent_Decl.P_Fully_Qualified_Name_Array)
         & TGen.Strings.Ada_Identifier
            (Ada.Strings.Unbounded.To_Unbounded_String
-              (Remove_Leading_Space
+              (Trim
                    (Ada.Strings.Wide_Wide_Hash
                         (Parent_Decl.P_Unique_Identifying_Name)'Image)));
 

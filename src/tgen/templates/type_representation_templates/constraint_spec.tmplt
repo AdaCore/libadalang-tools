@@ -21,9 +21,12 @@
 @@MACRO(REAL_CONSTRAINT)@@=
 (Kind     => TGen.Types.Constraints.@_$1_@,
 @@IF@@ @_$1_@ = "STATIC"
-(Kind => TGen.Types.Constraints.Static, Real_Val => TGen.Big_Int.From_String ("@_$2_@"))
+(Kind => TGen.Types.Constraints.Static, Real_Val => TGen.Big_Reals.From_String ("@_$2_@"))
 @@ELSIF@@ @_$1_@ = "NON_STATIC"
-(Kind => TGen.Types.Constraints.Static, Real_Val => TGen.Big_Int.From_String (@_$2_@'Image))
+@@--  TODO: fix this: we should not be getting the constraint value from a 'Image string, as
+@@--  we may lose precision and get a wrong value. Instead, we should make a conversions
+@@--  package and use it to convert to big real.
+(Kind => TGen.Types.Constraints.Static, Real_Val => TGen.Big_Reals.From_String (@_$2_@'Image))
 @@END_IF@@
 @@END_MACRO@@
 @@--

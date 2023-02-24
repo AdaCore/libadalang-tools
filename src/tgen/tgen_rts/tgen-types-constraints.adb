@@ -372,6 +372,6 @@ package body TGen.Types.Constraints is
 
    function Image (Self : Instance_Typ) return String is
    begin
-      return Typ (Self.Orig_Typ.Unchecked_Get.all).Image;
+      return Self.Orig_Typ.Unchecked_Get.Image;
    end Image;
 end TGen.Types.Constraints;

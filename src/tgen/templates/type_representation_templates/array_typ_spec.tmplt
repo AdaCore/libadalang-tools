@@ -7,6 +7,8 @@
 @@--  @_NUM_DIMS_@ Number of dimensions.
 @@--  @_CONSTRAINT_SPEC_@ If this is a constrained array type, specification
 @@--     code for its index constraints.
+@@--  @_ANONYMOUS_TYP_SPEC_@ If the component type is an anonymous type,
+@@--     specification for it.
 @@--
 @@INCLUDE@@ util.tmplt
    @_ANONYMOUS_TYP_SPEC_@
