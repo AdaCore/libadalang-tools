@@ -1140,7 +1140,6 @@ package body Laltools.Partial_GNATPP is
          Set_Arg (PP_Options, Split_Line_Before_Record, False);
          Set_Arg (PP_Options, Insert_Blank_Lines, False);
          Set_Arg (PP_Options, Preserve_Blank_Lines, False);
-         Set_Arg (PP_Options, Preserve_Line_Breaks, False);
          Set_Arg (PP_Options, Vertical_Enum_Types, False);
          Set_Arg (PP_Options, Vertical_Array_Types, False);
          Set_Arg (PP_Options, Vertical_Named_Aggregates, False);

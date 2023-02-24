@@ -982,7 +982,6 @@ package body Pp.Formatting is
       --  are in the proper sequence, and it sets the Pp_Off_Present flag.
 
       procedure Insert_Indentation (Lines_Data_P : Lines_Data_Ptr;
-                                    Cmd : Command_Line;
                                     Partial_GNATPP : Boolean := False);
 
       procedure Insert_Alignment
@@ -1036,7 +1035,7 @@ package body Pp.Formatting is
          Tok_Phases.Split_Lines
            (Lines_Data_P, Cmd,
             First_Time => False);
-         Tok_Phases.Insert_Indentation (Lines_Data_P, Cmd);
+         Tok_Phases.Insert_Indentation (Lines_Data_P);
          Tok_Phases.Insert_Alignment (Lines_Data_P, Cmd);
 
          Tokns_To_Buffer (Lines_Data.Out_Buf, Lines_Data.New_Tokns, Cmd);
@@ -1073,7 +1072,7 @@ package body Pp.Formatting is
             First_Time => False,
             Partial_GNATPP => Partial_GNATPP);
 
-         Tok_Phases.Insert_Indentation (Lines_Data_P, Cmd, Partial_GNATPP);
+         Tok_Phases.Insert_Indentation (Lines_Data_P, Partial_GNATPP);
 
          Tok_Phases.Insert_Alignment (Lines_Data_P, Cmd, Partial_GNATPP);
 
@@ -2541,11 +2540,6 @@ package body Pp.Formatting is
          --  there is a comment, this re-inserts "private" before the comment,
          --  to avoid messing up the formatting.
 
-         function Is_Named_Assoc return Boolean;
-         --  Check if the current line construct contains a simple or multiple
-         --  named aggregate association
-         --  (i.e., something like "X => val1," or "X | Y => val2,")
-
          function LB_Needs_To_Be_Enabled (Src_Tok : Tokn_Cursor) return Boolean;
 
          function LB_Needs_To_Be_Enabled (Src_Tok : Tokn_Cursor) return Boolean
@@ -2648,24 +2642,6 @@ package body Pp.Formatting is
          --  Returns the last parenthesis indent of the stack
          procedure Update_L_Paren_Indent_For_Preserve (Indent : Natural);
          --  Update last paren indentation to Indentation
-         function Before_Paren_Indent_For_Preserve return Natural;
-         --  Returns the previous (before the last element) parenthesis indent
-         --  from the stack
-
-         --  In --preserve-line-breaks mode, this is the amount of additional
-         --  indentation needed to make lines start just after a "(" on the
-         --  previous line. For example, if the input is:
-         --     X := Foo (Y,
-         --               Z);
-         --  we would normally put that all on one line. In
-         --  --preserve-line-breaks mode, we want a line break between
-         --  "," and "Z", and we want Z to line up after "(".
-         --  The previous accessors are used to get indentation
-         --  levels for previous and last paranthesis of a paren stack and to
-         --  update paren indentation level when this is needed.
-
-         function In_Paren_Context return Boolean;
-         --  Returns True if Paren_Stack contains at least 2 elements
 
          procedure Manage_Paren_Stack;
          --  Paren_Stack (below) is a stack containing one entry for each left
@@ -2709,17 +2685,6 @@ package body Pp.Formatting is
          --  Used by Manage_Paren_Stack to avoid pushing/popping the same paren
          --  twice.
 
-         Extra_Indent_For_Preserved_Line : Boolean := True;
-         --  True if a "preserved" line break should get extra indentation as a
-         --  line continuation, in addition to any "("-related indentation.
-         --  For example, we want extra here:
-         --     Foo
-         --       (X,
-         --        Y);
-         --  but not here:
-         --     Foo (X,
-         --          Y);
-
          procedure Manage_Paren_Stack is
             Crt_Indent : Natural := 0;
          begin
@@ -2731,32 +2696,7 @@ package body Pp.Formatting is
 
             --  We push the stack for "(" and pop for ")".
 
-            --  Normally, Extra_Indent_For_Preserved_Line is True, but we set
-            --  it False when we're inside an unclosed "(..." that is on the
-            --  same line as the previous Enabled line break. We're talking
-            --  about line breaks from previous phases, not "preserved" ones
-            --  added in this phase.
-
             if Kind (New_Tok) = '(' then
-               if Is_Empty (Paren_Stack) then
-                  if Partial_GNATPP and then Enabled_Cur_Line = 1 then
-                     Extra_Indent_For_Preserved_Line := False;
-                  else
-                     declare
-                        LB : Line_Break renames
-                          All_LB (Enabled_LBI (Enabled_Cur_Line - 1));
-                        New_Enabled_Line_Start : constant Positive :=
-                          Sloc_First (LB_Tok (LB)) + 1;
-                        New_This_Line_Start : constant Positive :=
-                          Sloc_First (New_Line_Start_Out);
-                     begin
-                        if New_Enabled_Line_Start = New_This_Line_Start then
-                           Extra_Indent_For_Preserved_Line := False;
-                        end if;
-                     end;
-                  end if;
-               end if;
-
                --  Add 2 extra spaces to indent at the first character position
                --  inside the parenthesis
                Crt_Indent :=
@@ -2765,10 +2705,6 @@ package body Pp.Formatting is
 
             elsif Kind (New_Tok) = ')' then
                Pop (Paren_Stack);
-
-               if Is_Empty (Paren_Stack) then
-                  Extra_Indent_For_Preserved_Line := True;
-               end if;
             end if;
          end Manage_Paren_Stack;
 
@@ -2788,19 +2724,6 @@ package body Pp.Formatting is
             Pop (Paren_Stack);
             Push (Paren_Stack, (Indent => Indent + 1));
          end Update_L_Paren_Indent_For_Preserve;
-
-         function Before_Paren_Indent_For_Preserve return Natural is
-            use Ada.Containers;
-            pragma Assert (Length (Paren_Stack) >= 2);
-         begin
-            return Element (Previous (Last (Paren_Stack))).Indent;
-         end Before_Paren_Indent_For_Preserve;
-
-         function In_Paren_Context return Boolean is
-            use Ada.Containers;
-         begin
-            return (Length (Paren_Stack) >= 2);
-         end In_Paren_Context;
 
          Pending_Tokns : aliased Tokn_Vec;
          --  Disabled_LB_Token, Tab_Token, and Spaces tokens are saved here, so
@@ -3857,29 +3780,6 @@ package body Pp.Formatting is
             Next_ss (Src_Tok);
          end Insert_Private;
 
-         function Is_Named_Assoc return Boolean is
-            pragma Assert (Kind (New_Tok) = Ident);
-            Crt_Tok : Tokn_Cursor := New_Tok;
-         begin
-            --  It is expected to have something like "X => val1" or
-            --  "X | Y | Z => val2" or "others => val"
-            --  Return false otherwise.
-
-            Crt_Tok := New_Tok;
-            while Kind (Crt_Tok) /= Arrow loop
-               if Kind (Crt_Tok) = Ident or Kind (Crt_Tok) = Res_Others or
-                 (Kind (Crt_Tok) in Spaces | Tab_Token | Disabled_LB_Token) or
-                 Kind (Crt_Tok) = '|'
-               then
-                  Crt_Tok := Next (Crt_Tok);
-               else
-                  return False;
-               end if;
-            end loop;
-
-            return Kind (Crt_Tok) = Arrow;
-         end Is_Named_Assoc;
-
          Qual_Nesting : Natural := 0;
       --  Count the nesting level of qualified expressions containing aggregates
       --  with extra parentheses.
@@ -4092,9 +3992,9 @@ package body Pp.Formatting is
                   end;
 
                --  Normally, we simply ignore EOL_Token in the input. But for
-               --  --preserve-line-breaks or --source-line-breaks mode, if we
-               --  see a line break in the input that is not yet in the output,
-               --  we copy it over. We set the indentation to take into account
+               --  --source-line-breaks mode, if we see a line break in the
+               --  input that is not yet in the output, we copy it over.
+               --  We set the indentation to take into account
                --  surrounding indentation, plus line continuation if
                --  appropriate, plus "("-related indentation. If the next
                --  character in the output is already ' ', we subtract one from
@@ -4108,104 +4008,7 @@ package body Pp.Formatting is
 
                   Next_ss (Src_Tok);
 
-                  if Arg (Cmd, Preserve_Line_Breaks) then
-
-                     declare
-                        Indentation : Natural := Before_Indentation;
-                     begin
-                        if Extra_Indent_For_Preserved_Line then
-                           --  See Manage_Paren_Stack
-                           Indentation :=
-                             Indentation + PP_Indent_Continuation (Cmd);
-                        end if;
-
-                        if Indentation /= 0 then
-                           --  Handle cases when line break just after Spaces or
-                           --  just after a '('
-                           if Kind (Prev (New_Tok)) = Spaces then
-                              --  If an affectation is preceeding the Spaces
-                              --  then nothing to do
-                              if Kind
-                                (Prev (Prev (Prev (New_Tok)))) /= Colon_Equal
-                              then
-                                 Indentation := Indentation - 1;
-                              end if;
-
-                           elsif Kind (Prev (New_Tok)) = '(' then
-                              Indentation := Indentation - 1;
-                           end if;
-                        end if;
-
-                        if Kind (New_Tok) /= Enabled_LB_Token then
-
-                           --  Check if the current indentation is for a named
-                           --  aggregate element association and adjust
-                           --  indentation if needed
-                           if Kind (New_Tok) = Ident and then Is_Named_Assoc
-                           then
-                              --  Indentation needs to be rectified only if
-                              --  this is not the first element of a named
-                              --  association
-                              if Kind (Prev (New_Tok)) /= '(' then
-                                 Indentation := Indentation + 1;
-                              end if;
-                           end if;
-
-                           --  If the EOL token should be inserted and the next
-                           --  element is a paranthesized expression inside a
-                           --  subprogram call or any other structure, the
-                           --  indentation level should be recomputed to allign
-                           --  the parathesis with the previous opened
-                           --  paranthesis instead of the current paren position
-                           --  (indent) of the Paren_Stack as Cur_Indentation.
-                           --  (the pattern that we are looking for to do that is
-                           --  "(.., (.." in a subprogram call with positional
-                           --  parameters).
-
-                           if not Is_Empty (Paren_Stack) and then
-                             In_Paren_Context and then
-                             Kind (New_Tok) = '(' and then
-                             Kind (Prev (Prev (Prev (New_Tok)))) = ','
-                           then
-                              Indentation :=
-                                Indentation + Before_Paren_Indent_For_Preserve;
-
-                              Update_L_Paren_Indent_For_Preserve
-                                   (Before_Paren_Indent_For_Preserve);
-
-                           else
-                              --  If we have an aggregate or parathesized
-                              --  expression just after a line break we should
-                              --  not take into account parenthesis position
-                              if not Is_Empty (Paren_Stack) and then
-                                Kind (New_Tok) = '(' and then
-                                Kind (Prev (Prev (Prev (New_Tok)))) = Colon_Equal
-                              then
-                                 pragma Assert
-                                   (not Extra_Indent_For_Preserved_Line);
-                                 --  Keep the PP_Indentation as current
-                                 --  indentation reference
-                                 Indentation :=
-                                   Indentation + PP_Indent_Continuation (Cmd);
-                              else
-                                 Indentation :=
-                                   Indentation + L_Paren_Indentation_For_Preserve;
-                              end if;
-
-                           end if;
-
-                           Cur_Indentation := Indentation;
-
-                           Append_Temp_Line_Break
-                             (Lines_Data_P,
-                              Org => "Append_Temp_ Preserve_Line_Breaks");
-
-                           Reset_Indentation;
-                           New_Line_Start_Out := New_Tok;
-                        end if;
-                     end;
-
-                  elsif Arg (Cmd, Source_Line_Breaks) then
+                  if Arg (Cmd, Source_Line_Breaks) then
 
                      if Kind (New_Tok) in Line_Break_Token then
                         declare
@@ -4434,7 +4237,6 @@ package body Pp.Formatting is
       end Insert_Comments_And_Blank_Lines;
 
       procedure Insert_Indentation (Lines_Data_P : Lines_Data_Ptr;
-                                    Cmd : Command_Line;
                                     Partial_GNATPP : Boolean := False)
       is
          function Is_Action_Call_Parameter (Tok : Tokn_Cursor) return Boolean;
@@ -4793,23 +4595,12 @@ package body Pp.Formatting is
                        Line_Break_Token_Index (New_Tok);
                      LB : Line_Break renames All_LB (Index);
                   begin
-                     --  If a Disabled_LB_Token is found and the switch
-                     --  --preserve-line-breaks is used then we do not want
-                     --  to change it in Enabled_LB_Token even is if it is
-                     --  enabled.
+                     if LB.Enabled then
+                        Append_Line_Break_Tokn
+                          (New_Tokns, Enabled => True, Index => Index);
 
-                     if Arg (Cmd, Preserve_Line_Breaks)
-                       and then Kind (New_Tok) = Disabled_LB_Token
-                     then
-                        null;
-                     else
-                        if LB.Enabled then
-                           Append_Line_Break_Tokn
-                             (New_Tokns, Enabled => True, Index => Index);
-
-                           LB.Tok := Nil_Tokn_Cursor;
-                           --  Tok is no longer needed
-                        end if;
+                        LB.Tok := Nil_Tokn_Cursor;
+                        --  Tok is no longer needed
                      end if;
                   end;
                when False_End_Of_Line =>

@@ -1,4 +1,5 @@
---  GNATpp fix --preserve-line-breaks
+--  GNATpp preserve line breaks without --preserve-line-breaks switch
+--  (this switch was removed in 24.xx)
 
 package body preserve_line_breaks is
 
@@ -14,8 +15,7 @@ package body preserve_line_breaks is
         array (1 .. 6)
         of Float;
 
-      type R is
-       record
+      type R is record
          I : Integer;
          F : Float;
          A : T;

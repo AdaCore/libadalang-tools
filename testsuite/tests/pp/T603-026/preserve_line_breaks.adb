@@ -1,4 +1,5 @@
---  GNATpp fix --preserve-line-breaks
+--  GNATpp preserve line breaks without --preserve-line-breaks switch
+--  (this switch was removed in 24.xx)
 
 package body preserve_line_breaks is
    
