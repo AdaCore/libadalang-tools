@@ -513,7 +513,7 @@ package body TGen.Types.Translation is
          Index := Index + 1;
       end loop;
 
-      if (not Is_Null (High_Bound (Rang)))
+      if not Is_Null (High_Bound (Rang))
         and then not Is_Null (Low_Bound (Rang))
       then
          Max :=
@@ -1588,11 +1588,11 @@ package body TGen.Types.Translation is
          return Record_Constrained
             (Ancestor_Type.P_Designated_Type_Decl, Root);
       else
-         pragma Assert ((Kind (Ancestor_Type.F_Constraint)
-                           in Ada_Composite_Constraint_Range) and
-                          (Ancestor_Type.F_Constraint
+         pragma Assert (Kind (Ancestor_Type.F_Constraint)
+                           in Ada_Composite_Constraint_Range and
+                          Ancestor_Type.F_Constraint
                                .As_Composite_Constraint
-                               .P_Is_Discriminant_Constraint));
+                               .P_Is_Discriminant_Constraint);
          return True;
       end if;
    end Record_Constrained;
@@ -1677,7 +1677,7 @@ package body TGen.Types.Translation is
       end if;
 
       if Needs_Renaming
-         or else (not Constraints.Contains (Variant.Discr_Name))
+         or else not Constraints.Contains (Variant.Discr_Name)
          or else not (Constraints.Element (Variant.Discr_Name).Kind in Static)
       then
 
@@ -1811,10 +1811,10 @@ package body TGen.Types.Translation is
 
       return New_Typ : Discriminated_Record_Typ (Constrained => True) do
          New_Typ.Mutable :=
-           (not Is_Null (Decl.F_Discriminants))
-           and then (not Is_Null
+           not Is_Null (Decl.F_Discriminants)
+           and then not Is_Null
              (Decl.F_Discriminants.As_Known_Discriminant_Part.F_Discr_Specs
-              .First_Child.As_Discriminant_Spec.F_Default_Expr));
+              .First_Child.As_Discriminant_Spec.F_Default_Expr);
 
          for Pair of Decl.F_Type_Def.As_Derived_Type_Def
                         .F_Subtype_Indication.F_Constraint
@@ -2841,11 +2841,11 @@ package body TGen.Types.Translation is
             end return;
          when Record_Typ_Range =>
             return Res : Translation_Result (Success => True) do
-               pragma Assert ((Kind (N.As_Subtype_Indication.F_Constraint)
-                                 in Ada_Composite_Constraint_Range) and
-                                (N.As_Subtype_Indication.F_Constraint
+               pragma Assert (Kind (N.As_Subtype_Indication.F_Constraint)
+                                 in Ada_Composite_Constraint_Range and
+                                N.As_Subtype_Indication.F_Constraint
                                      .As_Composite_Constraint
-                                     .P_Is_Discriminant_Constraint));
+                                     .P_Is_Discriminant_Constraint);
                Res.Res.Set (Anonymous_Typ'
                  (Name                => Ada_Identifier_Vectors.Empty_Vector,
                   Last_Comp_Unit_Idx  => 1,

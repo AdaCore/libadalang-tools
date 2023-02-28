@@ -1441,7 +1441,7 @@ package body Laltools.Partial_GNATPP is
             End_Node_Index   : constant Positive := End_Node.Child_Index + 1;
 
             Is_Slice : constant Boolean :=
-              (Start_Node_Index /= End_Node_Index)
+              Start_Node_Index /= End_Node_Index
               and then (Start_Node_Index /= 1
                         or End_Node_Index /= End_Node.Parent.Last_Child_Index);
 
@@ -1506,7 +1506,7 @@ package body Laltools.Partial_GNATPP is
             End_Node_Index   : constant Positive := End_Node.Child_Index + 1;
 
             Is_Slice : constant Boolean :=
-              (Start_Node_Index /= End_Node_Index)
+               Start_Node_Index /= End_Node_Index
                and then (Start_Node_Index /= 1
                          or End_Node_Index /=
                               End_Node.Parent.Last_Child_Index);
