@@ -1616,7 +1616,7 @@ package body Test.Actions is
 
                if
                  Current (Iterator) = No_Project
-                 or else (not Has_Attribute (Current (Iterator), Ext_Bld))
+                 or else not Has_Attribute (Current (Iterator), Ext_Bld)
                  or else
                    To_Lower
                      (Attribute_Value (Current (Iterator), Ext_Bld)) /= "true"

@@ -1486,8 +1486,8 @@ package body Test.Stub is
 
       Not_Empty_Stub : constant Boolean :=
         Arg_Kind = Ada_Subp_Decl and then  --  Not generic
-        (not Node.Inside_Generic) and then
-        (not Node.Inside_Protected);
+        not Node.Inside_Generic and then
+        not Node.Inside_Protected;
 
       Has_Limited_Params      : Boolean := False;
       Has_Limited_View_Params : Boolean := False;
@@ -1755,8 +1755,8 @@ package body Test.Stub is
 
       Not_Empty_Stub : constant Boolean :=
         Arg_Kind = Ada_Subp_Decl and then  --  Not generic
-        (not Node.Inside_Generic) and then
-        (not Node.Inside_Protected);
+        not Node.Inside_Generic and then
+        not Node.Inside_Protected;
 
       Has_Limited_Params      : Boolean := False;
       Has_Limited_View_Params : Boolean := False;

@@ -2109,8 +2109,8 @@ package body Pp.Formatting is
                         --  same level having soft line breaks associated)
                         if Prev_LL /= LL
                           and then not All_LB (Prev_LL).Enabled
-                          and then (All_LB (Prev_LL).Indentation =
-                                        All_LB (LL).Indentation - 1)
+                          and then All_LB (Prev_LL).Indentation
+                                   = All_LB (LL).Indentation - 1
                         then
                            All_LB (LL).Indentation :=
                              All_LB (LL).Indentation - 1;
@@ -3368,8 +3368,8 @@ package body Pp.Formatting is
                   --     --  Why put a comment here?
                   --     return Boolean;
                   elsif Prev_Indentation_Affect_Comments
-                    and then (Kind (Src_Tok) in
-                                Other_Whole_Line_Comment | Fillable_Comment)
+                    and then Kind (Src_Tok) in
+                               Other_Whole_Line_Comment | Fillable_Comment
                     --  Here look for the sequence:
                     --  )
                     --  Line_Break_Token
@@ -3394,8 +3394,8 @@ package body Pp.Formatting is
                   --  The next case deals with a comment right after the with
                   --  keyword of an aspect clause. This comment must be
                   --  affected by the with keyword identation.
-                  elsif (Kind (Src_Tok) in
-                           Other_Whole_Line_Comment | Fillable_Comment)
+                  elsif Kind (Src_Tok) in
+                          Other_Whole_Line_Comment | Fillable_Comment
                     --  Here look for the sequence:
                     --  with
                     --  Line_Break_Token
@@ -4438,7 +4438,7 @@ package body Pp.Formatting is
          end Called_As_Parameter_Of_An_Action_Call;
 
          function Is_Expected_Token (Tok : Tokn_Cursor) return Boolean
-         is ((Kind (Prev (Tok)) in ',' | '&' | ';' | ''' | Arrow)
+         is (Kind (Prev (Tok)) in ',' | '&' | ';' | ''' | Arrow
              or else (Kind (Prev (Tok)) = Ident and Kind (Next (Tok)) = '('));
 
          function Prev_LB_Indentation (Paren : Tokn_Cursor) return Positive

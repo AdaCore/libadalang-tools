@@ -148,8 +148,8 @@ package TGen.Types is
 
    function "=" (L, R : SP.Ref) return Boolean is
      ((L.Is_Null and then R.Is_Null)
-       or else ((not L.Is_Null)
-                and then (not R.Is_Null)
+       or else (not L.Is_Null
+                and then not R.Is_Null
                 and then L.Get.Name = R.Get.Name));
 
    function Try_Generate_Static

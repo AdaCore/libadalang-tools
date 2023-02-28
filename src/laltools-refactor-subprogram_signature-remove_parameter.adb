@@ -527,10 +527,10 @@ package body Laltools.Refactor.Subprogram_Signature.Remove_Parameter is
 
       if Parameter_Indices_Ranges'Length = 1
         and then Parameter_Indices_Ranges
-          (Parameter_Indices_Ranges'First).First = 1
-        and then (Parameter_Indices_Ranges
-                  (Parameter_Indices_Ranges'First).Last =
-                      Count_Subp_Parameters (Get_Subp_Params (Subp)))
+                   (Parameter_Indices_Ranges'First).First = 1
+        and then Parameter_Indices_Ranges
+                   (Parameter_Indices_Ranges'First).Last
+                 = Count_Subp_Parameters (Get_Subp_Params (Subp))
       then
          Edits := Remove_All_Parameters (Subp, Units);
       end if;
