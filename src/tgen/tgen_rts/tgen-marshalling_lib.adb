@@ -329,11 +329,11 @@ package body TGen.Marshalling_Lib is
       Offset := Offset + Num;
    end Write_Remainder;
 
-   -------------------------
-   -- Read_Write_Discrete --
-   -------------------------
+   ---------------------
+   -- Read_Write_Enum --
+   ---------------------
 
-   package body Read_Write_Discrete is
+   package body Read_Write_Enum is
 
       -----------------------
       -- Local Subprograms --
@@ -407,7 +407,7 @@ package body TGen.Marshalling_Lib is
          end if;
       end Read;
 
-   end Read_Write_Discrete;
+   end Read_Write_Enum;
 
    ------------------------------
    -- Read_Write_Decimal_Fixed --
@@ -420,7 +420,7 @@ package body TGen.Marshalling_Lib is
       --  'Fixed_Value. Use the longest possible integer in the architecture
       --  as a target (Long_Long_Long_Integer).
 
-      package Impl is new Read_Write_Discrete (Long_Long_Long_Integer);
+      package Impl is new Read_Write_Signed (Long_Long_Long_Integer);
 
       -----------
       -- Size --
@@ -491,7 +491,7 @@ package body TGen.Marshalling_Lib is
       --  'Fixed_Value. Use the longest possible integer in the architecture
       --  as a target (Long_Long_Long_Integer).
 
-      package Impl is new Read_Write_Discrete (Long_Long_Long_Integer);
+      package Impl is new Read_Write_Signed (Long_Long_Long_Integer);
 
       -----------
       -- Size --
@@ -773,6 +773,214 @@ package body TGen.Marshalling_Lib is
       end Read;
 
    end Read_Write_Float;
+
+   -----------------------
+   -- Read_Write_Signed --
+   -----------------------
+
+   package body Read_Write_Signed is
+
+      function Coarse_Norm is new Ada.Unchecked_Conversion
+        (Source => Long_Long_Long_Integer, Target => Long_Long_Long_Unsigned);
+      function Coarse_Denorm is new Ada.Unchecked_Conversion
+        (Source => Long_Long_Long_Unsigned, Target => Long_Long_Long_Integer);
+
+      -----------------------
+      -- Local Subprograms --
+      -----------------------
+
+      function Norm (V : T; F : T) return Long_Long_Long_Unsigned;
+      function Denorm (V : Long_Long_Long_Unsigned; F : T) return T'Base;
+      --  Convert to and from an unsigned integer that can then be marshalled.
+      --  Try to use as few bits as possible by shifting all values to zero.
+
+      Use_Coarse : Boolean;
+
+      procedure Setup_Use_Coarse (F, L : T; Max : out Long_Long_Long_Unsigned);
+      --  Check if we should use the coarse encoding or the refined one
+
+      ------------
+      -- Denorm --
+      ------------
+
+      function Denorm (V : Long_Long_Long_Unsigned; F : T) return T'Base is
+        (if Use_Coarse then T'Base (Coarse_Denorm (V))
+         else
+            T'Base (Long_Long_Long_Integer (F) + Long_Long_Long_Integer (V)));
+
+      ----------
+      -- Norm --
+      ----------
+
+      function Norm (V : T; F : T) return Long_Long_Long_Unsigned is
+        (if Use_Coarse then Coarse_Norm (Long_Long_Long_Integer (V))
+         else Long_Long_Long_Unsigned
+           (Long_Long_Long_Integer (V) - Long_Long_Long_Integer (F)));
+
+      ----------------------
+      -- Setup_Use_Coarse --
+      ----------------------
+
+      procedure Setup_Use_Coarse (F, L : T; Max : out Long_Long_Long_Unsigned)
+      is
+      begin
+         if F < 0
+           and then Long_Long_Long_Integer (L) > Long_Long_Long_Integer'Last
+           + Long_Long_Long_Integer (F)
+         then
+            Max := Long_Long_Long_Unsigned'Last;
+            Use_Coarse := True;
+         else
+            Max := Long_Long_Long_Unsigned
+              (Long_Long_Long_Integer (L) - Long_Long_Long_Integer (F));
+            Use_Coarse := False;
+         end if;
+      end Setup_Use_Coarse;
+
+      -----------
+      -- Size --
+      -----------
+
+      function Size
+        (First : T := T'First;
+         Last  : T := T'Last) return Natural
+      is
+         Max : Long_Long_Long_Unsigned;
+      begin
+         Setup_Use_Coarse (First, Last, Max);
+         for I in 0 .. 128 loop
+            if Max = 0 then
+               return I;
+            end if;
+            Max := Shift_Right (Max, 1);
+         end loop;
+         raise Program_Error;
+      end Size;
+
+      -----------
+      -- Write --
+      -----------
+
+      procedure Write
+        (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+         Buffer : in out Unsigned_8;
+         Offset : in out Offset_Type;
+         V      : T;
+         First  : T := T'First;
+         Last   : T := T'Last)
+      is
+         Max : Long_Long_Long_Unsigned;
+      begin
+         Setup_Use_Coarse (First, Last, Max);
+         Write (Stream, Buffer, Offset, Max, Norm (V, First));
+      end Write;
+
+      ----------
+      -- Read --
+      ----------
+
+      procedure Read
+        (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+         Buffer : in out Unsigned_8;
+         Offset : in out Offset_Type;
+         V      : out T;
+         First  : T := T'First;
+         Last   : T := T'Last)
+      is
+         Max : Long_Long_Long_Unsigned;
+         Val : Long_Long_Long_Unsigned;
+         R   : T'Base;
+      begin
+         Setup_Use_Coarse (First, Last, Max);
+         Read (Stream, Buffer, Offset, Max, Val);
+         R := Denorm (Val, First);
+         if R not in T then
+            raise Invalid_Value;
+         else
+            V := R;
+         end if;
+      end Read;
+   end Read_Write_Signed;
+
+   -------------------------
+   -- Read_Write_Unsigned --
+   -------------------------
+
+   package body Read_Write_Unsigned is
+
+      -----------------------
+      -- Local Subprograms --
+      -----------------------
+
+      function Norm (V : T; F : T) return Long_Long_Long_Unsigned is
+        (Long_Long_Long_Unsigned (V) - Long_Long_Long_Unsigned (F));
+
+      function Denorm (V : Long_Long_Long_Unsigned; F : T) return T'Base is
+        (T'Base (Long_Long_Long_Unsigned (F) + V));
+
+      -----------
+      -- Size --
+      -----------
+
+      function Size
+        (First : T := T'First;
+         Last  : T := T'Last) return Natural
+      is
+         Max : Long_Long_Long_Unsigned := Norm (Last, First);
+      begin
+         for I in 0 .. 128 loop
+            if Max = 0 then
+               return I;
+            end if;
+            Max := Shift_Right (Max, 1);
+         end loop;
+         raise Program_Error;
+      end Size;
+
+      -----------
+      -- Write --
+      -----------
+
+      procedure Write
+        (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+         Buffer : in out Unsigned_8;
+         Offset : in out Offset_Type;
+         V      : T;
+         First  : T := T'First;
+         Last   : T := T'Last)
+      is
+         Max : constant Long_Long_Long_Unsigned := Norm (Last, First);
+         Val : constant Long_Long_Long_Unsigned := Norm (V, First);
+      begin
+         Write (Stream, Buffer, Offset, Max, Val);
+      end Write;
+
+      ----------
+      -- Read --
+      ----------
+
+      procedure Read
+        (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+         Buffer : in out Unsigned_8;
+         Offset : in out Offset_Type;
+         V      : out T;
+         First  : T := T'First;
+         Last   : T := T'Last)
+      is
+         Max : constant Long_Long_Long_Unsigned := Norm (Last, First);
+         Val : Long_Long_Long_Unsigned;
+         R   : T'Base;
+      begin
+         Read (Stream, Buffer, Offset, Max, Val);
+         R := Denorm (Val, First);
+         if R not in T then
+            raise Invalid_Value;
+         else
+            V := R;
+         end if;
+      end Read;
+
+   end Read_Write_Unsigned;
 
    ------------
    -- In_Out --
