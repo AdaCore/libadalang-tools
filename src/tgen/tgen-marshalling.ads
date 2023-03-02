@@ -66,6 +66,10 @@ private
    --  given type.
 
    generic
+      Differentiate_Discrete : Boolean;
+      --  Whether we should use differentiated marshalling function for the
+      --  various discrete type kinds, or a single one.
+
       with function Component_Read
         (Assocs : Translate_Table) return Unbounded_String;
       --  Generate a call to read a record / array component

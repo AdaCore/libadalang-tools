@@ -223,19 +223,20 @@ package body TGen.Marshalling.JSON_Marshallers is
 
       procedure Generate_Base_Functions_For_Typ_Instance is new
         Generate_Base_Functions_For_Typ
-          (Component_Read        => Component_Read,
-           Component_Write       => Component_Write,
-           Component_Size        => Component_Size,
-           Component_Size_Max    => Component_Size_Max,
-           Variant_Read_Write    => Variant_Read_Write,
-           Variant_Size          => Variant_Size,
-           Variant_Size_Max      => Variant_Size_Max,
-           Print_Header          => Print_Header,
-           Print_Default_Header  => Print_Default_Header,
-           Print_Scalar          => Print_Scalar,
-           Print_Array           => Print_Array,
-           Print_Record          => Print_Record,
-           Print_Header_Wrappers => Print_Header_Wrappers);
+          (Differentiate_Discrete => False,
+           Component_Read         => Component_Read,
+           Component_Write        => Component_Write,
+           Component_Size         => Component_Size,
+           Component_Size_Max     => Component_Size_Max,
+           Variant_Read_Write     => Variant_Read_Write,
+           Variant_Size           => Variant_Size,
+           Variant_Size_Max       => Variant_Size_Max,
+           Print_Header           => Print_Header,
+           Print_Default_Header   => Print_Default_Header,
+           Print_Scalar           => Print_Scalar,
+           Print_Array            => Print_Array,
+           Print_Record           => Print_Record,
+           Print_Header_Wrappers  => Print_Header_Wrappers);
    begin
       --  Generate the base functions for Typ
 

@@ -779,7 +779,9 @@ package body TGen.Marshalling is
       if Typ in Scalar_Typ'Class then
          declare
             Generic_Name : constant String :=
-              (if Typ in Signed_Int_Typ'Class then "Read_Write_Signed"
+              (if Typ in Discrete_Typ'Class and then not Differentiate_Discrete
+               then "Read_Write_Discrete"
+               elsif Typ in Signed_Int_Typ'Class then "Read_Write_Signed"
                elsif Typ in Mod_Int_Typ'Class then "Read_Write_Unsigned"
                elsif Typ in Enum_Typ'Class then "Read_Write_Enum"
                elsif Typ in Float_Typ'Class then "Read_Write_Float"
