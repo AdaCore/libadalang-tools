@@ -13,9 +13,9 @@ package RAMSim is
       Base_Address : Bus_Address;
       Port         : Integer)
    is
-      new Bus_Device (Vendor_Id, Device_Id, Port, Native_Endian) with record
-         Controller : RAMsim_Control;
-      end record;
+     new Bus_Device (Vendor_Id, Device_Id, Port, Native_Endian) with record
+        Controller : RAMsim_Control;
+     end record;
    --  A comment about RAMsim_Ref before
 
    type RAMsim_Ref is access all RAMsim_Device'Class;
