@@ -5474,7 +5474,7 @@ package body Pp.Actions is
             declare
                function Needs_Completion return Boolean is
                  (Kind (Tree) in
-                      Ada_Decl_Block | Ada_Type_Decl | Ada_Object_Decl
+                    Ada_Decl_Block | Ada_Type_Decl | Ada_Object_Decl
                     | Ada_Subp_Body | Ada_Subp_Decl | Ada_Subp_Renaming_Decl
                     | Ada_Abstract_Subp_Decl | Ada_Null_Subp_Decl
                     | Ada_Generic_Subp_Decl | Ada_Generic_Subp_Instantiation
@@ -5486,7 +5486,7 @@ package body Pp.Actions is
                     | Ada_Generic_Package_Renaming_Decl
                     | Ada_Generic_Package_Instantiation
                     | Ada_Exception_Decl | Ada_Number_Decl
-                    | Ada_Stmt);
+                    | Ada_Stmt | Ada_Use_Type_Clause_Range);
                pragma Inline (Needs_Completion);
             begin
                if Needs_Completion then
