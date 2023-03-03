@@ -24,6 +24,6 @@ package wrong_indent is
       Long_Name : in Natural
       -- This one too
       );
-      -- This procedure is commented
+   -- This procedure is commented
 
 end wrong_indent;

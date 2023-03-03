@@ -55,12 +55,6 @@ package body Pp.Formatting is
    --  Next currently-enabled line break after F. Thus, F..Next_Enabled(F) is a
    --  line.
 
-   function Good_Column
-     (PP_Indentation : Positive; Indentation : Natural) return Natural is
-       ((Indentation / PP_Indentation) * PP_Indentation);
-   --  Make sure indentation is a multiple of PP_Indentation; otherwise style
-   --  checking complains "(style) bad column".
-
    procedure Tokns_To_Buffer
      (Buf : in out Buffer; Tokns : Scanner.Tokn_Vec;
       Cmd : Utils.Command_Lines.Command_Line);
@@ -3155,7 +3149,18 @@ package body Pp.Formatting is
             function Next_Is_End (Tok : Tokn_Cursor) return Boolean is
               (not After_Last (Next (Tok)) and then
                (Kind (Next (Tok)) = Res_End
-               or else Kind (Next_ss (Tok)) = Res_End));
+                  or else Kind (Next_ss (Tok)) = Res_End));
+
+            function Next_Is_End_Record (Tok : Tokn_Cursor) return Boolean is
+              (not After_Last (Next (Tok)) and then
+                 ((Kind (Next (Tok)) = Res_End
+                   and then (not After_Last (Next_ss (Next (Tok)))
+                             and then Kind (Next_ss (Next (Tok))) = Res_Record))
+                  or else
+                    (Kind (Next_ss (Tok)) = Res_End
+                     and then
+                       (not After_Last (Next_ss (Next_ss (Tok)))
+                        and then Kind (Next_ss (Next_ss (Tok))) = Res_Record))));
 
             function Next_Is_Inside_Case (Tok : Tokn_Cursor) return Boolean
             is
@@ -3236,7 +3241,6 @@ package body Pp.Formatting is
                         Kind (Prev (New_Tok)) = ';'))
 
                   then
-
                      null;
 
                      --  Handling the case where a new comment is added after
@@ -3314,6 +3318,7 @@ package body Pp.Formatting is
                               Corrected_Indentation := LB.Indentation;
                               Indentation := Corrected_Indentation;
                            end if;
+
                         else
                            Indentation :=
                              Natural'Max (Indentation,
@@ -3430,18 +3435,45 @@ package body Pp.Formatting is
                      --  the type indentation.
 
                      Indentation := Before_Indentation;
+
+                  elsif Prev_Indentation_Affect_Comments
+                    and then Kind (New_Tok) = Enabled_LB_Token
+                    and then Kind (Src_Tok) in
+                      Other_Whole_Line_Comment | Fillable_Comment
+                    and then Kind (Prev (New_Tok)) = ';'
+                    and then Next_Is_Action (New_Tok)
+                  then
+                     if Indentation /= After_Indentation then
+                        Indentation := After_Indentation;
+                     else
+                        Indentation := Natural'Max (Indentation,
+                                                    Before_Indentation);
+                     end if;
+
+                  elsif Prev_Indentation_Affect_Comments
+                    and then Kind (Src_Tok) in
+                      Other_Whole_Line_Comment | Fillable_Comment
+                    and then Kind (New_Tok) = Enabled_LB_Token
+                    and then Kind (Prev (New_Tok)) = ';'
+                    and then (Next_Is_End (New_Tok)
+                              and not Next_Is_End_Record (New_Tok))
+                  then
+
+                     if After_Indentation = Indentation then
+                        Indentation := Natural'Max
+                          (Indentation +  PP_Indentation (Cmd),
+                           PP_Indentation (Cmd));
+                     else
+                        Indentation := Natural'Max (Indentation,
+                                                    Before_Indentation);
+                     end if;
+
                   else
                      Indentation := Natural'Max (Indentation,
                                                  Before_Indentation);
                   end if;
                end if;
             end if;
-
-            --  Make sure Indentation is a multiple of PP_Indentation; otherwise
-            --  style checking complains "(style) bad column".
-
-            Indentation := Good_Column (PP_Indentation (Cmd), Indentation);
-            pragma Assert ((Indentation mod PP_Indentation (Cmd)) = 0);
 
             --  If we're inside something parenthesized, add an extra level
             --  (Note : this is a particular alignment case handled to avoid
