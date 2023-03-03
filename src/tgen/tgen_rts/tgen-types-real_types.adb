@@ -123,7 +123,7 @@ package body TGen.Types.Real_Types is
 
       function Rand is new Gen (T);
    begin
-      return Create (T'Image (Rand));
+      return Create (To_Quotient_String (LF_Conversions.To_Big_Real (Rand)));
    end Generate_Float_Typ;
 
    ----------------------
