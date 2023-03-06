@@ -3445,9 +3445,6 @@ package body Pp.Formatting is
                   then
                      if Indentation /= After_Indentation then
                         Indentation := After_Indentation;
-                     else
-                        Indentation := Natural'Max (Indentation,
-                                                    Before_Indentation);
                      end if;
 
                   elsif Prev_Indentation_Affect_Comments
@@ -3458,11 +3455,16 @@ package body Pp.Formatting is
                     and then (Next_Is_End (New_Tok)
                               and not Next_Is_End_Record (New_Tok))
                   then
-
                      if After_Indentation = Indentation then
-                        Indentation := Natural'Max
-                          (Indentation +  PP_Indentation (Cmd),
-                           PP_Indentation (Cmd));
+                        if Indentation = 0 then
+                           --  Can occur when it is the end of a package.
+                           --  In such situation indentation should be at least
+                           --  the value passed by the indentation switch.
+                           Indentation := PP_Indentation (Cmd);
+                        else
+                           Indentation := Natural'Max (Indentation,
+                                                       Before_Indentation);
+                        end if;
                      else
                         Indentation := Natural'Max (Indentation,
                                                     Before_Indentation);
