@@ -21,13 +21,13 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Containers.Vectors;
 with Ada.Strings;
 with Ada.Strings.Fixed;
 with Ada.Strings.Unbounded;
 
-with Langkit_Support.Slocs;
-
 with VSS.Characters;
+with VSS.Characters.Latin;
 with VSS.Strings.Conversions;
 with VSS.String_Vectors;
 with VSS.Text_Streams;
@@ -37,6 +37,49 @@ with VSS.Strings.Cursors.Iterators;
 with VSS.Strings.Cursors.Iterators.Characters;
 
 package body Lint.File_Edits is
+
+   package Positive_Vectors is new Ada.Containers.Vectors (Positive, Positive);
+
+   subtype Positive_Vector is Positive_Vectors.Vector;
+
+   procedure Compute_Line_Length
+     (Line        : VSS.Strings.Virtual_String;
+      Length      : out Natural;
+      Tabs_Length : out Positive_Vector);
+   --  Computes Line's Length by iterating through each character and
+   --  considering that each VSS.Characters.Latin.Character_Tabulation has a
+   --  maximum length of 8. The length of each
+   --  VSS.Characters.Latin.Character_Tabulation also appended to Tabs_Length.
+
+   -------------------------
+   -- Compute_Line_Length --
+   -------------------------
+
+   procedure Compute_Line_Length
+     (Line        : VSS.Strings.Virtual_String;
+      Length      : out Natural;
+      Tabs_Length : out Positive_Vector)
+   is
+      Character_It :
+        VSS.Strings.Cursors.Iterators.Characters.Character_Iterator :=
+          Line.Before_First_Character;
+
+      use type VSS.Characters.Virtual_Character;
+
+   begin
+      Length := 0;
+      Tabs_Length := Positive_Vectors.Empty_Vector;
+      while Character_It.Forward loop
+         if Character_It.Element =
+              VSS.Characters.Latin.Character_Tabulation
+         then
+            Tabs_Length.Append (8 - (Length mod 8));
+            Length := @ + (8 - (@ mod 8));
+         else
+            Length := @ + 1;
+         end if;
+      end loop;
+   end Compute_Line_Length;
 
    -----------------
    -- Apply_Edits --
@@ -66,9 +109,6 @@ package body Lint.File_Edits is
             Output : VSS.Text_Streams.File_Output.File_Output_Text_Stream;
             Buffer : constant VSS.Strings.Virtual_String :=
               Element (Edits_Cursor);
-            C_It   :
-              VSS.Strings.Cursors.Iterators.Characters.Character_Iterator :=
-                Buffer.At_First_Character;
             Ignore : Boolean := True;
 
          begin
@@ -79,10 +119,7 @@ package body Lint.File_Edits is
 
             Output.Create
               (VSS.Strings.Conversions.To_Virtual_String (Key (Edits_Cursor)));
-            while C_It.Has_Element loop
-               Output.Put (C_It.Element, Ignore);
-               Ignore := C_It.Forward;
-            end loop;
+            Output.Put (Buffer, Ignore);
             Output.Close;
 
          exception
@@ -126,34 +163,26 @@ package body Lint.File_Edits is
 
       while Has_Element (Edits_Cursor) loop
          declare
-            use Langkit_Support.Slocs;
-            use VSS.Characters;
-            use VSS.Strings;
-            use VSS.Strings.Conversions;
-            use VSS.Strings.Cursors.Iterators.Characters;
-            use VSS.String_Vectors;
-            use VSS.Text_Streams;
-            use VSS.Text_Streams.File_Input;
-
-            Original_Filename : constant Virtual_String :=
-              To_Virtual_String (Key (Edits_Cursor));
-            Original_File     : File_Input_Text_Stream;
-            Input_Buffer      : Virtual_String;
-            Output_Buffer     : Virtual_String;
+            Original_Filename : constant VSS.Strings.Virtual_String :=
+              VSS.Strings.Conversions.To_Virtual_String (Key (Edits_Cursor));
+            Original_File     :
+              VSS.Text_Streams.File_Input.File_Input_Text_Stream;
+            Input_Buffer      : VSS.Strings.Virtual_String;
+            Output_Buffer     : VSS.Strings.Virtual_String;
 
             Text_Edits        : constant Constant_Reference_Type :=
               Constant_Reference (Edits, Edits_Cursor);
             Text_Edits_Cursor : Text_Edit_Ordered_Sets.Cursor :=
-              Text_Edits.First;
+              Text_Edits.Last;
             Current_Text_Edit : Text_Edit :=
               Text_Edit_Ordered_Sets.Element (Text_Edits_Cursor);
             Inside_Text_Edit  : Boolean := False;
 
-            Current_Line_Number   : Line_Number := 1;
-            Current_Column_Number : Column_Number := 1;
+            Current_Line_Number   : Natural;
+            Current_Column_Number : Natural;
 
-            Current_Character : Virtual_Character;
-            Success           : Boolean := False;
+            Current_Character : VSS.Characters.Virtual_Character;
+            Success           : Boolean := True;
 
          begin
             Log_Progress
@@ -162,79 +191,110 @@ package body Lint.File_Edits is
                Message =>
                  "Creating buffer with " & Key (Edits_Cursor) & " edits");
 
-            Original_File.Open (Original_Filename);
-            loop
-               exit when Original_File.Is_End_Of_Stream;
+            Original_File.Open (Original_Filename, "utf-8");
+            while not Original_File.Is_End_Of_Stream loop
                Original_File.Get (Current_Character, Success);
                Input_Buffer.Append (Current_Character);
             end loop;
             Original_File.Close;
 
             declare
-               Lines          : constant Virtual_String_Vector :=
-                 Input_Buffer.Split_Lines (Keep_Terminator => True);
-               Lines_Iterator : constant Reversible_Iterator :=
-                 VSS.String_Vectors.Iterate (Lines);
+               Lines          :
+                 constant VSS.String_Vectors.Virtual_String_Vector :=
+                   Input_Buffer.Split_Lines (Keep_Terminator => True);
+               Lines_Iterator :
+                 constant VSS.String_Vectors.Reversible_Iterator :=
+                   VSS.String_Vectors.Iterate (Lines);
                Lines_Cursor   : VSS.String_Vectors.Cursor :=
-                 First (Lines_Iterator);
+                 VSS.String_Vectors.Last (Lines_Iterator);
 
-               Current_Line : Virtual_String;
+               Current_Line           : VSS.Strings.Virtual_String;
+               Current_Line_Length    : Natural;
+               Current_Line_Tabs_Size : Positive_Vector;
 
                Ignore : Boolean;
 
+               use type VSS.Characters.Virtual_Character;
+
             begin
+               Current_Line_Tabs_Size.Reserve_Capacity (10);
+
+               Current_Line_Number := Lines.Length;
                while VSS.String_Vectors.Has_Element (Lines_Cursor) loop
                   Current_Line :=
                     VSS.String_Vectors.Element (Lines, Lines_Cursor);
 
+                  Compute_Line_Length
+                    (Current_Line,
+                     Current_Line_Length,
+                     Current_Line_Tabs_Size);
+
+                  Current_Column_Number := Current_Line_Length;
+
                   declare
-                     C_It : Character_Iterator :=
-                       Current_Line.At_First_Character;
+                     Current_Line_Character_It :
+                       VSS.Strings.Cursors.Iterators.Characters.
+                         Character_Iterator :=
+                           Current_Line.After_Last_Character;
 
                   begin
-                     while C_It.Has_Element loop
-                        Current_Column_Number :=
-                          Column_Number (C_It.Character_Index);
+                     while Current_Line_Character_It.Backward loop
+                        if not Inside_Text_Edit then
+                           Output_Buffer.Prepend
+                             (Current_Line_Character_It.Element);
+                        end if;
+
                         if Current_Text_Edit /= No_Text_Edit then
                            if Current_Line_Number =
-                                Current_Text_Edit.Location.End_Line
+                                Natural (Current_Text_Edit.Location.Start_Line)
                              and then Current_Column_Number =
-                                        Current_Text_Edit.Location.End_Column
+                                        Natural
+                                          (Current_Text_Edit.Location.
+                                             Start_Column)
                            then
-                              Text_Edit_Ordered_Sets.Next (Text_Edits_Cursor);
+                              Text_Edit_Ordered_Sets.Previous
+                                (Text_Edits_Cursor);
                               if Text_Edit_Ordered_Sets.
                                    Has_Element (Text_Edits_Cursor)
                               then
                                  Current_Text_Edit :=
                                    Text_Edit_Ordered_Sets.
                                      Element (Text_Edits_Cursor);
+                              else
+                                 Current_Text_Edit := No_Text_Edit;
                               end if;
                               Inside_Text_Edit := False;
                            end if;
 
                            if Current_Line_Number =
-                                Current_Text_Edit.Location.Start_Line
+                                Natural (Current_Text_Edit.Location.End_Line)
                              and then Current_Column_Number =
-                                        Current_Text_Edit.Location.Start_Column
+                                        Natural
+                                          (Current_Text_Edit.Location.
+                                             End_Column)
                            then
-                              Output_Buffer.Append
-                                (To_Virtual_String
+                              Output_Buffer.Prepend
+                                (VSS.Strings.Conversions.To_Virtual_String
                                    (To_String (Current_Text_Edit.Text)));
                               Inside_Text_Edit := True;
                            end if;
                         end if;
 
-                        if not Inside_Text_Edit then
-                           Output_Buffer.Append (C_It.Element);
+                        if Current_Line_Character_It.Element =
+                          VSS.Characters.Latin.Character_Tabulation
+                        then
+                           Current_Column_Number :=
+                             @ - Current_Line_Tabs_Size.Last_Element;
+                           Current_Line_Tabs_Size.Delete_Last;
+                        else
+                           Current_Column_Number := @ - 1;
                         end if;
-
-                        Ignore := C_It.Forward;
                      end loop;
                   end;
 
                   Lines_Cursor :=
-                    VSS.String_Vectors.Next (Lines_Iterator, Lines_Cursor);
-                  Current_Line_Number := @ + 1;
+                    VSS.String_Vectors.Previous (Lines_Iterator, Lines_Cursor);
+                  Current_Line_Number := @ - 1;
                end loop;
             end;
 

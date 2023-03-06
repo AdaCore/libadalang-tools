@@ -1,0 +1,9 @@
+title: with_tabs
+
+description: |4
+    Tests that sources with tabs and non ascii characters are correctly
+    handled.
+
+driver: shell_script
+
+canonicalize_backslashes: True
