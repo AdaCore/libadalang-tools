@@ -99,6 +99,13 @@ package TGen.Libgen is
    --  procedures may result in overwriting of previously generated files if
    --  the output directories defined in Ctx are the same across calls.
 
+   function Required_Support_Packages
+     (Ctx       : Libgen_Context;
+      Unit_Name : TGen.Strings.Ada_Qualified_Name)
+      return TGen.Strings.Ada_Qualified_Name_Sets_Maps.Constant_Reference_Type;
+   --  Return a reference to the set of support packages that need to be
+   --  "withed" to be used with the types used in Unit_Name.
+
 private
    use TGen.Strings;
    use TGen.Context;
@@ -123,6 +130,9 @@ private
       Types_Per_Package : Types_Per_Package_Map;
       --  Map of package name to set of types for which we want to generate
       --  the support library.
+
+      Support_Packs_Per_Unit : TGen.Strings.Ada_Qualified_Name_Sets_Map;
+      --  Map of the required support packages for each processed unit
    end record;
 
 end TGen.Libgen;

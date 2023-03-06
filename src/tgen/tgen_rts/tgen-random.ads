@@ -27,6 +27,7 @@ with Interfaces; use Interfaces;
 
 with GNAT.Random_Numbers;
 
+with TGen.Big_Int;  use TGen.Big_Int;
 with TGen.Numerics; use TGen.Numerics;
 
 package TGen.Random is

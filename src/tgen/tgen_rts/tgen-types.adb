@@ -72,9 +72,6 @@ package body TGen.Types is
       return Pack_Name;
    end Package_Name;
 
-   function Package_Name (Self : Typ) return String is
-    (To_Ada (Self.Package_Name));
-
    ---------------------------
    -- Compilation_Unit_Name --
    ---------------------------
@@ -99,6 +96,12 @@ package body TGen.Types is
 
    function Dot_To_Underscore (C : Character) return Character is
      ((if C = '.' then '_' else C));
+
+   ------------
+   -- Encode --
+   ------------
+
+   function Encode (Self : Typ; Val : JSON_Value) return JSON_Value is (Val);
 
    ----------------------
    -- Default_Strategy --

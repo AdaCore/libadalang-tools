@@ -57,7 +57,6 @@ package body TGen.Types.Int_Types is
    end Image;
 
    function High_Bound (Self : Mod_Int_Typ) return Big_Integer is
-      use Big_Int;
    begin
       return Self.Mod_Value - To_Big_Integer (1);
    end High_Bound;
@@ -85,7 +84,6 @@ package body TGen.Types.Int_Types is
    function Get_Digits_Equivalence_Classes
      (R : Int_Range) return Interval_Vector
    is
-      use type Big_Int.Big_Integer;
 
       Result : Interval_Vector;
 
@@ -154,13 +152,14 @@ package body TGen.Types.Int_Types is
 
       use LLLI_Conversions;
 
-      function Draw (T : SP.Ref; R : Int_Range) return Value_Type'Class;
+      function Draw (T : SP.Ref; R : Int_Range) return JSON_Value;
 
    end Equivalence_Classes_Strategy_Int_Typ;
 
    package body Equivalence_Classes_Strategy_Int_Typ is
-      function Draw (T : SP.Ref; R : Int_Range) return Value_Type'Class is
-         use Big_Int;
+      function Draw
+        (T : SP.Ref with Unreferenced;
+         R : Int_Range) return JSON_Value is
 
          --  Constrain the range of possible values to
          --  LLI'First + 1 .. LLI'Last - 1 until V307-012 is fixed.
@@ -172,17 +171,17 @@ package body TGen.Types.Int_Types is
            LLLI_Conversions.To_Big_Integer
              (Long_Long_Long_Integer (Long_Long_Integer'Last - 1));
       begin
-         return (Discrete_Static_Value'
-                   (T     => T,
-                    Value =>
-                      LLLI_Conversions.To_Big_Integer
-                        (Rand_LLLI
-                          (From_Big_Integer (if R.Min <= First_LLI
-                                             then First_LLI
-                                             else R.Min),
-                           From_Big_Integer (if R.Max >= Last_LLI
-                                             then Last_LLI
-                                             else R.Max)))));
+         return (Create
+                 (LLLI_Conversions.To_Big_Integer
+                    (Rand_LLLI
+                       (From_Big_Integer
+                          (if R.Min <= First_LLI
+                             then First_LLI
+                             else R.Min),
+                          From_Big_Integer
+                            (if R.Max >= Last_LLI
+                             then Last_LLI
+                             else R.Max)))));
       end Draw;
 
    end Equivalence_Classes_Strategy_Int_Typ;
@@ -208,8 +207,7 @@ package body TGen.Types.Int_Types is
    -- Default_Strategy --
    ----------------------
 
-   function Default_Strategy
-     (Self    : Signed_Int_Typ) return Strategy_Type'Class
+   function Default_Strategy (Self : Signed_Int_Typ) return Strategy_Type'Class
    is
       Strat_Random : constant Strategy_Type'Class :=
         Generate_Static_Common (Discrete_Typ'Class (Self));
@@ -226,14 +224,10 @@ package body TGen.Types.Int_Types is
    --------------
 
    function Generate
-     (Strat : in out Static_Array_Constraint_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return Value_Type'Class
+     (Strat        : in out Array_Constraint_Strategy_Type;
+      Disc_Context : Disc_Value_Map) return JSON_Value
    is
-      package N_Conversions is
-        new Big_Int.Signed_Conversions (Int => Natural);
-      use N_Conversions;
-
-      use Big_Int;
+      use Nat_Conversions;
 
       Elements : Many_Type :=
         Many
@@ -245,7 +239,7 @@ package body TGen.Types.Int_Types is
       while Elements.More loop
          null;
       end loop;
-      return Base_Static_Value'(Value => +Natural'Image (Elements.Count));
+      return Create (Big_Int.To_Big_Integer (Elements.Count));
    end Generate;
 
    ----------------------------------------
@@ -253,13 +247,13 @@ package body TGen.Types.Int_Types is
    ----------------------------------------
 
    function Generate_Array_Constraint_Strategy
-     (Self : Signed_Int_Typ) return Static_Array_Constraint_Strategy_Type'Class
+     (Self : Signed_Int_Typ) return Array_Constraint_Strategy_Type'Class
    is
    begin
       case Self.Is_Static is
          when True =>
             declare
-               T : constant Static_Array_Constraint_Strategy_Type :=
+               T : constant Array_Constraint_Strategy_Type :=
                  (T => Self, Avg_Size => 5);
             begin
                return T;

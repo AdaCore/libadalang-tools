@@ -9,9 +9,9 @@ library project TGen_RTS is
    for Library_Dir use "lib-gen_rts." & Library_Type;
    for Object_Dir use "obj-tgen_rts." & Library_Type;
 
-   for Source_Dirs use (".");         
-       
-   package Compiler is  
-      for Default_Switches ("Ada") use ("-gnat2022"); 
+   for Source_Dirs use (".");
+
+   package Compiler is
+      for Default_Switches ("Ada") use ("-gnat2022");
    end Compiler;
 end TGen_RTS;

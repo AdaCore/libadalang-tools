@@ -62,18 +62,6 @@ package body TGen.Types.Discrete_Types is
    function High_Bound (Self : Discrete_Typ) return Big_Integer is
      (Big_Zero);
 
-   ---------------
-   -- To_String --
-   ---------------
-
-   function To_String (Self : Discrete_Static_Value) return String is
-      T_Classwide : constant Typ'Class := Self.T.Get;
-      T_Discrete  : constant Discrete_Typ'Class :=
-        Discrete_Typ'Class (T_Classwide);
-   begin
-      return T_Discrete.Lit_Image (Self.Value);
-   end To_String;
-
    --  Sampling strategy: draw an arbitrary value from an arbitrary sample in
    --  a list of samples.
 
@@ -83,17 +71,14 @@ package body TGen.Types.Discrete_Types is
 
    function Generate
      (S            : in out Sample_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return Value_Type'Class
+      Disc_Context : Disc_Value_Map) return JSON_Value
    is
-      Result        : Discrete_Static_Value;
       Picked_Index  : constant Positive :=
         Positive (Rand_Int (1, Integer (S.Samples.Length)));
       Picked_Sample : constant Alternatives_Set :=
         S.Samples.Element (Picked_Index);
    begin
-      Result.T := S.T;
-      Result.Value := Draw (Picked_Sample);
-      return Result;
+      return Create (Draw (Picked_Sample));
    end Generate;
 
    --------------------------------
@@ -126,18 +111,16 @@ package body TGen.Types.Discrete_Types is
       return Rand (Generator_Instance);
    end Gen;
 
-   function Generate_Static_Value_Random
-     (Ty : Typ'Class) return Value_Type'Class;
+   function Generate_Value_Random
+     (Ty : Typ'Class) return JSON_Value;
 
-   ----------------------------------
-   -- Generate_Static_Value_Random --
-   ----------------------------------
+   ---------------------------
+   -- Generate_Value_Random --
+   ---------------------------
 
-   function Generate_Static_Value_Random
-     (Ty : Typ'Class) return Value_Type'Class
+   function Generate_Value_Random
+     (Ty : Typ'Class) return JSON_Value
    is
-      Result : Discrete_Static_Value;
-
       Self : constant Discrete_Typ'Class := Discrete_Typ'Class (Ty);
       package LLI_Conversions is
         new Big_Int.Signed_Conversions (Int => Long_Long_Integer);
@@ -159,11 +142,9 @@ package body TGen.Types.Discrete_Types is
 
       function Rand is new Gen (T);
    begin
-      SP.From_Element (Result.T, Ty'Unrestricted_Access);
-      Result.Value :=
-        LLI_Conversions.To_Big_Integer (Long_Long_Integer (Rand));
-      return Result;
-   end Generate_Static_Value_Random;
+      return Create
+        (LLI_Conversions.To_Big_Integer (Long_Long_Integer (Rand)));
+   end Generate_Value_Random;
 
    --------------
    -- Generate --
@@ -171,7 +152,7 @@ package body TGen.Types.Discrete_Types is
 
    function Generate
      (S            : in out Array_Index_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return Value_Type'Class
+      Disc_Context : Disc_Value_Map) return JSON_Value
    is
       T_Classwide : constant Typ'Class := S.T.Get;
       T_Discrete  : constant Discrete_Typ'Class :=
@@ -202,7 +183,6 @@ package body TGen.Types.Discrete_Types is
       --     end record;
 
       declare
-         use Big_Int;
 
          Min_Size : Natural := S.Min_Size;
          Max_Size : Natural := S.Max_Size;
@@ -211,12 +191,13 @@ package body TGen.Types.Discrete_Types is
          Other_Index_Value : constant Big_Integer :=
            (if S.Other_Index_Constraint.Kind =
               TGen.Types.Constraints.Discriminant
-            then Disc_Context (S.Other_Index_Constraint.Disc_Name)
+            then
+               Disc_Context (S.Other_Index_Constraint.Disc_Name).Get
             else S.Other_Index_Constraint.Int_Val);
 
          Elements : Many_Type;
 
-         Result : Discrete_Static_Value := (T => S.T, others => <>);
+         Result : JSON_Value;
       begin
          if S.Index = End_Index
            and then T_Discrete.High_Bound - Other_Index_Value
@@ -313,11 +294,11 @@ package body TGen.Types.Discrete_Types is
          --  whole machinery above.
 
          if S.Index = Start_Index then
-            Result.Value :=
-              Other_Index_Value - To_Big_Integer (Elements.Count) + 1;
+            Result := Create
+              (Other_Index_Value - To_Big_Integer (Elements.Count) + 1);
          else
-            Result.Value :=
-              Other_Index_Value + To_Big_Integer (Elements.Count) - 1;
+            Result := Create
+              (Other_Index_Value + To_Big_Integer (Elements.Count) - 1);
          end if;
 
          return Result;
@@ -330,14 +311,14 @@ package body TGen.Types.Discrete_Types is
 
    function Generate
      (S            : in out Identity_Constraint_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return Value_Type'Class
+      Disc_Context : Disc_Value_Map) return JSON_Value
    is
-      Result : Discrete_Static_Value;
+      Result : JSON_Value;
    begin
       if S.Constraint.Kind = Discriminant then
-         Result.Value := Disc_Context (S.Constraint.Disc_Name);
+         Result := Disc_Context (S.Constraint.Disc_Name);
       elsif S.Constraint.Kind = Static then
-         Result.Value := S.Constraint.Int_Val;
+         Result := Create (S.Constraint.Int_Val);
       else
          raise Program_Error with "unsupported non static constraint";
       end if;
@@ -355,7 +336,6 @@ package body TGen.Types.Discrete_Types is
       return Strategy_Type'Class
    is
       use TGen.Numerics.Nat_Conversions;
-      use type Big_Int.Big_Integer;
 
       Strat : Array_Index_Strategy_Type;
 
@@ -376,7 +356,7 @@ package body TGen.Types.Discrete_Types is
         From_Big_Integer
           (Big_Int.Min
              (Self.High_Bound - Self.Low_Bound,
-              To_Big_Integer (Unconstrained_Array_Size_Max)));
+              Nat_Conversions.To_Big_Integer (Unconstrained_Array_Size_Max)));
       Average_Size :=
         Natural'Min (Natural'Max (Min_Size * 2, Min_Size + 5),
                      Min_Size + ((Max_Size - Min_Size) / 2));
@@ -428,7 +408,7 @@ package body TGen.Types.Discrete_Types is
       Strat : Basic_Strategy_Type;
    begin
       SP.From_Element (Strat.T, Self'Unrestricted_Access);
-      Strat.F := Generate_Static_Value_Random'Access;
+      Strat.F := Generate_Value_Random'Access;
       return Strat;
    end Generate_Static_Common;
 

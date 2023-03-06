@@ -1,0 +1,31 @@
+@@-- Useful macros
+@@-- LPAR() introduces a parenthesis at the first table line, a space otherwise
+@@MACRO(LPAR)@@
+@@IF@@ @_TABLE_LINE_@ = 1
+(
+@@ELSE@@
+ @_$1_@
+@@END_IF@@
+@@END_MACRO@@
+@@-- RPAR() introduces a parenthesis at the end table line, ; otherwise
+@@MACRO(RPAR)@@
+@@IF@@ @_TABLE_LINE_@ = @_NUMBER_LINE_@
+)
+@@ELSE@@
+;
+@@END_IF@@
+@@END_MACRO@@
+@@-- RVPAR() introduces a parenthesis at the end table line, , otherwise
+@@MACRO(RVPAR)@@
+@@IF@@ @_TABLE_LINE_@ = @_NUMBER_LINE_@
+)@_$1_@
+@@ELSE@@
+,
+@@END_IF@@
+@@END_MACRO@@
+@@-- BASE_SUFFIX adds the suffix _Base if FOR_BASE is true
+@@MACRO(BASE_SUFFIX)@@
+@@IF@@ @_FOR_BASE_@
+_Base
+@@END_IF@@
+@@END_MACRO@@

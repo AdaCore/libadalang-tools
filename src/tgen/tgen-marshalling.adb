@@ -25,15 +25,10 @@ with Ada.Numerics.Big_Numbers.Big_Integers;
 use  Ada.Numerics.Big_Numbers.Big_Integers;
 with Ada.Strings;                  use Ada.Strings;
 with Ada.Strings.Fixed;            use Ada.Strings.Fixed;
-with Ada.Strings.Unbounded;        use Ada.Strings.Unbounded;
-
-with GNAT.OS_Lib;
-
-with Templates_Parser;             use Templates_Parser;
+with Ada.Text_IO;                  use Ada.Text_IO;
 
 with TGen.Strings;                 use TGen.Strings;
 with TGen.Types.Array_Types;       use TGen.Types.Array_Types;
-with TGen.Types.Constraints;       use TGen.Types.Constraints;
 with TGen.Types.Discrete_Types;    use TGen.Types.Discrete_Types;
 with TGen.Types.Enum_Types;        use TGen.Types.Enum_Types;
 with TGen.Types.Int_Types;         use TGen.Types.Int_Types;
@@ -42,72 +37,9 @@ with TGen.Types.Record_Types;      use TGen.Types.Record_Types;
 
 package body TGen.Marshalling is
 
-   Global_Prefix   : constant String := "TGen_Marshalling";
-   Marshalling_Lib : constant String := "TGen.Marshalling_Lib";
-
-   --------------------
-   -- Template Files --
-   --------------------
-
-   Template_Folder               : constant String :=
-     "marshalling_templates/";
-   Array_Read_Write_Template     : constant String :=
-     Template_Folder & "array_read_write.tmplt";
-   Component_Read_Write_Template : constant String :=
-     Template_Folder & "component_read_write.tmplt";
-   Component_Size_Max_Template   : constant String :=
-     Template_Folder & "component_size_max.tmplt";
-   Component_Size_Template       : constant String :=
-     Template_Folder & "component_size.tmplt";
-   Composite_Base_Spec_Template  : constant String :=
-     Template_Folder & "composite_base_spec.tmplt";
-   Default_Header_Spec_Template  : constant String :=
-     Template_Folder & "default_header_spec.tmplt";
-   Header_Body_Template          : constant String :=
-     Template_Folder & "header_body.tmplt";
-   Header_Spec_Template          : constant String :=
-     Template_Folder & "header_spec.tmplt";
-   Header_Wrappers_Body_Template : constant String :=
-     Template_Folder & "header_wrappers_body.tmplt";
-   Header_Wrappers_Spec_Template : constant String :=
-     Template_Folder & "header_wrappers_spec.tmplt";
-   In_Out_Body_Template          : constant String :=
-     Template_Folder & "in_out_body.tmplt";
-   In_Out_Spec_Template          : constant String :=
-     Template_Folder & "in_out_spec.tmplt";
-   Record_Read_Write_Template    : constant String :=
-     Template_Folder & "record_read_write.tmplt";
-   Record_Size_Max_Template      : constant String :=
-     Template_Folder & "record_size_max.tmplt";
-   Record_Size_Template          : constant String :=
-     Template_Folder & "record_size.tmplt";
-   Scalar_Base_Spec_Template     : constant String :=
-     Template_Folder & "scalar_base_spec.tmplt";
-   Scalar_Read_Write_Template    : constant String :=
-     Template_Folder & "scalar_read_write.tmplt";
-   Variant_Read_Write_Template   : constant String :=
-     Template_Folder & "variant_read_write.tmplt";
-   Variant_Size_Max_Template     : constant String :=
-     Template_Folder & "variant_size_max.tmplt";
-   Variant_Size_Template         : constant String :=
-     Template_Folder & "variant_size.tmplt";
-   Array_Size_Max_Template       : constant String :=
-     Template_Folder & "array_size_max.tmplt";
-   Array_Size_Template           : constant String :=
-     Template_Folder & "array_size.tmplt";
-
    -----------------------
    -- Local Subprograms --
    -----------------------
-
-   function Prefix_For_Typ (Ty_Name : String) return String is
-     (Global_Prefix & "_" & Ty_Name);
-   --  Construct a prefix that will be shared by all entities generated for a
-   --  given type.
-
-   function Needs_Header (Typ : TGen.Types.Typ'Class) return Boolean;
-   --  Return True for types which have constraints (bounds of unconstrained
-   --  array types, and discriminants of unconstrained record types).
 
    function Needs_Wrappers (Typ : TGen.Types.Typ'Class) return Boolean;
    --  Return True for types with headers when they can occur nested in the
@@ -143,129 +75,6 @@ package body TGen.Marshalling is
    function Create_Tag_For_Intervals
      (Intervals : Alternatives_Set; Typ : TGen.Types.Typ'Class) return Tag;
    --  Return as a tag the choices represented by a set of intervals
-
-   procedure Generate_Base_Functions_For_Typ
-     (F_Spec             : File_Type;
-      F_Body             : File_Type;
-      Typ                : TGen.Types.Typ'Class;
-      Templates_Root_Dir : String;
-      For_Base           : Boolean := False)
-   with Pre => (if For_Base then Typ in Scalar_Typ'Class)
-     and then Typ not in Anonymous_Typ'Class;
-   --  Generate base marshalling and unmarshalling functions for Typ. Note that
-   --  this function will not operate recursively. It will thus have to be
-   --  called for each of the component type of a record for instance.
-   --
-   --  If For_Base is True, generate the functions for Typ'Base.
-   --
-   --  For scalars, we generate:
-   --
-   --  procedure TAGAda_Marshalling_Typ_Write
-   --    (TAGAda_Marshalling_Stream : not null access Root_Stream_Type'Class;
-   --     TAGAda_Marshalling_Buffer : in out Unsigned_8;
-   --     TAGAda_Marshalling_Offset : in out Offset_Type;
-   --     TAGAda_Marshalling_V      : Typ;
-   --     TAGAda_Marshalling_First  : Typ := Typ'First;
-   --     TAGAda_Marshalling_Last   : Typ := Typ'Last);
-   --
-   --  procedure TAGAda_Marshalling_Typ_Read
-   --    (TAGAda_Marshalling_Stream : not null access Root_Stream_Type'Class;
-   --     TAGAda_Marshalling_Buffer : in out Unsigned_8;
-   --     TAGAda_Marshalling_Offset : in out Offset_Type;
-   --     TAGAda_Marshalling_V      : out Typ;
-   --     TAGAda_Marshalling_First  : Typ := Typ'First;
-   --     TAGAda_Marshalling_Last   : Typ := Typ'Last);
-   --
-   --  function TAGAda_Marshalling_Typ_Size
-   --    (TAGAda_Marshalling_First  : Typ := Typ'First;
-   --     TAGAda_Marshalling_Last   : Typ := Typ'Last)
-   --     return Natural;
-   --
-   --  The additional First and Last parameters are used to handle anonymous
-   --  subtypes in record or array components.
-   --
-   --  For composite types with no headers, we generate:
-   --
-   --  procedure TAGAda_Marshalling_Typ_Write
-   --    (TAGAda_Marshalling_Stream : not null access Root_Stream_Type'Class;
-   --     TAGAda_Marshalling_Buffer : in out Unsigned_8;
-   --     TAGAda_Marshalling_Offset : in out Offset_Type;
-   --     TAGAda_Marshalling_V      : Typ);
-   --
-   --  procedure TAGAda_Marshalling_Typ_Read
-   --    (TAGAda_Marshalling_Stream : not null access Root_Stream_Type'Class;
-   --     TAGAda_Marshalling_Buffer : in out Unsigned_8;
-   --     TAGAda_Marshalling_Offset : in out Offset_Type;
-   --     TAGAda_Marshalling_V      : out Typ);
-   --
-   --  function TAGAda_Marshalling_Typ_Size
-   --    (TAGAda_Marshalling_V : Typ)
-   --    return Natural;
-   --
-   --  function TAGAda_Marshalling_Typ_Size_Max
-   --    return Natural;
-   --
-   --  The Size and Size_Max functions should be the same here, except if Typ
-   --  contains component with dynamic bounds which we do not handle well
-   --  currently.
-   --
-   --  For composite types with headers, we generate:
-   --
-   --  type TAGAda_Marshalling_Typ_Header_Type is record
-   --     < Typ's array bound or record discriminants >
-   --  end record;
-   --
-   --  function TAGAda_Marshalling_Typ_Input_Header
-   --    (TAGAda_Marshalling_Stream : not null access Root_Stream_Type'Class)
-   --    return TAGAda_Marshalling_Typ_Header_Type;
-   --
-   --  procedure TAGAda_Marshalling_Typ_Output_Header
-   --    (TAGAda_Marshalling_Stream : not null access Root_Stream_Type'Class;
-   --     TAGAda_Marshalling_V      : Typ);
-   --
-   --  function TAGAda_Marshalling_Typ_Bit_Size_Header return Natural;
-   --
-   --  function TAGAda_Marshalling_Typ_Byte_Size_Header return Natural;
-   --
-   --  procedure TAGAda_Marshalling_Typ_Write
-   --    (TAGAda_Marshalling_Stream : not null access Root_Stream_Type'Class;
-   --     TAGAda_Marshalling_Buffer : in out Unsigned_8;
-   --     TAGAda_Marshalling_Offset : in out Offset_Type;
-   --     TAGAda_Marshalling_V      : Typ);
-   --
-   --  procedure TAGAda_Marshalling_Typ_Read
-   --    (TAGAda_Marshalling_Stream : not null access Root_Stream_Type'Class;
-   --     TAGAda_Marshalling_Buffer : in out Unsigned_8;
-   --     TAGAda_Marshalling_Offset : in out Offset_Type;
-   --     TAGAda_Marshalling_V      : out Typ);
-   --
-   --  function TAGAda_Marshalling_Typ_Size
-   --    (TAGAda_Marshalling_V : Typ)
-   --    return Natural;
-   --
-   --  function TAGAda_Marshalling_Typ_Size_Max
-   --    (<Min and Max value of discriminants or array bounds>)
-   --    return Natural;
-   --
-   --  If the type can be used as a component (see Needs_Wrapper), we also
-   --  generate:
-   --
-   --  procedure TAGAda_Marshalling_Typ_Write_All
-   --    (TAGAda_Marshalling_Stream : not null access Root_Stream_Type'Class;
-   --     TAGAda_Marshalling_Buffer : in out Unsigned_8;
-   --     TAGAda_Marshalling_Offset : in out Offset_Type;
-   --     TAGAda_Marshalling_V      : Typ);
-   --
-   --  procedure TAGAda_Marshalling_Typ_Read_All
-   --    (TAGAda_Marshalling_Stream : not null access Root_Stream_Type'Class;
-   --     TAGAda_Marshalling_Buffer : in out Unsigned_8;
-   --     TAGAda_Marshalling_Offset : in out Offset_Type;
-   --     TAGAda_Marshalling_V      : out Typ);
-   --
-   --  function TAGAda_Marshalling_Typ_Size_Max_All return Natural;
-   --
-   --  They also marshall the header and add some padding so that there is
-   --  enough room to read a correct value if the header is mutated.
 
    procedure Create_Tags_For_Array_Bounds
      (U_Typ        : Unconstrained_Array_Typ'Class;
@@ -313,7 +122,8 @@ package body TGen.Marshalling is
 
       function Bound_To_String
         (C      : Discrete_Constraint_Value;
-         Typ    : TGen.Types.Typ'Class;
+         Typ
+         : TGen.Types.Typ'Class;
          Is_Min : Boolean := True) return String
       is
         (case C.Kind is
@@ -595,19 +405,15 @@ package body TGen.Marshalling is
    -------------------------------------
 
    procedure Generate_Base_Functions_For_Typ
-     (F_Spec             : File_Type;
-      F_Body             : File_Type;
-      Typ                : TGen.Types.Typ'Class;
-      Templates_Root_Dir : String;
-      For_Base           : Boolean := False)
+     (Typ      : TGen.Types.Typ'Class;
+      For_Base : Boolean := False)
    is
-      TRD : constant String :=
-        Templates_Root_Dir & GNAT.OS_Lib.Directory_Separator;
-
       B_Name         : constant String := Typ.Fully_Qualified_Name;
       Ty_Prefix      : constant String := Prefix_For_Typ (Typ.Slug);
       Ty_Name        : constant String :=
         (if For_Base then B_Name & "'Base" else B_Name);
+
+      type Component_Kind is (Array_Component, Record_Component);
 
       --  Function computing the indentation for component handling
 
@@ -633,9 +439,13 @@ package body TGen.Marshalling is
       function Size_Spacing (Spacing : Natural) return String is
         (if Typ in Array_Typ'Class then [1 .. Size_Arr_Spacing => ' ']
          else [1 .. Size_Init_Spacing + Spacing * Var_Incr_Spacing => ' ']);
+      --  Tags for the components of the header if any, their types, their
+      --  prefix and the corresponding Ada Value.
 
       procedure Collect_Info_For_Component
-        (Comp_Name    : String;
+        (Comp_Kind    : Component_Kind;
+         Comp_Name    : String;
+         Comp         : String;
          Comp_Ty      : TGen.Types.Typ'Class;
          Read_Tag     : out Unbounded_String;
          Write_Tag    : out Unbounded_String;
@@ -681,7 +491,9 @@ package body TGen.Marshalling is
       --------------------------------
 
       procedure Collect_Info_For_Component
-        (Comp_Name    : String;
+        (Comp_Kind    : Component_Kind;
+         Comp_Name    : String;
+         Comp         : String;
          Comp_Ty      : TGen.Types.Typ'Class;
          Read_Tag     : out Unbounded_String;
          Write_Tag    : out Unbounded_String;
@@ -702,28 +514,24 @@ package body TGen.Marshalling is
          Assocs           : constant Translate_Table :=
            [1 => Assoc ("GLOBAL_PREFIX", Global_Prefix),
             2 => Assoc ("COMP_PREFIX", Comp_Prefix),
-            3 => Assoc ("COMPONENT", Comp_Name),
+            3 => Assoc ("COMPONENT", Comp),
             4 => Assoc ("CONSTRAINTS", Comp_Constraints),
             5 => Assoc ("COMP_SCALAR", Comp_Scalar),
-            6 => Assoc ("NEEDS_HEADER", Needs_Header (Named_Comp_Ty))];
+            6 => Assoc ("NEEDS_HEADER", Needs_Header (Named_Comp_Ty)),
+            7 => Assoc ("COMPONENT_KIND", Component_Kind'Image (Comp_Kind)),
+            8 => Assoc ("COMPONENT_NAME", Comp_Name)];
+         Comp_Kind_Str : constant String :=
+           Component_Kind'Image (Comp_Kind);
+         pragma Unreferenced (Comp_Kind_Str);
       begin
-
-         Read_Tag := Parse
-           (TRD & Component_Read_Write_Template,
-            Assocs &
-            [1 => Assoc ("SPACING", RW_Spacing (Spacing)),
-             2 => Assoc ("ACTION", "Read")]);
-         Write_Tag := Parse
-           (TRD & Component_Read_Write_Template,
-            Assocs &
-            [1 => Assoc ("SPACING", RW_Spacing (Spacing)),
-             2 => Assoc ("ACTION", "Write")]);
-         Size_Tag := Parse
-           (TRD & Component_Size_Template,
-            Assocs & Assoc ("SPACING", Size_Spacing (Spacing)));
-         Size_Max_Tag := Parse
-           (TRD & Component_Size_Max_Template,
-            Assocs & Assoc ("SPACING", Max_Spacing (Spacing)));
+         Read_Tag := Component_Read
+           (Assocs & Assoc ("SPACING", RW_Spacing (Spacing)));
+         Write_Tag := Component_Write
+           (Assocs & Assoc ("SPACING", RW_Spacing (Spacing)));
+         Size_Tag := Component_Size
+           (Assocs & Assoc ("SPACING", Size_Spacing (Spacing)));
+         Size_Max_Tag := Component_Size_Max
+           (Assocs & Assoc ("SPACING", Max_Spacing (Spacing)));
       end Collect_Info_For_Component;
 
       ---------------------------------
@@ -753,7 +561,8 @@ package body TGen.Marshalling is
                Size_Max  : Unbounded_String;
             begin
                Collect_Info_For_Component
-                 (Object_Name & "." & Comp_Name, Comp_Ty,
+                 (Record_Component, Comp_Name,
+                  Object_Name & "." & Comp_Name, Comp_Ty,
                   Read, Write, Size, Size_Max, Spacing);
                Read_Tag := Read_Tag & Read;
                Write_Tag := Write_Tag & Write;
@@ -857,31 +666,28 @@ package body TGen.Marshalling is
                4 => Assoc ("CHOICES", Choices_Tag)];
 
          begin
-            Read_Tag := +String'
-              (Parse (TRD & Variant_Read_Write_Template, Assocs &
-                      [1 => Assoc ("COMPONENT_ACTION", Comp_Read_Tag),
-                       2 => Assoc ("VARIANT_PART", Variant_Read_Tag),
-                       3 => Assoc ("SPACING", RW_Spacing (Spacing))]));
-            Write_Tag := +String'
-              (Parse (TRD & Variant_Read_Write_Template, Assocs &
-                      [1 => Assoc ("COMPONENT_ACTION", Comp_Write_Tag),
-                       2 => Assoc ("VARIANT_PART", Variant_Write_Tag),
-                       3 => Assoc ("SPACING", RW_Spacing (Spacing))]));
-            Size_Tag := +String'
-              (Parse (TRD & Variant_Size_Template, Assocs &
-                      [1 => Assoc ("COMPONENT_SIZE", Comp_Size_Tag),
-                       2 => Assoc ("VARIANT_PART", Variant_Size_Tag),
-                       3 => Assoc ("SPACING", Size_Spacing (Spacing))]));
-            Size_Max_Tag := +String'
-              (Parse (TRD & Variant_Size_Max_Template, Assocs &
-                      [1 => Assoc ("COMPONENT_SIZE_MAX", Comp_Size_Max_Tag),
-                       2 => Assoc ("VARIANT_PART", Variant_Size_Max_Tag),
-                       3 => Assoc ("SPACING", Max_Spacing (Spacing))]));
+            Read_Tag := +Variant_Read_Write
+              (Assocs &
+               [1 => Assoc ("COMPONENT_ACTION", Comp_Read_Tag),
+                2 => Assoc ("VARIANT_PART", Variant_Read_Tag),
+                3 => Assoc ("SPACING", RW_Spacing (Spacing))]);
+            Write_Tag := +Variant_Read_Write
+              (Assocs &
+               [1 => Assoc ("COMPONENT_ACTION", Comp_Write_Tag),
+                2 => Assoc ("VARIANT_PART", Variant_Write_Tag),
+                3 => Assoc ("SPACING", RW_Spacing (Spacing))]);
+            Size_Tag := +Variant_Size
+              (Assocs &
+               [1 => Assoc ("COMPONENT_SIZE", Comp_Size_Tag),
+                2 => Assoc ("VARIANT_PART", Variant_Size_Tag),
+                3 => Assoc ("SPACING", Size_Spacing (Spacing))]);
+            Size_Max_Tag := +Variant_Size_Max
+              (Assocs &
+               [1 => Assoc ("COMPONENT_SIZE_MAX", Comp_Size_Max_Tag),
+                2 => Assoc ("VARIANT_PART", Variant_Size_Max_Tag),
+                3 => Assoc ("SPACING", Max_Spacing (Spacing))]);
          end;
       end Collect_Info_For_Variants;
-
-      --  Tags for the components of the header if any, their types, their
-      --  prefix and the corresponding Ada Value.
 
       Discr_Name_Tag : Tag;
       First_Name_Tag : Tag;
@@ -892,7 +698,6 @@ package body TGen.Marshalling is
         (if Typ in Array_Typ'Class
          then Create_Tags_For_Array_Dims (Array_Typ'Class (Typ))
          else +"");
-
    begin
       --  1. Generate operations for the header if needed
 
@@ -937,7 +742,7 @@ package body TGen.Marshalling is
          --  Generate the header
 
          declare
-            Assocs      : constant Translate_Table :=
+            Assocs : constant Translate_Table :=
               [1  => Assoc ("TY_NAME", Ty_Name),
                2  => Assoc ("TY_PREFIX", Ty_Prefix),
                3  => Assoc ("GLOBAL_PREFIX", Global_Prefix),
@@ -949,11 +754,7 @@ package body TGen.Marshalling is
                9  => Assoc ("ADA_DIM", Ada_Dim_Tag)];
 
          begin
-            Put_Line (F_Spec, Parse (TRD & Header_Spec_Template, Assocs));
-            New_Line (F_Spec);
-
-            Put_Line (F_Body, Parse (TRD & Header_Body_Template, Assocs));
-            New_Line (F_Body);
+            Print_Header (Assocs);
          end;
 
       --  If the type does not need a header, still generate definitions for
@@ -966,36 +767,11 @@ package body TGen.Marshalling is
                2  => Assoc ("TY_PREFIX", Ty_Prefix)];
 
          begin
-            Put_Line
-              (F_Spec, Parse (TRD & Default_Header_Spec_Template, Assocs));
-            New_Line (F_Spec);
+            Print_Default_Header (Assocs);
          end;
       end if;
 
-      --  2. Generate the specifications of the base operations
-
-      declare
-         Spec_Template : constant String :=
-           (if Typ in Scalar_Typ'Class then Scalar_Base_Spec_Template
-            else Composite_Base_Spec_Template);
-         Assocs        : constant Translate_Table :=
-           [1  => Assoc ("TY_NAME", Ty_Name),
-            2  => Assoc ("TY_PREFIX", Ty_Prefix),
-            3  => Assoc ("GLOBAL_PREFIX", Global_Prefix),
-            4  => Assoc ("DISCR_NAME", Discr_Name_Tag),
-            5  => Assoc ("FIRST_NAME", First_Name_Tag),
-            6  => Assoc ("LAST_NAME", Last_Name_Tag),
-            7  => Assoc ("COMP_TYP", Comp_Typ_Tag),
-            8  => Assoc ("COMP_PREFIX", Comp_Pref_Tag),
-            9  => Assoc ("ADA_DIM", Ada_Dim_Tag),
-            10 => Assoc ("FOR_BASE", For_Base)];
-
-      begin
-         Put_Line (F_Spec, Parse (TRD & Spec_Template, Assocs));
-         New_Line (F_Spec);
-      end;
-
-      --  3. Generate the body of the base operations
+      --  3. Generate the body and spec of the base operations
       --  3.1. For scalar types, we generate clones. We need to provide the
       --       name of the appropriate generic unit depending on the scalar
       --       kind (Discrete, Fixed, or Float).
@@ -1003,7 +779,9 @@ package body TGen.Marshalling is
       if Typ in Scalar_Typ'Class then
          declare
             Generic_Name : constant String :=
-              (if Typ in Signed_Int_Typ'Class then "Read_Write_Signed"
+              (if Typ in Discrete_Typ'Class and then not Differentiate_Discrete
+               then "Read_Write_Discrete"
+               elsif Typ in Signed_Int_Typ'Class then "Read_Write_Signed"
                elsif Typ in Mod_Int_Typ'Class then "Read_Write_Unsigned"
                elsif Typ in Enum_Typ'Class then "Read_Write_Enum"
                elsif Typ in Float_Typ'Class then "Read_Write_Float"
@@ -1020,9 +798,7 @@ package body TGen.Marshalling is
                7 => Assoc ("FOR_BASE", For_Base)];
 
          begin
-            Put_Line
-              (F_Body, Parse (TRD & Scalar_Read_Write_Template, Assocs));
-            New_Line (F_Body);
+            Print_Scalar (Assocs);
          end;
 
       --  3.2 For array types, we generate the calls for the components and we
@@ -1044,7 +820,8 @@ package body TGen.Marshalling is
             --  Contruct the calls for the components
 
             Collect_Info_For_Component
-              (Global_Prefix & "_E", Comp_Ty,
+              (Array_Component, Global_Prefix & "_E",
+               Global_Prefix & "_E", Comp_Ty,
                Component_Read, Component_Write,
                Component_Size, Component_Size_Max, 1);
 
@@ -1066,14 +843,7 @@ package body TGen.Marshalling is
                   12 => Assoc ("BOUND_TYP", Comp_Typ_Tag)];
 
             begin
-               Put_Line
-                 (F_Body, Parse (TRD & Array_Read_Write_Template, Assocs));
-               New_Line (F_Body);
-               Put_Line (F_Body, Parse (TRD & Array_Size_Template, Assocs));
-               New_Line (F_Body);
-               Put_Line
-                 (F_Body, Parse (TRD & Array_Size_Max_Template, Assocs));
-               New_Line (F_Body);
+               Print_Array (Assocs);
             end;
          end;
 
@@ -1144,15 +914,7 @@ package body TGen.Marshalling is
                   13 => Assoc ("DISCR_TYP", Comp_Typ_Tag)];
 
             begin
-               Put_Line
-                 (F_Body, Parse (TRD & Record_Read_Write_Template, Assocs));
-               New_Line (F_Body);
-               Put_Line
-                 (F_Body, Parse (TRD & Record_Size_Template, Assocs));
-               New_Line (F_Body);
-               Put_Line
-                 (F_Body, Parse (TRD & Record_Size_Max_Template, Assocs));
-               New_Line (F_Body);
+               Print_Record (Assocs);
             end;
          end;
       end if;
@@ -1171,69 +933,10 @@ package body TGen.Marshalling is
                6 => Assoc ("DISCR_PREFIX", Comp_Pref_Tag)];
 
          begin
-            Put_Line
-              (F_Spec, Parse (TRD & Header_Wrappers_Spec_Template, Assocs));
-            New_Line (F_Spec);
-            Put_Line
-              (F_Body, Parse (TRD & Header_Wrappers_Body_Template, Assocs));
-            New_Line (F_Body);
+            Print_Header_Wrappers (Assocs);
          end;
       end if;
    end Generate_Base_Functions_For_Typ;
-
-   --------------------------------------------
-   -- Generate_Marshalling_Functions_For_Typ --
-   --------------------------------------------
-
-   procedure Generate_Marshalling_Functions_For_Typ
-     (F_Spec, F_Body     : File_Type;
-      Typ                : TGen.Types.Typ'Class;
-      Templates_Root_Dir : String)
-   is
-      Ty_Name       : constant String := Typ.Fully_Qualified_Name;
-      Ty_Prefix     : constant String := Prefix_For_Typ (Typ.Slug);
-      Generic_Name  : constant String :=
-        (if Needs_Header (Typ) then "In_Out_Unconstrained" else "In_Out");
-      Assocs        : constant Translate_Table :=
-        [1 => Assoc ("TY_NAME", Ty_Name),
-         2 => Assoc ("TY_PREFIX", Ty_Prefix),
-         3 => Assoc ("MARSHALLING_LIB", Marshalling_Lib),
-         4 => Assoc ("GENERIC_NAME", Generic_Name),
-         5 => Assoc ("GLOBAL_PREFIX", Global_Prefix),
-         6 => Assoc ("NEEDS_HEADER", Needs_Header (Typ)),
-         7 => Assoc ("IS_SCALAR", Typ in Scalar_Typ'Class)];
-
-   begin
-      --  Generate the base functions for Typ
-
-      Generate_Base_Functions_For_Typ
-        (F_Spec, F_Body, Typ, Templates_Root_Dir);
-
-      --  If the type can be used as an array index constraint, also generate
-      --  the functions for Typ'Base. TODO: we probably should do that iff
-      --  the type actually constrains an array.
-
-      if Typ in Scalar_Typ'Class then
-         Generate_Base_Functions_For_Typ
-           (F_Spec, F_Body, Typ, Templates_Root_Dir, For_Base => True);
-      end if;
-
-      --  Generate the Input and Output subprograms
-
-      Put_Line
-        (F_Spec,
-         Parse
-           (Templates_Root_Dir & GNAT.OS_Lib.Directory_Separator
-            & In_Out_Spec_Template, Assocs));
-      New_Line (F_Spec);
-
-      Put_Line
-        (F_Body,
-         Parse
-           (Templates_Root_Dir & GNAT.OS_Lib.Directory_Separator
-            & In_Out_Body_Template, Assocs));
-      New_Line (F_Body);
-   end Generate_Marshalling_Functions_For_Typ;
 
    -----------------------
    -- Is_Supported_Type --
@@ -1265,7 +968,6 @@ package body TGen.Marshalling is
 
                for Cu in V_Choice.Components.Iterate loop
                   if not Is_Supported_Type (Element (Cu).Get) then
-                     Ada.Text_IO.Put_Line (Element (Cu).Get.Image);
                      return False;
                   end if;
                end loop;
@@ -1304,7 +1006,6 @@ package body TGen.Marshalling is
 
                for Cu in D_Typ.Discriminant_Types.Iterate loop
                   if not Is_Supported_Type (Element (Cu).Get) then
-                     Ada.Text_IO.Put_Line (Element (Cu).Get.Image);
                      return False;
                   end if;
                end loop;
@@ -1321,7 +1022,6 @@ package body TGen.Marshalling is
 
          for Cu in Record_Typ'Class (Typ).Component_Types.Iterate loop
             if not Is_Supported_Type (Element (Cu).Get) then
-               Ada.Text_IO.Put_Line (Element (Cu).Get.Image);
                return False;
             end if;
          end loop;
@@ -1342,8 +1042,6 @@ package body TGen.Marshalling is
          end if;
 
       else
-         Ada.Text_IO.Put_Line (Typ.Image);
-         Ada.Text_IO.Put_Line (Kind (Typ)'Image);
          return False;
       end if;
    end Is_Supported_Type;
@@ -1381,5 +1079,45 @@ package body TGen.Marshalling is
          return Trim (To_String (V), Left);
       end if;
    end String_Value;
+
+   --------------------------
+   -- Output_Fname_For_Typ --
+   --------------------------
+
+   function Output_Fname_For_Typ (Typ : TGen.Types.Typ'Class) return String
+   is
+   begin
+      return Prefix_For_Typ (Typ.Slug) & "Output";
+   end Output_Fname_For_Typ;
+
+   -------------------------
+   -- Input_Fname_For_Typ --
+   -------------------------
+
+   function Input_Fname_For_Typ (Typ : TGen.Types.Typ'Class) return String is
+   begin
+      return Prefix_For_Typ (Typ.Slug) & "_Input";
+   end Input_Fname_For_Typ;
+
+   ---------------------------------
+   -- Output_Header_Fname_For_Typ --
+   ---------------------------------
+
+   function Output_Header_Fname_For_Typ
+     (Typ : TGen.Types.Typ'Class) return String
+   is
+   begin
+      return Prefix_For_Typ (Typ.Slug) & "Output_Header";
+   end Output_Header_Fname_For_Typ;
+
+   --------------------------------
+   -- Input_Header_Fname_For_Typ --
+   --------------------------------
+
+   function Input_Header_Fname_For_Typ
+     (Typ : TGen.Types.Typ'Class) return String is
+   begin
+      return Prefix_For_Typ (Typ.Slug) & "_Input_Header";
+   end Input_Header_Fname_For_Typ;
 
 end TGen.Marshalling;

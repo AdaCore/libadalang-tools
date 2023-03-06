@@ -1,0 +1,29 @@
+--  Generated with TGen
+
+@@TABLE@@
+with @_WITH_PACKAGE_@; use @_WITH_PACKAGE_@;
+@@END_TABLE@@
+
+with TGen.Types.Array_Types;
+with TGen.Types.Constraints;
+with TGen.Types.Discrete_Types;
+with TGen.Types.Enum_Types;
+with TGen.Types.Int_Types;
+with TGen.Types.Parameter_Types;
+with TGen.Types.Real_Types;
+with TGen.Types.Record_Types;
+
+package body @_PACKAGE_NAME_@ is
+
+   procedure Dummy is null;
+
+   @@TABLE@@
+   @_TYPE_TEMPLATES_BODY_@
+   @@END_TABLE@@
+
+begin
+   null;
+   @@TABLE@@
+   @_TYPE_TEMPLATES_INIT_@
+   @@END_TABLE@@
+end @_PACKAGE_NAME_@;

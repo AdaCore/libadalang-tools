@@ -30,9 +30,11 @@ with Langkit_Support.Text; use Langkit_Support.Text;
 
 with GNATCOLL.VFS; use GNATCOLL.VFS;
 
+with TGen.Big_Int; use TGen.Big_Int;
 with TGen.Files;                use TGen.Files;
 with TGen.Gen_Strategies_Utils; use TGen.Gen_Strategies_Utils;
 with TGen.LAL_Utils;            use TGen.LAL_Utils;
+with TGen.Marshalling;          use TGen.Marshalling;
 with TGen.Strategies;
 with TGen.Types.Translation;    use TGen.Types.Translation;
 
@@ -133,50 +135,20 @@ package body TGen.Gen_Strategies is
            (Ada.Characters.Latin_9.LF)) + 1;
    end Number_Of_Lines;
 
-   procedure Collect_Type_Translations
-     (Context : in out Generation_Context;
-      Subp    : Basic_Decl'Class);
+   procedure Collect_Type_Translations (Subp : Basic_Decl'Class);
 
    -------------------------------
    -- Collect_Type_Translations --
    -------------------------------
 
-   procedure Collect_Type_Translations
-     (Context : in out Generation_Context;
-      Subp    : Basic_Decl'Class)
+   procedure Collect_Type_Translations (Subp : Basic_Decl'Class)
    is
-      Subp_Params : constant Params := Get_Subp_Params (Subp);
+      Subp_Translation_Res : constant Translation_Result :=
+        Translate (Subp.P_Subp_Spec_Or_Null.As_Subp_Spec);
    begin
-      if Subp_Params = No_Params then
-         return;
+      if not Subp_Translation_Res.Success then
+         raise Program_Error with To_String (Subp_Translation_Res.Diagnostics);
       end if;
-      for Subp_Param_Spec of Subp_Params.F_Params loop
-         declare
-            Parameters_Type : constant Defining_Name :=
-              Subp_Param_Spec.F_Type_Expr.
-                P_Designated_Type_Decl.P_Defining_Name;
-
-            Type_Fully_Qualified_Name : constant Unbounded_Text_Type :=
-              To_Unbounded_Text
-                (if not Is_Null (Parameters_Type)
-                 then Parameters_Type.P_Basic_Decl.P_Fully_Qualified_Name
-                 else "");
-
-            Typ_Translation_Res : constant Translation_Result :=
-              Translate (Subp_Param_Spec.F_Type_Expr);
-            Typ_Translation : SP.Ref;
-         begin
-
-            if Typ_Translation_Res.Success then
-               Typ_Translation := Typ_Translation_Res.Res;
-            else
-               raise Program_Error with
-                 To_String (Typ_Translation_Res.Diagnostics);
-            end if;
-            Context.Type_Translations.Include
-              (Type_Fully_Qualified_Name, Typ_Translation);
-         end;
-      end loop;
    end Collect_Type_Translations;
 
    ---------------
@@ -217,15 +189,37 @@ package body TGen.Gen_Strategies is
       Function_JSON     : constant JSON_Value := Create_Object;
       Test_Vectors_JSON : JSON_Array := Empty_Array;
       Test_Vector_JSON  : JSON_Array;
+
+      function Escape (Input_String : String) return String;
+      --  Escape every double quote inside Input_String
+
+      ------------
+      -- Escape --
+      ------------
+
+      function Escape (Input_String : String) return String is
+         Result : Unbounded_String;
+      begin
+         for C of Input_String loop
+            if C = '"' then
+               Result.Append ("""");
+            end if;
+            Result.Append (C);
+         end loop;
+         return +Result;
+      end Escape;
+
    begin
-      Collect_Type_Translations (Context, Subp);
+      Collect_Type_Translations (Subp);
       Subp_Data.All_Params_Static := True;
       for Param of Subp_Data.Parameters_Data loop
          if Param.Mode in In_Mode | In_Out_Mode then
             declare
+               Ignore_P_Qualified_Name : constant Ada_Qualified_Name :=
+                 To_Qualified_Name (+Param.Type_Fully_Qualified_Name);
                Param_Type : constant SP.Ref :=
-               Context.Type_Translations.Element
-                  (Param.Type_Fully_Qualified_Name);
+                 TGen.Types.Translation.Translation_Cache.Element
+                   (To_Qualified_Name (+Param.Type_Fully_Qualified_Name));
             begin
                Subp_Data.All_Params_Static :=
                  Subp_Data.All_Params_Static
@@ -255,6 +249,9 @@ package body TGen.Gen_Strategies is
          for Param of Subp_Data.Parameters_Data loop
             declare
                Param_JSON : constant JSON_Value := Create_Object;
+               Param_Type : constant SP.Ref :=
+                 TGen.Types.Translation.Translation_Cache.Element
+                   (To_Qualified_Name (+Param.Type_Fully_Qualified_Name));
             begin
                Param_JSON.Set_Field ("name", Create (+Param.Name));
                Param_JSON.Set_Field ("type_name", Create (+Param.Type_Name));
@@ -263,16 +260,34 @@ package body TGen.Gen_Strategies is
                      Strat : Strategies.Strategy_Type'Class :=
                         Strategies.Strategy_Type
                           (Context.Type_And_Param_Strategies.Element
-                            (Param.Type_Fully_Qualified_Name));
+                             (Param.Type_Fully_Qualified_Name));
+
+                     JSON_String_Var  : constant String :=
+                       +Param.Name &  "_JSON";
+                     JSON_String_Decl : constant String :=
+                       JSON_String_Var & " : constant TGen.JSON.JSON_Value :="
+                       & " TGen.JSON.Read ("""
+                       & Escape
+                         (Param_Type.Get.Encode (Strat.Generate
+                            (Strategies.Disc_Value_Maps.Empty_Map)).Write)
+                       & """);";
+
+                     Decls : JSON_Array;
                   begin
+                     Append (Decls, Create (JSON_String_Decl));
+                     Param_JSON.Set_Field ("decls", Decls);
+
                      Param_JSON.Set_Field
-                     ("value",
-                      Strat.Generate
-                        (Strategies.Disc_Value_Maps.Empty_Map).To_String);
+                       ("value",
+                        Input_Fname_For_Typ (Param_Type.Get)
+                        & "(" & JSON_String_Var & ")");
                   end;
                end if;
                Param_JSON.Set_Field
-               ("mode", Create (Integer'(Parameter_Mode'Pos (Param.Mode))));
+                 ("mode",
+                  Create
+                    (Big_Int.To_Big_Integer
+                       (Parameter_Mode'Pos (Param.Mode))));
                Append (Test_Vector_JSON, Param_JSON);
             end;
          end loop;

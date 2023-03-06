@@ -77,7 +77,6 @@ package body TGen.Types.Real_Types is
 
    function Low_Bound_Or_Default (Self : Decimal_Fixed_Typ) return Big_Real
    is
-      use Big_Reals;
    begin
       return (if Self.Has_Range
               then Self.Range_Value.Min
@@ -87,7 +86,6 @@ package body TGen.Types.Real_Types is
 
    function High_Bound_Or_Default (Self : Decimal_Fixed_Typ) return Big_Real
    is
-      use Big_Reals;
    begin
       return (if Self.Has_Range
               then Self.Range_Value.Max
@@ -105,13 +103,13 @@ package body TGen.Types.Real_Types is
       return Rand (Generator_Instance);
    end Gen;
 
-   function Generate_Float_Typ (Ty : Typ'Class) return Value_Type'Class;
+   function Generate_Float_Typ (Ty : Typ'Class) return JSON_Value;
 
-   --------------
-   -- Generate --
-   --------------
+   ------------------------
+   -- Generate_Float_Typ --
+   ------------------------
 
-   function Generate_Float_Typ (Ty : Typ'Class) return Value_Type'Class
+   function Generate_Float_Typ (Ty : Typ'Class) return JSON_Value
    is
       Self : constant Float_Typ := Float_Typ (Ty);
 
@@ -119,14 +117,13 @@ package body TGen.Types.Real_Types is
 
       HB : constant Big_Real := Self.High_Bound_Or_Default;
 
-      type T is new Long_Float
+      subtype T is Long_Float
       range LF_Conversions.From_Big_Real (LB)
         .. LF_Conversions.From_Big_Real (HB);
 
       function Rand is new Gen (T);
    begin
-      return Base_Static_Value'
-        (Value => +Long_Float'Image (Long_Float (Rand)));
+      return Create (To_Quotient_String (LF_Conversions.To_Big_Real (Rand)));
    end Generate_Float_Typ;
 
    ----------------------
@@ -150,40 +147,54 @@ package body TGen.Types.Real_Types is
    end Default_Strategy;
 
    function Generate_Ordinary_Fixed_Typ
-     (Ty : Typ'Class) return Value_Type'Class;
+     (Ty : Typ'Class) return JSON_Value;
 
    function Generate_Decimal_Fixed_Typ
-     (Ty : Typ'Class) return Value_Type'Class;
+     (Ty : Typ'Class) return JSON_Value;
 
    ---------------------------------
    -- Generate_Ordinary_Fixed_Typ --
    ---------------------------------
 
    function Generate_Ordinary_Fixed_Typ
-     (Ty : Typ'Class) return Value_Type'Class
+     (Ty : Typ'Class) return JSON_Value
    is
-      use Big_Reals;
+      use LLLI_Conversions;
+
       Self : constant Ordinary_Fixed_Typ := Ordinary_Fixed_Typ (Ty);
 
-      High_Bound : constant Long_Long_Long_Integer :=
-        Long_Long_Long_Integer
-          (LF_Conversions.From_Big_Real
-             (Self.Range_Value.Max / Self.Delta_Value));
-      Low_Bound  : constant Long_Long_Long_Integer :=
-        Long_Long_Long_Integer
-          (LF_Conversions.From_Big_Real
-             (Self.Range_Value.Min / Self.Delta_Value));
+      --  Translate the fixed type to the integer type
 
-      Rand_Val : constant Long_Long_Long_Integer :=
-        Rand_LLLI (Low_Bound, High_Bound);
+      Low_Bound  : constant Big_Real :=
+        Self.Range_Value.Min / Self.Delta_Value;
+      High_Bound : constant Big_Real :=
+        Self.Range_Value.Max / Self.Delta_Value;
+
+      Low_Bound_Int  : Long_Long_Long_Integer;
+      High_Bound_Int : Long_Long_Long_Integer;
+
    begin
-      return Base_Static_Value'
-        (Value => +(
-           To_String (Self.Delta_Value)
-           & " * "
-           & (if Rand_Val >= 0
-              then Rand_Val'Image
-              else "(" & Rand_Val'Image & ")")));
+      --  Check that the denominator is 1 for each of the integer bound
+
+      pragma Assert (Denominator (Low_Bound) = 1);
+      pragma Assert (Denominator (High_Bound) = 1);
+
+      Low_Bound_Int := From_Big_Integer (Numerator (Low_Bound));
+      High_Bound_Int := From_Big_Integer (Numerator (High_Bound));
+
+      --  Now, generate a random integer value
+
+      declare
+         Rand_Val : constant Big_Integer :=
+           LLLI_Conversions.To_Big_Integer
+             (Rand_LLLI (Low_Bound_Int, High_Bound_Int));
+      begin
+         --  Cast it back to a fixed point value
+
+         return Create
+           (To_Quotient_String
+              (To_Big_Real (Rand_Val) * Self.Delta_Value));
+      end;
    end Generate_Ordinary_Fixed_Typ;
 
    --------------------------------
@@ -191,9 +202,9 @@ package body TGen.Types.Real_Types is
    --------------------------------
 
    function Generate_Decimal_Fixed_Typ
-     (Ty : Typ'Class) return Value_Type'Class
+     (Ty : Typ'Class) return JSON_Value
    is
-      use Big_Reals;
+      use LLLI_Conversions;
       Self : constant Decimal_Fixed_Typ := Decimal_Fixed_Typ (Ty);
 
       --  TODO: Using High/Low_Bound_Or_Default ignores the digits value, which
@@ -201,25 +212,38 @@ package body TGen.Types.Real_Types is
       --  to generate some "sparse" integer ranges to ensure we do not go
       --  beyond the specified precision.
 
-      High_Bound : constant Long_Long_Long_Integer :=
-        Long_Long_Long_Integer
-          (LF_Conversions.From_Big_Real
-             (Self.High_Bound_Or_Default / Self.Delta_Value));
-      Low_Bound  : constant Long_Long_Long_Integer :=
-        Long_Long_Long_Integer
-          (LF_Conversions.From_Big_Real
-             (Self.Low_Bound_Or_Default / Self.Delta_Value));
+      --  Translate the fixed type to the integer type
 
-      Rand_Val : constant Long_Long_Long_Integer :=
-        Rand_LLLI (Low_Bound, High_Bound);
+      Low_Bound  : constant Big_Real :=
+        Self.Low_Bound_Or_Default / Self.Delta_Value;
+      High_Bound : constant Big_Real :=
+        Self.High_Bound_Or_Default / Self.Delta_Value;
+
+      Low_Bound_Int  : Long_Long_Long_Integer;
+      High_Bound_Int : Long_Long_Long_Integer;
+
    begin
-      return Base_Static_Value'
-        (Value => +(
-           Self.Delta_Value'Image
-           & " * "
-           & (if Rand_Val >= 0
-              then Rand_Val'Image
-              else "(" & Rand_Val'Image & ")")));
+      --  Check that the denominator is 1 for each of the integer bound
+
+      pragma Assert (Denominator (Low_Bound) = 1);
+      pragma Assert (Denominator (High_Bound) = 1);
+
+      Low_Bound_Int := From_Big_Integer (Numerator (Low_Bound));
+      High_Bound_Int := From_Big_Integer (Numerator (High_Bound));
+
+      --  Now, generate a random integer value
+
+      declare
+         Rand_Val : constant Big_Integer :=
+           LLLI_Conversions.To_Big_Integer
+             (Rand_LLLI (Low_Bound_Int, High_Bound_Int));
+      begin
+         --  Cast it back to a fixed point value
+
+         return Create
+           (To_Quotient_String
+              (To_Big_Real (Rand_Val) * Self.Delta_Value));
+      end;
    end Generate_Decimal_Fixed_Typ;
 
    overriding function Default_Strategy

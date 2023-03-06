@@ -1,0 +1,30 @@
+@@--  Template for the bodies of the base subprograms for scalar types.
+@@--  @_GLOBAL_PREFIX_@ Prefix used to prefix all entities local to the unit.
+@@--  @_TY_PREFIX_@ Prefix used to prefix all entities for the current type.
+@@--  @_TY_NAME_@ Name of the current type or of its base type if we are
+@@--       doing the generation for the base type.
+@@--  @_FOR_BASE_@ True if we are doing the generation for the base type.
+@@--  @_MARSHALLING_LIB_@ Name of the libary file for the marshalling
+@@--       functions.
+@@--  @_GENERIC_NAME_@ Name of the generic package for the base subprograms for
+@@--       the current type.
+@@--
+@@INCLUDE@@ util.tmplt
+   --  Read and Write functions for @_TY_NAME_@
+
+   package @_TY_PREFIX_@_Funs@_BASE_SUFFIX()_@_JSON is new
+     @_MARSHALLING_LIB_@.@_GENERIC_NAME_@_JSON (@_TY_NAME_@);
+
+   procedure @_TY_PREFIX_@_Write@_BASE_SUFFIX()_@
+     (@_GLOBAL_PREFIX_@_JSON  : out TGen.JSON.JSON_Value;
+      @_GLOBAL_PREFIX_@_V     : @_TY_NAME_@;
+      @_GLOBAL_PREFIX_@_First : @_TY_NAME_@ := @_TY_NAME_@'First;
+      @_GLOBAL_PREFIX_@_Last  : @_TY_NAME_@ := @_TY_NAME_@'Last)
+    renames @_TY_PREFIX_@_Funs@_BASE_SUFFIX()_@_JSON.Write;
+
+   procedure @_TY_PREFIX_@_Read@_BASE_SUFFIX()_@
+     (@_GLOBAL_PREFIX_@_JSON  : TGen.JSON.JSON_Value;
+      @_GLOBAL_PREFIX_@_V     : out @_TY_NAME_@;
+      @_GLOBAL_PREFIX_@_First : @_TY_NAME_@ := @_TY_NAME_@'First;
+      @_GLOBAL_PREFIX_@_Last  : @_TY_NAME_@ := @_TY_NAME_@'Last)
+    renames @_TY_PREFIX_@_Funs@_BASE_SUFFIX()_@_JSON.Read;

@@ -48,16 +48,13 @@ package TGen.Types.Translation is
    --  Translate N to TGen's internal type representation
 
    function Translate
-     (N : LAL.Base_Type_Decl;
+     (N       : LAL.Base_Type_Decl;
       Verbose : Boolean := False) return Translation_Result;
    --  Translate N to TGen's internal type representation
 
-   procedure Print_Cache_Stats;
-   --  Print translation cache statistics on the standard output
-
-   procedure PP_Cache;
-   --  Print the content of the translation cache on the standard output
-
+   function Translate
+     (N       : LAL.Subp_Spec;
+      Verbose : Boolean := False) return Translation_Result;
    package Translation_Maps is new Ada.Containers.Hashed_Maps
      (Key_Type        => Ada_Qualified_Name,
       Element_Type    => TGen.Types.SP.Ref,
@@ -67,6 +64,12 @@ package TGen.Types.Translation is
 
    Translation_Cache : Translation_Maps.Map;
    --  Cache used for the memoization of Translate.
+
+   procedure Print_Cache_Stats;
+   --  Print translation cache statistics on the standard output
+
+   procedure PP_Cache;
+   --  Print the content of the translation cache on the standard output
 
    procedure Clear_Cache;
    --  Clear the translation cache

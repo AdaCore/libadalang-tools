@@ -215,6 +215,8 @@ package TGen.Types.Constraints is
       and then Self.Subtype_Constraints.Static);
    --  Wether values for this Typ can be statically generated
 
+   function Encode (Self : Anonymous_Typ; Val : JSON_Value) return JSON_Value;
+
    overriding function Default_Strategy
      (Self : Anonymous_Typ) return Strategy_Type'Class;
 

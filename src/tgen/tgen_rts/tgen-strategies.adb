@@ -32,8 +32,19 @@ package body TGen.Strategies is
    --------------
 
    function Generate
+     (S            : in out Commented_Out_Strategy_Type;
+      Disc_Context : Disc_Value_Map) return JSON_Value is
+   begin
+      return Create ("--  Replace this comment by a valid value");
+   end Generate;
+
+   --------------
+   -- Generate --
+   --------------
+
+   function Generate
      (S            : in out Dispatching_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return Value_Type'Class
+      Disc_Context : Disc_Value_Map) return JSON_Value
    is
       Rnd : constant Float := Rand_Float;
    begin
@@ -68,7 +79,7 @@ package body TGen.Strategies is
 
       function Generate
         (S            : in out Equivalence_Class_Strategy_Type;
-         Disc_Context : Disc_Value_Map) return Value_Type'Class
+         Disc_Context : Disc_Value_Map) return JSON_Value
       is
          Idx : constant Integer := Rand_Int (1, Integer (S.Classes.Length));
       begin

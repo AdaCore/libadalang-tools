@@ -41,6 +41,7 @@ with Ada.Sequential_IO;
 with Langkit_Support.Slocs; use Langkit_Support.Slocs;
 
 with TGen.Context;
+with TGen.Libgen;
 
 package Test.Common is
 
@@ -368,6 +369,12 @@ package Test.Common is
 
    TGen_Ctx : TGen.Context.Generation_Context;
    --  Shared context for test vectors generation
+
+   TGen_Templates_Dir : String_Access;
+   --  Path to the installed TGen templates dir
+
+   TGen_Libgen_Ctx : TGen.Libgen.Libgen_Context;
+   --  Context for the support library generation
 
    TGen_Num_Tests : Positive := 5;
    --  Number of tests to be generated for each procedure

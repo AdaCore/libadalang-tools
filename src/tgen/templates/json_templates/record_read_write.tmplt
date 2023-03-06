@@ -1,0 +1,52 @@
+@@--  Template for the bodies of the Write and Read procedures for a record
+@@--  type.
+@@--  @_GLOBAL_PREFIX_@ Prefix used to prefix all entities local to the unit.
+@@--  @_TY_PREFIX_@ Prefix used to prefix all entities for the current type.
+@@--  @_TY_NAME_@ Name of the current type.
+@@--  @_COMPONENT_WRITE_@ Calls to Write for the component type on all
+@@--       components of @_GLOBAL_PREFIX_@_V.
+@@--  @_COMPONENT_READ_@ Calls to Read for the component type on all components
+@@--       of @_GLOBAL_PREFIX_@_V.
+@@--  @_VARIANT_WRITE_@ Calls to Write for the components from the variant
+@@--       part of @_GLOBAL_PREFIX_@_V.
+@@--  @_VARIANT_READ_@ Calls to Read for the components from the variant part
+@@--       of @_GLOBAL_PREFIX_@_V.
+@@--
+
+   procedure @_TY_PREFIX_@_Write
+     (@_GLOBAL_PREFIX_@_JSON : out TGen.JSON.JSON_Value;
+      @_GLOBAL_PREFIX_@_V    : @_TY_NAME_@)
+   is
+   begin
+@@IF@@ @_COMPONENT_WRITE_@ /= ""
+@@TABLE@@
+@_COMPONENT_WRITE_@
+@@END_TABLE@@
+@@ELSE@@
+      null;
+@@END_IF@@
+@@IF@@ @_VARIANT_WRITE_@ /= ""
+@_VARIANT_WRITE_@
+@@END_IF@@
+   end @_TY_PREFIX_@_Write;
+
+   procedure @_TY_PREFIX_@_Read
+     (@_GLOBAL_PREFIX_@_JSON : TGen.JSON.JSON_Value;
+      @_GLOBAL_PREFIX_@_V    : out @_TY_NAME_@)
+   is
+   begin
+@@IF@@ @_COMPONENT_READ_@ /= ""
+@@TABLE@@
+@_COMPONENT_READ_@
+@@END_TABLE@@
+@@ELSE@@
+      null;
+@@END_IF@@
+@@IF@@ @_VARIANT_READ_@ /= ""
+@_VARIANT_READ_@
+@@END_IF@@
+
+      if @_GLOBAL_PREFIX_@_V not in @_TY_NAME_@ then
+        raise Invalid_Value;
+      end if;
+   end @_TY_PREFIX_@_Read;

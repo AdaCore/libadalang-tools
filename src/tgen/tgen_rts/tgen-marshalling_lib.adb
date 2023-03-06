@@ -24,6 +24,9 @@
 with Ada.Unchecked_Conversion;
 with System.Unsigned_Types; use System.Unsigned_Types;
 
+with TGen.Big_Reals;     use TGen.Big_Reals;
+with TGen.Big_Reals_Aux; use TGen.Big_Reals_Aux;
+
 package body TGen.Marshalling_Lib is
 
    function Size (V : Unsigned_8) return Offset_Type is
@@ -410,6 +413,44 @@ package body TGen.Marshalling_Lib is
    end Read_Write_Enum;
 
    ------------------------------
+   -- Read_Write_Discrete_JSON --
+   ------------------------------
+
+   package body Read_Write_Discrete_JSON is
+
+      -----------
+      -- Write --
+      -----------
+
+      procedure Write
+        (JSON   : out TGen.JSON.JSON_Value;
+         V      : T;
+         First  : T := T'First;
+         Last   : T := T'Last)
+      is
+         pragma Unreferenced (First, Last);
+      begin
+         JSON := Create (T'Image (V));
+      end Write;
+
+      ----------
+      -- Read --
+      ----------
+
+      procedure Read
+        (JSON  : TGen.JSON.JSON_Value;
+         V     : out T;
+         First : T := T'First;
+         Last  : T := T'Last)
+      is
+         pragma Unreferenced (First, Last);
+      begin
+         V := T'Value (Get (JSON));
+      end Read;
+
+   end Read_Write_Discrete_JSON;
+
+   ------------------------------
    -- Read_Write_Decimal_Fixed --
    ------------------------------
 
@@ -479,6 +520,53 @@ package body TGen.Marshalling_Lib is
       end Read;
 
    end Read_Write_Decimal_Fixed;
+
+   -----------------------------------
+   -- Read_Write_Decimal_Fixed_JSON --
+   -----------------------------------
+
+   package body Read_Write_Decimal_Fixed_JSON is
+
+      package T_Conversions is new Decimal_Fixed_Conversions (Num => T);
+      --  To avoid the loss of precision, we encode the fixed point as a
+      --  Big_Real and then represent it as a fraction.
+
+      -----------
+      -- Write --
+      -----------
+
+      procedure Write
+        (JSON   : out TGen.JSON.JSON_Value;
+         V      : T;
+         First  : T := T'First;
+         Last   : T := T'Last)
+      is
+         pragma Unreferenced (First, Last);
+         V_Big_Real : constant TGen.Big_Reals.Big_Real :=
+           T_Conversions.To_Big_Real (V);
+      begin
+         JSON := Create (To_Quotient_String (V_Big_Real));
+      end Write;
+
+      ----------
+      -- Read --
+      ----------
+
+      procedure Read
+        (JSON  : TGen.JSON.JSON_Value;
+         V     : out T;
+         First : T := T'First;
+         Last  : T := T'Last)
+      is
+         pragma Unreferenced (First, Last);
+      begin
+         --  Decode the big real from the string encoded as a quotient string
+
+         V := T_Conversions.From_Big_Real
+           (Big_Reals.From_Quotient_String (Get (JSON)));
+      end Read;
+
+   end Read_Write_Decimal_Fixed_JSON;
 
    -------------------------------
    -- Read_Write_Ordinary_Fixed --
@@ -550,6 +638,54 @@ package body TGen.Marshalling_Lib is
       end Read;
 
    end Read_Write_Ordinary_Fixed;
+
+   ------------------------------------
+   -- Read_Write_Ordinary_Fixed_JSON --
+   ------------------------------------
+
+   package body Read_Write_Ordinary_Fixed_JSON is
+
+      package T_Conversions is new TGen.Big_Reals.Fixed_Conversions
+        (Num => T);
+      --  To avoid the loss of precision, we encode the fixed point as a
+      --  Big_Real and then represent it as a fraction.
+
+      -----------
+      -- Write --
+      -----------
+
+      procedure Write
+        (JSON   : out TGen.JSON.JSON_Value;
+         V      : T;
+         First  : T := T'First;
+         Last   : T := T'Last)
+      is
+         pragma Unreferenced (First, Last);
+         V_Big_Real : constant TGen.Big_Reals.Big_Real :=
+           T_Conversions.To_Big_Real (V);
+      begin
+         JSON := Create (To_Quotient_String (V_Big_Real));
+      end Write;
+
+      ----------
+      -- Read --
+      ----------
+
+      procedure Read
+        (JSON  : TGen.JSON.JSON_Value;
+         V     : out T;
+         First : T := T'First;
+         Last  : T := T'Last)
+      is
+         pragma Unreferenced (First, Last);
+      begin
+         --  Decode the big real from the string encoded as a quotient string
+
+         V := T_Conversions.From_Big_Real
+           (Big_Reals.From_Quotient_String (Get (JSON)));
+      end Read;
+
+   end Read_Write_Ordinary_Fixed_JSON;
 
    ----------------------
    -- Read_Write_Float --
@@ -880,7 +1016,7 @@ package body TGen.Marshalling_Lib is
       ----------
 
       procedure Read
-        (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+      (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
          V      : out T;
@@ -982,6 +1118,54 @@ package body TGen.Marshalling_Lib is
 
    end Read_Write_Unsigned;
 
+   ---------------------------
+   -- Read_Write_Float_JSON --
+   ---------------------------
+
+   package body Read_Write_Float_JSON is
+
+      package T_Conversions is new TGen.Big_Reals.Float_Conversions
+        (Num => T);
+      --  To avoid the loss of precision, we need to encode the float as a
+      --  Big_Real and then represent it as a fraction.
+
+      -----------
+      -- Write --
+      -----------
+
+      procedure Write
+        (JSON   : out TGen.JSON.JSON_Value;
+         V      : T;
+         First  : T := T'First;
+         Last   : T := T'Last)
+      is
+         pragma Unreferenced (First, Last);
+         V_Big_Real : constant TGen.Big_Reals.Big_Real :=
+           T_Conversions.To_Big_Real (V);
+      begin
+         JSON := Create (To_Quotient_String (V_Big_Real));
+      end Write;
+
+      ----------
+      -- Read --
+      ----------
+
+      procedure Read
+        (JSON  : TGen.JSON.JSON_Value;
+         V     : out T;
+         First : T := T'First;
+         Last  : T := T'Last)
+      is
+         pragma Unreferenced (First, Last);
+      begin
+         --  Decode the big real from the string encoded as a quotient string
+
+         V := T_Conversions.From_Big_Real
+           (Big_Reals.From_Quotient_String (Get (JSON)));
+      end Read;
+
+   end Read_Write_Float_JSON;
+
    ------------
    -- In_Out --
    ------------
@@ -1050,6 +1234,37 @@ package body TGen.Marshalling_Lib is
       end Output;
 
    end In_Out;
+
+   -----------------
+   -- In_Out_JSON --
+   -----------------
+
+   package body In_Out_JSON is
+
+      -----------
+      -- Input --
+      -----------
+
+      function Input (JSON : TGen.JSON.JSON_Value) return T is
+      begin
+         return V : T do
+            Read (JSON, V);
+         end return;
+      end Input;
+
+      ------------
+      -- Output --
+      ------------
+
+      function Output (V : T) return TGen.JSON.JSON_Value
+      is
+         JSON : TGen.JSON.JSON_Value := Create_Object;
+      begin
+         Write (JSON, V);
+         return JSON;
+      end Output;
+
+   end In_Out_JSON;
 
    --------------------------
    -- In_Out_Unconstrained --
@@ -1130,5 +1345,40 @@ package body TGen.Marshalling_Lib is
       end Output;
 
    end In_Out_Unconstrained;
+
+   -------------------------------
+   -- In_Out_Unconstrained_JSON --
+   -------------------------------
+
+   package body In_Out_Unconstrained_JSON is
+
+      -----------
+      -- Input --
+      -----------
+
+      function Input (JSON : TGen.JSON.JSON_Value) return T is
+         H : constant Header := Input_Header (JSON);
+      begin
+         return V : T := Init (H) do
+            Read (JSON, V);
+         end return;
+      end Input;
+
+      ------------
+      -- Output --
+      ------------
+
+      function Output (V : T) return TGen.JSON.JSON_Value
+      is
+         JSON : TGen.JSON.JSON_Value := Create_Object;
+      begin
+         pragma Warnings (Off);
+         Output_Header (JSON, V);
+         pragma Warnings (On);
+         Write (JSON, V);
+         return JSON;
+      end Output;
+
+   end In_Out_Unconstrained_JSON;
 
 end TGen.Marshalling_Lib;

@@ -7,6 +7,7 @@ with Ada.Text_IO;                 use Ada.Text_IO;
 with Interfaces;                  use Interfaces;
 with My_File;                     use My_File;
 with My_File.TGen_Support;        use My_File.TGen_Support;
+with TGen.JSON;
 with TGen.TGen_Support;           use TGen.TGen_Support;
 with Show_Date;                   use Show_Date;
 with Show_Date.TGen_Support;      use Show_Date.TGen_Support;
@@ -197,6 +198,25 @@ procedure Example_Gen is
       if M1 /= M2 then
          Ada.Text_IO.Put_Line ("M1 FAIl");
       end if;
+
+     --  Test JSON marshallers
+
+      declare
+         V1_JSON : constant TGen.JSON.JSON_value :=
+           TGen_Marshalling_my_file_R_Output (V1);
+         D1_JSON : constant TGen.JSON.JSON_Value :=
+           TGen_Marshalling_show_date_Date_Output (D1);
+      begin
+         V2 := TGen_Marshalling_My_file_R_Input (V1_JSON);
+         D2 := TGen_Marshalling_show_date_Date_Input (D1_JSON);
+
+         if V1 /= V2 then
+            Ada.Text_IO.Put_Line ("V1 FAIL (JSON marshallers)");
+         end if;
+         if D1 /= D2 then
+            Ada.Text_IO.Put_Line ("D1 FAIL (JSON marshallers)");
+         end if;
+      end;
    end Test;
 
    procedure Test_Discr (Debug : Boolean := False) is
@@ -229,6 +249,18 @@ procedure Example_Gen is
             Ada.Text_IO.Put_Line ("Discr FAIL");
          end if;
       end;
+
+      --  Test JSON marshallers
+
+     declare
+        V1_JSON : constant TGen.JSON.JSON_value :=
+           TGen_Marshalling_My_File_Shape_Output (V1);
+         V2     : Shape := TGen_Marshalling_My_File_Shape_Input (V1_JSON);
+     begin
+         if V1 /= V2 then
+            Ada.Text_IO.Put_Line ("Discr FAIL (JSON marshallers)");
+         end if;
+     end;
    end Test_Discr;
 
    procedure Test_String (Debug : Boolean := False) is
@@ -266,6 +298,19 @@ procedure Example_Gen is
 
          if V1 /= V2 then
             Ada.Text_IO.Put_Line ("String FAIL");
+         end if;
+      end;
+
+      --  Test JSON marshallers
+
+      declare
+         V1_JSON : constant TGen.JSON.JSON_Value :=
+           TGen_Marshalling_Standard_String_Output (V1);
+         V2      : constant String :=
+           TGen_Marshalling_Standard_String_Input (V1_JSON);
+      begin
+         if V1 /= V2 then
+            Ada.Text_IO.Put_Line ("String FAIL (JSON marshallers)");
          end if;
       end;
    end Test_String;

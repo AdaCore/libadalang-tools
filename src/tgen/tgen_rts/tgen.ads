@@ -22,6 +22,9 @@
 ------------------------------------------------------------------------------
 --
 --  Library for value generation and marshalling of Ada types
+
 package TGen is
+   pragma Preelaborate;
+
    Version : constant String := "0.0";
 end TGen;

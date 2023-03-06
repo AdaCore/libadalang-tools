@@ -28,7 +28,10 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with GNAT.OS_Lib;
 
+with TGen.LAL_Utils;
 with TGen.Marshalling;        use TGen.Marshalling;
+with TGen.Marshalling.Binary_Marshallers;
+with TGen.Marshalling.JSON_Marshallers;
 with TGen.Types.Array_Types;
 with TGen.Types.Constraints;
 with TGen.Types.Record_Types;
@@ -193,6 +196,7 @@ package body TGen.Libgen is
       Create (F_Spec, Out_File, File_Name & ".ads");
       Put (F_Spec, "with TGen.Marshalling_Lib; ");
       Put_Line (F_Spec, "use TGen.Marshalling_Lib;");
+      Put_Line (F_Spec, "with TGen.JSON;");
       Put (F_Spec, "with Interfaces; ");
       Put_Line (F_Spec, "use Interfaces;");
       Put_Line (F_Spec, "with Ada.Streams; use Ada.Streams;");
@@ -253,8 +257,14 @@ package body TGen.Libgen is
 
       if Part in Marshalling_Part | All_Parts then
          for T of Types loop
-            Generate_Marshalling_Functions_For_Typ
-              (F_Spec, F_Body, T.Get, To_String (Ctx.Root_Templates_Dir));
+            if Is_Supported_Type (T.Get) then
+               TGen.Marshalling.Binary_Marshallers
+                 .Generate_Marshalling_Functions_For_Typ
+                   (F_Spec, F_Body, T.Get, To_String (Ctx.Root_Templates_Dir));
+               TGen.Marshalling.JSON_Marshallers
+                 .Generate_Marshalling_Functions_For_Typ
+                   (F_Spec, F_Body, T.Get, To_String (Ctx.Root_Templates_Dir));
+            end if;
          end loop;
       end if;
 
@@ -343,6 +353,8 @@ package body TGen.Libgen is
       Diag : out Unbounded_String) return Boolean
    is
       use LAL;
+      use TGen.LAL_Utils;
+      use TGen.Strings.Ada_Qualified_Name_Sets_Maps;
 
       Spec : constant Base_Subp_Spec := Subp.P_Subp_Spec_Or_Null;
       --  Spec of the subprogram
@@ -351,7 +363,26 @@ package body TGen.Libgen is
       --  Transitive closure of required types for the parameters of the
       --  subprogram.
 
+      Unit_Name : constant Ada_Qualified_Name :=
+        Convert_Qualified_Name
+          (Subp.P_Enclosing_Compilation_Unit.P_Syntactic_Fully_Qualified_Name);
+      --  Name of the compilation unit this subprogram belongs to.
+
+      Support_Packs : Cursor := Ctx.Support_Packs_Per_Unit.Find (Unit_Name);
+      --  Cursor to the set of support packages for the unit this subprogram
+      --  belongs to.
+
+      Dummy_Inserted : Boolean;
+
    begin
+      if Support_Packs = No_Element then
+         Ctx.Support_Packs_Per_Unit.Insert
+           (Unit_Name,
+            Ada_Qualified_Name_Sets.Empty_Set,
+            Support_Packs,
+            Dummy_Inserted);
+      end if;
+
       for Param of Spec.P_Params loop
          declare
             Trans_Res : constant Translation_Result :=
@@ -368,6 +399,11 @@ package body TGen.Libgen is
                Diag := Trans_Res.Diagnostics;
                return False;
             end if;
+
+            --  Fill out the support package map
+            Ctx.Support_Packs_Per_Unit.Reference (Support_Packs).Include
+              (Support_Library_Package
+                 (Trans_Res.Res.Get.Compilation_Unit_Name));
 
             --  Include the param type in the set of types for which we want to
             --  generate the support library.
@@ -459,7 +495,12 @@ package body TGen.Libgen is
       --  Generate all support packages
 
       for Cur in Ctx.Types_Per_Package.Iterate loop
-         Generate_Support_Library (Ctx, Key (Cur), Part);
+         --  If all types are not supported, do not generate a support library
+
+         if not (for all T of Element (Cur) => not Is_Supported_Type (T.Get))
+         then
+            Generate_Support_Library (Ctx, Key (Cur), Part);
+         end if;
       end loop;
    end Generate;
 
@@ -481,5 +522,18 @@ package body TGen.Libgen is
       end if;
       return True;
    end Generate;
+
+   -------------------------------
+   -- Required_Support_Packages --
+   -------------------------------
+
+   function Required_Support_Packages
+     (Ctx       : Libgen_Context;
+      Unit_Name : TGen.Strings.Ada_Qualified_Name)
+      return TGen.Strings.Ada_Qualified_Name_Sets_Maps.Constant_Reference_Type
+   is
+   begin
+      return Ctx.Support_Packs_Per_Unit.Constant_Reference (Unit_Name);
+   end Required_Support_Packages;
 
 end TGen.Libgen;

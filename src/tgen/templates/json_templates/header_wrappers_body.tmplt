@@ -1,0 +1,36 @@
+@@--  Template for the body part of the wrappers marhsalling both the
+@@--  values and the headers.
+@@--  @_GLOBAL_PREFIX_@ Prefix used to prefix all entities local to the unit.
+@@--  @_TY_PREFIX_@ Prefix used to prefix all entities for the current type.
+@@--  @_TY_NAME_@ Name of the current type.
+@@--
+@@INCLUDE@@ util.tmplt
+
+   procedure @_TY_PREFIX_@_Write_All
+     (@_GLOBAL_PREFIX_@_JSON : out TGen.JSON.JSON_Value;
+      @_GLOBAL_PREFIX_@_V    : @_TY_NAME_@)
+   is
+   begin
+      @_TY_PREFIX_@_Write_Header
+        (@_GLOBAL_PREFIX_@_JSON, @_GLOBAL_PREFIX_@_V);
+      @_TY_PREFIX_@_Write
+        (@_GLOBAL_PREFIX_@_JSON, @_GLOBAL_PREFIX_@_V);
+   end @_TY_PREFIX_@_Write_All;
+
+   procedure @_TY_PREFIX_@_Read_All
+     (@_GLOBAL_PREFIX_@_JSON : TGen.JSON.JSON_Value;
+      @_GLOBAL_PREFIX_@_V    : out @_TY_NAME_@)
+   is
+      @_GLOBAL_PREFIX_@_H : @_TY_PREFIX_@_Header_Type;
+   begin
+      @_TY_PREFIX_@_Read_Header
+        (@_GLOBAL_PREFIX_@_JSON, @_GLOBAL_PREFIX_@_H);
+      @_GLOBAL_PREFIX_@_V :=
+        @_TY_PREFIX_@_Init_From_Header (@_GLOBAL_PREFIX_@_H);
+      @_TY_PREFIX_@_Read
+        (@_GLOBAL_PREFIX_@_JSON, @_GLOBAL_PREFIX_@_V);
+
+      if @_GLOBAL_PREFIX_@_V not in @_TY_NAME_@ then
+        raise Invalid_Value;
+      end if;
+   end @_TY_PREFIX_@_Read_All;

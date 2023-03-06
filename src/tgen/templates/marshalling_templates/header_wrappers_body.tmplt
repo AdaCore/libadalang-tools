@@ -1,4 +1,4 @@
-@@--  Template for the body part of the wrappers marhsalling both the
+@@--  Template for the body part of the wrappers marshalling both the
 @@--  values and the headers.
 @@--  @_GLOBAL_PREFIX_@ Prefix used to prefix all entities local to the unit.
 @@--  @_TY_PREFIX_@ Prefix used to prefix all entities for the current type.
