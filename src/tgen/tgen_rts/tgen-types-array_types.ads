@@ -47,8 +47,6 @@ package TGen.Types.Array_Types is
    end record;
    --  Represents an array type.
 
-   function Encode (Self : Array_Typ; Val : JSON_Value) return JSON_Value;
-
    function Supports_Static_Gen (Self : Array_Typ) return Boolean is
      (Self.Static_Gen);
    --  Wether values for this Typ can be statically generated

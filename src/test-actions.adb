@@ -848,6 +848,7 @@ package body Test.Actions is
       if Arg (Cmd, Gen_Test_Vectors) then
          Test.Common.Generate_Test_Vectors := True;
          Test.Common.Need_Lib_Support := True;
+         Test.Common.Unparse_Test_Vectors := Arg (Cmd, Unparse);
          declare
             Dir : File_Array_Access;
          begin

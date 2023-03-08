@@ -916,7 +916,7 @@ package body TGen.Type_Representation is
 
                   To_JSON_Fname : constant String :=
                     TGen.Marshalling.Output_Fname_For_Typ
-                      (Instance_Typ'Class (Typ).Orig_Typ.Get);
+                      (Instance_Typ'Class (Typ).Orig_Typ.Get.Name);
                begin
                   Insert
                     (Assocs,

@@ -17,14 +17,15 @@
      (@_GLOBAL_PREFIX_@_JSON : out TGen.JSON.JSON_Value;
       @_GLOBAL_PREFIX_@_V    : @_TY_NAME_@)
    is
+      Components : constant TGen.JSON.JSON_Value := TGen.JSON.Create_Object;
    begin
 @@IF@@ @_COMPONENT_WRITE_@ /= ""
 @@TABLE@@
 @_COMPONENT_WRITE_@
 @@END_TABLE@@
-@@ELSE@@
-      null;
 @@END_IF@@
+      TGen.JSON.Set_Field
+         (@_GLOBAL_PREFIX_@_JSON, "components", Components);
 @@IF@@ @_VARIANT_WRITE_@ /= ""
 @_VARIANT_WRITE_@
 @@END_IF@@
@@ -34,6 +35,9 @@
      (@_GLOBAL_PREFIX_@_JSON : TGen.JSON.JSON_Value;
       @_GLOBAL_PREFIX_@_V    : out @_TY_NAME_@)
    is
+      Components : constant TGen.JSON.JSON_Value :=
+         TGen.JSON.Get
+           (@_GLOBAL_PREFIX_@_JSON, "components");
    begin
 @@IF@@ @_COMPONENT_READ_@ /= ""
 @@TABLE@@

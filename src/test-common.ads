@@ -377,6 +377,11 @@ package Test.Common is
    --  Indicates that we should use TGen to generate tests vectors for the
    --  supported subprograms.
 
+   Unparse_Test_Vectors : Boolean := True;
+   --  Indicates that we should unparse test vectors to produce a GNATtest
+   --  harness with Ada literal values, not depending on the tgen_support
+   --  library.
+
    JSON_Test_Dir : String_Access;
    --  Dir in which the test vector in json format should be stored / looked up
 

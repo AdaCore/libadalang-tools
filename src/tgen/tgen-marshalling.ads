@@ -30,6 +30,7 @@ with Templates_Parser; use Templates_Parser;
 
 with TGen.Types.Constraints; use TGen.Types.Constraints;
 with TGen.Types;             use TGen.Types;
+with TGen.Strings;           use TGen.Strings;
 
 package TGen.Marshalling is
 
@@ -40,21 +41,11 @@ package TGen.Marshalling is
    --  Return True for types which have constraints (bounds of unconstrained
    --  array types, and discriminants of unconstrained record types).
 
-   function Output_Fname_For_Typ (Typ : TGen.Types.Typ'Class) return String;
+   function Output_Fname_For_Typ (Typ_FQN : Ada_Qualified_Name) return String;
    --  Name of the output marshalling function for the given type
 
-   function Input_Fname_For_Typ (Typ : TGen.Types.Typ'Class) return String;
+   function Input_Fname_For_Typ (Typ_FQN : Ada_Qualified_Name) return String;
    --  Name of the input marshalling function for the given type
-
-   function Output_Header_Fname_For_Typ
-     (Typ : TGen.Types.Typ'Class) return String
-     with Pre => Needs_Header (Typ);
-   --  Name of the output marshalling function for the given type header
-
-   function Input_Header_Fname_For_Typ
-     (Typ : TGen.Types.Typ'Class) return String
-     with Pre => Needs_Header (Typ);
-   --  Name of the input marshalling function for the given type header
 
 private
    Global_Prefix   : constant String := "TGen_Marshalling";

@@ -17,7 +17,7 @@
 @@IF@@ @_COMPONENT_KIND_@ = "RECORD_COMPONENT"
 @_SPACING_@   JSON_@_COMP_PREFIX_@ :=
 @_SPACING_@      TGen.JSON.Get
-@_SPACING_@        (@_GLOBAL_PREFIX_@_JSON, "@_COMPONENT_NAME_@");
+@_SPACING_@        (Components, "@_COMPONENT_NAME_@");
 @@ELSE@@
 @_SPACING_@   JSON_@_COMP_PREFIX_@ :=
 @_SPACING_@      TGen.JSON.Array_Element

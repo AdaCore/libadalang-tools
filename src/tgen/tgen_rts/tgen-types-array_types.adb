@@ -32,22 +32,6 @@ package body TGen.Types.Array_Types is
 
    use TGen.Types.SP;
 
-   ------------
-   -- Encode --
-   ------------
-
-   function Encode (Self : Array_Typ; Val : JSON_Value) return JSON_Value
-   is
-      Encoded_Elements : JSON_Array;
-      Result           : constant JSON_Value := Create_Object;
-   begin
-      for Elem of JSON_Array'(Val.Get ("array")) loop
-         Append (Encoded_Elements, Self.Component_Type.Get.Encode (Elem));
-      end loop;
-      Set_Field (Result, "array", Encoded_Elements);
-      return Result;
-   end Encode;
-
    -----------
    -- Image --
    -----------
@@ -508,12 +492,13 @@ package body TGen.Types.Array_Types is
       declare
          Random_Arr : constant Generic_Array_Type :=
            Strat.Draw (Data, Dimension_Sizes);
-         JSON_Arr : JSON_Array;
+         JSON_Arr   : TGen.JSON.JSON_Array;
       begin
          for Elem of Random_Arr loop
-            Append (JSON_Arr, Elem);
+            Append (JSON_Arr, Self.Component_Type.Get.Encode (Elem));
          end loop;
-         Set_Field (Result, "array", JSON_Arr);
+         Set_Field (Result, "array",
+                    Create (JSON_Arr));
       end;
       return Result;
    end Generate_Static_Common;
@@ -526,10 +511,9 @@ package body TGen.Types.Array_Types is
      (S            : in out Array_Strategy_Type;
       Disc_Context : Disc_Value_Map) return JSON_Value
    is
-      T : constant Array_Typ'Class := As_Array_Typ (S.T);
    begin
       return Generate_Static_Common
-        (T,
+        (As_Array_Typ (S.T),
          Disc_Context,
          S.Generate_Element_Strategy.all,
          S.Generate_Index_Strategies);
@@ -656,11 +640,10 @@ package body TGen.Types.Array_Types is
    function Encode
      (Self : Unconstrained_Array_Typ; Val : JSON_Value) return JSON_Value
    is
-      Result : constant JSON_Value := Encode (Array_Typ (Self), Val);
-      --  Encode the elements of the array
-
+      Result : constant JSON_Value := Val;
    begin
-      --  Encode the generated index bounds, if they are present
+      --  Only encode the dimensions. The component values are already
+      --  encoded.
 
       if Val.Has_Field ("dimensions") then
          declare
