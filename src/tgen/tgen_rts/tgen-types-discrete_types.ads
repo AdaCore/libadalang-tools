@@ -76,7 +76,7 @@ package TGen.Types.Discrete_Types is
 
    function Lit_Image (Self : Discrete_Typ; Lit : Big_Integer) return String;
    --  Returns the image of the Litteral whose "position" is Lit. For integer
-   --  types, this is simply Lit'Image, for enum types, this correponds to
+   --  types, this is simply Lit'Image, for enum types, this corresponds to
    --  the image of the enum litteral at position Lit.
 
    overriding function Default_Strategy
