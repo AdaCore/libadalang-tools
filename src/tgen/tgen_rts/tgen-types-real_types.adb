@@ -136,14 +136,10 @@ package body TGen.Types.Real_Types is
    ----------------------
 
    function Default_Strategy
-     (Self    : Float_Typ) return Strategy_Type'Class
+     (Self : Float_Typ) return Strategy_Type'Class
    is
-      --  TODO: use Long_Long_Long_Integer (as it is the biggest possible type
-      --  for which ranges can be defined), and add support to it in
-      --  GNATCOLL.JSON.
-
       Type_Ref : SP.Ref;
-      Strat : Basic_Strategy_Type;
+      Strat    : Basic_Strategy_Type;
    begin
       SP.From_Element (Type_Ref, Self'Unrestricted_Access);
       Strat.T := Type_Ref;
