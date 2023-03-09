@@ -10,7 +10,7 @@
 @@--       @_GLOBAL_PREFIX_@_E.
 @@--
    procedure @_TY_PREFIX_@_Write
-     (@_GLOBAL_PREFIX_@_JSON : out TGen.JSON.JSON_Value;
+     (@_GLOBAL_PREFIX_@_JSON : in out TGen.JSON.JSON_Value;
       @_GLOBAL_PREFIX_@_V    : @_TY_NAME_@)
    is
       @_GLOBAL_PREFIX_@_JSON_Array_Sizes : TGen.JSON.JSON_Array;

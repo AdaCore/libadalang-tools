@@ -14,7 +14,7 @@
 @@--
 
    procedure @_TY_PREFIX_@_Write
-     (@_GLOBAL_PREFIX_@_JSON : out TGen.JSON.JSON_Value;
+     (@_GLOBAL_PREFIX_@_JSON : in out TGen.JSON.JSON_Value;
       @_GLOBAL_PREFIX_@_V    : @_TY_NAME_@)
    is
       Components : constant TGen.JSON.JSON_Value := TGen.JSON.Create_Object;

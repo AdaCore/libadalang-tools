@@ -22,7 +22,7 @@
    end @_TY_PREFIX_@_Read_No_Param;
 
    procedure @_TY_PREFIX_@_Write_No_Param
-     (@_GLOBAL_PREFIX_@_JSON : out TGen.JSON.JSON_Value;
+     (@_GLOBAL_PREFIX_@_JSON : in out TGen.JSON.JSON_Value;
       @_GLOBAL_PREFIX_@_V    : @_TY_NAME_@)
    is
    begin

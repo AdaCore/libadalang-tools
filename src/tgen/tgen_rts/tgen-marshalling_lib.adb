@@ -423,7 +423,7 @@ package body TGen.Marshalling_Lib is
       -----------
 
       procedure Write
-        (JSON   : out TGen.JSON.JSON_Value;
+        (JSON   : in out TGen.JSON.JSON_Value;
          V      : T;
          First  : T := T'First;
          Last   : T := T'Last)
@@ -537,7 +537,7 @@ package body TGen.Marshalling_Lib is
 
       pragma Warnings (Off, "formal parameter * is read but never assigned");
       procedure Write
-        (JSON   : out TGen.JSON.JSON_Value;
+        (JSON   : in out TGen.JSON.JSON_Value;
          V      : T;
          First  : T := T'First;
          Last   : T := T'Last)
@@ -659,7 +659,7 @@ package body TGen.Marshalling_Lib is
 
       pragma Warnings (Off, "formal parameter * is read but never assigned");
       procedure Write
-        (JSON   : out TGen.JSON.JSON_Value;
+        (JSON   : in out TGen.JSON.JSON_Value;
          V      : T;
          First  : T := T'First;
          Last   : T := T'Last)
@@ -1141,7 +1141,7 @@ package body TGen.Marshalling_Lib is
 
       pragma Warnings (Off, "formal parameter * is read but never assigned");
       procedure Write
-        (JSON   : out TGen.JSON.JSON_Value;
+        (JSON   : in out TGen.JSON.JSON_Value;
          V      : T;
          First  : T := T'First;
          Last   : T := T'Last)
