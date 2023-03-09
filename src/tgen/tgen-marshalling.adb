@@ -724,7 +724,8 @@ package body TGen.Marshalling is
                  Discriminated_Record_Typ'Class (Typ);
 
             begin
-               --  Generate base functions for the discriminant types
+               --  Generate base functions for the discriminant types.
+               --  TODO???: why is this commented out?
 
                --  for Cu in D_Typ.Discriminant_Types.Iterate loop
                --     Generate_Base_Functions_For_Typ
