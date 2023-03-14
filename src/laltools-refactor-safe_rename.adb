@@ -31,7 +31,9 @@ with Ada.Strings; use Ada.Strings;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Strings.Unbounded.Text_IO; use Ada.Strings.Unbounded.Text_IO;
 with Ada.Strings.UTF_Encoding; use Ada.Strings.UTF_Encoding;
+with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Unchecked_Deallocation;
 
 with GPR2.Project.Registry.Attribute;
 
@@ -47,6 +49,63 @@ package body Laltools.Refactor.Safe_Rename is
    function "+"
      (Source : String)
       return Unbounded_String renames To_Unbounded_String;
+
+   ---------
+   -- "=" --
+   ---------
+
+   function "=" (New_Name : New_Name_Type; Name : Text_Type) return Boolean is
+     (New_Name.Lower = To_Lower (Name));
+
+   ---------
+   -- "=" --
+   ---------
+
+   function "="
+     (New_Name : New_Name_Access;
+      Name     : Text_Type)
+      return Boolean
+   is (New_Name.all = Name);
+
+   ----------
+   -- Free --
+   ----------
+
+   procedure Free (Object : in out New_Name_Access) is
+      procedure Free is new
+        Ada.Unchecked_Deallocation (New_Name_Type, New_Name_Access);
+   begin
+      Free (Object);
+   end Free;
+
+   function Create_Rename_Problem
+     (Problem : Rename_Problem'Class)
+      return Specific_Problem_Finder_Result
+   is (Specific_Problem_Finder_Result'
+         (Success => False,
+          Problem =>
+            Rename_Problem_Indefinite_Holders.To_Holder (Problem)));
+
+   --------------------------
+   -- Check_Rename_Problem --
+   --------------------------
+
+   function Check_Rename_Problem
+     (Problem : Rename_Problem'Class)
+      return Boolean
+   is (To_Lower (To_Text (Problem.New_Name)) =
+         To_Lower (Problem.Conflicting_Id.Text));
+
+   overriding
+   function Filename (Self : Rename_Problem) return String is
+     (Self.Conflicting_Id.Unit.Get_Filename);
+   --  Returns the filename of the analysis unit where Self happens.
+
+   overriding
+   function Location (Self : Rename_Problem)
+                      return Source_Location_Range is
+     (Self.Conflicting_Id.Sloc_Range);
+   --  Return a location in the file where Self happens.
 
    function Create_Naming_Scheme
      (Casing          : String;
@@ -170,26 +229,28 @@ package body Laltools.Refactor.Safe_Rename is
    --  check, In and Default mode are considered the same.
 
    function Check_Rename_Conflict
-     (New_Name : Unbounded_Text_Type;
+     (New_Name : New_Name_Access;
       Target   : Defining_Name'Class)
-      return Boolean is (Target.F_Name.Text = To_Text (New_Name))
-     with Pre => Target /= No_Defining_Name;
-   --  Checks if Target's name is equal to New_Name
-   --  FIXME: Do a case insensitive comparison
+      return Boolean
+   is (New_Name = To_Lower (Target.F_Name.Text))
+     with Pre => not Target.Is_Null;
+   --  Checks if New_Name is equal to Target's name.
+   --  The comparison is done using Langkit_Support.Text.To_Lower for
+   --  performance purposes.
 
    function Check_Subp_Rename_Conflict
      (Subp_A   : Basic_Decl'Class;
-      New_Name : Unbounded_Text_Type;
+      New_Name : New_Name_Access;
       Subp_B   : Basic_Decl'Class)
       return Boolean
-     with Pre => (Is_Subprogram (Subp_A) or else Subp_A.Kind
-                    in Ada_Generic_Subp_Instantiation_Range)
-                 and then (Is_Subprogram (Subp_B) or else
-                             Subp_B.Kind in
-                               Ada_Generic_Subp_Instantiation_Range);
+     with Pre => (Is_Subprogram (Subp_A)
+                  or else Subp_A.Kind in
+                            Ada_Generic_Subp_Instantiation_Range)
+                 and then (Is_Subprogram (Subp_B)
+                           or else Subp_B.Kind in
+                             Ada_Generic_Subp_Instantiation_Range);
    --  Checks if renaming Subp_A to New_Name causes a conflict with Subp_B.
    --  This includes checking if both subprograms are type conformant.
-   --  FIXME: Do a case insensitive comparison.
 
    procedure Initialize_Unit_Slocs_Maps
      (Unit_References      : out Unit_Slocs_Maps.Map;
@@ -368,14 +429,16 @@ package body Laltools.Refactor.Safe_Rename is
 
    function Check_Subp_Rename_Conflict
      (Subp_A   : Basic_Decl'Class;
-      New_Name : Unbounded_Text_Type;
+      New_Name : New_Name_Access;
       Subp_B   : Basic_Decl'Class)
       return Boolean
    is
       Subp_B_Name : constant Text_Type := Subp_B.P_Defining_Name.F_Name.Text;
 
    begin
-      if Subp_A = Subp_B or else Subp_B_Name /= To_Text (New_Name) then
+      if Subp_A = Subp_B
+        or else New_Name /= To_Lower (Subp_B_Name)
+      then
          return False;
       end if;
 
@@ -606,7 +669,7 @@ package body Laltools.Refactor.Safe_Rename is
       return Refactoring_Diagnotic_Vector
    is
       Problem_Finders : Specific_Rename_Problem_Finder_Vectors.Vector;
-      Problems : Refactoring_Diagnotic_Vector;
+      Problems        : Refactoring_Diagnotic_Vector;
 
    begin
       --  If we're renaming an enum literal, just check for collisions within
@@ -697,10 +760,10 @@ package body Laltools.Refactor.Safe_Rename is
 
       for Finder of Problem_Finders loop
          declare
-            Problem : constant Rename_Problem'Class := Finder.Find;
+            Result : constant Specific_Problem_Finder_Result := Finder.Find;
          begin
-            if Problem /= No_Rename_Problem then
-               Problems.Append (Problem);
+            if not Result.Success then
+               Problems.Append (Result.Problem.Element);
             end if;
          end;
       end loop;
@@ -740,16 +803,34 @@ package body Laltools.Refactor.Safe_Rename is
                  Constant_Reference (Self.References_Diff.Minus, C)
                loop
                   for Sloc of Slocs_Set loop
-                     Result.Append
-                       (Missing_Reference'
-                          (Canonical_Definition => Self.Canonical_Definition,
-                           New_Name             => Self.New_Name,
-                           Conflicting_Id       =>
-                             Lookup
-                               (Node => Key (C).Root,
-                                Sloc => Source_Location'
-                                  (Line   => Sloc.Start_Line,
-                                   Column => Sloc.Start_Column)).As_Name));
+                     declare
+                        Conflicting_Id : constant Libadalang.Analysis.Name :=
+                          Lookup
+                            (Node => Key (C).Root,
+                             Sloc => Source_Location'
+                               (Line   => Sloc.Start_Line,
+                                Column => Sloc.Start_Column)).As_Name;
+                     begin
+                        if Conflicting_Id.P_Referenced_Defining_Name /=
+                          Self.Canonical_Definition
+                        then
+                           Ada.Text_IO.Put_Line
+                             (Self.Canonical_Definition.Image);
+                           Ada.Text_IO.Put_Line
+                             (Conflicting_Id.Image);
+                           Result.Append
+                             (Missing_Reference'
+                                (Canonical_Definition =>
+                                   Self.Canonical_Definition,
+                                 New_Name             => Self.New_Name,
+                                 Conflicting_Id       =>
+                                   Lookup
+                                     (Node => Key (C).Root,
+                                      Sloc => Source_Location'
+                                        (Line   => Sloc.Start_Line,
+                                      Column => Sloc.Start_Column)).As_Name));
+                        end if;
+                     end;
                   end loop;
                end loop;
 
@@ -766,16 +847,25 @@ package body Laltools.Refactor.Safe_Rename is
                  Constant_Reference (Self.References_Diff.Plus, C)
                loop
                   for Sloc of Slocs_Set loop
-                     Result.Append
-                       (New_Reference'
-                          (Canonical_Definition => Self.Canonical_Definition,
-                           New_Name             => Self.New_Name,
-                           Conflicting_Id       =>
-                             Lookup
-                               (Node => Key (C).Root,
-                                Sloc => Source_Location'
-                                  (Line   => Sloc.Start_Line,
-                                   Column => Sloc.Start_Column)).As_Name));
+                     declare
+                        Conflicting_Id : constant Libadalang.Analysis.Name :=
+                          Lookup
+                            (Node => Key (C).Root,
+                             Sloc => Source_Location'
+                               (Line   => Sloc.Start_Line,
+                                Column => Sloc.Start_Column)).As_Name;
+                     begin
+                        if Conflicting_Id.P_Referenced_Defining_Name /=
+                          Self.Canonical_Definition
+                        then
+                           Result.Append
+                             (New_Reference'
+                                (Canonical_Definition =>
+                                   Self.Canonical_Definition,
+                                 New_Name             => Self.New_Name,
+                                 Conflicting_Id       => Conflicting_Id));
+                        end if;
+                     end;
                   end loop;
                end loop;
 
@@ -804,7 +894,7 @@ package body Laltools.Refactor.Safe_Rename is
    overriding
    function Find
      (Self : Name_Collision_Finder)
-      return Rename_Problem'Class
+      return Specific_Problem_Finder_Result
    is
       Canonical_Decl : constant Basic_Decl :=
         Self.Canonical_Definition.P_Basic_Decl;
@@ -989,10 +1079,12 @@ package body Laltools.Refactor.Safe_Rename is
 
          begin
             if Conflicting_Definition /= No_Defining_Name then
-               return Name_Collision'
-                 (Canonical_Definition => Self.Canonical_Definition,
-                  New_Name             => Self.New_Name,
-                  Conflicting_Id       => Conflicting_Definition.F_Name);
+               return
+                 Create_Rename_Problem
+                   (Name_Collision'
+                      (Canonical_Definition => Self.Canonical_Definition,
+                       New_Name             => Self.New_Name.Original,
+                       Conflicting_Id       => Conflicting_Definition.F_Name));
             end if;
          end;
       end loop;
@@ -1007,7 +1099,7 @@ package body Laltools.Refactor.Safe_Rename is
    overriding
    function Find
      (Self : Enum_Name_Collision_Finder)
-      return Rename_Problem'Class is
+      return Specific_Problem_Finder_Result is
    begin
       for Enum_Literal of
         Self.Canonical_Definition.Parent.Parent.As_Enum_Literal_Decl_List
@@ -1017,10 +1109,13 @@ package body Laltools.Refactor.Safe_Rename is
               (New_Name => Self.New_Name,
                Target   => Enum_Literal.P_Defining_Name)
             then
-               return Name_Collision'
-                 (Canonical_Definition => Self.Canonical_Definition,
-                  New_Name             => Self.New_Name,
-                  Conflicting_Id       => Enum_Literal.P_Defining_Name.F_Name);
+               return
+                 Create_Rename_Problem
+                   (Name_Collision'
+                      (Canonical_Definition => Self.Canonical_Definition,
+                       New_Name             => Self.New_Name.Original,
+                       Conflicting_Id       =>
+                         Enum_Literal.P_Defining_Name.F_Name));
             end if;
          end if;
       end loop;
@@ -1035,7 +1130,7 @@ package body Laltools.Refactor.Safe_Rename is
    overriding
    function Find
      (Self : Collision_With_Compilation_Unit_Finder)
-      return Rename_Problem'Class
+      return Specific_Problem_Finder_Result
    is
       Parent_Package : Base_Package_Decl := No_Base_Package_Decl;
 
@@ -1116,14 +1211,15 @@ package body Laltools.Refactor.Safe_Rename is
 
                begin
                   --  Check if the new name is already used by other unit
-                  --  FIXME: Do a case insensitive comparison
 
-                  if Unit_Decl_Identifier.Text = To_Text (Self.New_Name) then
-                     return Name_Collision'
-                       (Canonical_Definition => Self.Canonical_Definition,
-                        New_Name             => Self.New_Name,
-                        Conflicting_Id       =>
-                          Unit_Decl.P_Defining_Name.F_Name);
+                  if Self.New_Name = To_Lower (Unit_Decl_Identifier.Text) then
+                     return
+                       Create_Rename_Problem
+                         (Name_Collision'
+                            (Canonical_Definition => Self.Canonical_Definition,
+                             New_Name             => Self.New_Name.Original,
+                             Conflicting_Id       =>
+                               Unit_Decl.P_Defining_Name.F_Name));
                   end if;
                end;
             end if;
@@ -1140,14 +1236,14 @@ package body Laltools.Refactor.Safe_Rename is
    overriding
    function Find
      (Self : Compilation_Unit_Collision_Finder)
-      return Rename_Problem'Class
+      return Specific_Problem_Finder_Result
    is
       Parent_Unit : constant Analysis_Unit :=
         Self.Canonical_Definition.P_Basic_Decl.P_Parent_Basic_Decl.Unit;
 
       function Process_Compilation_Unit
         (Compilation_Unit : Libadalang.Analysis.Compilation_Unit)
-         return Rename_Problem'Class;
+         return Specific_Problem_Finder_Result;
       --  Checks if there are collisions with the top level declaration of
       --  Compilation_Unit.
 
@@ -1157,7 +1253,7 @@ package body Laltools.Refactor.Safe_Rename is
 
       function Process_Compilation_Unit
         (Compilation_Unit : Libadalang.Analysis.Compilation_Unit)
-         return Rename_Problem'Class
+         return Specific_Problem_Finder_Result
       is
          Parent_Package : Package_Decl := No_Package_Decl;
 
@@ -1184,11 +1280,13 @@ package body Laltools.Refactor.Safe_Rename is
                    (Self.New_Name,
                     Node.As_Basic_Decl.P_Defining_Name)
                then
-                  return Name_Collision'
-                    (Canonical_Definition => Self.Canonical_Definition,
-                     New_Name             => Self.New_Name,
-                     Conflicting_Id       =>
-                       Node.As_Basic_Decl.P_Defining_Name.F_Name);
+                  return
+                    Create_Rename_Problem
+                      (Name_Collision'
+                         (Canonical_Definition => Self.Canonical_Definition,
+                          New_Name             => Self.New_Name.Original,
+                          Conflicting_Id       =>
+                            Node.As_Basic_Decl.P_Defining_Name.F_Name));
                end if;
             end loop;
 
@@ -1203,11 +1301,14 @@ package body Laltools.Refactor.Safe_Rename is
                          (Self.New_Name,
                           Node.As_Basic_Decl.P_Defining_Name)
                      then
-                        return Name_Collision'
-                          (Canonical_Definition => Self.Canonical_Definition,
-                           New_Name             => Self.New_Name,
-                           Conflicting_Id       =>
-                             Node.As_Basic_Decl.P_Defining_Name.F_Name);
+                        return
+                          Create_Rename_Problem
+                            (Name_Collision'
+                               (Canonical_Definition =>
+                                  Self.Canonical_Definition,
+                                New_Name             => Self.New_Name.Original,
+                                Conflicting_Id       =>
+                                  Node.As_Basic_Decl.P_Defining_Name.F_Name));
                      end if;
                   end loop;
                end if;
@@ -1238,14 +1339,18 @@ package body Laltools.Refactor.Safe_Rename is
                   begin
                      --  Check if Self.New_Name is already used by this unit
 
-                     if Unit_Decl_Identifier.Text =
-                          To_Text (Self.New_Name)
+                     if Self.New_Name =
+                       To_Lower (Unit_Decl_Identifier.Text)
                      then
-                        return Name_Collision'
-                          (Canonical_Definition => Self.Canonical_Definition,
-                           New_Name             => Self.New_Name,
-                           Conflicting_Id       =>
-                             Compilation_Unit.P_Decl.P_Defining_Name.F_Name);
+                        return
+                          Create_Rename_Problem
+                            (Name_Collision'
+                               (Canonical_Definition =>
+                                  Self.Canonical_Definition,
+                                New_Name             => Self.New_Name.Original,
+                                Conflicting_Id       =>
+                                  Compilation_Unit.P_Decl.P_Defining_Name.
+                                    F_Name));
                      end if;
                   end;
                end if;
@@ -1261,13 +1366,13 @@ package body Laltools.Refactor.Safe_Rename is
               Self.Canonical_Definition.Unit.Root.As_Compilation_Unit_List
             loop
                declare
-                  Problem : constant Rename_Problem'Class :=
+                  Result : constant Specific_Problem_Finder_Result :=
                     Process_Compilation_Unit
                       (Compilaton_Unit.As_Compilation_Unit);
 
                begin
-                  if Problem /= No_Rename_Problem then
-                     return Problem;
+                  if not Result.Success then
+                     return Result;
                   end if;
                end;
             end loop;
@@ -1291,7 +1396,7 @@ package body Laltools.Refactor.Safe_Rename is
    overriding
    function Find
      (Self : Subp_Overriding_Finder)
-      return Rename_Problem'Class
+      return Specific_Problem_Finder_Result
    is
       function Check_Subp_Overriding_By_Rename_Conflict
         (Derived_Type : Type_Decl;
@@ -1441,8 +1546,8 @@ package body Laltools.Refactor.Safe_Rename is
       begin
          Look_For_Possible_Conflict :
          for Primitive of Primitives_List loop
-            if Primitive.P_Defining_Name.F_Name.Text =
-              To_Text (Self.New_Name)
+            if Self.New_Name =
+              To_Lower (Primitive.P_Defining_Name.F_Name.Text)
             then
                if Check_Subp_Overriding_By_Rename_Conflict
                  (First_Type,
@@ -1450,11 +1555,14 @@ package body Laltools.Refactor.Safe_Rename is
                   Subprogram_Spec,
                   Primitive.P_Canonical_Part.As_Subp_Decl.F_Subp_Spec)
                then
-                  return Overriding_Subprogram'
-                    (Canonical_Definition => Self.Canonical_Definition,
-                     New_Name             => Self.New_Name,
-                     Conflicting_Id       =>
-                       Primitive.P_Canonical_Part.P_Defining_Name.F_Name);
+                  return
+                    Create_Rename_Problem
+                      (Overriding_Subprogram'
+                         (Canonical_Definition => Self.Canonical_Definition,
+                          New_Name             => Self.New_Name.Original,
+                          Conflicting_Id       =>
+                            Primitive.P_Canonical_Part.P_Defining_Name.
+                              F_Name));
                end if;
             end if;
          end loop Look_For_Possible_Conflict;
@@ -1468,20 +1576,26 @@ package body Laltools.Refactor.Safe_Rename is
    ----------
 
    overriding
-   function Find (Self : Subtype_Indication_Collision_Finder)
-                  return Rename_Problem'Class is
+   function Find
+     (Self : Subtype_Indication_Collision_Finder)
+      return Specific_Problem_Finder_Result is
    begin
       for Reference of Self.References loop
          if Reference.Parent.Kind = Ada_Subtype_Indication
            and then Reference.Parent.Parent.Kind = Ada_Param_Spec
          then
             for Definition of Reference.Parent.Parent.As_Param_Spec.F_Ids loop
-               if Definition.F_Name.Text = To_Text (Self.New_Name) then
-                  return Name_Collision'
-                    (Canonical_Definition => Self.Canonical_Definition,
-                     New_Name             => Self.New_Name,
-                     Conflicting_Id       =>
-                       Definition.As_Defining_Name.P_Canonical_Part.F_Name);
+               if Self.New_Name =
+                 To_Lower (Definition.F_Name.Text)
+               then
+                  return
+                    Create_Rename_Problem
+                      (Name_Collision'
+                         (Canonical_Definition => Self.Canonical_Definition,
+                          New_Name             => Self.New_Name.Original,
+                          Conflicting_Id       =>
+                            Definition.As_Defining_Name.P_Canonical_Part.
+                              F_Name));
                end if;
             end loop;
          end if;
@@ -1497,7 +1611,7 @@ package body Laltools.Refactor.Safe_Rename is
    overriding
    function Find
      (Self : Name_Hiding_Finder)
-      return Rename_Problem'Class
+      return Specific_Problem_Finder_Result
    is
       use Ada_List_Hashed_Sets;
 
@@ -1515,9 +1629,6 @@ package body Laltools.Refactor.Safe_Rename is
         (if Is_Subp then Get_Subp_Spec (Canonical_Decl)
          else No_Base_Subp_Spec);
 
-      Possible_Problem : Hiding_Name;
-      Found_Problem    : Boolean := False;
-
       --  These are the scopes where declarations can get hidden by
       --  Canonical_Decl.
       Parent_Scopes : constant Ada_List_Hashed_Set :=
@@ -1529,14 +1640,16 @@ package body Laltools.Refactor.Safe_Rename is
       Use_Units_Public_Parts : constant Declarative_Part_Vector :=
         Get_Use_Units_Public_Parts (Self.Canonical_Definition);
 
-      procedure Check_Scope
-        (Scope : Ada_List'Class);
+      function Check_Scope
+        (Scope : Ada_List'Class)
+         return Specific_Problem_Finder_Result;
       --  Checks if Decl_Part contains any declaration that can be hidden by
       --  Canonical_Decl. If so, Possible_Problem is filled with the
       --  appropriate information and Found_Problem is set to True.
 
-      procedure Check_Scope
-        (Scope : Ada_List'Class) is
+      function Check_Scope
+        (Scope : Ada_List'Class)
+         return Specific_Problem_Finder_Result is
       begin
          if Is_Subp then
             Assert (not Canonical_Subp_Spec.Is_Null);
@@ -1557,14 +1670,14 @@ package body Laltools.Refactor.Safe_Rename is
                      New_Name => Self.New_Name,
                      Subp_B   => Decl.As_Basic_Decl)
                   then
-                     Possible_Problem :=
-                       (Canonical_Definition => Self.Canonical_Definition,
-                        New_Name             => Self.New_Name,
-                        Conflicting_Id       =>
-                          Decl.As_Basic_Decl.P_Canonical_Part.
-                            P_Defining_Name.F_Name);
-                     Found_Problem := True;
-                     return;
+                     return
+                       Create_Rename_Problem
+                         (Hiding_Name'
+                            (Canonical_Definition => Self.Canonical_Definition,
+                             New_Name             => Self.New_Name.Original,
+                             Conflicting_Id       =>
+                               Decl.As_Basic_Decl.P_Canonical_Part.
+                                 P_Defining_Name.F_Name));
                   end if;
                end if;
             end loop;
@@ -1583,37 +1696,43 @@ package body Laltools.Refactor.Safe_Rename is
                then
                   for Definition of Decl.As_Basic_Decl.P_Defining_Names loop
                      if Check_Rename_Conflict (Self.New_Name, Definition) then
-                        Possible_Problem :=
-                          (Canonical_Definition => Self.Canonical_Definition,
-                           New_Name             => Self.New_Name,
-                           Conflicting_Id       => Definition.F_Name);
-                        Found_Problem := True;
-                        return;
+                        return
+                          Create_Rename_Problem
+                            (Hiding_Name'
+                               (Canonical_Definition =>
+                                  Self.Canonical_Definition,
+                                New_Name             => Self.New_Name.Original,
+                                Conflicting_Id       => Definition.F_Name));
                      end if;
                   end loop;
                end if;
             end loop;
          end if;
+         return No_Rename_Problem;
       end Check_Scope;
 
    begin
       for Scope of Parent_Scopes loop
-         Check_Scope (Scope);
-         exit when Found_Problem;
+         declare
+            Result : constant Specific_Problem_Finder_Result :=
+              Check_Scope (Scope);
+         begin
+            if not Result.Success then
+               return Result;
+            end if;
+         end;
       end loop;
-
-      if Found_Problem then
-         return Possible_Problem;
-      end if;
 
       for Decl_Part of Use_Units_Public_Parts loop
-         Check_Scope (Decl_Part.F_Decls);
-         exit when Found_Problem;
+         declare
+            Result : constant Specific_Problem_Finder_Result :=
+              Check_Scope (Decl_Part.F_Decls);
+         begin
+            if not Result.Success then
+               return Result;
+            end if;
+         end;
       end loop;
-
-      if Found_Problem then
-         return Possible_Problem;
-      end if;
 
       return No_Rename_Problem;
    end Find;
@@ -1623,7 +1742,9 @@ package body Laltools.Refactor.Safe_Rename is
    ----------
 
    overriding
-   function Find (Self : Name_Hidden_Finder) return Rename_Problem'Class
+   function Find
+     (Self : Name_Hidden_Finder)
+      return Specific_Problem_Finder_Result
    is
       use Ada_List_Hashed_Sets;
 
@@ -1737,10 +1858,12 @@ package body Laltools.Refactor.Safe_Rename is
                  Declaration.As_Basic_Decl.P_Defining_Names
                loop
                   if Check_Conflict (Definition) then
-                     return Hidden_Name'
-                       (Canonical_Definition => Self.Canonical_Definition,
-                        New_Name             => Self.New_Name,
-                        Conflicting_Id       => Definition.F_Name);
+                     return
+                       Create_Rename_Problem
+                         (Hidden_Name'
+                            (Canonical_Definition => Self.Canonical_Definition,
+                             New_Name             => Self.New_Name.Original,
+                             Conflicting_Id       => Definition.F_Name));
                   end if;
                end loop;
             end if;
@@ -1760,10 +1883,12 @@ package body Laltools.Refactor.Safe_Rename is
                  Declaration.As_Basic_Decl.P_Defining_Names
                loop
                   if Check_Conflict (Definition) then
-                     return Hidden_Name'
-                       (Canonical_Definition => Self.Canonical_Definition,
-                        New_Name             => Self.New_Name,
-                        Conflicting_Id       => Definition.F_Name);
+                     return
+                       Create_Rename_Problem
+                         (Hidden_Name'
+                            (Canonical_Definition => Self.Canonical_Definition,
+                             New_Name             => Self.New_Name.Original,
+                             Conflicting_Id       => Definition.F_Name));
                   end if;
                end loop;
             end if;
@@ -1847,10 +1972,13 @@ package body Laltools.Refactor.Safe_Rename is
                Scope.Traverse (Visit'Access);
 
                if not Conflicting_Definition.Is_Null then
-                  return Hidden_Name'
-                    (Canonical_Definition => Self.Canonical_Definition,
-                     New_Name             => Self.New_Name,
-                     Conflicting_Id       => Conflicting_Definition.F_Name);
+                  return
+                    Create_Rename_Problem
+                      (Hidden_Name'
+                         (Canonical_Definition => Self.Canonical_Definition,
+                          New_Name             => Self.New_Name.Original,
+                          Conflicting_Id       =>
+                            Conflicting_Definition.F_Name));
                end if;
             end;
          end loop;
@@ -1866,7 +1994,7 @@ package body Laltools.Refactor.Safe_Rename is
    overriding
    function Find
      (Self : Param_Spec_Collision_Finder)
-      return Rename_Problem'Class
+      return Specific_Problem_Finder_Result
    is
       Param_Spec : Libadalang.Analysis.Param_Spec renames
         Self.Canonical_Definition.P_Basic_Decl.As_Param_Spec;
@@ -1897,14 +2025,17 @@ package body Laltools.Refactor.Safe_Rename is
          if Param_Spec.F_Type_Expr.Kind = Ada_Subtype_Indication
            and then not Subtype_Indication.Is_Null
            and then Subtype_Indication.F_Name.Kind = Ada_Identifier
-           and then Subtype_Indication.F_Name.Text = To_Text (Self.New_Name)
+           and then Self.New_Name =
+                      To_Lower (Subtype_Indication.F_Name.Text)
          then
-            return Name_Collision'
-              (Canonical_Definition => Self.Canonical_Definition,
-               New_Name             => Self.New_Name,
-               Conflicting_Id        => Param_Spec.F_Type_Expr.
-                 As_Subtype_Indication.F_Name.P_Referenced_Decl.
-                   P_Defining_Name.F_Name);
+            return
+              Create_Rename_Problem
+                (Name_Collision'
+                   (Canonical_Definition => Self.Canonical_Definition,
+                    New_Name             => Self.New_Name.Original,
+                    Conflicting_Id       => Param_Spec.F_Type_Expr.
+                      As_Subtype_Indication.F_Name.P_Referenced_Decl.
+                        P_Defining_Name.F_Name));
          end if;
 
          --  Possible problem 2: Renaming a parameter to the same name as
@@ -1912,12 +2043,16 @@ package body Laltools.Refactor.Safe_Rename is
 
          for Spec of Param_Spec_List loop
             for Spec_Definition of Spec.F_Ids loop
-               if Spec_Definition.F_Name.Text = To_Text (Self.New_Name) then
-                  return Name_Collision'
-                    (Canonical_Definition => Self.Canonical_Definition,
-                     New_Name             => Self.New_Name,
-                     Conflicting_Id       =>
-                       Spec_Definition.As_Defining_Name.F_Name);
+               if Self.New_Name =
+                 To_Lower (Spec_Definition.F_Name.Text)
+               then
+                  return
+                    Create_Rename_Problem
+                      (Name_Collision'
+                         (Canonical_Definition => Self.Canonical_Definition,
+                          New_Name             => Self.New_Name.Original,
+                          Conflicting_Id       =>
+                            Spec_Definition.As_Defining_Name.F_Name));
                end if;
             end loop;
          end loop;
@@ -1931,13 +2066,16 @@ package body Laltools.Refactor.Safe_Rename is
                   for Defining_Name
                     of Decl.As_Basic_Decl.P_Defining_Names
                   loop
-                     if Defining_Name.F_Name.Text =
-                       To_Text (Self.New_Name)
+                     if Self.New_Name =
+                          To_Lower (Defining_Name.F_Name.Text)
                      then
-                        return Name_Collision'
-                          (Canonical_Definition => Self.Canonical_Definition,
-                           New_Name             => Self.New_Name,
-                           Conflicting_Id       => Defining_Name.F_Name);
+                        return
+                          Create_Rename_Problem
+                            (Name_Collision'
+                               (Canonical_Definition =>
+                                  Self.Canonical_Definition,
+                                New_Name             => Self.New_Name.Original,
+                                Conflicting_Id       => Defining_Name.F_Name));
                      end if;
                   end loop;
                end if;
@@ -1975,13 +2113,16 @@ package body Laltools.Refactor.Safe_Rename is
                   for Defining_Name
                     of Decl.As_Basic_Decl.P_Defining_Names
                   loop
-                     if Defining_Name.F_Name.Text =
-                       To_Text (Self.New_Name)
+                     if Self.New_Name =
+                          To_Lower (Defining_Name.F_Name.Text)
                      then
-                        return Name_Collision'
-                          (Canonical_Definition => Self.Canonical_Definition,
-                           New_Name             => Self.New_Name,
-                           Conflicting_Id       => Defining_Name.F_Name);
+                        return
+                          Create_Rename_Problem
+                            (Name_Collision'
+                               (Canonical_Definition =>
+                                  Self.Canonical_Definition,
+                                New_Name             => Self.New_Name.Original,
+                                Conflicting_Id       => Defining_Name.F_Name));
                      end if;
                   end loop;
                end loop;
@@ -2004,7 +2145,10 @@ package body Laltools.Refactor.Safe_Rename is
       Units                : Analysis_Unit_Array) is
    begin
       Self.Canonical_Definition := Canonical_Definition;
-      Self.New_Name             := New_Name;
+      Self.New_Name             :=
+        new New_Name_Type'
+             (Original => New_Name,
+              Lower    => To_Unbounded_Text (To_Lower (To_Text (New_Name))));
       Self.Units                := Units;
       Self.References           := References;
    end Initialize;
@@ -2220,8 +2364,7 @@ package body Laltools.Refactor.Safe_Rename is
    function Info (Self : Hiding_Name) return String is
    begin
       return "Renaming " & Image (Self.Canonical_Definition.F_Name.Text)
-        & " to " & Image (To_Text (Self.New_Name))
-        & " hides "
+        & " to " & Image (To_Text (Self.New_Name)) & " hides "
         & Self.Conflicting_Id.Image;
    end Info;
 
@@ -2233,8 +2376,8 @@ package body Laltools.Refactor.Safe_Rename is
    function Info (Self : Missing_Reference) return String is
    begin
       return "Renaming " & Image (Self.Canonical_Definition.F_Name.Text)
-        & " to " & Image (To_Text (Self.New_Name)) & " loses reference "
-        & Self.Conflicting_Id.Image;
+        & " to " & Image (To_Text (Self.New_Name))
+        & " loses reference " & Self.Conflicting_Id.Image;
    end Info;
 
    ----------
@@ -2355,7 +2498,7 @@ package body Laltools.Refactor.Safe_Rename is
       Attribute_Value_Provider : Attribute_Value_Provider_Access := null)
       return Safe_Renamer
    is (((Definition.P_Canonical_Part,
-       New_Name,
+       Trim (New_Name, Ada.Strings.Both),
        Algorithm,
        (if Attribute_Value_Provider = null then
            Default_Naming_Scheme
@@ -2391,12 +2534,10 @@ package body Laltools.Refactor.Safe_Rename is
    is
       Edits : Refactoring_Edits;
 
-      Units : constant Analysis_Unit_Array := Analysis_Units.all;
-
-      References : constant Base_Id_Vectors.Vector :=
-        Find_All_References_For_Renaming (Self.Canonical_Definition, Units);
-
-      function Initialize_Algorithm return Problem_Finder_Algorithm'Class;
+      function Initialize_Algorithm
+        (Units      : Analysis_Unit_Array;
+         References : Base_Id_Vectors.Vector)
+         return Problem_Finder_Algorithm'Class;
       --  Returns an initialized Problem_Finder_Algorithm depending on
       --  Self.Algorithm.
 
@@ -2404,7 +2545,10 @@ package body Laltools.Refactor.Safe_Rename is
       -- Initialize_Algorithm --
       --------------------------
 
-      function Initialize_Algorithm return Problem_Finder_Algorithm'Class
+      function Initialize_Algorithm
+        (Units      : Analysis_Unit_Array;
+         References : Base_Id_Vectors.Vector)
+         return Problem_Finder_Algorithm'Class
       is
          References_Map : Unit_Slocs_Maps.Map;
 
@@ -2412,7 +2556,7 @@ package body Laltools.Refactor.Safe_Rename is
          case Self.Algorithm is
             when Map_References =>
                return Algorithm : Reference_Mapper
-                 (Units_Length => Units'Length)
+                                    (Units_Length => Units'Length)
                do
                   Initialize_Unit_Slocs_Maps
                     (Unit_References      => References_Map,
@@ -2437,23 +2581,51 @@ package body Laltools.Refactor.Safe_Rename is
          end case;
       end Initialize_Algorithm;
 
-      Algorithm : Problem_Finder_Algorithm'Class := Initialize_Algorithm;
-
    begin
-      Self.Add_References_To_Edits (References, Edits);
-
-      --  If Self.Canonical_Definition is a top level declaration then its
-      --  file name and all other file names of its references that are
-      --  top level declartions need to be renamed.
-
-      if Self.Is_Top_Level_Decl (Self.Canonical_Definition.P_Basic_Decl) then
-         Self.Add_Files_Rename_To_Edits (References, Edits);
+      --  Do nothing if we're renaming to an empty string or to the same name
+      if Ada.Strings.Wide_Wide_Unbounded."="
+           (Self.New_Name, Null_Unbounded_Wide_Wide_String)
+        or To_Lower (To_Text (Self.New_Name)) =
+             To_Lower (Self.Canonical_Definition.F_Name.Text)
+      then
+         return Edits;
       end if;
 
-      Edits.Diagnostics := Algorithm.Find;
+      declare
+         Units      : constant Analysis_Unit_Array := Analysis_Units.all;
+         References : constant Base_Id_Vectors.Vector :=
+           Find_All_References_For_Renaming (Self.Canonical_Definition, Units);
+         Algorithm  : Problem_Finder_Algorithm'Class :=
+           Initialize_Algorithm (Units, References);
 
-      return Edits;
+      begin
+         Self.Add_References_To_Edits (References, Edits);
+
+         --  If Self.Canonical_Definition is a top level declaration then its
+         --  file name and all other file names of its references that are
+         --  top level declartions need to be renamed.
+
+         if Self.Is_Top_Level_Decl
+              (Self.Canonical_Definition.P_Basic_Decl)
+         then
+            Self.Add_Files_Rename_To_Edits (References, Edits);
+         end if;
+
+         Edits.Diagnostics := Algorithm.Find;
+
+         return Edits;
+      end;
    end Refactor;
+
+   --------------
+   -- Finalize --
+   --------------
+
+   overriding
+   procedure Finalize (Self : in out AST_Analyser) is
+   begin
+      Free (Self.New_Name);
+   end Finalize;
 
    -----------------------------
    -- Add_References_To_Edits --
