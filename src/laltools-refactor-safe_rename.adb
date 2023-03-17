@@ -33,7 +33,7 @@ with Ada.Strings.Unbounded.Text_IO; use Ada.Strings.Unbounded.Text_IO;
 with Ada.Strings.UTF_Encoding; use Ada.Strings.UTF_Encoding;
 with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
-with Ada.Unchecked_Deallocation;
+--  with Ada.Unchecked_Deallocation;
 
 with GPR2.Project.Registry.Attribute;
 
@@ -57,26 +57,9 @@ package body Laltools.Refactor.Safe_Rename is
    function "=" (New_Name : New_Name_Type; Name : Text_Type) return Boolean is
      (New_Name.Lower = To_Lower (Name));
 
-   ---------
-   -- "=" --
-   ---------
-
-   function "="
-     (New_Name : New_Name_Access;
-      Name     : Text_Type)
-      return Boolean
-   is (New_Name.all = Name);
-
-   ----------
-   -- Free --
-   ----------
-
-   procedure Free (Object : in out New_Name_Access) is
-      procedure Free is new
-        Ada.Unchecked_Deallocation (New_Name_Type, New_Name_Access);
-   begin
-      Free (Object);
-   end Free;
+   ---------------------------
+   -- Create_Rename_Problem --
+   ---------------------------
 
    function Create_Rename_Problem
      (Problem : Rename_Problem'Class)
@@ -229,7 +212,7 @@ package body Laltools.Refactor.Safe_Rename is
    --  check, In and Default mode are considered the same.
 
    function Check_Rename_Conflict
-     (New_Name : New_Name_Access;
+     (New_Name : New_Name_Type;
       Target   : Defining_Name'Class)
       return Boolean
    is (New_Name = To_Lower (Target.F_Name.Text))
@@ -240,7 +223,7 @@ package body Laltools.Refactor.Safe_Rename is
 
    function Check_Subp_Rename_Conflict
      (Subp_A   : Basic_Decl'Class;
-      New_Name : New_Name_Access;
+      New_Name : New_Name_Type;
       Subp_B   : Basic_Decl'Class)
       return Boolean
      with Pre => (Is_Subprogram (Subp_A)
@@ -429,7 +412,7 @@ package body Laltools.Refactor.Safe_Rename is
 
    function Check_Subp_Rename_Conflict
      (Subp_A   : Basic_Decl'Class;
-      New_Name : New_Name_Access;
+      New_Name : New_Name_Type;
       Subp_B   : Basic_Decl'Class)
       return Boolean
    is
@@ -2146,9 +2129,9 @@ package body Laltools.Refactor.Safe_Rename is
    begin
       Self.Canonical_Definition := Canonical_Definition;
       Self.New_Name             :=
-        new New_Name_Type'
-             (Original => New_Name,
-              Lower    => To_Unbounded_Text (To_Lower (To_Text (New_Name))));
+        New_Name_Type'
+          (Original => New_Name,
+           Lower    => To_Unbounded_Text (To_Lower (To_Text (New_Name))));
       Self.Units                := Units;
       Self.References           := References;
    end Initialize;
@@ -2616,16 +2599,6 @@ package body Laltools.Refactor.Safe_Rename is
          return Edits;
       end;
    end Refactor;
-
-   --------------
-   -- Finalize --
-   --------------
-
-   overriding
-   procedure Finalize (Self : in out AST_Analyser) is
-   begin
-      Free (Self.New_Name);
-   end Finalize;
 
    -----------------------------
    -- Add_References_To_Edits --

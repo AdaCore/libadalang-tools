@@ -30,7 +30,6 @@ with Ada.Containers.Indefinite_Holders;
 with Ada.Containers.Indefinite_Vectors;
 with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Ordered_Sets;
-with Ada.Finalization;
 
 with GNATCOLL.Projects;
 
@@ -122,12 +121,6 @@ private
    end record;
 
    function "=" (New_Name : New_Name_Type; Name : Text_Type) return Boolean;
-
-   type New_Name_Access is access all New_Name_Type;
-
-   function "=" (New_Name : New_Name_Access; Name : Text_Type) return Boolean;
-
-   procedure Free (Object : in out New_Name_Access);
 
    type Rename_Problem is abstract new Refactoring_Diagnotic with
       record
@@ -308,10 +301,10 @@ private
    --  can be gained, therefore, they are stored seperately.
 
    type AST_Analyser (Units_Length : Integer) is new
-     Ada.Finalization.Limited_Controlled and Problem_Finder_Algorithm with
+     Problem_Finder_Algorithm with
       record
          Canonical_Definition : Defining_Name;
-         New_Name             : New_Name_Access;
+         New_Name             : New_Name_Type;
          Units                : Analysis_Unit_Array (1 .. Units_Length);
          References           : Base_Id_Vectors.Vector;
       end record;
@@ -338,9 +331,6 @@ private
       return Refactoring_Diagnotic_Vector;
    --  Finds problems caused by renaming a definition. The strategy of this
    --  algorithm is to analyse the AST and look for specific problems.
-
-   overriding
-   procedure Finalize (Self : in out AST_Analyser);
 
    package Rename_Problem_Indefinite_Holders is new
      Ada.Containers.Indefinite_Holders (Rename_Problem'Class);
@@ -381,7 +371,7 @@ private
    type Name_Collision_Finder is new Specific_Problem_Finder with
       record
          Canonical_Definition : Defining_Name;
-         New_Name             : New_Name_Access;
+         New_Name             : New_Name_Type;
       end record;
 
    overriding
@@ -393,7 +383,7 @@ private
    type Enum_Name_Collision_Finder is new Specific_Problem_Finder with
       record
          Canonical_Definition : Defining_Name;
-         New_Name             : New_Name_Access;
+         New_Name             : New_Name_Type;
       end record;
 
    overriding
@@ -406,7 +396,7 @@ private
      Specific_Problem_Finder with
       record
          Canonical_Definition : Defining_Name;
-         New_Name             : New_Name_Access;
+         New_Name             : New_Name_Type;
          Units                : Analysis_Unit_Array (1 .. Units_Length);
       end record;
 
@@ -424,7 +414,7 @@ private
      Specific_Problem_Finder with
       record
          Canonical_Definition : Defining_Name;
-         New_Name             : New_Name_Access;
+         New_Name             : New_Name_Type;
          Units                : Analysis_Unit_Array (1 .. Units_Length);
       end record;
 
@@ -438,7 +428,7 @@ private
    type Subp_Overriding_Finder is new Specific_Problem_Finder with
       record
          Canonical_Definition : Defining_Name;
-         New_Name             : New_Name_Access;
+         New_Name             : New_Name_Type;
       end record;
 
    overriding
@@ -451,7 +441,7 @@ private
    type Param_Spec_Collision_Finder is new Specific_Problem_Finder with
       record
          Canonical_Definition : Defining_Name;
-         New_Name             : New_Name_Access;
+         New_Name             : New_Name_Type;
          Reference            : Base_Id := No_Base_Id;
       end record;
 
@@ -464,7 +454,7 @@ private
    type Name_Hiding_Finder is new Specific_Problem_Finder with
       record
          Canonical_Definition : Defining_Name;
-         New_Name             : New_Name_Access;
+         New_Name             : New_Name_Type;
       end record;
 
    overriding
@@ -477,7 +467,7 @@ private
       record
          Canonical_Definition : Defining_Name;
          References           : Base_Id_Vectors.Vector;
-         New_Name             : New_Name_Access;
+         New_Name             : New_Name_Type;
       end record;
 
    overriding
@@ -492,7 +482,7 @@ private
       record
          Canonical_Definition : Defining_Name;
          References           : Base_Id_Vectors.Vector;
-         New_Name             : New_Name_Access;
+         New_Name             : New_Name_Type;
       end record;
 
    overriding
