@@ -32,6 +32,8 @@ Start_Column: 17
 End_Line: 20
 End_Column: 21
 Problems:
+Renaming Quux to Baz loses reference <Id "Quux" main.adb:19:17-19:21>
+Renaming Quux to Baz loses reference <Id "Quux" main.adb:20:17-20:21>
 Renaming Quux to Baz creates a new reference <Id "Baz" main.adb:9:14-9:17>
 Renaming Quux to Baz creates a new reference <Id "Baz" main.adb:10:14-10:17>
 

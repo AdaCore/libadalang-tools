@@ -77,7 +77,12 @@ package body Laltools.Refactor.Safe_Rename is
      (Problem : Rename_Problem'Class)
       return Boolean
    is (To_Lower (To_Text (Problem.New_Name)) =
-         To_Lower (Problem.Conflicting_Id.Text));
+         To_Lower (Problem.Conflicting_Id.Text)
+       or else To_Lower (Problem.Canonical_Definition.F_Name.Text) =
+                 To_Lower (Problem.Conflicting_Id.Text));
+   --  The name we are trying to rename to must be the same as an already
+   --  existing name (first equality) or we're losing a reference to the
+   --  original name (second equality).
 
    overriding
    function Filename (Self : Rename_Problem) return String is
@@ -790,29 +795,17 @@ package body Laltools.Refactor.Safe_Rename is
                         Conflicting_Id : constant Libadalang.Analysis.Name :=
                           Lookup
                             (Node => Key (C).Root,
-                             Sloc => Source_Location'
-                               (Line   => Sloc.Start_Line,
-                                Column => Sloc.Start_Column)).As_Name;
+                             Sloc =>
+                               Source_Location'
+                                 (Line   => Sloc.Start_Line,
+                                  Column => Sloc.Start_Column)).As_Name;
                      begin
-                        if Conflicting_Id.P_Referenced_Defining_Name /=
-                          Self.Canonical_Definition
-                        then
-                           Ada.Text_IO.Put_Line
-                             (Self.Canonical_Definition.Image);
-                           Ada.Text_IO.Put_Line
-                             (Conflicting_Id.Image);
-                           Result.Append
-                             (Missing_Reference'
-                                (Canonical_Definition =>
-                                   Self.Canonical_Definition,
-                                 New_Name             => Self.New_Name,
-                                 Conflicting_Id       =>
-                                   Lookup
-                                     (Node => Key (C).Root,
-                                      Sloc => Source_Location'
-                                        (Line   => Sloc.Start_Line,
-                                      Column => Sloc.Start_Column)).As_Name));
-                        end if;
+                        Result.Append
+                          (Missing_Reference'
+                             (Canonical_Definition =>
+                                Self.Canonical_Definition,
+                              New_Name             => Self.New_Name,
+                              Conflicting_Id       => Conflicting_Id));
                      end;
                   end loop;
                end loop;
@@ -838,16 +831,12 @@ package body Laltools.Refactor.Safe_Rename is
                                (Line   => Sloc.Start_Line,
                                 Column => Sloc.Start_Column)).As_Name;
                      begin
-                        if Conflicting_Id.P_Referenced_Defining_Name /=
-                          Self.Canonical_Definition
-                        then
-                           Result.Append
-                             (New_Reference'
-                                (Canonical_Definition =>
-                                   Self.Canonical_Definition,
-                                 New_Name             => Self.New_Name,
-                                 Conflicting_Id       => Conflicting_Id));
-                        end if;
+                        Result.Append
+                          (New_Reference'
+                             (Canonical_Definition =>
+                                Self.Canonical_Definition,
+                              New_Name             => Self.New_Name,
+                              Conflicting_Id       => Conflicting_Id));
                      end;
                   end loop;
                end loop;
