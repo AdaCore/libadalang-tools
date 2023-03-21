@@ -115,6 +115,8 @@ class Testsuite(e3.testsuite.Testsuite):
                  "--prefix=local"],
                  cwd=rts_working_dir
             )
+        else:
+            print ("failed to build tgen_rts")
 
         # Make it available through the GPR_PROJECT_PATH env var
         if p.status == 0:
@@ -122,6 +124,8 @@ class Testsuite(e3.testsuite.Testsuite):
             if "GPR_PROJECT_PATH" in os.environ:
                 new_GPP += os.pathsep + os.environ["GPR_PROJECT_PATH"]
             os.environ["GPR_PROJECT_PATH"] = new_GPP
+        else:
+            print ("failed to install tgen_rts")
 
 
 if __name__ == "__main__":
