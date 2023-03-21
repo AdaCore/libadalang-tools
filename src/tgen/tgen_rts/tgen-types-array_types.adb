@@ -470,8 +470,8 @@ package body TGen.Types.Array_Types is
                Dimension_JSON := Create_Object;
                Set_Field (Dimension_JSON, "First", Index_Value.Low_Bound);
                Set_Field (Dimension_JSON, "Last", Index_Value.High_Bound);
+               Append (Dimensions_JSON, Dimension_JSON);
             end loop;
-            Append (Dimensions_JSON, Dimension_JSON);
             Set_Field (Result, "dimensions", Dimensions_JSON);
          end;
       end if;
