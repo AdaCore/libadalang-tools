@@ -821,7 +821,7 @@ package body Test.Skeleton is
          if Data.Data_Kind = Declaration_Data then
             Generate_Nested_Hierarchy (Data);
             Generate_Test_Package (Data);
-            if Test.Common.Generate_Test_Vectors then
+            if Ada.Directories.Exists (Test.Common.JSON_Test_Dir.all) then
                Output_Generated_Tests (Data, Suite_Data_List);
             end if;
             Get_Test_Packages_List (Suite_Data_List);
