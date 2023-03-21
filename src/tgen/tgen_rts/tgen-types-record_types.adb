@@ -1129,4 +1129,15 @@ package body TGen.Types.Record_Types is
       end loop;
       return Strat;
    end Default_Strategy;
+
+   -----------------
+   -- Simple_Name --
+   -----------------
+
+   function Simple_Name (Self : Function_Typ) return String is
+   begin
+      return To_String (Unbounded_String
+        (Self.Name.Element (Self.Name.Last_Index - 1)));
+   end Simple_Name;
+
 end TGen.Types.Record_Types;

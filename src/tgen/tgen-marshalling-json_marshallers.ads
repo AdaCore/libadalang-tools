@@ -50,4 +50,21 @@ package TGen.Marshalling.JSON_Marshallers is
    --  that they generate. This should be splitted from the generation of
    --  binary marshallers.
 
+   procedure Generate_TC_Serializers_For_Subp
+     (F_Spec, F_Body     : File_Type;
+      FN_Typ             : TGen.Types.Typ'Class;
+      Templates_Root_Dir : String) with
+      Pre => FN_Typ.Kind = Function_Kind;
+   --  Generate a test-case serializer for FN_Typ:
+   --
+   --  This generates a procedure, with the same parameters as the subprogram
+   --  represented by FN_Typ in addition to an "Origin" parameter and a
+   --  "JSON_Unit" parameter. The latter may contain tests for this subprogram,
+   --  or other subprograms of the same unit, and the generated procedure will
+   --  add a new testcase in "JSON_Unit" from the values passed to the first
+   --  parameters.
+   --
+   --  The generated procedure also has a Origin parameter which can be used
+   --  to specify which tool produced the test case.
+
 end TGen.Marshalling.JSON_Marshallers;

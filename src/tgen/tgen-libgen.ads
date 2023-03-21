@@ -144,6 +144,9 @@ private
       --  a parameter / a parameter component, a type / a type component) to
       --  its specified strategy.
 
+      Imports_Per_Unit : TGen.Strings.Ada_Qualified_Name_Sets_Map;
+      --  Set of "withed" unit for a given unit name.
+
    end record;
 
 end TGen.Libgen;

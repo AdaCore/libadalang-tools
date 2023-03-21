@@ -22,7 +22,6 @@
 ------------------------------------------------------------------------------
 
 with Ada.Exceptions;
-with Ada.Strings.Wide_Wide_Hash;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with GNATCOLL.GMP.Integers;
@@ -32,6 +31,8 @@ with Langkit_Support.Text; use Langkit_Support.Text;
 with Libadalang.Analysis;  use Libadalang.Analysis;
 with Libadalang.Common;    use Libadalang.Common;
 with Libadalang.Expr_Eval; use Libadalang.Expr_Eval;
+
+with Test.Common;
 
 with TGen.LAL_Utils;             use TGen.LAL_Utils;
 with TGen.Types.Array_Types;     use TGen.Types.Array_Types;
@@ -3179,16 +3180,15 @@ package body TGen.Types.Translation is
                                    .P_Fully_Qualified_Name_Array)'Last;
 
       Parent_Decl : constant Basic_Decl := N.P_Parent_Basic_Decl;
+      UID         : constant String :=
+        Test.Common.Mangle_Hash_Full (Subp => Parent_Decl);
    begin
 
       F_Typ.Last_Comp_Unit_Idx := Comp_Unit_Idx;
       F_Typ.Name :=
         Convert_Qualified_Name (Parent_Decl.P_Fully_Qualified_Name_Array)
         & TGen.Strings.Ada_Identifier
-           (Ada.Strings.Unbounded.To_Unbounded_String
-              (Trim
-                   (Ada.Strings.Wide_Wide_Hash
-                        (Parent_Decl.P_Unique_Identifying_Name)'Image)));
+           (Ada.Strings.Unbounded.To_Unbounded_String (UID));
 
       --  Check if we have already translated the function type
 
@@ -3212,6 +3212,13 @@ package body TGen.Types.Translation is
                   F_Typ.Component_Types.Insert
                     (Key      => +Id.As_Defining_Name.Text,
                      New_Item => Current_Typ.Res);
+                  F_Typ.Param_Modes.Insert
+                    (Key      => +Id.As_Defining_Name.Text,
+                     New_Item =>
+                       (case Param.F_Mode is
+                        when Ada_Mode_Default | Ada_Mode_In => In_Mode,
+                        when Ada_Mode_In_Out                => In_Out_Mode,
+                        when others                         => Out_Mode));
                end loop;
             else
                return Current_Typ;
@@ -3219,7 +3226,22 @@ package body TGen.Types.Translation is
          end;
       end loop;
 
+      if not N.P_Returns.Is_Null then
+         declare
+            Ret : constant Translation_Result :=
+              Translate (N.P_Returns, Verbose);
+         begin
+            if not Ret.Success then
+               return (False, Ret.Diagnostics);
+            end if;
+            F_Typ.Ret_Typ := Ret.Res;
+         end;
+      else
+         F_Typ.Ret_Typ := SP.Null_Ref;
+      end if;
       --  Function type was successfully translated
+
+      F_Typ.Subp_UID := +UID;
 
       F_Typ_Ref.Set (F_Typ);
       Translation_Cache.Insert (F_Typ.Name, F_Typ_Ref);

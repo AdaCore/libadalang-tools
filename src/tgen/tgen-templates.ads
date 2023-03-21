@@ -103,6 +103,8 @@ package TGen.Templates is
         Template_Folder & "scalar_read_write.tmplt";
       Variant_Read_Write_Template   : constant String :=
         Template_Folder & "variant_read_write.tmplt";
+      Function_TC_Dump_Template     : constant String :=
+        Template_Folder & "function_tc_dump.tmplt";
    end JSON_Marshalling;
 
    package Type_Representation is

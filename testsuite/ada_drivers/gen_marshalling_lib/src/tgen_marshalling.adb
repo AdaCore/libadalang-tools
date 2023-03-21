@@ -151,7 +151,8 @@ procedure TGen_Marshalling is
          end if;
          if Node.Kind in Ada_Generic_Package_Instantiation then
             Node.As_Generic_Package_Instantiation.P_Designated_Generic_Decl
-            .As_Generic_Package_Decl.Traverse (Traverse_Helper'Access);
+            .As_Generic_Package_Decl.F_Package_Decl
+            .Traverse (Traverse_Helper'Access);
             return Over;
          end if;
          return LALCO.Into;

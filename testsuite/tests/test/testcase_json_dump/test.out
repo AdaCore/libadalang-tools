@@ -1,0 +1,24 @@
+Units remaining: 2     Units remaining: 1     
+my_file.ads:14:4: info: corresponding test PASSED
+my_file.ads:14:4: info: corresponding test PASSED
+my_file.ads:14:4: info: corresponding test PASSED
+my_file.ads:14:4: info: corresponding test PASSED
+my_file.ads:14:4: info: corresponding test PASSED
+my_file.ads:72:4: info: corresponding test PASSED
+my_file.ads:72:4: info: corresponding test PASSED
+my_file.ads:72:4: info: corresponding test PASSED
+my_file.ads:72:4: info: corresponding test PASSED
+my_file.ads:72:4: info: corresponding test PASSED
+my_file.ads:72:4: info: corresponding test PASSED
+my_file.ads:72:4: info: corresponding test PASSED
+my_file.ads:86:4: info: corresponding test PASSED
+my_file.ads:86:4: info: corresponding test PASSED
+my_file.ads:86:4: info: corresponding test PASSED
+my_file.ads:86:4: info: corresponding test PASSED
+my_file.ads:86:4: info: corresponding test PASSED
+my_file.ads:86:4: info: corresponding test PASSED
+my_file.ads:86:4: info: corresponding test PASSED
+my_file.ads:14:4: error: corresponding test FAILED: Test not implemented. (my_file-test_data-tests.adb:45)
+my_file.ads:72:4: error: corresponding test FAILED: Test not implemented. (my_file-test_data-tests.adb:66)
+my_file.ads:86:4: error: corresponding test FAILED: Test not implemented. (my_file-test_data-tests.adb:87)
+22 tests run: 19 passed; 3 failed; 0 crashed.

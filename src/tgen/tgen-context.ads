@@ -51,7 +51,7 @@ package TGen.Context is
 
    package Unit_To_JSON_Maps is new Ada.Containers.Ordered_Maps
      (Key_Type     => Unbounded_Text_Type,
-      Element_Type => JSON_Array,
+      Element_Type => JSON_Value,
       "<"          => Ada.Strings.Wide_Wide_Unbounded."<");
    subtype Unit_To_JSON_Map is Unit_To_JSON_Maps.Map;
 

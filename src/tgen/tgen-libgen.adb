@@ -56,16 +56,14 @@ package body TGen.Libgen is
 
    procedure Generate_Support_Library
      (Ctx        : Libgen_Context;
-      Pack_Name  : Ada_Qualified_Name;
-      Part       : Any_Library_Part) with
+      Pack_Name  : Ada_Qualified_Name) with
      Pre => Ctx.Types_Per_Package.Contains (Pack_Name);
    --  Generate the support library files (spec and body) for the types that
    --  are declared in Pack_Name.
 
    procedure Generate_Value_Gen_Library
      (Ctx        : Libgen_Context;
-      Pack_Name  : Ada_Qualified_Name;
-      Part       : Any_Library_Part) with
+      Pack_Name  : Ada_Qualified_Name) with
      Pre => Ctx.Strat_Types_Per_Package.Contains (Pack_Name);
    --  Generate the type representation library files (spec and body) for the
    --  types that are declared in Pack_Name.
@@ -233,12 +231,14 @@ package body TGen.Libgen is
 
    procedure Generate_Support_Library
      (Ctx        : Libgen_Context;
-      Pack_Name  : Ada_Qualified_Name;
-      Part       : Any_Library_Part)
+      Pack_Name  : Ada_Qualified_Name)
    is
+      use Ada_Identifier_Vectors;
+
       F_Spec           : File_Type;
       F_Body           : File_Type;
       Ada_Pack_Name    : constant String := To_Ada (Pack_Name);
+      Origin_Unit      : Ada_Qualified_Name := Pack_Name.Copy;
       Typ_Dependencies : Typ_Set;
       File_Name        : constant String :=
         Ada.Directories.Compose
@@ -247,6 +247,8 @@ package body TGen.Libgen is
 
       Types : constant Types_Per_Package_Maps.Constant_Reference_Type :=
         Ctx.Types_Per_Package.Constant_Reference (Pack_Name);
+
+      TRD : constant String := To_String (Ctx.Root_Templates_Dir);
 
    begin
       Create (F_Spec, Out_File, File_Name & ".ads");
@@ -261,8 +263,41 @@ package body TGen.Libgen is
       Put_Line (F_Spec, "with TGen.Types;");
       Put_Line (F_Spec, "with TGen.Types.Discrete_Types;");
       Put_Line (F_Spec, "with TGen.Types.Int_Types;");
+      New_Line (F_Spec);
+
+      --  Add the import of the original unit, to be able to declare
+      --  subprograms with the same profile as in the original unit.
+
+      Origin_Unit.Delete_Last;
+
+      if Ctx.Imports_Per_Unit.Contains (Origin_Unit) then
+         for Dep of Ctx.Imports_Per_Unit.Constant_Reference (Origin_Unit) loop
+            Put_Line (F_Spec, "with " & To_Ada (Dep) & ";");
+         end loop;
+      end if;
+
+      --  Add the imports to the support packages for all the types of the
+      --  subprograms declared in this package
+
+      if Ctx.Support_Packs_Per_Unit.Contains (Origin_Unit) then
+         for Dep of Ctx.Support_Packs_Per_Unit
+                      .Constant_Reference (Origin_Unit)
+         loop
+            if Dep /= Pack_Name then
+               Put_Line (F_Spec, "with " & To_Ada (Dep) & "; use "
+                                 & To_Ada (Dep) & ";");
+            end if;
+         end loop;
+      end if;
 
       Put_Line (F_Spec, "package " & Ada_Pack_Name & " is");
+      New_Line (F_Spec);
+
+      --  Create a dummy null procedure in each support package, in case we end
+      --  up not generating anything, to ensure that the body is still legal
+      --  and the support library still builds.
+
+      Put_Line (F_Spec, "   procedure Dummy;");
       New_Line (F_Spec);
 
       Create (F_Body, Out_File, File_Name & ".adb");
@@ -279,7 +314,6 @@ package body TGen.Libgen is
       --  careful to remove the self dependency.
 
       declare
-         use Ada_Identifier_Vectors;
          Package_Dependencies : Ada_Qualified_Name_Set;
          Package_Dependency   : Ada_Qualified_Name;
       begin
@@ -305,7 +339,12 @@ package body TGen.Libgen is
 
       Put_Line
         (F_Body, "package body " & Ada_Pack_Name & " is");
-            New_Line (F_Body);
+      New_Line (F_Body);
+
+      --  Complete the dummy null procedure
+
+      Put_Line (F_Body, "procedure Dummy is null;");
+      New_Line (F_Body);
 
       --  Disable predicate checks in the marshalling and unmarshalling
       --  functions.
@@ -316,25 +355,29 @@ package body TGen.Libgen is
 
       --  Generate the marshalling support lib
 
-      if Part in Marshalling_Part | All_Parts then
-         for T of Types loop
-            if Is_Supported_Type (T.Get)
+      for T of Types loop
+         if Is_Supported_Type (T.Get)
 
-              --  We ignore instance types when generating marshallers as they
-              --  are not types per-se, but a convenient way of binding a type
-              --  to its strategy context.
+            --  We ignore instance types when generating marshallers as they
+            --  are not types per-se, but a convenient way of binding a type
+            --  to its strategy context.
 
-               and then T.Get not in Instance_Typ'Class
-            then
-               TGen.Marshalling.Binary_Marshallers
-                 .Generate_Marshalling_Functions_For_Typ
-                   (F_Spec, F_Body, T.Get, To_String (Ctx.Root_Templates_Dir));
+            and then T.Get not in Instance_Typ'Class
+         then
+            if T.Get.Kind in Function_Kind then
                TGen.Marshalling.JSON_Marshallers
-                 .Generate_Marshalling_Functions_For_Typ
-                   (F_Spec, F_Body, T.Get, To_String (Ctx.Root_Templates_Dir));
+                  .Generate_TC_Serializers_For_Subp
+                     (F_Spec, F_Body, T.Get, TRD);
+            else
+               TGen.Marshalling.Binary_Marshallers
+                  .Generate_Marshalling_Functions_For_Typ
+                     (F_Spec, F_Body, T.Get, TRD);
+               TGen.Marshalling.JSON_Marshallers
+                  .Generate_Marshalling_Functions_For_Typ
+                     (F_Spec, F_Body, T.Get, TRD);
             end if;
-         end loop;
-      end if;
+         end if;
+      end loop;
 
       Put_Line (F_Body, "end " & Ada_Pack_Name & ";");
       Close (F_Body);
@@ -348,8 +391,7 @@ package body TGen.Libgen is
 
    procedure Generate_Value_Gen_Library
      (Ctx        : Libgen_Context;
-      Pack_Name  : Ada_Qualified_Name;
-      Part       : Any_Library_Part with Unreferenced)
+      Pack_Name  : Ada_Qualified_Name)
    is
       use Templates_Parser;
       F_Spec           : File_Type;
@@ -622,6 +664,9 @@ package body TGen.Libgen is
       --  Cursor to the set of support packages for the unit this subprogram
       --  belongs to.
 
+      Imports : Cursor := Ctx.Imports_Per_Unit.Find (Unit_Name);
+      --  Cursor to the set of withed units for Unit_Name.
+
       Dummy_Inserted : Boolean;
 
       Spec : constant Base_Subp_Spec := Subp.P_Subp_Spec_Or_Null;
@@ -640,6 +685,25 @@ package body TGen.Libgen is
             Ada_Qualified_Name_Sets.Empty_Set,
             Support_Packs,
             Dummy_Inserted);
+      end if;
+
+      --  Fill the Imports_Per_Unit map only if it hasn't been done before.
+      --  Do not try to do that for the Standard unit (which doesn't depend on
+      --  anything either way).
+
+      if Imports = No_Element
+        and then To_String (Unit_Name.First_Element) /= "standard"
+      then
+         Ctx.Imports_Per_Unit.Insert
+           (Unit_Name,
+            Ada_Qualified_Name_Sets.Empty_Set,
+            Imports,
+            Dummy_Inserted);
+         for Unit of Subp.P_Enclosing_Compilation_Unit.P_Withed_Units loop
+            Ctx.Imports_Per_Unit.Reference (Imports).Insert
+              (TGen.LAL_Utils.Convert_Qualified_Name
+                 (Unit.P_Syntactic_Fully_Qualified_Name));
+         end loop;
       end if;
 
       declare
@@ -670,9 +734,6 @@ package body TGen.Libgen is
 
             Ctx.Support_Packs_Per_Unit.Reference (Support_Packs).Include
               (Support_Library_Package (Param.Get.Compilation_Unit_Name));
-
-            Subp_Types.Union
-              (Type_Dependencies (Param, Transitive => True));
          end loop;
 
          --  Get the transitive closure of the types on which the parameters'
@@ -689,6 +750,16 @@ package body TGen.Libgen is
            (Subp_Types,
             Ctx.Types_Per_Package,
             Support_Library_Package'Access);
+
+         --  Add the "vanilla" function type to the set of types for which we
+         --  want to generate a support library; this enables the generation
+         --  of whole testcase serializers.
+
+         Append_Types
+           (Typ_Sets.To_Set (Trans_Res.Res),
+           Ctx.Types_Per_Package,
+           Support_Library_Package'Access);
+
          Append_Types
            (Subp_Types,
             Ctx.Types_Per_Package,
@@ -772,23 +843,30 @@ package body TGen.Libgen is
 
       --  Generate all support packages
 
-      for Cur in Ctx.Types_Per_Package.Iterate loop
-         --  If all types are not supported, do not generate a support library
+      if Part in Marshalling_Part | All_Parts then
+         for Cur in Ctx.Types_Per_Package.Iterate loop
+            --  If all types are not supported, do not generate a support
+            --  library.
 
-         if not (for all T of Element (Cur) => not Is_Supported_Type (T.Get))
-         then
-            Generate_Support_Library (Ctx, Key (Cur), Part);
-         end if;
-      end loop;
+            if not (for all T of Element (Cur) =>
+                      not Is_Supported_Type (T.Get))
+            then
+               Generate_Support_Library (Ctx, Key (Cur));
+            end if;
+         end loop;
+      end if;
+      if Part in Test_Generation_Part | All_Parts then
+         for Cur in Ctx.Strat_Types_Per_Package.Iterate loop
+            --  If all types are not supported, do not generate a support
+            --  library.
 
-      for Cur in Ctx.Strat_Types_Per_Package.Iterate loop
-         --  If all types are not supported, do not generate a support library
-
-         if not (for all T of Element (Cur) => not Is_Supported_Type (T.Get))
-         then
-            Generate_Value_Gen_Library (Ctx, Key (Cur), Part);
-         end if;
-      end loop;
+            if not (for all T of Element (Cur) =>
+                      not Is_Supported_Type (T.Get))
+            then
+               Generate_Value_Gen_Library (Ctx, Key (Cur));
+            end if;
+         end loop;
+      end if;
    end Generate;
 
    --------------

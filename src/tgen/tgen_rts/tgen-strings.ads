@@ -172,4 +172,12 @@ package TGen.Strings is
       "="          => Ada_Qualified_Name_Sets."=");
    subtype Ada_Qualified_Name_Sets_Map is Ada_Qualified_Name_Sets_Maps.Map;
 
+   function Is_Operator (Op_Name : String) return Boolean;
+   --  Return wether Self is an operator
+
+   function Map_Operator_Name (Op_Name : String) return String with
+     Pre => Is_Operator (Op_Name);
+   --  Return a string representing the kind of operator that Op_Name is, or
+   --  raise Constraint_Error ir Op_Name is an unknown operator.
+
 end TGen.Strings;
