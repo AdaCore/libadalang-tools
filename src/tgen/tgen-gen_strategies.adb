@@ -30,15 +30,20 @@ with Langkit_Support.Text; use Langkit_Support.Text;
 
 with GNATCOLL.VFS; use GNATCOLL.VFS;
 
-with TGen.Big_Int; use TGen.Big_Int;
 with TGen.Files;                use TGen.Files;
 with TGen.Gen_Strategies_Utils; use TGen.Gen_Strategies_Utils;
 with TGen.LAL_Utils;            use TGen.LAL_Utils;
-with TGen.Marshalling;          use TGen.Marshalling;
 with TGen.Strategies;
 with TGen.Types.Translation;    use TGen.Types.Translation;
 
 package body TGen.Gen_Strategies is
+
+   procedure Try_Load_Tests
+     (Context   : in out Generation_Context;
+      Unit_Name : String);
+   --  Check if there are already tests generated for the unit in the output
+   --  dir; if there are, load them in the context, otherwise create an empty
+   --  JSON object for the unit in the Context.Test_Vectors test-cases map.
 
    ----------------
    -- Initialize --
@@ -168,7 +173,7 @@ package body TGen.Gen_Strategies is
          begin
             Write
               (JSON_Unit_Writable_File,
-               Write (Create (Element (Unit_JSON_Cursor))));
+               Element (Unit_JSON_Cursor).Write (Compact => False));
             Close (JSON_Unit_Writable_File);
          end;
       end loop;
@@ -186,56 +191,36 @@ package body TGen.Gen_Strategies is
    is
       Subp_Data : Subprogram_Data :=
         Extract_Subprogram_Data (Subp);
-      Function_JSON     : constant JSON_Value := Create_Object;
-      Test_Vectors_JSON : JSON_Array := Empty_Array;
-      Test_Vector_JSON  : JSON_Array;
-
-      function Escape (Input_String : String) return String;
-      --  Escape every double quote inside Input_String
-
-      ------------
-      -- Escape --
-      ------------
-
-      function Escape (Input_String : String) return String is
-         Result : Unbounded_String;
-      begin
-         for C of Input_String loop
-            if C = '"' then
-               Result.Append ("""");
-            end if;
-            Result.Append (C);
-         end loop;
-         return +Result;
-      end Escape;
+      Function_JSON      : JSON_Value := Create_Object;
+      Test_Vectors_JSON  : JSON_Array := Empty_Array;
+      Test_Vector_Values : JSON_Array;
+      Test_Vector_JSON   : JSON_Value := Create_Object;
 
    begin
       Collect_Type_Translations (Subp);
       Subp_Data.All_Params_Static := True;
       for Param of Subp_Data.Parameters_Data loop
-         if Param.Mode in In_Mode | In_Out_Mode then
-            declare
-               Ignore_P_Qualified_Name : constant Ada_Qualified_Name :=
-                 To_Qualified_Name (+Param.Type_Fully_Qualified_Name);
-               Param_Type : constant SP.Ref :=
-                 TGen.Types.Translation.Translation_Cache.Element
-                   (To_Qualified_Name (+Param.Type_Fully_Qualified_Name));
-            begin
-               Subp_Data.All_Params_Static :=
-                 Subp_Data.All_Params_Static
-                 and then Param_Type.Get.Supports_Static_Gen;
-               Subp_Data.Some_Param_Static :=
-                 Subp_Data.Some_Param_Static
-                 or else Param_Type.Get.Supports_Static_Gen;
-               if not Context.Type_And_Param_Strategies.Contains
+         declare
+            Ignore_P_Qualified_Name : constant Ada_Qualified_Name :=
+              To_Qualified_Name (+Param.Type_Fully_Qualified_Name);
+            Param_Type : constant SP.Ref :=
+              TGen.Types.Translation.Translation_Cache.Element
+                (To_Qualified_Name (+Param.Type_Fully_Qualified_Name));
+         begin
+            Subp_Data.All_Params_Static :=
+               Subp_Data.All_Params_Static
+               and then Param_Type.Get.Supports_Static_Gen;
+            Subp_Data.Some_Param_Static :=
+               Subp_Data.Some_Param_Static
+               or else Param_Type.Get.Supports_Static_Gen;
+            if not Context.Type_And_Param_Strategies.Contains
                  (Param.Type_Fully_Qualified_Name)
-               then
-                  Context.Type_And_Param_Strategies.Insert
-                  (Param.Type_Fully_Qualified_Name,
-                     Try_Generate_Static (Param_Type));
-               end if;
-            end;
-         end if;
+            then
+               Context.Type_And_Param_Strategies.Insert
+                 (Param.Type_Fully_Qualified_Name,
+                  Try_Generate_Static (Param_Type));
+            end if;
+         end;
       end loop;
 
       --  Do not generate any JSON if none of the types are supported.
@@ -244,94 +229,99 @@ package body TGen.Gen_Strategies is
          return;
       end if;
 
-      for J in 1 .. Nb_Tests loop
-         Test_Vector_JSON := Empty_Array;
-         for Param of Subp_Data.Parameters_Data loop
-            declare
-               Param_JSON : constant JSON_Value := Create_Object;
-               Param_Type : constant SP.Ref :=
-                 TGen.Types.Translation.Translation_Cache.Element
-                   (To_Qualified_Name (+Param.Type_Fully_Qualified_Name));
-            begin
-               Param_JSON.Set_Field ("name", Create (+Param.Name));
-               Param_JSON.Set_Field ("type_name", Create (+Param.Type_Name));
-               if Param.Mode in In_Mode | In_Out_Mode then
-                  declare
-                     Strat : Strategies.Strategy_Type'Class :=
-                        Strategies.Strategy_Type
-                          (Context.Type_And_Param_Strategies.Element
-                             (Param.Type_Fully_Qualified_Name));
-
-                     JSON_String_Var  : constant String :=
-                       +Param.Name &  "_JSON";
-                     JSON_String_Decl : constant String :=
-                       JSON_String_Var & " : constant TGen.JSON.JSON_Value :="
-                       & " TGen.JSON.Read ("""
-                       & Escape
-                         (Param_Type.Get.Encode (Strat.Generate
-                            (Strategies.Disc_Value_Maps.Empty_Map)).Write)
-                       & """);";
-
-                     Decls : JSON_Array;
-                  begin
-                     Append (Decls, Create (JSON_String_Decl));
-                     Param_JSON.Set_Field ("decls", Decls);
-
-                     Param_JSON.Set_Field
-                       ("value",
-                        Input_Fname_For_Typ (Param_Type.Get)
-                        & "(" & JSON_String_Var & ")");
-                  end;
-               end if;
-               Param_JSON.Set_Field
-                 ("mode",
-                  Create
-                    (Big_Int.To_Big_Integer
-                       (Parameter_Mode'Pos (Param.Mode))));
-               Append (Test_Vector_JSON, Param_JSON);
-            end;
-         end loop;
-         if not Is_Empty (Test_Vector_JSON) then
-            Append (Test_Vectors_JSON, Create (Test_Vector_JSON));
-         end if;
-      end loop;
-
-      Function_JSON.Set_Field
-        ("fully_qualified_name", +Subp_Data.Fully_Qualified_Name);
-      Function_JSON.Set_Field ("package_name", +Subp_Data.Parent_Package);
-      Function_JSON.Set_Field ("UID", +Subp_UID);
-      Function_JSON.Set_Field
-        ("generation_complete", Create (Subp_Data.All_Params_Static));
-      if not Is_Null (Subp.P_Subp_Spec_Or_Null.P_Returns) then
-         Function_JSON.Set_Field
-           ("return_type",
-            Create (+Subp_Data.Return_Type_Fully_Qualified_Name));
-      end if;
-      Function_JSON.Set_Field ("values", Test_Vectors_JSON);
+      --  Try to load pre-existing tests, if any, or create an empty unit JSON
+      --  if there is not such file on disk.
 
       if not Context.Test_Vectors.Contains (Subp_Data.Parent_Package) then
-         Context.Test_Vectors.Insert (Subp_Data.Parent_Package, Empty_Array);
+         Try_Load_Tests (Context, +Subp_Data.Parent_Package);
       end if;
 
       declare
-
-         procedure Add_Function_Testing
-           (Unit_Name  : Unbounded_Text_Type;
-            Unit_Tests : in out JSON_Array);
-
-         procedure Add_Function_Testing
-           (Unit_Name  : Unbounded_Text_Type;
-            Unit_Tests : in out JSON_Array) is
-         begin
-            pragma Unreferenced (Unit_Name);
-            Append (Unit_Tests, Function_JSON);
-         end Add_Function_Testing;
-
+         use Unit_To_JSON_Maps;
+         Unit_JSON : constant Unit_To_JSON_Maps.Reference_Type :=
+           Context.Test_Vectors.Reference (Subp_Data.Parent_Package);
       begin
-         Context.Test_Vectors.Update_Element
-           (Context.Test_Vectors.Find (Subp_Data.Parent_Package),
-            Add_Function_Testing'Access);
+         --  Identify if there are already JSON tests for this subp
+
+         if Unit_JSON.Has_Field (+Subp_UID) then
+            Function_JSON := Unit_JSON.Get (+Subp_UID);
+            Test_Vectors_JSON := Function_JSON.Get ("test_vectors");
+         else
+            Function_JSON.Set_Field
+              ("fully_qualified_name", +Subp_Data.Fully_Qualified_Name);
+            Function_JSON.Set_Field
+              ("package_name", +Subp_Data.Parent_Package);
+            Function_JSON.Set_Field
+              ("generation_complete", Create (Subp_Data.All_Params_Static));
+            if not Is_Null (Subp.P_Subp_Spec_Or_Null.P_Returns) then
+               Function_JSON.Set_Field
+                 ("return_type",
+                  Create (+Subp_Data.Return_Type_Fully_Qualified_Name));
+            end if;
+         end if;
+
+         for J in 1 .. Nb_Tests loop
+            Test_Vector_Values := Empty_Array;
+            Test_Vector_JSON := Create_Object;
+            for Param of Subp_Data.Parameters_Data loop
+               declare
+                  Param_JSON : constant JSON_Value := Create_Object;
+                  Param_Type : constant SP.Ref :=
+                    TGen.Types.Translation.Translation_Cache.Element
+                      (To_Qualified_Name (+Param.Type_Fully_Qualified_Name));
+               begin
+                  Param_JSON.Set_Field ("name", Create (+Param.Name));
+                  Param_JSON.Set_Field
+                    ("type_name", Create (+Param.Type_Fully_Qualified_Name));
+                  declare
+                     Strat : Strategies.Strategy_Type'Class :=
+                       Strategies.Strategy_Type
+                         (Context.Type_And_Param_Strategies.Element
+                            (Param.Type_Fully_Qualified_Name));
+                  begin
+                     Param_JSON.Set_Field
+                       ("value",
+                          (Param_Type.Get.Encode (Strat.Generate
+                             (Strategies.Disc_Value_Maps.Empty_Map))));
+                  end;
+                  Append (Test_Vector_Values, Param_JSON);
+               end;
+            end loop;
+            Test_Vector_JSON.Set_Field ("param_values", Test_Vector_Values);
+            Test_Vector_JSON.Set_Field ("origin", "TGen");
+
+            if not Is_Empty (Test_Vector_Values) then
+               Append (Test_Vectors_JSON, Test_Vector_JSON);
+            end if;
+         end loop;
+         Function_JSON.Set_Field ("test_vectors", Test_Vectors_JSON);
+         Unit_JSON.Set_Field (+Subp_UID, Function_JSON);
       end;
    end Generate_Test_Vectors;
+
+   --------------------
+   -- Try_Load_Tests --
+   --------------------
+
+   procedure Try_Load_Tests
+     (Context   : in out Generation_Context;
+      Unit_Name : String)
+   is
+      use Unit_To_JSON_Maps;
+
+      JSON_File : constant Virtual_File :=
+        Get_JSON_Name (Context, Unit_Name);
+      JSON_Content : JSON_Value := Create_Object;
+   begin
+      if JSON_File.Is_Regular_File then
+         JSON_Content := TGen.JSON.Read
+           (JSON_File.Read_File.all, +JSON_File.Full_Name);
+         if JSON_Content.Kind = JSON_Object_Type then
+            Context.Test_Vectors.Insert (+Unit_Name, JSON_Content);
+            return;
+         end if;
+      end if;
+      Context.Test_Vectors.Insert (+Unit_Name, JSON_Content);
+   end Try_Load_Tests;
 
 end TGen.Gen_Strategies;
