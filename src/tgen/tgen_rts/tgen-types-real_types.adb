@@ -115,19 +115,21 @@ package body TGen.Types.Real_Types is
       Self   : constant Float_Typ := Float_Typ (Ty);
 
       LB : constant Big_Real := Self.Low_Bound_Or_Default;
-
       HB : constant Big_Real := Self.High_Bound_Or_Default;
 
-      subtype T is Long_Float
-      range LF_Conversions.From_Big_Real (LB)
-        .. LF_Conversions.From_Big_Real (HB);
-
-      function Rand is new Gen (T);
    begin
       Set_Field (Result, "quotient", True);
+
+      --  We generate floats uniformly over the representation, and not
+      --  over the real range.
+
       Set_Field (Result,
                  "value",
-                 To_Quotient_String (LF_Conversions.To_Big_Real (Rand)));
+                 To_Quotient_String
+                   (Value
+                      (TGen.Random.Random
+                           (Create (Self.Digits_Value, LB),
+                            Create (Self.Digits_Value, HB)))));
       return Result;
    end Generate_Float_Typ;
 
@@ -190,7 +192,8 @@ package body TGen.Types.Real_Types is
            LLLI_Conversions.To_Big_Integer
              (Rand_LLLI (Low_Bound_Int, High_Bound_Int));
       begin
-         --  Cast it back to a fixed point value
+         --  Cast it back to a fixed point value. TODO: represent exactly the
+         --  fixed point number.
 
          Set_Field (Result, "quotient", True);
          Set_Field (Result,

@@ -77,6 +77,11 @@ package TGen.Random is
                LLLI_Conversions.From_Big_Integer (Max))));
    --  Assumes that Min / Max fit on a Long_Long_Long_Integer
 
+   function Random (Min, Max : Any_Float) return Any_Float
+     with
+       Pre  => Min.Precision = Max.Precision,
+       Post => Random'Result.Precision = Min.Precision;
+
 private
    type Many_Type is tagged record
       Min_Size, Max_Size : Natural;
