@@ -3,6 +3,7 @@
 @@--  @_GLOBAL_PREFIX_@ Prefix used to prefix all entities local to the unit.
 @@--  @_TY_PREFIX_@ Prefix used to prefix all entities for the current type.
 @@--  @_TY_NAME_@ Name of the current type.
+@@--  @_ADA_DIM_@ Suffixes of the array attributes for each dimension.
 @@--  @_COMPONENT_WRITE_@ Call to Write for the component type on
 @@--       @_GLOBAL_PREFIX_@_E.
 @@--  @_COMPONENT_READ_@ Call to Read for the component type on
@@ -12,8 +13,18 @@
      (@_GLOBAL_PREFIX_@_JSON : out TGen.JSON.JSON_Value;
       @_GLOBAL_PREFIX_@_V    : @_TY_NAME_@)
    is
+      @_GLOBAL_PREFIX_@_JSON_Array_Sizes : TGen.JSON.JSON_Array;
       @_GLOBAL_PREFIX_@_JSON_Array : TGen.JSON.JSON_Array;
    begin
+@@TABLE@@
+      TGen.JSON.Append
+         (@_GLOBAL_PREFIX_@_JSON_Array_Sizes,
+          TGen.JSON.Create (Natural'Image (@_GLOBAL_PREFIX_@_V'Length@_ADA_DIM_@)));
+@@END_TABLE@@
+      TGen.JSON.Set_Field
+         (@_GLOBAL_PREFIX_@_JSON,
+          "sizes",
+          @_GLOBAL_PREFIX_@_JSON_Array_Sizes);
       for @_GLOBAL_PREFIX_@_E of @_GLOBAL_PREFIX_@_V loop
 @_COMPONENT_WRITE_@
       end loop;

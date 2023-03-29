@@ -459,6 +459,20 @@ package body TGen.Types.Array_Types is
          end;
       end loop;
 
+      --  Add the size of each array dimension as metadata information
+
+      declare
+         Sizes_JSON : JSON_Array;
+      begin
+         for Index_Value of Index_Values loop
+            Append
+              (Sizes_JSON,
+               Create
+                 (To_String (Index_Value.High_Bound - Index_Value.Low_Bound)));
+         end loop;
+         Set_Field (Result, "sizes", Sizes_JSON);
+      end;
+
       --  Add them to the dimensions field of the JSON result
 
       if Self in Unconstrained_Array_Typ'Class then
