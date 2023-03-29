@@ -2015,20 +2015,20 @@ package body METRICS.Actions is
       --  Thus, the metric is always recorded in the Outer_Unit of From.
 
       --  The ASIS-based version computes Hierarchy_Coupling as follows:
-         --
+      --
       --  Crown in computed for each unit. This is the set of leaf descendants
       --  of this unit. Crown is a local variable. (Better: in
       --  Gather_Dependencies, if we see a leaf unit, add it Crown(?name) of
       --  each ancestor.)
-         --
+      --
       --  Crown is used only for Hierarchy_Coupling_Out. Loop through Crown,
       --  Union its OO_Supporters into Category_Supporters (local var). Remove
       --  descendents of the unit (including itself) from Category_Supporters.
       --  Hierarchy_Coupling_Out is then Length (Category_Supporters).
-         --
-         --  Length(OO_Supporters) = Tagged_Coupling_Out!
-         --  OO_Dependents is the reverse of OO_Supporters.
-         --
+      --
+      --  Length(OO_Supporters) = Tagged_Coupling_Out!
+      --  OO_Dependents is the reverse of OO_Supporters.
+      --
       --  For Hierarchy_Coupling_In, loop through the unit's descendents
       --  (including itself), and union its OO_Dependents into
       --  Category_Dependents (local var).  Remove descendents of the unit
@@ -2289,9 +2289,9 @@ package body METRICS.Actions is
       --  ends in ".xml", that is replaced by ".xsd"; otherwise,
       --  ".xsd" is appended. So "foo.xml" --> "foo.xsd", but
       --  "foo.bar" --> "foo.bar.xsd".
-         --
-         --  Note that this name is written to the XML file, in addition
-         --  to being used to open the XSD file.
+      --
+      --  Note that this name is written to the XML file, in addition
+      --  to being used to open the XSD file.
 
       function Xsd_File_Name return String is
          Norm : constant String := Normalize_Pathname (Xml_FD_Name);
