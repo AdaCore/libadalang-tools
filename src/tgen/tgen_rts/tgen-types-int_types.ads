@@ -96,22 +96,7 @@ package TGen.Types.Int_Types is
    function Gen return T;
 
    overriding function Default_Strategy
-     (Self    : Signed_Int_Typ) return Strategy_Type'Class;
+     (Self : Signed_Int_Typ) return Strategy_Type'Class;
    --  Generate a strategy to statically generate (in one pass) values for Self
-
-   type Array_Constraint_Strategy_Type is new Strategy_Type with
-      record
-         T        : Signed_Int_Typ (Is_Static => True);
-         Avg_Size : Integer;
-      end record;
-   overriding function Generate
-     (Strat        : in out Array_Constraint_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return JSON_Value;
-
-   function Generate_Array_Constraint_Strategy
-     (Self : Signed_Int_Typ)
-      return Array_Constraint_Strategy_Type'Class;
-   --  Generate a strategy to statically generate (in a single pass) integer
-   --  values suitable for use in array index constraints, i.e. not too large.
 
 end TGen.Types.Int_Types;

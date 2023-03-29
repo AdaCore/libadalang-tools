@@ -752,18 +752,35 @@ package body Test.Actions is
             Check_Separate_Root;
       end case;
 
+      --  JSON Tests
+
+      if Arg (Cmd, Serialized_Test_Dir) /= null then
+         if not GNAT.OS_Lib.Is_Absolute_Path
+           (Arg (Cmd, Serialized_Test_Dir).all)
+         then
+            Test.Common.JSON_Test_Dir := new String'
+              (Ada.Directories.Current_Directory
+               & GNAT.OS_Lib.Directory_Separator
+               & Arg (Cmd, Serialized_Test_Dir).all);
+         else
+            Test.Common.JSON_Test_Dir := new String'
+              (Arg (Cmd, Serialized_Test_Dir).all);
+         end if;
+      else
+         Test.Common.JSON_Test_Dir := new String'
+           (Normalize_Pathname
+              (Root_Prj.Object_Dir.Display_Full_Name
+               & Directory_Separator & Test.Common.Test_Dir_Name.all
+               & Directory_Separator & "JSON_Tests",
+               Resolve_Links  => False,
+               Case_Sensitive => False)
+            & Directory_Separator);
+      end if;
+
       --  Test vectors
 
       if Arg (Cmd, Gen_Test_Vectors) then
          Test.Common.Generate_Test_Vectors := True;
-         Test.Common.JSON_Test_Dir := new String'
-           (Test.Common.Harness_Dir_Str.all & "JSON_tests"
-            & GNAT.OS_Lib.Directory_Separator);
-         if Debug_Flag_1 then
-            Put ("Requested test vectors generation at"
-                 & " <harness_dir>/JSON_tests\n");
-         end if;
-
          declare
             Dir : File_Array_Access;
          begin

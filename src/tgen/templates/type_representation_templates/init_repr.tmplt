@@ -1,0 +1,4 @@
+@@--  Template for the initialization of a signed int type representation.
+@@--  @_TY_PREFIX_@ Prefix used to prefix all entities for the current type.
+
+   @_TY_PREFIX_@_Typ_Ref.Set (@_TY_PREFIX_@_Typ);

@@ -23,8 +23,9 @@
 
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 
-with TGen.Marshalling_Templates;
-with TGen.Strings; use TGen.Strings;
+with TGen.Strings;            use TGen.Strings;
+with TGen.Templates;
+with TGen.Types.Record_Types; use TGen.Types.Record_Types;
 
 package body TGen.Marshalling.JSON_Marshallers is
 
@@ -42,8 +43,9 @@ package body TGen.Marshalling.JSON_Marshallers is
         & GNAT.OS_Lib.Directory_Separator
         & "json_templates"
         & GNAT.OS_Lib.Directory_Separator;
-      package Templates is new TGen.Marshalling_Templates (TRD);
-      use Templates;
+
+      package Templates is new TGen.Templates (TRD);
+      use Templates.JSON_Marshalling;
 
       Ty_Name       : constant String := Typ.Fully_Qualified_Name;
       Ty_Prefix     : constant String := Prefix_For_Typ (Typ.Slug);
@@ -264,5 +266,67 @@ package body TGen.Marshalling.JSON_Marshallers is
            (In_Out_Body_Template, Assocs));
       New_Line (F_Body);
    end Generate_Marshalling_Functions_For_Typ;
+
+   --------------------------------------
+   -- Generate_TC_Serializers_For_Subp --
+   --------------------------------------
+
+   procedure Generate_TC_Serializers_For_Subp
+     (F_Spec, F_Body     : File_Type;
+      FN_Typ             : TGen.Types.Typ'Class;
+      Templates_Root_Dir : String)
+   is
+      use Component_Maps;
+
+      TRD : constant String :=
+        Templates_Root_Dir
+        & GNAT.OS_Lib.Directory_Separator
+        & "json_templates"
+        & GNAT.OS_Lib.Directory_Separator;
+
+      package Templates is new TGen.Templates (TRD);
+      use Templates.JSON_Marshalling;
+
+      Assocs : Translate_Set;
+      Param_Names : Vector_Tag;
+      Param_Types : Vector_Tag;
+      Param_Slugs : Vector_Tag;
+   begin
+      if Function_Typ (FN_Typ).Component_Types.Is_Empty then
+         return;
+      end if;
+      Assocs.Insert (Assoc ("GLOBAL_PREFIX", Global_Prefix));
+      Assocs.Insert
+        (Assoc ("PROC_NAME",
+         (if Is_Operator (Function_Typ (FN_Typ).Simple_Name)
+         then Map_Operator_Name (Function_Typ (FN_Typ).Simple_Name)
+         else (Function_Typ (FN_Typ).Simple_Name))));
+      Assocs.Insert (Assoc ("PROC_UID", Function_Typ (FN_Typ).Subp_UID));
+      for Param_Cur in Function_Typ (FN_Typ).Component_Types.Iterate loop
+         Param_Names.Append (Unbounded_String (Key (Param_Cur)));
+         Param_Types.Append
+           (To_Ada (Function_Typ (FN_Typ).Component_Types
+                    .Constant_Reference (Param_Cur).Get.Name));
+         Param_Slugs.Append
+           (To_Symbol (Function_Typ (FN_Typ).Component_Types
+                       .Constant_Reference (Param_Cur).Get.Name, '_'));
+      end loop;
+      Assocs.Insert (Assoc ("PARAM_NAME", Param_Names));
+      Assocs.Insert (Assoc ("PARAM_TY", Param_Types));
+      Assocs.Insert (Assoc ("PARAM_SLUG", Param_Slugs));
+
+      --  First generate the spec
+
+      Assocs.Insert (Assoc ("FOR_SPEC", True));
+      Put_Line (F_Spec, Parse (Function_TC_Dump_Template, Assocs));
+      New_Line (F_Spec);
+
+      --  Then the body
+
+      Assocs.Insert (Assoc ("FOR_SPEC", False));
+      Put_Line (F_Body, Parse (Function_TC_Dump_Template, Assocs));
+      New_Line (F_Body);
+
+   end Generate_TC_Serializers_For_Subp;
 
 end TGen.Marshalling.JSON_Marshallers;

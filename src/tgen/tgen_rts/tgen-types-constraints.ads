@@ -150,7 +150,8 @@ package TGen.Types.Constraints is
    --  Constraints for one index of an array. If the constraints are static
    --  then these contains the discrete range that constrain this index.
    --  If absent is true, this means that the index is constrained on the whole
-   --  range of the index type.
+   --  range of the index type. TODO: why can't we put the discrete range
+   --  constraint either way?
 
    function Static (Self : Index_Constraint) return Boolean is
       (if Self.Present then Self.Discrete_Range.Static);
@@ -221,5 +222,28 @@ package TGen.Types.Constraints is
      (Self : Anonymous_Typ) return Strategy_Type'Class;
 
    procedure Free_Content (Self : in out Anonymous_Typ);
+
+   type Instance_Typ is new Typ with record
+      Orig_Typ : SP.Ref;
+   end record;
+   --  Special type to handle strategy customization
+
+   function Kind (Self : Instance_Typ) return Typ_Kind is (Instance_Kind);
+
+   function As_Instance_Typ (Self : SP.Ref) return Instance_Typ'Class is
+     (Instance_Typ'Class (Self.Unchecked_Get.all)) with
+     Pre => (not SP.Is_Null (Self))
+            and then (Self.Get.Kind in Instance_Kind);
+   pragma Inline (As_Instance_Typ);
+
+   function Image (Self : Instance_Typ) return String;
+
+   function Supports_Static_Gen (Self : Instance_Typ) return Boolean is
+     (False);
+   --  Wether values for this Typ can be statically generated
+
+   overriding function Default_Strategy
+     (Self : Instance_Typ) return Strategy_Type'Class
+   is (raise Program_Error);
 
 end TGen.Types.Constraints;

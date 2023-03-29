@@ -1,0 +1,19 @@
+@@--  Template for the specification of a scalar type representation.
+@@--  @_TY_PREFIX_@ Prefix used to prefix all entities for the current type.
+@@--  @_TY_NAME_@ Name of the current type.
+
+   package @_TY_PREFIX_@_Typ_Conversions is
+      new TGen.Big_Int.Signed_Conversions (@_TY_NAME_@);
+
+   @_TY_PREFIX_@_Typ : constant TGen.Types.Int_Types.Signed_Int_Typ :=
+      (Name => To_Qualified_Name ("@_TY_NAME_@"),
+       Is_Static => True,
+       Range_Value =>
+          TGen.Types.Discrete_Types.Int_Range'
+             (Min =>
+                 @_TY_PREFIX_@_Typ_Conversions.To_Big_Integer
+                    (@_TY_NAME_@'First),
+              Max =>
+                 @_TY_PREFIX_@_Typ_Conversions.To_Big_Integer
+                    (@_TY_NAME_@'Last)),
+       others => <>);

@@ -1,0 +1,9 @@
+@@--  @_TY_PREFIX_@ Prefix for all of the type declarations
+@@--  @_VARIANT_NUMBER_@ Index of the variant in the record
+@@--  @_VARIANT_CHOICE_NUMBER_@ All of the variant choice numbers.
+@@--  Template for a variant initialization
+
+@@TABLE@@
+   @_TY_PREFIX_@_Variant_@_VARIANT_NUMBER_@.Variant_Choices.Append
+      (@_TY_PREFIX_@_Variant_Choice_@_VARIANT_NUMBER_@_@_VARIANT_CHOICE_NUMBER_@);
+@@END_TABLE@@

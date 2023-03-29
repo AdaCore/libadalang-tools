@@ -2,7 +2,7 @@
 --                                                                          --
 --                                  TGen                                    --
 --                                                                          --
---                       Copyright (C) 2023, AdaCore                        --
+--                        Copyright (C) 2023, AdaCore                       --
 --                                                                          --
 -- TGen  is  free software; you can redistribute it and/or modify it  under --
 -- under  terms of  the  GNU General  Public License  as  published by  the --
@@ -21,26 +21,33 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-package body TGen.Types.Parameter_Types is
+with Ada.Containers.Ordered_Maps;
 
-   ------------------
-   -- Package_Name --
-   ------------------
+with TGen.Context; use TGen.Context;
+with TGen.Types; use TGen.Types;
 
-   function Package_Name (Self : Parameter_Typ) return Ada_Qualified_Name is
-      Parent_Package : Ada_Qualified_Name := Self.Name.Copy;
-   begin
-      Parent_Package.Delete_Last;
-      Parent_Package.Delete_Last;
-      return Parent_Package;
-   end Package_Name;
+package TGen.Dependency_Graph is
 
-   ------------
-   -- Encode --
-   ------------
+   package Typ_Maps is new Ada.Containers.Ordered_Maps
+     (Key_Type     => SP.Ref,
+      Element_Type => Typ_Set,
+      "="          => Typ_Sets."=");
+   subtype Typ_Map is Typ_Maps.Map;
 
-   function Encode
-     (Self : Parameter_Typ; Val : JSON_Value) return JSON_Value is
-     (Self.Parameter_Type.Get.Encode (Val));
+   type Graph_Type is record
+      Nodes : Typ_Set;
+      Succ, Pred : Typ_Map;
+   end record;
 
-end TGen.Types.Parameter_Types;
+   procedure Create_Node (G : in out Graph_Type; New_Node : SP.Ref);
+
+   procedure Create_Edge (G : in out Graph_Type; From, To : SP.Ref)
+     with Pre => G.Nodes.Contains (From) and then G.Nodes.Contains (To);
+
+   procedure Traverse
+     (G        : Graph_Type;
+      Callback : access procedure (N : SP.Ref));
+   --  Traverse the graph in the topological order and call callback on every
+   --  node.
+
+end TGen.Dependency_Graph;

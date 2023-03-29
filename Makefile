@@ -15,7 +15,7 @@ LIB_PROJECTS = \
 BIN_PROJECTS = \
 	src/build.gpr
 
-TESTSUITE_PROJECTS = \
+TESTSUITE_PROJECTS ?= \
 	testsuite/ada_drivers/partial_gnatpp/partial_gnatpp.gpr \
 	testsuite/ada_drivers/refactor_imports/refactor_imports.gpr \
 	testsuite/ada_drivers/outgoing_calls/outgoing_calls.gpr \

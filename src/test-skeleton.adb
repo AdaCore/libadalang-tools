@@ -821,7 +821,7 @@ package body Test.Skeleton is
          if Data.Data_Kind = Declaration_Data then
             Generate_Nested_Hierarchy (Data);
             Generate_Test_Package (Data);
-            if Test.Common.Generate_Test_Vectors then
+            if Ada.Directories.Exists (Test.Common.JSON_Test_Dir.all) then
                Output_Generated_Tests (Data, Suite_Data_List);
             end if;
             Get_Test_Packages_List (Suite_Data_List);
@@ -6819,7 +6819,7 @@ package body Test.Skeleton is
 
       Unit_Raw_Content : GNAT.Strings.String_Access;
 
-      Unit_Content : JSON_Array;
+      Unit_Content : JSON_Value := JSON_Null;
       Subp_Content : JSON_Value := JSON_Null;
       Single_Vec   : JSON_Array;
 
@@ -6836,6 +6836,12 @@ package body Test.Skeleton is
       --  Output a call to subp with the values in Single_Vec, indented by
       --  Initial_Pad amount.
 
+      function Dot_To_Undescore (C : Character) return Character is
+        (if C = '.' then '_' else C);
+
+      function Escape (Input_String : String) return String;
+      --  Escape every double quote inside Input_String
+
       ------------------
       -- Pp_Subp_Call --
       ------------------
@@ -6847,13 +6853,30 @@ package body Test.Skeleton is
          for Param_Id in Single_Vec loop
             Put
               (F,
-               "Param_" & Array_Element (Single_Vec, Param_Id).Get ("name"));
+               Array_Element (Single_Vec, Param_Id).Get ("name") & " => "
+               & "Param_" & Array_Element (Single_Vec, Param_Id).Get ("name"));
             if Array_Has_Element (Single_Vec, Param_Id + 1) then
                Put (F, ", ");
             end if;
          end loop;
          Put (F, ");");
       end Pp_Subp_Call;
+
+      ------------
+      -- Escape --
+      ------------
+
+      function Escape (Input_String : String) return String is
+         Result : Unbounded_String;
+      begin
+         for C of Input_String loop
+            if C = '"' then
+               Result.Append ("""");
+            end if;
+            Result.Append (C);
+         end loop;
+         return +Result;
+      end Escape;
 
    begin
       --  We do not support non-instanciated generic packages
@@ -6874,10 +6897,7 @@ package body Test.Skeleton is
       end if;
 
       Unit_Content := Read
-        (Unit_Raw_Content.all, +JSON_Unit_File.Full_Name).Get;
-      if Unit_Content = Empty_Array then
-         return;
-      end if;
+        (Unit_Raw_Content.all, +JSON_Unit_File.Full_Name);
 
       for Subp of Data.Subp_List loop
 
@@ -6885,14 +6905,14 @@ package body Test.Skeleton is
          --  full hash of the subprogram. If not found, skip to the next
          --  subprogram.
 
-         for Val of Unit_Content loop
-            if String'(Val.Get ("UID")) = Subp.Subp_Full_Hash.all then
-               Subp_Content := Val;
-               exit;
-            end if;
-         end loop;
+         if Unit_Content.Has_Field (Subp.Subp_Full_Hash.all) then
+            Subp_Content := Unit_Content.Get (Subp.Subp_Full_Hash.all);
+         else
+            Subp_Content := JSON_Null;
+         end if;
+
          if Subp_Content = JSON_Null
-           or else Subp_Content.Get ("values") = Empty_Array
+           or else Subp_Content.Get ("test_vectors") = Empty_Array
          then
             goto Continue;
          end if;
@@ -6903,7 +6923,8 @@ package body Test.Skeleton is
             Is_Function         : constant Boolean :=
               Subp_Content.Has_Field ("return_type");
 
-            Subp_Vectors : constant JSON_Array := Subp_Content.Get ("values");
+            Subp_Vectors : constant JSON_Array :=
+              Subp_Content.Get ("test_vectors");
             Test_Count   : Positive := 1;
 
             Com : constant String :=
@@ -6973,7 +6994,7 @@ package body Test.Skeleton is
             New_Line (Body_F);
 
             for Test_Vec of Subp_Vectors loop
-               Single_Vec := Test_Vec.Get;
+               Single_Vec := Test_Vec.Get ("param_values");
 
                Put_Line
                  (Spec_F,
@@ -6989,18 +7010,16 @@ package body Test.Skeleton is
                   & " (Gnattest_T : in out Test) is");
 
                for Param of Single_Vec loop
-                  if Param.Get ("mode") in 0 | 1 then
-                     for Decl of JSON_Array'(Param.Get ("decls")) loop
-                        Put_Line (Body_F, Com & "   " & Decl.Get);
-                     end loop;
-                  end if;
                   Put_Line
                     (Body_F,
                      Com & "   Param_" & Param.Get ("name") & " : "
                      & Param.Get ("type_name")
-                     & (if Param.Get ("mode") in 0 | 1
-                        then " := " & Param.Get ("value") & ";"
-                        else ";"));
+                     & ":= " & "TGen_Marshalling_"
+                     & Translate
+                         (Param.Get ("type_name"),
+                          Dot_To_Undescore'Unrestricted_Access)
+                     & "_Input (TGen.JSON.Read("""
+                     & Escape (Param.Get ("value").Write) & """));");
                end loop;
                Put_Line (Body_F, Com & "begin");
                if Is_Function then
@@ -7030,7 +7049,8 @@ package body Test.Skeleton is
                  (Body_F,
                   Com & "         ""Test" & Test_Count'Image & " for "
                   & Subp.Subp_Name_Image.all
-                  & " crashed: "" & Ada.Exceptions.Exception_"
+                  & ", generated by " & Test_Vec.Get ("origin")
+                  & ", crashed: "" & ASCII.LF & Ada.Exceptions.Exception_"
                   & "Information (Exc));");
                if not Generation_Complete then
                   Put_Line (Body_F, "   begin");

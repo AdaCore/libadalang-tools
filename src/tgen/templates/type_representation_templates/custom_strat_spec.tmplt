@@ -1,0 +1,9 @@
+@@--  Template for the initialization of a scalar type representation.
+@@--  @_TY_PREFIX_@ Prefix used to prefix all entities for the current type.
+
+   type @_TY_PREFIX_@_Strategy is
+      new TGen.Strategies.Strategy_Type with null record;
+   overriding function Generate
+      (S            : in out @_TY_PREFIX_@_Strategy;
+       Disc_Context : TGen.Strategies.Disc_Value_Map)
+         return TGen.JSON.JSON_Value;

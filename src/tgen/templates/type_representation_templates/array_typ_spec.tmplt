@@ -1,0 +1,23 @@
+@@--  Template for the specification of an array type.
+@@--  @_TY_PREFIX_@ Common prefix for all entities of the type.
+@@--  @_ARRAY_TYP_@ Type of the array (either Constrained_Array_Typ or
+@@--     Unconstrained_Array_Typ.
+@@--  @_INDEX_TY_PREFIX_@ Prefixes for the index types.
+@@--  @_COMPONENT_TY_PREFIX_@ Prefix for the component type.
+@@--  @_NUM_DIMS_@ Number of dimensions.
+@@--  @_CONSTRAINT_SPEC_@ If this is a constrained array type, specification
+@@--     code for its index constraints.
+@@--  @_ANONYMOUS_TYP_SPEC_@ If the component type is an anonymous type,
+@@--     specification for it.
+@@--
+@@INCLUDE@@ util.tmplt
+   @_ANONYMOUS_TYP_SPEC_@
+@@IF@@ @_ARRAY_TYP_@ = "Constrained_Array_Typ"
+   @_CONSTRAINT_SPEC_@
+@@END_IF@@
+@@--
+   @_TY_PREFIX_@_Typ : TGen.Types.Array_Types.@_ARRAY_TYP_@ :=
+      (Num_Dims => @_NUM_DIMS_@,
+       Name      => TGen.Strings.To_Qualified_Name ("@_TY_NAME_@"),
+       others => <>);
+   @_TY_PREFIX_@_Typ_Ref : TGen.Types.SP.Ref;

@@ -26,11 +26,6 @@ with Ada.Characters.Latin_1;
 
 package body TGen.Strings is
 
-   function To_Symbol
-     (Name : Ada_Qualified_Name; Sep : Character) return String;
-   --  Turn the given qualified name to a symbol, using the given Sep to
-   --  separate identifiers.
-
    --------------
    -- New_Line --
    --------------
@@ -175,4 +170,63 @@ package body TGen.Strings is
         (Result, To_Unbounded_String (To_Lower (Name (I .. Name'Last))));
       return Result;
    end To_Qualified_Name;
+
+   -----------------
+   -- Is_Operator --
+   -----------------
+
+   function Is_Operator (Op_Name : String) return Boolean is
+     (Op_Name'Length >= 1 and then Op_Name (Op_Name'First) = '"');
+
+   -----------------------
+   -- Map_Operator_Name --
+   -----------------------
+
+   function Map_Operator_Name (Op_Name : String) return String is
+   begin
+      if Op_Name = """and""" then
+         return "Op_And";
+      elsif Op_Name = """or""" then
+         return "Op_Or";
+      elsif Op_Name = """xor""" then
+         return "Op_Xor";
+      elsif Op_Name = """<""" then
+         return "Op_Less";
+      elsif Op_Name = """<=""" then
+         return "Op_Less_Eq";
+      elsif Op_Name = """>""" then
+         return "Op_More";
+      elsif Op_Name = """>=""" then
+         return "Op_More_Eq";
+      elsif Op_Name = """=""" then
+         return "Op_Eq";
+      elsif Op_Name = """/=""" then
+         return "Op_Neq";
+      elsif Op_Name = """+""" then
+         return "Op_Plus";
+      elsif Op_Name = """-""" then
+         return "Op_Minus";
+      elsif Op_Name = """&""" then
+         return "Op_Concat";
+      elsif Op_Name = """*""" then
+         return "Op_Mult";
+      elsif Op_Name = """/""" then
+         return "Op_Div";
+      elsif Op_Name = """mod""" then
+         return "Op_Mod";
+      elsif Op_Name = """rem""" then
+         return "Op_rem";
+      elsif Op_Name = """**""" then
+         return "Op_Pow";
+      elsif Op_Name = """abs""" then
+         return "Op_Abs";
+      elsif Op_Name = """not""" then
+         return "Op_Not";
+      else
+         --  Defensive code
+
+         raise Constraint_Error with "Unknown operator name";
+      end if;
+   end Map_Operator_Name;
+
 end TGen.Strings;

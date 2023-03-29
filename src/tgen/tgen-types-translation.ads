@@ -53,8 +53,9 @@ package TGen.Types.Translation is
    --  Translate N to TGen's internal type representation
 
    function Translate
-     (N       : LAL.Subp_Spec;
+     (N       : LAL.Base_Subp_Spec;
       Verbose : Boolean := False) return Translation_Result;
+
    package Translation_Maps is new Ada.Containers.Hashed_Maps
      (Key_Type        => Ada_Qualified_Name,
       Element_Type    => TGen.Types.SP.Ref,
@@ -65,6 +66,17 @@ package TGen.Types.Translation is
    Translation_Cache : Translation_Maps.Map;
    --  Cache used for the memoization of Translate.
 
+   package Type_Decl_Maps is new Ada.Containers.Hashed_Maps
+     (Key_Type        => Ada_Qualified_Name,
+      Element_Type    => LAL.Base_Type_Decl,
+      Hash            => TGen.Strings.Hash2,
+      Equivalent_Keys => TGen.Strings.Ada_Identifier_Vectors."=",
+      "="             => Libadalang.Analysis."=");
+
+   Type_Decl_Cache : Type_Decl_Maps.Map;
+   --  Cache to be able to find the LAL base type decl node from the fully
+   --  qualified name.
+
    procedure Print_Cache_Stats;
    --  Print translation cache statistics on the standard output
 
@@ -73,5 +85,10 @@ package TGen.Types.Translation is
 
    procedure Clear_Cache;
    --  Clear the translation cache
+
+private
+   Anonymous_Typ_Index : Positive := 1;
+   --  Index incremented each time we create an anonymous type, to uniquely
+   --  identify every anonymous type created.
 
 end TGen.Types.Translation;

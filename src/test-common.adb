@@ -135,7 +135,7 @@ package body Test.Common is
       Root_Ignore : Basic_Decl;
 
       Subp_Depth : Natural := 0;
-      --  Indicates how deep in subprogrmam specs the analysis is.
+      --  Indicates how deep in subprogram specs the analysis is.
       --  Only first level parameters are subjects to substitution for root
       --  tagged type.
       --  Also, for compatibility reasons the last parameter on depth 1
@@ -411,7 +411,10 @@ package body Test.Common is
       elsif Subp.Kind = Ada_Subp_Renaming_Decl then
          L_Subp := Subp.As_Subp_Renaming_Decl.F_Subp_Spec.As_Base_Subp_Spec;
       else
-         L_Subp := Subp.As_Basic_Subp_Decl.P_Subp_Decl_Spec;
+         --  This allows us to compute the Hash of generic instantiations.
+
+         L_Subp := Subp.As_Basic_Decl.P_Subp_Spec_Or_Null
+                     (Follow_Generic => True);
       end if;
 
       L_Subp_Span := Sloc_Range (L_Subp);

@@ -67,8 +67,8 @@ package TGen.Types is
                      Disc_Record_Kind,
                      Non_Disc_Record_Kind,
                      Anonymous_Kind,
-                     Parameter_Kind,
                      Function_Kind,
+                     Instance_Kind,
                      Unsupported);
 
    subtype Discrete_Typ_Range is Typ_Kind range Signed_Int_Kind .. Enum_Kind;

@@ -89,6 +89,9 @@ package TGen.Strings is
    --  Remove the trailing spaces and comma of the given Text, e.g. passing
    --  "[a, b, " will return "[a, b".
 
+   function Trim (Text : String) return String is
+      (Trim (Text, Left));
+
    function Dot_To_Underscore (C : Character) return Character is
      ((if C = '.' then '_' else C));
 
@@ -143,8 +146,14 @@ package TGen.Strings is
      with Pre => not Name.Is_Empty;
    --  Turn the given qualified name into a filename
 
+   function To_Symbol
+     (Name : Ada_Qualified_Name; Sep : Character) return String;
+   --  Turn the given qualified name to a symbol, using the given Sep to
+   --  separate identifiers.
+
    function "<" (L, R : Ada_Qualified_Name) return Boolean is
      (Ada.Strings.Less_Case_Insensitive (To_Ada (L), To_Ada (R)));
+   --  TODO: reimplement this function to make it more efficient
 
    function To_Qualified_Name (Name : String) return Ada_Qualified_Name;
    --  Turn the given string into our internal qualified name structure
@@ -162,5 +171,13 @@ package TGen.Strings is
       Element_Type => Ada_Qualified_Name_Set,
       "="          => Ada_Qualified_Name_Sets."=");
    subtype Ada_Qualified_Name_Sets_Map is Ada_Qualified_Name_Sets_Maps.Map;
+
+   function Is_Operator (Op_Name : String) return Boolean;
+   --  Return wether Self is an operator
+
+   function Map_Operator_Name (Op_Name : String) return String with
+     Pre => Is_Operator (Op_Name);
+   --  Return a string representing the kind of operator that Op_Name is, or
+   --  raise Constraint_Error ir Op_Name is an unknown operator.
 
 end TGen.Strings;

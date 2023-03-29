@@ -2,7 +2,7 @@
 --                                                                          --
 --                                  TGen                                    --
 --                                                                          --
---                       Copyright (C) 2022, AdaCore                        --
+--                      Copyright (C) 2022-2023, AdaCore                    --
 --                                                                          --
 -- TGen  is  free software; you can redistribute it and/or modify it  under --
 -- under  terms of  the  GNU General  Public License  as  published by  the --
@@ -23,6 +23,7 @@
 --
 --  Defines a global context type for value generation purposes
 
+with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Indefinite_Hashed_Maps;
 with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Ordered_Sets;
@@ -50,7 +51,7 @@ package TGen.Context is
 
    package Unit_To_JSON_Maps is new Ada.Containers.Ordered_Maps
      (Key_Type     => Unbounded_Text_Type,
-      Element_Type => JSON_Array,
+      Element_Type => JSON_Value,
       "<"          => Ada.Strings.Wide_Wide_Unbounded."<");
    subtype Unit_To_JSON_Map is Unit_To_JSON_Maps.Map;
 
@@ -59,12 +60,15 @@ package TGen.Context is
       "=" => SP."=");
    subtype Typ_Set is Typ_Sets.Set;
 
+   package Typ_Lists is new Ada.Containers.Doubly_Linked_Lists
+     (Element_Type => SP.Ref);
+   subtype Typ_List is Typ_Lists.List;
+
    package Type_Vectors_Maps is new Ada.Containers.Ordered_Maps
      (Key_Type     => Unbounded_Text_Type,
       Element_Type => Typ_Set,
       "<"          => Ada.Strings.Wide_Wide_Unbounded."<",
       "="          => Typ_Sets."=");
-
    subtype Type_Vectors_Map is Type_Vectors_Maps.Map;
 
    type Unsupported_Behavior_Kind is (No_Test, Commented_Out);

@@ -165,7 +165,7 @@ package body TGen.Gen_Strategies_Utils is
               Subp_Param_Spec.F_Type_Expr.
                 P_Designated_Type_Decl.P_Defining_Name;
 
-            Param_Mode : constant Parameter_Mode :=
+            Param_Mode : constant TGen.Subprograms.Parameter_Mode :=
               (case Kind (Subp_Param_Spec.F_Mode) is
                   when Ada_Mode_Default | Ada_Mode_In => In_Mode,
                   when Ada_Mode_In_Out => In_Out_Mode,

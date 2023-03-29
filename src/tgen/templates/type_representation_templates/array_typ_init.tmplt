@@ -1,0 +1,23 @@
+@@--  Template for the initialization of an array type
+@@--  @_TY_PREFIX_@ Common prefix for all entities of the type.
+@@--  @_ARRAY_TYP_@ Type of the array (either Constrained_Array_Typ or
+@@--     Unconstrained_Array_Typ.
+@@--  @_INDEX_TY_PREFIX_@ Prefixes for the index types.
+@@--  @_CONSTRAINT_INIT_@ If this is a constrained array type, initialization
+@@--     code for its index constraints.
+@@--  @_ANONYMOUS_TYP_INIT_@ Initialization code for the array components
+@@--     that are of an anonymous type.
+@@--
+@@INCLUDE@@ util.tmplt
+   @_ANONYMOUS_TYP_INIT_@
+@@IF@@ @_ARRAY_TYP_@ = "Constrained_Array_Typ"
+   @_CONSTRAINT_INIT_@
+   @_TY_PREFIX_@_Typ.Index_Constraints :=
+      @_TY_PREFIX_@_Constraint.Constraint_Array;
+@@END_IF@@
+   @_TY_PREFIX_@_Typ.Component_Type := @_COMPONENT_TY_PREFIX_@_Typ_Ref;
+   @_TY_PREFIX_@_Typ.Index_Types :=
+@@TABLE'ALIGN_ON("=>")@@
+            @_LPAR()_@@_TABLE_LINE_@ => @_INDEX_TY_PREFIX_@_Typ_Ref@_RVPAR(;)_@
+@@END_TABLE@@
+   @_TY_PREFIX_@_Typ_Ref.Set (@_TY_PREFIX_@_Typ);

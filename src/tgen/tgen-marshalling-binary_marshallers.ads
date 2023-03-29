@@ -29,7 +29,10 @@ package TGen.Marshalling.Binary_Marshallers is
      (F_Spec, F_Body     : File_Type;
       Typ                : TGen.Types.Typ'Class;
       Templates_Root_Dir : String);
-   --  Generate marshalling and unmarshalling functions for Typ.
+   --  Generate binary marshalling and unmarshalling functions for Typ. Note
+   --  that this function will not operate recursively. It will thus have to
+   --  be called for each of the component type of a record for instance.
+   --
    --  If the type does not need a header, we generate:
    --
    --  procedure TAGAda_Marshalling_Typ_Output

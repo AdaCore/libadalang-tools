@@ -1,0 +1,15 @@
+@@--  Template for the specification of an anonymous type representation.
+@@--  @_TY_PREFIX_@ Prefix used to prefix all entities for the current type.
+@@--  @_TY_NAME_@ Name of the current type.
+@@--  @_CONSTRAINT_KIND_@ Type of the constraint
+@@--  @_CONSTRAINT_IMAGE_@ Representation of the constraint
+@@--
+@@IF@@ @_HAS_CONSTRAINT_@
+   @_CONSTRAINT_SPEC_@
+ @@END_IF@@
+@@--
+   @_TY_PREFIX_@_Typ : TGen.Types.Constraints.Anonymous_Typ :=
+      (Name => TGen.Strings.To_Qualified_Name ("@_TY_NAME_@"),
+       others => <>);
+
+   @_TY_PREFIX_@_Typ_Ref : TGen.Types.SP.Ref;

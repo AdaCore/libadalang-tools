@@ -1,0 +1,115 @@
+@@--  Template for the specification of any kind of constraint
+@@--
+@@--  Macro to instantiate a discrete constraint.
+@@--  @_$1_@: Kind of the constraint (STATIC, NON_STATIC, DISCRIMINANT)
+@@--  @_$2_@: Value of the constraint
+@@--
+@@INCLUDE@@ util.tmplt
+@@MACRO(DISCRETE_CONSTRAINT)@@
+@@IF@@ @_$1_@ = "STATIC"
+(Kind => TGen.Types.Constraints.Static, Int_Val => TGen.Big_Int.From_String ("@_$2_@"))
+@@ELSIF@@ @_$1_@ = "NON_STATIC"
+(Kind => TGen.Types.Constraints.Static, Int_Val => TGen.Big_Int.From_String (@_$2_@'Image))
+@@ELSE@@
+(Kind => TGen.Types.Constraints.Discriminant, Disc_Name => TGen.Strings."+" ("@_$2_@"))
+@@END_IF@@
+@@END_MACRO@@
+
+@@--  Macro to instantiate a real constraint.
+@@--  @_$1_@: Kind of the constraint (STATIC, NON_STATIC)
+@@--  @_$2_@: Value of the constraint
+@@MACRO(REAL_CONSTRAINT)@@=
+(Kind     => TGen.Types.Constraints.@_$1_@,
+@@IF@@ @_$1_@ = "STATIC"
+(Kind => TGen.Types.Constraints.Static, Real_Val => TGen.Big_Reals.From_String ("@_$2_@"))
+@@ELSIF@@ @_$1_@ = "NON_STATIC"
+@@--  TODO: fix this: we should not be getting the constraint value from a 'Image string, as
+@@--  we may lose precision and get a wrong value. Instead, we should make a conversions
+@@--  package and use it to convert to big real.
+(Kind => TGen.Types.Constraints.Static, Real_Val => TGen.Big_Reals.From_String (@_$2_@'Image))
+@@END_IF@@
+@@END_MACRO@@
+@@--
+@@--
+@@--  Macro to instantiate a discrete range constraint.
+@@--  @_$1_@: Kind of the constraint LB (STATIC, NON_STATIC, DISCRIMINANT)
+@@--  @_$2_@: Value of the constraint LB
+@@--  @_$3_@: Kind of the constraint UB (STATIC, NON_STATIC, DISCRIMINANT)
+@@--  @_$4_@: Value of the constraint UB
+@@MACRO(DISCRETE_RANGE_CONSTRAINT)@@=
+(Low_Bound => @_DISCRETE_CONSTRAINT(@_$1_@, @_$2_@)_@,
+ High_Bound => @_DISCRETE_CONSTRAINT(@_$3_@, @_$4_@)_@)
+@@END_MACRO@@
+@@--
+@@--
+@@--  Macro to instantiate a real range constraint.
+@@--  @_$1_@: Kind of the constraint LB (STATIC, NON_STATIC)
+@@--  @_$2_@: Value of the constraint LB
+@@--  @_$3_@: Kind of the constraint UB (STATIC, NON_STATIC)
+@@--  @_$4_@: Value of the constraint UB
+@@MACRO(REAL_RANGE_CONSTRAINT)@@=
+(Low_Bound => @_REAL_CONSTRAINT(@_$1_@, @_$2_@)_@,
+ High_Bound => @_REAL_CONSTRAINT(@_$3_@, @_$4_@)_@)
+@@END_MACRO@@
+@@--
+@@--
+@@--  Macro to instantiate an index constraint.
+@@--  @_$1_@: Whether this index constraint has a discrete range or not (the
+@@--    present discriminant in the Index_Constraint type).
+@@--  @_$2_@: Kind of the constraint LB (STATIC, NON_STATIC, DISCRIMINANT)
+@@--  @_$3_@: Value of the constraint LB
+@@--  @_$4_@: Kind of the constraint UB (STATIC, NON_STATIC, DISCRIMINANT)
+@@--  @_$5_@: Value of the constraint UB
+@@MACRO(INDEX_CONSTRAINT)@@
+@@IF@@ @_$1_@
+(Present        => True,
+ Discrete_Range =>
+    @_DISCRETE_RANGE_CONSTRAINT(@_$2_@, @_$3_@, @_$4_@, @_$5_@)_@)
+@@ELSE@@
+(Present => False)
+@@END_IF@@
+@@END_MACRO@@
+@@--
+@@--
+@@--  Template for the specification of a discrete range constraint
+@@IF@@ @_CONSTRAINT_@ = "Discrete_Range_Constraint"
+   @_TY_PREFIX_@_Constraint : aliased TGen.Types.Constraints.Discrete_Range_Constraint :=
+      @_DISCRETE_RANGE_CONSTRAINT(@_CONSTRAINT_KIND_LB_@, @_VALUE_LB_@, @_CONSTRAINT_KIND_UB_@, @_VALUE_UB_@)_@;
+@@--
+@@--
+@@ELSIF@@ @_CONSTRAINT_@ = "Real_Range_Constraint"
+   @_TY_PREFIX_@_Constraint : aliased TGen.Types.Constraints.Real_Range_Constraint :=
+      @_REAL_RANGE_CONSTRAINT(@_CONSTRAINT_KIND_LB_@, @_VALUE_LB_@, @_CONSTRAINT_KIND_UB_@, @_VALUE_UB_@)_@;
+@@--
+@@--
+@@--  Template for the specification of a digit constraint
+@@ELSIF@@ @_CONSTRAINT_@ = "Digits_Constraint"
+   @_TY_PREFIX_@_Constraint : aliased TGen.Types.Constraints.Digits_Constraint :=
+      (Has_Range => @_HAS_RANGE_@,
+@@IF@@ @_HAS_RANGE_@
+       Digits_Value => @_DISCRETE_CONSTRAINT(@_CONSTRAINT_KIND_DIGITS_VALUE_@, @_DIGITS_VALUE_@)_@,
+       Range_Value => @_REAL_RANGE_CONSTRAINT(@_CONSTRAINT_KIND_LB_@, @_VALUE_LB_@, @_CONSTRAINT_KIND_UB_@, @_VALUE_UB_@)_@);
+@@ELSE@@
+       Digits_Value => @_DISCRETE_CONSTRAINT(@_CONSTRAINT_KIND_DIGITS_VALUE_@, @_DIGITS_VALUE_@)_@);
+@@END_IF@@
+@@--
+@@--
+@@--  Template for the specification of index constraints
+@@ELSIF@@ @_CONSTRAINT_@ = "Index_Constraints"
+   @_TY_PREFIX_@_Constraint : aliased TGen.Types.Constraints.Index_Constraints :=
+   (Num_Dims         => @_NUM_DIMS_@,
+    Constraint_Array =>
+      @@TABLE@@
+      @_LPAR()_@@_INDEX_NUMBER_@ =>
+         @_INDEX_CONSTRAINT(@_PRESENT_@, @_CONSTRAINT_KIND_LB_@, @_VALUE_LB_@, @_CONSTRAINT_KIND_UB_@, @_VALUE_UB_@)_@@_RVPAR()_@
+      @@END_TABLE@@
+   );
+@@--
+@@--
+@@--  Template for the specification of discriminant constraints
+@@--  This is initialized in initialization code.
+@@ELSIF@@ @_CONSTRAINT_@ = "Discriminant_Constraints"
+   @_TY_PREFIX_@_Constraint : aliased TGen.Types.Constraints.Discriminant_Constraints;
+
+@@--  All of the constraint kinds have been dealt with at this point.
+@@END_IF@@

@@ -2,7 +2,7 @@
 --                                                                          --
 --                                  TGen                                    --
 --                                                                          --
---                       Copyright (C) 2023, AdaCore                        --
+--                        Copyright (C) 2023, AdaCore                       --
 --                                                                          --
 -- TGen  is  free software; you can redistribute it and/or modify it  under --
 -- under  terms of  the  GNU General  Public License  as  published by  the --
@@ -21,37 +21,28 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-package TGen.Types.Parameter_Types is
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with Ada.Text_IO; use Ada.Text_IO;
 
-   --  A convenient way to represent parameters as type values. The name of the
-   --  type will be the parameter fully qualified name (which is the function
-   --  FQN + the parameter name).
+with Templates_Parser; use Templates_Parser;
 
-   type Parameter_Mode_Type is (In_Mode, In_Out_Mode, Out_Mode);
+with TGen.Types;             use TGen.Types;
+with TGen.Parse_Strategy; use TGen.Parse_Strategy;
 
-   type Parameter_Typ is new Typ with record
-      Parameter_Type : SP.Ref;
-      Parameter_Mode : Parameter_Mode_Type;
-   end record;
+package TGen.Type_Representation is
 
-   function Supports_Static_Gen (Self : Parameter_Typ) return Boolean is
-     (True);
-   --  Wether values for this Typ can be statically generated
+   procedure Generate_Type_Representation_For_Typ
+     (F_Spec, F_Body     : File_Type;
+      Typ                : TGen.Types.Typ'Class;
+      Templates_Root_Dir : String;
+      Strategies         : FQN_To_Parsed_Strat_Maps.Map;
+      Init_Package_Code  : in out Tag);
+   --  Generate the TGen type representation for the given type. Note that
+   --  this function is not recursive, and must thus be called for all of
+   --  the component types of this type that are not anonymous types.
+   --
+   --  For all of the component types that are anonymous types, type
+   --  type definitions will be generated (they still require the ancestor
+   --  type's type definition though).
 
-   function Image (Self : Parameter_Typ) return String is
-      (Typ (Self).Image & " : " & SP.Get (Self.Parameter_Type).Image);
-
-   function Package_Name (Self : Parameter_Typ) return Ada_Qualified_Name;
-
-   function Encode (Self : Parameter_Typ; Val : JSON_Value) return JSON_Value;
-
-   function Kind (Self : Parameter_Typ) return Typ_Kind is (Parameter_Kind);
-
-   function As_Parameter_Typ (Self : SP.Ref)
-     return Parameter_Typ'Class is
-     (Parameter_Typ'Class (Self.Unchecked_Get.all)) with
-     Pre => (not SP.Is_Null (Self))
-            and then (Self.Get.Kind in Parameter_Kind);
-   pragma Inline (As_Parameter_Typ);
-
-end TGen.Types.Parameter_Types;
+end TGen.Type_Representation;

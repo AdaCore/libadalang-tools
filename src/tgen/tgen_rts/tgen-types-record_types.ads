@@ -25,13 +25,12 @@
 
 with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Hashed_Maps;
-with Ada.Containers.Vectors;
+with Ada.Strings.Unbounded.Equal_Case_Insensitive;
+with Ada.Strings.Unbounded.Hash;
 
 with TGen.Strategies;           use TGen.Strategies;
 with TGen.Types.Discrete_Types; use TGen.Types.Discrete_Types;
 with TGen.Types.Constraints;    use TGen.Types.Constraints;
-
-with Ada.Strings.Unbounded.Hash;
 
 package TGen.Types.Record_Types is
 
@@ -44,7 +43,7 @@ package TGen.Types.Record_Types is
      (Key_Type        => Unbounded_String,
       Element_Type    => SP.Ref,
       Hash            => Ada.Strings.Unbounded.Hash,
-      Equivalent_Keys => "=",
+      Equivalent_Keys => Ada.Strings.Unbounded.Equal_Case_Insensitive,
       "="             => SP."=");
    subtype Component_Map is Component_Maps.Map;
    --  Maps for discriminants and components, from their defining name to
@@ -52,12 +51,6 @@ package TGen.Types.Record_Types is
    --  not specified, initialyzing a record with a positional aggregate will
    --  very likely result in an error, a named association should be used
    --  instead.
-
-   package Component_Vectors is new Ada.Containers.Vectors
-     (Index_Type   => Positive,
-      Element_Type => Unbounded_String,
-      "="          => "=");
-   subtype Component_Vector is Component_Vectors.Vector;
 
    type Record_Typ is new Composite_Typ with record
       Component_Types : Component_Maps.Map;
@@ -103,7 +96,7 @@ package TGen.Types.Record_Types is
 
    type Variant_Part;
 
-   type Variant_Part_Acc is access Variant_Part;
+   type Variant_Part_Acc is access all Variant_Part;
 
    type Variant_Choice is record
       Alt_Set    : Alternatives_Set;
@@ -224,10 +217,30 @@ package TGen.Types.Record_Types is
             and then (Self.Get.Kind in Disc_Record_Kind);
    pragma Inline (As_Discriminated_Record_Typ);
 
-   type Function_Typ is new Record_Typ with null record;
+   type Parameter_Mode is (In_Mode, In_Out_Mode, Out_Mode);
+   package Parameter_Mode_Maps is new Ada.Containers.Hashed_Maps
+     (Key_Type        => Unbounded_String,
+      Element_Type    => Parameter_Mode,
+      Hash            => Ada.Strings.Unbounded.Hash,
+      Equivalent_Keys => "=");
+
+   subtype Param_Mode_Map is Parameter_Mode_Maps.Map;
+
+   type Function_Typ is new Record_Typ with record
+      Subp_UID : Unbounded_String;
+      Ret_Typ : SP.Ref;
+      Param_Modes : Param_Mode_Map;
+   end record;
 
    function Kind (Self : Function_Typ) return Typ_Kind is
      (Function_Kind);
+
+   function Simple_Name (Self : Function_Typ) return String;
+   --  Return the simple name associated with this subprogram,
+   --  removing unit name prefix and the trailing hash.
+
+   function Default_Strategy
+     (Self : Function_Typ) return Strategy_Type'Class;
 
    function As_Function_Typ
      (Self : SP.Ref) return Function_Typ'Class is

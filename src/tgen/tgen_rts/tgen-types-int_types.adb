@@ -219,48 +219,4 @@ package body TGen.Types.Int_Types is
         (Strat_Random, Strat_Equivalence_Classes, 0.5);
    end Default_Strategy;
 
-   --------------
-   -- Generate --
-   --------------
-
-   function Generate
-     (Strat        : in out Array_Constraint_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return JSON_Value
-   is
-      use Nat_Conversions;
-
-      Elements : Many_Type :=
-        Many
-          (0,
-           From_Big_Integer
-             (Strat.T.Range_Value.Max - Strat.T.Range_Value.Min),
-           Strat.Avg_Size);
-   begin
-      while Elements.More loop
-         null;
-      end loop;
-      return Create (Big_Int.To_Big_Integer (Elements.Count));
-   end Generate;
-
-   ----------------------------------------
-   -- Generate_Array_Constraint_Strategy --
-   ----------------------------------------
-
-   function Generate_Array_Constraint_Strategy
-     (Self : Signed_Int_Typ) return Array_Constraint_Strategy_Type'Class
-   is
-   begin
-      case Self.Is_Static is
-         when True =>
-            declare
-               T : constant Array_Constraint_Strategy_Type :=
-                 (T => Self, Avg_Size => 5);
-            begin
-               return T;
-            end;
-         when others =>
-            return raise Program_Error with "unsupported non static type";
-      end case;
-   end Generate_Array_Constraint_Strategy;
-
 end TGen.Types.Int_Types;

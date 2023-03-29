@@ -78,7 +78,7 @@ package TGen.Types.Real_Types is
    function Kind (Self : Float_Typ) return Typ_Kind is (Float_Kind);
 
    overriding function Default_Strategy
-     (Self    : Float_Typ) return Strategy_Type'Class;
+     (Self : Float_Typ) return Strategy_Type'Class;
    --  Generate a strategy to statically generate (in one pass) values for Self
 
    function As_Float_Typ (Self : SP.Ref) return Float_Typ'Class is
@@ -103,7 +103,7 @@ package TGen.Types.Real_Types is
    --  Wether values for this Typ can be statically generated
 
    overriding function Default_Strategy
-     (Self    : Ordinary_Fixed_Typ) return Strategy_Type'Class;
+     (Self : Ordinary_Fixed_Typ) return Strategy_Type'Class;
    --  Generate a strategy to statically generate (in one pass) values for Self
 
    function Low_Bound_Or_Default (Self : Ordinary_Fixed_Typ) return Big_Real
@@ -149,7 +149,7 @@ package TGen.Types.Real_Types is
    --  Wether values for this Typ can be statically generated
 
    overriding function Default_Strategy
-     (Self    : Decimal_Fixed_Typ) return Strategy_Type'Class;
+     (Self : Decimal_Fixed_Typ) return Strategy_Type'Class;
 
    function Image (Self : Decimal_Fixed_Typ) return String;
 

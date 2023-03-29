@@ -48,7 +48,8 @@ package Test.Command_Lines is
       Relocatable_Harness,
       Gen_Test_Vectors,
       Test_Filtering,
-      Test_Filtering_File_IO);
+      Test_Filtering_File_IO,
+      Serialized_Test_Dir);
 
    package Test_Boolean_Switches is new Boolean_Switches
      (Descriptor,
@@ -87,7 +88,8 @@ package Test.Command_Lines is
       Copy_Environment,
       Reporter,
       Gen_Test_Num,
-      Gen_Unsupported_Behavior);
+      Gen_Unsupported_Behavior,
+      Serialized_Test_Dir);
 
    package Test_String_Switches is new String_Switches
      (Descriptor,
@@ -106,7 +108,8 @@ package Test.Command_Lines is
        Copy_Environment         => '=',
        Reporter                 => '=',
        Gen_Test_Num             => '=',
-       Gen_Unsupported_Behavior => '=']);
+       Gen_Unsupported_Behavior => '=',
+       Serialized_Test_Dir      => '=']);
 
    type Test_String_Seqs is (Exclude_From_Stubbing);
 

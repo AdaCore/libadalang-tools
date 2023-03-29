@@ -1087,7 +1087,7 @@ package body TGen.Marshalling is
    function Output_Fname_For_Typ (Typ : TGen.Types.Typ'Class) return String
    is
    begin
-      return Prefix_For_Typ (Typ.Slug) & "Output";
+      return Prefix_For_Typ (Typ.Slug) & "_Output";
    end Output_Fname_For_Typ;
 
    -------------------------

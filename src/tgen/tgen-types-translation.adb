@@ -32,13 +32,14 @@ with Libadalang.Analysis;  use Libadalang.Analysis;
 with Libadalang.Common;    use Libadalang.Common;
 with Libadalang.Expr_Eval; use Libadalang.Expr_Eval;
 
+with Test.Common;
+
 with TGen.LAL_Utils;             use TGen.LAL_Utils;
 with TGen.Types.Array_Types;     use TGen.Types.Array_Types;
 with TGen.Types.Constraints;     use TGen.Types.Constraints;
 with TGen.Types.Discrete_Types;  use TGen.Types.Discrete_Types;
 with TGen.Types.Enum_Types;      use TGen.Types.Enum_Types;
 with TGen.Types.Int_Types;       use TGen.Types.Int_Types;
-with TGen.Types.Parameter_Types; use TGen.Types.Parameter_Types;
 with TGen.Types.Real_Types;      use TGen.Types.Real_Types;
 with TGen.Types.Record_Types;    use TGen.Types.Record_Types;
 with TGen.Numerics;
@@ -61,17 +62,10 @@ package body TGen.Types.Translation is
    Verbose_Diag : Boolean := False;
    package Text renames Langkit_Support.Text;
 
-   procedure PP_Cache is
-      use Translation_Maps;
-      Cache_Cur : Cursor := Translation_Cache.First;
-   begin
-      while Has_Element (Cache_Cur) loop
-         Put_Line
-           (To_Ada (Key (Cache_Cur))
-            & " => " & Element (Cache_Cur).Get.Image);
-         Next (Cache_Cur);
-      end loop;
-   end PP_Cache;
+   function Get_From_Cache
+     (FQN : Ada_Qualified_Name; T : out SP.Ref) return Boolean;
+   --  Try to get a type named FQN from the cache. If the lookup is
+   --  succesful, return True and set T to the cached translation.
 
    Cache_Hits : Natural := 0;
    Cache_Miss : Natural := 0;
@@ -255,6 +249,44 @@ package body TGen.Types.Translation is
 
    function "+" (Text : Unbounded_Text_Type) return Unbounded_String is
      (TGen.Types.Translation."+" (+Text));
+
+   --------------
+   -- PP_Cache --
+   --------------
+
+   procedure PP_Cache is
+      use Translation_Maps;
+      Cache_Cur : Cursor := Translation_Cache.First;
+   begin
+      while Has_Element (Cache_Cur) loop
+         Put_Line
+           (To_Ada (Key (Cache_Cur))
+            & " => " & Element (Cache_Cur).Get.Image);
+         Next (Cache_Cur);
+      end loop;
+   end PP_Cache;
+
+   --------------------
+   -- Get_From_Cache --
+   --------------------
+
+   function Get_From_Cache
+     (FQN : Ada_Qualified_Name; T : out SP.Ref) return Boolean
+   is
+      use Translation_Maps;
+      Cache_Cur : constant Cursor := Translation_Cache.Find (FQN);
+   begin
+      --  If we have the type name in the cache, return it
+
+      if Cache_Cur /= No_Element then
+         Cache_Hits := Cache_Hits + 1;
+         T := Element (Cache_Cur);
+         return True;
+      end if;
+
+      Cache_Miss := Cache_Miss + 1;
+      return False;
+   end Get_From_Cache;
 
    ------------------------------------
    -- Var_Choice_Supports_Static_Gen --
@@ -2882,7 +2914,6 @@ package body TGen.Types.Translation is
 
       Full_Decl : constant Base_Type_Decl := N.P_Full_View;
    begin
-
       --  Do not memoize anonymous types
 
       if Is_Null (Full_Decl.F_Name) then
@@ -2890,32 +2921,31 @@ package body TGen.Types.Translation is
       end if;
 
       declare
-         Cache_Cur : constant Cursor :=
-           Translation_Cache.Find
-             (Convert_Qualified_Name
-                (Full_Decl.P_Fully_Qualified_Name_Array));
+         FQN     : constant Ada_Qualified_Name :=
+           Convert_Qualified_Name
+             (Full_Decl.P_Fully_Qualified_Name_Array);
+         Cache_T : SP.Ref;
       begin
          --  If we have the type name in the cache, return it
 
-         if Cache_Cur /= No_Element then
-            Cache_Hits := Cache_Hits + 1;
+         if Get_From_Cache (FQN, Cache_T) then
             return Res : Translation_Result (Success => True) do
-               Res.Res := Element (Cache_Cur);
+               Res.Res := Cache_T;
             end return;
          end if;
-
-         Cache_Miss := Cache_Miss + 1;
 
          --  Otherwise, compute the type translation and store it in the cache
 
          declare
             Trans_Res : constant Translation_Result :=
-            Translate_Internal (Full_Decl, Verbose);
+              Translate_Internal (Full_Decl, Verbose);
+            FQN       : constant Ada_Qualified_Name :=
+              Convert_Qualified_Name
+                (Full_Decl.P_Fully_Qualified_Name_Array);
          begin
             if Trans_Res.Success then
-               Translation_Cache.Insert
-                 (Convert_Qualified_Name
-                   (Full_Decl.P_Fully_Qualified_Name_Array), Trans_Res.Res);
+               Translation_Cache.Insert (FQN, Trans_Res.Res);
+               Type_Decl_Cache.Insert (FQN, Full_Decl);
             end if;
             return Trans_Res;
          end;
@@ -3139,58 +3169,80 @@ package body TGen.Types.Translation is
    ---------------
 
    function Translate
-     (N       : LAL.Subp_Spec;
+     (N       : LAL.Base_Subp_Spec;
       Verbose : Boolean := False) return Translation_Result
    is
-      F_Typ     : Function_Typ;
-      F_Typ_Ref : SP.Ref;
-      Result    : Translation_Result (Success => True);
+      F_Typ         : Function_Typ;
+      F_Typ_Ref     : SP.Ref;
+      Result        : Translation_Result (Success => True);
+      Comp_Unit_Idx : constant Positive :=
+        Unbounded_Text_Type_Array'(N.P_Enclosing_Compilation_Unit.P_Decl
+                                   .P_Fully_Qualified_Name_Array)'Last;
+
+      Parent_Decl : constant Basic_Decl := N.P_Parent_Basic_Decl;
+      UID         : constant String :=
+        Test.Common.Mangle_Hash_Full (Subp => Parent_Decl);
    begin
+
+      F_Typ.Last_Comp_Unit_Idx := Comp_Unit_Idx;
       F_Typ.Name :=
-        Convert_Qualified_Name (N.F_Subp_Name.P_Fully_Qualified_Name_Array);
-      if not N.F_Subp_Params.Is_Null then
-         for Param of N.F_Subp_Params.F_Params loop
-            declare
-               Current_Typ : constant Translation_Result :=
-                 Translate (Param.F_Type_Expr, Verbose);
-            begin
-               if Current_Typ.Success then
-                  for Id of Param.F_Ids loop
-                     declare
-                        P_Typ      : Parameter_Typ;
-                        Param_Mode : constant Parameter_Mode_Type :=
-                        (case Kind (Param.F_Mode) is
-                           when Ada_Mode_Default | Ada_Mode_In => In_Mode,
-                           when Ada_Mode_In_Out => In_Out_Mode,
-                           when Ada_Mode_Out => Out_Mode,
-                           when others => Out_Mode);
-                        P_Typ_Ref  : SP.Ref;
-                     begin
-                        P_Typ.Name :=
-                        Convert_Qualified_Name
-                          (Id.P_Fully_Qualified_Name_Array);
-                        P_Typ.Parameter_Type := Current_Typ.Res;
-                        P_Typ.Parameter_Mode := Param_Mode;
-                        P_Typ_Ref.Set (P_Typ);
+        Convert_Qualified_Name (Parent_Decl.P_Fully_Qualified_Name_Array)
+        & TGen.Strings.Ada_Identifier
+           (Ada.Strings.Unbounded.To_Unbounded_String (UID));
 
-                        F_Typ.Component_Types.Insert
-                          (Key      => +Id.As_Defining_Name.Text,
-                           New_Item => P_Typ_Ref);
-                     end;
-                  end loop;
-               else
-                  return Current_Typ;
-               end if;
-            end;
-         end loop;
-      end if;
+      --  Check if we have already translated the function type
 
-      --  Function type was successfully translated. Now we can append both
-      --  the parameters and the function to the translation cache.
+      declare
+         Cache_T : SP.Ref;
+      begin
+         if Get_From_Cache (F_Typ.Name, Cache_T) then
+            Result.Res := Cache_T;
+            return Result;
+         end if;
+      end;
 
-      for P_Typ of F_Typ.Component_Types loop
-         Translation_Cache.Insert (SP.Get (P_Typ).Name, P_Typ);
+      for Param of N.P_Params loop
+         declare
+            Current_Typ : constant Translation_Result :=
+              Translate (Param.F_Type_Expr, Verbose);
+         begin
+            if Current_Typ.Success then
+
+               for Id of Param.F_Ids loop
+                  F_Typ.Component_Types.Insert
+                    (Key      => +Id.As_Defining_Name.Text,
+                     New_Item => Current_Typ.Res);
+                  F_Typ.Param_Modes.Insert
+                    (Key      => +Id.As_Defining_Name.Text,
+                     New_Item =>
+                       (case Param.F_Mode is
+                        when Ada_Mode_Default | Ada_Mode_In => In_Mode,
+                        when Ada_Mode_In_Out                => In_Out_Mode,
+                        when others                         => Out_Mode));
+               end loop;
+            else
+               return Current_Typ;
+            end if;
+         end;
       end loop;
+
+      if not N.P_Returns.Is_Null then
+         declare
+            Ret : constant Translation_Result :=
+              Translate (N.P_Returns, Verbose);
+         begin
+            if not Ret.Success then
+               return (False, Ret.Diagnostics);
+            end if;
+            F_Typ.Ret_Typ := Ret.Res;
+         end;
+      else
+         F_Typ.Ret_Typ := SP.Null_Ref;
+      end if;
+      --  Function type was successfully translated
+
+      F_Typ.Subp_UID := +UID;
+
       F_Typ_Ref.Set (F_Typ);
       Translation_Cache.Insert (F_Typ.Name, F_Typ_Ref);
       Result.Res := F_Typ_Ref;
