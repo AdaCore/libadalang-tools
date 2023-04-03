@@ -1359,8 +1359,7 @@ package body Test.Harness is
             return SPI;
          end if;
 
-         SPI.UUT_File_Name := new String'
-           (Test.Skeleton.Source_Table.Get_Current_Source_Spec);
+         SPI.UUT_File_Name := new String'(UUT);
 
          declare
             Corresponding_Body : constant String :=
