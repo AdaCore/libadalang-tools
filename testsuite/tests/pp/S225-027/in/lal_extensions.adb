@@ -220,12 +220,12 @@ package body LAL_Extensions is
            when Ada_Type_Decl => Decl.As_Type_Decl.F_Aspects,
            when Ada_Subtype_Decl => Decl.As_Subtype_Decl.F_Aspects,
            --  See P415-048:
---         when ada_Component_Decl =>
---            F_Aspects (Component_Decl (Decl)),
---         when ada_Entry_Decl =>
---            F_Aspects (Entry_Decl (Decl)),
---         when ada_Protected_Body_Stub =>
---            F_Aspects (Protected_Body_Stub (Decl)),
+           --         when ada_Component_Decl =>
+           --            F_Aspects (Component_Decl (Decl)),
+           --         when ada_Entry_Decl =>
+           --            F_Aspects (Entry_Decl (Decl)),
+           --         when ada_Protected_Body_Stub =>
+           --            F_Aspects (Protected_Body_Stub (Decl)),
 
            when others => raise Program_Error);
    end Get_Aspects;

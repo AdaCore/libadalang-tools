@@ -1125,9 +1125,9 @@ package body Pp.Scanner is
 
             --  identifier
 
-         --  We allow '$' at the start of an identifier because that's what
-         --  preprocessor symbols look like, and this allows us to process some
-         --  files that use preprocessing.
+            --  We allow '$' at the start of an identifier because that's what
+            --  preprocessor symbols look like, and this allows us to process some
+            --  files that use preprocessing.
 
          elsif Is_Letter (Cur) or else (Lang = Ada_Lang and then Cur = '$')
          then
@@ -1595,9 +1595,9 @@ package body Pp.Scanner is
                --  the paragraph in Tok.
                end if;
 
-            --  Not a comment, so cannot be combined. Finish constructing Tok,
-            --  send it to Result followed by Tok_EOL, Possible_Spaces, and
-            --  Tok_2, then exit.
+               --  Not a comment, so cannot be combined. Finish constructing Tok,
+               --  send it to Result followed by Tok_EOL, Possible_Spaces, and
+               --  Tok_2, then exit.
 
             else
                pragma Assert (Tok_2.Kind not in Comment_Kind);
@@ -1758,12 +1758,12 @@ package body Pp.Scanner is
       --  Allow to disable this, because it can get false positives in case of
       --  comment paragraphs.
          --
-      --  For example, if two comment lines in a row are indented differently,
-      --  they will look like two paragraphs, but then we indent them the same
-      --  in the output, so now they look like one paragraph. To fix this, we
-      --  would need something like Collect_Comments in Final_Check. Or perhaps
-      --  we could make gnatpp closer to idempotency (e.g. DO consider them
-      --  part of the same paragraph in the first place).
+         --  For example, if two comment lines in a row are indented differently,
+         --  they will look like two paragraphs, but then we indent them the same
+         --  in the output, so now they look like one paragraph. To fix this, we
+         --  would need something like Collect_Comments in Final_Check. Or perhaps
+         --  we could make gnatpp closer to idempotency (e.g. DO consider them
+         --  part of the same paragraph in the first place).
 
       if Debug_Flag_2 then
          return;

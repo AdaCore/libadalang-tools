@@ -1502,7 +1502,7 @@ package body Stub.Actions is
       if Debug_Mode then
          Print (Unit);
       --         Put ("With trivia\n");
---         PP_Trivia (Unit);
+      --         PP_Trivia (Unit);
       end if;
 
       case Root_Node.Kind is

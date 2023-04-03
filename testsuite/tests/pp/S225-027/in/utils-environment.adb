@@ -65,8 +65,8 @@ package body Utils.Environment is
    --  times per run.
 
    --   Tmpdir_Displayed : Boolean := False;
-   --  True if the value of the TMPDIR environment variable has been displayed;
-   --  we don't want to display it more than once per run.
+      --  True if the value of the TMPDIR environment variable has been displayed;
+      --  we don't want to display it more than once per run.
 
    --------------
       -- Clean_Up --

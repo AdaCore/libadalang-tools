@@ -1992,10 +1992,10 @@ package body Pp.Actions is
       --  declaration denoted by Id, or an attribute, or nil. Is_Predef is True if
       --  Id denotes a predefined Ada or GNAT identifier.
       --
-   --  This is called early (during Subtree_To_Ada). Casing of reserved words
-   --  is handled later, in a separate pass (see Keyword_Casing), because they
-   --  are not explicit in the tree, except that operator symbols are handled
-   --  here. All of the Str_Templates have reserved words in lower case.
+      --  This is called early (during Subtree_To_Ada). Casing of reserved words
+      --  is handled later, in a separate pass (see Keyword_Casing), because they
+      --  are not explicit in the tree, except that operator symbols are handled
+      --  here. All of the Str_Templates have reserved words in lower case.
       --
       --  Id_With_Casing is used for Def_Names, Usage_Names and pragmas. For
       --  Def_Names, the Kind comes from the Symbol_Table, which only works
@@ -2071,14 +2071,7 @@ package body Pp.Actions is
             then
               As_Declared
             elsif
-              Id (1) = '"' -- operator symbol
-            --              Kind not in Ada_Attribute_Ref | Ada_Update_Attribute_Ref
---              and then
---              (Id (1) = '"') -- operator symbol
---               or else Is_Reserved_Word (Id, Utils.Ada_Version)
---               or else Id = Name_And_Then
---               or else Id = Name_Or_Else)
-
+              Id (1) = '"'
             then PP_Keyword_Casing (Cmd)
             elsif Is_Predef and then Use_Predefined_Casing then As_Declared
             else
@@ -2095,7 +2088,7 @@ package body Pp.Actions is
                  when Ada_Number_Decl => PP_Number_Casing (Cmd),
                  when Null_Kind =>
                    --                   (if PP_Name_Casing (Cmd) = As_Declared then Mixed
---                    else PP_Name_Casing (Cmd)),
+         --                    else PP_Name_Casing (Cmd)),
          PP_Name_Casing (Cmd),
                  when others => PP_Name_Casing (Cmd)));
          --  The Null_Kind case is for identifiers specific to pragmas
@@ -2423,21 +2416,21 @@ package body Pp.Actions is
          --     X                    : Ada_Long_Type_Name;
          --     A_Long_Constant_Name : constant T := 123;
          --
-      --  where we wish to align the ":" and ":=" tokens. But the
-      --  Insert_Alignment algorithm doesn't align things unless subsequent
-      --  lines "match", which includes having the same number of tabs. But X
-      --  has no ":=", so we add a fake tab so it will match the preceding and
-      --  following lines.
+         --  where we wish to align the ":" and ":=" tokens. But the
+         --  Insert_Alignment algorithm doesn't align things unless subsequent
+         --  lines "match", which includes having the same number of tabs. But X
+         --  has no ":=", so we add a fake tab so it will match the preceding and
+         --  following lines.
          --
          --  Append_Tab inserts a fake tab after each ":" tab. If there is no
          --  ":=" following, the fake tab remains. If there IS a ":=", a real
          --  tab replaces the fake one.
          --
-      --  Fake tabs initially have the same position as the preceding ":" tab.
-      --  When Insert_Alignment calculates Max_Col, it ignores the fake ones,
-      --  so they won't push anything further to the right. It sets the Col of
-      --  the fake ones to Max_Col; hence Num_Blanks will be zero, so fake tabs
-      --  won't insert any blanks.
+         --  Fake tabs initially have the same position as the preceding ":" tab.
+         --  When Insert_Alignment calculates Max_Col, it ignores the fake ones,
+         --  so they won't push anything further to the right. It sets the Col of
+         --  the fake ones to Max_Col; hence Num_Blanks will be zero, so fake tabs
+         --  won't insert any blanks.
          --
          --  Context clauses are handled in a similar manner:
          --
@@ -3197,7 +3190,7 @@ package body Pp.Actions is
                      when Ada_Op_In | Ada_Op_Not_In =>
                         raise Program_Error;
                      --  ???Don't treat membership tests as operators, for now
---               return 1;
+                        --               return 1;
 
                      when Ada_Op_And_Then | Ada_Op_Or_Else | Ada_Op_And |
                        Ada_Op_Or | Ada_Op_Xor =>
@@ -3347,10 +3340,10 @@ package body Pp.Actions is
             Arg1       : constant Ada_Tree := F_Left (Expr).As_Ada_Node;
             Arg2       : constant Ada_Tree := F_Right (Expr).As_Ada_Node;
 
-         --  The arguments can't have lower precedence than the expression as
-         --  a whole; that's what precedence means -- you need parens to put
-         --  a "+" inside a "*". The right-hand argument can't have equal
-         --  precedence, because Ada has no right-associative binary operators.
+            --  The arguments can't have lower precedence than the expression as
+            --  a whole; that's what precedence means -- you need parens to put
+            --  a "+" inside a "*". The right-hand argument can't have equal
+            --  precedence, because Ada has no right-associative binary operators.
 
             pragma Assert (Precedence (Arg1) >= Precedence (Tree));
             pragma Assert (Precedence (Arg2) > Precedence (Tree));
@@ -3378,12 +3371,12 @@ package body Pp.Actions is
                return;
             end if;
 
-         --  The recursive calls to Do_Bin_Op below bypass the
-         --  normal recursion via Subtree_To_Ada, so we need to pass along the
-         --  Cur_Level to Interpret_Template. When we reach something that's
-         --  not a binary op, we switch back to the normal recursion via
-         --  Interpret_Template on the Arg. We split lines after the
-         --  operator symbol, as in:
+            --  The recursive calls to Do_Bin_Op below bypass the
+            --  normal recursion via Subtree_To_Ada, so we need to pass along the
+            --  Cur_Level to Interpret_Template. When we reach something that's
+            --  not a binary op, we switch back to the normal recursion via
+            --  Interpret_Template on the Arg. We split lines after the
+            --  operator symbol, as in:
             --     Some_Long_Thing +
             --     Some_Other_Long_Thing
             --  except in the case of short circuits:
@@ -3537,13 +3530,13 @@ package body Pp.Actions is
             pragma Assert (Check_Whitespace);
             Check_Whitespace := False;
 
-         --  In most cases, we simply print out S. All of the complicated code
-         --  below is for the --decimal-grouping and --based-grouping
-         --  switches. If --decimal-grouping was used to specify a nonzero
-         --  value, and we have a numeric literal without a base, and that
-         --  literal contains no underscores, we insert underscores. Similarly
-         --  for --based-grouping. A based literal is one containing "#" or
-         --  ":"; note that "10#...#" is considered based, not decimal.
+            --  In most cases, we simply print out S. All of the complicated code
+            --  below is for the --decimal-grouping and --based-grouping
+            --  switches. If --decimal-grouping was used to specify a nonzero
+            --  value, and we have a numeric literal without a base, and that
+            --  literal contains no underscores, we insert underscores. Similarly
+            --  for --based-grouping. A based literal is one containing "#" or
+            --  ":"; note that "10#...#" is considered based, not decimal.
 
             case Tree.Kind is
                when Ada_String_Literal =>
@@ -3798,12 +3791,12 @@ package body Pp.Actions is
                       F_Params (F_Subp_Params (Spec))
                     else No_Param_Spec_List));
 
---  ???The following gets SIGSEGV:
---            Is_Function : constant Boolean :=
---              Present (Spec) and then Present (F_Subp_Returns (Spec));
---            Param_Count : constant Query_Count :=
---              Subtree_Count (Params) +
---              Boolean'Pos (Is_Function); -- Add one extra for function result
+            --  ???The following gets SIGSEGV:
+            --            Is_Function : constant Boolean :=
+            --              Present (Spec) and then Present (F_Subp_Returns (Spec));
+            --            Param_Count : constant Query_Count :=
+            --              Subtree_Count (Params) +
+            --              Boolean'Pos (Is_Function); -- Add one extra for function result
             Is_Function : Boolean;
             Param_Count : Query_Count :=
               (if Params.Is_Null then 0 else Subtree_Count (Params));
@@ -3935,8 +3928,8 @@ package body Pp.Actions is
             when Property_Error =>
                return No_Basic_Decl;
          --  Uncomment the following to recover from libadalang failures:
---            when others =>
---               return No_Basic_Decl;
+         --            when others =>
+         --               return No_Basic_Decl;
          end Denoted_Decl;
 
          function Denoted_Def_Name
@@ -3959,9 +3952,9 @@ package body Pp.Actions is
             --  above to this return.
             return Id;
          --  Uncomment the following to recover from libadalang failures:
---         exception
---            when others =>
---               return Id;
+         --         exception
+         --            when others =>
+         --               return Id;
          end Denoted_Def_Name;
 
          procedure Do_Def_Or_Usage_Name is
@@ -4144,7 +4137,7 @@ package body Pp.Actions is
 
          if Partial or else Arg (Cmd, Source_Line_Breaks) then
             --            pragma Assert
---              (Kind (Last (New_Tokns'Access)) not in Line_Break_Token);
+            --              (Kind (Last (New_Tokns'Access)) not in Line_Break_Token);
             Append_Line_Break
               (Hard => True, -- Why hard????????????????
 
@@ -4294,8 +4287,8 @@ package body Pp.Actions is
       --
       --  Add_CR is True if we should convert LF to CRLF.
       --
-   --  Wide_Text_IO accepts a Form parameter that inserts CR's on windows, but
-   --  it doesn't do that on unix, so we insert CR's by hand.
+      --  Wide_Text_IO accepts a Form parameter that inserts CR's on windows, but
+      --  it doesn't do that on unix, so we insert CR's by hand.
 
       function Remove_Extra_Line_Breaks (Add_CR : Boolean) return WChar_Vector
       is
@@ -4333,9 +4326,9 @@ package body Pp.Actions is
                   end if;
                end return;
 
-            --  Optimize the case where we're not changing anything. The reason
-            --  Remove_Extra_Line_Breaks keeps the initial NL is that this
-            --  optimization wouldn't work otherwise.
+               --  Optimize the case where we're not changing anything. The reason
+               --  Remove_Extra_Line_Breaks keeps the initial NL is that this
+               --  optimization wouldn't work otherwise.
 
             else
                return Result : WChar_Vector := To_Vector (Out_Buf) do
@@ -4500,11 +4493,11 @@ package body Pp.Actions is
 
       In_Vec, Out_Vec : Char_Vector;
 
-   --  We initially write the output to Temp_Output_Name, then later rename it
-   --  to Output_Name (except in Pipe mode). These are full pathnames. If we
-   --  are overwriting the Source_Name, and it's a link link-->file, we want to
-   --  overwrite file. But we put the temp file in the directory containing
-   --  link, in case the directory containing file is not writable.
+      --  We initially write the output to Temp_Output_Name, then later rename it
+      --  to Output_Name (except in Pipe mode). These are full pathnames. If we
+      --  are overwriting the Source_Name, and it's a link link-->file, we want to
+      --  overwrite file. But we put the temp file in the directory containing
+      --  link, in case the directory containing file is not writable.
 
       function Get_Output_Name (Resolve_Links : Boolean) return String;
       function Get_Output_Name (Resolve_Links : Boolean) return String is
@@ -4578,19 +4571,19 @@ package body Pp.Actions is
                return;
             end if;
 
---            if Mimic_gcc and then (Verbose_Mode or else Debug_Flag_V) then
---               Put_Line
---                 ((if Output_Mode in Replace_Modes
---                     then "updating "
---                     else "creating ") &
---                  (if Debug_Flag_V then Short_Source_Name (SF) else Output_Name));
---            end if;
+            --            if Mimic_gcc and then (Verbose_Mode or else Debug_Flag_V) then
+            --               Put_Line
+            --                 ((if Output_Mode in Replace_Modes
+            --                     then "updating "
+            --                     else "creating ") &
+            --                  (if Debug_Flag_V then Short_Source_Name (SF) else Output_Name));
+            --            end if;
 
-         --  The temp file was created, so write a pair (Temp_Output_Name,
-         --  Output_Name) of lines to the file name file, so Finalize will know
-         --  to rename temp --> output. This is done under lock, in case this
-         --  is an inner process of an incremental build, and the -j switch of
-         --  the builder is used to invoke this in parallel.
+            --  The temp file was created, so write a pair (Temp_Output_Name,
+            --  Output_Name) of lines to the file name file, so Finalize will know
+            --  to rename temp --> output. This is done under lock, in case this
+            --  is an inner process of an incremental build, and the -j switch of
+            --  the builder is used to invoke this in parallel.
 
             if Arg (Cmd, Outer_Parallel) then
                pragma Assert (Mimic_gcc (Cmd));
@@ -4616,20 +4609,20 @@ package body Pp.Actions is
                   Do_Writes;
                end;
 
-         --  Otherwise, it's safe to do the writes without any locking. We want
-         --  to avoid locking when possible, because it reduces the likelihood
-         --  of stale locks left lying around. It's a little more efficient,
-         --  too.
+               --  Otherwise, it's safe to do the writes without any locking. We want
+               --  to avoid locking when possible, because it reduces the likelihood
+               --  of stale locks left lying around. It's a little more efficient,
+               --  too.
 
             else
                Do_Writes;
             end if;
          end if;
       --      exception
---         when Lock_Error =>
---            Utils.Output.Error ("cannot create " & Lock_File_Name);
---            Utils.Output.Error ("delete it by hand if stale");
---            raise;
+      --         when Lock_Error =>
+      --            Utils.Output.Error ("cannot create " & Lock_File_Name);
+      --            Utils.Output.Error ("delete it by hand if stale");
+      --            raise;
       end Write_File_Name_File;
 
       procedure Write_Str (Out_Vec : Char_Vector);
@@ -4664,8 +4657,8 @@ package body Pp.Actions is
             end if;
          end if;
 
-      --  If a BOM (byte order mark) was found in the input, we want to put it
-      --  in the output.
+         --  If a BOM (byte order mark) was found in the input, we want to put it
+         --  in the output.
 
          if BOM_Seen then
             pragma Assert (Wide_Character_Encoding (Cmd) = WCEM_UTF8);
@@ -4745,7 +4738,7 @@ package body Pp.Actions is
 
       end if;
 
---      pragma Assert (Is_Empty (Symtab));
+      --      pragma Assert (Is_Empty (Symtab));
       Append (In_Vec, Input);
       declare
          Messages : Scanner.Source_Message_Vector;
@@ -4759,11 +4752,11 @@ package body Pp.Actions is
            (Cmd, In_Vec, Root (Unit), In_Range, Out_Vec, Ignored_Out_Range,
             Messages);
          --        (CU, Cmd, Output_Name, Form_String,
---         Do_Diff, Output_Written, To_Ada => True);
---      --  We have to flush the cache here, because Unit_Id's get reused between
---      --  runs of this.
---      Flush_Cache;
---      Clear (Symtab);
+            --         Do_Diff, Output_Written, To_Ada => True);
+            --      --  We have to flush the cache here, because Unit_Id's get reused between
+            --      --  runs of this.
+            --      Flush_Cache;
+            --      Clear (Symtab);
 
          if not Is_Empty (Messages) then
             pragma Assert (Length (Messages) = 1);
