@@ -188,7 +188,7 @@ procedure TGen_Marshalling is
       Jobs    : Libadalang.Helpers.App_Job_Context_Array with Unreferenced)
    is
    begin
-      Generate (Gen_Ctx, Marshalling_Part);
+      Generate (Gen_Ctx, All_Parts);
    end App_Post_Process;
 begin
    App.Run;
