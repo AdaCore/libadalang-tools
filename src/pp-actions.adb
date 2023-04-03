@@ -964,13 +964,11 @@ package body Pp.Actions is
            when Ada_Number_Decl =>
              L ("?~,# ~~ ^: constant ^2:=[# !]"),
            when Ada_Object_Decl =>
-              L ("?~,# ~~ ^:[#1? ~~~? ~~~? ~~~ !]? ^2:=[# ~~]~!"
-           , Aspects),
+              L ("?~,# ~~ ^:[#1? ~~~? ~~~? ~~~ !]? ^2:=[# ~~]~!", Aspects),
            when Ada_Extended_Return_Stmt_Object_Decl =>
              L ("?~,# ~~ ^:? ~~~? ~~~? ~~~ !? ^2:=[# ~~]~!", Aspects),
-            when Ada_No_Type_Object_Renaming_Decl => null,
-              --  TO BE DONE: add support for this node
-              --  L ("! renames ? ~~~? ~~~? ~~~ !", Aspects),
+           when Ada_No_Type_Object_Renaming_Decl =>
+              L ("?~,# ~~? ~~~? ~~~? ~~~? ~~~? ~~~!", Aspects),
            when Ada_Package_Renaming_Decl =>
              L ("package !!", Aspects),
            when Ada_Single_Protected_Decl =>
@@ -3674,8 +3672,10 @@ package body Pp.Actions is
 
                case Inst.Kind is
                   when Required_Subtree =>
-                     Subtree_To_Ada
-                       (Subt, New_Level (Cur_Level, TT), Subtree_Index);
+                     if not Subtrees (Subtree_Index).Is_Null then
+                        Subtree_To_Ada
+                          (Subt, New_Level (Cur_Level, TT), Subtree_Index);
+                     end if;
 
                   when Opt_Subtree_Or_List =>
                      Do_Opt_Subtree_Or_List (Subt, Subtree_Index);
@@ -3848,7 +3848,6 @@ package body Pp.Actions is
                      if Inst.Index = 0 then
                         Cur_Subtree_Index := Cur_Subtree_Index + 1;
                      end if;
-
                      Do_Subtree
                        (Subtree_Index => (if Inst.Index = 0
                                             then Cur_Subtree_Index
@@ -3858,6 +3857,7 @@ package body Pp.Actions is
                      if Label_Seen and then Inst.T_Kind = ';' then
                         Label_Seen := False;
                      else
+
                         case Scanner.Token_Kind'(Inst.T_Kind) is
                            when Same_Text_Kind =>
                               Append_And_Put (New_Tokns, Inst.T_Kind);
@@ -3873,7 +3873,6 @@ package body Pp.Actions is
 
             pragma Assert
               (Used = [Subtrees_Index => True], "Not all used: " & Kind'Img);
-
          end Interpret_Template;
 
          use Alternative_Templates;
@@ -5283,6 +5282,7 @@ package body Pp.Actions is
 
          procedure Do_Def_Or_Usage_Name is
             Id : constant Base_Id := Tree.As_Base_Id;
+
             Is_Def_Name : constant Boolean :=
               Id.Parent.Kind = Ada_Defining_Name;
 
@@ -5292,28 +5292,29 @@ package body Pp.Actions is
                else Denoted_Decl (Id));
 
             Def_Name : constant Base_Id := Denoted_Def_Name (Decl, Id);
-            pragma Assert (if Is_Def_Name then Def_Name = Id);
 
             Is_Attr_Name : constant Boolean :=
               (Parent_Tree.Kind = Ada_Attribute_Ref
                and then Tree = Parent_Tree.As_Attribute_Ref.F_Attribute)
-               or else (Parent_Tree.Kind = Ada_Update_Attribute_Ref and then
-                        Tree = Parent_Tree.As_Update_Attribute_Ref.F_Attribute);
+               or else
+                (Parent_Tree.Kind = Ada_Update_Attribute_Ref and then
+                 Tree = Parent_Tree.As_Update_Attribute_Ref.F_Attribute);
 
             K : constant Ada_Node_Kind_Type :=
-              (if Is_Attr_Name then Parent_Tree.Kind
-               elsif Decl.Is_Null then Null_Kind
-               else Decl.Kind);
+            (if Is_Attr_Name then Parent_Tree.Kind
+             elsif Decl.Is_Null then Null_Kind
+             else Decl.Kind);
 
             Is_Constant_Name : constant Boolean :=
               K in Ada_Object_Decl_Range
-                and then Decl.As_Object_Decl.F_Has_Constant;
+              and then K /= Ada_No_Type_Object_Renaming_Decl
+              and then Decl.As_Object_Decl.F_Has_Constant;
 
             With_Casing : constant W_Str :=
-              Id_With_Casing
-                (Id_Name (Def_Name), Kind => K,
-                 Is_Predef => Is_Predef (Is_Def_Name, Decl),
-                 Is_Constant => Is_Constant_Name);
+            Id_With_Casing
+              (Id_Name (Def_Name), Kind => K,
+               Is_Predef => Is_Predef (Is_Def_Name, Decl),
+               Is_Constant => Is_Constant_Name);
          begin
             Append_And_Put (New_Tokns, Ident, W_Intern (With_Casing));
          end Do_Def_Or_Usage_Name;
@@ -5321,6 +5322,7 @@ package body Pp.Actions is
       --  Start of processing for Subtree_To_Ada
 
       begin
+
          if Is_Nil (Tree) then -- ???
             return;
          end if;
@@ -5403,7 +5405,8 @@ package body Pp.Actions is
                Do_Param_Spec;
 
             when Ada_Object_Decl |
-              Ada_Extended_Return_Stmt_Object_Decl =>
+                 Ada_Extended_Return_Stmt_Object_Decl | --  =>
+                 Ada_No_Type_Object_Renaming_Decl =>
                Do_Object_Decl;
 
             when Ada_Component_Decl =>
