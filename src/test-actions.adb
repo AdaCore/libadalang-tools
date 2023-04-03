@@ -1047,8 +1047,9 @@ package body Test.Actions is
 
       Put (" --exclude-from-stubbing=file       - List of sources whose bodies should not\n");
       Put ("                                      be stubbed\n");
-      Put (" --exclude-from-stubbing:unit=file  - List of sources whose bodies should not\n");
-      Put ("                                      be stubbed when testing unit\n");
+      Put (" --exclude-from-stubbing:spec=file  - List of sources whose bodies should not\n");
+      Put ("                                      be stubbed when testing unit whose\n");
+      Put ("                                      specification is located in file spec\n");
       Put ("\n");
 
       Put (" --harness-dir=dirname  - Output dir for test harness\n");
