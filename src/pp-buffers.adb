@@ -586,6 +586,8 @@ package body Pp.Buffers is
    is
       pragma Assert (Expand_Tabs);
 
+      use type System.WCh_Con.WC_Encoding_Method;
+
       package Decoder is new GNAT.Decode_String
         (Encoding_Method => Wide_Character_Encoding);
       package Brackets_Decoder is new GNAT.Decode_String
@@ -632,13 +634,12 @@ package body Pp.Buffers is
       while Ptr <= Input'Last loop
          --  Set C to the current wide character
 
-         if Input (Ptr) = '[' then
-            if State /= In_Comment and then At_Brackets_Start then
-               Brackets_Decoder.Decode_Wide_Character (Input, Ptr, C);
-            else
-               C   := '[';
-               Ptr := Ptr + 1;
-            end if;
+         if Input (Ptr) = '['
+           and then State /= In_Comment
+           and then At_Brackets_Start
+           and then Wide_Character_Encoding = System.WCh_Con.WCEM_Brackets
+         then
+            Brackets_Decoder.Decode_Wide_Character (Input, Ptr, C);
 
          else
             Decoder.Decode_Wide_Character (Input, Ptr, C);
