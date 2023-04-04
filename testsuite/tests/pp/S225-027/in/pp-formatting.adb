@@ -990,10 +990,10 @@ package body Pp.Formatting is
       --  have changed blank to NL and vice versa, and it turns a series of
       --  blanks into a single one. Similarly needed if Comments_Gnat_Beginning
       --  is True.
-         --
-         --  The reason this is generic is that when Is_Out is True, it calls
-         --  Move_Past_Out_Tok, so we are evilly depending on the fact that
-         --  Out_Tok and Tok are the same object.
+      --
+      --  The reason this is generic is that when Is_Out is True, it calls
+      --  Move_Past_Out_Tok, so we are evilly depending on the fact that
+      --  Out_Tok and Tok are the same object.
 
       function Count_Lines (Buf : Buffer) return Natural is
          S : W_Str renames Elements (Buf) (1 .. Last_Position (Buf));

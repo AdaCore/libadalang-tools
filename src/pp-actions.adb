@@ -2001,7 +2001,7 @@ package body Pp.Actions is
             Subtype_Ind_Index_Alt => L ("?~~ ~!?~~~"),
             Subtype_Ind_Alt => L ("?~~ ~!? ~~~"),
             Record_Type_Decl_Split_Alt =>
-              L ("type !! is${!}" & Aspects),
+              L ("type !! is$[!]" & Aspects),
             Record_Type_Decl_Alt => L ("type !! is# !" & Aspects),
                       --  Otherwise, we could have a line break just before the
                       --  last semicolon.

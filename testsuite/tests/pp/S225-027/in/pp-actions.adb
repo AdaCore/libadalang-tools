@@ -2415,35 +2415,35 @@ package body Pp.Actions is
            (Parent, Tree  : Ada_Tree_Base; Token_Text : Symbol;
             Index_In_Line : Tab_Index_In_Line; Is_Insertion_Point : Boolean);
          --  Append a Tab_Rec onto Tabs.
-            --
-            --  Handling of "fake tabs":
-            --  Fake tabs are used to deal with situations like this:
-            --
-            --     A_Long_Var_Name      : T          := 123;
-            --     X                    : Ada_Long_Type_Name;
-            --     A_Long_Constant_Name : constant T := 123;
-            --
+         --
+         --  Handling of "fake tabs":
+         --  Fake tabs are used to deal with situations like this:
+         --
+         --     A_Long_Var_Name      : T          := 123;
+         --     X                    : Ada_Long_Type_Name;
+         --     A_Long_Constant_Name : constant T := 123;
+         --
       --  where we wish to align the ":" and ":=" tokens. But the
       --  Insert_Alignment algorithm doesn't align things unless subsequent
       --  lines "match", which includes having the same number of tabs. But X
       --  has no ":=", so we add a fake tab so it will match the preceding and
       --  following lines.
-            --
+         --
          --  Append_Tab inserts a fake tab after each ":" tab. If there is no
          --  ":=" following, the fake tab remains. If there IS a ":=", a real
          --  tab replaces the fake one.
-            --
+         --
       --  Fake tabs initially have the same position as the preceding ":" tab.
       --  When Insert_Alignment calculates Max_Col, it ignores the fake ones,
       --  so they won't push anything further to the right. It sets the Col of
       --  the fake ones to Max_Col; hence Num_Blanks will be zero, so fake tabs
       --  won't insert any blanks.
-            --
-            --  Context clauses are handled in a similar manner:
-            --
-            --     with Ada.Characters.Handling; use Ada.Characters.Handling;
-            --     with Ada.Exceptions;
-            --     with Ada.Strings;             use Ada.Strings;
+         --
+         --  Context clauses are handled in a similar manner:
+         --
+         --     with Ada.Characters.Handling; use Ada.Characters.Handling;
+         --     with Ada.Exceptions;
+         --     with Ada.Strings;             use Ada.Strings;
 
          procedure Append_Tab
            (Parent, Tree  : Ada_Tree_Base; Token_Text : Symbol;
@@ -4289,11 +4289,11 @@ package body Pp.Actions is
       --  exactly one at the end. Also, if Preserve_Blank_Lines is False, we
       --  collapse 3 or more NL's in a row down to 2.  ???It would be cleaner if
       --  we didn't put multiple blank lines in in the first place.
-         --
-         --  This also converts LF to CRLF if appropriate.
-         --
-         --  Add_CR is True if we should convert LF to CRLF.
-         --
+      --
+      --  This also converts LF to CRLF if appropriate.
+      --
+      --  Add_CR is True if we should convert LF to CRLF.
+      --
    --  Wide_Text_IO accepts a Form parameter that inserts CR's on windows, but
    --  it doesn't do that on unix, so we insert CR's by hand.
 
