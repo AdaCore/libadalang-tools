@@ -43,8 +43,8 @@ with Pp.Scanner.Lines;
 package body Pp.Formatting is
    use Utils.Command_Lines;
 
---   use Common_Flag_Switches, Common_String_Switches,
---     Common_String_Seq_Switches, Common_Nat_Switches;
+   --   use Common_Flag_Switches, Common_String_Switches,
+   --     Common_String_Seq_Switches, Common_Nat_Switches;
 
    pragma Warnings (Off);
    use Pp_Flag_Switches, Pp_Boolean_Switches, Attribute_Casing_Switches,
@@ -199,7 +199,7 @@ package body Pp.Formatting is
          Last   := All_LB (All_LBI (Result));
       end loop;
 
---???      pragma Assert (First.Level = Last.Level);
+      --???      pragma Assert (First.Level = Last.Level);
       return Result;
    end Next_Enabled;
 
@@ -1189,15 +1189,15 @@ package body Pp.Formatting is
             --  we collect them all together and check that their text
             --  more-or-less matches.
                --
-            --  Similarly, we do this if Comments_Gnat_Beginning. For example,
-            --  if one comment starts with a single blank and the next starts
-            --  with two, then they will not look like a single paragraph
-            --  during Insert_Comments_And_Blank_Lines, but here they will,
-            --  because an extra blank has been added to the first.
+               --  Similarly, we do this if Comments_Gnat_Beginning. For example,
+               --  if one comment starts with a single blank and the next starts
+               --  with two, then they will not look like a single paragraph
+               --  during Insert_Comments_And_Blank_Lines, but here they will,
+               --  because an extra blank has been added to the first.
                --
-            --  Actually, we need to do this in any case: if two comments in
-            --  the input are not indented the same, they will be indented the
-            --  same in the output, and thus appear to be a fillable paragraph.
+               --  Actually, we need to do this in any case: if two comments in
+               --  the input are not indented the same, they will be indented the
+               --  same in the output, and thus appear to be a fillable paragraph.
 
             if Kind (Src_Tok) in Whole_Line_Comment
               and then Kind (Out_Tok) in Whole_Line_Comment
@@ -1374,9 +1374,9 @@ package body Pp.Formatting is
          Put ("New_Tokns:\n");
          Put_Tokens (Lines_Data.New_Tokns);
          --         Put ("Out_Tokns:\n");
---         Put_Tokens (Lines_Data.Out_Tokns);
---         Put ("Saved_New_Tokns:\n");
---         Put_Tokens (Lines_Data.Saved_New_Tokns);
+         --         Put_Tokens (Lines_Data.Out_Tokns);
+         --         Put ("Saved_New_Tokns:\n");
+         --         Put_Tokens (Lines_Data.Saved_New_Tokns);
          Dbg_Out.Output_Enabled := False;
       end if;
 
@@ -1479,9 +1479,9 @@ package body Pp.Formatting is
 
          Put (" lev=\1", Image (Integer (All_LB (All_LBI (Cur_Line)).Level)));
 
---         if False then
---            Put ("\t\1", Image (All_LB (All_LBI (Cur_Line)).Kind));
---         end if;
+         --         if False then
+         --            Put ("\t\1", Image (All_LB (All_LBI (Cur_Line)).Kind));
+         --         end if;
 
          if All_LB (All_LBI (Cur_Line)).Enabled
            and then Cur_Line /= Last_Index (All_LBI)
@@ -1810,8 +1810,8 @@ package body Pp.Formatting is
             --  there's no point in turning it into:
             --     P
             --       (...
-         --  assuming PP_Cont_Line_Indentation = 2, because it doesn't shorten
-         --  any lines. If the procedure name is slightly longer than "P":
+            --  assuming PP_Cont_Line_Indentation = 2, because it doesn't shorten
+            --  any lines. If the procedure name is slightly longer than "P":
             --     Proc (...
             --  there's _probably_ no point in turning it into:
             --     Proc
@@ -2157,9 +2157,9 @@ package body Pp.Formatting is
                   pragma Assert
                     (Disable_Final_Check or else Kind (Src_Tok) = ';');
 
-            --  Check for "end Some_Name;" --> "end;" case. This only happens
-            --  when the --no-end-id switch was given. Here, the name was
-            --  present in the source, so we insert it.
+                  --  Check for "end Some_Name;" --> "end;" case. This only happens
+                  --  when the --no-end-id switch was given. Here, the name was
+                  --  present in the source, so we insert it.
 
                elsif not Arg (Cmd, End_Id) and then Kind (New_Tok) = ';'
                  and then Kind (Prev_Lexeme (New_Tok)) = Res_End
@@ -2616,8 +2616,8 @@ package body Pp.Formatting is
                New_Space_NL  := Pending_Space and At_LB;
             end if;
 
-         --  If we're just before a blank followed by NL, move past the blank,
-         --  so we won't add a new NL below.
+            --  If we're just before a blank followed by NL, move past the blank,
+            --  so we won't add a new NL below.
 
             if New_Space_NL then
                pragma Assert (New_Preceding_Blanks > 0);
@@ -2795,10 +2795,10 @@ package body Pp.Formatting is
                else
                   Cur_Indentation := Indentation;
 
-               --  Try to make comment fit on line. If we're filling it, then
-               --  rely on that to make it fit. If Cur_Indentation pushes
-               --  it past Max_Line_Length, and the comment would fit if
-               --  not indented, then reduce the indentation.
+                  --  Try to make comment fit on line. If we're filling it, then
+                  --  rely on that to make it fit. If Cur_Indentation pushes
+                  --  it past Max_Line_Length, and the comment would fit if
+                  --  not indented, then reduce the indentation.
 
                   declare
                      W : constant Positive := Width (Src_Tok);
@@ -2865,15 +2865,15 @@ package body Pp.Formatting is
                   null;
             end case;
 
-         --  Comments at the beginning are not indented. The "2" is to skip the
-         --  initial sentinel NL.
+            --  Comments at the beginning are not indented. The "2" is to skip the
+            --  initial sentinel NL.
 
             if Kind (Prev (Prev (New_Tok))) = Start_Of_Input then
                Indentation := 0;
 
-         --  Otherwise, we indent as for the max of the preceding and following
-         --  line breaks, except when Look_Before is False (as it is for this
-         --  comment, which is followed by "else").
+               --  Otherwise, we indent as for the max of the preceding and following
+               --  line breaks, except when Look_Before is False (as it is for this
+               --  comment, which is followed by "else").
 
             else
                Indentation := After_Indentation;
@@ -2900,8 +2900,8 @@ package body Pp.Formatting is
                end if;
             end if;
 
-         --  Make sure Indentation is a multiple of PP_Indentation; otherwise
-         --  style checking complains "(style) bad column".
+            --  Make sure Indentation is a multiple of PP_Indentation; otherwise
+            --  style checking complains "(style) bad column".
 
             Indentation := -- ????????????????Good_Column
               (Indentation / PP_Indentation (Cmd)) * PP_Indentation (Cmd);
@@ -2981,8 +2981,8 @@ package body Pp.Formatting is
                  (if LB_Tok (LB) = New_Tok then
                     Kind (New_Tok) = Enabled_LB_Token);
             --               pragma Assert????????????????
---                 (if LB_Tok (LB) = Prev (New_Tok) then
---                    Kind (Prev (New_Tok)) = Disabled_LB_Token);
+               --                 (if LB_Tok (LB) = Prev (New_Tok) then
+               --                    Kind (Prev (New_Tok)) = Disabled_LB_Token);
                begin
                if LB.Tok = New_Tok then
                   Append_Tokn
@@ -3055,8 +3055,8 @@ package body Pp.Formatting is
 
             if Arg (Cmd, Source_Line_Breaks) then
                --               if Tokens_Require_Space
---                 (Last (New_Tokns'Access), Next (New_Tok))
---               then
+               --                 (Last (New_Tokns'Access), Next (New_Tok))
+               --               then
                --  ????????????????Need to skip Tabs and whatnot above.
                --  Can Prev/Next_Lexeme be changed to do that?
                Append_Spaces (New_Tokns, Count => 1);
@@ -3103,36 +3103,36 @@ package body Pp.Formatting is
          New_Line_Start_Out := New_Tok;
          pragma Assert (Is_Empty (Temp_LBI));
 
-      --  The two sequences Src_Tokns and Out_Tokns should be identical,
-      --  with some exceptions where mismatches are possible. The code below
-      --  to insert comments depends on this fact. We step through the two
-      --  sequences, copying text into Buffer, and detect any token mismatch.
-      --  The allowed mismatches are:
+         --  The two sequences Src_Tokns and Out_Tokns should be identical,
+         --  with some exceptions where mismatches are possible. The code below
+         --  to insert comments depends on this fact. We step through the two
+         --  sequences, copying text into Buffer, and detect any token mismatch.
+         --  The allowed mismatches are:
          --
-      --     The Out sequence has no comments, so when we detect a mismatch and
-      --     the source one is a comment, that's where we insert the comment.
+         --     The Out sequence has no comments, so when we detect a mismatch and
+         --     the source one is a comment, that's where we insert the comment.
          --
          --     The sequences may have blank lines in different places.
          --
          --     We normalize "end;" to "end Some_Name;"
          --
-      --     We normalize by removing "declare" from a block statement with no
+         --     We normalize by removing "declare" from a block statement with no
          --     declarative items. We put the "declare" back in here.
          --     ????????????????True?
          --
-      --     We normalize by removing "private" from a package (etc) when there
-      --     is nothing in the private part. We put the "private" back in here.
+         --     We normalize by removing "private" from a package (etc) when there
+         --     is nothing in the private part. We put the "private" back in here.
          --
-      --     We normalize a qualified expression with unnecessary parentheses
-      --     containing an aggregate. That is "T'((X, Y, Z))" is normalized to
-      --     "T'(X, Y, Z)", where "(X, Y, Z)" is an aggregate. We pretty-much
-      --     have to do that, because ASIS provides no way to distinguish these
+         --     We normalize a qualified expression with unnecessary parentheses
+         --     containing an aggregate. That is "T'((X, Y, Z))" is normalized to
+         --     "T'(X, Y, Z)", where "(X, Y, Z)" is an aggregate. We pretty-much
+         --     have to do that, because ASIS provides no way to distinguish these
          --     two forms.
          --
          --     There is a mode in which we insert underscores in numeric
          --     literals, as in 12_345_678.
          --
-      --     Allowed Replacements of Characters (see RM-J.2). We normalize "!"
+         --     Allowed Replacements of Characters (see RM-J.2). We normalize "!"
          --     to "|" when used as a delimiter. The other allowed replacements
          --     (: for # and % for ") are not normalized.
          --
@@ -3181,9 +3181,9 @@ package body Pp.Formatting is
                   pragma Assert
                     (Disable_Final_Check or else Kind (Src_Tok) = ';');
 
-            --  Check for "end Some_Name;" --> "end;" case. This only happens
-            --  when the --no-end-id switch was given. Here, the name was
-            --  present in the source, so we insert it.
+                  --  Check for "end Some_Name;" --> "end;" case. This only happens
+                  --  when the --no-end-id switch was given. Here, the name was
+                  --  present in the source, so we insert it.
 
                elsif not Arg (Cmd, End_Id) and then Kind (New_Tok) = ';'
                  and then Kind (Prev_Lexeme (New_Tok)) = Res_End
@@ -3234,14 +3234,14 @@ package body Pp.Formatting is
                elsif Kind (Src_Tok) = End_Of_Line_Comment then
                   Insert_End_Of_Line_Comment;
 
-               --  If the source has a blank line at this point, send it to the
-               --  output (unless Insert_Blank_Lines is True, in which case we
-               --  want to ignore blank lines in the input, since a previous
-               --  phase inserted them in the "right" place). But avoid
-               --  multiple blank lines (unless either Preserve_Line_Breaks or
-               --  Preserve_Blank_Lines is True) and blank lines just before
-               --  End_Of_Input.
-               --  Suppress blank lines in new mode????????????????
+                  --  If the source has a blank line at this point, send it to the
+                  --  output (unless Insert_Blank_Lines is True, in which case we
+                  --  want to ignore blank lines in the input, since a previous
+                  --  phase inserted them in the "right" place). But avoid
+                  --  multiple blank lines (unless either Preserve_Line_Breaks or
+                  --  Preserve_Blank_Lines is True) and blank lines just before
+                  --  End_Of_Input.
+                  --  Suppress blank lines in new mode????????????????
 
                elsif Is_Blank_Line (Src_Tok)
                  and then not Arg (Cmd, Source_Line_Breaks)
@@ -3281,15 +3281,15 @@ package body Pp.Formatting is
                      end;
                   end;
 
-               --  Normally, we simply ignore EOL_Token in the input. But
-               --  for --preserve-line-breaks mode, if we see a line break in
-               --  the input that is not yet in the output, we copy it
-               --  over. We set the indentation to take into account
-               --  surrounding indentation, plus line continuation if
-               --  appropriate, plus "("-related indentation. If the next
-               --  character in the output is already ' ', we subtract one
-               --  from the indentation to make up for that. (There can never
-               --  be two in a row.)????????????????
+                  --  Normally, we simply ignore EOL_Token in the input. But
+                  --  for --preserve-line-breaks mode, if we see a line break in
+                  --  the input that is not yet in the output, we copy it
+                  --  over. We set the indentation to take into account
+                  --  surrounding indentation, plus line continuation if
+                  --  appropriate, plus "("-related indentation. If the next
+                  --  character in the output is already ' ', we subtract one
+                  --  from the indentation to make up for that. (There can never
+                  --  be two in a row.)????????????????
 
                elsif Kind (Src_Tok) in EOL_Token then
                   pragma Assert
@@ -3363,9 +3363,9 @@ package body Pp.Formatting is
                            end if;
                         end;
 
-                     --  There is no line break in New_Tokns corresponding to
-                     --  the EOL_Token in the source, so create a new one using
-                     --  Append_Temp_Line_Break.
+                        --  There is no line break in New_Tokns corresponding to
+                        --  the EOL_Token in the source, so create a new one using
+                        --  Append_Temp_Line_Break.
 
                      else
                         declare
@@ -3389,23 +3389,23 @@ package body Pp.Formatting is
                                  end;
                            end case;
 
---                           if Extra_Indent_For_Preserved_Line then
---                              --  See Manage_Paren_Stack
---
---                              --  We don't want this if there's an enabled one
---                              --  below????????????????
---                              Indentation :=
---                                Indentation + PP_Indent_Continuation (Cmd);
---                           end if;
---
---                           if Kind (Prev (New_Tok)) = Spaces
---                             and then Indentation /= 0
---                           then
---                              Indentation := Indentation - 1;
---                           end if;
---
---                           Indentation :=????????????????
---                             Indentation + L_Paren_Indentation_For_Preserve;
+                           --                           if Extra_Indent_For_Preserved_Line then
+                           --                              --  See Manage_Paren_Stack
+                           --
+                           --                              --  We don't want this if there's an enabled one
+                           --                              --  below????????????????
+                           --                              Indentation :=
+                           --                                Indentation + PP_Indent_Continuation (Cmd);
+                           --                           end if;
+                           --
+                           --                           if Kind (Prev (New_Tok)) = Spaces
+                           --                             and then Indentation /= 0
+                           --                           then
+                           --                              Indentation := Indentation - 1;
+                           --                           end if;
+                           --
+                           --                           Indentation :=????????????????
+                           --                             Indentation + L_Paren_Indentation_For_Preserve;
                            Cur_Indentation := Indentation;
                            Append_Temp_Line_Break
                              (Lines_Data_P,
@@ -3464,7 +3464,7 @@ package body Pp.Formatting is
          Clear (Saved_New_Tokns);
          pragma Assert (Syntax_Cur_Line = Last_Index (Syntax_LBI) + 1);
          --         pragma Assert (Enabled_Cur_Line = Last_Index (Enabled_LBI) + 1);
---  ????????????????
+         --  ????????????????
 
          <<Done>>
          null;
@@ -3638,14 +3638,14 @@ package body Pp.Formatting is
 
          procedure Calculate_Num_Blanks is
 
-         --  Note on Col and Num_Blanks components of Tab_Rec: Col is
-         --  initialized to a bogus value, and Num_Blanks to 0. Process_Line
-         --  sets Col to the correct value. Flush_Para uses Col, and possibly
-         --  changes Num_Blanks to some positive value. After the call to
-         --  Calculate_Num_Blanks, Num_Blanks is used to insert the correct
-         --  number of ' ' characters. Thus, Col is temporary, used only within
-         --  Calculate_Num_Blanks, to communicate information from Process_Line
-         --  to Flush_Para.
+            --  Note on Col and Num_Blanks components of Tab_Rec: Col is
+            --  initialized to a bogus value, and Num_Blanks to 0. Process_Line
+            --  sets Col to the correct value. Flush_Para uses Col, and possibly
+            --  changes Num_Blanks to some positive value. After the call to
+            --  Calculate_Num_Blanks, Num_Blanks is used to insert the correct
+            --  number of ' ' characters. Thus, Col is temporary, used only within
+            --  Calculate_Num_Blanks, to communicate information from Process_Line
+            --  to Flush_Para.
 
             Paragraph_Tabs : Tab_In_Line_Vector_Vectors.Vector;
             --  One Tab_In_Line_Vector for each line in the current paragraph
@@ -3660,19 +3660,19 @@ package body Pp.Formatting is
             --
             --     X : T (Discrim => 123) := (This | That => 345);
             --
-         --  we collect two tabs for ':' and ':=', which have the same Tree
-         --  (a variable declaration tree). The '|' and '=>' characters in
-         --  the discriminant constraint and the aggregate also have tabs, but
-         --  these are skipped, because their Tree is different (more nested).
-         --  If there are no tabs on the line, then of course Cur_Line_Tabs
-         --  will be empty. In addition, if we have something like:
+            --  we collect two tabs for ':' and ':=', which have the same Tree
+            --  (a variable declaration tree). The '|' and '=>' characters in
+            --  the discriminant constraint and the aggregate also have tabs, but
+            --  these are skipped, because their Tree is different (more nested).
+            --  If there are no tabs on the line, then of course Cur_Line_Tabs
+            --  will be empty. In addition, if we have something like:
             --
             --     A := (1 | 2 | 3 => ...);
             --
-         --  the '|' and '=>' tabs will have the same Index_In_Line, in which
-         --  case we give up (set Tab_Mismatch to True, and set Cur_Line_Tabs
-         --  to empty). Those tabs are only of use if we end up enabling line
-         --  breaks after the '|'s.
+            --  the '|' and '=>' tabs will have the same Index_In_Line, in which
+            --  case we give up (set Tab_Mismatch to True, and set Cur_Line_Tabs
+            --  to empty). Those tabs are only of use if we end up enabling line
+            --  breaks after the '|'s.
             --
             --  Handling of "insertion points".
             --
@@ -3680,34 +3680,34 @@ package body Pp.Formatting is
             --
             --     ! ^:= !
             --
-         --  which means insert the left-hand side, followed by " := ",
-         --  followed by the right-hand side. (It's actually more complicated;
-         --  this is just an example.) There is a tab before ":=", so multiple
-         --  assignment_statements line up like this:
+            --  which means insert the left-hand side, followed by " := ",
+            --  followed by the right-hand side. (It's actually more complicated;
+            --  this is just an example.) There is a tab before ":=", so multiple
+            --  assignment_statements line up like this:
             --
             --     Long_Name        := 1;
             --     X                := 10_000;
             --     Even_Longer_Name := 1_000_000;
             --
-         --  If we add a tab at the end (just before the ";"): "! ^:= !^2", we
-         --  get this:
+            --  If we add a tab at the end (just before the ";"): "! ^:= !^2", we
+            --  get this:
             --
             --     Long_Name        := 1        ;
             --     X                := 10_000   ;
             --     Even_Longer_Name := 1_000_000;
             --
-         --  If in addition we add an insertion point before the right-hand
-         --  side, so the template is: "! ^:= &2!^2", then the blanks are
-         --  inserted before the right-hand side, resulting in right-justified
-         --  expressions:
+            --  If in addition we add an insertion point before the right-hand
+            --  side, so the template is: "! ^:= &2!^2", then the blanks are
+            --  inserted before the right-hand side, resulting in right-justified
+            --  expressions:
             --
             --     Long_Name        :=         1;
             --     X                :=    10_000;
             --     Even_Longer_Name := 1_000_000;
             --
-         --  (We currently do not right-justify those expressions; this is just
-         --  an example to show how "&" works. "&" is actually used in
-         --  Do_Component_Clause.)
+            --  (We currently do not right-justify those expressions; this is just
+            --  an example to show how "&" works. "&" is actually used in
+            --  Do_Component_Clause.)
 
             procedure Flush_Para;
             --  Called at the end of a "tabbing paragraph", i.e. a group of one or
@@ -3743,49 +3743,49 @@ package body Pp.Formatting is
                   --
                   --     end P;
                   --
-            --  The tabs are shown as ^1 and ^2 in (*2) above, although they
-            --  are really kept in a separate data structure (Tabs) rather than
-            --  in the text itself, and take up zero columns in the buffer.
-            --  The "paragraph" we're talking about consists of the three
-            --  variable-declaration lines. Note that the alignment from the
-            --  input has been forgotten; we would get the same thing if the
-            --  input were unaligned. Our job is to align the ":" and ":="
-            --  symbols, whether or not they were originally aligned.
+                  --  The tabs are shown as ^1 and ^2 in (*2) above, although they
+                  --  are really kept in a separate data structure (Tabs) rather than
+                  --  in the text itself, and take up zero columns in the buffer.
+                  --  The "paragraph" we're talking about consists of the three
+                  --  variable-declaration lines. Note that the alignment from the
+                  --  input has been forgotten; we would get the same thing if the
+                  --  input were unaligned. Our job is to align the ":" and ":="
+                  --  symbols, whether or not they were originally aligned.
                   --
-            --  ^1 means Index_In_Line = 1; ^2 means Index_In_Line = 2 (see
-            --  type Tab_Rec). The Col of each tab is currently set to the
-            --  column in which it appears in (*2), and the Num_Blanks is
-            --  currently set to 0. The following code sets the Col of each tab
-            --  to the column in which it WILL appear, and the Num_Blanks to
-            --  the number of blanks to expand the tab to in order to achieve
-            --  that.
+                  --  ^1 means Index_In_Line = 1; ^2 means Index_In_Line = 2 (see
+                  --  type Tab_Rec). The Col of each tab is currently set to the
+                  --  column in which it appears in (*2), and the Num_Blanks is
+                  --  currently set to 0. The following code sets the Col of each tab
+                  --  to the column in which it WILL appear, and the Num_Blanks to
+                  --  the number of blanks to expand the tab to in order to achieve
+                  --  that.
                   --
-            --  We first loop through all the ^1 tabs, and calculate the max
-            --  Col, which will be the ":" of the A_Long_Variable_Name line.
-            --  We then loop through those again, and set the Num_Blanks to be
-            --  the number of blanks needed to reach that max column. For each
-            --  such ^1 tab, we loop from that ^1, through ^2 and ^3 and so
-            --  on (we have no ^3... in this example), adjusting their Col
-            --  accordingly.
+                  --  We first loop through all the ^1 tabs, and calculate the max
+                  --  Col, which will be the ":" of the A_Long_Variable_Name line.
+                  --  We then loop through those again, and set the Num_Blanks to be
+                  --  the number of blanks needed to reach that max column. For each
+                  --  such ^1 tab, we loop from that ^1, through ^2 and ^3 and so
+                  --  on (we have no ^3... in this example), adjusting their Col
+                  --  accordingly.
                   --
-            --  Then we loop through all the ^2 tabs in the same way, and so on
-            --  for ^3, etc.
+                  --  Then we loop through all the ^2 tabs in the same way, and so on
+                  --  for ^3, etc.
                   --
-            --  So in this example, we loop down through the ^1 tabs to
-            --  calculate where to put the ":"'s. Then down through the ^1 tabs
-            --  again to adjust the Num_Blanks for the ^1 tabs, and loop across
-            --  to adjust the Col for the ^1 and ^2 tabs. Then down through the
-            --  ^2 tabs to calculate where to put the ":="'s.
+                  --  So in this example, we loop down through the ^1 tabs to
+                  --  calculate where to put the ":"'s. Then down through the ^1 tabs
+                  --  again to adjust the Num_Blanks for the ^1 tabs, and loop across
+                  --  to adjust the Col for the ^1 and ^2 tabs. Then down through the
+                  --  ^2 tabs to calculate where to put the ":="'s.
                   --
-            --  Then down through the ^2 tabs to adjust the Num_Blanks for the
-            --  ^2 tabs, and loop across to adjust the Col for the ^2 tabs.
-            --  Note that adjusting the Col for the ":"'s affects where
-            --  we're going to put the ":="'s -- that's the reason for the
-            --  "loop across" part.
+                  --  Then down through the ^2 tabs to adjust the Num_Blanks for the
+                  --  ^2 tabs, and loop across to adjust the Col for the ^2 tabs.
+                  --  Note that adjusting the Col for the ":"'s affects where
+                  --  we're going to put the ":="'s -- that's the reason for the
+                  --  "loop across" part.
                   --
-               --  The end result is to calculate the Num_Blanks so that when
-               --  we expand the tabs, (*2) above will be turned (back) into
-               --  the (*1).
+                  --  The end result is to calculate the Num_Blanks so that when
+                  --  we expand the tabs, (*2) above will be turned (back) into
+                  --  the (*1).
 
                --  We must not process a zero-line paragraph. For efficiency, we
                --  can avoid processing a one-line paragraph (leaving all tabs, if
@@ -3869,9 +3869,9 @@ package body Pp.Formatting is
             begin
                while Kind (New_Tok) not in End_Of_Input | Enabled_LB_Token loop
 
-               --  We can have two tabs at the same place if the second one is
-               --  fake. Also for implicit 'in' mode, etc. Hence 'while', not
-               --  'if' here:
+                  --  We can have two tabs at the same place if the second one is
+                  --  fake. Also for implicit 'in' mode, etc. Hence 'while', not
+                  --  'if' here:
 
                   while Cur_Tab.Insertion_Point = New_Tok loop
                      pragma Assert (not Cur_Tab.Deleted);
@@ -3955,15 +3955,15 @@ package body Pp.Formatting is
                   return;
                end if;
 
---               Dbg_Out.Put ("\1: \t", Name);
---
---               for J in 1 .. Last_Index (X) loop
---                  if J /= 1 then
---                     Dbg_Out.Put ("; ");
---                  end if;
---                  Dbg_Out.Put ("\1", Tab_Image (Out_Buf, Tabs, X (J)));
---               end loop;
---               Dbg_Out.Put ("\n");
+               --               Dbg_Out.Put ("\1: \t", Name);
+               --
+               --               for J in 1 .. Last_Index (X) loop
+               --                  if J /= 1 then
+               --                     Dbg_Out.Put ("; ");
+               --                  end if;
+               --                  Dbg_Out.Put ("\1", Tab_Image (Out_Buf, Tabs, X (J)));
+               --               end loop;
+               --               Dbg_Out.Put ("\n");
             end Put_Tab_In_Line_Vector;
 
             procedure Put_Paragraph_Tabs is
@@ -3987,23 +3987,23 @@ package body Pp.Formatting is
                while Kind (New_Tok) /= End_Of_Input loop
                declare
                --               First_Char_In_Line : constant Natural :=
-            --                 Sloc (New_Tok).First - Sloc (New_Tok).Col + 1;
+                  --                 Sloc (New_Tok).First - Sloc (New_Tok).Col + 1;
                   begin
                   Process_Line;
 
                   --               Dbg_Out.Put ("<<");
                   --
---               for X in First_Char_In_Line .. Sloc (New_Tok).First - 1 loop
+                  --               for X in First_Char_In_Line .. Sloc (New_Tok).First - 1 loop
                   --                  for Tab of Cur_Line_Tabs loop
-         --                     if X = Position (Out_Buf, Tabs (Tab).Mark) then
+                  --                     if X = Position (Out_Buf, Tabs (Tab).Mark) then
                   --                        Dbg_Out.Put ("^");
                   --                     end if;
                   --                  end loop;
---                  Dbg_Out.Put ("\1", To_UTF8 ((1 => Char_At (Out_Buf, X))));
+                  --                  Dbg_Out.Put ("\1", To_UTF8 ((1 => Char_At (Out_Buf, X))));
                   --               end loop;
                   --               Dbg_Out.Put (">>\n");
-            --               Put_Tab_In_Line_Vector ("First", First_Line_Tabs);
-               --               Put_Tab_In_Line_Vector ("Cur", Cur_Line_Tabs);
+                  --               Put_Tab_In_Line_Vector ("First", First_Line_Tabs);
+                  --               Put_Tab_In_Line_Vector ("Cur", Cur_Line_Tabs);
 
                   Next_ss (New_Tok);
                   --  Consume the newline

@@ -669,12 +669,12 @@ package body Utils.Command_Lines is
          --  "--output-dir" with parameter "parm", or "--output" with parameter
          --  "-dirparm".
             --
-         --  However, there is are cases where we have to allow this sort of
-         --  thing for compatibility reasons: gnatstub has a string switch
-         --  -gnaty, which is a prefix of -gnatyo and -gnatyM. Hence the
-         --  special case for -gnaty below. In this case, Text_To_Switch will
-         --  return the longest one (e.g. -gnatyM123 is -gnatyM with an
-         --  argument of 123).
+            --  However, there is are cases where we have to allow this sort of
+            --  thing for compatibility reasons: gnatstub has a string switch
+            --  -gnaty, which is a prefix of -gnatyo and -gnatyM. Hence the
+            --  special case for -gnaty below. In this case, Text_To_Switch will
+            --  return the longest one (e.g. -gnatyM123 is -gnatyM with an
+            --  argument of 123).
 
          for Switch1 in Descriptor.Allowed_Switches'Range loop
             pragma Assert

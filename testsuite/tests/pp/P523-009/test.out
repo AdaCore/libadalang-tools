@@ -298,7 +298,7 @@ package body ada_main is
       return (gnat_exit_status);
    end main;
 
---  BEGIN Object file/option list
+   --  BEGIN Object file/option list
    --   C:\Projects\gps_test\Test069_refactoring\obj\native\stream_buffer.2.o
    --   C:\Projects\gps_test\Test069_refactoring\obj\native\test_queues.1.o
    --   C:\Projects\gps_test\Test069_refactoring\obj\native\test_refactoring.2.o
@@ -309,7 +309,7 @@ package body ada_main is
    --   -static
    --   -lgnat
    --   -Wl,--stack=0x2000000
---  END Object file/option list
+   --  END Object file/option list
 
 end ada_main;
 pragma Ada_95;
@@ -991,7 +991,7 @@ package body ada_main is
       return (gnat_exit_status);
    end main;
 
---  BEGIN Object file/option list
+   --  BEGIN Object file/option list
    --   C:\Projects\gps_test\Test070_gnatpp\obj\native\test_gnatpp.1.o
    --   C:\Projects\gps_test\Test070_gnatpp\obj\native\test070.2.o
    --   -LC:\Projects\gps_test\Test070_gnatpp\obj\native\
@@ -1000,7 +1000,7 @@ package body ada_main is
    --   -static
    --   -lgnat
    --   -Wl,--stack=0x2000000
---  END Object file/option list
+   --  END Object file/option list
 
 end ada_main;
 pragma Ada_95;

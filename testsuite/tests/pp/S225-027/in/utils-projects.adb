@@ -888,8 +888,8 @@ package body Utils.Projects is
                end if;
             else
                --               if Debug_Flag_C then
---                  Put_Line ("Stored switches " & File_Switches.all);
---               end if;
+               --                  Put_Line ("Stored switches " & File_Switches.all);
+               --               end if;
 
                Insert
                  (Individual_Source_Options, Name,
@@ -1226,10 +1226,10 @@ package body Utils.Projects is
 
          --  Now Parse again, so command-line args override project file args
 
---  Environment has:
---               if not Mimic_gcc then
---                  --  Ignore unrecognized switches in the inner invocation
---                  Error ...
+         --  Environment has:
+         --               if not Mimic_gcc then
+         --                  --  Ignore unrecognized switches in the inner invocation
+         --                  Error ...
 
          Parse
            (Cmd_Text, Cmd, Phase => Cmd_Line_2, Callback => Callback,

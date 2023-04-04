@@ -275,7 +275,7 @@ package body Utils.Drivers is
          Dump_Cmd (Cmd);
       end if;
 
---      Utils.Check_Parameters; -- ????Move into Init?
+      --      Utils.Check_Parameters; -- ????Move into Init?
 
       --  ????????????????Stuff from Environment:
 
@@ -286,27 +286,27 @@ package body Utils.Drivers is
          pragma Assert
            (Get_Current_Dir = Tool_Current_Dir.all & Directory_Separator);
 
---         if not Incremental_Mode then
---            Change_Dir (Tool_Temp_Dir.all);
---            Utils.Compiler_Options.Store_I_Options;
---         end if;
+         --         if not Incremental_Mode then
+         --            Change_Dir (Tool_Temp_Dir.all);
+         --            Utils.Compiler_Options.Store_I_Options;
+         --         end if;
 
          --  Create output directory if necessary
 
---         if Out_Dir /= null then
---            Parallel_Make_Dir (Out_Dir.all, Give_Message => Verbose_Mode);
---         end if;
+         --         if Out_Dir /= null then
+         --            Parallel_Make_Dir (Out_Dir.all, Give_Message => Verbose_Mode);
+         --         end if;
       end;
 
       --  In Incremental_Mode, we invoke the builder instead of doing the
       --  normal tool processing. The inner invocations of this tool invoked by
       --  the builder will do the normal tool processing.
 
---      if Utils.Options.Incremental_Mode then
---         Environment.Call_Builder;
---      else
---         Utils.Source_Table.Processing.Process_Sources;
---      end if;
+      --      if Utils.Options.Incremental_Mode then
+      --         Environment.Call_Builder;
+      --      else
+      --         Utils.Source_Table.Processing.Process_Sources;
+      --      end if;
 
       --  Create output directory if necessary
 
@@ -340,13 +340,13 @@ package body Utils.Drivers is
       GNATCOLL.Projects.Free (Tool.Project_Env);
       Environment.Clean_Up;
 
---      if not Utils.Options.Incremental_Mode then
---         if not Utils.Source_Table.Processing
---             .All_Files_Successfully_Processed
---         then
---            GNAT.OS_Lib.OS_Exit (1);
---         end if;
---      end if;
+      --      if not Utils.Options.Incremental_Mode then
+      --         if not Utils.Source_Table.Processing
+      --             .All_Files_Successfully_Processed
+      --         then
+      --            GNAT.OS_Lib.OS_Exit (1);
+      --         end if;
+      --      end if;
 
       Utils.Main_Done := True;
 

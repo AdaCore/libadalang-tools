@@ -154,10 +154,10 @@ package body Pp.Buffers is
    begin
       Buf.From_First := From_First;
       --         if C = NL then
---            Buf.Cur_Column := 1;
---         else
---            Buf.Cur_Column := Buf.Cur_Column + 1;
---         end if;
+      --            Buf.Cur_Column := 1;
+      --         else
+      --            Buf.Cur_Column := Buf.Cur_Column + 1;
+      --         end if;
       Buf.Cur_Char   :=
         (if From_First > Last_Index (Buf.From) then W_NUL
          else Buf.From (From_First));
@@ -322,10 +322,10 @@ package body Pp.Buffers is
       Buf.From_First := From_First;
       Append (Buf.To, Buf.Cur_Char);
       --         if C = NL then
---            Buf.Cur_Column := 1;
---         else
---            Buf.Cur_Column := Buf.Cur_Column + 1;
---         end if;
+      --            Buf.Cur_Column := 1;
+      --         else
+      --            Buf.Cur_Column := Buf.Cur_Column + 1;
+      --         end if;
       Buf.Cur_Char :=
         (if From_First > Last_Index (Buf.From) then W_NUL
          else Buf.From (From_First));
@@ -340,10 +340,10 @@ package body Pp.Buffers is
       Buf.From_First := From_First;
       Append (Buf.To, Buf.Cur_Char);
       --         if C = NL then
---            Buf.Cur_Column := 1;
---         else
---            Buf.Cur_Column := Buf.Cur_Column + 1;
---         end if;
+      --            Buf.Cur_Column := 1;
+      --         else
+      --            Buf.Cur_Column := Buf.Cur_Column + 1;
+      --         end if;
       Result       :=
         (if From_First > Last_Index (Buf.From) then W_NUL
          else Buf.From (From_First));
@@ -402,7 +402,7 @@ package body Pp.Buffers is
 
       Maybe_Adjust_Marker (Buf);
 
---      Buf.Cur_Column := Buf.Cur_Column + 1;
+      --      Buf.Cur_Column := Buf.Cur_Column + 1;
       Append (Buf.To, C);
    end Insert;
 
@@ -423,11 +423,11 @@ package body Pp.Buffers is
         (if Is_Line_Terminator (C) then
            (Is_Empty (Buf.To) or else Last_Element (Buf.To) /= ' '));
 
---      if Is_Line_Terminator (C) then
---         Buf.Cur_Column := 1;
---      else
---         Buf.Cur_Column := Buf.Cur_Column + 1;
---      end if;
+      --      if Is_Line_Terminator (C) then
+      --         Buf.Cur_Column := 1;
+      --      else
+      --         Buf.Cur_Column := Buf.Cur_Column + 1;
+      --      end if;
       Append (Buf.To, C);
    end Insert_Any;
 
@@ -442,7 +442,7 @@ package body Pp.Buffers is
    begin
       Maybe_Adjust_Marker (Buf);
 
---      Buf.Cur_Column := 1;
+      --      Buf.Cur_Column := 1;
       pragma Assert -- no trailing blanks allowed
         (Is_Empty (Buf.To) or else Last_Element (Buf.To) /= ' ');
 
@@ -457,7 +457,7 @@ package body Pp.Buffers is
    begin
       Maybe_Adjust_Marker (Buf);
 
---      Buf.Cur_Column := Buf.Cur_Column + 1;
+      --      Buf.Cur_Column := Buf.Cur_Column + 1;
       Append (Buf.To, C);
       pragma Assert (At_End (Buf));
    end Append;
@@ -480,11 +480,11 @@ package body Pp.Buffers is
         (if Is_Line_Terminator (C) then
            (Is_Empty (Buf.To) or else Last_Element (Buf.To) /= ' '));
 
---      if Is_Line_Terminator (C) then
---         Buf.Cur_Column := 1;
---      else
---         Buf.Cur_Column := Buf.Cur_Column + 1;
---      end if;
+      --      if Is_Line_Terminator (C) then
+      --         Buf.Cur_Column := 1;
+      --      else
+      --         Buf.Cur_Column := Buf.Cur_Column + 1;
+      --      end if;
       Append (Buf.To, C);
       pragma Assert (At_End (Buf));
    end Append_Any;
@@ -503,7 +503,7 @@ package body Pp.Buffers is
    begin
       Maybe_Adjust_Marker (Buf);
 
---      Buf.Cur_Column := 1;
+      --      Buf.Cur_Column := 1;
       pragma Assert -- no trailing blanks allowed
         (Is_Empty (Buf.To) or else Last_Element (Buf.To) /= ' ');
 
@@ -519,10 +519,10 @@ package body Pp.Buffers is
 
       Append (Buf.To, C);
       --      if C = NL then
---         Buf.Cur_Column := 1;
---      else
---         Buf.Cur_Column := Buf.Cur_Column + 1;
---      end if;
+      --         Buf.Cur_Column := 1;
+      --      else
+      --         Buf.Cur_Column := Buf.Cur_Column + 1;
+      --      end if;
 
       pragma Assert (Char_At (Buf, Mark) = C);
    end Insert_Keeping_Mark;
@@ -692,11 +692,11 @@ package body Pp.Buffers is
    --  we're inside a comment ('--' doesn't start a comment inside a string
    --  literal).
       --
-   --  In_String_Literal is for normal string literals surrounded by double
-   --  quotes. In_Obsolescent_String_Literal is for string literals surrounded
-   --  by percent signs, as allowed by J.2(4). It is necessary to distinguish
-   --  these, because the surrounding characters have to match. That is, if we
-   --  see:
+      --  In_String_Literal is for normal string literals surrounded by double
+      --  quotes. In_Obsolescent_String_Literal is for string literals surrounded
+      --  by percent signs, as allowed by J.2(4). It is necessary to distinguish
+      --  these, because the surrounding characters have to match. That is, if we
+      --  see:
       --
       --     "Hello%world"
       --
@@ -844,9 +844,9 @@ package body Pp.Buffers is
            (Last_Index (Buf.To) = 1
             or else Buf.To (Last_Index (Buf.To) - 1) /= ' '));
 
---      if C = NL then
---         Buf.Cur_Column := 1;
---      end if;
+      --      if C = NL then
+      --         Buf.Cur_Column := 1;
+      --      end if;
    end Replace_Previous;
 
    procedure Reset (Buf : in out Buffer) is

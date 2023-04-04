@@ -184,9 +184,9 @@ package Utils.Fast_Vectors is
    --      Post => Elems'Result'First = Index_Type'First;
    function Elems_Var (Container : Vector) return Big_Ptr_Var; -- with
    --      Post => Elems_Var'Result'First = Index_Type'First;
---  ???Above postconditions cause warnings These return a pointer to the
---  underlying data structure. This is of course dangerous. The idea is
---  that you can do:
+      --  ???Above postconditions cause warnings These return a pointer to the
+      --  underlying data structure. This is of course dangerous. The idea is
+      --  that you can do:
       --
       --     X : Elems_Array renames Elems (V) (1 .. Last_Index (V));
       --

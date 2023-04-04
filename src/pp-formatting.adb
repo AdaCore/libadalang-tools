@@ -2514,15 +2514,14 @@ package body Pp.Formatting is
          --  is too long to fit on the line, turn it into a Whole_Line_Comment,
          --  taking care to indent.
 
-         --  Note that the Subtree_To_Ada pass already inserted indentation, so we
-         --  mostly keep the indentation level at zero. The exception is comments,
-         --  which Subtree_To_Ada didn't see. For comments, we temporarily set the
-         --  indentation to that of the surrounding code.
+         --  Note that the Subtree_To_Ada pass already inserted indentation, so
+         --  we mostly keep the indentation level at zero. The exception is
+         --  comments, which Subtree_To_Ada didn't see. For comments, we
+         --  temporarily set the indentation to that of the surrounding code.
 
          procedure Insert_Whole_Line_Comment;
          --  Found a Whole_Line_Comment; copy it to the output, taking care to
-         --  indent, except that if the comment starts in column 1, we assume
-         --  the user wants to keep it that way.
+         --  indent.
 
          procedure Insert_Preprocessor_Directive;
          --  Found a Preprocessor_Directive; copy it to the output, preserving
@@ -3019,7 +3018,7 @@ package body Pp.Formatting is
          --  affect comments.
          function Prev_Indentation_Affect_Comments return Boolean;
          --  Will return True if the last line-breaks indentation affect
-         --  comments (i.e., Syntax_LBI Affects_Comments = False
+         --  comments (i.e., Syntax_LBI Affects_Comments = True).
          function After_Indentation return Natural;
          --  Same as "All_LB (Syntax_LBI (Cur_Line)).Indentation", except we
          --  skip Syntax_LBI with Affects_Comments = False. In other words,
@@ -3062,15 +3061,27 @@ package body Pp.Formatting is
             end if;
          end After_Indentation;
 
+         -------------------------------
+         -- Insert_Whole_Line_Comment --
+         -------------------------------
+
          procedure Insert_Whole_Line_Comment is
+            Indentation           : Natural;
+            Corrected_Indentation : Natural := 0;
+
             function Look_Before return Boolean;
             --  True if we should look before the current location to determine
-            --  indentation level for the comment. If the next lexeme is "begin",
-            --  for example, we want to indent to the level of "begin", even
-            --  though there is probably previous code more deeply indented.
+            --  indentation level for the comment. If the next lexeme is
+            --  "begin", for example, we want to indent to the level of
+            --  "begin", even though there is probably previous code more
+            --  deeply indented.
 
-            procedure Set_Cur_Indent;
+            procedure Set_Cur_Indentation;
             --  Set Cur_Indentation as appropriate
+
+            -----------------
+            -- Look_Before --
+            -----------------
 
             function Look_Before return Boolean is
             begin
@@ -3090,57 +3101,40 @@ package body Pp.Formatting is
                   return True;
                end if;
 
-               --  Should the following list include "exception"???
                return Kind (New_Tok) not in
                  Res_Begin | Res_Else | Res_Elsif | Res_When;
             end Look_Before;
 
-            Indentation : Natural;
-            Corrected_Indentation : Natural := 0;
+            -------------------------
+            -- Set_Cur_Indentation --
+            -------------------------
 
-            procedure Set_Cur_Indent is
+            procedure Set_Cur_Indentation is
             begin
-               if Sloc (Src_Tok).Col = 1
-                 or else Kind (Src_Tok) = Special_Comment
+               if Kind (Src_Tok) in
+                    Special_Comment | Pp_Off_Comment | Pp_On_Comment
                  or else Arg (Cmd, Comments_Unchanged)
                then
-                  Cur_Indentation := Sloc (Src_Tok).Col - 1; -- Keep as in input
+                  --  Keep as in input
+                  Cur_Indentation := Sloc (Src_Tok).Col - 1;
+
                else
                   Cur_Indentation := Indentation;
-
-                  declare
-                     W          : constant Positive := Width (Src_Tok);
-                     Src_Indent : constant Positive := Sloc (Src_Tok).Col - 1;
-                  begin
-
-                     if (not Comment_Filling_Enabled (Cmd)
-                         or else Kind (Src_Tok) /= Fillable_Comment)
-                       and then Cur_Indentation + W > Arg (Cmd, Max_Line_Length)
-                       and then W <= Arg (Cmd, Max_Line_Length)
-                     then
-                        --  If the current line length exceeds Max_Line_Length
-                        --  get the minimal indentation level and allign at the
-                        --  left, either choosing the current indentation
-                        --  level either keeping it as in input.
-
-                        Cur_Indentation :=
-                          (if Src_Indent mod PP_Indentation (Cmd) = 0
-                           then Natural'Min (Src_Indent, Indentation)
-                           else Indentation);
-                     end if;
-                  end;
-
                end if;
-            end Set_Cur_Indent;
+            end Set_Cur_Indentation;
 
             function Next_Is_Action (Tok : Tokn_Cursor) return Boolean is
-              (not After_Last (Next (Tok)) and then
-               Kind (Next (Tok))
-               in Res_Procedure | Res_Function | Res_Overriding);
+              (not After_Last (Next (Tok))
+               and then Kind (Next (Tok)) in
+                          Res_Procedure | Res_Function | Res_Overriding);
+
+            function Next_Is_Identifier (Tok : Tokn_Cursor) return Boolean is
+              (not After_Last (Next (Tok))
+               and then Kind (Next (Tok)) in Ident);
 
             function Next_Is_Type (Tok : Tokn_Cursor) return Boolean is
-              (not After_Last (Next (Tok)) and then
-               Kind (Next (Tok)) = Res_Type);
+              (not After_Last (Next (Tok))
+               and then Kind (Next (Tok)) = Res_Type);
 
             function Next_Is_Begin (Tok : Tokn_Cursor) return Boolean is
               (not After_Last (Next (Tok)) and then
@@ -3224,21 +3218,18 @@ package body Pp.Formatting is
                  Special_Comment | Fillable_Comment => null;
             end case;
 
-            --  Comments at the beginning are not indented. The "2" is to skip the
-            --  initial sentinel NL.
-
+            --  Comments at the beginning are not indented. The "2" is to skip
+            --  the initial sentinel NL.
             if Kind (Prev (Prev (New_Tok))) = Start_Of_Input then
                Indentation := 0;
 
-            --  Otherwise, we indent as for the max of the preceding and following
-            --  line breaks, except when Look_Before is False (as it is for this
-            --  comment, which is followed by "else").
-
+            --  Otherwise, we indent as for the max of the preceding and
+            --  following line breaks, except when Look_Before is False (as it
+            --  is for this comment, which is followed by "else").
             else
                Indentation := After_Indentation;
 
                if Look_Before then
-
                   --  If last lines-breaks indentation does not affect comments
                   --  and if the previous line is a blank line and the following
                   --  line is a subprogram declaration, the after indentation
@@ -3253,55 +3244,48 @@ package body Pp.Formatting is
                   then
                      null;
 
-                     --  Handling the case where a new comment is added after
-                     --  a sequence of ");" and separated by a blank line from
-                     --  a code line. In this case the alignment will be based
-                     --  on the following line indentation.
-
+                  --  Handling the case where a new comment is added after a
+                  --  sequence of ");" and separated by a blank line from a
+                  --  code line. In this case the alignment will be based on
+                  --  the following line indentation.
                   elsif Prev_Indentation_Affect_Comments and then
                     Is_Blank_Line (Prev_ss (Src_Tok)) and then
                     Kind (New_Tok) = Enabled_LB_Token and then
                     Kind (Prev (New_Tok)) = ';' and then
                     Kind (Prev (Prev (New_Tok))) = ')'
                   then
-
-                     --  Preserve the maximal indentation level when
-                     --  the current ');' is followed by an IF statement
-                     --  part or a CASE statement part or a BEGIN or END
-                     --  keyword align with the following line of code otherwise
-                     --  (i.e., keep the after indentation level)
-
-                     if Next_Is_Begin (New_Tok)
-                       or else Next_Is_End (New_Tok)
-                       or else  Next_Is_Inside_If (New_Tok)
-                       or else Next_Is_Inside_Case (New_Tok)
+                     --  Preserve the maximal indentation level when the
+                     --  current ');' is followed by an IF statement part or a
+                     --  CASE statement part or a BEGIN or END keyword align
+                     --  with the following line of code otherwise (i.e., keep
+                     --  the after indentation level).
+                     if Next_Is_Begin (New_Tok) or else
+                       Next_Is_End (New_Tok) or else
+                       Next_Is_Inside_If (New_Tok) or else
+                       Next_Is_Inside_Case (New_Tok)
                      then
-                        Indentation := Natural'Max (Indentation,
-                                                    Before_Indentation);
+                        Indentation :=
+                          Natural'Max (Indentation, Before_Indentation);
                      end if;
 
-                     --  Preserve the following type indentation level when
-                     --  the current ';' is followed by a type declaration
-
-                  elsif Prev_Indentation_Affect_Comments and then
-                    Is_Blank_Line (Prev_ss (Src_Tok)) and then
-                    Kind (New_Tok) = Enabled_LB_Token and then
-                    Kind (Prev (New_Tok)) = ';' and then
-                    Next_Is_Type (Next_ss (New_Tok))
+                  --  Preserve the following type indentation level when
+                  --  the current ';' is followed by a type declaration.
+                  elsif Prev_Indentation_Affect_Comments
+                    and then Is_Blank_Line (Prev_ss (Src_Tok))
+                    and then Kind (New_Tok) = Enabled_LB_Token
+                    and then Kind (Prev (New_Tok)) = ';'
+                    and then Next_Is_Type (Next_ss (New_Tok))
                   then
+                     null;
 
-                     Indentation := After_Indentation;
-
-                     --  This is for the situation where no Enabled_LB_Token
-                     --  is present and the indentation information
-                     --  is held by Disabled_LB_Token. In this situation,
-                     --  since if this information affects comments then this
-                     --  information should be used to compute the right
-                     --  indentation value.
-
-                  elsif Prev_Indentation_Affect_Comments and then
-                    (Kind (Src_Tok) = Other_Whole_Line_Comment
-                     or else Kind (Src_Tok) = Fillable_Comment)
+                  --  This is for the situation where no Enabled_LB_Token is
+                  --  present and the indentation information is held by
+                  --  Disabled_LB_Token. In this situation, since if this
+                  --  information affects comments then this information should
+                  --  be used to compute the right indentation value.
+                  elsif Prev_Indentation_Affect_Comments
+                    and then (Kind (Src_Tok) = Other_Whole_Line_Comment
+                              or else Kind (Src_Tok) = Fillable_Comment)
                     and then (Kind (New_Tok) = Ident
                               or else Kind (New_Tok) = Res_Others
                               or else Kind (New_Tok) = Res_When
@@ -3309,21 +3293,21 @@ package body Pp.Formatting is
                     and then Kind (Prev (Prev (New_Tok))) = Disabled_LB_Token
                     and then Kind (Prev (Prev (Prev (New_Tok)))) in  ',' | ';'
                   then
-
                      --  The corrected indentation is based on an already set
                      --  value on the LB Indentation and it is used to adjust
                      --  the Cur_Indentation in case of a parathesized context.
-
                      declare
-                        P : constant Tokn_Cursor := Prev (Prev (New_Tok));
+                        P  : constant Tokn_Cursor := Prev (Prev (New_Tok));
                         LB : Line_Break renames
                           All_LB (Line_Break_Token_Index (P));
                      begin
                         if LB.Enabled and then LB.Affects_Comments then
                            --  Do nothing when ');' is detected before
-                           if not
-                             (Kind (Prev (Prev (Prev (New_Tok)))) = ';' and then
-                              Kind (Prev (Prev (Prev (Prev (New_Tok))))) = ')')
+                           if not (Kind (Prev (Prev (Prev (New_Tok)))) = ';'
+                                   and then
+                                     Kind
+                                       (Prev (Prev (Prev (Prev (New_Tok))))) =
+                                          ')')
                            then
                               Corrected_Indentation := LB.Indentation;
                               Indentation := Corrected_Indentation;
@@ -3331,8 +3315,7 @@ package body Pp.Formatting is
 
                         else
                            Indentation :=
-                             Natural'Max (Indentation,
-                                          Before_Indentation);
+                             Natural'Max (Indentation, Before_Indentation);
                         end if;
                      end;
 
@@ -3340,7 +3323,6 @@ package body Pp.Formatting is
                   --  closing parathesis should be aligned with the others
                   --  aggregates and closing parenthesis should have the right
                   --  indentation too.
-
                   elsif Prev_Indentation_Affect_Comments
                     and then (Kind (Src_Tok) = Other_Whole_Line_Comment
                               or else Kind (Src_Tok) = Fillable_Comment)
@@ -3352,7 +3334,7 @@ package body Pp.Formatting is
                   then
 
                      declare
-                        P : constant Tokn_Cursor :=
+                        P  : constant Tokn_Cursor :=
                           Prev (Prev (Prev (New_Tok)));
                         LB : Line_Break renames
                           All_LB (Line_Break_Token_Index (P));
@@ -3364,15 +3346,16 @@ package body Pp.Formatting is
                      end;
 
                   --  Preserve the following type indentation level when
-                  --  the current ';' is followed by an action
-                  elsif Prev_Indentation_Affect_Comments and then
-                    Kind (Src_Tok) = Other_Whole_Line_Comment and then
-                    Kind (New_Tok) = Enabled_LB_Token and then
-                    Kind (Prev (New_Tok)) = ';' and then
-                    Next_Is_Action (New_Tok)
+                  --  the current ';' is followed by a type declaration,
+                  --  action or identifier.
+                  elsif Prev_Indentation_Affect_Comments
+                    and then Kind (Src_Tok) = Other_Whole_Line_Comment
+                    and then Kind (New_Tok) = Enabled_LB_Token
+                    and then Kind (Prev (New_Tok)) = ';'
+                    and then (Next_Is_Action (New_Tok)
+                              or else Next_Is_Identifier (New_Tok))
                   then
-
-                     Indentation := After_Indentation;
+                     null;
 
                   --  The next case deals with comments between the
                   --  Param_Spec and the return keyword.
@@ -3399,9 +3382,8 @@ package body Pp.Formatting is
                               and then Kind (Prev (Prev (Prev (New_Tok)))) =
                                          ')')
                   then
-
                      declare
-                        P : constant Tokn_Cursor := Prev (Prev (New_Tok));
+                        P  : constant Tokn_Cursor := Prev (Prev (New_Tok));
                         LB : Line_Break renames
                           All_LB (Line_Break_Token_Index (P));
                      begin
@@ -3423,7 +3405,6 @@ package body Pp.Formatting is
                               and then Kind (Prev (Prev (New_Tok))) in
                                          Spaces)
                   then
-
                      declare
                         LB : Line_Break renames
                           All_LB (Line_Break_Token_Index (New_Tok));
@@ -3442,13 +3423,11 @@ package body Pp.Formatting is
                       Kind (Prev_ss (Prev (Prev (Prev (Src_Tok))))) = Res_Is
                     and then Kind (Next (New_Tok)) = Enabled_LB_Token
                   then
-
                      --  This is the case of a type declaration having an EOL
                      --  comment and a whole line or fillable comment between
                      --  "is" and "record" keyword.
                      --  In this case, the line comment should be aligned on
                      --  the type indentation.
-
                      Indentation := Before_Indentation;
 
                   elsif Prev_Indentation_Affect_Comments
@@ -3491,7 +3470,7 @@ package body Pp.Formatting is
                     and then (Next_Is_Type (New_Tok)
                               or Next_Is_Action (New_Tok))
                   then
-                     Indentation := After_Indentation;
+                     null;
 
                   elsif not Prev_Indentation_Affect_Comments
                     and then Kind (Src_Tok) in
@@ -3524,8 +3503,7 @@ package body Pp.Formatting is
                      --
                      --  In such cases the comment should be aligned with the
                      --  following declaration
-
-                     Indentation := After_Indentation;
+                     null;
 
                   elsif Prev_Indentation_Affect_Comments
                     and then Kind (Src_Tok) = Fillable_Comment
@@ -3540,8 +3518,8 @@ package body Pp.Formatting is
                      Indentation := Before_Indentation;
 
                   else
-                     Indentation := Natural'Max (Indentation,
-                                                 Before_Indentation);
+                     Indentation :=
+                       Natural'Max (Indentation, Before_Indentation);
                   end if;
                end if;
             end if;
@@ -3569,7 +3547,7 @@ package body Pp.Formatting is
                Indentation := Corrected_Indentation;
             end if;
 
-            Set_Cur_Indent;
+            Set_Cur_Indentation;
 
             if Is_Blank_Line (Prev_ss (Src_Tok))
               or else Kind (Last (New_Tokns'Access)) /= Enabled_LB_Token
@@ -3607,7 +3585,7 @@ package body Pp.Formatting is
                exit when Kind (Src_Tok) not in
                  Special_Comment | Fillable_Comment | Other_Whole_Line_Comment;
 
-               Set_Cur_Indent;
+               Set_Cur_Indentation;
                Append_Temp_Line_Break
                  (Lines_Data_P,
                   Org => "Append_Temp_ in Insert_Whole_Line_Comment 2");

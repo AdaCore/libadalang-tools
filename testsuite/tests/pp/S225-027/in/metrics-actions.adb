@@ -471,9 +471,9 @@ package body METRICS.Actions is
                B         := M;
                M.Is_Spec := False;
 
-            --  A subprogram body could act as a spec. If we haven't
-            --  seen the spec (yet), we assume the body is a spec.
-            --  If we later see a spec, we move the body to the Bodies array.
+               --  A subprogram body could act as a spec. If we haven't
+               --  seen the spec (yet), we assume the body is a spec.
+               --  If we later see a spec, we move the body to the Bodies array.
 
             when Ada_Subp_Body =>
                pragma Assert (B = null);
@@ -1805,11 +1805,11 @@ package body METRICS.Actions is
             if Arg (Cmd, Metrics_All) then
                Result := (Computed_Metrics => False, others => True);
 
-            --  If no metrics were requested on the command line, we compute
-            --  all metrics except coupling and "computed" metrics. ???This
-            --  doesn't match the documentation. Also, at least for now,
-            --  disable contract metrics and Lines_Spark, because those don't
-            --  exist in lalmetric and we're trying to be compatible.
+               --  If no metrics were requested on the command line, we compute
+               --  all metrics except coupling and "computed" metrics. ???This
+               --  doesn't match the documentation. Also, at least for now,
+               --  disable contract metrics and Lines_Spark, because those don't
+               --  exist in lalmetric and we're trying to be compatible.
 
             elsif Result = Empty_Metrics_Set then
                Result := (others => True);
@@ -2523,7 +2523,7 @@ package body METRICS.Actions is
       CU_List : constant Ada_Node := Root (Unit);
       pragma Assert (not CU_List.Is_Null);
       --      pragma Assert (Kind (CU_List) = List_Kind);
---    pragma Assert (Children_Count (CU_List) = 1);
+      --    pragma Assert (Children_Count (CU_List) = 1);
       --  libadalang supports multiple compilation units per file,
       --  but gnatmetric does not, and lalmetric does not yet.
 
