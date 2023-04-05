@@ -40,13 +40,13 @@ package body Utils.Command_Lines.Common is
    function WCEM (Cmd : Command_Line) return Character is
       WCEM : constant String :=
         (if Arg (Cmd, Wide_Character_Encoding) = null
-           then "b"
+           then "8"
            else Arg (Cmd, Wide_Character_Encoding).all);
       C : constant Character := WCEM (1);
    begin
       --  We actually only support -Ws, -W8, and -Wb.
 
-      if WCEM'Length /= 1 or else C not in 's' | '8' | 'b' then
+      if WCEM'Length /= 1 or else C not in '8' | 'b' then
          Cmd_Error ("unrecognized wide character encoding: """ & WCEM & """");
       end if;
 
