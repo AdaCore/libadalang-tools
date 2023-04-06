@@ -302,6 +302,13 @@ package body TGen.Marshalling.JSON_Marshallers is
          then Map_Operator_Name (Function_Typ (FN_Typ).Simple_Name)
          else (Function_Typ (FN_Typ).Simple_Name))));
       Assocs.Insert (Assoc ("PROC_UID", Function_Typ (FN_Typ).Subp_UID));
+      if Function_Typ (FN_Typ).Ret_Typ /= SP.Null_Ref then
+         Assocs.Insert (Assoc
+           ("PROC_RETURN_TY",
+            Function_Typ (FN_Typ).Ret_Typ.Get.Fully_Qualified_Name));
+      else
+         Assocs.Insert (Assoc ("PROC_RETURN_TY", ""));
+      end if;
       for Param_Cur in Function_Typ (FN_Typ).Component_Types.Iterate loop
          Param_Names.Append (Unbounded_String (Key (Param_Cur)));
          Param_Types.Append
