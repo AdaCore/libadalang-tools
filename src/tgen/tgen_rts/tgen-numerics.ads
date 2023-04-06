@@ -91,6 +91,34 @@ package TGen.Numerics is
 
    function Value (F : Any_Float) return Big_Reals.Big_Real;
 
+   function Digits_To_Precision
+     (Digits_Value : Natural) return Precision_Type
+   is
+      --  GNAT makes conservative assumption about the number of digits for
+      --  each of the floating point precision: a single-precision floating
+      --  point will have at the very minimum 6 digits of precision, a double
+      --  15 digits, and in the extended precision format, 18 digits. See the
+      --  specification of the IEEE floating point format for more information.
+      --
+      --  TODO???: this should use the Machine_Mantissa attribute.
+
+     (if Digits_Value <= 6 then Single
+      elsif Digits_Value <= 15 then Double
+      elsif Digits_Value <= 18 then Extended
+      else raise Program_Error with "Unsupported digits value.");
+
+   function First (Digits_Value : Natural) return Any_Float
+   is (case Digits_To_Precision (Digits_Value) is
+          when Single => Create (Float'First),
+          when Double => Create (Long_Float'First),
+          when Extended => Create (Long_Long_Float'First));
+
+   function Last (Digits_Value : Natural) return Any_Float
+   is (case Digits_To_Precision (Digits_Value) is
+          when Single => Create (Float'Last),
+          when Double => Create (Long_Float'Last),
+          when Extended => Create (Long_Long_Float'Last));
+
 private
    type Any_Float (Precision : Precision_Type) is
       record
@@ -121,20 +149,11 @@ private
      (Digits_Value : Natural;
       R            : Big_Reals.Big_Real) return Any_Float
    is
-      --  GNAT makes conservative assumption about the number of digits for
-      --  each of the floating point precision: a single-precision floating
-      --  point will have at the very minimum 6 digits of precision, a double
-      --  15 digits, and in the extended precision format, 18 digits. See the
-      --  specification of the IEEE floating point format for more information.
-      --
-      --  TODO???: this should use the Machine_Mantissa attribute.
-
-     (if Digits_Value <= 6
-      then (Single, F_Conversions.From_Big_Real (R))
-      elsif Digits_Value <= 15 then (Double, LF_Conversions.From_Big_Real (R))
-      elsif Digits_Value <= 18 then
-        (Extended, Long_Long_Float (LF_Conversions.From_Big_Real (R)))
-      else raise Program_Error with "Unsupported digits value.");
+     (case Digits_To_Precision (Digits_Value) is
+         when Single => (Single, F_Conversions.From_Big_Real (R)),
+         when Double => (Double, LF_Conversions.From_Big_Real (R)),
+         when Extended =>
+           (Extended, Long_Long_Float (LF_Conversions.From_Big_Real (R))));
 
    function Value (F : Any_Float) return Big_Reals.Big_Real
    is (case F.Precision is

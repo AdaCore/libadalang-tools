@@ -59,16 +59,6 @@ package body TGen.Types.Real_Types is
                  else "")
          else " (non static)"));
 
-   function Low_Bound_Or_Default (Self : Float_Typ) return Big_Real is
-     (if Self.Has_Range and then Big_Reals.Is_Valid (Self.Range_Value.Min)
-      then Self.Range_Value.Min
-      else LF_Conversions.To_Big_Real (Long_Float'First));
-
-   function High_Bound_Or_Default (Self : Float_Typ) return Big_Real is
-     (if Self.Has_Range and then Big_Reals.Is_Valid (Self.Range_Value.Max)
-      then Self.Range_Value.Max
-      else LF_Conversions.To_Big_Real (Long_Float'Last));
-
    function Low_Bound_Or_Default (Self : Ordinary_Fixed_Typ) return Big_Real
    is (Self.Range_Value.Min);
 
@@ -114,8 +104,14 @@ package body TGen.Types.Real_Types is
       Result : constant JSON_Value := Create_Object;
       Self   : constant Float_Typ := Float_Typ (Ty);
 
-      LB : constant Big_Real := Self.Low_Bound_Or_Default;
-      HB : constant Big_Real := Self.High_Bound_Or_Default;
+      LB : constant Any_Float :=
+        (if Self.Has_Range
+         then Create (Self.Digits_Value, Self.Range_Value.Min)
+         else First (Self.Digits_Value));
+      HB : constant Any_Float :=
+        (if Self.Has_Range
+         then Create (Self.Digits_Value, Self.Range_Value.Max)
+         else Last (Self.Digits_Value));
 
    begin
       Set_Field (Result, "quotient", True);
@@ -123,13 +119,11 @@ package body TGen.Types.Real_Types is
       --  We generate floats uniformly over the representation, and not
       --  over the real range.
 
-      Set_Field (Result,
-                 "value",
-                 To_Quotient_String
-                   (Value
-                      (TGen.Random.Random
-                           (Create (Self.Digits_Value, LB),
-                            Create (Self.Digits_Value, HB)))));
+      Set_Field
+        (Result,
+         "value",
+         To_Quotient_String (Value (TGen.Random.Random (LB, HB))));
+
       return Result;
    end Generate_Float_Typ;
 
