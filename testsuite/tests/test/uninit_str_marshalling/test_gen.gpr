@@ -1,0 +1,19 @@
+with "test/test.gpr";
+with "test/tgen_support/tgen_support.gpr";
+
+project Test_Gen is
+
+   for Main use ("example_gen.adb");
+
+   for Object_Dir use "obj";
+
+   package Builder is
+      for Switches ("ada") use ("-g", "-gnat2022", "-gnatwV");
+   end Builder;
+
+   package Linker is
+      for Switches ("ada") use ("-g");
+   end Linker;
+
+end Test_Gen;
+
