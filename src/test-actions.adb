@@ -767,14 +767,22 @@ package body Test.Actions is
               (Arg (Cmd, Serialized_Test_Dir).all);
          end if;
       else
-         Test.Common.JSON_Test_Dir := new String'
-           (Normalize_Pathname
-              (Root_Prj.Object_Dir.Display_Full_Name
-               & Directory_Separator & Test.Common.Test_Dir_Name.all
-               & Directory_Separator & "JSON_Tests",
-               Resolve_Links  => False,
-               Case_Sensitive => False)
-            & Directory_Separator);
+         if Is_Absolute_Path (Test.Common.Test_Dir_Name.all) then
+            Test.Common.JSON_Test_Dir := new String'
+              (Normalize_Pathname
+                 (Test.Common.Test_Dir_Name.all
+                  & Directory_Separator & "JSON_Tests",
+                  Resolve_Links  => False,
+                  Case_Sensitive => False));
+         else
+            Test.Common.JSON_Test_Dir := new String'
+              (Normalize_Pathname
+                 (Root_Prj.Object_Dir.Display_Full_Name
+                  & Directory_Separator & Test.Common.Test_Dir_Name.all
+                  & Directory_Separator & "JSON_Tests",
+                  Resolve_Links  => False,
+                  Case_Sensitive => False));
+         end if;
       end if;
 
       --  Test vectors
