@@ -37,6 +37,7 @@ with GNAT.SHA1;
 with Utils.Command_Lines;       use Utils.Command_Lines;
 
 with GNAT.Directory_Operations; use GNAT.Directory_Operations;
+with GNAT.Traceback.Symbolic;
 
 with Utils.Tool_Names;
 
@@ -101,7 +102,7 @@ package body Test.Common is
 
       Full_Hash :=
         To_Unbounded_String
-          (Mangle_Hash_Full
+          (Mangle_Hash_16
              (Subp,
               N_Controlling => not Unwind_Controlling));
 
@@ -472,8 +473,24 @@ package body Test.Common is
       Trace
         (Me_Hash,
          "Hash : " & To_String (Head (Hash_Result, 16)));
-      return To_String (Head (Hash_Result, 16));
+      return To_String (Hash_Result);
    end Mangle_Hash_Full;
+
+   --------------------
+   -- Mangle_Hash_16 --
+   --------------------
+
+   function Mangle_Hash_16
+     (Subp           : Ada_Node'Class;
+      Case_Sensitive : Boolean := False;
+      N_Controlling  : Boolean := False;
+      For_Stubs      : Boolean := False) return String
+   is
+   begin
+      return Head
+        (Mangle_Hash_Full (Subp, Case_Sensitive, N_Controlling, For_Stubs),
+         16);
+   end Mangle_Hash_16;
 
    -----------------
    -- Get_Nesting --
@@ -760,6 +777,22 @@ package body Test.Common is
 
       Ada.Text_IO.Put_Line (Ada.Text_IO.Standard_Output, Message);
    end Report_Std;
+
+   ---------------
+   -- Report_Ex --
+   ---------------
+
+   procedure Report_Ex (Ex : Ada.Exceptions.Exception_Occurrence) is
+   begin
+      if Strict_Execution then
+         Report_Err
+           (Ada.Exceptions.Exception_Name (Ex)
+            & " : "
+            & Ada.Exceptions.Exception_Message (Ex)
+            & ASCII.LF
+            & GNAT.Traceback.Symbolic.Symbolic_Traceback (Ex));
+      end if;
+   end Report_Ex;
 
    -----------------------
    -- Unit_To_File_Name --

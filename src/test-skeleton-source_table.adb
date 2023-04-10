@@ -82,6 +82,9 @@ package body Test.Skeleton.Source_Table is
       Project_Name : String_Access;
       --  Name of corresponding project. Only relevant for bodies.
       Unit_Name : String_Access := null;
+
+      Inst_Dir : String_Access;
+      --  Directory for overriding instrumented sources
    end record;
 
    package Source_File_Table is new
@@ -241,6 +244,28 @@ package body Test.Skeleton.Source_Table is
             New_SF_Record.Project_Name := new String'(P.Name);
          end;
 
+      end if;
+
+      if Instrument then
+         declare
+            Given_File : constant GNATCOLL.VFS.Virtual_File :=
+              Create (+Fname);
+            Other_File : constant GNATCOLL.VFS.Virtual_File :=
+              Source_Project_Tree.Other_File (Given_File);
+            F_Info     : constant File_Info                 :=
+              Source_Project_Tree.Info (Given_File);
+            P : constant Project_Type := F_Info.Project;
+         begin
+            New_SF_Record.Inst_Dir := new String'
+              (Display_Full_Name
+                 (P.Object_Dir / (+(To_Lower (P.Name) & Instr_Suffix))));
+            if Given_File /= Other_File
+              and then Is_Regular_File (Other_File.Display_Full_Name)
+            then
+               New_SF_Record.Corresponding_Body :=
+                 new String'(Other_File.Display_Full_Name);
+            end if;
+         end;
       end if;
 
       Insert (SF_Table, Full_Source_Name_String.all, New_SF_Record);
@@ -419,6 +444,47 @@ package body Test.Skeleton.Source_Table is
       Free (Short_Source_Name_String);
       Free (Full_Source_Name_String);
    end Add_Body_Reference;
+
+   ----------------------------------
+   -- Add_Body_For_Instrumentation --
+   ----------------------------------
+
+   procedure Add_Body_For_Instrumentation (Fname : String) is
+      New_SF_Record : SF_Record;
+   begin
+      Trace (Me, "adding source for instrumentation: " & Fname);
+
+      if not Is_Regular_File (Fname) then
+         Report_Std ("gnattest: " & Fname & " not found");
+         return;
+      end if;
+
+      Full_Source_Name_String  :=
+        new String'(Normalize_Pathname
+          (Fname,
+           Resolve_Links  => False,
+             Case_Sensitive => False));
+
+      --  Making the new SF_Record
+      New_SF_Record.Full_Source_Name :=
+        new String'(Full_Source_Name_String.all);
+
+      declare
+         Given_File : constant GNATCOLL.VFS.Virtual_File :=
+           Create (+Fname);
+         F_Info     : constant File_Info                 :=
+           Source_Project_Tree.Info (Given_File);
+         P : constant Project_Type := F_Info.Project;
+      begin
+         New_SF_Record.Inst_Dir := new String'
+           (Display_Full_Name
+              (P.Object_Dir / (+(To_Lower (P.Name) & Instr_Suffix))));
+      end;
+
+      Insert (SF_Table, Full_Source_Name_String.all, New_SF_Record);
+
+      Free (Full_Source_Name_String);
+   end Add_Body_For_Instrumentation;
 
    ----------------------
    --  SF_Table_Empty  --
@@ -647,6 +713,22 @@ package body Test.Skeleton.Source_Table is
       return Source_File_Table.Element
         (SF_Table, SN).Suffixless_Name.all;
    end Get_Source_Suffixless_Name;
+
+   --------------------------
+   -- Get_Source_Instr_Dir --
+   --------------------------
+
+   function Get_Source_Instr_Dir (Source_Name : String) return String
+   is
+      SN : constant String :=
+        Normalize_Pathname
+          (Name           => Source_Name,
+           Resolve_Links  => False,
+           Case_Sensitive => False);
+   begin
+      return Source_File_Table.Element
+        (SF_Table, SN).Inst_Dir.all;
+   end Get_Source_Instr_Dir;
 
    ------------------------------
    -- Initialize_Project_Table --

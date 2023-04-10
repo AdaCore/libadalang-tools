@@ -205,6 +205,8 @@ package body Test.Actions is
       Test.Common.Verbose := Arg (Cmd, Verbose);
       Test.Common.Quiet   := Arg (Cmd, Quiet);
 
+      Test.Common.Instrument := Arg (Cmd, Dump_Test_Inputs);
+
       if Arg (Cmd, Passed_Tests) /= null then
          if Arg (Cmd, Passed_Tests).all = "hide" then
             Test.Common.Show_Passed_Tests := False;
@@ -630,6 +632,11 @@ package body Test.Actions is
               ("options --additional-tests and --stub are incompatible");
          end if;
 
+         if Arg (Cmd, Dump_Test_Inputs) then
+            Cmd_Error_No_Help
+              ("options --dump-test-inputs and --stub are not yet compatible");
+         end if;
+
          if not Tests_Dir_Set then
             Free (Test.Common.Test_Dir_Name);
             Test.Common.Test_Dir_Name := new String'
@@ -751,6 +758,42 @@ package body Test.Actions is
          when Root_Mode   =>
             Check_Separate_Root;
       end case;
+
+      --  Instrumentation
+
+      if Arg (Cmd, Dump_Test_Inputs) then
+         Files := SPT.Root_Project.Source_Files (True);
+         for F in Files'Range loop
+            if
+              To_Lower (SPT.Info (Files (F)).Language) = "ada"
+              and then not Is_Externally_Built (Files (F))
+            then
+               if SPT.Info (Files (F)).Unit_Part = Unit_Body then
+                  Test.Skeleton.Source_Table.Add_Body_For_Instrumentation
+                    (Files (F).Display_Full_Name);
+               end if;
+            end if;
+         end loop;
+         Unchecked_Free (Files);
+
+         declare
+            F : File_Array_Access;
+         begin
+            Append
+              (F,
+               GNATCOLL.VFS.Create
+                 (+(Test.Common.Harness_Dir_Str.all
+                    & Directory_Separator
+                    & "test_obj"
+                    & Directory_Separator
+                    & Test.Common.Test_Prj_Prefix
+                    & To_Lower (SPT.Root_Project.Name)
+                    & Test.Common.Instr_Suffix)));
+            Test.Common.Create_Dirs (F);
+            Unchecked_Free (F);
+         end;
+
+      end if;
 
       --  JSON Tests
 

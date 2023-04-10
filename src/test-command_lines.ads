@@ -49,7 +49,8 @@ package Test.Command_Lines is
       Gen_Test_Vectors,
       Test_Filtering,
       Test_Filtering_File_IO,
-      Serialized_Test_Dir);
+      Serialized_Test_Dir,
+      Dump_Test_Inputs);
 
    package Test_Boolean_Switches is new Boolean_Switches
      (Descriptor,
