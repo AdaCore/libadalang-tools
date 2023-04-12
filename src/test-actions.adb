@@ -787,8 +787,24 @@ package body Test.Actions is
 
       --  Test vectors
 
+      --  Alway initialize the Libgen context; we don't know if there will be
+      --  JSON tests to load or not.
+
+      Test.Common.TGen_Libgen_Ctx := TGen.Libgen.Create
+        (Output_Dir         =>
+           Test.Common.Harness_Dir_Str.all & "tgen_support",
+         User_Project_Path  => Arg (Cmd, Project_File).all,
+         Root_Templates_Dir =>
+           (Containing_Directory
+              (Containing_Directory
+                 (GNAT.OS_Lib.Locate_Exec_On_Path ("gnattest").all))
+            & GNAT.OS_Lib.Directory_Separator & "share"
+            & GNAT.OS_Lib.Directory_Separator & "tgen"
+            & GNAT.OS_Lib.Directory_Separator & "templates"));
+
       if Arg (Cmd, Gen_Test_Vectors) then
          Test.Common.Generate_Test_Vectors := True;
+         Test.Common.Need_Lib_Support := True;
          declare
             Dir : File_Array_Access;
          begin
@@ -804,18 +820,6 @@ package body Test.Actions is
            (Test.Common.TGen_Ctx,
             Ada.Strings.Unbounded.To_Unbounded_String
               (Test.Common.JSON_Test_Dir.all));
-
-         Test.Common.TGen_Libgen_Ctx := TGen.Libgen.Create
-           (Output_Dir         =>
-             Test.Common.Harness_Dir_Str.all & "tgen_support",
-            User_Project_Path  => Arg (Cmd, Project_File).all,
-            Root_Templates_Dir =>
-              (Containing_Directory
-                (Containing_Directory
-                   (GNAT.OS_Lib.Locate_Exec_On_Path ("gnattest").all))
-              & GNAT.OS_Lib.Directory_Separator & "share"
-              & GNAT.OS_Lib.Directory_Separator & "tgen"
-              & GNAT.OS_Lib.Directory_Separator & "templates"));
 
          if Arg (Cmd, Gen_Test_Num) /= null then
             begin
@@ -958,6 +962,10 @@ package body Test.Actions is
             end if;
             Test.Harness.Test_Runner_Generator  (Src_Prj);
             Test.Harness.Project_Creator        (Src_Prj);
+         end if;
+         if Test.Common.Need_Lib_Support then
+            TGen.Libgen.Generate
+              (Test.Common.TGen_Libgen_Ctx, TGen.Libgen.All_Parts);
          end if;
          Test.Harness.Generate_Makefile (Src_Prj);
          Test.Common.Generate_Common_File;

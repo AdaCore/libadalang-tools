@@ -376,6 +376,9 @@ package Test.Common is
    TGen_Libgen_Ctx : TGen.Libgen.Libgen_Context;
    --  Context for the support library generation
 
+   Need_Lib_Support : Boolean := False;
+   --  Whether we actually need to output the tgen_support library or not
+
    TGen_Num_Tests : Positive := 5;
    --  Number of tests to be generated for each procedure
 

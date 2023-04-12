@@ -739,7 +739,7 @@ package body Test.Skeleton is
             Process_Stubs (Data.Units_To_Stub);
          end if;
 
-         if Generate_Test_Vectors and then not Data.Is_Generic then
+         if not Data.Is_Generic then
             Subp_Cur := Data.Subp_List.First;
             while Subp_Cur /= Subp_Data_List.No_Element loop
                declare
@@ -759,12 +759,14 @@ package body Test.Skeleton is
                         Report_Std (To_String (Diags));
                         Report_Std ("Test harness may not build.");
                      end if;
-                     TGen.Gen_Strategies.Generate_Test_Vectors
-                     (TGen_Ctx,
-                        Test.Common.TGen_Num_Tests,
-                        Element (Subp_Cur).Subp_Declaration.As_Basic_Decl,
-                        Ada.Strings.Unbounded.To_Unbounded_String
-                        (Element (Subp_Cur).Subp_Full_Hash.all));
+                     if Generate_Test_Vectors then
+                        TGen.Gen_Strategies.Generate_Test_Vectors
+                          (TGen_Ctx,
+                           Test.Common.TGen_Num_Tests,
+                           Element (Subp_Cur).Subp_Declaration.As_Basic_Decl,
+                           Ada.Strings.Unbounded.To_Unbounded_String
+                             (Element (Subp_Cur).Subp_Full_Hash.all));
+                     end if;
                   when others =>
                      if Debug_Flag_1 then
                         Report_Std ("Warning: (TGen) "
@@ -803,9 +805,9 @@ package body Test.Skeleton is
                end;
                Subp_Data_List.Next (Subp_Cur);
             end loop;
-            TGen.Gen_Strategies.Generate_Artifacts (TGen_Ctx);
-            TGen.Libgen.Generate
-              (Test.Common.TGen_Libgen_Ctx, TGen.Libgen.All_Parts);
+            if Generate_Test_Vectors then
+               TGen.Gen_Strategies.Generate_Artifacts (TGen_Ctx);
+            end if;
          end if;
 
          declare
@@ -6814,8 +6816,8 @@ package body Test.Skeleton is
       --  overwritten if the hash hasn't changed.
 
       JSON_Unit_File : constant Virtual_File := GNATCOLL.VFS.Create
-         (+(Test.Common.JSON_Test_Dir.all & Data.Unit_Full_Name.all
-         & ".json"));
+         (+Test.Common.JSON_Test_Dir.all)
+         / (+(Data.Unit_Full_Name.all & ".json"));
 
       Unit_Raw_Content : GNAT.Strings.String_Access;
 
@@ -6967,6 +6969,10 @@ package body Test.Skeleton is
                   Tested_Type           => No_Ada_Node),
                Test_Package  => new String'(Test_Unit_Name),
                Original_Type => No_Ada_Node));
+
+            --  Indicate that we are actually needing the tgen_support lib
+
+            Test.Common.Need_Lib_Support := True;
 
             Put_Line (Spec_F, "with GNATtest_Generated;");
             New_Line (Spec_F);
@@ -8374,7 +8380,7 @@ package body Test.Skeleton is
       Put_New_Line;
       S_Put (0, "with ""gnattest_common.gpr"";");
       Put_New_Line;
-      if Test.Common.Generate_Test_Vectors then
+      if Test.Common.Need_Lib_Support then
          S_Put
            (0,
             "with ""tgen_support" & GNAT.OS_Lib.Directory_Separator

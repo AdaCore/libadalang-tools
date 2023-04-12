@@ -1,6 +1,0 @@
-description:
-    Test test-case dumping in JSON format for a subset of types.
-
-driver: shell_script
-control:
-    - [XFAIL, 'x86', 'Marshalling not working for 32bits (UB03-008)']
