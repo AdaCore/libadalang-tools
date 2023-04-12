@@ -1,0 +1,7 @@
+description:
+    Test test-case dumping in JSON format for uninitialized characters.
+
+driver: shell_script
+control:
+    - [XFAIL, 'windows', 'Marshalling of chars broken on windows']
+    - [XFAIL, 'x86', 'Marshalling not working for 32bits (UB03-008)']

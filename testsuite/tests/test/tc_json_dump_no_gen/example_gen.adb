@@ -48,7 +48,7 @@ procedure Example_Gen is
       Y_2 => 2);
 
    Shape_Arr_Inst : constant Shape_Array (1 .. 2) :=
-     (1 => Shape_Inst, others => <>);
+     (1 => Shape_Inst, others => (Name_Size => 10, Name => "Null_Shape", others => <>));
 
    T_Gen_Inst : constant T_Gen := 9;
 

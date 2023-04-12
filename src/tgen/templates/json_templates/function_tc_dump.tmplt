@@ -46,6 +46,9 @@
          Subp_JSON := TGen.JSON.Create_Object;
          Subp_JSON.Set_Field ("fully_qualified_name", "@_PROC_NAME_@");
          Subp_JSON.Set_Field ("generation_complete", True);
+@@IF@@ @_PROC_RETURN_TY_@ /= ""
+         Subp_JSON.Set_Field ("return_type", "@_PROC_RETURN_TY_@");
+@@END_IF@@
       end if;
       New_Test_Vec.Set_Field ("origin", @_GLOBAL_PREFIX_@_Origin);
 @@TABLE@@
