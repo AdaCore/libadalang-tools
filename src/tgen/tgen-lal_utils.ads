@@ -56,4 +56,18 @@ package TGen.LAL_Utils is
      (Text_QN : Libadalang.Analysis.Unbounded_Text_Type_Array)
       return Ada_Qualified_Name;
 
+   function JSON_Test_Filename
+     (Subp : Libadalang.Analysis.Basic_Decl) return String with
+     Pre => Subp.P_Is_Subprogram;
+   --  Return the simple name for the JSON file in which the tests for Subp
+   --  should be stored.
+
+   function Default_Blob_Test_Filename
+     (Subp : Libadalang.Analysis.Basic_Decl) return String with
+     Pre => Subp.P_Is_Subprogram;
+   --  Return the default simple name for the binary file in which a test
+   --  for Subp should be stored. It has no extension, so it can be suffixed
+   --  or prefixed with anything to differentiate various test cases for the
+   --  same subprogram.
+
 end TGen.LAL_Utils;

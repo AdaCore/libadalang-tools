@@ -23,6 +23,8 @@
 
 with Libadalang.Common; use Libadalang.Common;
 
+with Test.Common;
+
 package body TGen.LAL_Utils is
 
    -----------------------
@@ -82,5 +84,44 @@ package body TGen.LAL_Utils is
       end loop;
       return Res;
    end Convert_Qualified_Name;
+
+   ------------------------
+   -- JSON_Test_Filename --
+   ------------------------
+
+   function JSON_Test_Filename
+     (Subp : Libadalang.Analysis.Basic_Decl) return String
+   is
+      Comp_Unit : constant Libadalang.Analysis.Compilation_Unit :=
+        Subp.P_Enclosing_Compilation_Unit;
+   begin
+      return To_JSON_filename
+        (Convert_Qualified_Name
+           (Comp_Unit.P_Syntactic_Fully_Qualified_Name));
+   end JSON_Test_Filename;
+
+   --------------------------------
+   -- Default_Blob_Test_Filename --
+   --------------------------------
+
+   function Default_Blob_Test_Filename
+     (Subp : Libadalang.Analysis.Basic_Decl) return String
+   is
+      FQN : Ada_Qualified_Name :=
+        To_Qualified_Name (Subp.P_Defining_Name.F_Name);
+   begin
+      --  Having a filename with double quotes inside is a recipe for disaster,
+      --  so map the operator name if Subp is one.
+
+      if Is_Operator (+(Unbounded_String (FQN.Last_Element))) then
+         FQN.Replace_Element
+           (FQN.Last_Index,
+            To_Unbounded_String
+              (Map_Operator_Name
+                (To_String (Unbounded_String (FQN.Last_Element)))));
+      end if;
+      FQN.Append (To_Unbounded_String (Test.Common.Mangle_Hash_Full (Subp)));
+      return To_Filename (FQN);
+   end Default_Blob_Test_Filename;
 
 end TGen.LAL_Utils;

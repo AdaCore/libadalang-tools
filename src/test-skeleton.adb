@@ -64,6 +64,7 @@ with Utils.Command_Lines; use Utils.Command_Lines;
 with Utils.Environment;
 with Utils_Debug; use Utils_Debug;
 
+with TGen.LAL_Utils;
 with TGen.Libgen;
 with TGen.Gen_Strategies;
 with TGen.Strings;
@@ -6817,7 +6818,8 @@ package body Test.Skeleton is
 
       JSON_Unit_File : constant Virtual_File := GNATCOLL.VFS.Create
          (+Test.Common.JSON_Test_Dir.all)
-         / (+(Data.Unit_Full_Name.all & ".json"));
+         / (+TGen.LAL_Utils.JSON_Test_Filename
+               (Data.Subp_List.First_Element.Subp_Declaration.As_Basic_Decl));
 
       Unit_Raw_Content : GNAT.Strings.String_Access;
 

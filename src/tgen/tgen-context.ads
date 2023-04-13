@@ -87,7 +87,9 @@ package TGen.Context is
       --  Directory for generated artifacts
 
       Test_Vectors : Unit_To_JSON_Map;
-      --  JSON holding the generated test vectors, one for each unit
+      --  JSON holding the generated test vectors, one for each unit.
+      --  The keys are the simple filenames in which the test vectors will be
+      --  written.
 
       Codegen_Required : Boolean := False;
       --  Whether generation of some type values requires a dynamic-validation
