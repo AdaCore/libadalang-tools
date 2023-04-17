@@ -37,13 +37,6 @@ package TGen.Files is
      (Context : Generation_Context) return Virtual_File
    is (GNATCOLL.VFS.Create (Filesystem_String (+Context.Output_Dir)));
 
-   function Get_JSON_Name
-     (Context   : Generation_Context;
-      Unit_Name : String) return Virtual_File
-     is (Get_Output_Dir (Context) / Filesystem_String (Unit_Name & ".json"));
-   --  Return the name of the JSON file that will hold the generation results
-   --  for unit Unit_Name.
-
    function "/" (Dir, Name : String) return String is
      (Ada.Directories.Compose (Dir, Name));
    --  Likewise, without the "dir shouldn't be empty" constraint but

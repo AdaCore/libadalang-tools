@@ -39,8 +39,8 @@ with TGen.Types.Translation;    use TGen.Types.Translation;
 package body TGen.Gen_Strategies is
 
    procedure Try_Load_Tests
-     (Context   : in out Generation_Context;
-      Unit_Name : String);
+     (Context  : in out Generation_Context;
+      Filename : String);
    --  Check if there are already tests generated for the unit in the output
    --  dir; if there are, load them in the context, otherwise create an empty
    --  JSON object for the unit in the Context.Test_Vectors test-cases map.
@@ -167,7 +167,7 @@ package body TGen.Gen_Strategies is
       for Unit_JSON_Cursor in Context.Test_Vectors.Iterate loop
          declare
             File : constant Virtual_File :=
-              Get_JSON_Name (Context, +Key (Unit_JSON_Cursor));
+              Get_Output_Dir (Context) / (+(+Key (Unit_JSON_Cursor)));
             JSON_Unit_Writable_File : Writable_File :=
               Write_File (File);
          begin
@@ -191,6 +191,8 @@ package body TGen.Gen_Strategies is
    is
       Subp_Data : Subprogram_Data :=
         Extract_Subprogram_Data (Subp);
+      JSON_Filename      : constant String :=
+        JSON_Test_Filename (Subp.As_Basic_Decl);
       Function_JSON      : JSON_Value := Create_Object;
       Test_Vectors_JSON  : JSON_Array := Empty_Array;
       Test_Vector_Values : JSON_Array;
@@ -232,14 +234,14 @@ package body TGen.Gen_Strategies is
       --  Try to load pre-existing tests, if any, or create an empty unit JSON
       --  if there is not such file on disk.
 
-      if not Context.Test_Vectors.Contains (Subp_Data.Parent_Package) then
-         Try_Load_Tests (Context, +Subp_Data.Parent_Package);
+      if not Context.Test_Vectors.Contains (+JSON_Filename) then
+         Try_Load_Tests (Context, JSON_Filename);
       end if;
 
       declare
          use Unit_To_JSON_Maps;
          Unit_JSON : constant Unit_To_JSON_Maps.Reference_Type :=
-           Context.Test_Vectors.Reference (Subp_Data.Parent_Package);
+           Context.Test_Vectors.Reference (+JSON_Filename);
       begin
          --  Identify if there are already JSON tests for this subp
 
@@ -304,24 +306,24 @@ package body TGen.Gen_Strategies is
    --------------------
 
    procedure Try_Load_Tests
-     (Context   : in out Generation_Context;
-      Unit_Name : String)
+     (Context  : in out Generation_Context;
+      Filename : String)
    is
       use Unit_To_JSON_Maps;
 
       JSON_File : constant Virtual_File :=
-        Get_JSON_Name (Context, Unit_Name);
+        Get_Output_Dir (Context) / (+Filename);
       JSON_Content : JSON_Value := Create_Object;
    begin
       if JSON_File.Is_Regular_File then
          JSON_Content := TGen.JSON.Read
            (JSON_File.Read_File.all, +JSON_File.Full_Name);
          if JSON_Content.Kind = JSON_Object_Type then
-            Context.Test_Vectors.Insert (+Unit_Name, JSON_Content);
+            Context.Test_Vectors.Insert (+Filename, JSON_Content);
             return;
          end if;
       end if;
-      Context.Test_Vectors.Insert (+Unit_Name, JSON_Content);
+      Context.Test_Vectors.Insert (+Filename, JSON_Content);
    end Try_Load_Tests;
 
 end TGen.Gen_Strategies;

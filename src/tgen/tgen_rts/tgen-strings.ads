@@ -180,4 +180,8 @@ package TGen.Strings is
    --  Return a string representing the kind of operator that Op_Name is, or
    --  raise Constraint_Error ir Op_Name is an unknown operator.
 
+   function To_JSON_filename (FQN : Ada_Qualified_Name) return String is
+     (To_Filename (FQN) & ".json");
+   --  Convert FQN to a filename, and append the ".json" extension
+
 end TGen.Strings;
