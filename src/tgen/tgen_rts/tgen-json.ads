@@ -488,10 +488,11 @@ package TGen.JSON is
    package Utils is
       type JSON_Auto_IO is new Ada.Finalization.Limited_Controlled with
       private;
-      --  Type to handle automatic loading and un-loading from disk of JSON
-      --  values. When created, if the specified filename exists, the internal
-      --  ref will hold the contents of that file loaded as a JSON_Value. It
-      --  will then be written to disk once this object is finalized.
+      --  Type to handle automatic reading and writing JSON values from a
+      --  specific file. When created, if the specified filename exists, the
+      --  internal ref will hold the contents of that file loaded as a
+      --  JSON_Value. It will then be written to disk once this object is
+      --  finalized.
 
       function Create (Filename : String) return JSON_Auto_IO;
       --  Create a JSON_Auto_IO by loading the contents of Filename in its

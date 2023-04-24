@@ -41,7 +41,6 @@ with GNATCOLL.Projects;
 with Ada.Sequential_IO;
 with Langkit_Support.Slocs; use Langkit_Support.Slocs;
 
-with TGen.Context;
 with TGen.Libgen;
 
 package Test.Common is
@@ -380,13 +379,12 @@ package Test.Common is
    Unparse_Test_Vectors : Boolean := False;
    --  Indicates that we should unparse test vectors to produce a GNATtest
    --  harness with Ada literal values, not depending on the tgen_support
-   --  library.
+   --  library. False by default as there are many scenarios in which
+   --  unparsing will result in invalid code
+   --  (private types from other packages etc..)
 
    JSON_Test_Dir : String_Access;
    --  Dir in which the test vector in json format should be stored / looked up
-
-   TGen_Ctx : TGen.Context.Generation_Context;
-   --  Shared context for test vectors generation
 
    TGen_Templates_Dir : String_Access;
    --  Path to the installed TGen templates dir
@@ -394,8 +392,17 @@ package Test.Common is
    TGen_Libgen_Ctx : TGen.Libgen.Libgen_Context;
    --  Context for the support library generation
 
-   Need_Lib_Support : Boolean := False;
-   --  Whether we actually need to output the tgen_support library or not
+   type Lib_Support_Status is (Not_Needed, Needed, Generated);
+
+   procedure Request_Lib_Support;
+   --  Record that we need to output the TGen support library. This has no
+   --  effect if the support library has already been generated.
+
+   function Get_Lib_Support_Status return Lib_Support_Status;
+   --  Get the current lib support status
+
+   procedure Mark_Lib_Support_Generated;
+   --  Flag that the TGen support library has already been generated
 
    TGen_Num_Tests : Positive := 5;
    --  Number of tests to be generated for each procedure
@@ -420,5 +427,9 @@ package Test.Common is
 
    Instr_Suffix : constant String := "-gnattest-instr";
    --  Suffix for object subdirs containing instrumented sources
+private
+
+   Need_Lib_Support : Lib_Support_Status := Not_Needed;
+   --  Whether we actually need to output the tgen_support library or not
 
 end Test.Common;

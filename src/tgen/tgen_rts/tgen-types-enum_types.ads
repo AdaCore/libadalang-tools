@@ -45,7 +45,7 @@ package TGen.Types.Enum_Types is
 
    function Supports_Static_Gen (Self : Char_Typ) return Boolean is
       (not Self.Has_Range or else Self.Range_Value.Static);
-   --  Wether values for this Typ can be statically generated
+   --  Whether values for this Typ can be statically generated
 
    function Image (Self : Char_Typ) return String;
 
@@ -76,7 +76,7 @@ package TGen.Types.Enum_Types is
    type Bool_Typ is new Enum_Typ with null record;
 
    function Supports_Static_Gen (Self : Bool_Typ) return Boolean;
-   --  Wether values for this Typ can be statically generated
+   --  Whether values for this Typ can be statically generated
 
    function Image (Self : Bool_Typ) return String;
 
@@ -112,7 +112,7 @@ package TGen.Types.Enum_Types is
 
    function Supports_Static_Gen (Self : Other_Enum_Typ) return Boolean is
      (Self.Is_Static);
-   --  Wether values for this Typ can be statically generated
+   --  Whether values for this Typ can be statically generated
 
    function Image (Self : Other_Enum_Typ) return String;
 

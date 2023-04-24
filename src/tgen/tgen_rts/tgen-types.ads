@@ -124,7 +124,7 @@ package TGen.Types is
    --  record type must be constrained.
 
    function Supports_Static_Gen (Self : Typ) return Boolean is (False);
-   --  Wether values for this Typ can be statically generated
+   --  Whether values for this Typ can be statically generated
 
    function Default_Strategy (Self : Typ)
       return TGen.Strategies.Strategy_Type'Class;

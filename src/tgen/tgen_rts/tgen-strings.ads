@@ -179,7 +179,7 @@ package TGen.Strings is
    subtype Ada_Qualified_Name_Sets_Map is Ada_Qualified_Name_Sets_Maps.Map;
 
    function Is_Operator (Op_Name : String) return Boolean;
-   --  Return wether Self is an operator
+   --  Return Whether Self is an operator
 
    function Map_Operator_Name (Op_Name : String) return String with
      Pre => Is_Operator (Op_Name);

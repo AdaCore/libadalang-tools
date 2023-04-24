@@ -1226,4 +1226,31 @@ package body Test.Common is
 
    end Check_Unit_For_Elaboration;
 
+   -------------------------
+   -- Request_Lib_Support --
+   -------------------------
+
+   procedure Request_Lib_Support is
+   begin
+      if Need_Lib_Support = Not_Needed then
+         Need_Lib_Support := Needed;
+      end if;
+   end Request_Lib_Support;
+
+   ----------------------------
+   -- Get_Lib_Support_Status --
+   ----------------------------
+
+   function Get_Lib_Support_Status return Lib_Support_Status is
+     (Need_Lib_Support);
+
+   --------------------------------
+   -- Mark_Lib_Support_Generated --
+   --------------------------------
+
+   procedure Mark_Lib_Support_Generated is
+   begin
+      Need_Lib_Support := Generated;
+   end Mark_Lib_Support_Generated;
+
 end Test.Common;

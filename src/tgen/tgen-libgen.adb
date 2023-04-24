@@ -625,11 +625,6 @@ package body TGen.Libgen is
                Ctx.Strategy_Map);
          end if;
 
-         --  Get the transitive closure of the types on which the parameters'
-         --  types depend, that need to be included in the support library.
-         --  Only do so if we actually inserted the type in the set to avoid
-         --  recomputing transitive closures and doing set unions.
-
          for Param of Fct_Typ.Component_Types loop
 
             --  Fill out the support package map
@@ -644,6 +639,14 @@ package body TGen.Libgen is
          Fct_Ref.Set (Fct_Typ);
          Subp_Types := Type_Dependencies (Fct_Ref, Transitive => True);
 
+         --  Ctx.Types_Per_Package contains the types for which marshallers
+         --  will be generated (with the exclusion of instance types and
+         --  anonymous types), whereas Ctx.Strat_Types_Per_Package contains the
+         --  types for which the representation will be generated. These are
+         --  very similar in practice, the main difference being that the Strat
+         --  map will contain the instantiated Function_Typ, whereas the
+         --  regular map will only contain the base Function_Typ.
+
          Append_Types
            (Subp_Types,
             Ctx.Types_Per_Package,
@@ -655,8 +658,8 @@ package body TGen.Libgen is
 
          Append_Types
            (Typ_Sets.To_Set (Trans_Res.Res),
-           Ctx.Types_Per_Package,
-           Support_Library_Package'Access);
+            Ctx.Types_Per_Package,
+            Support_Library_Package'Access);
 
          Append_Types
            (Subp_Types,

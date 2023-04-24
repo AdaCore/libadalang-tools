@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2019-2022, AdaCore                    --
+--                         Copyright (C) 2023, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -20,46 +20,32 @@
 -- the files COPYING3 and COPYING.RUNTIME respectively.  If not, see        --
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
+--
+--  Package defining the processing of units in order to generate test vectors
+--  for the subprograms in a given unit.
+--
+--  These test vectors are to be inserted in the test harness, see
+--  Test.Skeleton for this.
 
 with Libadalang.Analysis; use Libadalang.Analysis;
+
 with Utils.Command_Lines; use Utils.Command_Lines;
-with Utils.Tools;         use Utils.Tools;
 
-package Test.Actions is
+package Test.Generation is
 
-   type Test_Tool is new Tool_State with private;
+   procedure Run_First_Pass_Tool (Cmd : Command_Line);
+   --  Run a new instance of Test.Actions.Test_Tool that will process all
+   --  sources to find the subprogram of interest and generate, build and run
+   --  the generation harness.
 
-   procedure Register_Specific_Attributes;
-   --  Registers gnattest specific project attributes so that they can be
-   --  queried later.
+   procedure Process_Source (Unit : Analysis_Unit);
+   --  Iterate over the subprograms defined in Unit and include them in the
+   --  TGen.Libgen context so that the subprograms get included in the value
+   --  generation harness.
 
-private
+   procedure Generate_Build_And_Run (Cmd : Command_Line);
+   --  Generate, build and run the test vector generation harness. This also
+   --  run a second pass of the gnattest tool, to actually create a user facing
+   --  test harness, unpacking the serialized tests just created.
 
-   overriding procedure Init
-     (Tool : in out Test_Tool; Cmd : in out Command_Line);
-   overriding procedure First_Per_File_Action
-     (Tool : in out Test_Tool;
-      Cmd : Command_Line;
-      File_Name : String;
-      Input : String;
-      BOM_Seen : Boolean;
-      Unit : Analysis_Unit);
-   overriding procedure First_Pass_Post_Process
-     (Tool : in out Test_Tool; Cmd : in out Command_Line);
-   overriding procedure Second_Per_File_Action
-     (Tool : in out Test_Tool;
-      Cmd : Command_Line;
-      File_Name : String;
-      Input : String;
-      BOM_Seen : Boolean;
-      Unit : Analysis_Unit);
-   overriding procedure Final (Tool : in out Test_Tool; Cmd : Command_Line);
-   overriding procedure Tool_Help (Tool : Test_Tool);
-   overriding procedure Second_Per_Invalid_File_Action
-     (Tool      : in out Test_Tool;
-      Cmd       :        Command_Line;
-      File_Name :        String);
-
-   type Test_Tool is new Tool_State with null record;
-
-end Test.Actions;
+end Test.Generation;

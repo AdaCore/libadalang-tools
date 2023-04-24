@@ -59,7 +59,7 @@ package TGen.Types.Record_Types is
 
    function Supports_Static_Gen (Self : Record_Typ) return Boolean is
      (Self.Static_Gen);
-   --  Wether values for this Typ can be statically generated
+   --  Whether values for this Typ can be statically generated
 
    function Image (Self : Record_Typ) return String;
 

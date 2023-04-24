@@ -49,7 +49,7 @@ package TGen.Types.Array_Types is
 
    function Supports_Static_Gen (Self : Array_Typ) return Boolean is
      (Self.Static_Gen);
-   --  Wether values for this Typ can be statically generated
+   --  Whether values for this Typ can be statically generated
 
    function Get_Diagnostics (Self : Array_Typ) return String;
 

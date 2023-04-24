@@ -51,7 +51,7 @@ package TGen.Types.Real_Types is
 
    function Supports_Static_Gen (Self : Float_Typ) return Boolean is
      (Self.Is_Static);
-   --  Wether values for this Typ can be statically generated
+   --  Whether values for this Typ can be statically generated
 
    function Image (Self : Float_Typ) return String;
 
@@ -80,7 +80,7 @@ package TGen.Types.Real_Types is
 
    function Supports_Static_Gen (Self : Ordinary_Fixed_Typ) return Boolean is
      (Self.Is_Static);
-   --  Wether values for this Typ can be statically generated
+   --  Whether values for this Typ can be statically generated
 
    overriding function Default_Strategy
      (Self : Ordinary_Fixed_Typ) return Strategy_Type'Class;
@@ -126,7 +126,7 @@ package TGen.Types.Real_Types is
 
    function Supports_Static_Gen (Self : Decimal_Fixed_Typ) return Boolean is
      (Self.Is_Static);
-   --  Wether values for this Typ can be statically generated
+   --  Whether values for this Typ can be statically generated
 
    overriding function Default_Strategy
      (Self : Decimal_Fixed_Typ) return Strategy_Type'Class;

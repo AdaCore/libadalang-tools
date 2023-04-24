@@ -214,7 +214,7 @@ package TGen.Types.Constraints is
    function Supports_Static_Gen (Self : Anonymous_Typ) return Boolean is
      (Self.Named_Ancestor.Get.Supports_Static_Gen
       and then Self.Subtype_Constraints.Static);
-   --  Wether values for this Typ can be statically generated
+   --  Whether values for this Typ can be statically generated
 
    function Encode (Self : Anonymous_Typ; Val : JSON_Value) return JSON_Value;
 
@@ -246,7 +246,7 @@ package TGen.Types.Constraints is
 
    function Supports_Static_Gen (Self : Instance_Typ) return Boolean is
      (False);
-   --  Wether values for this Typ can be statically generated
+   --  Whether values for this Typ can be statically generated
 
    function Get_Diagnostics (Self : Instance_Typ) return String is
      (Self.Orig_Typ.Get.Get_Diagnostics);
