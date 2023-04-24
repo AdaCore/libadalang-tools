@@ -37,7 +37,7 @@ private
 
    overriding procedure Init
      (Tool : in out Test_Tool; Cmd : in out Command_Line);
-   overriding procedure Per_File_Action
+   overriding procedure Second_Per_File_Action
      (Tool : in out Test_Tool;
       Cmd : Command_Line;
       File_Name : String;
@@ -46,7 +46,7 @@ private
       Unit : Analysis_Unit);
    overriding procedure Final (Tool : in out Test_Tool; Cmd : Command_Line);
    overriding procedure Tool_Help (Tool : Test_Tool);
-   overriding procedure Per_Invalid_File_Action
+   overriding procedure Second_Per_Invalid_File_Action
      (Tool      : in out Test_Tool;
       Cmd       :        Command_Line;
       File_Name :        String);

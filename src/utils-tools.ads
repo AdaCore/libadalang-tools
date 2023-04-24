@@ -30,8 +30,11 @@ with Utils.Command_Lines; use Utils.Command_Lines;
 package Utils.Tools is
 
    --  Each tool should derive from Tool_State, and override the ops.
-   --  The driver calls Init, then Per_File_Action on each source file,
-   --  then Final.
+   --  The driver calls Init, then First_Per_File_Action on each source file,
+   --  then First_Pass_Post_Process, then Second_Per_File_Action on each source
+   --  file, then Final.
+
+   type Pass_Kind is (First_Pass, Second_Pass);
 
    type Tool_State is abstract tagged limited record
       Project_Tree : GNATCOLL.Projects.Project_Tree_Access;
@@ -42,11 +45,23 @@ package Utils.Tools is
 
       Context : Analysis_Context := No_Analysis_Context;
       --  The only tool that needs access to the Context is gnatstub.
+
+      Run_First_Pass : Boolean := False;
+      --  Whether the drive should skip the first pass or not. Saves time by
+      --  not re-instantiating LAL analysis contexts.
    end record;
 
    procedure Init (Tool : in out Tool_State; Cmd : in out Command_Line)
       is abstract;
-   procedure Per_File_Action
+   procedure First_Per_File_Action
+     (Tool : in out Tool_State;
+      Cmd : Command_Line;
+      File_Name : String;
+      Input : String;
+      BOM_Seen : Boolean;
+      Unit : Analysis_Unit)
+     is null;
+   procedure Second_Per_File_Action
      (Tool : in out Tool_State;
       Cmd : Command_Line;
       File_Name : String;
@@ -58,11 +73,19 @@ package Utils.Tools is
    --  BOM_Seen is True if there was a BOM at the start of the file;
    --  the BOM is not included in Input.
 
-   procedure Per_Invalid_File_Action
+   procedure First_Per_Invalid_File_Action
      (Tool : in out Tool_State;
       Cmd : Command_Line;
       File_Name : String) is null;
-   --  Called for invalid sources that don't make it to Per_File_Action
+   procedure Second_Per_Invalid_File_Action
+     (Tool : in out Tool_State;
+      Cmd : Command_Line;
+      File_Name : String) is null;
+   --  Called for invalid sources that don't make it to <Nth>_Per_File_Action
+
+   procedure First_Pass_Post_Process
+     (Tool : in out Tool_State; Cmd : in out Command_Line) is null;
+   --  Called in between First_Per_File_Action and Second_Per_File_Action
 
    procedure Process_File
      (Tool         : in out Tool_State'Class;
@@ -70,9 +93,11 @@ package Utils.Tools is
       File_Name    : String;
       Counter      : Natural;
       Syntax_Error : out Boolean;
-      Reparse      : Boolean := False);
+      Reparse      : Boolean := False;
+      Pass         : Pass_Kind := Second_Pass);
    --  This class-wide procedure takes care of some bookkeeping, and then
-   --  dispatches to Per_File_Action.
+   --  dispatches to First_Per_File_Action or Second_Per_File_Action depending
+   --  on the .
    --
    --  If Tool.Context is nil, Process_File creates it. This is necessary
    --  because we have to defer the Create_Context call until after we've read

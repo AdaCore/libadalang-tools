@@ -186,9 +186,9 @@ package body Stub.Actions is
       null;
    end Final;
 
-   ---------------------
-   -- Per_File_Action --
-   ---------------------
+   ----------------------------
+   -- Second_Per_File_Action --
+   ----------------------------
 
    --  Debugging printouts:
    --  See also Libadalang.Debug.
@@ -1584,7 +1584,7 @@ package body Stub.Actions is
       <<Skip>>
    end Generate_File;
 
-   procedure Per_File_Action
+   procedure Second_Per_File_Action
      (Tool : in out Stub_Tool;
       Cmd : Command_Line;
       File_Name : String;
@@ -1602,7 +1602,7 @@ package body Stub.Actions is
              Lib_Item_Or_Subunit.As_Subunit.F_Body.As_Ada_Node,
          when others => raise Program_Error);
 
-   --  Start of processing for Per_File_Action
+   --  Start of processing for Second_Per_File_Action
 
    begin
       if Debug_Mode then
@@ -1648,7 +1648,7 @@ package body Stub.Actions is
       Generate_File
         (Tool, Cmd, File_Name, Input, BOM_Seen, Root_Node,
          Parent_Body_Of_Subunit => No_Ada_Node);
-   end Per_File_Action;
+   end Second_Per_File_Action;
 
    ---------------
    -- Tool_Help --

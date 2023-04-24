@@ -1042,11 +1042,11 @@ package body Test.Actions is
       end if;
    end Final;
 
-   ---------------------
-   -- Per_File_Action --
-   ---------------------
+   ----------------------------
+   -- Second_Per_File_Action --
+   ----------------------------
 
-   procedure Per_File_Action
+   procedure Second_Per_File_Action
      (Tool : in out Test_Tool;
       Cmd : Command_Line;
       File_Name : String;
@@ -1067,13 +1067,13 @@ package body Test.Actions is
       else
          Test.Skeleton.Process_Source (Unit);
       end if;
-   end Per_File_Action;
+   end Second_Per_File_Action;
 
-   -----------------------------
-   -- Per_Invalid_File_Action --
-   -----------------------------
+   ------------------------------------
+   -- Second_Per_Invalid_File_Action --
+   ------------------------------------
 
-   overriding procedure Per_Invalid_File_Action
+   overriding procedure Second_Per_Invalid_File_Action
      (Tool      : in out Test_Tool;
       Cmd       :        Command_Line;
       File_Name :        String)
@@ -1081,7 +1081,7 @@ package body Test.Actions is
       pragma Unreferenced (Tool, Cmd, File_Name);
    begin
       Test.Common.Source_Processing_Failed := True;
-   end Per_Invalid_File_Action;
+   end Second_Per_Invalid_File_Action;
 
    ---------------
    -- Tool_Help --

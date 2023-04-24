@@ -35,7 +35,7 @@ private
 
    overriding procedure Init
      (Tool : in out Stub_Tool; Cmd : in out Command_Line);
-   overriding procedure Per_File_Action
+   overriding procedure Second_Per_File_Action
      (Tool : in out Stub_Tool;
       Cmd : Command_Line;
       File_Name : String;

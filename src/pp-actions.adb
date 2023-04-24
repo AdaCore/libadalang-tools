@@ -448,9 +448,9 @@ package body Pp.Actions is
       end if;
    end Final;
 
-   ---------------------
-   -- Per_File_Action --
-   ---------------------
+   ----------------------------
+   -- Second_Per_File_Action --
+   ----------------------------
 
    type Output_Modes is
    --  Defines the where and how gnatpp places the result source.
@@ -5998,11 +5998,11 @@ package body Pp.Actions is
          Clear_Lines_Data;
    end Format_Vector;
 
-   ---------------------
-   -- Per_File_Action --
-   ---------------------
+   ----------------------------
+   -- Second_Per_File_Action --
+   ----------------------------
 
-   procedure Per_File_Action
+   procedure Second_Per_File_Action
      (Tool      : in out Pp_Tool;
       Cmd       : Command_Line;
       File_Name : String;
@@ -6221,7 +6221,7 @@ package body Pp.Actions is
       end Write_Src_Buf;
 
    begin
-      --  Start of processing for Per_File_Action
+      --  Start of processing for Second_Per_File_Action
 
       Trace ("Processing " & File_Name, Info);
 
@@ -6339,7 +6339,7 @@ package body Pp.Actions is
 
             Lines_Data := (others => <>);
          end if;
-   end Per_File_Action;
+   end Second_Per_File_Action;
 
    ---------------
    -- Tool_Help --

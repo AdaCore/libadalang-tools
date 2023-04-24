@@ -107,7 +107,38 @@ package body Utils.Drivers is
          for Ignored_Arg of Arg (Cmd, Ignore) loop
             Read_File_Names_From_File (Ignored_Arg.all, Include_One'Access);
          end loop;
+         if Tool.Run_First_Pass then
+            if Arg (Cmd, Verbose) then
+               Err_Out.Put ("First pass:\n");
+            end if;
+            for F_Name of File_Names (Cmd) loop
+               if not Contains (Ignored, Simple_Name (F_Name.all)) then
+                  if Arg (Cmd, Verbose) then
+                     Err_Out.Put ("[\1] \2\n", Image (Counter), F_Name.all);
+                  end if;
 
+                  Counter := Counter - 1;
+                  Has_Syntax_Err := False;
+                  Process_File
+                    (Tool,
+                     Cmd,
+                     F_Name.all,
+                     Counter,
+                     Has_Syntax_Err,
+                     Pass => First_Pass);
+                  if Has_Syntax_Err and then not Utils.Syntax_Errors then
+                     Utils.Syntax_Errors := True;
+                  end if;
+               end if;
+            end loop;
+
+            pragma Assert (Counter = 0);
+            Tool.First_Pass_Post_Process (Cmd);
+            Counter := N_File_Names;
+            if Arg (Cmd, Verbose) then
+               Err_Out.Put ("Second pass:\n");
+            end if;
+         end if;
          for F_Name of File_Names (Cmd) loop
             if not Contains (Ignored, Simple_Name (F_Name.all)) then
                if Arg (Cmd, Verbose) then
@@ -118,7 +149,13 @@ package body Utils.Drivers is
 
                Counter := Counter - 1;
                Has_Syntax_Err := False;
-               Process_File (Tool, Cmd, F_Name.all, Counter, Has_Syntax_Err);
+               Process_File
+                 (Tool,
+                  Cmd,
+                  F_Name.all,
+                  Counter,
+                  Has_Syntax_Err,
+                  Pass => Second_Pass);
                if Has_Syntax_Err and then not Utils.Syntax_Errors then
                   Utils.Syntax_Errors := True;
                end if;
