@@ -57,6 +57,7 @@ with GNATCOLL.Strings;
 
 private with Ada.Containers.Vectors;
 private with GNATCOLL.Atomic;
+private with GNAT.Strings;
 
 with TGen.Big_Int;   use TGen.Big_Int;
 with TGen.Big_Reals; use TGen.Big_Reals;
@@ -480,6 +481,39 @@ package TGen.JSON is
       with Pre => Val.Kind = JSON_Object_Type;
    --  Assuming Val is a JSON object, call CB on all its field, passing the
    --  given User_Object from call to call.
+
+   ----------------------------
+   --  Custom TGen interface --
+   ----------------------------
+   package Utils is
+      type JSON_Auto_IO is new Ada.Finalization.Limited_Controlled with
+      private;
+      --  Type to handle automatic loading and un-loading from disk of JSON
+      --  values. When created, if the specified filename exists, the internal
+      --  ref will hold the contents of that file loaded as a JSON_Value. It
+      --  will then be written to disk once this object is finalized.
+
+      function Create (Filename : String) return JSON_Auto_IO;
+      --  Create a JSON_Auto_IO by loading the contents of Filename in its
+      --  internal ref if the file exists. If not, the internal ref is an empty
+      --  JSON object. The JSON_Value held by the JSON_Auto_IO will be
+      --  serialized to filename when finalized.
+      --
+      --  This function propagates Ada.Directories.Filename_Error if the passed
+      --  Filename does not contain a valid path.
+
+      function Get_JSON_Ref (Self : JSON_Auto_IO) return JSON_Value;
+      --  Get a reference to the JSON_Value held by Self
+
+   private
+         type JSON_Auto_IO is new Ada.Finalization.Limited_Controlled with
+         record
+            Filename     : GNAT.Strings.String_Access;
+            JSON_Content : JSON_Value := Create_Object;
+         end record;
+
+         overriding procedure Finalize (Self : in out JSON_Auto_IO);
+   end Utils;
 
 private
 

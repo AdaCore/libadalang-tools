@@ -24,6 +24,7 @@
 with Ada.Characters.Handling;          use Ada.Characters.Handling;
 with Ada.Characters.Wide_Wide_Latin_1; use Ada.Characters.Wide_Wide_Latin_1;
 with Ada.Containers;                   use Ada.Containers;
+with Ada.Directories;
 with Ada.Exceptions;
 with Ada.Strings.Unbounded;            use Ada.Strings.Unbounded;
 with Ada.Text_IO;
@@ -35,6 +36,7 @@ with GNAT.Decode_UTF8_String;
 
 with GNATCOLL.Atomic;         use GNATCOLL.Atomic;
 with GNATCOLL.Strings;        use GNATCOLL.Strings;
+with GNATCOLL.VFS;
 
 package body TGen.JSON is
 
@@ -2001,5 +2003,70 @@ package body TGen.JSON is
 
       return Unb;
    end Un_Escape_String;
+
+   -----------
+   -- Utils --
+   -----------
+   package body Utils is
+
+      ------------
+      -- Create --
+      ------------
+
+      function Create (Filename : String) return JSON_Auto_IO is
+         use GNATCOLL.VFS;
+         VF : constant Virtual_File := Create (+Filename);
+         Content : constant JSON_Value :=
+           (if Ada.Directories.Exists (Filename)
+            then Read (VF.Read_File.all, Filename)
+            else Create_Object);
+         --  Use Ada.Directories here as it checks whether Filename can
+         --  designate a file or not, and raises an exception if it is not the
+         --  case.
+      begin
+         return Res : JSON_Auto_IO do
+            Res.Filename := new String'(Filename);
+            Res.JSON_Content := Content;
+         end return;
+      end Create;
+
+      ------------------
+      -- Get_JSON_Ref --
+      ------------------
+
+      function Get_JSON_Ref (Self : JSON_Auto_IO) return JSON_Value is
+      (Self.JSON_Content);
+
+      ----------------
+      --  Finalize  --
+      ----------------
+
+      overriding procedure Finalize (Self : in out JSON_Auto_IO) is
+         use Ada.Directories;
+         use GNAT.Strings;
+         File : Ada.Text_IO.File_Type;
+      begin
+         if Self.Filename = null then
+            return;
+         end if;
+
+         --  Assume Self.Filename is a valid path, as otherwise Create would
+         --  have already complained about this.
+
+         if not Self.JSON_Content.Is_Empty then
+            if Ada.Directories.Exists (Self.Filename.all) then
+               Ada.Text_IO.Open
+                 (File, Ada.Text_IO.Out_File, Self.Filename.all);
+            else
+               Create_Path (Containing_Directory (Self.Filename.all));
+               Ada.Text_IO.Create
+                 (File, Ada.Text_IO.Out_File, Self.Filename.all);
+            end if;
+            Ada.Text_IO.Put (File, Self.JSON_Content.Write (Compact => True));
+            Ada.Text_IO.Close (File);
+         end if;
+         Free (Self.Filename);
+      end Finalize;
+   end Utils;
 
 end TGen.JSON;

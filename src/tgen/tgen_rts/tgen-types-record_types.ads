@@ -70,6 +70,12 @@ package TGen.Types.Record_Types is
       Padding : Natural := 0) return String;
    --  Image of Self but allows to specify an optional indentation
 
+   function Encode
+     (Self : Record_Typ; Val : JSON_Value) return JSON_Value;
+
+   function Supports_Gen (Self : Record_Typ) return Boolean is
+     (for all Comp of Self.Component_Types => Comp.Get.Supports_Gen);
+
    function As_Record_Typ (Self : SP.Ref)
      return Record_Typ'Class is
      (Record_Typ'Class (Self.Unchecked_Get.all)) with
@@ -85,9 +91,6 @@ package TGen.Types.Record_Types is
    overriding function Default_Strategy
      (Self : Nondiscriminated_Record_Typ) return Strategy_Type'Class;
    --  Generate a strategy to statically generate (in one pass) values for Self
-
-   function Encode
-     (Self : Nondiscriminated_Record_Typ; Val : JSON_Value) return JSON_Value;
 
    function As_Nondiscriminated_Record_Typ (Self : SP.Ref)
      return Nondiscriminated_Record_Typ'Class is
@@ -214,6 +217,8 @@ package TGen.Types.Record_Types is
    function Encode
      (Self : Discriminated_Record_Typ; Val : JSON_Value) return JSON_Value;
 
+   function Supports_Gen (Self : Discriminated_Record_Typ) return Boolean;
+
    function As_Discriminated_Record_Typ
      (Self : SP.Ref) return Discriminated_Record_Typ'Class is
      (Discriminated_Record_Typ'Class (Self.Unchecked_Get.all)) with
@@ -242,6 +247,10 @@ package TGen.Types.Record_Types is
    function Simple_Name (Self : Function_Typ) return String;
    --  Return the simple name associated with this subprogram,
    --  removing unit name prefix and the trailing hash.
+
+   function JSON_Test_Filename (Self : Function_Typ) return String;
+   --  Return the simple name of the file in which tests for Self should be
+   --  stored.
 
    function Default_Strategy
      (Self : Function_Typ) return Strategy_Type'Class;

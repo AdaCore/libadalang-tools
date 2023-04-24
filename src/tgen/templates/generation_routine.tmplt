@@ -1,0 +1,45 @@
+@@--  Template to generate a generation routine for a given
+@@--  subprogram.
+@@--  @_GLOBAL_PREFIX_@ Prefix used to prefix all local entities to the unit.
+@@--  @_SUBP_NAME_@  Simple name of the subprogram for which test vectors will
+@@--                 be generated.
+@@--  @_SUBP_UID_@   UID of the subprogram
+@@--  @_FN_TYP_REF_@ Name of the SP.Ref representing this subp in the value
+@@--                 library.
+@@--  @_PARAM_NAME_@ Simple name of the parameters of the subprogram
+@@--  @_PARAM_TY_@   Fully qualified name of the type of the parameters of the
+@@--                 subprogram.
+@@--  @_INPUT_FN_@   Name of the JSON input function for the parameters of the
+@@--                 subprogram.
+@@--  @_NUM_TESTS_@  Number of tests to be generated for this subprogram
+@@INCLUDE@@ json_templates/util.tmplt
+
+   --  Test case generation for @_SUBP_NAME_@
+
+   procedure Gen_@_SUBP_NAME_@_@_SUBP_UID_@ 
+     (Unit_JSON : in out TGen.JSON.JSON_Value)
+   is
+      Subp  : TGen.Types.SP.Ref renames @_FN_TYP_REF_@;
+      Strat : TGen.Strategies.Strategy_Type'Class := Subp.Get.Default_Strategy;
+   begin
+      for Test_Num in 1 .. @_NUM_TESTS_@ loop
+         Generate_One : declare
+            Values   : constant TGen.JSON.JSON_Value :=
+              Subp.Get.Encode 
+                (Strat.Generate (TGen.Strategies.Disc_Value_Maps.Empty_Map));
+@@TABLE'ALIGN_ON(":")@@
+            Ada_@_PARAM_NAME_@ : @_PARAM_TY_@ :=
+              @_INPUT_FN_@ (Values.Get ("components").Get ("@_PARAM_NAME_@"));
+@@END_TABLE@@
+         begin
+            --  TODO: Add pre/post validation and coverage computation
+
+            @_SUBP_NAME_@_Dump_TC
+@@TABLE'ALIGN_ON(":")@@
+              @_LPAR()_@@_GLOBAL_PREFIX_@_@_PARAM_NAME_@ => Ada_@_PARAM_NAME_@,
+@@END_TABLE@@
+               @_GLOBAL_PREFIX_@_Unit_JSON => Unit_JSON,
+               @_GLOBAL_PREFIX_@_Origin => "TGen");
+         end Generate_One;
+      end loop;
+   end Gen_@_SUBP_NAME_@_@_SUBP_UID_@;

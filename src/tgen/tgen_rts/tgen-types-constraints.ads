@@ -226,6 +226,9 @@ package TGen.Types.Constraints is
 
    procedure Free_Content (Self : in out Anonymous_Typ);
 
+   function Supports_Gen (Self : Anonymous_Typ) return Boolean is
+     (Self.Named_Ancestor.Get.Supports_Gen);
+
    type Instance_Typ is new Typ with record
       Orig_Typ : SP.Ref;
    end record;
@@ -247,6 +250,9 @@ package TGen.Types.Constraints is
 
    function Get_Diagnostics (Self : Instance_Typ) return String is
      (Self.Orig_Typ.Get.Get_Diagnostics);
+
+   function Supports_Gen (Self : Instance_Typ) return Boolean is
+     (Self.Orig_Typ.Get.Supports_Gen);
 
    overriding function Default_Strategy
      (Self : Instance_Typ) return Strategy_Type'Class

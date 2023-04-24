@@ -112,7 +112,7 @@ package body TGen.Types.Record_Types is
    ------------
 
    function Encode
-     (Self : Nondiscriminated_Record_Typ; Val : JSON_Value) return JSON_Value
+     (Self : Record_Typ; Val : JSON_Value) return JSON_Value
    is
       use Component_Maps;
       Components : constant JSON_Value := Val.Get ("components");
@@ -480,13 +480,47 @@ package body TGen.Types.Record_Types is
          end loop;
          return "";
       end Inspect_Variant;
-
    begin
       if Comp_Res'Length > 0 then
          return Comp_Res;
       end if;
       return Inspect_Variant (Self.Variant);
    end Get_Diagnostics;
+
+   ------------------
+   -- Supports_Gen --
+   ------------------
+
+   function Supports_Gen (Self : Discriminated_Record_Typ) return Boolean is
+
+      function Inspect_Variant (Var : Variant_Part_Acc) return Boolean;
+      --  Traverse the variant part tree to determine whether some type is not
+      --  supported for generation.
+
+      ---------------------
+      -- Inspect_Variant --
+      ---------------------
+
+      function Inspect_Variant (Var : Variant_Part_Acc) return Boolean is
+         Res : Boolean := True;
+      begin
+         if Var = null then
+            return True;
+         end if;
+         for Choice of Var.Variant_Choices loop
+            Res := (for all Cmp of Choice.Components => Cmp.Get.Supports_Gen);
+            exit when not Res;
+            Res := Inspect_Variant (Choice.Variant);
+            exit when not Res;
+         end loop;
+         return Res;
+      end Inspect_Variant;
+   begin
+      if not Record_Typ (Self).Supports_Gen then
+         return False;
+      end if;
+      return Inspect_Variant (Self.Variant);
+   end Supports_Gen;
 
    ------------------
    -- Free_Content --
@@ -1217,5 +1251,12 @@ package body TGen.Types.Record_Types is
       return To_String (Unbounded_String
         (Self.Name.Element (Self.Name.Last_Index - 1)));
    end Simple_Name;
+
+   ------------------------
+   -- JSON_Test_Filename --
+   ------------------------
+
+   function JSON_Test_Filename (Self : Function_Typ) return String is
+     (To_Filename (Self.Compilation_Unit_Name) & ".json");
 
 end TGen.Types.Record_Types;
