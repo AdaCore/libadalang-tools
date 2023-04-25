@@ -1412,7 +1412,7 @@ package body Test.Stub is
             else
                Id.Self_Hash := new String'
                  (Substring_16
-                    (Mangle_Hash_Full (Element, For_Stubs => True)));
+                    (Mangle_Hash_16 (Element, For_Stubs => True)));
             end if;
 
          when Ada_Entry_Decl =>

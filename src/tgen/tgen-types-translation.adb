@@ -3181,7 +3181,7 @@ package body TGen.Types.Translation is
 
       Parent_Decl : constant Basic_Decl := N.P_Parent_Basic_Decl;
       UID         : constant String :=
-        Test.Common.Mangle_Hash_Full (Subp => Parent_Decl);
+        Test.Common.Mangle_Hash_16 (Subp => Parent_Decl);
    begin
 
       F_Typ.Last_Comp_Unit_Idx := Comp_Unit_Idx;

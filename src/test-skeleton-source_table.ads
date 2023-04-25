@@ -83,6 +83,9 @@ package Test.Skeleton.Source_Table is
    --  In stub mode we need references from non-argument sources to their
    --  bodies in case we'd need to stub any of them.
 
+   procedure Add_Body_For_Instrumentation (Fname : String);
+   --  Adds body source for future instrumentation
+
    function SF_Table_Empty return Boolean;
    --  Checks if the source table is empty
 
@@ -113,6 +116,7 @@ package Test.Skeleton.Source_Table is
    function Get_Source_Body            (Source_Name : String) return String;
    function Get_Source_Project_Name    (Source_Name : String) return String;
    function Get_Source_Unit_Name       (Source_Name : String) return String;
+   function Get_Source_Instr_Dir       (Source_Name : String) return String;
 
    procedure Mark_Sourse_Stubbed (Source_Name : String);
    function Source_Stubbed (Source_Name : String) return Boolean;

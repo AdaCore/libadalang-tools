@@ -28,6 +28,7 @@ with Libadalang.Analysis; use Libadalang.Analysis;
 with Langkit_Support.Text; use Langkit_Support.Text;
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with Ada.Exceptions;
 
 with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Containers.Indefinite_Ordered_Sets;
@@ -64,6 +65,13 @@ package Test.Common is
       N_Controlling  : Boolean := False;
       For_Stubs      : Boolean := False) return String;
    --  Returns full hash for given subprogram
+
+   function Mangle_Hash_16
+     (Subp           : Ada_Node'Class;
+      Case_Sensitive : Boolean := False;
+      N_Controlling  : Boolean := False;
+      For_Stubs      : Boolean := False) return String;
+   --  Returns 16 first characters of a hash for given subprogram
 
    function Mangle_Hash
      (Subp               : Ada_Node'Class;
@@ -139,8 +147,13 @@ package Test.Common is
 
    procedure Report_Err (Message : String);
    --  Prints its argument to the standard error output
+
    procedure Report_Std (Message : String; Offset : Integer := 0);
    --  Prints its argument to the standard output. Silent in quiet mode
+
+   procedure Report_Ex (Ex : Ada.Exceptions.Exception_Occurrence);
+   --  Reports exception information with traceback if Strict_Execution in True
+
    package Char_Sequential_IO is new Ada.Sequential_IO (Character);
    Output_File : Char_Sequential_IO.File_Type;
 
@@ -396,5 +409,11 @@ package Test.Common is
 
    Test_Filtering : Boolean := True;
    --  Generate test filtering in the test driver
+
+   Instrument : Boolean := False;
+   --  Whether we should instrument sources
+
+   Instr_Suffix : constant String := "-gnattest-instr";
+   --  Suffix for object subdirs containing instrumented sources
 
 end Test.Common;

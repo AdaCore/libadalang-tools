@@ -53,9 +53,9 @@ with GNAT.OS_Lib;
 with GNAT.SHA1;
 with GNAT.Directory_Operations; use GNAT.Directory_Operations;
 with GNAT.Strings;
-with GNAT.Traceback.Symbolic;
 
 with Test.Common; use Test.Common;
+with Test.Instrument;
 with Test.Harness;
 with Test.Skeleton.Source_Table; use Test.Skeleton.Source_Table;
 with Test.Mapping; use Test.Mapping;
@@ -532,9 +532,6 @@ package body Test.Skeleton is
       procedure Cleanup;
       --  Frees Data components
 
-      procedure Report (Ex : Ada.Exceptions.Exception_Occurrence);
-      --  Reports problematic source with exception information
-
       procedure Cleanup is
       begin
          if Data.Data_Kind = Declaration_Data then
@@ -699,22 +696,6 @@ package body Test.Skeleton is
 
       end Get_Suite_Components;
 
-      ------------
-      -- Report --
-      ------------
-
-      procedure Report (Ex : Ada.Exceptions.Exception_Occurrence) is
-      begin
-         if Strict_Execution then
-            Report_Err
-              (Ada.Exceptions.Exception_Name (Ex)
-               & " : "
-               & Ada.Exceptions.Exception_Message (Ex)
-               & ASCII.LF
-               & GNAT.Traceback.Symbolic.Symbolic_Traceback (Ex));
-         end if;
-      end Report;
-
    begin
       if The_Unit.Root.Kind /= Ada_Compilation_Unit then
          --  For example, it can be a Pragma_Node_List for a body source
@@ -738,6 +719,10 @@ package body Test.Skeleton is
          --  dependencies.
          if Stub_Mode_ON then
             Process_Stubs (Data.Units_To_Stub);
+         end if;
+
+         if Test.Common.Instrument then
+            Test.Instrument.Process_Source (The_Unit);
          end if;
 
          if not Data.Is_Generic then
@@ -892,7 +877,7 @@ package body Test.Skeleton is
                      & Base_Name (The_Unit.Get_Filename));
          Report_Err ("source file may be incomplete/invalid");
 
-         Report (Ex);
+         Report_Ex (Ex);
          Cleanup;
 
       when Ex : others =>
@@ -902,7 +887,7 @@ package body Test.Skeleton is
          Report_Err ("unexpected error while creating test package for "
                      & Base_Name (The_Unit.Get_Filename));
 
-         Report (Ex);
+         Report_Ex (Ex);
          Cleanup;
    end Process_Source;
 
@@ -1598,11 +1583,11 @@ package body Test.Skeleton is
                   Subp.Subp_Mangle_Name := new
                     String'(Mangle_Hash (Node));
                   Subp.Subp_Full_Hash := new
-                    String'(Mangle_Hash_Full (Node));
+                    String'(Mangle_Hash_16 (Node));
                   Subp.Subp_Hash_V1 := new
-                    String'(Mangle_Hash_Full (Node, True, True));
+                    String'(Mangle_Hash_16 (Node, True, True));
                   Subp.Subp_Hash_V2_1 := new
-                    String'(Mangle_Hash_Full
+                    String'(Mangle_Hash_16
                             (Node,
                                N_Controlling => True));
 
@@ -1683,11 +1668,11 @@ package body Test.Skeleton is
             Subp.Subp_Mangle_Name := new
               String'(Mangle_Hash (Node, Unwind_Controlling => False));
             Subp.Subp_Full_Hash := new
-              String'(Mangle_Hash_Full (Node, N_Controlling => True));
+              String'(Mangle_Hash_16 (Node, N_Controlling => True));
             Subp.Subp_Hash_V1 := new
-              String'(Mangle_Hash_Full (Node, True, True));
+              String'(Mangle_Hash_16 (Node, True, True));
             Subp.Subp_Hash_V2_1 := new
-              String'(Mangle_Hash_Full
+              String'(Mangle_Hash_16
                       (Node,
                          N_Controlling => True));
 
@@ -5287,6 +5272,10 @@ package body Test.Skeleton is
             New_Line_Count;
             S_Put (0, "with System.Assertions;");
             New_Line_Count;
+            if Test.Common.Instrument then
+               S_Put (0, "with TGen.Instr_Support;");
+               Put_New_Line;
+            end if;
             if Test.Common.Generate_Test_Vectors and then not Data.Is_Generic
             then
                S_Put (0, "with Ada.Exceptions;");
@@ -5581,8 +5570,17 @@ package body Test.Skeleton is
             if not Generate_Separates then
                declare
                   Old_Package : constant String :=
-                    Output_Dir & Directory_Separator
-                    & Test_File_Name.all & ".adb";
+                       (if Test.Common.Instrument then
+                          Harness_Dir_Str.all
+                          & Directory_Separator
+                          & "test_obj"
+                          & Directory_Separator
+                          & Test_Prj_Prefix
+                          & To_Lower (Source_Project_Tree.Root_Project.Name)
+                          & Instr_Suffix
+                        else Output_Dir)
+                       & Directory_Separator
+                       & Test_File_Name.all & ".adb";
                   Success : Boolean;
                begin
                   if Is_Regular_File (Old_Package) then
@@ -6462,6 +6460,10 @@ package body Test.Skeleton is
                New_Line_Count;
                S_Put (0, "with System.Assertions;");
                New_Line_Count;
+               if Test.Common.Instrument then
+                  S_Put (0, "with TGen.Instr_Support;");
+                  Put_New_Line;
+               end if;
                if Test.Common.Generate_Test_Vectors
                  and then not Data.Is_Generic
                then
@@ -6760,7 +6762,16 @@ package body Test.Skeleton is
                if not Generate_Separates then
                   declare
                      Old_Package : constant String :=
-                       Output_Dir & Directory_Separator
+                       (if Test.Common.Instrument then
+                          Harness_Dir_Str.all
+                          & Directory_Separator
+                          & "test_obj"
+                          & Directory_Separator
+                          & Test_Prj_Prefix
+                          & To_Lower (Source_Project_Tree.Root_Project.Name)
+                          & Instr_Suffix
+                        else Output_Dir)
+                       & Directory_Separator
                        & Test_File_Name.all & ".adb";
                      Success : Boolean;
                   begin
@@ -6946,6 +6957,8 @@ package body Test.Skeleton is
               Create (+Output_Dir) / (+(Test_Unit_File_Name & ".adb"));
             Spec_F, Body_F : File_Type;
 
+            Instrument_Setup : Boolean := True;
+
          begin
 
             if Spec_VF.Is_Regular_File then
@@ -6997,6 +7010,12 @@ package body Test.Skeleton is
                Put_Line (Body_F, "with " & To_Ada (Pack) & "; use "
                                   & To_Ada (Pack) & ";");
             end loop;
+
+            if Test.Common.Instrument then
+               New_Line (Body_F);
+               Put_Line (Body_F, "with TGen.Instr_Support;");
+            end if;
+
             New_Line (Body_F);
             Put_Line (Body_F, "package body " & Test_Unit_Name & " is");
             New_Line (Body_F);
@@ -7016,6 +7035,46 @@ package body Test.Skeleton is
                   "   procedure Gen_" & Subp.Subp_Mangle_Name.all
                   & "_" & Trim (Test_Count'Image, Both)
                   & " (Gnattest_T : in out Test) is");
+
+               if Test.Common.Instrument and then Instrument_Setup then
+                  --  We need to setup filter for binary test dumping, this is
+                  --  needed to be done only once in the first of the generated
+                  --  tests for the same routine so that we collect all inputs
+                  --  without overwrtiting any of them.
+                  Put_Line
+                    (Body_F, "      "
+                     & "function GNATTEST_Set_Current_Test return Boolean;");
+                  Put_Line
+                    (Body_F, "      "
+                     & "function GNATTEST_Set_Current_Test return Boolean is");
+                  Put_Line (Body_F, "      begin");
+                  Put_Line
+                    (Body_F, "         "
+                       & "TGen.Instr_Support.Test_Input_Counter := 1;");
+                  Put_Line
+                    (Body_F, "         "
+                     & "TGen.Instr_Support.Autogenerated := True;");
+                  Put_Line
+                    (Body_F,
+                     "         TGen.Instr_Support.Subp_Hash := """
+                     & Mangle_Hash_Full (Subp.Subp_Declaration)
+                     & """;");
+                  Put_Line
+                    (Body_F,
+                     "         TGen.Instr_Support.Nesting_Hash := """
+                     & GNAT.SHA1.Digest (Get_Nesting (Subp.Subp_Declaration))
+                     & """;");
+                  Put_Line (Body_F, "         return True;");
+                  Put_Line
+                    (Body_F, "      end GNATTEST_Set_Current_Test;");
+                  Put_Line
+                    (Body_F, "      "
+                     & "Dummy_GNATTEST : Boolean := "
+                     & "GNATTEST_Set_Current_Test;");
+                  New_Line (Body_F);
+
+                  Instrument_Setup := False;
+               end if;
 
                for Param of Single_Vec loop
                   Put_Line
@@ -7403,7 +7462,7 @@ package body Test.Skeleton is
          declare
             Suffix : constant String :=
               "_"
-              & Head (Mangle_Hash_Full (Decl), 6)
+              & Head (Mangle_Hash_16 (Decl), 6)
               & "_"
               & Head (GNAT.SHA1.Digest (Get_Nesting (Decl)), 6);
          begin
@@ -8274,6 +8333,37 @@ package body Test.Skeleton is
          if Subp.Has_TC_Info then
             Put_Wrapper_Rename (6, Subp);
          end if;
+      end if;
+
+      if Test.Common.Instrument then
+         S_Put (6, "function GNATTEST_Set_Current_Test return Boolean;");
+         New_Line_Count;
+         S_Put (6, "function GNATTEST_Set_Current_Test return Boolean is");
+         New_Line_Count;
+         S_Put (6, "begin");
+         New_Line_Count;
+         S_Put (9, "TGen.Instr_Support.Test_Input_Counter := 1;");
+         New_Line_Count;
+         S_Put (9, "TGen.Instr_Support.Autogenerated := False;");
+         New_Line_Count;
+         S_Put
+           (9,
+            "TGen.Instr_Support.Subp_Hash := """
+            & Mangle_Hash_Full (Subp.Subp_Declaration)
+            & """;");
+         New_Line_Count;
+         S_Put
+           (9,
+            "TGen.Instr_Support.Nesting_Hash := """
+            & GNAT.SHA1.Digest (Get_Nesting (Subp.Subp_Declaration))
+            & """;");
+         New_Line_Count;
+         S_Put (9, "return True;");
+         New_Line_Count;
+         S_Put (6, "end GNATTEST_Set_Current_Test;");
+         New_Line_Count;
+         S_Put (6, "Dummy_GNATTEST : Boolean := GNATTEST_Set_Current_Test;");
+         Put_New_Line;
       end if;
 
       S_Put (0, "--  end read only");
