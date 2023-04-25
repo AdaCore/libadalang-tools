@@ -479,11 +479,22 @@ package Pp.Scanner is
      Pre => Tkn.Kind in Comment_Kind;
    --  Check if Tkn (which must be a comment) ends with -- or --\NL
 
+   function Is_Empty_Comment
+     (Token : Pp.Scanner.Token)
+      return Boolean with
+     Pre => Token.Kind in Comment_Kind;
+   --  Check if Token (which must be a comment) is an empty comment (starts
+   --  with --, optionally followed by spaces and a NL).
+
    procedure Append_Comment_Text
-     (V : in out Tokn_Vec; X : Tokn_Cursor; Tx : W_Str;
-      Recompute_Length : Boolean;
-      Comments_Only, Comments_Gnat_Beginning : Boolean;
-      Indent : Natural := 0; Org : String) with
+     (V                       : in out Tokn_Vec;
+      X                       : Tokn_Cursor;
+      Tx                      : W_Str;
+      Recompute_Length        : Boolean;
+      Comments_Only           : Boolean;
+      Leading_Blanks          : Natural;
+      Indent                  : Natural := 0;
+      Org                     : String) with
      Pre => Kind (X) in Comment_Kind;
    --  Append a comment token, adjusting the length for zero indentation,
    --  and using the possibly-filled text Tx. I don't think it's

@@ -1,3 +1,4 @@
+
 ------------------------------------------------------------------------------
 --                                                                          --
 --                             Libadalang Tools                             --
@@ -21,10 +22,12 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Unchecked_Conversion;
 with Ada.Text_IO;
-with Utils.Predefined_Symbols; use Utils.Predefined_Symbols;
+with Ada.Unchecked_Conversion;
+
 with Pp.Error_Slocs; use Pp.Error_Slocs;
+
+with Utils.Predefined_Symbols; use Utils.Predefined_Symbols;
 
 package body Pp.Scanner is
 
@@ -572,26 +575,44 @@ package body Pp.Scanner is
            and then Tkn_Txt (Tkn_Txt'Last - 2) = '-');
    end Is_Header_Comment;
 
+   ----------------------
+   -- Is_Empty_Comment --
+   ----------------------
+
+   function Is_Empty_Comment
+     (Token : Pp.Scanner.Token)
+      return Boolean
+   is
+      Token_Text : constant W_Str := To_W_Str (Text (Token));
+
+   begin
+      return
+        Token_Text'Length = 0
+        or else ((for all J in Token_Text'First .. Token_Text'Last - 1
+                  => Token_Text (J) = ' ')
+                 and Token_Text (Token_Text'Last) in NL | ' ');
+   end Is_Empty_Comment;
+
+   -------------------------
+   -- Append_Comment_Text --
+   -------------------------
+
    procedure Append_Comment_Text
-     (V : in out Tokn_Vec; X : Tokn_Cursor; Tx : W_Str;
+     (V                : in out Tokn_Vec;
+      X                : Tokn_Cursor;
+      Tx               : W_Str;
       Recompute_Length : Boolean;
-      Comments_Only, Comments_Gnat_Beginning : Boolean;
-      Indent : Natural := 0; Org : String)
+      Comments_Only    : Boolean;
+      Leading_Blanks   : Natural;
+      Indent           : Natural := 0;
+      Org              : String)
    is
       Tok : Token := Token_At_Cursor (X);
       Line_Width, Max_Line_Width : Natural := 0;
       Prefix_Len : Natural;
 
    begin
-      --  Add two leading spaces to Fillable_Comment or
-      --  Other_Whole_Line_Comment tokens that are not part of a header
-      --  comment.
-      if Comments_Gnat_Beginning
-        and then not Is_Header_Comment (Tok)
-        and then Tok.Kind in Fillable_Comment | Other_Whole_Line_Comment
-      then
-         Tok.Leading_Blanks := Natural'Max (Tok.Leading_Blanks, 2);
-      end if;
+      Tok.Leading_Blanks := Leading_Blanks;
       Prefix_Len := W_Str'("--")'Length + Tok.Leading_Blanks;
 
       Tok.Text := W_Intern (Tx);
