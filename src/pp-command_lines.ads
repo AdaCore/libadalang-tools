@@ -406,7 +406,7 @@ package Pp.Command_Lines is
      ([Max_Line_Length => 79,
        Indentation => 3,
        Indent_Continuation => 0,
-   --  Default for Indent_Continuation is one less than Indentation, or 1.
+       --  Default for Indent_Continuation is one less than Indentation, or 1.
        Initial_Indentation => 0,
        Decimal_Grouping => 3,
        Based_Grouping => 4,

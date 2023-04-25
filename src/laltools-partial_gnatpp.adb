@@ -46,12 +46,13 @@ with Utils.Command_Lines;
 package body Laltools.Partial_GNATPP is
 
    function Copy_Slice
-     (S    : Utils.Char_Vectors.Char_Vector;
-      From : Positive := 1)
+     (Source : Utils.Char_Vectors.Char_Vector;
+      Offset : Natural := 0)
       return Ada.Strings.Unbounded.Unbounded_String
    is (Ada.Strings.Unbounded.To_Unbounded_String
-         (Utils.Char_Vectors.Char_Vectors.Elems (S)
-            (From .. Utils.Char_Vectors.Char_Vectors.Last_Index (S))));
+         (Utils.Char_Vectors.Char_Vectors.Elems (Source)
+            (1 + Offset
+             .. Utils.Char_Vectors.Char_Vectors.Last_Index (Source))));
    --  Converts a Char_Vector into an Unbounded_String
 
    type Partial_Select_Edits is
@@ -89,12 +90,19 @@ package body Laltools.Partial_GNATPP is
    function Get_Next_Sibling (Node : Ada_Node) return Ada_Node;
    --  Returns the node's next sibling or No_Ada_Node if no sibling found
 
-   function Get_Starting_Offset
-     (Node      : Ada_Node;
-      PP_Indent : Natural)
+   function Get_Initial_Indentation
+     (Node           : Ada_Node;
+      PP_Indentation : Natural)
       return Natural;
-   --  Returns the starting offset that needs to be used for the selected Node
-   --  formatting
+   --  Returns the initial indentation that needs to be used for the selected
+   --  Node formatting
+
+   function Get_First_Line_Offset
+     (Node : Ada_Node)
+      return Natural;
+   --  Returns an offset that needs to be applied to the first line.
+   --  This is for cases like 'overriding procedure', where 'overriding' is
+   --  not in the same node as 'procedure'.
 
    procedure Filter_Initially_Selected_Lines_From_Output
      (Unit              : Analysis_Unit;
@@ -701,16 +709,19 @@ package body Laltools.Partial_GNATPP is
               else No_Ada_Node);
    end Get_Next_Sibling;
 
-   ---------------------------
-   --  Get_Starting_Offset  --
-   ---------------------------
+   -------------------------------
+   --  Get_Initial_Indentation  --
+   -------------------------------
 
-   function Get_Starting_Offset
-     (Node      : Ada_Node;
-      PP_Indent : Natural)
+   function Get_Initial_Indentation
+     (Node           : Ada_Node;
+      PP_Indentation : Natural)
       return Natural
    is
       Parent_Node : Ada_Node := No_Ada_Node;
+
+      function Get_Parent_Indentation (Node : Ada_Node) return Natural;
+      --  Returns the Node's parent indentation
 
       function Is_Expected_Parent_Kind (Kind : Ada_Node_Kind_Type)
                                         return Boolean
@@ -739,12 +750,14 @@ package body Laltools.Partial_GNATPP is
          Parent_Node := Parent;
       end Is_Expected_Parent_Node_Callback;
 
-      function Get_Parent_Offset (Node : Ada_Node) return Natural;
-      --  Returns the parent indentation related to the current Node.
+      ---------------------------
+      -- Get_Parent_Indenation --
+      ---------------------------
 
-      function Get_Parent_Offset (Node : Ada_Node) return Natural
+      function Get_Parent_Indentation (Node : Ada_Node) return Natural
       is
          Offset : Natural := 0;
+
       begin
          Parent_Node := Node;
          Find_Matching_Parents
@@ -757,21 +770,20 @@ package body Laltools.Partial_GNATPP is
          then
             Offset := 0;
          else
-            Offset := Natural (Parent_Node.Sloc_Range.Start_Column);
+            Offset := Natural (Parent_Node.Sloc_Range.Start_Column) - 1;
          end if;
 
          case Kind (Parent_Node) is
             when Ada_Package_Body | Ada_Package_Decl
                | Ada_Task_Body | Ada_Subp_Body | Ada_Decl_Block
                | Ada_For_Loop_Stmt | Ada_Loop_Stmt | Ada_While_Loop_Stmt
-
-               => Offset := Offset + PP_Indent;
+               => Offset := Offset + PP_Indentation;
 
             when others => null;
          end case;
 
          return Offset;
-      end Get_Parent_Offset;
+      end Get_Parent_Indentation;
 
       Prev_Sibling : constant Ada_Node := Get_Previous_Sibling (Node);
       Next_Sibling : constant Ada_Node := Get_Next_Sibling (Node);
@@ -779,21 +791,25 @@ package body Laltools.Partial_GNATPP is
 
    begin
       if Node.Kind in Ada_Ada_List then
-         Offset := Natural (Node.Sloc_Range.Start_Column);
+         Offset :=
+           (if Node.Sloc_Range.Start_Column = 0 then 0
+            else Natural (Node.Sloc_Range.Start_Column) - 1);
 
       elsif Node.Kind in Ada_Subp_Spec_Range then
          --  Subp_Spec nodes can have an overriding node sibling. The correct
          --  offset is given by the enclosing declaration, which is the
          --  parent node.
          Offset :=
-           Get_Starting_Offset
-             (Node.P_Parent_Basic_Decl.As_Ada_Node, PP_Indent);
+           Get_Initial_Indentation
+             (Node.P_Parent_Basic_Decl.As_Ada_Node, PP_Indentation);
 
       elsif (not Prev_Sibling.Is_Null and not Next_Sibling.Is_Null)
         and then Prev_Sibling.Sloc_Range.Start_Column =
                    Next_Sibling.Sloc_Range.Start_Column
       then
-         Offset := Natural (Prev_Sibling.Sloc_Range.Start_Column);
+         Offset :=
+           (if Prev_Sibling.Sloc_Range.Start_Column = 0 then 0
+            else Natural (Prev_Sibling.Sloc_Range.Start_Column) - 1);
 
       elsif not Prev_Sibling.Is_Null then
          if Node.Kind in
@@ -805,29 +821,70 @@ package body Laltools.Partial_GNATPP is
             then
                --  Get the parent node which should be a Library_Item which
                --  will give us the offset to use for the reformatting
-               Offset := Get_Parent_Offset (Node);
+               Offset := Get_Parent_Indentation (Node);
             else
-               Offset := Natural (Prev_Sibling.Sloc_Range.Start_Column);
+               Offset :=
+                 (if Prev_Sibling.Sloc_Range.Start_Column = 0 then 0
+                  else Natural (Prev_Sibling.Sloc_Range.Start_Column) - 1);
             end if;
          else
-            Offset := Natural (Prev_Sibling.Sloc_Range.Start_Column);
+            Offset :=
+              (if Prev_Sibling.Sloc_Range.Start_Column = 0 then 0
+               else Natural (Prev_Sibling.Sloc_Range.Start_Column) - 1);
          end if;
 
       elsif not Next_Sibling.Is_Null then
-         Offset := Natural (Next_Sibling.Sloc_Range.Start_Column);
+         Offset :=
+           (if Next_Sibling.Sloc_Range.Start_Column = 0 then 0
+            else Natural (Next_Sibling.Sloc_Range.Start_Column) - 1);
 
       elsif Prev_Sibling.Is_Null and Next_Sibling.Is_Null then
          --  We should look backward for the Node parent to find the offset
          --  of the parent and compute the one related to the reformatted node
          --  based on gnatpp indentation and indent continuation parameters
-         Offset := Get_Parent_Offset (Node);
+         Offset := Get_Parent_Indentation (Node);
 
       else
-         Offset := Natural (Node.Sloc_Range.Start_Column);
+         Offset :=
+           (if Node.Sloc_Range.Start_Column = 0 then 0
+            else Natural (Node.Sloc_Range.Start_Column) - 1);
       end if;
 
       return Offset;
-   end Get_Starting_Offset;
+   end Get_Initial_Indentation;
+
+   ---------------------------
+   -- Get_First_Line_Offset --
+   ---------------------------
+
+   function Get_First_Line_Offset
+     (Node : Ada_Node)
+      return Natural
+   is
+      Overriding_Text : constant String := "overriding";
+      Not_Overriding_Text : constant String := "not overriding";
+
+   begin
+      if Node.Kind in Ada_Subp_Spec_Range then
+         if Node.Previous_Sibling.Kind in Ada_Overriding_Overriding_Range
+           and then Node.Previous_Sibling.Sloc_Range.Start_Line =
+                      Node.Sloc_Range.Start_Line
+         then
+            return Overriding_Text'Length;
+         elsif Node.Previous_Sibling.Kind in
+                 Ada_Overriding_Not_Overriding_Range
+           and then Node.Previous_Sibling.Sloc_Range.Start_Line =
+                      Node.Sloc_Range.Start_Line
+         then
+            return Not_Overriding_Text'Length;
+         else
+            return 0;
+         end if;
+
+      else
+         return 0;
+      end if;
+   end Get_First_Line_Offset;
 
    ---------------------------------------------------
    --  Filter_Initially_Selected_Lines_From_Output  --
@@ -1161,7 +1218,7 @@ package body Laltools.Partial_GNATPP is
       end Set_Source_Line_Breaks_Switches;
 
       Start_Node, End_Node : Ada_Node;
-      Offset               : Natural := 0;
+      Initial_Indentation  : Natural := 0;
       Input_Sel            : Char_Vector;
 
    begin
@@ -1190,12 +1247,8 @@ package body Laltools.Partial_GNATPP is
       --  and set this value for further usage by Insert_Indentation in
       --  the post phases processing of the tree.
 
-      Offset :=
-        Get_Starting_Offset (Formatted_Node, PP_Indentation (PP_Options));
-
-      if Offset /= 0 then
-         Set_Partial_GNATPP_Offset (Offset - 1);
-      end if;
+      Initial_Indentation :=
+        Get_Initial_Indentation (Formatted_Node, PP_Indentation (PP_Options));
 
       --  Format_Vector will rewrite the input selection and returns the
       --  formatted text corresponding to the Enclosing_Node. The output
@@ -1203,12 +1256,13 @@ package body Laltools.Partial_GNATPP is
       --  on the closest enclosing parent of the initial selection.
 
       Format_Vector
-        (Cmd            => Final_PP_Options,
-         Input          => Input_Sel,
-         Node           => Formatted_Node,
-         Output         => Output,
-         Messages       => PP_Messages,
-         Partial_GNATPP => True);
+        (Cmd                 => Final_PP_Options,
+         Input               => Input_Sel,
+         Node                => Formatted_Node,
+         Output              => Output,
+         Messages            => PP_Messages,
+         Initial_Indentation => Initial_Indentation,
+         Partial_GNATPP      => True);
 
       --  In the case of preserving source line breaks switch usage, get the
       --  filtered output of the significant lines based on the initial
@@ -1608,19 +1662,17 @@ package body Laltools.Partial_GNATPP is
       use Pp.Command_Lines;
       use Utils.Command_Lines;
 
-      Formatting_Region  : constant Formatting_Region_Type :=
+      Formatting_Region   : constant Formatting_Region_Type :=
         Get_Formatting_Region (Unit, Input_Selection_Range);
-      Offset             : constant Natural :=
-        Get_Starting_Offset
+      Initial_Indentation : constant Natural :=
+        Get_Initial_Indentation
           (Formatting_Region.Enclosing_Node, PP_Indentation (PP_Options));
+      First_Line_Offset   : constant Natural :=
+        Get_First_Line_Offset (Formatting_Region.Enclosing_Node);
 
-      Formatted_Text_Ignore : Positive := 1;
+      Formatted_Text_Ignore : Natural := 0;
 
    begin
-      if Offset /= 0 then
-         Set_Partial_GNATPP_Offset (Offset - 1);
-      end if;
-
       declare
          Input_Text      : constant Utils.Char_Vectors.Char_Vector :=
            Get_Selection_Text
@@ -1634,22 +1686,25 @@ package body Laltools.Partial_GNATPP is
       begin
          if Formatting_Region.List_Slice then
             Format_Vector
-              (Cmd               => PP_Options,
-               Input             => Input_Text,
-               Node              => Formatting_Region.Enclosing_Node,
-               Output            => Formatted_Text,
-               Messages          => Diagnostics,
-               Partial_GNATPP    => True,
-               Start_Child_Index => Formatting_Region.Start_Child_Index,
-               End_Child_Index   => Formatting_Region.End_Child_Index);
+              (Cmd                 => PP_Options,
+               Input               => Input_Text,
+               Node                => Formatting_Region.Enclosing_Node,
+               Output              => Formatted_Text,
+               Messages            => Diagnostics,
+               Initial_Indentation => Initial_Indentation,
+               Partial_GNATPP      => True,
+               Start_Child_Index   => Formatting_Region.Start_Child_Index,
+               End_Child_Index     => Formatting_Region.End_Child_Index);
          else
             Format_Vector
-              (Cmd            => PP_Options,
-               Input          => Input_Text,
-               Node           => Formatting_Region.Enclosing_Node,
-               Output         => Formatted_Text,
-               Messages       => Diagnostics,
-               Partial_GNATPP => True);
+              (Cmd                 => PP_Options,
+               Input               => Input_Text,
+               Node                => Formatting_Region.Enclosing_Node,
+               Output              => Formatted_Text,
+               Messages            => Diagnostics,
+               First_Line_Offset   => First_Line_Offset,
+               Initial_Indentation => Initial_Indentation,
+               Partial_GNATPP      => True);
          end if;
 
          declare
@@ -1690,11 +1745,12 @@ package body Laltools.Partial_GNATPP is
                        (Data (Formatting_Region.Start_Token)).Start_Column);
 
                if Start_Col /= 1 then
-                  --  The formatted text has an offset in all lines, including
-                  --  the first one. If Start_Col /= 1 it means that we must
-                  --  trim the leading blanks of the formatted text.
+                  --  The formatted text has an Initial_Indentation in all
+                  --  lines, including the first one. If Start_Col /= 1 it
+                  --  means that we must trim the leading blanks of the
+                  --  formatted text.
 
-                  Formatted_Text_Ignore := @ + Offset - 1;
+                  Formatted_Text_Ignore := @ + Initial_Indentation;
                end if;
             end;
 

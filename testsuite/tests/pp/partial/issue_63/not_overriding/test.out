@@ -1,0 +1,13 @@
+*************************************
+test.ads(<SubpSpec test.ads:8:19-8:87>) - 8:19-8:87
+^
+procedure Bar
+     (Self : Baz; I : Integer; J : Integer; K, L : Integer)$
+*************************************
+
+*************************************
+test.adb(<SubpSpec test.adb:3:4-7:22>) - 3:1-7:22
+^
+   procedure Bar (Self : Baz; I : Integer; J : Integer; K, L : Integer)$
+*************************************
+

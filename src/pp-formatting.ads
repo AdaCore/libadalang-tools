@@ -222,7 +222,10 @@ package Pp.Formatting is
       --  final result. We initially generate New_Tokns, then Tokns_To_Buffer
       --  converts that to Out_Buf for the last few phases.
 
-      Cur_Indentation : Natural := 0;
+      First_Line_Offset   : Natural := 0;
+
+      Initial_Indentation : Natural := 0;
+      Cur_Indentation     : Natural := 0;
 
       --  Each line break is represented by a Line_Break appended onto the
       --  Line_Breaks vector. Hard line breaks are initially enabled. Soft
