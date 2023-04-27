@@ -40,19 +40,12 @@ with TGen.Marshalling;        use TGen.Marshalling;
 with TGen.Marshalling.Binary_Marshallers;
 with TGen.Marshalling.JSON_Marshallers;
 with TGen.Type_Representation;
-with TGen.Types.Array_Types;
 with TGen.Types.Constraints;  use TGen.Types.Constraints;
 with TGen.Types.Record_Types; use TGen.Types.Record_Types;
 with TGen.Types.Translation;  use TGen.Types.Translation;
 with TGen.Types;              use TGen.Types;
 
 package body TGen.Libgen is
-
-   function Type_Dependencies
-     (T : SP.Ref; Transitive : Boolean := False) return Typ_Set;
-   --  Return all the types that T needs to have visibility on (i.e. index/
-   --  component / discriminant types). If transitive is True, this returns
-   --  the transitive closure of types on which self depends.
 
    procedure Generate_Support_Library
      (Ctx        : Libgen_Context;
@@ -82,106 +75,6 @@ package body TGen.Libgen is
                             return Ada_Qualified_Name);
    --  Include all the types in Source in the correct package key in Dest. All
    --  anonymous types are ignored.
-
-   -----------------------
-   -- Type_Dependencies --
-   -----------------------
-
-   function Type_Dependencies
-     (T : SP.Ref; Transitive : Boolean := False) return Typ_Set
-   is
-      use TGen.Types.Array_Types;
-
-      Res : Typ_Set;
-
-      procedure Inspect_Variant (Var : Variant_Part_Acc);
-      --  Include the types of the components defined in Var in the set of type
-      --  on which T depends on, and inspect them transitively if needed.
-
-      procedure Inspect_Variant (Var : Variant_Part_Acc) is
-      begin
-         if Var = null then
-            return;
-         end if;
-         for Choice of Var.Variant_Choices loop
-            for Comp of Choice.Components loop
-               Res.Include (Comp);
-               if Transitive or else Comp.Get.Kind = Anonymous_Kind then
-                  Res.Union (Type_Dependencies (Comp, Transitive));
-               end if;
-            end loop;
-            Inspect_Variant (Choice.Variant);
-         end loop;
-      end Inspect_Variant;
-
-   begin
-      case T.Get.Kind is
-         when Anonymous_Kind =>
-            Res.Include (As_Anonymous_Typ (T).Named_Ancestor);
-            if Transitive then
-               Res.Union (Type_Dependencies
-                            (As_Anonymous_Typ (T).Named_Ancestor, Transitive));
-            end if;
-         when Array_Typ_Range =>
-            declare
-               Comp_Ty : constant SP.Ref := As_Array_Typ (T).Component_Type;
-            begin
-               Res.Include (Comp_Ty);
-               if Transitive or else Comp_Ty.Get.Kind = Anonymous_Kind then
-                  Res.Union (Type_Dependencies (Comp_Ty, Transitive));
-               end if;
-            end;
-
-            --  Index type are discrete types, and thus do not depend on
-            --  any type.
-
-            for Idx_Typ of As_Array_Typ (T).Index_Types loop
-                  Res.Include (Idx_Typ);
-               if Idx_Typ.Get.Kind = Anonymous_Kind then
-                  Res.Union (Type_Dependencies (Idx_Typ, Transitive));
-               end if;
-            end loop;
-         when Non_Disc_Record_Kind =>
-            for Comp_Typ of As_Nondiscriminated_Record_Typ (T).Component_Types
-            loop
-               Res.Include (Comp_Typ);
-               if Transitive or else Comp_Typ.Get.Kind = Anonymous_Kind then
-                  Res.Union (Type_Dependencies (Comp_Typ, Transitive));
-               end if;
-            end loop;
-         when Function_Kind =>
-            for Comp_Typ of As_Function_Typ (T).Component_Types
-            loop
-               Res.Include (Comp_Typ);
-               if Transitive then
-                  Res.Union (Type_Dependencies (Comp_Typ, Transitive));
-               end if;
-            end loop;
-         when Disc_Record_Kind =>
-            for Comp_Typ of As_Discriminated_Record_Typ (T).Component_Types
-            loop
-               Res.Include (Comp_Typ);
-               if Transitive or else Comp_Typ.Get.Kind = Anonymous_Kind then
-                  Res.Union (Type_Dependencies (Comp_Typ, Transitive));
-               end if;
-            end loop;
-
-            --  Discriminant types are discrete types, and thus do not depend
-            --  on any type.
-
-            for Disc_Typ of As_Discriminated_Record_Typ (T).Discriminant_Types
-            loop
-               Res.Include (Disc_Typ);
-               if Transitive or else Disc_Typ.Get.Kind = Anonymous_Kind then
-                  Res.Union (Type_Dependencies (Disc_Typ, Transitive));
-               end if;
-            end loop;
-            Inspect_Variant (As_Discriminated_Record_Typ (T).Variant);
-         when others =>
-            null;
-      end case;
-      return Res;
-   end Type_Dependencies;
 
    -----------------------------
    -- Support_Library_Package --
@@ -353,28 +246,31 @@ package body TGen.Libgen is
         (F_Body, "   pragma Assertion_Policy (Predicate => Ignore);");
       New_Line (F_Body);
 
-      --  Generate the marshalling support lib
+      --  Generate the marshalling support lib. Make sure to sort the types
+      --  in dependency order otherwise we will get access before elaboration
+      --  issues.
 
-      for T of Types loop
+      for T of Sort (Types) loop
+
          if Is_Supported_Type (T.Get)
 
-            --  We ignore instance types when generating marshallers as they
-            --  are not types per-se, but a convenient way of binding a type
-            --  to its strategy context.
+           --  We ignore instance types when generating marshallers as they
+           --  are not types per-se, but a convenient way of binding a type
+           --  to its strategy context.
 
             and then T.Get not in Instance_Typ'Class
          then
             if T.Get.Kind in Function_Kind then
                TGen.Marshalling.JSON_Marshallers
-                  .Generate_TC_Serializers_For_Subp
-                     (F_Spec, F_Body, T.Get, TRD);
+                 .Generate_TC_Serializers_For_Subp
+                   (F_Spec, F_Body, T.Get, TRD);
             else
                TGen.Marshalling.Binary_Marshallers
-                  .Generate_Marshalling_Functions_For_Typ
-                     (F_Spec, F_Body, T.Get, TRD);
+                 .Generate_Marshalling_Functions_For_Typ
+                   (F_Spec, F_Body, T.Get, TRD);
                TGen.Marshalling.JSON_Marshallers
-                  .Generate_Marshalling_Functions_For_Typ
-                     (F_Spec, F_Body, T.Get, TRD);
+                 .Generate_Marshalling_Functions_For_Typ
+                   (F_Spec, F_Body, T.Get, TRD);
             end if;
          end if;
       end loop;
@@ -509,52 +405,13 @@ package body TGen.Libgen is
       --  initialization code must be generated before the type. Sort the
       --  types here.
 
-      declare
-         G : Graph_Type;
-         Sorted_Types : Typ_List;
-         procedure Append (T : SP.Ref);
-
-         ------------
-         -- Append --
-         ------------
-
-         procedure Append (T : SP.Ref) is
-         begin
-            Sorted_Types.Append (T);
-         end Append;
-      begin
-
-         --  Create the nodes of the graph
-
-         for T of Types loop
-            Create_Node (G, T);
-         end loop;
-
-         --  Create the edges
-
-         for T of Types loop
-            for Dep of Type_Dependencies (T) loop
-               --  Filter out type dependencies that don't belong to this
-               --  package
-
-               if Types.Contains (Dep) then
-                  Create_Edge (G, Dep, T);
-               end if;
-            end loop;
-         end loop;
-
-         --  Sort the types
-
-         Traverse (G, Append'Access);
-
-         for T of Sorted_Types loop
-            TGen.Type_Representation.Generate_Type_Representation_For_Typ
-              (F_Spec, F_Body, T.Get,
-               To_String (Ctx.Root_Templates_Dir),
-               Ctx.Strategy_Map,
-               Initialization_Code);
-         end loop;
-      end;
+      for T of Sort (Types) loop
+         TGen.Type_Representation.Generate_Type_Representation_For_Typ
+           (F_Spec, F_Body, T.Get,
+            To_String (Ctx.Root_Templates_Dir),
+            Ctx.Strategy_Map,
+            Initialization_Code);
+      end loop;
 
       --  Print the initialization code, used for the type representation
 
