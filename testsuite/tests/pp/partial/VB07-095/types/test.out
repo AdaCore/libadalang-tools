@@ -200,7 +200,7 @@ type_declarations.ads(<TaskTypeDecl ["Server"] type_declarations.ads:115:4-118:1
    task type Server is
       entry Next_Work_Item (WI : in Work_Item);
       entry Shut_Down;
-   end Server$
+   end Server;$
 *************************************
 
 *************************************
@@ -210,7 +210,7 @@ type_declarations.ads(<TaskTypeDecl ["Keyboard_Driver"] type_declarations.ads:11
    is new Serial_Device with
       entry Read (C : out Character);
       entry Write (C : in Character);
-   end Keyboard_Driver$
+   end Keyboard_Driver;$
 *************************************
 
 
@@ -287,7 +287,7 @@ task_type_arr.adb(<TaskTypeDecl ["TT"] task_type_arr.adb:30:4-32:11>) - 30:1-32:
 ^
    task type TT is
       entry Start (N : Integer);
-   end TT$
+   end TT;$
 *************************************
 
 *************************************
@@ -315,7 +315,7 @@ task_type_arr.adb(<ObjectDecl ["My_Tasks"] task_type_arr.adb:44:4-44:36>) - 44:1
 *************************************
 simple_task_type_decl.adb(<TaskTypeDecl ["TT"] simple_task_type_decl.adb:29:4-29:17>) - 29:1-29:17
 ^
-   task type TT$
+   task type TT;$
 *************************************
 
 *************************************
@@ -344,7 +344,7 @@ protected_obj_type_decl.adb(<ProtectedTypeDecl ["P_Obj_Type"] protected_obj_type
       function Get return Integer;
    private
       Local : Integer := 0;
-   end P_Obj_Type$
+   end P_Obj_Type;$
 *************************************
 
 *************************************
@@ -360,7 +360,7 @@ protected_obj_type_decl.adb(<ProtectedBody ["P_Obj_Type"] protected_obj_type_dec
       begin
          return Local;
       end Get;
-   end P_Obj_Type$
+   end P_Obj_Type;$
 *************************************
 
 *************************************
@@ -381,7 +381,7 @@ protected_objects_entries.adb(<SingleProtectedDecl ["Obj"] protected_objects_ent
    private
       Local  : Integer;
       Is_Set : Boolean := False;
-   end Obj$
+   end Obj;$
 *************************************
 
 *************************************
@@ -405,7 +405,7 @@ protected_objects_entries.adb(<ProtectedBody ["Obj"] protected_objects_entries.a
          V      := Local;
          Is_Set := False;
       end Get;
-   end Obj$
+   end Obj;$
 *************************************
 
 *************************************
@@ -421,7 +421,7 @@ protected_objects_entries.adb(<EntryBody ["Get"] protected_objects_entries.adb:4
       begin
          V      := Local;
          Is_Set := False;
-      end Get$
+      end Get;$
 *************************************
 
 *************************************
