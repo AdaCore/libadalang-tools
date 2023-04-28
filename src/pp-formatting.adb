@@ -161,9 +161,9 @@ package body Pp.Formatting is
    end Sname_83;
 
    procedure Insert_Comment_Text
-     (Lines_Data_P : Lines_Data_Ptr;
-      Cmd : Utils.Command_Lines.Command_Line;
-      Comment_Tok : Scanner.Tokn_Cursor);
+     (Lines_Data_P   : Lines_Data_Ptr;
+      Cmd            : Utils.Command_Lines.Command_Line;
+      Comment_Token  : Scanner.Tokn_Cursor);
    --  Insert the text of the comment into New_Tokns, including the initial
    --  "--" and leading blanks.
    --  This will eventually be replaced by Comment_Tokn_To_Buf.
@@ -332,9 +332,7 @@ package body Pp.Formatting is
             Level                      => 1,
             Indentation                => Cur_Indentation,
             Bin_Op_Count               => 0,
-            Length                     => <>
---            Kind        => Not_An_Element
-           ));
+            Length                     => <>));
       Append (Temp_LBI, Last_Index (All_LB));
 
       Scanner.Lines.Append_Line_Break_Tokn
@@ -342,22 +340,31 @@ package body Pp.Formatting is
          Index => Last_Index (All_LB), Org => Org);
    end Append_Temp_Line_Break;
 
+   -------------------------
+   -- Insert_Comment_Text --
+   -------------------------
+
    procedure Insert_Comment_Text
-     (Lines_Data_P : Lines_Data_Ptr;
-      Cmd : Utils.Command_Lines.Command_Line;
-      Comment_Tok : Scanner.Tokn_Cursor)
+     (Lines_Data_P   : Lines_Data_Ptr;
+      Cmd            : Utils.Command_Lines.Command_Line;
+      Comment_Token  : Scanner.Tokn_Cursor)
    is
-      Lines_Data : Lines_Data_Rec renames Lines_Data_P.all;
-      Cur_Indentation : Natural renames Lines_Data.Cur_Indentation;
-      New_Tokns : Scanner.Tokn_Vec renames Lines_Data.New_Tokns;
       use Scanner;
+
+      Lines_Data      : Lines_Data_Rec renames Lines_Data_P.all;
+      Cur_Indentation : Natural renames Lines_Data.Cur_Indentation;
+      New_Tokns       : Scanner.Tokn_Vec renames Lines_Data.New_Tokns;
 
       function Filled_Text
         (Comment_Tok    : Tokn_Cursor;
          Leading_Blanks : Natural)
-         return           W_Str;
+         return W_Str;
       --  Returns the text of the comment after filling (see
       --  GNATCOLL.Paragraph_Filling).
+
+      ----------------
+      -- Filled_Text--
+      ----------------
 
       function Filled_Text
         (Comment_Tok    : Tokn_Cursor;
@@ -365,141 +372,163 @@ package body Pp.Formatting is
          return           W_Str
       is
          use GNATCOLL.Paragraph_Filling, Ada.Strings.Unbounded;
+
          S1 : constant String := Str (Text (Comment_Tok)).S;
          S2 : constant String :=
            To_String
              (Pretty_Fill
-                (S1,
+                (Paragraph       => S1,
                  Max_Line_Length =>
                    Arg (Cmd, Max_Line_Length) -
                    (Cur_Indentation + String'("--")'Length + Leading_Blanks)));
+
       begin
          return From_UTF8 (S2);
       end Filled_Text;
 
       --  Comments_Gnat_Beginning causes the comment to start with at least 2
+      --  blanks, unless its an empty comment which must not have leading
       --  blanks.
       --  This is only aplicable to Fillable_Comment or
       --  Other_Whole_Line_Comment tokens that are not part of a header
       --  comment.
-
       Leading_Blanks : constant Natural :=
         (if Arg (Cmd, Comments_Gnat_Beginning)
-           and then not Is_Header_Comment (Token_At_Cursor (Comment_Tok))
-           and then Kind (Comment_Tok) in
+           and then not Is_Header_Comment (Token_At_Cursor (Comment_Token))
+           and then Kind (Comment_Token) in
                       Fillable_Comment | Other_Whole_Line_Comment
          then
-           Natural'Max (Scanner.Leading_Blanks (Comment_Tok), 2)
-         else Scanner.Leading_Blanks (Comment_Tok));
+           (if Is_Empty_Comment (Token_At_Cursor (Comment_Token)) then 0
+            else Natural'Max (Scanner.Leading_Blanks (Comment_Token), 2))
+         else Scanner.Leading_Blanks (Comment_Token));
+
       --  In Comments_Only mode, we need to indent "by hand" here. In normal
       --  mode, Cur_Indentation will be heeded by the line breaks.
       Do_Filling : constant Boolean :=
         Comment_Filling_Enabled (Cmd)
-          and then Kind (Comment_Tok) = Fillable_Comment;
-      Text : constant W_Str :=
-        (if Do_Filling then Filled_Text (Comment_Tok, Leading_Blanks)
-         else To_W_Str (Scanner.Text (Comment_Tok)));
+        and then Kind (Comment_Token) = Fillable_Comment;
+      Text       : constant W_Str :=
+        (if Do_Filling then Filled_Text (Comment_Token, Leading_Blanks)
+         else To_W_Str (Scanner.Text (Comment_Token)));
 
    --  Start of processing for Insert_Comment_Text
 
    begin
       Append_Comment_Text
-        (New_Tokns, Comment_Tok, Text,
+        (V                => New_Tokns,
+         X                => Comment_Token,
+         Tx               => Text,
          Recompute_Length => True,
-         Comments_Only => Arg (Cmd, Comments_Only),
-         Comments_Gnat_Beginning => Arg (Cmd, Comments_Gnat_Beginning),
-         Org => "Insert_Comment_Text");
+         Comments_Only    => Arg (Cmd, Comments_Only),
+         Leading_Blanks   => Leading_Blanks,
+         Org              => "Insert_Comment_Text");
       --  It would be good to avoid dealing with text here, and avoid
       --  recomputing the length all the time.
    end Insert_Comment_Text;
 
-   procedure Comment_Tokn_To_Buf
-     (Buf : in out Buffer;
-      Comment_Tok : Scanner.Tokn_Cursor;
-      Cmd : Utils.Command_Lines.Command_Line);
+   procedure Comment_Token_To_Buffer
+     (Buffer        : in out Pp.Buffers.Buffer;
+      Comment_Token : Scanner.Tokn_Cursor;
+      Cmd           : Utils.Command_Lines.Command_Line);
    --  Called by Tokns_To_Buffer in the comment case, which is the most
    --  complicated.
 
-   procedure Comment_Tokn_To_Buf
-     (Buf : in out Buffer;
-      Comment_Tok : Scanner.Tokn_Cursor;
-      Cmd : Utils.Command_Lines.Command_Line)
+   -----------------------------
+   -- Comment_Token_To_Buffer --
+   -----------------------------
+
+   procedure Comment_Token_To_Buffer
+     (Buffer        : in out Pp.Buffers.Buffer;
+      Comment_Token : Scanner.Tokn_Cursor;
+      Cmd           : Utils.Command_Lines.Command_Line)
    is
       use Scanner;
 
       function Filled_Text
-        (Comment_Tok    : Tokn_Cursor)
-         return           W_Str;
+        (Comment_Token : Tokn_Cursor)
+         return W_Str;
       --  Returns the text of the comment after filling (see
       --  GNATCOLL.Paragraph_Filling).
 
       --  Comments_Gnat_Beginning causes the comment to start with at least 2
+      --  blanks, unless its an empty comment which must not have leading
       --  blanks.
-
+      --  This is only aplicable to Fillable_Comment or
+      --  Other_Whole_Line_Comment tokens that are not part of a header
+      --  comment.
       pragma Assert
         (if Arg (Cmd, Comments_Gnat_Beginning)
-           and then not Is_Header_Comment (Token_At_Cursor (Comment_Tok))
-           and then Kind (Comment_Tok) in
+           and then not Is_Header_Comment (Token_At_Cursor (Comment_Token))
+           and then Kind (Comment_Token) in
                       Fillable_Comment | Other_Whole_Line_Comment
          then
-           Scanner.Leading_Blanks (Comment_Tok) >= 2);
-      Prev_Tok : constant Tokn_Cursor := Prev (Comment_Tok);
-      pragma Assert (if Kind (Comment_Tok) in Whole_Line_Comment then
+            (if Is_Empty_Comment (Token_At_Cursor (Comment_Token))
+             then Scanner.Leading_Blanks (Comment_Token) = 0
+             else Scanner.Leading_Blanks (Comment_Token) >= 2));
+
+      Prev_Tok : constant Tokn_Cursor := Prev (Comment_Token);
+      pragma Assert (if Kind (Comment_Token) in Whole_Line_Comment then
         Kind (Prev_Tok) in Spaces | EOL_Token | Line_Break_Token);
       Indentation : constant W_Str :=
-        (if Kind (Comment_Tok) in Whole_Line_Comment then
+        (if Kind (Comment_Token) in Whole_Line_Comment then
           (if Kind (Prev_Tok) = Spaces then To_W_Str (Text (Prev_Tok)) else "")
          else "");
       pragma Assert
-        (if Kind (Comment_Tok) in Whole_Line_Comment then
-           Indentation'Length = Sloc_Col (Comment_Tok) - 1);
+        (if Kind (Comment_Token) in Whole_Line_Comment then
+           Indentation'Length = Sloc_Col (Comment_Token) - 1);
       First_Line_Prelude : constant W_Str :=
-          "--" & [1 .. Scanner.Leading_Blanks (Comment_Tok) => ' '];
+          "--" & [1 .. Scanner.Leading_Blanks (Comment_Token) => ' '];
       --  String that precedes the comment Text (first line)
       Subsequent_Prelude : constant W_Str := Indentation & First_Line_Prelude;
       --  String that precedes subsequent line of the comment Text
 
+      -----------------
+      -- Filled_Text --
+      -----------------
+
       function Filled_Text
-        (Comment_Tok    : Tokn_Cursor)
-         return           W_Str
+        (Comment_Token : Tokn_Cursor)
+         return W_Str
       is
          use GNATCOLL.Paragraph_Filling, Ada.Strings.Unbounded;
-         S1 : String renames Str (Text (Comment_Tok)).S;
+
+         S1 : String renames Str (Text (Comment_Token)).S;
          S2 : constant String :=
            To_String
              (Pretty_Fill
                 (S1,
                  Max_Line_Length =>
                    Arg (Cmd, Max_Line_Length) - Subsequent_Prelude'Length));
+
       begin
          return From_UTF8 (S2);
       end Filled_Text;
 
       Do_Filling : constant Boolean :=
-          Arg (Cmd, Comments_Only)
-          and then Comment_Filling_Enabled (Cmd)
-          and then Kind (Comment_Tok) = Fillable_Comment;
-      Text_NL : constant W_Str :=
-        (if Do_Filling then Filled_Text (Comment_Tok)
-         else To_W_Str (Scanner.Text (Comment_Tok)));
+        Arg (Cmd, Comments_Only)
+        and then Comment_Filling_Enabled (Cmd)
+        and then Kind (Comment_Token) = Fillable_Comment;
+      Text_NL    : constant W_Str :=
+        (if Do_Filling then Filled_Text (Comment_Token)
+         else To_W_Str (Scanner.Text (Comment_Token)));
       pragma Assert (Text_NL (Text_NL'Last) = NL);
-      Text : W_Str renames Text_NL (Text_NL'First .. Text_NL'Last - 1);
       --  Skip last NL
+      Text       : W_Str renames Text_NL (Text_NL'First .. Text_NL'Last - 1);
 
-   --  Start of processing for Comment_Tokn_To_Buf
+   --  Start of processing for Comment_Token_To_Buffer
 
    begin
-      Insert (Buf, First_Line_Prelude);
+      Insert (Buffer, First_Line_Prelude);
 
       for X in Text'Range loop
          if Text (X) = NL then
-            Insert_NL (Buf);
-            Insert (Buf, Subsequent_Prelude);
+            Insert_NL (Buffer);
+            Insert (Buffer, Subsequent_Prelude);
          else
-            Insert (Buf, Text (X));
+            Insert (Buffer, Text (X));
          end if;
       end loop;
-   end Comment_Tokn_To_Buf;
+   end Comment_Token_To_Buffer;
 
    procedure Tokns_To_Buffer
      (Buf : in out Buffer; Tokns : Scanner.Tokn_Vec;
@@ -515,7 +544,7 @@ package body Pp.Formatting is
             --  Skip the last LB sentinel
             while not After_Last (Cur) loop
                if Kind (Cur) in Comment_Kind then
-                  Comment_Tokn_To_Buf (Buf, Cur, Cmd);
+                  Comment_Token_To_Buffer (Buf, Cur, Cmd);
                else
                   Insert_Any (Buf, To_W_Str (Text (Cur)));
                end if;
