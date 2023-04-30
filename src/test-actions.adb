@@ -822,7 +822,8 @@ package body Test.Actions is
             end if;
             for Index of Indexes loop
                Process_Exclusion_List
-                 (Attribute_Value (Root_Prj, Exclude_Attr, Index.all),
+                 (":" & Index.all & "="
+                  & Attribute_Value (Root_Prj, Exclude_Attr, Index.all),
                   From_Project => True);
             end loop;
          end;
