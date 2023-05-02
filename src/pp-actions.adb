@@ -779,135 +779,131 @@ package body Pp.Actions is
    begin
       return
         (case Kind is
-           when Ada_Discrete_Base_Subtype_Decl => null,
-           when Ada_Discrete_Subtype_Name => null,
-           when Ada_Contract_Case_Assoc => null,
-           when Ada_Contract_Cases => null,
-           when Ada_Multi_Dim_Array_Assoc => null,
-           when Ada_Error_Decl => null,
-           when Ada_Error_Stmt => null,
-           when Ada_Enum_Subp_Spec => null,
-           when Ada_Enum_Lit_Synth_Type_Expr => null,
-            --  ???The above are not used
-
-           when Ada_Type_Attributes_Repository => null,
-           when Ada_Synthetic_Binary_Spec => null,
-           when Ada_Synthetic_Unary_Spec => null,
-           when Ada_Synthetic_Formal_Param_Decl => null,
-           when Ada_Synthetic_Subp_Decl => null,
-           when Ada_Synthetic_Defining_Name => null,
-           when Ada_Synthetic_Identifier => null,
-           when Ada_Synthetic_Type_Expr => null,
-           when Ada_Synthetic_Char_Enum_Lit => null,
+            when Ada_Synthetic_Binary_Spec       => null,
+            when Ada_Synthetic_Unary_Spec        => null,
+            when Ada_Synthetic_Formal_Param_Decl => null,
+            when Ada_Synthetic_Subp_Decl         => null,
+            when Ada_Synthetic_Defining_Name     => null,
+            when Ada_Synthetic_Identifier        => null,
+            when Ada_Synthetic_Type_Expr         => null,
+            when Ada_Synthetic_Char_Enum_Lit     => null,
             --  The above nodes are specific to synthetic predefined operators
-            --  and will never appear in source code.
+         --  and will never appear in source code.
+            when Ada_Discrete_Base_Subtype_Decl  => null,
+            when Ada_Discrete_Subtype_Name       => null,
+            when Ada_Contract_Case_Assoc         => null,
+            when Ada_Contract_Cases              => null,
+            when Ada_Multi_Dim_Array_Assoc       => null,
+            when Ada_Error_Decl                  => null,
+            when Ada_Error_Stmt                  => null,
+            when Ada_Enum_Subp_Spec              => null,
+            when Ada_Enum_Lit_Synth_Type_Expr    => null,
+            when Ada_Type_Attributes_Repository  => null,
 
-           when Ada_Pp_Else_Directive
+            when Ada_Pp_Else_Directive
               | Ada_Pp_Elsif_Directive
               | Ada_Pp_End_If_Directive
               | Ada_Pp_If_Directive
-              | Ada_Pp_Then_Kw => null,
-           --  These nodes are produced only by preprocessor-specific grammar
-           --  rules, so the parsing of compilation units (default grammar
-           --  rule) will never create them, and thus these nodes will never
-           --  show up here.
+              | Ada_Pp_Then_Kw                     => null,
+              --  These nodes are produced only by preprocessor-specific
+              --  grammar rules, so the parsing of compilation units (default
+              --  grammar rule) will never create them, and thus these nodes
+              --  will never show up here.
 
-           when Ada_Iterated_Assoc => null,
-           when Ada_Bracket_Aggregate => null,
-           when Ada_Bracket_Delta_Aggregate => null,
-           when Ada_Delta_Aggregate => null,
-           when Ada_Decl_Expr => null,
-           --  ??? Ada 2020 related expressions, needs to be implemented. See
-           --  T519-017.
+            when Ada_Iterated_Assoc              => null,
+            when Ada_Bracket_Aggregate           => null,
+            when Ada_Bracket_Delta_Aggregate     => null,
+            when Ada_Delta_Aggregate             => null,
+            when Ada_Decl_Expr                   => null,
+            --  ??? Ada 2020 related expressions, needs to be implemented. See
+            --  T519-017.
 
-           when Ada_Abstract_State_Decl => null,
-           when Ada_Abstract_State_Decl_Expr => null,
-           when Ada_Multi_Abstract_State_Decl => null,
-           when Ada_Paren_Abstract_State_Decl => null,
-           --   ??? SPARK related expressions, needs to be implemented. See
-           --   U305-048.
+            when Ada_Abstract_State_Decl         => null,
+            when Ada_Abstract_State_Decl_Expr    => null,
+            when Ada_Multi_Abstract_State_Decl   => null,
+            when Ada_Paren_Abstract_State_Decl   => null,
+            --   ??? SPARK related expressions, needs to be implemented. See
+            --   U305-048.
 
-           when Ada_Ada_List => null,
-           when Ada_Subp_Spec => null,
-           when Ada_Aggregate_Assoc => null,
+            when Ada_Ada_List                                   => null,
+            when Ada_Subp_Spec                                  => null,
+            when Ada_Aggregate_Assoc                            => null,
+            when Ada_Accept_Stmt_Body                           => L ("!"),
+            when Ada_Entry_Completion_Formal_Params             => L ("!"),
 
-           when Ada_Accept_Stmt_Body => L ("!"),
-
-           when Ada_Entry_Completion_Formal_Params => L ("!"),
-
-           when Ada_Constrained_Array_Indices |
-             Ada_Unconstrained_Array_Indices =>
-             L ("(?~,# ~~)"),
-           when Ada_Unconstrained_Array_Index =>
-             L ("! range <>"),
-           when Ada_Aspect_Assoc =>
-             L ("!*? ^=># ~~~_"),
-           when Ada_At_Clause =>
-             L ("for ! use at !"),
-           when Ada_Attribute_Def_Clause | Ada_Enum_Rep_Clause =>
-             L ("for ! use [!]"),
-           when Ada_Record_Rep_Clause =>
-             L ("for ! use record? at mod ~~;~$", "{?~;$~;$~}", "end record"),
-           when Ada_Aspect_Spec =>
-             L (" with$[?~,# ~~]"),
-             --  ???We could try something like the following:
-             --  "? with[#1 ~,#1 ~]~"
-           when Ada_Component_Decl =>
-             L ("?~,# ~~ ^: !? ^2:=[# ~~]~", Aspects),
-           when Ada_Discriminant_Spec =>
-             L ("?~,# ~~ ^: !? ^2:=[# ~~]~? with [# ~~]~"),
-             --  Adding [aspects_specifications] support for this node kind
-           when Ada_Params => null,
-           when Ada_Param_Spec => null,
-           when Ada_Base_Package_Decl =>
-             L ("package !#",
-                Aspects_Is,
-                " is$",
-                "!",
-                "!",
-                "end !1/"),
-           when Ada_Abstract_Subp_Decl =>
-             L ("?~~ ~!", " is abstract", Aspects),
-           when Ada_Expr_Function =>
-             L ("?~~ ~!", " is[# !]", Aspects),
-           when Ada_Null_Subp_Decl =>
-             L ("?~~ ~!", " is null", Aspects),
-           when Ada_Subp_Renaming_Decl =>
-             L ("?~~ ~!!", Aspects),
-           when Ada_Subp_Decl =>
-             L ("?~~ ~!" & Aspects),
-           when Ada_Subp_Body_Stub =>
-             L ("?~~ ~! is separate" & Aspects),
-           when Ada_Concrete_Formal_Subp_Decl =>
-             L ("?~~ ~with !? is ~~~" & Aspects),
-           when Ada_Abstract_Formal_Subp_Decl =>
-             L ("?~~ ~with ! is abstract? ~~~" & Aspects),
+            when Ada_Constrained_Array_Indices
+                 | Ada_Unconstrained_Array_Indices              =>
+               L ("(?~,# ~~)"),
+            when Ada_Unconstrained_Array_Index                  =>
+              L ("! range <>"),
+            when Ada_Aspect_Assoc                               =>
+              L ("!*? ^=># ~~~_"),
+            when Ada_At_Clause                                  =>
+              L ("for ! use at !;"),
+            when Ada_Attribute_Def_Clause | Ada_Enum_Rep_Clause =>
+              L ("for ! use [!];"),
+            when Ada_Record_Rep_Clause                          =>
+              L ("for ! use record? at mod ~~;~$", "{?~$~$~}", "end record;"),
+            when Ada_Aspect_Spec                                =>
+              L (" with$[?~,# ~~]"),
+              --  ???We could try something like the following:
+              --  "? with[#1 ~,#1 ~]~"
+            when Ada_Component_Decl                             =>
+              L ("?~,# ~~ ^: !? ^2:=[# ~~]~", Aspects, ";"),
+            when Ada_Discriminant_Spec                          =>
+              L ("?~,# ~~ ^: !? ^2:=[# ~~]~? with [# ~~]~"),
+              --  Adding [aspects_specifications] support for this node kind
+            when Ada_Params                                     => null,
+            when Ada_Param_Spec                                 => null,
+            when Ada_Base_Package_Decl                          =>
+              L ("package !#",
+           Aspects_Is,
+           " is$",
+           "!",
+           "!",
+           "end !1/;"),
+            when Ada_Abstract_Subp_Decl                         =>
+              L ("?~~ ~!", " is abstract", Aspects, ";"),
+            when Ada_Expr_Function                              =>
+              L ("?~~ ~!", " is[# !]", Aspects, ";"),
+            when Ada_Null_Subp_Decl                             =>
+              L ("?~~ ~!", " is null", Aspects, ";"),
+            when Ada_Subp_Renaming_Decl                         =>
+              L ("?~~ ~!!", Aspects, ";"),
+            when Ada_Subp_Decl                                  =>
+              L ("?~~ ~!", Aspects, ";"),
+            when Ada_Subp_Body_Stub                             =>
+              L ("?~~ ~! is separate", Aspects, ";"),
+            when Ada_Concrete_Formal_Subp_Decl                  =>
+              L ("?~~ ~with !? is ~~~", Aspects, ";"),
+            when Ada_Abstract_Formal_Subp_Decl                  =>
+              L ("?~~ ~with ! is abstract? ~~~", Aspects, ";"),
            when Ada_Subp_Kind_Function =>
              L ("function"),
            when Ada_Subp_Kind_Procedure =>
              L ("procedure"),
            when Ada_Package_Body_Stub =>
-             L ("package body ! is separate", Aspects),
+             L ("package body ! is separate", Aspects, ";"),
            when Ada_Protected_Body_Stub =>
-             L ("protected body ! is separate", Aspects),
+             L ("protected body ! is separate", Aspects, ";"),
            when Ada_Task_Body_Stub =>
-             L ("task body ! is separate", Aspects),
+             L ("task body ! is separate", Aspects, ";"),
            when Ada_Package_Body =>
              L ("package body !",
                 Aspects_Is,
                 " is$",
                 "!",
                 "!",
-                "end !1/"),
+                "end !1/;"),
            when Ada_Protected_Body =>
-             L ("protected body !", Aspects_Is, " is$", "!", "end !1/"),
+             L ("protected body !", Aspects_Is, " is$", "!", "end !1/;"),
            when Ada_Subp_Body =>
              L ("?~~ ~!",
                 Aspects_Is,
                 "#+1 is$",
                 "!",
                 "!",
-                "end !"),
+                "end !;"),
                --  We increase the level of the # before " is", so it will be
                --  equal to that of the formal parameters, so if the "is" goes
                --  on a new line, the parameters will be split as well.
@@ -922,9 +918,9 @@ package body Pp.Actions is
                 " is$",
                 "!",
                 "!",
-                "end !1/"),
+                "end !1/;"),
            when Ada_Entry_Decl =>
-             L ("?~~ ~entry !", Aspects),
+             L ("?~~ ~entry !", Aspects, ";"),
            when Ada_Entry_Spec =>
              L ("!?[# (~~)]~?~~~"),
            when Ada_Entry_Body =>
@@ -933,56 +929,60 @@ package body Pp.Actions is
                 " when !]# is$",
                 "!",
                 "!",
-                "end !1/"),
+                "end !1/;"),
            when Ada_Enum_Literal_Decl =>
              L ("!"),
            when Ada_Exception_Decl =>
-             L ("?~,# ~~ ^: exception!", Aspects),
+             L ("?~,# ~~ ^: exception!", Aspects, ";"),
            when Ada_Generic_Package_Instantiation =>
-             L ("package ! is new !?[# (~,#1 ~)]~", Aspects),
+             L ("package ! is new !?[# (~,#1 ~)]~", Aspects, ";"),
            when Ada_Generic_Subp_Instantiation =>
-             L ("?~~ ~! ! is new !?[# (~,#1 ~)]~", Aspects),
+             L ("?~~ ~! ! is new !?[# (~,#1 ~)]~", Aspects, ";"),
            when Ada_Generic_Package_Decl =>
              L ("generic$",
                 "!",
                 "!"),
            when Ada_Generic_Formal_Part =>
-             L ("{?~;$~;$~}"),
-           when Ada_Generic_Formal_Obj_Decl |
-               Ada_Generic_Formal_Subp_Decl | Ada_Generic_Formal_Type_Decl =>
+             L ("{?~$~$~}"),
+           when Ada_Generic_Formal_Obj_Decl
+                | Ada_Generic_Formal_Subp_Decl
+                | Ada_Generic_Formal_Type_Decl =>
              L ("!"),
            when Ada_Generic_Formal_Package =>
              L ("with !"),
            when Ada_Generic_Package_Renaming_Decl =>
-             L ("generic package ! renames !", Aspects),
+             L ("generic package ! renames !", Aspects, ";"),
            when Ada_Generic_Subp_Renaming_Decl =>
-             L ("generic ! ! renames !", Aspects),
+             L ("generic ! ! renames !", Aspects, ";"),
            when Ada_Generic_Subp_Decl =>
-             L ("generic$", "!", "!"),
+             L ("generic$", "!", "!;"),
            when Ada_Generic_Subp_Internal =>
              L ("!", Aspects),
            when Ada_Number_Decl =>
-             L ("?~,# ~~ ^: constant ^2:=[# !]"),
+             L ("?~,# ~~ ^: constant ^2:=[# !];"),
            when Ada_Object_Decl =>
-              L ("?~,# ~~ ^:[#1? ~~~? ~~~? ~~~ !]? ^2:=[# ~~]~!", Aspects),
+              L
+                ("?~,# ~~ ^:[#1? ~~~? ~~~? ~~~ !]? ^2:=[# ~~]~!",
+                 Aspects,
+                 ";"),
            when Ada_Extended_Return_Stmt_Object_Decl =>
              L ("?~,# ~~ ^:? ~~~? ~~~? ~~~ !? ^2:=[# ~~]~!", Aspects),
            when Ada_No_Type_Object_Renaming_Decl =>
-              L ("?~,# ~~? ~~~? ~~~? ~~~? ~~~? ~~~!", Aspects),
+              L ("?~,# ~~? ~~~? ~~~? ~~~? ~~~? ~~~!", Aspects, ";"),
            when Ada_Package_Renaming_Decl =>
-             L ("package !!", Aspects),
+             L ("package !!", Aspects, ";"),
            when Ada_Single_Protected_Decl =>
              L ("protected !",
                 Aspects_Is,
                 " is? new ~ and ~ with~$",
                 "!",
-                "end !1"),
+                "end !1;"),
            when Ada_Protected_Type_Decl =>
              L ("protected type !!",
                 Aspects_Is,
                 " is? new ~ and ~ with~$",
                 "!",
-                "end !1"),
+                "end !1;"),
              --  ???The interfaces should be moved from
              --  Ada_Single_Protected_Decl and Ada_Protected_Type_Decl to
              --  Ada_Protected_Def.
@@ -992,11 +992,11 @@ package body Pp.Actions is
            when Ada_Single_Task_Decl =>
              L ("!"),
            when Ada_Single_Task_Type_Decl =>
-             L ("task !!", Aspects_Is, "? is$~~~"),
+             L ("task !!", Aspects_Is, "? is$~~~;"),
            when Ada_Task_Type_Decl =>
              L ("task type !!",
                 Aspects_Is,
-                "? is~~~"),
+                "? is~~~;"),
            when Ada_Task_Def =>
              L ("? new ~ and ~ with~$",
                 "!$",
@@ -1011,17 +1011,17 @@ package body Pp.Actions is
            when Ada_Concrete_Type_Decl |
               Ada_Formal_Type_Decl => null,
            when Ada_Incomplete_Type_Decl =>
-              L ("type !!"), -- Aspects?
+              L ("type !!;"), -- Aspects?
            when Ada_Incomplete_Formal_Type_Decl =>
-              L ("type !!? is ~~~? or use ~~~"),
+              L ("type !!? is ~~~? or use ~~~;"),
            when Ada_Incomplete_Tagged_Type_Decl =>
-              L ("type !! is /tagged"),
+              L ("type !! is /tagged;"),
               --  The "/" is for F_Has_Abstract, which is always
               --  Abstract_Absent.
 
            when Ada_Classwide_Type_Decl => null,
            when Ada_Subtype_Decl =>
-             L ("subtype ! is[# !", Aspects, "]"),
+             L ("subtype ! is[# !", Aspects, "];"),
            when Ada_Compilation_Unit => null,
            when Ada_Component_Def =>
              L ("?~~ ~?~~ ~!"),
@@ -1037,17 +1037,17 @@ package body Pp.Actions is
            when Ada_Range_Constraint =>
              L ("!"),
            when Ada_Declarative_Part =>
-             L ("?${~;$~};$$~"),
+             L ("?${~$~}$$~"),
            when Ada_Private_Part =>
-             L ("?$private${~;$~};$~"),
+             L ("?$private${~$~}$~"),
            when Ada_Public_Part =>
-             L ("?{~;$~};$~"),
+             L ("?{~$~}$~"),
            when Ada_Elsif_Expr_Part =>
              L ("elsif[# !]# then[# !]"),
            when Ada_Entry_Index_Spec =>
              L ("for ! in[# !]"),
            when Ada_Exception_Handler =>
-             L ("when[? ~~ :~ ?~ #| ~~] ^=>$", "{?~;$~;$~}"),
+             L ("when[? ~~ :~ ?~ #| ~~] ^=>$", "{?~$~$~}"),
            when Ada_Explicit_Deref =>
              L ("!.all"),
            when Ada_Aggregate => null,
@@ -1099,7 +1099,7 @@ package body Pp.Actions is
            when Ada_Library_Item =>
              L ("?~~ ~!"),
            when Ada_Null_Component_Decl =>
-             L ("null"),
+             L ("null;"),
            when Ada_Others_Designator =>
              L ("others"),
            when Ada_Param_Assoc => null,
@@ -1111,16 +1111,16 @@ package body Pp.Actions is
            when Ada_Select_Stmt =>
              L ("select",
                 "!",
-                "?else$", "{~;$~;$}~",
-                "?then abort$", "{~;$~;$}~",
-                "end select"),
+                "?else$", "{~$~$}~",
+                "?then abort$", "{~$~$}~",
+                "end select;"),
            when Ada_Select_When_Part => null,
            when Ada_Accept_Stmt =>
-             L ("accept !? #(~~)~?~~~"),
+             L ("accept !? #(~~)~?~~~;"),
            when Ada_Accept_Stmt_With_Stmts =>
              L ("accept !? #(~~)~?~~~",
                 "!",
-                "end !1/"),
+                "end !1/;"),
            when Ada_Null_Record_Def =>
              L ("null record/"),
              --  Null_Record_Def inherits F_Components from
@@ -1130,73 +1130,73 @@ package body Pp.Actions is
            when Ada_Record_Type_Def =>
              L ("?~~ ~?~~ ~?~~ ~!"),
            when Ada_Component_List =>
-             L ("{?~;$~;$~}", "{?~~;$~}"),
+             L ("{?~$~$~}", "{?~~;$~}"),
            when Ada_Variant =>
              L ("when[ ?~ #| ~~] =>$", "!"),
            when Ada_Case_Stmt_Alternative =>
-             L ("when[ ?~ #| ~~] =>$", "{?~;$~;$~}"),
+             L ("when[ ?~ #| ~~] =>$", "{?~$~$~}"),
            when Ada_Variant_Part =>
              L ("case !# is$", "{!}", "end case"),
            when Ada_Case_Stmt =>
-             L ("case !# is$", "{?~~;$~!}", "end case"),
+             L ("case !# is$", "{?~~$~!}", "end case;"),
            when Ada_Extended_Return_Stmt =>
              L ("return[# !]",
                 "!",
-                "end return"),
+                "end return;"),
            when Ada_If_Stmt =>
              L ("if[ !]# then$",
-                "{?~;$~;$~}",
+                "{?~$~$~}",
                 "?~~~",
                 "?else$",
-                "{~;$~;$}~",
-                "end if"),
+                "{~$~$}~",
+                "end if;"),
            when Ada_Elsif_Stmt_Part =>
-             L ("elsif[ !]# then$", "{?~;$~;$~}"),
+             L ("elsif[ !]# then$", "{?~$~$~}"),
            when Ada_Named_Stmt =>
-             L ("! :$! !1"),
+             L ("! :$!"),
            when Ada_Named_Stmt_Decl =>
              L ("!"),
            when Ada_Begin_Block =>
              L ("!",
-                "end/"),
+                "end? ~~~;"),
            when Ada_Decl_Block =>
              L ("?declare$",
                 "~~~",
                 "!",
-                "end/"),
+                "end? ~~~;"),
                --  For Ada_Begin_Block and Ada_Decl_Block, the "begin" comes
                --  from Do_Handled_Stmts.
            when Ada_Loop_Stmt | Ada_For_Loop_Stmt | Ada_While_Loop_Stmt =>
-             L ("?~~# ~loop$", "{?~;$~;$~}", "end loop/"),
+             L ("?~~# ~loop$", "{?~$~$~}", "end loop? ~~~;"),
            when Ada_For_Loop_Spec => null,
            when Ada_For_Loop_Var_Decl =>
              L ("!? : ~~~"),
            when Ada_While_Loop_Spec =>
              L ("while[ !]"),
            when Ada_Abort_Stmt =>
-             L ("abort ?~, ~~"),
+             L ("abort ?~, ~~;"),
            when Ada_Assign_Stmt =>
-             L ("! ^:=[# !]"),
+             L ("! ^:=[# !];"),
            when Ada_Target_Name =>
              L ("@"),
            when Ada_Call_Stmt =>
-             L ("!"),
+             L ("!;"),
            when Ada_Delay_Stmt =>
-             L ("delay? ~~~ !"),
+             L ("delay? ~~~ !;"),
            when Ada_Exit_Stmt =>
-             L ("exit? ~~~? when[ ~~]~"),
+             L ("exit? ~~~? when[ ~~]~;"),
            when Ada_Goto_Stmt =>
-             L ("goto !"),
+             L ("goto !;"),
            when Ada_Label => L ("<<!>>"),
            when Ada_Label_Decl => L ("!"),
            when Ada_Null_Stmt =>
-             L ("null"),
+             L ("null;"),
            when Ada_Raise_Stmt =>
-             L ("raise? ~~~?[# with ~~]~"),
+             L ("raise? ~~~?[# with ~~]~;"),
            when Ada_Requeue_Stmt =>
-             L ("requeue !? ~~~"),
+             L ("requeue !? ~~~;"),
            when Ada_Return_Stmt =>
-             L ("return[?# ~~~]"),
+             L ("return[?# ~~~];"),
            when Ada_Terminate_Alternative =>
              L ("terminate"),
            when Ada_Subunit =>
@@ -1207,7 +1207,6 @@ package body Pp.Actions is
              L ("array[# !] of !"),
            when Ada_Derived_Type_Def =>
              L ("?~~ ~?~~ ~?~~ ~new !? and[# ~ and# ~]~? with# ~~~? ~~~"),
-
            when Ada_Formal_Discrete_Type_Def =>
              L ("#(<>)"),
            when Ada_Interface_Type_Def =>
@@ -1247,11 +1246,11 @@ package body Pp.Actions is
            when Ada_Anonymous_Type =>
              L ("!"),
            when Ada_Use_Package_Clause =>
-             L ("use[# ?~,# ~~]"),
+             L ("use[# ?~,# ~~];"),
            when Ada_Use_Type_Clause =>
-             L ("use? ~~~ type[# ?~,# ~~]"),
+             L ("use? ~~~ type[# ?~,# ~~];"),
            when Ada_With_Clause =>
-             L ("?~~ ~?~~ ~with[# ^?~,# ~~]"),
+             L ("?~~ ~?~~ ~with[# ^?~,# ~~];"),
                --  Note: the tab ('^') is ignored for limited/private 'with's
                --  (see Append_Tab).
 
@@ -1684,11 +1683,8 @@ package body Pp.Actions is
 
       type Alt_Templates is
         (Empty_Alt,
-         Hard_Break_Alt,
-         Semi_Alt,
-         Semi_LB_Alt,
-         Semi_LB_LB_Alt,
-         Semi_Soft,
+         LB_Alt,
+         LB_LB_Alt,
          Subtree_Alt,
          Comma_Soft,
          Pragma_Alt,
@@ -1704,6 +1700,7 @@ package body Pp.Actions is
          Enum_Rep_Nonvertical_Bracket_Agg_Alt,
          Obj_Decl_Alt,
          Obj_Decl_Vertical_Agg_Alt,
+         Extended_Return_Stmt_Object_Decl_Vertical_Agg_Alt,
          Comp_Decl_Vertical_Agg_Alt,
          Generic_Package_Instantiation_Vertical_Agg_Alt,
          Generic_Subp_Instantiation_Vertical_Agg_Alt,
@@ -1728,6 +1725,7 @@ package body Pp.Actions is
          Indent_Soft_Alt,
          Outdent_Alt,
          Soft_Alt,
+         Soft_Space_Alt,
          For_Loop_Spec_Stmt_Alt,
          For_Loop_Spec_Quant_Alt,
          Tab_2_Alt,
@@ -1866,28 +1864,25 @@ package body Pp.Actions is
 
       procedure Init_Alternative_Templates is
          Stmts_And_Handlers : constant Str_Template :=
-           "{~;$~;$}~" &
+           "{~$~$}~" &
            "?exception$" &
            "{~$~}~";
       begin
          Str_Alt_Table :=
            [Empty_Alt => L (""),
-            Hard_Break_Alt => L ("$"),
-            Semi_Alt => L (";"),
-            Semi_LB_Alt => L (";$"),
-            Semi_LB_LB_Alt => L (";$$"),
-            Semi_Soft => L (";# "),
+            LB_Alt => L ("$"),
+            LB_LB_Alt => L ("$$"),
             Subtree_Alt => L ("!"),
             Comma_Soft => L (",# "),
-            Pragma_Alt => L ("/?[# (~,#1 ~)]~"),
-            Extended_Return_Stmt_Short_Alt => L ("return !/"),
+            Pragma_Alt => L ("/?[# (~,#1 ~)]~;"),
+            Extended_Return_Stmt_Short_Alt => L ("return !/;"),
             --  Unfortunately, the --named-vertical-aggregate switch requires
             --  not only different formatting of aggregates, but different
             --  formatting of various contexts in which the aggregate might
             --  appear. Therefore we need various ..._Vertical_Agg_Alt
             --  templates, which typically replace a soft line break with a
             --  hard line break.
-            Extended_Return_Stmt_Short_Vertical_Agg_Alt => L ("return$!/"),
+            Extended_Return_Stmt_Short_Vertical_Agg_Alt => L ("return$!/;"),
             Extended_Return_Stmt_Vertical_Agg_Alt =>
               L (Replace_One
                  (Ada_Extended_Return_Stmt,
@@ -1900,12 +1895,19 @@ package body Pp.Actions is
             Enum_Rep_Nonvertical_Agg_Alt => L ("#(?~~ with #~?~,#1 ~~)"),
             Enum_Rep_Nonvertical_Bracket_Agg_Alt => L ("#?~~ with #~?~,#1 ~~"),
             Obj_Decl_Alt =>
-              L (Replace_One
-                (Ada_Object_Decl, From => ":[#1? ~~~? ~~~? ~~~ !]?",
-                 To => ":? ~~~? ~~~? ~~~ !?")),
+              L
+                (Replace_One
+                   (Kind => Ada_Object_Decl,
+                    From => ":[#1? ~~~? ~~~? ~~~ !]?",
+                    To   => ":? ~~~? ~~~? ~~~ !?")),
             Obj_Decl_Vertical_Agg_Alt =>
               L (Replace_One
-                 (Ada_Object_Decl, From => ":=[# ~~]~", To => ":=[$~~]~")),
+                (Ada_Object_Decl, From => ":=[# ~~]~", To => ":=[$~~]~")),
+            Extended_Return_Stmt_Object_Decl_Vertical_Agg_Alt =>
+              L
+                (Replace_One
+                   (Ada_Extended_Return_Stmt_Object_Decl,
+                    From => ":=[# ~~]~", To => ":=[$~~]~")),
             Comp_Decl_Vertical_Agg_Alt =>
               L (Replace_One
                  (Ada_Component_Decl, From => ":=[# ~~]~", To => ":=[$~~]~")),
@@ -1935,16 +1937,13 @@ package body Pp.Actions is
             Multi_Name_Vertical_Assoc_Alt => L ("?~ ^|#1 ~ ^=>[$~!]"),
             Multi_Name_Assoc_Alt => L ("?~ ^|#1 ~ ^=>[# ~!]"),
             Comp_Clause_Alt =>
-              L ("! ^at `2! ^2range [#`3! ^3../[# `4!^4]]"),
+              L ("! ^at `2! ^2range [#`3! ^3../[# `4!^4]];"),
              --  We need to ignore the ".." subtree, and put it explicitly in
              --  the template, because function Tab_Token checks for the ".".
             Handled_Stmts_With_Begin_Alt =>
               L ("?begin$" & Stmts_And_Handlers),
             Handled_Stmts_With_Begin_Alt_Partial_Mode =>
-              L ("begin$" & "?{~;$~;$}~" & "?exception$" & "{~$~}~"),
-           --              "{~;$~;$}~" &
-           --  "?exception$" &
-           --  "{~$~}~"
+              L ("begin$" & "?{~$~$}~" & "?exception$" & "{~$~}~"),
             Handled_Stmts_With_Do_Alt =>
               L ("# ?do$" & Stmts_And_Handlers),
             Handled_Stmts_With_Do_Vertical_Agg_Alt =>
@@ -1961,6 +1960,7 @@ package body Pp.Actions is
             Indent_Soft_Alt => L ("[#"),
             Outdent_Alt => L ("]"),
             Soft_Alt => L ("#"),
+            Soft_Space_Alt => L ("# "),
             For_Loop_Spec_Stmt_Alt => L ("for ! !? ~~~ !? when ~~~"),
             For_Loop_Spec_Quant_Alt => L ("! !? ~~~ !#? when ~~~"),
             Tab_2_Alt => L ("^2"),
@@ -1970,9 +1970,9 @@ package body Pp.Actions is
             Vertical_Agg_AM_Tab_4_Alt => L (" ^4:=[$!]"),
             Vertical_Agg_Not_AM_Default_Alt => L (" :=[$!]"),
             Select_When_Alt =>
-              L ("? when ~~ =>~$" & "{?~;$~;$~}"),
+              L ("? when ~~ =>~$" & "{?~$~$~}"),
             Select_Or_When_Alt =>
-              L ("or? when ~~ =>~$" & "{?~;$~;$~}"),
+              L ("or? when ~~ =>~$" & "{?~$~$~}"),
             Call_Threshold_Alt => L ("!?[$0(~,$0~)]~"),
                 --  We use $0 instead of $ here, so that the indentation of
                 --  these will not affect following comments.
@@ -2001,15 +2001,15 @@ package body Pp.Actions is
             Subtype_Ind_Index_Alt => L ("?~~ ~!?~~~"),
             Subtype_Ind_Alt => L ("?~~ ~!? ~~~"),
             Record_Type_Decl_Split_Alt =>
-              L ("type !! is$[!]" & Aspects),
-            Record_Type_Decl_Alt => L ("type !! is# !" & Aspects),
+              L ("type !! is$[!]", Aspects, ";"),
+            Record_Type_Decl_Alt => L ("type !! is# !", Aspects, ";"),
                       --  Otherwise, we could have a line break just before the
                       --  last semicolon.
             Record_Type_Decl_Aspects_Alt =>
-              L ("type !! is# !" & Aspects),
-            Enum_Array_Decl_Alt => L ("type !! is$[!]" & Aspects),
-            Type_Decl_Alt => L ("type !! is[# !]" & Aspects),
-            Formal_Type_Decl_Alt => L ("type !! is[# !]?~~~" & Aspects),
+              L ("type !! is# !", Aspects, ";"),
+            Enum_Array_Decl_Alt => L ("type !! is$[!]", Aspects, ";"),
+            Type_Decl_Alt => L ("type !! is[# !]", Aspects, ";"),
+            Formal_Type_Decl_Alt => L ("type !! is[# !]?~~~", Aspects, ";"),
             Boxy_Constrained_Alt => L ("(?~,# ~~)")];
 
          for Alt in Alt_Templates loop
@@ -2415,7 +2415,7 @@ package body Pp.Actions is
       --  Replacements for Vertical_Named_Aggregates
 
       if Arg (Cmd, Vertical_Named_Aggregates) then
-         Replace_Tmp (Ada_Enum_Rep_Clause, "for ! use [!]", "for ! use$[!]");
+         Replace_Tmp (Ada_Enum_Rep_Clause, "for ! use [!];", "for ! use$[!];");
       end if;
 
       --  Replacements for Vertical_Case_Alternatives
@@ -2445,14 +2445,14 @@ package body Pp.Actions is
       if Arg (Cmd, Split_Line_Before_Record) then
          Replace_Tmp
            (Ada_Record_Rep_Clause,
-            "for ! use record? at mod ~~;~${?~;$~;$~}end record",
-            "for ! use${record? at mod ~~;~${?~;$~;$~}end record}");
+            "for ! use record? at mod ~~;~${?~$~$~}end record;",
+            "for ! use${record? at mod ~~;~${?~$~$~}end record};");
       end if;
 
       --  Replacements for Indent_Named_Statements
 
       if Arg (Cmd, Indent_Named_Statements) then
-         Replace_Tmp (Ada_Named_Stmt, "! :$! !1", "! :${! !1}");
+         Replace_Tmp (Ada_Named_Stmt, "! :$!", "! :${!}");
       end if;
 
       Init_Alternative_Templates;
@@ -3545,16 +3545,18 @@ package body Pp.Actions is
 
                      if Index < Real_End_Index then
                         declare
-                           Same_Line : constant Boolean := Use_Same_Line;
                            use Alternative_Templates;
-                           pragma Assert
-                             (if Same_Line
-                                then Between = Tok_Alt_Table (Semi_LB_Alt));
-                           Tween : constant Tok_Template :=
+
+                           Same_Line : constant Boolean := Use_Same_Line;
+                           pragma
+                             Assert
+                               (if Same_Line
+                                then Between = Tok_Alt_Table (LB_Alt));
+                           Tween     : constant Tok_Template :=
                              (if Same_Line then
                                 (if Ada_Tree (Prev_With) = Subtree (Tree, Index)
-                                   then Tok_Alt_Table (Semi_Soft)
-                                   else Tok_Alt_Table (Semi_LB_Alt))
+                                 then Tok_Alt_Table (Soft_Space_Alt)
+                                 else Tok_Alt_Table (LB_Alt))
                               else Between);
                         begin
                            Interpret_Template
@@ -3855,6 +3857,7 @@ package body Pp.Actions is
 
                   when Verbatim =>
                      if Label_Seen and then Inst.T_Kind = ';' then
+                        Append_And_Put (New_Tokns, Inst.T_Kind);
                         Label_Seen := False;
                      else
 
@@ -3976,11 +3979,19 @@ package body Pp.Actions is
             Cur_Level : Nesting_Level);
 
          procedure Do_List;
+         --  This formats the list elements with a hard line break in between.
+         --  It is called when a "!" in a template refers to a list subtree. If
+         --  you don't want this formatting, you must use "?" instead of "!".
+         --  See for example, the template for Ada_If_Expression, where we want
+         --  soft line breaks in between paths. Sometimes this is called for a
+         --  list of one element, in which case the Between doesn't matter
+         --  (e.g. Defining_Name_List, where there is only one).
+
          procedure Do_Literal;
          procedure Do_Label;
          procedure Do_Param_Spec; -- also Formal_Object_Declaration
          procedure Do_Object_Decl;
-         --  Extended_Return_Stmt_Object_Decl is also passed to Do_Object_Decl
+         procedure Do_Extended_Return_Stmt_Object_Decl;
          procedure Do_Component_Decl;
          procedure Do_Pragma;
          procedure Do_Select_When_Part;
@@ -4166,35 +4177,21 @@ package body Pp.Actions is
 
          procedure Do_Compilation_Unit is
          begin
-   --          Put ("--  \1 = \2", "Unit_Kind", Capitalize (Tree.Unit_Kind'Img));
-   --          Interpret_Template ("$", Subtrees => Empty_Tree_Array);
-   --          Put
-   --            ("--  \1 = \2",
-   --             "Unit_Class",
-   --             Capitalize (Tree.Unit_Class'Img));
-   --          Interpret_Template ("$", Subtrees => Empty_Tree_Array);
-   --          Put
-   --            ("--  \1 = \2",
-   --             "Unit_Origin",
-   --             Capitalize (Tree.Unit_Origin'Img));
-   --          Interpret_Template ("$", Subtrees => Empty_Tree_Array);
-   --          Interpret_Template ("$", Subtrees => Empty_Tree_Array);
             Subtrees_To_Ada
               (Subtree (Tree, 1),
                Pre     => Tok_Alt_Table (Empty_Alt),
-               Between => Tok_Alt_Table (Semi_LB_Alt),
-               Post    => Tok_Alt_Table (Semi_LB_LB_Alt));
+               Between => Tok_Alt_Table (LB_Alt),
+               Post    => Tok_Alt_Table (LB_LB_Alt));
             Subtree_To_Ada
               (Subtree (Tree, 2),
                Cur_Level + 1,
                Index_In_Parent => 2);
-            Append_And_Put (New_Tokns, ';');
-            Interpret_Alt_Template (Hard_Break_Alt, Subtrees => Empty_Tree_Array);
+            Interpret_Alt_Template (LB_Alt, Subtrees => Empty_Tree_Array);
             Subtrees_To_Ada
               (Subtree (Tree, 3),
                Pre     => Tok_Alt_Table (Empty_Alt),
-               Between => Tok_Alt_Table (Semi_LB_Alt),
-               Post    => Tok_Alt_Table (Semi_LB_Alt));
+               Between => Tok_Alt_Table (LB_Alt),
+               Post    => Tok_Alt_Table (LB_Alt));
          end Do_Compilation_Unit;
 
          procedure Do_Component_Clause is
@@ -4660,42 +4657,29 @@ package body Pp.Actions is
          end Do_For_Loop_Spec;
 
          procedure Do_List is
-         --  This formats the list elements with a hard line break in between. It
-         --  is called when a "!" in a template refers to a list subtree. If you
-         --  don't want this formatting, you must use "?" instead of "!". See,
-         --  for example, the template for Ada_If_Expression, where we want soft
-         --  line breaks in between paths. Sometimes this is called for a list
-         --  of one element, in which case the Between doesn't matter (e.g.
-         --  Defining_Name_List, where there is only one).
          begin
-            --  This is a partial format of an Ada_Node_List.
             if Root = Tree
               and then Partial_GNATPP
             then
+               --  This is a partial format of an Ada_Node_List
                pragma
                  Assert
                    (Tree.Parent.Kind in
                       Ada_Handled_Stmts_Range
                       | Ada_Declarative_Part_Range
                       | Ada_Base_Loop_Stmt);
-
-               Subtrees_To_Ada
-                 (Tree,
-                  Pre               => Tok_Alt_Table (Empty_Alt),
-                  Between           => Tok_Alt_Table (Semi_LB_Alt),
-                  Post              => Tok_Alt_Table (Semi_Alt),
-                  Start_Child_Index => Start_Child_Index,
-                  End_Child_Index   => End_Child_Index);
-
             else
                pragma
                  Assert (Start_Child_Index = 0 and End_Child_Index = 0);
-               Subtrees_To_Ada
-                 (Tree,
-                  Pre     => Tok_Alt_Table (Empty_Alt),
-                  Between => Tok_Alt_Table (Hard_Break_Alt),
-                  Post    => Tok_Alt_Table (Empty_Alt));
             end if;
+
+            Subtrees_To_Ada
+              (Tree,
+               Pre               => Tok_Alt_Table (Empty_Alt),
+               Between           => Tok_Alt_Table (LB_Alt),
+               Post              => Tok_Alt_Table (Empty_Alt),
+               Start_Child_Index => Start_Child_Index,
+               End_Child_Index   => End_Child_Index);
          end Do_List;
 
          procedure Do_Literal is
@@ -4918,6 +4902,10 @@ package body Pp.Actions is
             pragma Assert (Index = Subtree_Count (Tree));
          end Do_Param_Spec;
 
+         --------------------
+         -- Do_Object_Decl --
+         --------------------
+
          procedure Do_Object_Decl is
          begin
 
@@ -4938,6 +4926,22 @@ package body Pp.Actions is
                end if;
             end if;
          end Do_Object_Decl;
+
+         -----------------------------------------
+         -- Do_Extended_Return_Stmt_Object_Decl --
+         -----------------------------------------
+
+         procedure Do_Extended_Return_Stmt_Object_Decl is
+         begin
+            if Is_Vertical_Aggregate
+                 (Tree.As_Extended_Return_Stmt_Object_Decl.F_Default_Expr)
+            then
+               Interpret_Alt_Template
+                 (Extended_Return_Stmt_Object_Decl_Vertical_Agg_Alt);
+            else
+               Interpret_Template;
+            end if;
+         end Do_Extended_Return_Stmt_Object_Decl;
 
          procedure Do_Component_Decl is
          begin
@@ -5404,10 +5408,12 @@ package body Pp.Actions is
             when Ada_Param_Spec =>
                Do_Param_Spec;
 
-            when Ada_Object_Decl |
-                 Ada_Extended_Return_Stmt_Object_Decl | --  =>
-                 Ada_No_Type_Object_Renaming_Decl =>
+            when Ada_Object_Decl
+                 | Ada_No_Type_Object_Renaming_Decl =>
                Do_Object_Decl;
+
+            when Ada_Extended_Return_Stmt_Object_Decl_Range =>
+               Do_Extended_Return_Stmt_Object_Decl;
 
             when Ada_Component_Decl =>
                Do_Component_Decl;
@@ -5469,36 +5475,6 @@ package body Pp.Actions is
          Indent (Arg (Cmd, Initial_Indentation));
 
          Subtree_To_Ada (Tree, Cur_Level => 1, Index_In_Parent => 1);
-
-         --  In Partial Gnatpp mode when the input node is in the list below
-         --  the last ';' is not generated and should be added here.
-
-         if Partial_GNATPP then
-            declare
-               function Needs_Completion return Boolean is
-                 (Kind (Tree) in
-                    Ada_Decl_Block | Ada_Type_Decl | Ada_Object_Decl
-                    | Ada_Subp_Body | Ada_Subp_Decl | Ada_Subp_Renaming_Decl
-                    | Ada_Abstract_Subp_Decl | Ada_Null_Subp_Decl
-                    | Ada_Generic_Subp_Decl | Ada_Generic_Subp_Instantiation
-                    | Ada_Subtype_Decl | Ada_Incomplete_Type_Decl
-                    | Ada_Incomplete_Tagged_Type_Decl
-                    | Ada_Task_Body | Ada_Entry_Decl | Ada_Single_Task_Decl
-                    | Ada_Package_Decl | Ada_Package_Body
-                    | Ada_Generic_Package_Decl | Ada_Package_Renaming_Decl
-                    | Ada_Generic_Package_Renaming_Decl
-                    | Ada_Generic_Package_Instantiation
-                    | Ada_Exception_Decl | Ada_Number_Decl
-                    | Ada_Stmt | Ada_Use_Type_Clause_Range);
-               pragma Inline (Needs_Completion);
-            begin
-               if Needs_Completion then
-                  if Kind (Last (New_Tokns'Access)) not in ';' then
-                     Append_And_Put (New_Tokns, ';');
-                  end if;
-               end if;
-            end;
-         end if;
 
          --  In Partial mode, we might need to add a line break. Same for
          --  Source_Line_Breaks.

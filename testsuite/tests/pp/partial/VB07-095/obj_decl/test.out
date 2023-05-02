@@ -102,7 +102,7 @@ single_protected_decl.adb(<SingleProtectedDecl ["Obj"] single_protected_decl.adb
    private
       --  Data goes here
       Local : Integer := 0;
-   end Obj$
+   end Obj;$
 *************************************
 
 *************************************
@@ -120,7 +120,7 @@ single_protected_decl.adb(<ProtectedBody ["Obj"] single_protected_decl.adb:45:4-
       begin
          return Local;
       end Get;
-   end Obj$
+   end Obj;$
 *************************************
 
 *************************************
@@ -132,7 +132,7 @@ single_protected_decl.adb(<SingleProtectedDecl ["Shared_Array"] single_protected
       procedure Set_Component (N : in Index; E : in Item);
    private
       Table : Item_Array (Index) := (others => Null_Item);
-   end Shared_Array$
+   end Shared_Array;$
 *************************************
 
 *************************************
@@ -148,7 +148,7 @@ single_protected_decl.adb(<ProtectedBody ["Shared_Array"] single_protected_decl.
       begin
          Table (N) := E;
       end Set_Component;
-   end Shared_Array$
+   end Shared_Array;$
 *************************************
 
 
