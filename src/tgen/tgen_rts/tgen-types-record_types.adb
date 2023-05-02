@@ -88,6 +88,25 @@ package body TGen.Types.Record_Types is
       return To_String (Str);
    end Image_Internal;
 
+   ---------------------
+   -- Get_Diagnostics --
+   ---------------------
+
+   function Get_Diagnostics (Self : Record_Typ) return String is
+      use Component_Maps;
+   begin
+      for Comp_Cur in Self.Component_Types.Iterate loop
+         declare
+            Diags : constant String := Element (Comp_Cur).Get.Get_Diagnostics;
+         begin
+            if Diags'Length > 0 then
+               return Diags;
+            end if;
+         end;
+      end loop;
+      return "";
+   end Get_Diagnostics;
+
    ------------
    -- Encode --
    ------------
@@ -419,6 +438,55 @@ package body TGen.Types.Record_Types is
       Res.Set_Field ("components", Components);
       return Res;
    end Encode;
+
+   ---------------------
+   -- Get_Diagnostics --
+   ---------------------
+
+   function Get_Diagnostics (Self : Discriminated_Record_Typ) return String is
+      Comp_Res : constant String := Record_Typ (Self).Get_Diagnostics;
+
+      function Inspect_Variant (Var : Variant_Part_Acc) return String;
+      --  Inspect the variant part for unsupported types, and return the first
+      --  diagnostics found, if any.
+
+      ---------------------
+      -- Inspect_Variant --
+      ---------------------
+
+      function Inspect_Variant (Var : Variant_Part_Acc) return String is
+      begin
+         if Var = null then
+            return "";
+         end if;
+         for Choice of Var.Variant_Choices loop
+            for Comp of Choice.Components loop
+               declare
+                  Diags : constant String := Comp.Get.Get_Diagnostics;
+               begin
+                  if Diags'Length > 0 then
+                     return Diags;
+                  end if;
+               end;
+            end loop;
+            declare
+               Subvar_Res : constant String :=
+                 Inspect_Variant (Choice.Variant);
+            begin
+               if Subvar_Res'Length > 0 then
+                  return Subvar_Res;
+               end if;
+            end;
+         end loop;
+         return "";
+      end Inspect_Variant;
+
+   begin
+      if Comp_Res'Length > 0 then
+         return Comp_Res;
+      end if;
+      return Inspect_Variant (Self.Variant);
+   end Get_Diagnostics;
 
    ------------------
    -- Free_Content --

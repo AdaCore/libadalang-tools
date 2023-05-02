@@ -2820,7 +2820,7 @@ package body TGen.Types.Translation is
          --  revisited.
 
          Type_Decl_Node :=
-           N.As_Subtype_Indication.P_Designated_Type_Decl.P_Full_View;
+           N.As_Subtype_Indication.P_Designated_Type_Decl;
       end if;
 
       Intermediate_Result := Translate (Type_Decl_Node, Verbose);
@@ -2913,6 +2913,8 @@ package body TGen.Types.Translation is
       use Translation_Maps;
 
       Full_Decl : constant Base_Type_Decl := N.P_Full_View;
+      FQN       : constant Ada_Qualified_Name :=
+        Convert_Qualified_Name (Full_Decl.P_Fully_Qualified_Name_Array);
    begin
       --  Do not memoize anonymous types
 
@@ -2921,9 +2923,6 @@ package body TGen.Types.Translation is
       end if;
 
       declare
-         FQN     : constant Ada_Qualified_Name :=
-           Convert_Qualified_Name
-             (Full_Decl.P_Fully_Qualified_Name_Array);
          Cache_T : SP.Ref;
       begin
          --  If we have the type name in the cache, return it
@@ -2939,9 +2938,6 @@ package body TGen.Types.Translation is
          declare
             Trans_Res : constant Translation_Result :=
               Translate_Internal (Full_Decl, Verbose);
-            FQN       : constant Ada_Qualified_Name :=
-              Convert_Qualified_Name
-                (Full_Decl.P_Fully_Qualified_Name_Array);
          begin
             if Trans_Res.Success then
                Translation_Cache.Insert (FQN, Trans_Res.Res);
@@ -2976,6 +2972,13 @@ package body TGen.Types.Translation is
         Unbounded_Text_Type_Array'(N.P_Enclosing_Compilation_Unit.P_Decl
                                    .P_Fully_Qualified_Name_Array)'Last;
 
+      FQN : constant Ada_Qualified_Name :=
+        Convert_Qualified_Name (Type_Name.P_Fully_Qualified_Name_Array);
+
+      First_Part : constant Basic_Decl'Class := N.P_All_Parts (1);
+      --  First part of the declaration. Used to determine whether the type we
+      --  are translating is private or not.
+
    begin
       Verbose_Diag := Verbose;
       Is_Static := Is_Static
@@ -2994,9 +2997,13 @@ package body TGen.Types.Translation is
          return Res : Translation_Result (Success => True) do
             Res.Res.Set
               (Unsupported_Typ'
-                (Name => TGen.Strings.Ada_Identifier_Vectors.To_Vector
-                           (To_Unbounded_String (N.Image), 1),
-                 Last_Comp_Unit_Idx => 1));
+                (Name               =>
+                  TGen.Strings.Ada_Identifier_Vectors.To_Vector
+                    (To_Unbounded_String (N.Image), 1),
+                 Last_Comp_Unit_Idx => 1,
+                 Reason             =>
+                   To_Unbounded_String
+                     ("Anonymous array or access type unsupported")));
          end return;
       elsif Text.Image (Type_Name.P_Fully_Qualified_Name) = "System.Address"
       then
@@ -3007,18 +3014,35 @@ package body TGen.Types.Translation is
 
          return Res : Translation_Result (Success => True) do
             Res.Res.Set (Unsupported_Typ'
-              (Name               =>
-                 Convert_Qualified_Name
-                   (Type_Name.P_Fully_Qualified_Name_Array),
-               Last_Comp_Unit_Idx => Comp_Unit_Idx));
+              (Name               => FQN,
+               Last_Comp_Unit_Idx => Comp_Unit_Idx,
+               Reason             =>
+                 To_Unbounded_String
+                   ("System.Address unsupported")));
+         end return;
+      elsif First_Part.As_Base_Type_Decl.P_Is_Private
+           and then Positive (FQN.Length) - Comp_Unit_Idx > 1
+      then
+         --  We are dealing with a private type declared in a nested package,
+         --  consider this as unsupported.
+
+         return Res : Translation_Result (Success => True) do
+            Res.Res.Set (Unsupported_Typ'
+              (Name               => FQN,
+               Last_Comp_Unit_Idx => Comp_Unit_Idx,
+               Reason             =>
+                 To_Unbounded_String
+                   ("Private types declared in nested package are not"
+                    & " supported")));
          end return;
       elsif Root_Type.P_Is_Formal then
          return Res : Translation_Result (Success => True) do
             Res.Res.Set (Formal_Typ'
-              (Name               =>
-                 Convert_Qualified_Name
-                   (Type_Name.P_Fully_Qualified_Name_Array),
-               Last_Comp_Unit_Idx => Comp_Unit_Idx));
+              (Name               => FQN,
+               Last_Comp_Unit_Idx => Comp_Unit_Idx,
+               Reason             =>
+                 To_Unbounded_String
+                   ("Generic formal types are unsupported")));
          end return;
       elsif Root_Type.P_Is_Int_Type then
          return Translate_Int_Decl (N, Type_Name, Comp_Unit_Idx);
@@ -3030,8 +3054,7 @@ package body TGen.Types.Translation is
          return Res : Translation_Result (Success => True) do
             Res.Res.Set (Bool_Typ'
               (Is_Static          => True,
-               Name               => Convert_Qualified_Name
-                 (Type_Name.P_Fully_Qualified_Name_Array),
+               Name               => FQN,
                Last_Comp_Unit_Idx => Comp_Unit_Idx));
          end return;
       elsif Root_Type.P_Is_Enum_Type then
@@ -3040,9 +3063,7 @@ package body TGen.Types.Translation is
             return Res : Translation_Result (Success => True) do
                Res.Res.Set (Other_Enum_Typ'
                  (Is_Static          => False,
-                  Name               =>
-                    Convert_Qualified_Name
-                      (Type_Name.P_Fully_Qualified_Name_Array),
+                  Name               => FQN,
                   Last_Comp_Unit_Idx => Comp_Unit_Idx));
             end return;
          end if;
@@ -3070,9 +3091,7 @@ package body TGen.Types.Translation is
                  (Float_Typ'
                     (Is_Static          => False,
                      Has_Range          => False,
-                     Name               =>
-                       Convert_Qualified_Name
-                         (Type_Name.P_Fully_Qualified_Name_Array),
+                     Name               => FQN,
                      Last_Comp_Unit_Idx => Comp_Unit_Idx));
             end return;
          end if;
@@ -3089,9 +3108,7 @@ package body TGen.Types.Translation is
                   Res.Res.Set
                     (Ordinary_Fixed_Typ'
                        (Is_Static          => False,
-                        Name               =>
-                          Convert_Qualified_Name
-                            (Type_Name.P_Fully_Qualified_Name_Array),
+                        Name               => FQN,
                         Last_Comp_Unit_Idx => Comp_Unit_Idx));
                end return;
             end if;
@@ -3105,9 +3122,7 @@ package body TGen.Types.Translation is
                     (Decimal_Fixed_Typ'
                        (Is_Static          => False,
                         Has_Range          => False,
-                        Name               =>
-                          Convert_Qualified_Name
-                            (Type_Name.P_Fully_Qualified_Name_Array),
+                        Name               => FQN,
                         Last_Comp_Unit_Idx => Comp_Unit_Idx));
                end return;
             end if;
@@ -3121,10 +3136,10 @@ package body TGen.Types.Translation is
             return Res : Translation_Result (Success => True) do
                Res.Res.Set
                  (Unsupported_Typ'
-                    (Name               =>
-                       Convert_Qualified_Name
-                         (Type_Name.P_Fully_Qualified_Name_Array),
-                     Last_Comp_Unit_Idx => Comp_Unit_Idx));
+                    (Name               => FQN,
+                     Last_Comp_Unit_Idx => Comp_Unit_Idx,
+                     Reason             =>
+                       To_Unbounded_String ("tagged types not supported")));
             end return;
          else
             return Translate_Record_Decl (N, Type_Name, Comp_Unit_Idx);
@@ -3134,19 +3149,18 @@ package body TGen.Types.Translation is
          return Res : Translation_Result (Success => True) do
             Res.Res.Set
               (Access_Typ'
-                 (Name               =>
-                    Convert_Qualified_Name
-                      (Type_Name.P_Fully_Qualified_Name_Array),
-                  Last_Comp_Unit_Idx => Comp_Unit_Idx));
+                 (Name               => FQN,
+                  Last_Comp_Unit_Idx => Comp_Unit_Idx,
+                  Reason             =>
+                    To_Unbounded_String ("Access types are not supported")));
          end return;
       end if;
 
       return Res : Translation_Result (Success => True) do
          Res.Res.Set (Unsupported_Typ'
-           (Name               =>
-              Convert_Qualified_Name
-                (Type_Name.P_Fully_Qualified_Name_Array),
-            Last_Comp_Unit_Idx => Comp_Unit_Idx));
+           (Name               => FQN,
+            Last_Comp_Unit_Idx => Comp_Unit_Idx,
+            Reason             => To_Unbounded_String ("Unknown type kind")));
       end return;
 
    exception

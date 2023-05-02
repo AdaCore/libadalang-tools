@@ -774,8 +774,8 @@ package body Test.Skeleton is
                            Diags)
                      then
                         Report_Std
-                          ("Warning (tgen): Error while generating the"
-                           & "support library for "
+                          ("Warning (tgen) while generating the"
+                           & " support library for "
                            & Element (Subp_Cur).Subp_Name_Image.all & ":");
                         Report_Std (To_String (Diags));
                         Report_Std ("Test harness may not build.");
@@ -6888,12 +6888,6 @@ package body Test.Skeleton is
       Output_Dir : constant String :=
         Get_Source_Output_Dir (Data.Unit_File_Name.all);
 
-      Support_Packs : constant Ada_Qualified_Name_Sets_Maps
-                               .Constant_Reference_Type :=
-        TGen.Libgen.Required_Support_Packages
-          (Ctx       => Test.Common.TGen_Libgen_Ctx,
-           Unit_Name => To_Qualified_Name (Data.Unit_Full_Name.all));
-
       function Escape (Input_String : String) return String;
       --  Escape every double quote inside Input_String
 
@@ -7046,6 +7040,11 @@ package body Test.Skeleton is
                Put (F, ");");
             end Pp_Subp_Call;
 
+            Support_Packs : constant Ada_Qualified_Name_Sets_Maps
+                                       .Constant_Reference_Type :=
+              TGen.Libgen.Required_Support_Packages
+                (Ctx       => Test.Common.TGen_Libgen_Ctx,
+                 Unit_Name => To_Qualified_Name (Data.Unit_Full_Name.all));
          begin
 
             if Spec_VF.Is_Regular_File then

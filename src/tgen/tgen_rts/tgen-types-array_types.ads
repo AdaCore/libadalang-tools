@@ -51,6 +51,8 @@ package TGen.Types.Array_Types is
      (Self.Static_Gen);
    --  Wether values for this Typ can be statically generated
 
+   function Get_Diagnostics (Self : Array_Typ) return String;
+
    function As_Array_Typ (Self : SP.Ref)
      return Array_Typ'Class is
      (Array_Typ'Class (Self.Unchecked_Get.all)) with

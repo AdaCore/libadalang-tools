@@ -334,7 +334,8 @@ package body TGen.Types.Constraints is
          when others =>
             Res.Set (Unsupported_Typ'
               (Name               => Self.Named_Ancestor.Get.Name,
-               Last_Comp_Unit_Idx => Comp_Unit_Idx));
+               Last_Comp_Unit_Idx => Comp_Unit_Idx,
+               Reason => +"Unknown named ancestor type kind"));
       end case;
       return Res;
    end As_Named_Typ;

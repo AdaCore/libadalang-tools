@@ -536,6 +536,16 @@ package body TGen.Libgen is
          return False;
       end if;
 
+      declare
+         Unsupported_Diags : constant String :=
+           Trans_Res.Res.Get.Get_Diagnostics;
+      begin
+         if Unsupported_Diags'Length > 0 then
+            Diag := To_Unbounded_String (Unsupported_Diags);
+            return False;
+         end if;
+      end;
+
       if Support_Packs = No_Element then
          Ctx.Support_Packs_Per_Unit.Insert
            (Unit_Name,

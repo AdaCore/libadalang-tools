@@ -136,6 +136,14 @@ package TGen.Types is
    --  Encore Val so that all internal representations get turned into actual
    --  Ada values. i.e. Enum positions gets turned into enum literals.
 
+   function Get_Diagnostics (Self : Typ) return String is
+     (To_Ada (Self.Name) & ": Non specialized type translation not supported");
+   --  Return a diagnostic string detailing the reason why Self is / depends on
+   --  an unsupported type.
+   --
+   --  Return an empty string if there are no unsupported types in the
+   --  transitive closure of Self.
+
    function JSON_Kind (Kind : Typ_Kind) return JSON_Value_Type is
      (case Kind is
          when Signed_Int_Kind | Mod_Int_Kind | Enum_Kind | Char_Kind =>
@@ -153,6 +161,10 @@ package TGen.Types is
    --  Helper for shared pointers
 
    type Scalar_Typ (Is_Static : Boolean) is new Typ with null record;
+
+   function Get_Diagnostics (Self : Scalar_Typ) return String is ("");
+   --  If we get a successful translation to a Scalar_Typ descendent, we should
+   --  be able to generate anything.
 
    type Composite_Typ is new Typ with null record;
 
@@ -189,7 +201,13 @@ package TGen.Types is
    Big_Zero_F : constant Big_Reals.Big_Real :=
      TGen.Big_Reals.To_Real (0);
 
-   type Unsupported_Typ is new Typ with null record;
+   type Unsupported_Typ is new Typ with record
+      Reason : Unbounded_String;
+      --  Why this type is not supported.
+   end record;
+
+   function Get_Diagnostics (Self : Unsupported_Typ) return String is
+     (To_Ada (Self.Name) & ": " & (+Self.Reason));
 
    function Kind (Self : Unsupported_Typ) return Typ_Kind is (Unsupported);
 

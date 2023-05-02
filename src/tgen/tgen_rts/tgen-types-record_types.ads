@@ -63,6 +63,8 @@ package TGen.Types.Record_Types is
 
    function Image (Self : Record_Typ) return String;
 
+   function Get_Diagnostics (Self : Record_Typ) return String;
+
    function Image_Internal
      (Self    : Record_Typ;
       Padding : Natural := 0) return String;
@@ -174,6 +176,8 @@ package TGen.Types.Record_Types is
    --  be determined from the list of discriminant values.
 
    function Image (Self : Discriminated_Record_Typ) return String;
+
+   function Get_Diagnostics (Self : Discriminated_Record_Typ) return String;
 
    overriding function Default_Strategy
      (Self : Discriminated_Record_Typ) return Strategy_Type'Class;
