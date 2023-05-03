@@ -313,6 +313,23 @@ package body Test.Skeleton is
    --  Add the given test case to the test package mapping, using
    --  Subp.TC_Info to fill in test case information.
 
+   procedure Add_TR
+     (TP_List           : in out TP_Mapping_List.List;
+      TPtarg            : String;
+      Test_Case_Name    : String;
+      Test_Routine_Name : String;
+      Test_Case_Line    : Natural;
+      Test_Case_Column  : Natural;
+      Test_Rout_Line    : Natural;
+      Test_File         : String;
+      Test_Time         : String;
+      Subp              : Subp_Info);
+   --  Add the given test case to the test package mapping. This does not use
+   --  Subp.TC_Info contrarily to the above, but uses the parameter values to
+   --  fill in a new test case. TODO???: there is a lot of code duplication
+   --  with the subprogram above; if not merged, the two subprograms should
+   --  be at least refactored to avoid it.
+
    procedure Add_DT
      (TP_List : in out TP_Mapping_List.List;
       TPtarg  : String;
@@ -6822,6 +6839,10 @@ package body Test.Skeleton is
 
    end Generate_Test_Package;
 
+   ----------------------------
+   -- Output_Generated_Tests --
+   ----------------------------
+
    procedure Output_Generated_Tests
      (Data : Data_Holder; Suite_Data_List : in out Suites_Data_Type)
    is
@@ -6851,32 +6872,8 @@ package body Test.Skeleton is
           (Ctx       => Test.Common.TGen_Libgen_Ctx,
            Unit_Name => To_Qualified_Name (Data.Unit_Full_Name.all));
 
-      procedure Pp_Subp_Call (F : File_Type; Initial_Pad : Natural := 0);
-      --  Output a call to subp with the values in Single_Vec, indented by
-      --  Initial_Pad amount.
-
       function Escape (Input_String : String) return String;
       --  Escape every double quote inside Input_String
-
-      ------------------
-      -- Pp_Subp_Call --
-      ------------------
-
-      procedure Pp_Subp_Call (F : File_Type; Initial_Pad : Natural := 0) is
-         Pad_Str : constant String (1 .. Initial_Pad) := [others => ' '];
-      begin
-         Put (F, Pad_Str & Subp_Content.Get ("fully_qualified_name") & " (");
-         for Param_Id in Single_Vec loop
-            Put
-              (F,
-               Array_Element (Single_Vec, Param_Id).Get ("name") & " => "
-               & "Param_" & Array_Element (Single_Vec, Param_Id).Get ("name"));
-            if Array_Has_Element (Single_Vec, Param_Id + 1) then
-               Put (F, ", ");
-            end if;
-         end loop;
-         Put (F, ");");
-      end Pp_Subp_Call;
 
       ------------
       -- Escape --
@@ -6893,6 +6890,9 @@ package body Test.Skeleton is
          end loop;
          return +Result;
       end Escape;
+
+      TP_List : TP_Mapping_List.List;
+      --  Information about generated test-cases
 
    begin
       --  We do not support non-instanciated generic packages
@@ -6933,6 +6933,8 @@ package body Test.Skeleton is
             goto Continue;
          end if;
 
+         --  Adding a list of new test cases for Subp
+
          declare
             Generation_Complete : constant Boolean :=
               Subp_Content.Get ("generation_complete");
@@ -6956,21 +6958,86 @@ package body Test.Skeleton is
               Create (+Output_Dir) / (+(Test_Unit_File_Name & ".ads"));
             Body_VF : constant Virtual_File :=
               Create (+Output_Dir) / (+(Test_Unit_File_Name & ".adb"));
-            Spec_F, Body_F : File_Type;
+
+            Test_Case_Name : Unbounded_String;
 
             Instrument_Setup : Boolean := True;
+
+            type File_Kind is (Body_Kind, Spec_Kind);
+            type Indexes_Arr is array (File_Kind) of Natural;
+            type File_Type_Arr is array (File_Kind) of File_Type;
+
+            Line_Indexes : Indexes_Arr := [others => 0];
+            Files        : File_Type_Arr;
+            --  Record the current indexes for each written file, needed to
+            --  output source location information about the generated test
+            --  cases.
+
+            procedure Pp_Subp_Call
+              (F : File_Type; Initial_Pad : Natural := 0);
+            --  Output a call to subp with the values in Single_Vec, indented
+            --  by Initial_Pad amount.
+
+            procedure Put_Line (F : File_Kind; S : String);
+            procedure New_Line (F : File_Kind);
+            --  Wrapper around Ada.Text_IO primitives, incrementing the line
+            --  indexes for the given File_Kind, to keep track of the line
+            --  index.
+
+            --------------
+            -- Put_Line --
+            --------------
+
+            procedure Put_Line (F : File_Kind; S : String) is
+            begin
+               Line_Indexes (F) := @ + 1;
+               Ada.Text_IO.Put_Line (Files (F), S);
+            end Put_Line;
+
+            --------------
+            -- New_Line --
+            --------------
+
+            procedure New_Line (F : File_Kind) is
+            begin
+               Line_Indexes (F) := @ + 1;
+               Ada.Text_IO.New_Line (Files (F));
+            end New_Line;
+
+            ------------------
+            -- Pp_Subp_Call --
+            ------------------
+
+            procedure Pp_Subp_Call (F : File_Type; Initial_Pad : Natural := 0)
+            is
+               Pad_Str : constant String (1 .. Initial_Pad) := [others => ' '];
+            begin
+               Put (F, Pad_Str & Subp_Content.Get ("fully_qualified_name")
+                    & " (");
+               for Param_Id in Single_Vec loop
+                  Put
+                    (F,
+                     Array_Element (Single_Vec, Param_Id).Get ("name") & " => "
+                     & "Param_"
+                     & Array_Element (Single_Vec, Param_Id).Get ("name"));
+                  if Array_Has_Element (Single_Vec, Param_Id + 1) then
+                     Put (F, ", ");
+                  end if;
+               end loop;
+               Put (F, ");");
+            end Pp_Subp_Call;
 
          begin
 
             if Spec_VF.Is_Regular_File then
-               Open (Spec_F, Out_File, +Spec_VF.Full_Name);
+               Open (Files (Spec_Kind), Out_File, +Spec_VF.Full_Name);
             else
-               Create (Spec_F, Out_File, +Spec_VF.Full_Name);
+               Create (Files (Spec_Kind), Out_File, +Spec_VF.Full_Name);
             end if;
             if Body_VF.Is_Regular_File then
-               Open (Body_F, Out_File, +Body_VF.Full_Name);
+               Open (Files (Body_Kind), Out_File, +Body_VF.Full_Name);
             else
-               Create (Body_F, Out_File, +Body_VF.Full_Name);
+               Create (Files (Body_Kind), Out_File, +Body_VF.Full_Name);
             end if;
 
             --  Create a test type for this test package
@@ -6990,51 +7057,73 @@ package body Test.Skeleton is
 
             Test.Common.Need_Lib_Support := True;
 
-            Put_Line (Spec_F, "with GNATtest_Generated;");
-            New_Line (Spec_F);
-            Put_Line (Spec_F, "package " & Test_Unit_Name & " is");
-            New_Line (Spec_F);
+            Put_Line (Spec_Kind, "with GNATtest_Generated;");
+            New_Line (Spec_Kind);
+            Put_Line (Spec_Kind, "package " & Test_Unit_Name & " is");
+            New_Line (Spec_Kind);
             Put_Line
-              (Spec_F,
+              (Spec_Kind,
                "type Test is new GNATtest_Generated.GNATtest_Standard."
                & Data.Unit_Full_Name.all & "." & Test_Data_Unit_Name
                & ".Test");
-            Put_Line (Spec_F, "  with null record;");
-            New_Line (Spec_F);
+            Put_Line (Spec_Kind, "  with null record;");
+            New_Line (Spec_Kind);
 
-            Put_Line (Body_F, "with Ada.Exceptions;");
-            New_Line (Body_F);
-            Put_Line (Body_F, "with Aunit.Assertions;");
-            New_Line (Body_F);
-            Put_Line (Body_F, "with TGen.JSON;");
+            Put_Line (Body_Kind, "with Ada.Exceptions;");
+            New_Line (Body_Kind);
+            Put_Line (Body_Kind, "with Aunit.Assertions;");
+            New_Line (Body_Kind);
+            Put_Line (Body_Kind, "with TGen.JSON;");
             for Pack of Support_Packs loop
-               Put_Line (Body_F, "with " & To_Ada (Pack) & "; use "
-                                  & To_Ada (Pack) & ";");
+               Put_Line (Body_Kind, "with " & To_Ada (Pack) & "; use "
+                         & To_Ada (Pack) & ";");
             end loop;
 
             if Test.Common.Instrument then
-               New_Line (Body_F);
-               Put_Line (Body_F, "with TGen.Instr_Support;");
+               New_Line (Body_Kind);
+               Put_Line (Body_Kind, "with TGen.Instr_Support;");
             end if;
 
-            New_Line (Body_F);
-            Put_Line (Body_F, "package body " & Test_Unit_Name & " is");
-            New_Line (Body_F);
+            New_Line (Body_Kind);
+            Put_Line (Body_Kind, "package body " & Test_Unit_Name & " is");
+            New_Line (Body_Kind);
 
             for Test_Vec of Subp_Vectors loop
+
+               Test_Case_Name := +"Gen_" & Subp.Subp_Mangle_Name.all
+                 & "_" & Trim (Test_Count'Image, Both);
+
+               --  Fill in information about each testcase that we are adding
+
+               Add_TR
+                 (TP_List           => TP_List,
+                  TPtarg            => Data.Unit_Full_Name.all,
+                  Test_Case_Name    =>
+                    "generated test case" & Test_Count'Image,
+                  Test_Routine_Name => +Test_Case_Name,
+
+                  --  There is no test-case pragma associated to this test
+                  --  case as it was automatically generated. Add an invalid
+                  --  line and column number to make this explicit.
+
+                  Test_Case_Line    => 0,
+                  Test_Case_Column  => 0,
+                  Test_Rout_Line    => Line_Indexes (Body_Kind) + 1,
+                  Test_File         => +Body_VF.Base_Name,
+                  Test_Time         => "modified",
+                  Subp              => Subp);
+
                Single_Vec := Test_Vec.Get ("param_values");
 
                Put_Line
-                 (Spec_F,
-                  "   procedure Gen_" & Subp.Subp_Mangle_Name.all
-                  & "_" & Trim (Test_Count'Image, Both)
+                 (Spec_Kind,
+                  "procedure " & (+Test_Case_Name)
                   & " (Gnattest_T : in out Test);");
-               New_Line (Spec_F);
+               New_Line (Spec_Kind);
 
                Put_Line
-                 (Body_F,
-                  "   procedure Gen_" & Subp.Subp_Mangle_Name.all
-                  & "_" & Trim (Test_Count'Image, Both)
+                 (Body_Kind,
+                  "procedure " & (+Test_Case_Name)
                   & " (Gnattest_T : in out Test) is");
 
                if Test.Common.Instrument and then Instrument_Setup then
@@ -7043,36 +7132,36 @@ package body Test.Skeleton is
                   --  tests for the same routine so that we collect all inputs
                   --  without overwrtiting any of them.
                   Put_Line
-                    (Body_F, "      "
+                    (Body_Kind, "      "
                      & "function GNATTEST_Set_Current_Test return Boolean;");
                   Put_Line
-                    (Body_F, "      "
+                    (Body_Kind, "      "
                      & "function GNATTEST_Set_Current_Test return Boolean is");
-                  Put_Line (Body_F, "      begin");
+                  Put_Line (Body_Kind, "      begin");
                   Put_Line
-                    (Body_F, "         "
-                       & "TGen.Instr_Support.Test_Input_Counter := 1;");
+                    (Body_Kind, "         "
+                     & "TGen.Instr_Support.Test_Input_Counter := 1;");
                   Put_Line
-                    (Body_F, "         "
+                    (Body_Kind, "         "
                      & "TGen.Instr_Support.Autogenerated := True;");
                   Put_Line
-                    (Body_F,
+                    (Body_Kind,
                      "         TGen.Instr_Support.Subp_Hash := """
                      & Mangle_Hash_Full (Subp.Subp_Declaration)
                      & """;");
                   Put_Line
-                    (Body_F,
+                    (Body_Kind,
                      "         TGen.Instr_Support.Nesting_Hash := """
                      & GNAT.SHA1.Digest (Get_Nesting (Subp.Subp_Declaration))
                      & """;");
-                  Put_Line (Body_F, "         return True;");
+                  Put_Line (Body_Kind, "         return True;");
                   Put_Line
-                    (Body_F, "      end GNATTEST_Set_Current_Test;");
+                    (Body_Kind, "      end GNATTEST_Set_Current_Test;");
                   Put_Line
-                    (Body_F, "      "
+                    (Body_Kind, "      "
                      & "Dummy_GNATTEST : Boolean := "
                      & "GNATTEST_Set_Current_Test;");
-                  New_Line (Body_F);
+                  New_Line (Body_Kind);
 
                   Instrument_Setup := False;
                end if;
@@ -7097,7 +7186,7 @@ package body Test.Skeleton is
                         Value := Get (Unparsed_JSON, "value");
 
                         Put_Line
-                          (Body_F,
+                          (Body_Kind,
                            Com & "   Param_" & Param.Get ("name") & " : "
                            & Param.Get ("type_name") & " "
                            & (+Constraints)
@@ -7117,58 +7206,58 @@ package body Test.Skeleton is
                           & "))";
                      begin
                         Put_Line
-                          (Body_F,
+                          (Body_Kind,
                            Com & "   Param_" & Param.Get ("name") & " : "
                            & Param.Get ("type_name")
                            & ":= " & (+Value) & ";");
                      end;
                   end if;
                end loop;
-               Put_Line (Body_F, Com & "begin");
+               Put_Line (Body_Kind, Com & "begin");
                if Is_Function then
-                  Put_Line (Body_F, Com & "   declare");
-                  Put_Line (Body_F, Com & "      Ret_Val : "
-                                    & Subp_Content.Get ("return_type") & ":=");
-                  Put (Body_F, Com);
-                  Pp_Subp_Call (Body_F, 8);
-                  New_Line (Body_F);
-                  Put_Line (Body_F, Com & "   begin");
+                  Put_Line (Body_Kind, Com & "   declare");
+                  Put_Line (Body_Kind, Com & "      Ret_Val : "
+                            & Subp_Content.Get ("return_type") & ":=");
+                  Put (Files (Body_Kind), Com);
+                  Pp_Subp_Call (Files (Body_Kind), 8);
+                  New_Line (Body_Kind);
+                  Put_Line (Body_Kind, Com & "   begin");
                   Put_Line
-                    (Body_F,
+                    (Body_Kind,
                      Com & "      --  Insert function call result validation"
                      & " here");
-                  Put_Line (Body_F, Com & "      null;");
-                  Put_Line (Body_F, Com & "   end;");
+                  Put_Line (Body_Kind, Com & "      null;");
+                  Put_Line (Body_Kind, Com & "   end;");
                else
-                  Put (Body_F, Com);
-                  Pp_Subp_Call (Body_F, 3);
+                  Put (Files (Body_Kind), Com);
+                  Pp_Subp_Call (Files (Body_Kind), 3);
                end if;
-               New_Line (Body_F);
-               Put_Line (Body_F, Com & "exception");
-               Put_Line (Body_F, Com & "   when Exc : others =>");
-               Put_Line (Body_F, Com & "      AUnit.Assertions.Assert");
-               Put_Line (Body_F, Com & "        (False,");
+               New_Line (Body_Kind);
+               Put_Line (Body_Kind, Com & "exception");
+               Put_Line (Body_Kind, Com & "   when Exc : others =>");
+               Put_Line (Body_Kind, Com & "      AUnit.Assertions.Assert");
+               Put_Line (Body_Kind, Com & "        (False,");
                Put_Line
-                 (Body_F,
+                 (Body_Kind,
                   Com & "         ""Test" & Test_Count'Image & " for "
                   & Subp.Subp_Name_Image.all
                   & ", generated by " & Test_Vec.Get ("origin")
                   & ", crashed: "" & ASCII.LF & Ada.Exceptions.Exception_"
                   & "Information (Exc));");
                if not Generation_Complete then
-                  Put_Line (Body_F, "   begin");
-                  Put_Line (Body_F, "      AUnit.Assertions.Assert");
-                  Put_Line (Body_F, "        (False,");
+                  Put_Line (Body_Kind, "   begin");
+                  Put_Line (Body_Kind, "      AUnit.Assertions.Assert");
+                  Put_Line (Body_Kind, "        (False,");
                   Put_Line
-                    (Body_F, "         ""Missing test values for "
+                    (Body_Kind, "         ""Missing test values for "
                      & Subp.Subp_Name_Image.all & "."
                      & " Please fill out manually."");");
                end if;
                Put_Line
-                 (Body_F,
+                 (Body_Kind,
                  "   end Gen_" & Subp.Subp_Mangle_Name.all & "_"
                  & Trim (Test_Count'Image, Both) & ";");
-               New_Line (Body_F);
+               New_Line (Body_Kind);
 
                --  Create TR info for each new testcase
 
@@ -7193,18 +7282,18 @@ package body Test.Skeleton is
                Test_Count := Test_Count + 1;
             end loop;
 
-            Put_Line (Spec_F, "end " & Test_Unit_Name & ";");
-            Put_Line (Body_F, "end " & Test_Unit_Name & ";");
+            Put_Line (Spec_Kind, "end " & Test_Unit_Name & ";");
+            Put_Line (Body_Kind, "end " & Test_Unit_Name & ";");
 
-            Close (Spec_F);
-            Close (Body_F);
+            Close (Files (Spec_Kind));
+            Close (Files (Body_Kind));
          exception
             when others =>
-               if Is_Open (Spec_F) then
-                  Close (Spec_F);
+               if Is_Open (Files (Spec_Kind)) then
+                  Close (Files (Spec_Kind));
                end if;
-               if Is_Open (Body_F) then
-                  Close (Body_F);
+               if Is_Open (Files (Body_Kind)) then
+                  Close (Files (Body_Kind));
                end if;
                if Unit_Raw_Content not in null then
                   GNAT.Strings.Free (Unit_Raw_Content);
@@ -7215,6 +7304,8 @@ package body Test.Skeleton is
       <<Continue>>
       end loop;
 
+      Add_Test_List (Data.Unit_File_Name.all, TP_List);
+      TP_List.Clear;
       GNAT.Strings.Free (Unit_Raw_Content);
 
    end Output_Generated_Tests;
@@ -7255,6 +7346,98 @@ package body Test.Skeleton is
       TP_List.Replace_Element (TP_Cur, TP);
 
    end Add_DT;
+
+   ------------
+   -- Add_TR --
+   ------------
+
+   procedure Add_TR
+     (TP_List           : in out TP_Mapping_List.List;
+      TPtarg            : String;
+      Test_Case_Name    : String;
+      Test_Routine_Name : String;
+      Test_Case_Line    : Natural;
+      Test_Case_Column  : Natural;
+      Test_Rout_Line    : Natural;
+      Test_File         : String;
+      Test_Time         : String;
+      Subp              : Subp_Info)
+   is
+      TC : constant TC_Mapping := TC_Mapping'
+        (Line      => Test_Case_Line,
+         Column    => Test_Case_Column,
+         Test      => new String'(Test_File),
+         Test_Time => new String'(Test_Time),
+         TC_Name   => new String'(Test_Case_Name),
+         T_Name    => new String'(Test_Routine_Name),
+         TR_Line   => Test_Rout_Line);
+      --  Representation of the new test case
+
+      TR : TR_Mapping_List.Cursor;
+      TP : TP_Mapping_List.Cursor;
+
+      Subp_Name_Span : constant Source_Location_Range :=
+        Subp.Subp_Declaration.As_Basic_Decl.P_Defining_Name.Sloc_Range;
+      Subp_Span : constant Source_Location_Range :=
+        Subp.Subp_Declaration.Sloc_Range;
+
+   begin
+      --  Find the right package under test ...
+
+      for TP_Cur in TP_List.Iterate loop
+
+         if TP_Mapping_List.Element (TP_Cur).TP_Name.all = TPtarg then
+            TP := TP_Cur;
+            exit;
+         end if;
+      end loop;
+
+      --  If it does not exist, create it
+
+      if TP = TP_Mapping_List.No_Element then
+         TP_List.Append
+           (TP_Mapping'(TP_Name => new String'(TPtarg), others => <>));
+            TP := TP_List.Last;
+      end if;
+
+      --  Find the subprogram under test ..
+
+      for TR_Cur in TP_Mapping_List.Reference (TP_List, TP).TR_List.Iterate
+      loop
+         if TR_Mapping_List.Element (TR_Cur).TR_Name.all
+           = Subp.Subp_Text_Name.all
+         then
+            TR := TR_Cur;
+            exit;
+         end if;
+      end loop;
+
+      --  If it does not exist create it
+
+      if TR = TR_Mapping_List.No_Element then
+         TP_Mapping_List.Reference (TP_List, TP).TR_List.Append
+           (TR_Mapping'
+              (TR_Name   => new String'(Subp.Subp_Text_Name.all),
+               Line      => Natural (Subp_Name_Span.Start_Line),
+               Column    => Natural (Subp_Name_Span.Start_Column),
+               Decl_Line => Natural (Subp_Span.Start_Line),
+               others    => <>));
+         TR := TP_Mapping_List.Reference (TP_List, TP).TR_List.Last;
+      end if;
+
+      --  Now add the test case at the correct position in the test case
+      --  mapping. This is brittle as we have to use references to the
+      --  container element to modify it in place.
+
+      declare
+         TP_Ref : constant TP_Mapping_List.Reference_Type :=
+           TP_Mapping_List.Reference (TP_List, TP);
+         TR_Ref : constant TR_Mapping_List.Reference_Type :=
+           TR_Mapping_List.Reference (TP_Ref.TR_List, TR);
+      begin
+         TR_Ref.TC_List.Append (TC);
+      end;
+   end Add_TR;
 
    ------------
    -- Add_TR --
