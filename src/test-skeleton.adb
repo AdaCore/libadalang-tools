@@ -310,6 +310,8 @@ package body Test.Skeleton is
       Test_T  : String;
       Subp    : Subp_Info;
       TR_Line : Natural := 1);
+   --  Add the given test case to the test package mapping, using
+   --  Subp.TC_Info to fill in test case information.
 
    procedure Add_DT
      (TP_List : in out TP_Mapping_List.List;
@@ -3719,7 +3721,7 @@ package body Test.Skeleton is
 
       Current_Type : Base_Type_Info;
       --  The test type for which the primitives are
-      --  put togather in the corresponding test package
+      --  put together in the corresponding test package
 
       Test_Unit_Suffix : String_Access;
       --  Generic or non-generic test package suffix or.
