@@ -36,14 +36,16 @@ package Pp.Actions is
    type Pp_Tool is new Tool_State with private;
 
    procedure Format_Vector
-     (Cmd               : Command_Line;
-      Input             : Char_Vector;
-      Node              : Ada_Node;
-      Output            : out Char_Vector;
-      Messages          : out Pp.Scanner.Source_Message_Vector;
-      Partial_GNATPP    : Boolean := False;
-      Start_Child_Index : Natural := 0;
-      End_Child_Index   : Natural := 0)
+     (Cmd                 : Command_Line;
+      Input               : Char_Vector;
+      Node                : Ada_Node;
+      Output              : out Char_Vector;
+      Messages            : out Pp.Scanner.Source_Message_Vector;
+      First_Line_Offset   : Natural := 0;
+      Initial_Indentation : Natural := 0;
+      Partial_GNATPP      : Boolean := False;
+      Start_Child_Index   : Natural := 0;
+      End_Child_Index     : Natural := 0)
      with Pre => Pp.Scanner.Source_Message_Vectors.Is_Empty (Messages);
    --  This pretty prints the given source. Parameters:
    --
@@ -66,8 +68,25 @@ package Pp.Actions is
    --
    --     Messages -- Error messages.
    --
+   --     First_Line_Offset -- Apply an offset to the line length of the
+   --     first line. This is needed to partially format nodes that do not
+   --     start at the beggining of a line. For instance, in a Subp_Spec
+   --     preceded by the "overriding" keyword (which is a sibling node),
+   --     there might not be a LB between the two, therefore, the first line
+   --     of the formatted must have an additional offset of 11 characters (10
+   --     for the overriding keyword plus 1 for the blank).
+   --
+   --     Initial_Indentation -- Apply an extra indentation to the whole
+   --     formatted node.
+   --
    --     Partial_GNATPP -- Boolean parameterset when Format_Vector is called
    --     in a context of code snippet reformatting (from partial-gnatpp).
+   --
+   --     Start_Child_Index -- The index of the first node to format if
+   --     Partial_GNATPP is true and if we're formatting a list.
+   --
+   --     End_Child_Index -- The index of the last node to format if
+   --     Partial_GNATPP is true and if we're formatting a list.
    --
    --  If Messages is not empty, then the client should notify the user
    --  somehow, and avoid updating the user's source code. In addition, if
@@ -81,12 +100,6 @@ package Pp.Actions is
    --  Note that the gnatpp program does not call this directly; it calls
    --  Per_File_Action. Format_Vector is for calling from text editors and
    --  the like. Format_Vector is called from lalstub and partial-gnatpp.
-
-   procedure Set_Partial_GNATPP_Offset (Val : Natural);
-   function Get_Partial_GNATPP_Offset return Natural;
-   --  These two accessors are used by Partial_GNATPP to write/read
-   --  global Partial_GNATPP_Offset variable value. They are used exclusively
-   --  for the partial formatting of the code.
 
    procedure Clear_Template_Tables;
    --  Clear all gnatpp's predefined template tables.

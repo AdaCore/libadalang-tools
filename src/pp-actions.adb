@@ -137,23 +137,6 @@ package body Pp.Actions is
    function Mimic_gcc (Cmd : Command_Line) return Boolean is
      (Arg (Cmd, Outer_Dir) /= null);
 
-   Partial_GNATPP_Offset : Natural := 0;
-   --  This global variable defines an offset for partial-gnatpp based on the
-   --  offsets of previous/next sibling of the formatted node.
-   --  This value is set in partial formatting mode by Partial_GNATPP by
-   --  get/set accessors defined in the public part of this package and used
-   --  later by the indentation pass of the formatting phases.
-
-   procedure Set_Partial_GNATPP_Offset (Val : Natural) is
-   begin
-      Partial_GNATPP_Offset := Val;
-   end Set_Partial_GNATPP_Offset;
-
-   function Get_Partial_GNATPP_Offset return Natural is
-   begin
-      return Partial_GNATPP_Offset;
-   end Get_Partial_GNATPP_Offset;
-
    ----------
    -- Init --
    ----------
@@ -539,14 +522,14 @@ package body Pp.Actions is
 
    use Line_Break_Vectors, Line_Break_Index_Vectors;
    use Tab_Vectors;
-   Lines_Data : aliased Lines_Data_Rec;
 
-   Cur_Indentation : Natural renames Lines_Data.Cur_Indentation;
-   All_LB : Line_Break_Vector renames Lines_Data.All_LB;
-   All_LBI : Line_Break_Index_Vector renames Lines_Data.All_LBI;
-   Tabs : Tab_Vector renames Lines_Data.Tabs;
-   Src_Tokns : Scanner.Tokn_Vec renames Lines_Data.Src_Tokns;
-   New_Tokns : Scanner.Tokn_Vec renames Lines_Data.New_Tokns;
+   Lines_Data          : aliased Lines_Data_Rec;
+   Cur_Indentation     : Natural renames Lines_Data.Cur_Indentation;
+   All_LB              : Line_Break_Vector renames Lines_Data.All_LB;
+   All_LBI             : Line_Break_Index_Vector renames Lines_Data.All_LBI;
+   Tabs                : Tab_Vector renames Lines_Data.Tabs;
+   Src_Tokns           : Scanner.Tokn_Vec renames Lines_Data.Src_Tokns;
+   New_Tokns           : Scanner.Tokn_Vec renames Lines_Data.New_Tokns;
 
    procedure Tree_To_Ada_2
      (Root              : Ada_Node;
@@ -2952,7 +2935,7 @@ package body Pp.Actions is
          pragma Assert
            (abs Amount in
               0 | 1 | PP_Indentation (Cmd) | PP_Indent_Continuation (Cmd) |
-              Arg (Cmd, Initial_Indentation));
+              Lines_Data.Initial_Indentation);
          Last_LBI : constant Line_Break_Index := All_LBI (Last (All_LBI));
          Last_LB : Line_Break renames All_LB (Last_LBI);
       begin
@@ -5472,7 +5455,7 @@ package body Pp.Actions is
             Level    => 1,
             Kind     => Null_Kind);
 
-         Indent (Arg (Cmd, Initial_Indentation));
+         Indent (Lines_Data.Initial_Indentation);
 
          Subtree_To_Ada (Tree, Cur_Level => 1, Index_In_Parent => 1);
 
@@ -5514,7 +5497,7 @@ package body Pp.Actions is
 
          Scanner.Append_Tokn (New_Tokns, Scanner.End_Of_Input);
 
-         Indent (-Arg (Cmd, Initial_Indentation)); -- note negation
+         Indent (-Lines_Data.Initial_Indentation); -- note negation
          pragma Assert (Is_Empty (Tree_Stack));
          pragma Assert (Cur_Indentation = 0);
       end Convert_Tree_To_Ada;
@@ -5578,14 +5561,16 @@ package body Pp.Actions is
    -------------------
 
    procedure Format_Vector
-     (Cmd               : Command_Line;
-      Input             : Char_Vector;
-      Node              : Ada_Node;
-      Output            : out Char_Vector;
-      Messages          : out Pp.Scanner.Source_Message_Vector;
-      Partial_GNATPP    : Boolean := False;
-      Start_Child_Index : Natural := 0;
-      End_Child_Index   : Natural := 0)
+     (Cmd                 : Command_Line;
+      Input               : Char_Vector;
+      Node                : Ada_Node;
+      Output              : out Char_Vector;
+      Messages            : out Pp.Scanner.Source_Message_Vector;
+      First_Line_Offset   : Natural := 0;
+      Initial_Indentation : Natural := 0;
+      Partial_GNATPP      : Boolean := False;
+      Start_Child_Index   : Natural := 0;
+      End_Child_Index     : Natural := 0)
    is
       Partial : constant Boolean := Is_Empty (Input);
 
@@ -5889,6 +5874,9 @@ package body Pp.Actions is
 
    begin
       --  Start of processing for Format_Vector
+
+      Lines_Data.First_Line_Offset := First_Line_Offset;
+      Lines_Data.Initial_Indentation := Initial_Indentation;
 
       Clear (Src_Buf);
       Insert_Ada_Source
@@ -6276,11 +6264,13 @@ package body Pp.Actions is
 
       begin
          Format_Vector
-           (Cmd      => Cmd,
-            Input    => In_Vec,
-            Node     => Root (Unit),
-            Output   => Out_Vec,
-            Messages => Messages);
+           (Cmd                 => Cmd,
+            Input               => In_Vec,
+            Node                => Root (Unit),
+            Output              => Out_Vec,
+            Messages            => Messages,
+            Initial_Indentation =>
+              Arg (Cmd, Pp.Command_Lines.Initial_Indentation));
 
          if not Messages.Is_Empty then
             for Message of Messages loop

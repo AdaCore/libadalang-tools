@@ -41,7 +41,6 @@ with Langkit_Support.Slocs; use Langkit_Support;
 with Pp.Command_Lines; use Pp.Command_Lines;
 with Pp.Error_Slocs; use Pp.Error_Slocs;
 with Pp.Scanner.Lines;
-with Pp.Actions;
 
 package body Pp.Formatting is
    use Utils.Command_Lines;
@@ -555,20 +554,27 @@ package body Pp.Formatting is
       end if;
    end Tokns_To_Buffer;
 
+   ----------------------
+   -- Do_Comments_Only --
+   ----------------------
+
    procedure Do_Comments_Only
      (Lines_Data_P : Lines_Data_Ptr;
-      Src_Buf : in out Buffer;
-      Cmd : Utils.Command_Lines.Command_Line)
+      Src_Buf      : in out Buffer;
+      Cmd          : Utils.Command_Lines.Command_Line)
    is
       use Scanner;
-      Lines_Data : Lines_Data_Rec renames Lines_Data_P.all;
-      Cur_Indentation : Natural renames Lines_Data.Cur_Indentation;
-      Src_Toks : aliased Tokn_Vec;
+
+      Lines_Data          : Lines_Data_Rec renames Lines_Data_P.all;
+      Initial_Indentation : Natural renames Lines_Data.Initial_Indentation;
+      Cur_Indentation     : Natural renames Lines_Data.Cur_Indentation;
+
+      Src_Toks            : aliased Tokn_Vec;
       pragma Assert (Is_Empty (Src_Toks));
-      Ignored : Boolean := Get_Tokns
+      Ignored             : Boolean := Get_Tokns
         (Src_Buf, Src_Toks,
          Comments_Special_On => Arg (Cmd, Comments_Special));
-      Cur_Tok : Tokn_Cursor :=
+      Cur_Tok             : Tokn_Cursor :=
         Next (First (Src_Toks'Unchecked_Access)); -- skip sentinel
 
       Saved_New_Tokns : Scanner.Tokn_Vec renames Lines_Data.Saved_New_Tokns;
@@ -582,7 +588,7 @@ package body Pp.Formatting is
 
       procedure Reset_Indentation is
       begin
-         Cur_Indentation := Arg (Cmd, Initial_Indentation);
+         Cur_Indentation := Initial_Indentation;
       end Reset_Indentation;
 
    --  Start of processing for Do_Comments_Only
@@ -1004,8 +1010,7 @@ package body Pp.Formatting is
       --  Copy_Pp_Off_Regions. In particular, it checks that OFF/ON commands
       --  are in the proper sequence, and it sets the Pp_Off_Present flag.
 
-      procedure Insert_Indentation (Lines_Data_P : Lines_Data_Ptr;
-                                    Partial_GNATPP : Boolean := False);
+      procedure Insert_Indentation (Lines_Data_P : Lines_Data_Ptr);
 
       procedure Insert_Alignment
         (Lines_Data_P   : Lines_Data_Ptr;
@@ -1095,7 +1100,7 @@ package body Pp.Formatting is
             First_Time => False,
             Partial_GNATPP => Partial_GNATPP);
 
-         Tok_Phases.Insert_Indentation (Lines_Data_P, Partial_GNATPP);
+         Tok_Phases.Insert_Indentation (Lines_Data_P);
 
          Tok_Phases.Insert_Alignment (Lines_Data_P, Cmd, Partial_GNATPP);
 
@@ -1951,16 +1956,23 @@ package body Pp.Formatting is
             else First.Indentation + Without_Indent);
       end Line_Len;
 
+      -----------------
+      -- Split_Lines --
+      -----------------
+
       procedure Split_Lines
         (Lines_Data_P : Lines_Data_Ptr;
          Cmd : Command_Line;
          First_Time : Boolean;
          Partial_GNATPP : Boolean := False)
       is
-         Lines_Data : Lines_Data_Rec renames Lines_Data_P.all;
-         All_LB : Line_Break_Vector renames Lines_Data.All_LB;
-         All_LBI : Line_Break_Index_Vector renames Lines_Data.All_LBI;
-         New_Tokns : Scanner.Tokn_Vec renames Lines_Data.New_Tokns;
+         Lines_Data          : Lines_Data_Rec renames Lines_Data_P.all;
+         First_Line_Offset   : Natural renames Lines_Data.First_Line_Offset;
+         Initial_Indentation : Natural renames Lines_Data.Initial_Indentation;
+         All_LB              : Line_Break_Vector renames Lines_Data.All_LB;
+         All_LBI             : Line_Break_Index_Vector renames
+           Lines_Data.All_LBI;
+         New_Tokns           : Scanner.Tokn_Vec renames Lines_Data.New_Tokns;
 
          function Worthwhile_Line_Break
            (F, X : Line_Break_Index) return Boolean;
@@ -2038,6 +2050,9 @@ package body Pp.Formatting is
          --  All line breaks for a given line that are at the same level,
          --  plus an extra one at the end that is already enabled.
 
+         First_Line : Boolean := True;
+         Offset     : Natural := Initial_Indentation + First_Line_Offset;
+
       --  Start of processing for Split_Lines
 
       begin
@@ -2068,8 +2083,7 @@ package body Pp.Formatting is
             loop -- through levels
                L   := Next_Enabled (Lines_Data, F);
                Len :=
-                 Line_Len (All_LB, All_LBI (F), All_LBI (L))
-                   + Pp.Actions.Get_Partial_GNATPP_Offset;
+                 Line_Len (All_LB, All_LBI (F), All_LBI (L)) + Offset;
 
                exit when Len <= Arg (Cmd, Max_Line_Length); -- short enough
                exit when not More_Levels; -- no more line breaks to enable
@@ -2116,13 +2130,17 @@ package body Pp.Formatting is
                      --  level, except that we don't do that within binary
                      --  operators.
 
-                     elsif (Line_Len (All_LB, FF, LB (X + 1))
-                            + Pp.Actions.Get_Partial_GNATPP_Offset)
+                     elsif Line_Len (All_LB, FF, LB (X + 1))
+                           + Offset
                            > Arg (Cmd, Max_Line_Length)
                        or else (not Arg (Cmd, Compact)
                                 and then All_LB (LL).Bin_Op_Count = 0)
                      then
                         pragma Assert (not All_LB (LL).Enabled);
+                        if First_Line then
+                           First_Line := False;
+                           Offset := @ - First_Line_Offset;
+                        end if;
                         All_LB (LL).Enabled := True;
                         All_LB (LL).Affects_Comments := True;
                         --  Keep the indentation level of the previous LL if
@@ -2153,7 +2171,7 @@ package body Pp.Formatting is
               (All_LB (All_LBI (F)).Length
                = Line_Len (All_LB, All_LBI (F),
                            All_LBI (Next_Enabled (Lines_Data, F)))
-                 + Pp.Actions.Get_Partial_GNATPP_Offset);
+                 + Offset);
             F := L;
          end loop; -- through line breaks
 
@@ -2514,14 +2532,20 @@ package body Pp.Formatting is
          Partial_GNATPP : Boolean := False)
       is
          pragma Assert (not Pp_Off_Present); -- initialized by caller
-         Lines_Data : Lines_Data_Rec renames Lines_Data_P.all;
-         Cur_Indentation : Natural renames Lines_Data.Cur_Indentation;
-         All_LB : Line_Break_Vector renames Lines_Data.All_LB;
-         Temp_LBI : Line_Break_Index_Vector renames Lines_Data.Temp_LBI;
-         Enabled_LBI : Line_Break_Index_Vector renames Lines_Data.Enabled_LBI;
-         Syntax_LBI : Line_Break_Index_Vector renames Lines_Data.Syntax_LBI;
-         Src_Tokns : Scanner.Tokn_Vec renames Lines_Data.Src_Tokns;
-         Saved_New_Tokns : Scanner.Tokn_Vec renames Lines_Data.Saved_New_Tokns;
+
+         Lines_Data          : Lines_Data_Rec renames Lines_Data_P.all;
+         Initial_Indentation : Natural renames Lines_Data.Initial_Indentation;
+         Cur_Indentation     : Natural renames Lines_Data.Cur_Indentation;
+         All_LB              : Line_Break_Vector renames Lines_Data.All_LB;
+         Temp_LBI            : Line_Break_Index_Vector renames
+           Lines_Data.Temp_LBI;
+         Enabled_LBI         : Line_Break_Index_Vector renames
+           Lines_Data.Enabled_LBI;
+         Syntax_LBI          : Line_Break_Index_Vector renames
+           Lines_Data.Syntax_LBI;
+         Src_Tokns           : Scanner.Tokn_Vec renames Lines_Data.Src_Tokns;
+         Saved_New_Tokns     : Scanner.Tokn_Vec renames
+           Lines_Data.Saved_New_Tokns;
 
          procedure Reset_Indentation;
          --  Set the indentation to it's initial value (usually 0, but can be set
@@ -2582,7 +2606,7 @@ package body Pp.Formatting is
 
          procedure Reset_Indentation is
          begin
-            Cur_Indentation := Arg (Cmd, Initial_Indentation);
+            Cur_Indentation := Initial_Indentation;
          end Reset_Indentation;
 
          function Match (Src_Tok, Out_Tok : Tokn_Cursor) return Boolean is
@@ -3250,7 +3274,7 @@ package body Pp.Formatting is
             --  Comments at the beginning are not indented. The "2" is to skip
             --  the initial sentinel NL.
             if Kind (Prev (Prev (New_Tok))) = Start_Of_Input then
-               Indentation := 0;
+               Indentation := Lines_Data.Initial_Indentation;
 
             --  Otherwise, we indent as for the max of the preceding and
             --  following line breaks, except when Look_Before is False (as it
@@ -4324,7 +4348,6 @@ package body Pp.Formatting is
          end if;
 
          pragma Assert (Is_Empty (Paren_Stack));
-         pragma Assert (Cur_Indentation = Arg (Cmd, Initial_Indentation));
          pragma Assert (At_Last (Src_Tok));
 
          Append_Tokn (New_Tokns, End_Of_Input);
@@ -4346,8 +4369,7 @@ package body Pp.Formatting is
          Clear (Syntax_LBI);
       end Insert_Comments_And_Blank_Lines;
 
-      procedure Insert_Indentation (Lines_Data_P : Lines_Data_Ptr;
-                                    Partial_GNATPP : Boolean := False)
+      procedure Insert_Indentation (Lines_Data_P : Lines_Data_Ptr)
       is
          function Is_Action_Call_Parameter (Tok : Tokn_Cursor) return Boolean;
          --  Returns true if the line break token is part of an action call
@@ -4776,22 +4798,10 @@ package body Pp.Formatting is
                      Adjust_Indentation_After_Comma (New_Tok);
                   end if;
 
-                  --  If partial formatting (called from Partial_GNATPP) then
-                  --  use an offset picked from the previous/next sibling of
-                  --  the reformatted node to add spaces at the begining of
-                  --  each line.
                   if Kind (Next (New_Tok))
                     not in Line_Break_Token | End_Of_Input
                   then
-                     declare
-                        Offset     : constant Natural :=
-                          Pp.Actions.Get_Partial_GNATPP_Offset;
-                        Crt_Indent : constant Natural :=
-                          (if Partial_GNATPP then (LB.Indentation + Offset)
-                           else LB.Indentation);
-                     begin
-                        Append_Spaces (New_Tokns, Crt_Indent);
-                     end;
+                     Append_Spaces (New_Tokns, LB.Indentation);
                   end if;
                end;
             end if;
@@ -4843,8 +4853,9 @@ package body Pp.Formatting is
          Cmd            : Command_Line;
          Partial_GNATPP : Boolean := False)
       is
-         Lines_Data : Lines_Data_Rec renames Lines_Data_P.all;
-         Tabs       : Tab_Vector renames Lines_Data.Tabs;
+         Lines_Data          : Lines_Data_Rec renames Lines_Data_P.all;
+         Initial_Indentation : Natural renames Lines_Data.Initial_Indentation;
+         Tabs                : Tab_Vector renames Lines_Data.Tabs;
 
          Saved_New_Tokns : Scanner.Tokn_Vec renames Lines_Data.Saved_New_Tokns;
          New_Tokns       : Scanner.Tokn_Vec renames Lines_Data.New_Tokns;
@@ -5649,9 +5660,12 @@ package body Pp.Formatting is
                                 Sloc_Col (Next_Line_Break) + Num_Spaces - 1;
                               --  Current length of current line
                               New_Line_Len : constant Natural :=
-                                Line_Len + Tab.Num_Blanks;
-                              --  Length the current line will be after we expand
-                              --  this tab. Don't do it if it will be too long.
+                                Line_Len
+                                + Tab.Num_Blanks
+                                + Initial_Indentation;
+                              --  Length the current line will be after we
+                              --  expand this tab. Don't do it if it will be
+                              --  too long.
                            begin
                               if New_Line_Len <= Arg (Cmd, Max_Line_Length) then
                                  Append_Spaces

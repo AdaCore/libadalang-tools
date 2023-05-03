@@ -118,7 +118,8 @@ abstract_subprogram_declaration.ads(<AbstractSubpDecl ["Unit_Set"] abstract_subp
 *************************************
 abstract_subprogram_declaration.ads(<AbstractSubpDecl ["Take"] abstract_subprogram_declaration.ads:29:5-30:51>) - 29:1-30:51
 ^
-    procedure Take (Element : out Element_Type; From : in out Set) is abstract;$
+    procedure Take
+      (Element : out Element_Type; From : in out Set) is abstract;$
 *************************************
 
 -----------------------------------------------------------------
