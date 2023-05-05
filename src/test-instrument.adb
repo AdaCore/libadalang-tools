@@ -329,9 +329,9 @@ package body Test.Instrument is
       S_Put (Pad + 3, "function GNATTEST_Dump_Inputs return Boolean is");
       Put_New_Line;
 
-      S_Put (Pad + 6, "F : Ada.Streams.Stream_IO.File_Type;");
+      S_Put (Pad + 6, "GNATTEST_F : Ada.Streams.Stream_IO.File_Type;");
       Put_New_Line;
-      S_Put (Pad + 6, "S : Stream_Access;");
+      S_Put (Pad + 6, "GNATTEST_S : Stream_Access;");
       Put_New_Line;
 
       S_Put (Pad + 3, "begin");
@@ -358,7 +358,7 @@ package body Test.Instrument is
 
       S_Put
         (Pad + 6,
-         "Create (F, Out_File, """
+         "Create (GNATTEST_F, Out_File, """
          & TGen.LAL_Utils.Default_Blob_Test_Filename (Decl.P_Decl_Part)
          & "-"" & TGen.Instr_Support.Test_Input_Number);");
       Put_New_Line;
@@ -367,7 +367,7 @@ package body Test.Instrument is
          "TGen.Instr_Support.Test_Input_Counter := "
          & "TGen.Instr_Support.Test_Input_Counter + 1;");
       Put_New_Line;
-      S_Put (Pad + 6, "S := Stream (F);");
+      S_Put (Pad + 6, "GNATTEST_S := Stream (GNATTEST_F);");
       Put_New_Line;
       Put_New_Line;
 
@@ -384,7 +384,7 @@ package body Test.Instrument is
                     (Pad + 6,
                       "TGen.TGen_Support."
                      & TGen.Marshalling.Output_Fname_For_Typ (Param_Typ)
-                     & " (S, "
+                     & " (GNATTEST_S, "
                      & Node_Image (Name)
                      & ");");
                   Put_New_Line;
@@ -396,7 +396,7 @@ package body Test.Instrument is
                      To_Ada (Param_Typ.Package_Name)
                      & ".TGen_Support."
                      & TGen.Marshalling.Output_Fname_For_Typ (Param_Typ)
-                     & " (S, "
+                     & " (GNATTEST_S, "
                      & Node_Image (Name)
                      & ");");
                   Put_New_Line;
@@ -407,7 +407,7 @@ package body Test.Instrument is
 
       Put_New_Line;
 
-      S_Put (Pad + 6, "Close (F);");
+      S_Put (Pad + 6, "Close (GNATTEST_F);");
       Put_New_Line;
 
       S_Put (Pad + 6, "return True;");
