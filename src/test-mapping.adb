@@ -584,7 +584,7 @@ package body Test.Mapping is
                           (9,
                            (if Put_If then "if" else "elsif")
                            & " Starts_With (SLOC, """
-                           & Src & ":" & Trim (TC.Line'Img, Both)
+                           & Src & ":" & Trim (TR.Decl_Line'Img, Both)
                            & """) then");
                         First_TC_Ever := False;
                         Put_New_Line;
