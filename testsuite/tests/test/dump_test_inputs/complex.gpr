@@ -1,0 +1,24 @@
+with "matrix/matrix.gpr";
+project Complex is
+
+   for Source_Dirs use ("src");
+   for Main use ("main.adb");
+
+   for Languages use ("Ada");
+   for Object_Dir use "obj";
+
+   package Compiler is
+      for Default_Switches ("ada") use
+            ("-g", "-O1", "-gnata");
+   end Compiler;
+
+   package Check is
+      for Default_Switches ("ada") use ("v");
+   end Check;
+
+   package Gnattest is
+      for Gnattest_Switches use
+        ("--passed-tests=hide", "--skeleton-default=pass");
+   end Gnattest;
+
+end Complex;

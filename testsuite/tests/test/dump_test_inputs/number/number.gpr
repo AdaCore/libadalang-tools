@@ -1,0 +1,10 @@
+project Number is
+
+   for Source_Dirs use (".");
+
+   package Compiler is
+      for Default_Switches ("ada") use
+            ("-g", "-O1", "-gnata");
+   end Compiler;
+
+end Number;

@@ -1,0 +1,12 @@
+generate test driver
+generate test driver with instrumentation
+build instrumented test driver
+1 tests run: 1 passed; 0 failed; 0 crashed.
+input for Add_Matrix dumped
+1 tests run: 1 passed; 0 failed; 0 crashed.
+1 tests run: 1 passed; 0 failed; 0 crashed.
+3 test inputs dumped for Multiply
+mix instrumentation with generated vectors
+build mixed test driver
+6 tests run: 6 passed; 0 failed; 0 crashed.
+input from auto-generated test for Add_Matrix dumped
