@@ -1,0 +1,14 @@
+with "../number/number.gpr";
+
+project Matrix is
+
+   for Source_Dirs use (".");
+
+   for Languages use ("Ada");
+
+   package Compiler is
+      for Default_Switches ("ada") use
+            ("-g", "-O1", "-gnata");
+   end Compiler;
+
+end Matrix;
