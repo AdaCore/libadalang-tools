@@ -196,7 +196,7 @@ package Test.Harness is
    --  Generate Makefile with relevant coverage targets
 
    procedure Test_Runner_Generator (Source_Prj : String);
-   --  Generates Main_Sute and Test_Runner
+   --  Generates Main_Suite and Test_Runner
 
    procedure Project_Creator (Source_Prj : String);
    --  Generates a simple project file for the test driver
