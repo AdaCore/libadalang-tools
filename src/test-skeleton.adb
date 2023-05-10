@@ -323,6 +323,7 @@ package body Test.Skeleton is
       Test_Rout_Line    : Natural;
       Test_File         : String;
       Test_Time         : String;
+      Origin            : Test_Case_Origin_Type;
       Subp              : Subp_Info);
    --  Add the given test case to the test package mapping. This does not use
    --  Subp.TC_Info contrarily to the above, but uses the parameter values to
@@ -430,13 +431,19 @@ package body Test.Skeleton is
    procedure Generate_Nested_Hierarchy (Data : Data_Holder);
    --  Creates dummy child packages copying nested packages from tested package
 
-   procedure Generate_Test_Package (Data : Data_Holder);
-   --  Generates test package spec and body
+   procedure Generate_Test_Package
+     (Data    : Data_Holder;
+      TP_List : in out TP_Mapping_List.List);
+   --  Generates test package spec and body. Save in TP_List information about
+   --  generated tests.
 
    procedure Output_Generated_Tests
-     (Data : Data_Holder; Suite_Data_List : in out Suites_Data_Type);
+     (Data            : Data_Holder;
+      Suite_Data_List : in out Suites_Data_Type;
+      TP_List         : in out TP_Mapping_List.List);
    --  Create test packages containing all the generated tests from TGen,
-   --  loading them from file. Fill the suite info as we create new test cases.
+   --  loading them from file. Fill the suite info as we create new test cases,
+   --  and save in TP_List information about generated tests.
 
    procedure Generate_Procedure_Wrapper (Current_Subp : Subp_Info);
    --  Prints a test-case specific wrapper for tested procedure
@@ -828,11 +835,19 @@ package body Test.Skeleton is
          end;
 
          if Data.Data_Kind = Declaration_Data then
-            Generate_Nested_Hierarchy (Data);
-            Generate_Test_Package (Data);
-            if Ada.Directories.Exists (Test.Common.JSON_Test_Dir.all) then
-               Output_Generated_Tests (Data, Suite_Data_List);
-            end if;
+            declare
+               TP_List : TP_Mapping_List.List;
+               --  Save information about generated test cases
+
+            begin
+               Generate_Nested_Hierarchy (Data);
+               Generate_Test_Package (Data, TP_List);
+               if Ada.Directories.Exists (Test.Common.JSON_Test_Dir.all) then
+                  Output_Generated_Tests (Data, Suite_Data_List, TP_List);
+               end if;
+               Add_Test_List (Data.Unit_File_Name.all, TP_List);
+               TP_List.Clear;
+            end;
             Get_Test_Packages_List (Suite_Data_List);
             Cur := Test_Packages.First;
             loop
@@ -3716,7 +3731,9 @@ package body Test.Skeleton is
    --  Generate_Test_Package  --
    -----------------------------
 
-   procedure Generate_Test_Package (Data : Data_Holder) is
+   procedure Generate_Test_Package
+     (Data    : Data_Holder;
+      TP_List : in out TP_Mapping_List.List) is
 
       Output_Dir             : constant String :=
         Get_Source_Output_Dir (Data.Unit_File_Name.all);
@@ -3762,7 +3779,6 @@ package body Test.Skeleton is
       Current_Pack : Package_Info;
 
       TP_Map  : TP_Mapping;
-      TP_List : TP_Mapping_List.List;
 
       Tear_Down_Line_Add : Natural := 0;
 
@@ -4884,7 +4900,7 @@ package body Test.Skeleton is
          Close_File;
 
          if not Current_Type.Main_Type_Abstract then
-            TP_Map.TP_Name := new String'(Test_File_Name.all & ".ads");
+            TP_Map.TP_Name := new String'(Data.Unit_Full_Name.all);
             TP_List.Append (TP_Map);
          end if;
 
@@ -5387,14 +5403,14 @@ package body Test.Skeleton is
 
                      if Is_Unimplemented_Test (MD.TR_Text) then
                         TR_SLOC_Buffer.Append
-                          ((new String'(Test_File_Name.all & ".ads"),
+                          ((new String'(Data.Unit_Full_Name.all),
                            new String'(Test_File_Name.all & ".adb"),
                            null,
                            Subp_Data_List.Element (Subp_Cur),
                            New_Line_Counter));
                      else
                         TR_SLOC_Buffer.Append
-                          ((new String'(Test_File_Name.all & ".ads"),
+                          ((new String'(Data.Unit_Full_Name.all),
                            new String'(Test_File_Name.all & ".adb"),
                            new String'("modified"),
                            Subp_Data_List.Element (Subp_Cur),
@@ -5547,7 +5563,7 @@ package body Test.Skeleton is
 
                      Add_DT
                        (TP_List,
-                        Test_File_Name.all & ".ads",
+                        Data.Unit_Full_Name.all,
                         Test_File_Name.all & ".adb",
                         New_Line_Counter,
                         1);
@@ -6075,7 +6091,7 @@ package body Test.Skeleton is
 
             Close_File;
 
-            TP_Map.TP_Name := new String'(Test_File_Name.all & ".ads");
+            TP_Map.TP_Name := new String'(Data.Unit_Full_Name.all);
             TP_List.Append (TP_Map);
 
             Reset_Line_Counter;
@@ -6571,14 +6587,14 @@ package body Test.Skeleton is
 
                         if Is_Unimplemented_Test (MD.TR_Text) then
                            TR_SLOC_Buffer.Append
-                             ((new String'(Test_File_Name.all & ".ads"),
+                             ((new String'(Data.Unit_Full_Name.all),
                               new String'(Test_File_Name.all & ".adb"),
                               null,
                               Subp_Data_List.Element (Subp_Cur),
                               New_Line_Counter));
                         else
                            TR_SLOC_Buffer.Append
-                             ((new String'(Test_File_Name.all & ".ads"),
+                             ((new String'(Data.Unit_Full_Name.all),
                               new String'(Test_File_Name.all & ".adb"),
                               new String'("modified"),
                               Subp_Data_List.Element (Subp_Cur),
@@ -6742,7 +6758,7 @@ package body Test.Skeleton is
 
                         Add_DT
                           (TP_List,
-                           Test_File_Name.all & ".ads",
+                           Data.Unit_Full_Name.all,
                            Test_File_Name.all & ".adb",
                            New_Line_Counter,
                            1);
@@ -6830,9 +6846,6 @@ package body Test.Skeleton is
 
       end if;
 
-      Add_Test_List (Data.Unit_File_Name.all, TP_List);
-      TP_List.Clear;
-
       if Data.Is_Generic then
          Gen_Tests_Storage.Append (Gen_Tests);
       end if;
@@ -6844,7 +6857,9 @@ package body Test.Skeleton is
    ----------------------------
 
    procedure Output_Generated_Tests
-     (Data : Data_Holder; Suite_Data_List : in out Suites_Data_Type)
+     (Data            : Data_Holder;
+      Suite_Data_List : in out Suites_Data_Type;
+      TP_List         : in out TP_Mapping_List.List)
    is
       use TGen.Strings;
 
@@ -6890,9 +6905,6 @@ package body Test.Skeleton is
          end loop;
          return +Result;
       end Escape;
-
-      TP_List : TP_Mapping_List.List;
-      --  Information about generated test-cases
 
    begin
       --  We do not support non-instanciated generic packages
@@ -6959,7 +6971,7 @@ package body Test.Skeleton is
             Body_VF : constant Virtual_File :=
               Create (+Output_Dir) / (+(Test_Unit_File_Name & ".adb"));
 
-            Test_Case_Name : Unbounded_String;
+            Test_Routine_Name : Unbounded_String;
 
             Instrument_Setup : Boolean := True;
 
@@ -7090,7 +7102,7 @@ package body Test.Skeleton is
 
             for Test_Vec of Subp_Vectors loop
 
-               Test_Case_Name := +"Gen_" & Subp.Subp_Mangle_Name.all
+               Test_Routine_Name := +"Gen_" & Subp.Subp_Mangle_Name.all
                  & "_" & Trim (Test_Count'Image, Both);
 
                --  Fill in information about each testcase that we are adding
@@ -7100,30 +7112,32 @@ package body Test.Skeleton is
                   TPtarg            => Data.Unit_Full_Name.all,
                   Test_Case_Name    =>
                     "generated test case" & Test_Count'Image,
-                  Test_Routine_Name => +Test_Case_Name,
-
-                  --  There is no test-case pragma associated to this test
-                  --  case as it was automatically generated. Add an invalid
-                  --  line and column number to make this explicit.
-
-                  Test_Case_Line    => 0,
-                  Test_Case_Column  => 0,
+                  Test_Routine_Name => +Test_Routine_Name,
+                  Test_Case_Line    =>
+                    Natural (Subp.Subp_Declaration.Sloc_Range.Start_Line),
+                  Test_Case_Column  =>
+                    Natural (Subp.Subp_Declaration.Sloc_Range.Start_Column),
                   Test_Rout_Line    => Line_Indexes (Body_Kind) + 1,
                   Test_File         => +Body_VF.Base_Name,
+
+                  --  TODO???: add a timestamp. For now, use the accepted
+                  --  modified value.
+
                   Test_Time         => "modified",
+                  Origin            => Test_Case_Generated,
                   Subp              => Subp);
 
                Single_Vec := Test_Vec.Get ("param_values");
 
                Put_Line
                  (Spec_Kind,
-                  "procedure " & (+Test_Case_Name)
+                  "procedure " & (+Test_Routine_Name)
                   & " (Gnattest_T : in out Test);");
                New_Line (Spec_Kind);
 
                Put_Line
                  (Body_Kind,
-                  "procedure " & (+Test_Case_Name)
+                  "procedure " & (+Test_Routine_Name)
                   & " (Gnattest_T : in out Test) is");
 
                if Test.Common.Instrument and then Instrument_Setup then
@@ -7304,8 +7318,6 @@ package body Test.Skeleton is
       <<Continue>>
       end loop;
 
-      Add_Test_List (Data.Unit_File_Name.all, TP_List);
-      TP_List.Clear;
       GNAT.Strings.Free (Unit_Raw_Content);
 
    end Output_Generated_Tests;
@@ -7361,10 +7373,12 @@ package body Test.Skeleton is
       Test_Rout_Line    : Natural;
       Test_File         : String;
       Test_Time         : String;
+      Origin            : Test_Case_Origin_Type;
       Subp              : Subp_Info)
    is
       TC : constant TC_Mapping := TC_Mapping'
-        (Line      => Test_Case_Line,
+        (Origin    => Origin,
+         Line      => Test_Case_Line,
          Column    => Test_Case_Column,
          Test      => new String'(Test_File),
          Test_Time => new String'(Test_Time),
@@ -7451,124 +7465,44 @@ package body Test.Skeleton is
       Subp    : Subp_Info;
       TR_Line : Natural := 1)
    is
-      TC : TC_Mapping;
-      TR : TR_Mapping;
-      TP : TP_Mapping;
-
-      TR_Cur : TR_Mapping_List.Cursor;
-      TP_Cur : TP_Mapping_List.Cursor := TP_List.First;
-
-      Subp_Name_Span : constant Source_Location_Range :=
-        Subp.Subp_Declaration.As_Basic_Decl.P_Defining_Name.Sloc_Range;
       Subp_Span : constant Source_Location_Range :=
         Subp.Subp_Declaration.Sloc_Range;
-      TC_Span   : constant Source_Location_Range :=
-        (if Subp.Has_TC_Info then
-            Subp.TC_Info.Elem.Sloc_Range
-         else
-            No_Source_Location_Range);
    begin
+      if Subp.Has_TC_Info then
+         declare
+            TC_Span   : constant Source_Location_Range :=
+              Subp.TC_Info.Elem.Sloc_Range;
+         begin
+            Add_TR
+              (TP_List           => TP_List,
+               TPtarg            => TPtarg,
+               Test_Case_Name    => Subp.TC_Info.Name.all,
+               Test_Routine_Name => Subp.Subp_Mangle_Name.all,
+               Test_Case_Line    => Natural (TC_Span.Start_Line),
+               Test_Case_Column  => Natural (TC_Span.Start_Column),
+               Test_Rout_Line    => TR_Line,
+               Test_File         => Test_F,
+               Test_Time         => Test_T,
+               Origin            => Test_Case_Pragma,
+               Subp              => Subp);
+         end;
+      else
+         Add_TR
+           (TP_List           => TP_List,
+            TPtarg            => TPtarg,
 
-      loop
-         exit when TP_Cur = TP_Mapping_List.No_Element;
+            --  Let's give this test an arbitrary but generic name
 
-         if TP_Mapping_List.Element (TP_Cur).TP_Name.all = TPtarg then
-            exit;
-         end if;
-
-         TP_Mapping_List.Next (TP_Cur);
-      end loop;
-
-      if TP_Cur = TP_Mapping_List.No_Element then
-         TP.TP_Name := new String'(TPtarg);
-         TR.TR_Name := new String'(Subp.Subp_Text_Name.all);
-         TR.Line := Natural (Subp_Name_Span.Start_Line);
-         TR.Decl_Line  := Natural (Subp_Span.Start_Line);
-         TR.Column := Natural (Subp_Name_Span.Start_Column);
-         if Subp.Has_TC_Info then
-            TC.T_Name := new String'(Subp.Subp_Mangle_Name.all);
-            TC.TC_Name := new String'(Subp.TC_Info.Name.all);
-            TC.Line := Natural (TC_Span.Start_Line);
-            TC.Column := Natural (TC_Span.Start_Column);
-            TC.Test := new String'(Test_F);
-            TC.Test_Time := new String'(Test_T);
-            TC.TR_Line := TR_Line;
-            TR.TC_List.Append (TC);
-         else
-            TR.Test := new String'(Test_F);
-            TR.Test_Time := new String'(Test_T);
-            TR.TR_Line := TR_Line;
-            TR.T_Name := new String'(Subp.Subp_Mangle_Name.all);
-         end if;
-
-         TP.TR_List.Append (TR);
-         TP_List.Append (TP);
-
-         return;
+            Test_Case_Name    => "test case",
+            Test_Routine_Name => Subp.Subp_Mangle_Name.all,
+            Test_Case_Line    => Natural (Subp_Span.Start_Line),
+            Test_Case_Column  => Natural (Subp_Span.Start_Column),
+            Test_Rout_Line    => TR_Line,
+            Test_File         => Test_F,
+            Test_Time         => Test_T,
+            Origin            => Gnattest_Generated,
+            Subp              => Subp);
       end if;
-
-      TP := TP_Mapping_List.Element (TP_Cur);
-
-      TR_Cur := TP.TR_List.First;
-      loop
-         exit when TR_Cur = TR_Mapping_List.No_Element;
-
-         if
-           TR_Mapping_List.Element (TR_Cur).Line =
-           Natural (Subp_Name_Span.Start_Line) and then
-           TR_Mapping_List.Element (TR_Cur).Column =
-           Natural (Subp_Name_Span.Start_Column)
-         then
-            exit;
-         end if;
-
-         TR_Mapping_List.Next (TR_Cur);
-      end loop;
-
-      if TR_Cur = TR_Mapping_List.No_Element then
-
-         TR.TR_Name := new String'(Subp.Subp_Text_Name.all);
-         TR.Line := Natural (Subp_Name_Span.Start_Line);
-         TR.Decl_Line := Natural (Subp_Span.Start_Line);
-         TR.Column := Natural (Subp_Name_Span.Start_Column);
-         if Subp.Has_TC_Info then
-            TC.T_Name := new String'(Subp.Subp_Mangle_Name.all);
-            TC.TC_Name := new String'(Subp.TC_Info.Name.all);
-            TC.Line := Natural (TC_Span.Start_Line);
-            TC.Column := Natural (TC_Span.Start_Column);
-            TC.Test := new String'(Test_F);
-            TC.Test_Time := new String'(Test_T);
-            TC.TR_Line := TR_Line;
-            TR.TC_List.Append (TC);
-         else
-            TR.Test := new String'(Test_F);
-            TR.Test_Time := new String'(Test_T);
-            TR.TR_Line := TR_Line;
-            TR.T_Name := new String'(Subp.Subp_Mangle_Name.all);
-         end if;
-
-         TP.TR_List.Append (TR);
-         TP_List.Replace_Element (TP_Cur, TP);
-
-         return;
-      end if;
-
-      TR := TR_Mapping_List.Element (TR_Cur);
-
-      --  The only way that there is same subprogram already is when it has
-      --  test_cases. So no need to check if it has TC_Info.
-      TC.T_Name := new String'(Subp.Subp_Mangle_Name.all);
-      TC.TC_Name := new String'(Subp.TC_Info.Name.all);
-      TC.Line := Natural (TC_Span.Start_Line);
-      TC.Column := Natural (TC_Span.Start_Column);
-      TC.Test := new String'(Test_F);
-      TC.Test_Time := new String'(Test_T);
-      TC.TR_Line := TR_Line;
-      TR.TC_List.Append (TC);
-
-      TP.TR_List.Replace_Element (TR_Cur, TR);
-      TP_List.Replace_Element (TP_Cur, TP);
-
    end Add_TR;
 
    -------------------------------

@@ -46,17 +46,26 @@ package body Test.Mapping is
    -------------------
 
    procedure Add_Test_List (Name : String; List : TP_Mapping_List.List) is
-      M : Mapping_Type;
+      SP_Cur : SP_Mapping.Cursor;
    begin
       Trace (Me, "adding test list for " & Name);
       if Mapping.Contains (Name) then
-         M := Mapping.Element (Name);
-         M.Test_Info := Copy (List);
-         Mapping.Replace (Name, M);
+         SP_Cur := Mapping.Find (Name);
       else
-         M.Test_Info := Copy (List);
-         Mapping.Include (Name, M);
+         Mapping.Include (Name, Mapping_Type'(others => <>));
+         SP_Cur := Mapping.Find (Name);
       end if;
+
+      --  Add the new elements into the list
+
+      declare
+         Mapping_Ref : constant SP_Mapping.Reference_Type :=
+           Mapping.Reference (SP_Cur);
+      begin
+         for TR of List loop
+            Mapping_Ref.Test_Info.Append (TR);
+         end loop;
+      end;
    end Add_Test_List;
 
    -------------------
@@ -198,56 +207,39 @@ package body Test.Mapping is
                        """>");
                   Put_New_Line;
 
-                  if TR.Test = null then
+                  TC_Cur := TR.TC_List.First;
+                  loop
+                     exit when TC_Cur = TC_Mapping_List.No_Element;
 
-                     TC_Cur := TR.TC_List.First;
-                     loop
-                        exit when TC_Cur = TC_Mapping_List.No_Element;
+                     TC := TC_Mapping_List.Element (TC_Cur);
 
-                        TC := TC_Mapping_List.Element (TC_Cur);
-
-                        S_Put
-                          (12,
-                           "<test_case name=""" &
-                             TC.TC_Name.all &
-                             """ line=""" &
-                             Trim (Natural'Image (TC.Line), Both) &
-                             """ column=""" &
-                             Trim (Natural'Image (TC.Column), Both) &
-                             """>");
-                        Put_New_Line;
-                        S_Put
-                          (15,
-                           "<test file="""
-                           & TC.Test.all
-                           & """ line="""
-                           & Trim (Natural'Image (TC.TR_Line), Both)
-                           & """ column=""1"""
-                           & " name=""" & TC.T_Name.all & """");
-                        S_Put (0, " timestamp="""
-                               & TC.Test_Time.all
-                               & """/>");
-                        Put_New_Line;
-                        S_Put (12, "</test_case>");
-                        Put_New_Line;
-
-                        TC_Mapping_List.Next (TC_Cur);
-                     end loop;
-
-                  else
                      S_Put
                        (12,
+                        "<test_case name=""" &
+                          TC.TC_Name.all &
+                          """ line=""" &
+                          Trim (Natural'Image (TC.Line), Both) &
+                          """ column=""" &
+                          Trim (Natural'Image (TC.Column), Both) &
+                          """>");
+                     Put_New_Line;
+                     S_Put
+                       (15,
                         "<test file="""
-                        & TR.Test.all
+                        & TC.Test.all
                         & """ line="""
-                        & Trim (Natural'Image (TR.TR_Line), Both)
+                        & Trim (Natural'Image (TC.TR_Line), Both)
                         & """ column=""1"""
-                        & " name=""" & TR.T_Name.all & """");
+                        & " name=""" & TC.T_Name.all & """");
                      S_Put (0, " timestamp="""
-                            & TR.Test_Time.all
+                            & TC.Test_Time.all
                             & """/>");
                      Put_New_Line;
-                  end if;
+                     S_Put (12, "</test_case>");
+                     Put_New_Line;
+
+                     TC_Mapping_List.Next (TC_Cur);
+                  end loop;
 
                   S_Put (9, "</tested>");
                   Put_New_Line;
@@ -561,6 +553,7 @@ package body Test.Mapping is
       TP_List : TP_Mapping_List.List;
 
       First_TC_Ever : Boolean := True;
+      First_Auto_TC : Boolean;
 
       function Put_If return Boolean is (Index = 1 and First_TC_Ever);
       --  Tells whether we should put IF instead of ELSIF
@@ -578,14 +571,28 @@ package body Test.Mapping is
             for TP of TP_List loop
                for TR of TP.TR_List loop
 
-                  if TR.Test = null then
-                     for TC of TR.TC_List loop
+                  First_Auto_TC := True;
+                  for TC of TR.TC_List loop
+                     --  Add a filter for gnattest generated tests +
+                     --  automatically generated test-cases, that are all
+                     --  located at the subprogram prototype point only once.
+                     --  Test-cases coming from test case pragmas all have
+                     --  different names so generate a different filter for
+                     --  each one of them.
+
+                     if TC.Origin = Test_Case_Pragma or else First_Auto_TC
+                     then
                         S_Put
                           (9,
                            (if Put_If then "if" else "elsif")
                            & " Starts_With (SLOC, """
-                           & Src & ":" & Trim (TR.Decl_Line'Img, Both)
+                           & Src & ":" & Trim (TC.Line'Img, Both)
                            & """) then");
+                        if TC.Origin in Gnattest_Generated
+                          | Test_Case_Generated
+                        then
+                           First_Auto_TC := False;
+                        end if;
                         First_TC_Ever := False;
                         Put_New_Line;
                         S_Put
@@ -593,23 +600,9 @@ package body Test.Mapping is
                            "return Filter.Selection ("
                            & Trim (Index'Img, Both) & ");");
                         Put_New_Line;
-                     end loop;
-                     Index := Index + 1;
-                  else
-                     S_Put
-                       (9,
-                        (if Index = 1 then "if" else "elsif")
-                        & " Starts_With (SLOC, """
-                        & Src & ":" & Trim (TR.Decl_Line'Img, Both)
-                        & """) then");
-                     Put_New_Line;
-                     S_Put
-                       (12,
-                        "return Filter.Selection ("
-                        & Trim (Index'Img, Both) & ");");
-                     Put_New_Line;
-                     Index := Index + 1;
-                  end if;
+                     end if;
+                  end loop;
+                  Index := Index + 1;
 
                end loop;
             end loop;
