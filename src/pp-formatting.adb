@@ -2917,6 +2917,7 @@ package body Pp.Formatting is
             --  so we won't add a new NL below.
 
             if New_Space_NL then
+
                pragma Assert (New_Preceding_Blanks > 0);
                New_Preceding_Blanks := New_Preceding_Blanks - 1;
 
@@ -2928,6 +2929,7 @@ package body Pp.Formatting is
                   Pending : Tokn_Cursor := First (Pending_Tokns'Unchecked_Access);
                   Spaces_Found : Boolean := False;
                begin
+
                   while not After_Last (Pending) loop
                      if Kind (Pending) = Spaces then
                         pragma Assert (Tokn_Length (Pending) = 1);
@@ -2938,6 +2940,7 @@ package body Pp.Formatting is
                      end if;
                      Next (Pending);
                   end loop;
+
                   pragma Assert (Spaces_Found);
                   Pending_Tokns := New_Pending_Tokns;
                end;
@@ -2975,7 +2978,10 @@ package body Pp.Formatting is
                     and then Kind (Prev (New_Tok)) = Spaces
                     and then LB_Tok (LB) = Prev (Prev (New_Tok));
                end if;
-               if LB_Tok (LB) = Prev (New_Tok) or else LB_Tok (LB) = New_Tok then
+
+               if LB_Tok (LB) = Prev (New_Tok)
+                 or else LB_Tok (LB) = New_Tok
+               then
                   At_Tok := True;
                end if;
 
@@ -2984,6 +2990,7 @@ package body Pp.Formatting is
                   --  This is needed because every comment in New_Tokns must be
                   --  followed by EOL_Token.
                else
+
                   pragma Assert
                     (if Kind (New_Tok) = Disabled_LB_Token then
                        not All_LB (Line_Break_Token_Index (New_Tok)).Enabled);
@@ -3004,13 +3011,26 @@ package body Pp.Formatting is
                   elsif Kind (Prev (New_Tok)) = Spaces
                     and then Kind (Prev (Prev (New_Tok))) in Line_Break_Token
                   then
-                     null;
+                     if Insert_Blank_Lines (Cmd)
+                       and then Kind (New_Tok) = Ident
+                       and then Kind (Prev_ss (New_Tok)) = Disabled_LB_Token
+                       and then Kind (Prev (Prev_ss (New_Tok))) = Res_Is
+                     then
+                        --   Handling something like
+                        --       subtype My_Subtype is      -- Some EOL comment
+                        --         Mode range Some_Value_A .. Some_Value_B;
+                        --  In this case the disabled LB token is not enabled.
+                        --  So, enabling it here.
+                        All_LB (Line_Break_Token_Index
+                                (Prev_ss (New_Tok))).Enabled := True;
+                     end if;
 
                   else
                      if Kind (New_Tok) = Ident
                        and then Kind (Prev (New_Tok)) = '('
                      then
                         --  Handling the situation where EOL comment follows '('
+                        --  or "is" keyword
                         --  (i.e., the situations like
                         --      function X
                         --        (-- some EOL comment here
@@ -3052,7 +3072,6 @@ package body Pp.Formatting is
                   end if;
                end if;
             end;
-
             Next_ss (Src_Tok);
          end Insert_End_Of_Line_Comment;
 

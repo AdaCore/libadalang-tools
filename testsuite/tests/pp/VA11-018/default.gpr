@@ -1,0 +1,43 @@
+project Default is
+
+  for Main use ("main.adb");
+
+  package Pretty_Printer is
+      GENERAL_RULES := ("--max-line-length=120",
+                        "--indentation=3",
+                        "--indent-continuation=2",
+                        "--alignment",
+                        "--no-separate-loop",
+                        "--no-separate-then",
+                        "--use-on-new-line",
+                        "--vertical-array-types",
+                        "--vertical-case-alternatives",
+                        "--vertical-enum-types",
+                        "--vertical-named-aggregates",
+                        "--call-threshold=1",
+                        "--par-threshold=1");
+
+      BLANK_LINE_RULES := ("--insert-blank-lines");
+
+      CASING_RULES  := ("--name-mixed-case",
+                        "--attribute-mixed-case",
+                        "--keyword-lower-case",
+                        "--enum-mixed-case",
+                        "--type-mixed-case",
+                        "--number-mixed-case",
+                        "--pragma-mixed-case");
+
+      COMMENT_RULES := ("--comments-unchanged");
+
+      MISC_RULES := ("--decimal-grouping=0",
+                     "--based-grouping=0");
+
+      for Default_Switches ("Ada") use GENERAL_RULES &
+        BLANK_LINE_RULES &
+        CASING_RULES &
+        COMMENT_RULES &
+        MISC_RULES;
+
+  end Pretty_Printer;
+   
+end Default;

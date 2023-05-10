@@ -3905,11 +3905,13 @@ package body Pp.Actions is
                      Parent : constant Ada_Tree := Parent_Tree;
                   begin
                      if Partial_GNATPP then
-                        null; --  Insert_Blank_Line_Before := True;
+                        null;
                      else
                         if Parent.Kind in Ada_Ada_List then
                            if Subtree (Parent, 1) /= Tree then
-                              Insert_Blank_Line_Before := True;
+                              Insert_Blank_Line_Before :=
+                                not (Tree.Kind = Ada_Package_Decl
+                                     and then Arg (Cmd, Comments_Unchanged));
                            end if;
                         end if;
                      end if;
