@@ -29,7 +29,8 @@ with Interfaces; use type Interfaces.Unsigned_16;
 
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 
-with GNATCOLL.VFS; use GNATCOLL.VFS;
+with GNATCOLL.JSON;     use GNATCOLL.JSON;
+with GNATCOLL.VFS;      use GNATCOLL.VFS;
 with GNATCOLL.Projects; use GNATCOLL.Projects;
 with GNATCOLL.Traces;
 
@@ -1012,8 +1013,10 @@ package body Test.Actions is
               (Test.Common.TGen_Libgen_Ctx, TGen.Libgen.All_Parts);
          end if;
          Test.Harness.Generate_Makefile (Src_Prj);
+         Test.Harness.Generate_Config;
          Test.Common.Generate_Common_File;
          Test.Mapping.Generate_Mapping_File;
+
       end if;
 
       if Test.Common.Strict_Execution

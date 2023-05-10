@@ -21,6 +21,7 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
+with GNATCOLL.JSON;
 with GNATCOLL.VFS;                use GNATCOLL.VFS;
 with GNATCOLL.Traces;             use GNATCOLL.Traces;
 with GNATCOLL.Projects;           use GNATCOLL.Projects;
@@ -4255,6 +4256,22 @@ package body Test.Harness is
       Close_File;
 
    end Generate_Makefile;
+
+   ---------------------
+   -- Generate_Config --
+   ---------------------
+
+   procedure Generate_Config
+   is
+      use GNATCOLL.JSON;
+      Config : constant JSON_Value := Create_Object;
+   begin
+      Create (Harness_Dir.all & ".gnattest-config.json");
+      Config.Set_Field ("dump_test_inputs", Test.Common.Instrument);
+      S_Put (0, Config.Write);
+      Put_New_Line;
+      Close_File;
+   end Generate_Config;
 
    --------------------
    -- Process_Source --

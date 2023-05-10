@@ -195,6 +195,10 @@ package Test.Harness is
    procedure Generate_Makefile (Source_Prj : String);
    --  Generate Makefile with relevant coverage targets
 
+   procedure Generate_Config;
+   --  Generate the configuration file (in the harness directory) for the
+   --  current gnattest run.
+
    procedure Test_Runner_Generator (Source_Prj : String);
    --  Generates Main_Suite and Test_Runner
 

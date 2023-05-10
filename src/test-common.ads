@@ -324,7 +324,7 @@ package Test.Common is
    Has_Test_Cases : Boolean := False;
 
    Separate_Drivers : Boolean := False;
-   --  When true, multiple test drivers willbe generated
+   --  When true, multiple test drivers will be generated
 
    Additional_Tests_Prj : GNAT.OS_Lib.String_Access := null;
 
