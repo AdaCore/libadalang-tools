@@ -404,7 +404,7 @@ package Test.Common is
    --  Root package name for common generated files
 
    Subp_UT_Counter : Natural := 0;
-   --  Total ammount of processed subprograms
+   --  Total amount of processed subprograms
 
    Text_IO_Present : Boolean := False;
    --  Whether runtime has Ada.Text_IO
