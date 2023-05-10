@@ -34,6 +34,12 @@ package TGen.Dependency_Graph is
       "="          => Typ_Sets."=");
    subtype Typ_Map is Typ_Maps.Map;
 
+   function Type_Dependencies
+     (T : SP.Ref; Transitive : Boolean := False) return Typ_Set;
+   --  Return all the types that T needs to have visibility on (i.e. index/
+   --  component / discriminant types). If transitive is True, this returns
+   --  the transitive closure of types on which self depends.
+
    type Graph_Type is record
       Nodes : Typ_Set;
       Succ, Pred : Typ_Map;
@@ -49,5 +55,8 @@ package TGen.Dependency_Graph is
       Callback : access procedure (N : SP.Ref));
    --  Traverse the graph in the topological order and call callback on every
    --  node.
+
+   function Sort (Types : Typ_Sets.Set) return Typ_List;
+   --  Sort the types in their dependency order
 
 end TGen.Dependency_Graph;
