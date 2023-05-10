@@ -3930,6 +3930,23 @@ package body Test.Harness is
          ASCII.HT
          & "$(GPRBUILD) $(BUILDERFLAGS) -P$< $(GPRFLAGS) -gargs -j$(NUMPROC)");
       Put_New_Line;
+
+      if Test.Common.Instrument then
+         Put_New_Line;
+         S_Put (0, "%-build-inst: %.gpr");
+         Put_New_Line;
+         S_Put
+           (0,
+            ASCII.HT
+            & "$(GPRBUILD) $(BUILDERFLAGS) -P$< $(GPRFLAGS) "
+            & " --src-subdirs=gnattest-instr"
+            & " --implicit-with="
+            & "tgen_support" & GNAT.OS_Lib.Directory_Separator
+            & "tgen_support.gpr"
+            & " -gargs -j$(NUMPROC)");
+         Put_New_Line;
+      end if;
+
       Put_New_Line;
 
       --  In most cases, the difference between a native coverage analysis and
