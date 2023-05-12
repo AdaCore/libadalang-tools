@@ -69,8 +69,7 @@ package body TGen.JSON.Unparse is
       type Nat_Array is array (Natural range <>) of Natural;
 
       function Pp_Arr
-        (Arr           : JSON_Array;
-         Current_Index : in out Positive;
+        (Current_Index : in out Positive;
          Sizes         : Nat_Array) return Unbounded_String;
       --  Unflatten the generated array
 
@@ -79,63 +78,58 @@ package body TGen.JSON.Unparse is
       ------------
 
       function Pp_Arr
-        (Arr           : JSON_Array;
-         Current_Index : in out Positive;
+        (Current_Index : in out Positive;
          Sizes         : Nat_Array) return Unbounded_String
       is
-         Unparsed_Value : Unbounded_String;
+         Unparsed_Value   : Unbounded_String;
+         Current_Arr_Size : constant Natural := Sizes (Sizes'First);
       begin
          Append (Unparsed_Value, "(");
-         for I in 1 .. Sizes'First loop
 
-            --  We have reached the last index type: add component values
-            --  to the resulting array. Encode on the fly to avoid a
-            --  redundant traversal of the array.
+         --  Special cases for array of size 0 and array of size 1
+
+         if Current_Arr_Size = 0 then
+
+            --  Print an empty aggregate
+
+            Append (Unparsed_Value, "others => <>");
+
+         elsif Current_Arr_Size = 1 then
+
+            --  Print an aggregate with the others keyword as we can't
+            --  have an array declared e.g. (1) but (others => 1), or
+            --  (<index> => 1) is allowed. As we don't have the index
+            --  here, pick the former.
+
+            Append (Unparsed_Value, "others => ");
+         end if;
+
+         for I in 1 .. Current_Arr_Size loop
+
+            --  We have reached the last index type: unparse the component
+            --  value
 
             if Sizes'Length = 1 then
+               --  An array component can't be of an unconstrained type.
 
-               if Length (Arr) = 0 then
-
-                  --  Print an empty aggregate
-
-                  Append (Unparsed_Value, "others => <>");
-
-               elsif Length (Arr) = 1 then
-
-                  --  Print an aggregate with the others keyword as we can't
-                  --  have an array declared e.g. (1) but (others => 1), or
-                  --  (<index> => 1) is allowed. As we don't have the index
-                  --  here, pick the former.
-
-                  Append (Unparsed_Value, "others => ");
-                  Append (Unparsed_Value,
-                          UTF8_String'(Unparse (Get (Val, 1)).Get ("value")));
-               else
-                  for Elem of Val loop
-                     --  An array component can't be of an unconstrained type.
-
-                     Append
-                       (Unparsed_Value,
-                        UTF8_String'(Unparse (Elem).Get ("value")));
-                     Append (Unparsed_Value, ", ");
-                  end loop;
-                  Trim (Unparsed_Value, Right);
-                  Trim (Unparsed_Value, Null_Set, To_Set (','));
-               end if;
-
+               Append
+                 (Unparsed_Value,
+                  UTF8_String'
+                    (Unparse (Get (Val, Current_Index)).Get ("value")));
                Current_Index := @ + 1;
-
             else
-                  --  Otherwise, generate the nested array recursively
+               --  Otherwise, generate the nested array recursively
 
-                  Append
-                    (Unparsed_Value,
-                     Pp_Arr
-                       (Arr,
-                        Current_Index,
-                        Sizes (Sizes'First + 1 .. Sizes'Last)));
+               Append
+                 (Unparsed_Value,
+                  Pp_Arr
+                    (Current_Index,
+                     Sizes (Sizes'First + 1 .. Sizes'Last)));
             end if;
+            Append (Unparsed_Value, ", ");
          end loop;
+         Trim (Unparsed_Value, Right);
+         Trim (Unparsed_Value, Null_Set, To_Set (','));
          Append (Unparsed_Value, ")");
          return Unparsed_Value;
       end Pp_Arr;
@@ -150,7 +144,7 @@ package body TGen.JSON.Unparse is
          Sizes_Arr (I) := Natural'Value (Get (Array_Element (Sizes, I)));
       end loop;
 
-      return Pp_Arr (Val, Dummy_Index, Sizes_Arr);
+      return Pp_Arr (Dummy_Index, Sizes_Arr);
    end Unparse_Array;
 
    ---------------------------------

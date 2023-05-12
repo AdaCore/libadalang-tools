@@ -369,8 +369,7 @@ package body TGen.Types.Array_Types is
      (Self                   : Array_Typ'Class;
       Disc_Context           : Disc_Value_Map;
       Generate_Element_Strat : in out Strategy_Type'Class;
-      Generate_Index_Strat   : in out Index_Strategy_Array)
-      return JSON_Value
+      Generate_Index_Strat   : in out Index_Strategy_Array) return JSON_Value
    is
       pragma Warnings (Off);
       function Generate_Component_Wrapper
@@ -452,7 +451,8 @@ package body TGen.Types.Array_Types is
             Append
               (Sizes_JSON,
                Create
-                 (To_String (Index_Value.High_Bound - Index_Value.Low_Bound)));
+                 (To_String
+                      (Index_Value.High_Bound - Index_Value.Low_Bound + 1)));
          end loop;
          Set_Field (Result, "sizes", Sizes_JSON);
       end;
