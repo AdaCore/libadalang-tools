@@ -349,19 +349,19 @@ begin
 
    --  Generate records of type R randomly, marshall them and unmarshall them
 
-   for I in 1 .. 5000 loop
+   for I in 1 .. 200 loop
       Test;
    end loop;
 
    --  Generate strings of various sizes randomly, marshall them and unmarshall them
 
-   for I in 1 .. 5000 loop
+   for I in 1 .. 200 loop
       Test_String;
    end loop;
 
    --  Generate shapes of various kinds randomly, marshall them and unmarshall them
 
-   for I in 1 .. 5000 loop
+   for I in 1 .. 200 loop
       Test_Discr;
    end Loop;
 

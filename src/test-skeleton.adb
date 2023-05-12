@@ -44,7 +44,6 @@ with Ada.Exceptions;
 with Ada.Strings; use Ada.Strings;
 with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 
-with GNATCOLL.JSON; use GNATCOLL.JSON;
 with GNATCOLL.Traces; use GNATCOLL.Traces;
 with GNATCOLL.VFS; use GNATCOLL.VFS;
 with Langkit_Support.Slocs; use Langkit_Support.Slocs;
@@ -65,8 +64,11 @@ with Utils.Environment;
 with Utils_Debug; use Utils_Debug;
 
 with TGen.LAL_Utils;
-with TGen.Libgen;
 with TGen.Gen_Strategies;
+with TGen.JSON;        use TGen.JSON;
+with TGen.JSON.Unparse;
+with TGen.Libgen;
+with TGen.Marshalling; use TGen.Marshalling;
 with TGen.Strings;
 
 package body Test.Skeleton is
@@ -6851,9 +6853,6 @@ package body Test.Skeleton is
       --  Output a call to subp with the values in Single_Vec, indented by
       --  Initial_Pad amount.
 
-      function Dot_To_Undescore (C : Character) return Character is
-        (if C = '.' then '_' else C);
-
       function Escape (Input_String : String) return String;
       --  Escape every double quote inside Input_String
 
@@ -7077,16 +7076,51 @@ package body Test.Skeleton is
                end if;
 
                for Param of Single_Vec loop
-                  Put_Line
-                    (Body_F,
-                     Com & "   Param_" & Param.Get ("name") & " : "
-                     & Param.Get ("type_name")
-                     & ":= " & "TGen_Marshalling_"
-                     & Translate
-                         (Param.Get ("type_name"),
-                          Dot_To_Undescore'Unrestricted_Access)
-                     & "_Input (TGen.JSON.Read("""
-                     & Escape (Param.Get ("value").Write) & """));");
+                  if Test.Common.Unparse_Test_Vectors then
+
+                     --  If the user requested unparsing the tests, generate
+                     --  a single declaration holding the _unparsed_ parameter
+                     --  value.
+
+                     declare
+                        Unparsed_JSON : constant JSON_Value :=
+                          TGen.JSON.Unparse.Unparse
+                            (Param.Get ("value"));
+                        Constraints   : Unbounded_String;
+                        Value         : Unbounded_String;
+                     begin
+                        if Has_Field (Unparsed_JSON, "constraints") then
+                           Constraints := Get (Unparsed_JSON, "constraints");
+                        end if;
+                        Value := Get (Unparsed_JSON, "value");
+
+                        Put_Line
+                          (Body_F,
+                           Com & "   Param_" & Param.Get ("name") & " : "
+                           & Param.Get ("type_name") & " "
+                           & (+Constraints)
+                           &  " := " & (+Value) & ";");
+                     end;
+                  else
+                     --  If unparsing was not requested, generate a call to
+                     --  the right JSON marshaller after having read the JSON
+                     --  value, which needs to be escaped.
+
+                     declare
+                        Value : constant Unbounded_String :=
+                          +Input_Fname_For_Typ
+                          (To_Qualified_Name (Param.Get ("type_name")))
+                          & " (TGen.JSON.Read ("
+                          & """" & Escape (Param.Get ("value").Write) & """"
+                          & "))";
+                     begin
+                        Put_Line
+                          (Body_F,
+                           Com & "   Param_" & Param.Get ("name") & " : "
+                           & Param.Get ("type_name")
+                           & ":= " & (+Value) & ";");
+                     end;
+                  end if;
                end loop;
                Put_Line (Body_F, Com & "begin");
                if Is_Function then

@@ -423,7 +423,7 @@ package body TGen.Marshalling_Lib is
       -----------
 
       procedure Write
-        (JSON   : out TGen.JSON.JSON_Value;
+        (JSON   : in out TGen.JSON.JSON_Value;
          V      : T;
          First  : T := T'First;
          Last   : T := T'Last)
@@ -535,8 +535,9 @@ package body TGen.Marshalling_Lib is
       -- Write --
       -----------
 
+      pragma Warnings (Off, "formal parameter * is read but never assigned");
       procedure Write
-        (JSON   : out TGen.JSON.JSON_Value;
+        (JSON   : in out TGen.JSON.JSON_Value;
          V      : T;
          First  : T := T'First;
          Last   : T := T'Last)
@@ -545,8 +546,10 @@ package body TGen.Marshalling_Lib is
          V_Big_Real : constant TGen.Big_Reals.Big_Real :=
            T_Conversions.To_Big_Real (V);
       begin
-         JSON := Create (To_Quotient_String (V_Big_Real));
+         Set_Field (JSON, "quotient", True);
+         Set_Field (JSON, "value", To_Quotient_String (V_Big_Real));
       end Write;
+      pragma Warnings (On, "formal parameter * is read but never assigned");
 
       ----------
       -- Read --
@@ -563,7 +566,7 @@ package body TGen.Marshalling_Lib is
          --  Decode the big real from the string encoded as a quotient string
 
          V := T_Conversions.From_Big_Real
-           (Big_Reals.From_Quotient_String (Get (JSON)));
+           (Big_Reals.From_Quotient_String (Get (JSON, "value")));
       end Read;
 
    end Read_Write_Decimal_Fixed_JSON;
@@ -654,8 +657,9 @@ package body TGen.Marshalling_Lib is
       -- Write --
       -----------
 
+      pragma Warnings (Off, "formal parameter * is read but never assigned");
       procedure Write
-        (JSON   : out TGen.JSON.JSON_Value;
+        (JSON   : in out TGen.JSON.JSON_Value;
          V      : T;
          First  : T := T'First;
          Last   : T := T'Last)
@@ -664,8 +668,10 @@ package body TGen.Marshalling_Lib is
          V_Big_Real : constant TGen.Big_Reals.Big_Real :=
            T_Conversions.To_Big_Real (V);
       begin
-         JSON := Create (To_Quotient_String (V_Big_Real));
+         Set_Field (JSON, "quotient", True);
+         Set_Field (JSON, "value", To_Quotient_String (V_Big_Real));
       end Write;
+      pragma Warnings (On, "formal parameter * is read but never assigned");
 
       ----------
       -- Read --
@@ -682,7 +688,7 @@ package body TGen.Marshalling_Lib is
          --  Decode the big real from the string encoded as a quotient string
 
          V := T_Conversions.From_Big_Real
-           (Big_Reals.From_Quotient_String (Get (JSON)));
+           (Big_Reals.From_Quotient_String (Get (JSON, "value")));
       end Read;
 
    end Read_Write_Ordinary_Fixed_JSON;
@@ -1133,8 +1139,9 @@ package body TGen.Marshalling_Lib is
       -- Write --
       -----------
 
+      pragma Warnings (Off, "formal parameter * is read but never assigned");
       procedure Write
-        (JSON   : out TGen.JSON.JSON_Value;
+        (JSON   : in out TGen.JSON.JSON_Value;
          V      : T;
          First  : T := T'First;
          Last   : T := T'Last)
@@ -1143,8 +1150,10 @@ package body TGen.Marshalling_Lib is
          V_Big_Real : constant TGen.Big_Reals.Big_Real :=
            T_Conversions.To_Big_Real (V);
       begin
-         JSON := Create (To_Quotient_String (V_Big_Real));
+         Set_Field (JSON, "quotient", True);
+         Set_Field (JSON, "value", To_Quotient_String (V_Big_Real));
       end Write;
+      pragma Warnings (On, "formal parameter * is read but never assigned");
 
       ----------
       -- Read --
@@ -1161,7 +1170,7 @@ package body TGen.Marshalling_Lib is
          --  Decode the big real from the string encoded as a quotient string
 
          V := T_Conversions.From_Big_Real
-           (Big_Reals.From_Quotient_String (Get (JSON)));
+           (Big_Reals.From_Quotient_String (Get (JSON, "value")));
       end Read;
 
    end Read_Write_Float_JSON;

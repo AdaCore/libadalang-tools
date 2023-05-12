@@ -619,7 +619,7 @@ package body TGen.Libgen is
 
          Append_Types
            (Subp_Types,
-            Ctx.Types_Per_Package,
+            Ctx.Strat_Types_Per_Package,
             Value_Library_Package'Access);
          return True;
       end;

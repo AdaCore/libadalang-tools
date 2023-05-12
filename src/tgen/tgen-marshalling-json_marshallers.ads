@@ -49,6 +49,10 @@ package TGen.Marshalling.JSON_Marshallers is
    --  generated before, as we need the header type (for unconstrained type)
    --  that they generate. This should be splitted from the generation of
    --  binary marshallers.
+   --
+   --  TODO???: we produce a JSON with metadata to actually be able to unparse
+   --  an Ada literal value from it. This should be configured through a
+   --  parameter passed to the marshallers as it makes the JSON bigger.
 
    procedure Generate_TC_Serializers_For_Subp
      (F_Spec, F_Body     : File_Type;

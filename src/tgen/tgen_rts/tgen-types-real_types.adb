@@ -59,16 +59,6 @@ package body TGen.Types.Real_Types is
                  else "")
          else " (non static)"));
 
-   function Low_Bound_Or_Default (Self : Float_Typ) return Big_Real is
-     (if Self.Has_Range and then Big_Reals.Is_Valid (Self.Range_Value.Min)
-      then Self.Range_Value.Min
-      else LF_Conversions.To_Big_Real (Long_Float'First));
-
-   function High_Bound_Or_Default (Self : Float_Typ) return Big_Real is
-     (if Self.Has_Range and then Big_Reals.Is_Valid (Self.Range_Value.Max)
-      then Self.Range_Value.Max
-      else LF_Conversions.To_Big_Real (Long_Float'Last));
-
    function Low_Bound_Or_Default (Self : Ordinary_Fixed_Typ) return Big_Real
    is (Self.Range_Value.Min);
 
@@ -111,19 +101,30 @@ package body TGen.Types.Real_Types is
 
    function Generate_Float_Typ (Ty : Typ'Class) return JSON_Value
    is
-      Self : constant Float_Typ := Float_Typ (Ty);
+      Result : constant JSON_Value := Create_Object;
+      Self   : constant Float_Typ := Float_Typ (Ty);
 
-      LB : constant Big_Real := Self.Low_Bound_Or_Default;
+      LB : constant Any_Float :=
+        (if Self.Has_Range
+         then Create (Self.Digits_Value, Self.Range_Value.Min)
+         else First (Self.Digits_Value));
+      HB : constant Any_Float :=
+        (if Self.Has_Range
+         then Create (Self.Digits_Value, Self.Range_Value.Max)
+         else Last (Self.Digits_Value));
 
-      HB : constant Big_Real := Self.High_Bound_Or_Default;
-
-      subtype T is Long_Float
-      range LF_Conversions.From_Big_Real (LB)
-        .. LF_Conversions.From_Big_Real (HB);
-
-      function Rand is new Gen (T);
    begin
-      return Create (To_Quotient_String (LF_Conversions.To_Big_Real (Rand)));
+      Set_Field (Result, "quotient", True);
+
+      --  We generate floats uniformly over the representation, and not
+      --  over the real range.
+
+      Set_Field
+        (Result,
+         "value",
+         To_Quotient_String (Value (TGen.Random.Random (LB, HB))));
+
+      return Result;
    end Generate_Float_Typ;
 
    ----------------------
@@ -131,14 +132,10 @@ package body TGen.Types.Real_Types is
    ----------------------
 
    function Default_Strategy
-     (Self    : Float_Typ) return Strategy_Type'Class
+     (Self : Float_Typ) return Strategy_Type'Class
    is
-      --  TODO: use Long_Long_Long_Integer (as it is the biggest possible type
-      --  for which ranges can be defined), and add support to it in
-      --  GNATCOLL.JSON.
-
       Type_Ref : SP.Ref;
-      Strat : Basic_Strategy_Type;
+      Strat    : Basic_Strategy_Type;
    begin
       SP.From_Element (Type_Ref, Self'Unrestricted_Access);
       Strat.T := Type_Ref;
@@ -160,8 +157,8 @@ package body TGen.Types.Real_Types is
      (Ty : Typ'Class) return JSON_Value
    is
       use LLLI_Conversions;
-
-      Self : constant Ordinary_Fixed_Typ := Ordinary_Fixed_Typ (Ty);
+      Result : constant JSON_Value := Create_Object;
+      Self   : constant Ordinary_Fixed_Typ := Ordinary_Fixed_Typ (Ty);
 
       --  Translate the fixed type to the integer type
 
@@ -189,11 +186,15 @@ package body TGen.Types.Real_Types is
            LLLI_Conversions.To_Big_Integer
              (Rand_LLLI (Low_Bound_Int, High_Bound_Int));
       begin
-         --  Cast it back to a fixed point value
+         --  Cast it back to a fixed point value. TODO: represent exactly the
+         --  fixed point number.
 
-         return Create
-           (To_Quotient_String
-              (To_Big_Real (Rand_Val) * Self.Delta_Value));
+         Set_Field (Result, "quotient", True);
+         Set_Field (Result,
+                    "value",
+                    To_Quotient_String
+                      (To_Big_Real (Rand_Val) * Self.Delta_Value));
+         return Result;
       end;
    end Generate_Ordinary_Fixed_Typ;
 
@@ -205,7 +206,8 @@ package body TGen.Types.Real_Types is
      (Ty : Typ'Class) return JSON_Value
    is
       use LLLI_Conversions;
-      Self : constant Decimal_Fixed_Typ := Decimal_Fixed_Typ (Ty);
+      Result : constant JSON_Value := Create_Object;
+      Self   : constant Decimal_Fixed_Typ := Decimal_Fixed_Typ (Ty);
 
       --  TODO: Using High/Low_Bound_Or_Default ignores the digits value, which
       --  may not play nice with the digits value if it is too low. We may need
@@ -240,9 +242,12 @@ package body TGen.Types.Real_Types is
       begin
          --  Cast it back to a fixed point value
 
-         return Create
-           (To_Quotient_String
-              (To_Big_Real (Rand_Val) * Self.Delta_Value));
+         Set_Field (Result, "quotient", True);
+         Set_Field (Result,
+                    "value",
+                    To_Quotient_String
+                      (To_Big_Real (Rand_Val) * Self.Delta_Value));
+         return Result;
       end;
    end Generate_Decimal_Fixed_Typ;
 

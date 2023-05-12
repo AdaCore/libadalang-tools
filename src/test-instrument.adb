@@ -383,7 +383,7 @@ package body Test.Instrument is
                   S_Put
                     (Pad + 6,
                       "TGen.TGen_Support."
-                     & TGen.Marshalling.Output_Fname_For_Typ (Param_Typ)
+                     & TGen.Marshalling.Output_Fname_For_Typ (Param_Typ.Name)
                      & " (GNATTEST_S, "
                      & Node_Image (Name)
                      & ");");
@@ -395,7 +395,7 @@ package body Test.Instrument is
                     (Pad + 6,
                      To_Ada (Param_Typ.Package_Name)
                      & ".TGen_Support."
-                     & TGen.Marshalling.Output_Fname_For_Typ (Param_Typ)
+                     & TGen.Marshalling.Output_Fname_For_Typ (Param_Typ.Name)
                      & " (GNATTEST_S, "
                      & Node_Image (Name)
                      & ");");

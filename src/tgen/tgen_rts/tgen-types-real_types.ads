@@ -33,16 +33,6 @@ package TGen.Types.Real_Types is
 
    type Real_Typ is new Scalar_Typ with null record;
 
-   function Low_Bound_Or_Default (Self : Real_Typ) return Big_Real is
-     (LF_Conversions.To_Big_Real (Long_Float'First));
-   --  Return the low bound for Self if it has one explicitly defined, or
-   --  Long_Float'First otherwise.
-
-   function High_Bound_Or_Default (Self : Real_Typ) return Big_Real is
-     (LF_Conversions.To_Big_Real (Long_Float'Last));
-   --  Return the high bound for Self if it has one explicitly defined, or
-   --  Long_Float'Last otherwise.
-
    type Float_Typ (Is_Static, Has_Range : Boolean) is new
      Real_Typ (Is_Static => Is_Static) with record
       case Is_Static is
@@ -62,16 +52,6 @@ package TGen.Types.Real_Types is
    function Supports_Static_Gen (Self : Float_Typ) return Boolean is
      (Self.Is_Static);
    --  Wether values for this Typ can be statically generated
-
-   function Low_Bound_Or_Default (Self : Float_Typ) return Big_Real
-   with Pre => Self.Is_Static;
-   --  Return the low bound for Self if it has one explicitly defined, or
-   --  Long_Float'First otherwise.
-
-   function High_Bound_Or_Default (Self : Float_Typ) return Big_Real
-   with Pre => Self.Is_Static;
-   --  Return the high bound for Self if it has one explicitly defined, or
-   --  Long_Float'Last otherwise.
 
    function Image (Self : Float_Typ) return String;
 

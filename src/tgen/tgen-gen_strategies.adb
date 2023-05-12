@@ -73,7 +73,6 @@ package body TGen.Gen_Strategies is
       for Package_Data of Context.Packages_Data loop
          null;
       end loop;
-      --  Generate_Type_Strategies (Context);
    end Generate_Artifacts;
 
    ----------------------------------

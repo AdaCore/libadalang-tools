@@ -96,16 +96,19 @@ package body TGen.Types.Record_Types is
      (Self : Nondiscriminated_Record_Typ; Val : JSON_Value) return JSON_Value
    is
       use Component_Maps;
+      Components : constant JSON_Value := Val.Get ("components");
    begin
       return Res : constant JSON_Value := Create_Object do
          for Cur in Self.Component_Types.Iterate loop
             declare
                Comp_Name : constant String := To_String (Key (Cur));
-               Comp_Val  : constant JSON_Value := Val.Get (Comp_Name);
+               Comp_Val  : constant JSON_Value := Components.Get (Comp_Name);
             begin
-               Res.Set_Field (Comp_Name, Element (Cur).Get.Encode (Comp_Val));
+               Components.Set_Field
+                 (Comp_Name, Element (Cur).Get.Encode (Comp_Val));
             end;
          end loop;
+         Res.Set_Field ("components", Components);
       end return;
    end Encode;
 
@@ -384,25 +387,36 @@ package body TGen.Types.Record_Types is
      (Self : Discriminated_Record_Typ; Val : JSON_Value) return JSON_Value
    is
       use Component_Maps;
-      Disc_Values : Disc_Value_Map;
-      Comp_Map    : Component_Map;
-      Res         : constant JSON_Value := Create_Object;
+      Disc_Values   : Disc_Value_Map;
+      Comp_Map      : Component_Map;
+      Discriminants : constant JSON_Value := Val.Get ("discriminants");
+      Components    : constant JSON_Value := Val.Get ("components");
+      Res           : constant JSON_Value := Create_Object;
    begin
+      --  Encode the discriminants
+
       for Cur in Self.Discriminant_Types.Iterate loop
          declare
-            Disc_Val : constant JSON_Value := Val.Get (To_String (Key (Cur)));
+            Disc_Val : constant JSON_Value :=
+              Discriminants.Get (To_String (Key (Cur)));
          begin
             Disc_Values.Insert (Key (Cur), Disc_Val);
-            Res.Set_Field
+            Discriminants.Set_Field
               (To_String (Key (Cur)), Element (Cur).Get.Encode (Disc_Val));
          end;
       end loop;
+      Res.Set_Field ("discriminants", Discriminants);
+
+      --  Encode the components
+
       Comp_Map := Self.Components (Disc_Values);
       for Cur in Comp_Map.Iterate loop
-         Res.Set_Field
+         Components.Set_Field
            (To_String (Key (Cur)),
-            Element (Cur).Get.Encode (Val.Get (To_String (Key (Cur)))));
+            Element (Cur).Get.Encode
+            (Components.Get (To_String (Key (Cur)))));
       end loop;
+      Res.Set_Field ("components", Components);
       return Res;
    end Encode;
 
@@ -682,10 +696,16 @@ package body TGen.Types.Record_Types is
 
    function Generate
      (S            : in out Nondisc_Record_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return JSON_Value is
+      Disc_Context : Disc_Value_Map) return JSON_Value
+   is
+      Result : constant JSON_Value := Create_Object;
    begin
-      return S.Generate
-        (As_Record_Typ (S.T), S.Component_Strats, Disc_Context);
+      --  Set the component values
+
+      Set_Field
+        (Result, "components",
+         S.Generate (As_Record_Typ (S.T), S.Component_Strats, Disc_Context));
+      return Result;
    end Generate;
 
    ----------------------
@@ -742,7 +762,8 @@ package body TGen.Types.Record_Types is
       --  This context holds the values for the discriminant of the record
       --  being generated.
 
-      Res : constant JSON_Value := Create_Object;
+      Discriminants : constant JSON_Value := Create_Object;
+      Result        : constant JSON_Value := Create_Object;
    begin
       --  Start of by filling the discriminant context
 
@@ -813,10 +834,11 @@ package body TGen.Types.Record_Types is
 
       for Disc_Cursor in Current_Context.Iterate loop
          Set_Field
-            (Val       => Res,
+           (Val        => Discriminants,
             Field_Name => +Key (Disc_Cursor),
             Field      => Element (Disc_Cursor));
       end loop;
+      Set_Field (Result, "discriminants", Discriminants);
 
       --  Now, generate values for the components
 
@@ -828,24 +850,12 @@ package body TGen.Types.Record_Types is
              Last_Comp_Unit_Idx => Disc_Record.Last_Comp_Unit_Idx,
             Component_Types     => Components,
             Static_Gen          => Disc_Record.Static_Gen);
-
-         procedure Add_To_Res (Name : UTF8_String; Value : JSON_Value);
-
-         ----------------
-         -- Add_To_Res --
-         ----------------
-
-         procedure Add_To_Res (Name : UTF8_String; Value : JSON_Value) is
-         begin
-            Set_Field (Val => Res, Field_Name => Name, Field => Value);
-         end Add_To_Res;
-
       begin
-         Map_JSON_Object
-           (Val => S.Generate (R, S.Component_Strats, Current_Context),
-            CB  => Add_To_Res'Access);
+         Set_Field
+           (Result, "components",
+            S.Generate (R, S.Component_Strats, Current_Context));
       end;
-      return Res;
+      return Result;
    end Generate;
 
    ----------------------

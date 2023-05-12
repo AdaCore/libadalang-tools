@@ -27,7 +27,6 @@ with Ada.Strings;                  use Ada.Strings;
 with Ada.Strings.Fixed;            use Ada.Strings.Fixed;
 with Ada.Text_IO;                  use Ada.Text_IO;
 
-with TGen.Strings;                 use TGen.Strings;
 with TGen.Types.Array_Types;       use TGen.Types.Array_Types;
 with TGen.Types.Discrete_Types;    use TGen.Types.Discrete_Types;
 with TGen.Types.Enum_Types;        use TGen.Types.Enum_Types;
@@ -725,7 +724,8 @@ package body TGen.Marshalling is
                  Discriminated_Record_Typ'Class (Typ);
 
             begin
-               --  Generate base functions for the discriminant types
+               --  Generate base functions for the discriminant types.
+               --  TODO???: why is this commented out?
 
                --  for Cu in D_Typ.Discriminant_Types.Iterate loop
                --     Generate_Base_Functions_For_Typ
@@ -1084,40 +1084,19 @@ package body TGen.Marshalling is
    -- Output_Fname_For_Typ --
    --------------------------
 
-   function Output_Fname_For_Typ (Typ : TGen.Types.Typ'Class) return String
+   function Output_Fname_For_Typ (Typ_FQN : Ada_Qualified_Name) return String
    is
    begin
-      return Prefix_For_Typ (Typ.Slug) & "_Output";
+      return Prefix_For_Typ (To_Symbol (Typ_FQN, '_')) & "_Output";
    end Output_Fname_For_Typ;
 
    -------------------------
    -- Input_Fname_For_Typ --
    -------------------------
 
-   function Input_Fname_For_Typ (Typ : TGen.Types.Typ'Class) return String is
+   function Input_Fname_For_Typ (Typ_FQN : Ada_Qualified_Name) return String is
    begin
-      return Prefix_For_Typ (Typ.Slug) & "_Input";
+      return Prefix_For_Typ (To_Symbol (Typ_FQN, '_')) & "_Input";
    end Input_Fname_For_Typ;
-
-   ---------------------------------
-   -- Output_Header_Fname_For_Typ --
-   ---------------------------------
-
-   function Output_Header_Fname_For_Typ
-     (Typ : TGen.Types.Typ'Class) return String
-   is
-   begin
-      return Prefix_For_Typ (Typ.Slug) & "Output_Header";
-   end Output_Header_Fname_For_Typ;
-
-   --------------------------------
-   -- Input_Header_Fname_For_Typ --
-   --------------------------------
-
-   function Input_Header_Fname_For_Typ
-     (Typ : TGen.Types.Typ'Class) return String is
-   begin
-      return Prefix_For_Typ (Typ.Slug) & "_Input_Header";
-   end Input_Header_Fname_For_Typ;
 
 end TGen.Marshalling;

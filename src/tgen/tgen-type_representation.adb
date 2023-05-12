@@ -259,10 +259,12 @@ package body TGen.Type_Representation is
                   Constraint_Kind_LB, Constraint_Kind_UB : Unbounded_String;
                   Value_LB, Value_UB : Unbounded_String;
                begin
-                  Collect_Info_For_Discrete_Range_Constraint
-                    (Index.Discrete_Range,
-                     Constraint_Kind_LB, Value_LB,
-                     Constraint_Kind_UB, Value_UB);
+                  if Index.Present then
+                     Collect_Info_For_Discrete_Range_Constraint
+                       (Index.Discrete_Range,
+                        Constraint_Kind_LB, Value_LB,
+                        Constraint_Kind_UB, Value_UB);
+                  end if;
                   Constraint_Kind_LBs :=
                     Constraint_Kind_LBs & Constraint_Kind_LB;
                   Constraint_Kind_UBs :=
@@ -916,7 +918,7 @@ package body TGen.Type_Representation is
 
                   To_JSON_Fname : constant String :=
                     TGen.Marshalling.Output_Fname_For_Typ
-                      (Instance_Typ'Class (Typ).Orig_Typ.Get);
+                      (Instance_Typ'Class (Typ).Orig_Typ.Get.Name);
                begin
                   Insert
                     (Assocs,
