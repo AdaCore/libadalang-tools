@@ -114,7 +114,7 @@ package Pp.Command_Lines is
      (Attribute_Mixed_Case, Attribute_Lower_Case, Attribute_Upper_Case);
 
    package Attribute_Casing_Switches is new Enum_Switches (Descriptor,
-      Attribute_Casing);
+                                                           Attribute_Casing);
 
    package Attribute_Casing_Shorthands is new Attribute_Casing_Switches
      .Set_Shorthands
@@ -124,7 +124,7 @@ package Pp.Command_Lines is
    type Keyword_Casing is (Keyword_Lower_Case, Keyword_Upper_Case);
 
    package Keyword_Casing_Switches is new Enum_Switches (Descriptor,
-      Keyword_Casing);
+                                                         Keyword_Casing);
 
    package Keyword_Casing_Shorthands is new Keyword_Casing_Switches
      .Set_Shorthands
@@ -165,7 +165,7 @@ package Pp.Command_Lines is
       Number_Mixed_Case);
 
    package Number_Casing_Switches is new Enum_Switches (Descriptor,
-      Number_Casing);
+                                                        Number_Casing);
 
    package Number_Casing_Shorthands is new Number_Casing_Switches
      .Set_Shorthands
@@ -176,7 +176,7 @@ package Pp.Command_Lines is
      (Pragma_Mixed_Case, Pragma_Lower_Case, Pragma_Upper_Case);
 
    package Pragma_Casing_Switches is new Enum_Switches (Descriptor,
-      Pragma_Casing);
+                                                        Pragma_Casing);
 
    package Pragma_Casing_Shorthands is new Pragma_Casing_Switches
      .Set_Shorthands
@@ -197,7 +197,7 @@ package Pp.Command_Lines is
    --  (such as changing "end;" to "end X;"). Neither of these work yet.
 
    package Pp_Boolean_Switches is new Boolean_Switches (Descriptor,
-      Pp_Booleans);
+                                                        Pp_Booleans);
 
    package Pp_Boolean_Shorthands is new Pp_Boolean_Switches.Set_Shorthands
      ((Align_Modes                => null, End_Id => null, Separate_Is => null,
@@ -249,7 +249,7 @@ package Pp.Command_Lines is
    type Pp_String_Seqs is (Dictionary);
 
    package Pp_String_Seq_Switches is new String_Seq_Switches (Descriptor,
-      Pp_String_Seqs);
+                                                              Pp_String_Seqs);
 
    package Pp_String_Seq_Syntax is new Pp_String_Seq_Switches.Set_Syntax
      ((Dictionary => ':'));
@@ -268,7 +268,7 @@ package Pp.Command_Lines is
       Case_Threshold); -- Not documented
 
    package Pp_Nat_Switches is new Other_Switches (Descriptor, Pp_Nats, Natural,
-      Natural'Image, Natural'Value);
+                                                  Natural'Image, Natural'Value);
 
    package Pp_Nat_Syntax is new Pp_Nat_Switches.Set_Syntax
      ((Max_Line_Length => '!', Indentation => '!', Indent_Continuation => '!',

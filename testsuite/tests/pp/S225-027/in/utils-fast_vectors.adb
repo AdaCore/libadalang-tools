@@ -33,7 +33,7 @@ package body Utils.Fast_Vectors is
    pragma Suppress (All_Checks);
 
    procedure Free is new Ada.Unchecked_Deallocation (Elements_Type,
-      Elements_Access);
+                                                     Elements_Access);
 
    type Iterator is new Vector_Iterator_Interfaces.Reversible_Iterator with
    record
@@ -204,7 +204,7 @@ package body Utils.Fast_Vectors is
 
    function Elems_Var (Container : Vector) return Big_Ptr_Var is
       function Cast is new Ada.Unchecked_Conversion (System.Address,
-         Big_Ptr_Var);
+                                                     Big_Ptr_Var);
    begin
       return Cast (Container.Elements.EA'Address);
    end Elems_Var;
@@ -367,9 +367,9 @@ package body Utils.Fast_Vectors is
       ----------
 
       procedure Sort (Container : in out Vector) is
-         procedure Sort is new Generic_Array_Sort (Index_Type => Index_Type,
-            Element_Type => Element_Type, Array_Type => Elements_Array,
-            "<"                                               => "<");
+         procedure Sort is new Generic_Array_Sort (Index_Type   => Index_Type,
+                                                   Element_Type => Element_Type, Array_Type => Elements_Array,
+                                                   "<"          => "<");
 
       begin
          if Container.Last <= Index_Type'First then

@@ -29,7 +29,7 @@ package Utils.Char_Vectors is
    subtype Char_Vector is Char_Vectors.Vector;
 
    package WChar_Vectors is new Vectors (Positive, Wide_Character,
-      Wide_String);
+                                         Wide_String);
    subtype WChar_Vector is WChar_Vectors.Vector;
 
    subtype Char_Subrange is Char_Vectors.Subrange;

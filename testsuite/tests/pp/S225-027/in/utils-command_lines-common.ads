@@ -12,7 +12,7 @@ package Utils.Command_Lines.Common is
       Process_RTL_Units);
 
    package Common_Flag_Switches is new Flag_Switches (Common_Descriptor,
-      Common_Flags);
+                                                      Common_Flags);
 
    package Common_Flag_Shorthands is new Common_Flag_Switches.Set_Shorthands
      (
@@ -38,7 +38,7 @@ package Utils.Command_Lines.Common is
    type Common_Booleans is (Syntax_Only);
 
    package Common_Boolean_Switches is new Boolean_Switches (Common_Descriptor,
-      Common_Booleans);
+                                                            Common_Booleans);
 
    package Common_Boolean_Defaults is new Common_Boolean_Switches.Set_Defaults
      ((Syntax_Only => False));
@@ -48,7 +48,7 @@ package Utils.Command_Lines.Common is
      ((Syntax_Only => +"-so"));
 
    package Ada_Version_Switches is new Enum_Switches (Common_Descriptor,
-      Opt_Ada_Version_Type, Default => No_Ada_Version);
+                                                      Opt_Ada_Version_Type, Default => No_Ada_Version);
 
    package Ada_Version_Shorthands is new Ada_Version_Switches.Set_Shorthands
      ((Ada_83   => +"-gnat83", Ada_95 => +"-gnat95", Ada_2005 => +"-gnat2005",
@@ -73,7 +73,7 @@ package Utils.Command_Lines.Common is
       );
 
    package Common_String_Switches is new String_Switches (Common_Descriptor,
-      Common_Strings);
+                                                          Common_Strings);
 
    package Common_String_Syntax is new Common_String_Switches.Set_Syntax
      ((Project_File               => ':', Run_Time_System => '=',
@@ -125,7 +125,7 @@ package Utils.Command_Lines.Common is
    --  ??? -j is ignored.
    type Common_Nats is (Jobs);
    package Common_Nat_Switches is new Other_Switches (Common_Descriptor,
-      Common_Nats, Natural, Natural'Image, Natural'Value);
+                                                      Common_Nats, Natural, Natural'Image, Natural'Value);
    package Common_Nat_Syntax is new Common_Nat_Switches.Set_Syntax
      ((Jobs => '!'));
    package Common_Nat_Defaults is new Common_Nat_Switches.Set_Defaults

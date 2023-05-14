@@ -137,18 +137,18 @@ package Utils.Command_Lines is
      (GNAT.OS_Lib."/=" (X, null));
 
    package String_Ref_Vectors is new Utils.Vectors (Positive, String_Ref,
-      String_Ref_Array);
+                                                    String_Ref_Array);
    use String_Ref_Vectors;
    subtype String_Ref_Vector is String_Ref_Vectors.Vector;
 
    function Hash_String is new GNAT.String_Hash.Hash (Character, String,
-      Hash_Type);
+                                                      Hash_Type);
    function Hash_String_Ref (X : String_Ref) return Hash_Type is
      (Hash_String (X.all));
    function String_Eq (X, Y : String_Ref) return Boolean is (X.all = Y.all);
 
    package String_Ref_Sets is new Ada.Containers.Hashed_Sets (String_Ref,
-      Hash_String_Ref, String_Eq, String_Eq);
+                                                              Hash_String_Ref, String_Eq, String_Eq);
    subtype String_Ref_Set is String_Ref_Sets.Set;
 
    --  ???For each _Switches generic, specify:
@@ -457,7 +457,7 @@ package Utils.Command_Lines is
    ----------------------------------------------------------------
 
    package String_Access_Vectors is new Utils.Vectors (Positive,
-      GNAT.OS_Lib.String_Access, GNAT.OS_Lib.String_List);
+                                                       GNAT.OS_Lib.String_Access, GNAT.OS_Lib.String_List);
    use String_Access_Vectors;
    subtype String_Access_Vector is String_Access_Vectors.Vector;
 
@@ -655,7 +655,7 @@ private
      array (All_Switches range <>) of Switch_Descriptor;
 
    package Switch_Descriptor_Vectors is new Utils.Vectors (All_Switches,
-      Switch_Descriptor, Switch_Descriptor_Array);
+                                                           Switch_Descriptor, Switch_Descriptor_Array);
    use Switch_Descriptor_Vectors;
 
    type Command_Line_Descriptor is limited record

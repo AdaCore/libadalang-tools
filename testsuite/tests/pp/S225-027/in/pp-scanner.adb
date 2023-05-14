@@ -168,8 +168,8 @@ package body Pp.Scanner is
 
    function Sloc (X : Tokn_Cursor) return Source_Location is
    begin
-      return (Line => Sloc_Line (X), Col => Sloc_Col (X),
-         First     => Sloc_First (X), Last => Sloc_Last (X));
+      return (Line  => Sloc_Line (X), Col => Sloc_Col (X),
+              First => Sloc_First (X), Last => Sloc_Last (X));
    end Sloc;
 
    function Sloc_Line (X : Tokn_Cursor) return Positive is

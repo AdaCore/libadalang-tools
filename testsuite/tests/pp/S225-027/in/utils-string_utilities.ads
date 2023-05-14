@@ -171,7 +171,7 @@ package Utils.String_Utilities is
    --  Exception_Message.
 
    package String_Vectors is new Ada.Containers.Indefinite_Vectors (Positive,
-      String);
+                                                                    String);
    subtype String_Vector is String_Vectors.Vector;
 
    package String_Sets is new Ada.Containers.Indefinite_Ordered_Sets (String);

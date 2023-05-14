@@ -37,7 +37,7 @@ package body METRICS.Line_Counting is
    --  raise an exception if we find something wrong.
 
    package Cumulative_Counts_Vectors is new Utils.Vectors (Line_Num,
-      Cumulative_Counts, Cumulative_Counts_Array);
+                                                           Cumulative_Counts, Cumulative_Counts_Array);
 
    function Get_Cumulative_Counts
      (Unit : Analysis_Unit) return Cumulative_Counts_Array

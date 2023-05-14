@@ -21,7 +21,7 @@ package Utils.Var_Length_Ints is
    for Octet_Array'Component_Size use 8; -- needed if Octet is signed
 
    package Octet_Vectors is new Utils.Vectors (Octet_Index, Octet,
-      Octet_Array);
+                                               Octet_Array);
    subtype Octet_Vector is Octet_Vectors.Vector;
    use Octet_Vectors;
 

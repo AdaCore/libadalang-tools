@@ -41,7 +41,7 @@ private
    Empty_CU_Sym : constant CU_Symbol := Intern ("");
 
    package CU_Symbol_Sets is new Ada.Containers.Hashed_Sets (CU_Symbol,
-      Hash_Symbol, Equivalent_Elements => Case_Insensitive_Equal);
+                                                             Hash_Symbol, Equivalent_Elements => Case_Insensitive_Equal);
    use CU_Symbol_Sets;
 
    type Metrics_Values is array (Metrics_Enum) of Metric_Nat;
@@ -57,7 +57,7 @@ private
    type Metrix_Index is new Positive;
    type Metrix_Array is array (Metrix_Index range <>) of Metrix_Ref;
    package Metrix_Vectors is new Utils.Vectors (Metrix_Index, Metrix_Ref,
-      Metrix_Array);
+                                                Metrix_Array);
    use Metrix_Vectors;
 
    Null_Kind : constant Ada_Node_Kind_Type := Ada_Abort_Absent;

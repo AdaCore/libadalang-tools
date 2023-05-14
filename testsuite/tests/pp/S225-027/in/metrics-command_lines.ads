@@ -40,7 +40,7 @@ package METRICS.Command_Lines is
       Short_File_Names, Progress_Indicator_Mode);
 
    package Metrics_Flag_Switches is new Flag_Switches (Descriptor,
-      Metrics_Flags);
+                                                       Metrics_Flags);
 
    package Metrics_Flag_Shorthands is new Metrics_Flag_Switches.Set_Shorthands
      ((Test                  => null,
@@ -193,7 +193,7 @@ package METRICS.Command_Lines is
    --  Set of coupling metrics
 
    package Metrics_Boolean_Switches is new Boolean_Switches (Descriptor,
-      Metrics_Booleans);
+                                                             Metrics_Booleans);
 
    package Metrics_Boolean_Shorthands is new Metrics_Boolean_Switches
      .Set_Shorthands
@@ -232,7 +232,7 @@ package METRICS.Command_Lines is
    type Metrics_Strings is (Output_Suffix, Global_File_Name, Xml_File_Name);
 
    package Metrics_String_Switches is new String_Switches (Descriptor,
-      Metrics_Strings);
+                                                           Metrics_Strings);
 
    package Metrics_String_Syntax is new Metrics_String_Switches.Set_Syntax
      ((Output_Suffix => '=', Global_File_Name => '=', Xml_File_Name => '='));
@@ -245,7 +245,7 @@ package METRICS.Command_Lines is
    type Metrics_String_Seqs is (Gnatmetric_Debug);
 
    package Metrics_String_Seq_Switches is new String_Seq_Switches (Descriptor,
-      Metrics_String_Seqs);
+                                                                   Metrics_String_Seqs);
 
    package Metrics_String_Seq_Syntax is new Metrics_String_Seq_Switches
      .Set_Syntax

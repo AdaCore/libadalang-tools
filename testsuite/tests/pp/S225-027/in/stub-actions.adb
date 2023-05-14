@@ -503,7 +503,7 @@ package body Stub.Actions is
       end Put_To_Out_Vec;
 
       package Buffered_Output is new Utils.Generic_Formatted_Output (W_Char,
-         W_Str, Basic_Put_Char => Put_To_Out_Vec);
+                                                                     W_Str, Basic_Put_Char => Put_To_Out_Vec);
       use Buffered_Output;
 
       procedure Generate_CU_Header;

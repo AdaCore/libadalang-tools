@@ -34,8 +34,8 @@ package body Utils.Generic_Symbols is
 
    type Symbol_Ptr is access Symbol_Rec;
    type Symbol_Ptr_Array is array (Symbol range <>) of Symbol_Ptr;
-   package Symbol_Ptr_Vectors is new Vectors (Index_Type => Symbol,
-      Element_Type => Symbol_Ptr, Elements_Array => Symbol_Ptr_Array);
+   package Symbol_Ptr_Vectors is new Vectors (Index_Type   => Symbol,
+                                              Element_Type => Symbol_Ptr, Elements_Array => Symbol_Ptr_Array);
    use Symbol_Ptr_Vectors;
 
    All_Ptrs : Symbol_Ptr_Vectors.Vector;
@@ -56,7 +56,7 @@ package body Utils.Generic_Symbols is
    end record;
 
    function Hash_String is new System.String_Hash.Hash (Character, String,
-      Hash_Type);
+                                                        Hash_Type);
 
    --  Note that there are two kinds of hashing going on here.
    --  The Hash_String function is used in the creation of Symbols

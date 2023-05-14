@@ -2684,7 +2684,21 @@ package body Pp.Formatting is
          Start_Line_Src_Tok : Tokn_Cursor := First (Src_Tokns'Access);
          --  Token at the beginning of the previous line, but never a comment
 
-         function L_Paren_Indentation_For_Preserve return Natural;
+         function Before_Indentation return Natural;
+         --  Same as "All_LB (Syntax_LBI (Cur_Line - 1)).Indentation", except
+         --  we skip Syntax_LBI with Affects_Comments = False. In other
+         --  words, this is the previous line-breaks indentation which should
+         --  affect comments.
+         function Prev_Indentation_Affect_Comments return Boolean;
+         --  Will return True if the last line-breaks indentation affect
+         --  comments (i.e., Syntax_LBI Affects_Comments = True).
+         function After_Indentation return Natural;
+         --  Same as "All_LB (Syntax_LBI (Cur_Line)).Indentation", except we
+         --  skip Syntax_LBI with Affects_Comments = False. In other words,
+         --  this is the current/next line-breaks indentation which should
+         --  affect comments.
+
+         function L_Paren_Indent_For_Preserve return Natural;
          --  Returns the last parenthesis indent of the stack
          procedure Update_L_Paren_Indent_For_Preserve (Indent : Natural);
          --  Update last paren indentation to Indentation
@@ -2754,14 +2768,14 @@ package body Pp.Formatting is
             end if;
          end Manage_Paren_Stack;
 
-         function L_Paren_Indentation_For_Preserve return Natural is
+         function L_Paren_Indent_For_Preserve return Natural is
          begin
             if Is_Empty (Paren_Stack) then
                return 0;
             else
                return Last_Element (Paren_Stack).Indent;
             end if;
-         end L_Paren_Indentation_For_Preserve;
+         end L_Paren_Indent_For_Preserve;
 
          procedure Update_L_Paren_Indent_For_Preserve (Indent : Natural)
          is
@@ -3050,7 +3064,7 @@ package body Pp.Formatting is
 
                            Cur_Indentation := Crt_Indent;
 
-                           if L_Paren_Indentation_For_Preserve /= Crt_Indent
+                           if L_Paren_Indent_For_Preserve /= Crt_Indent
                            then
                               Update_L_Paren_Indent_For_Preserve
                                 (Crt_Indent - 2);
@@ -3082,20 +3096,6 @@ package body Pp.Formatting is
          --  If > First, this points to the most recently encountered
          --  Pp_Off_Comment or Pp_On_Comment in Src_Tokns. Used to check for
          --  errors; they must alternate, OFF, ON, OFF, ....
-
-         function Before_Indentation return Natural;
-         --  Same as "All_LB (Syntax_LBI (Cur_Line - 1)).Indentation", except
-         --  we skip Syntax_LBI with Affects_Comments = False. In other
-         --  words, this is the previous line-breaks indentation which should
-         --  affect comments.
-         function Prev_Indentation_Affect_Comments return Boolean;
-         --  Will return True if the last line-breaks indentation affect
-         --  comments (i.e., Syntax_LBI Affects_Comments = True).
-         function After_Indentation return Natural;
-         --  Same as "All_LB (Syntax_LBI (Cur_Line)).Indentation", except we
-         --  skip Syntax_LBI with Affects_Comments = False. In other words,
-         --  this is the current/next line-breaks indentation which should
-         --  affect comments.
 
          function Before_Indentation return Natural is
             X : Line_Break_Index_Index :=
@@ -4168,6 +4168,7 @@ package body Pp.Formatting is
                            LB : Line_Break renames
                              All_LB (Line_Break_Token_Index (New_Tok));
                         begin
+
                            --  If we have a line break with
                            --  Source_Line_Breaks_Enabled already True, it means
                            --  we already did New_To_Newer in the 'else' below
@@ -4203,8 +4204,8 @@ package body Pp.Formatting is
 
                      else
                         declare
-                           Indentation : Natural := 0;
-                           P : Tokn_Cursor := New_Tok;
+                           Indentation          : Natural := 0;
+                           P                    : Tokn_Cursor := New_Tok;
                         begin
 
                            case Kind (New_Tok) is
@@ -4226,6 +4227,99 @@ package body Pp.Formatting is
                                        LB.Affects_Comments := True;
                                     end if;
 
+                                    if not Is_Empty (Paren_Stack)
+                                      and then Kind (New_Tok) = Ident
+                                      and then Kind (P) = Disabled_LB_Token
+                                      and then Kind (Prev (P)) =  ';'
+                                      and then Kind (Prev_ss (Prev (P))) in
+                                          Ident | Res_Null | ')'
+                                    then
+                                       LB.Indentation :=
+                                         L_Paren_Indent_For_Preserve
+                                           + Before_Indentation - 1;
+
+                                    elsif  not Is_Empty (Paren_Stack)
+                                      and then Kind (New_Tok) in
+                                          Ident | String_Lit | Character_Literal
+                                      and then Kind (P) = Disabled_LB_Token
+                                      and then Kind (Prev (P)) =  ','
+                                      and then Kind (Prev_ss (Prev (P))) in
+                                          Ident | String_Lit |
+                                          Character_Literal | Numeric_Literal |
+                                          Res_All | Res_Null | Box | ')'
+                                    then
+                                       if
+                                         (Kind (Prev_ss (Prev (P))) = ')'
+                                          and then
+                                          Kind (Prev_ss
+                                                (Prev_ss (Prev (P)))) = ')')
+                                         or else
+                                           (Kind (New_Tok) in Ident | String_Lit
+                                            and then
+                                            Kind
+                                              (Prev_ss (Prev (P))) = String_Lit)
+                                       then
+                                          --  already up to date indentation
+                                          null;
+
+                                       elsif LB.Indentation /=
+                                         L_Paren_Indent_For_Preserve
+                                         + Before_Indentation + 1
+                                       then
+                                          LB.Indentation :=
+                                            L_Paren_Indent_For_Preserve
+                                              + Before_Indentation - 1;
+
+                                       end if;
+                                    else
+                                       if not Is_Empty (Paren_Stack) then
+                                          if Kind (New_Tok) = Ident
+                                            and then
+                                              Kind (P) = Disabled_LB_Token
+                                            and then
+                                              Kind (Prev (P)) in
+                                                Colon_Equal | Arrow
+                                            and then
+                                              Kind (Prev_ss (Prev (P))) =
+                                                Tab_Token
+                                          then
+                                             null;
+
+                                          elsif Kind (New_Tok) = Ident
+                                            and then
+                                              Kind (P) = Disabled_LB_Token
+                                            and then
+                                              Kind
+                                                (Prev_ss (Prev (P))) = Res_With
+                                          then
+                                             Update_L_Paren_Indent_For_Preserve
+                                               (LB.Indentation
+                                                - Before_Indentation);
+
+                                          elsif Kind (New_Tok) = Ident and then
+                                            Kind (P) = Disabled_LB_Token
+                                            and then Kind (Prev (P)) = Res_If
+                                            and then
+                                              Kind (Prev_ss (Prev (P))) = '('
+                                          then
+                                             --  IF expression starts here
+                                             Update_L_Paren_Indent_For_Preserve
+                                               (LB.Indentation);
+
+                                          elsif Kind (New_Tok) in
+                                                Res_Then | Res_Else
+                                            and then
+                                              Kind (P) = Disabled_LB_Token
+                                          then
+                                             Update_L_Paren_Indent_For_Preserve
+                                               (LB.Indentation);
+                                          else
+                                             Update_L_Paren_Indent_For_Preserve
+                                               (LB.Indentation
+                                                - Before_Indentation + 1);
+                                          end if;
+                                       end if;
+                                    end if;
                                     Indentation := LB.Indentation;
                                  end;
                            end case;
@@ -4298,12 +4392,12 @@ package body Pp.Formatting is
                                  Cur_Indentation := LB.Indentation;
                               elsif Kind (New_Tok) = Ident then
                                  Cur_Indentation :=
-                                   L_Paren_Indentation_For_Preserve;
+                                   L_Paren_Indent_For_Preserve;
                               end if;
 
                            else
                               LB.Indentation :=
-                                L_Paren_Indentation_For_Preserve + 1;
+                                L_Paren_Indent_For_Preserve + 1;
 
                               Cur_Indentation := LB.Indentation;
                            end if;

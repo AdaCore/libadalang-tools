@@ -100,7 +100,7 @@ package Pp.Formatting is
    type Line_Break_Index is new Positive;
    type Line_Break_Array is array (Line_Break_Index range <>) of Line_Break;
    package Line_Break_Vectors is new Utils.Vectors (Line_Break_Index,
-      Line_Break, Line_Break_Array);
+                                                    Line_Break, Line_Break_Array);
    subtype Line_Break_Vector is Line_Break_Vectors.Vector;
 
    use Line_Break_Vectors;
