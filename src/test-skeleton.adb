@@ -753,7 +753,14 @@ package body Test.Skeleton is
             Test.Instrument.Process_Source (The_Unit);
          end if;
 
-         if not Data.Is_Generic then
+         --  Only include subprograms in the Libgen context if we are
+         --  generating test inputs or if there already are serialized tests.
+
+         if not Data.Is_Generic
+           and then (Test.Common.Generate_Test_Vectors
+                     or else Ada.Directories.Exists
+                               (Test.Common.JSON_Test_Dir.all))
+         then
             Subp_Cur := Data.Subp_List.First;
             while Subp_Cur /= Subp_Data_List.No_Element loop
                declare
