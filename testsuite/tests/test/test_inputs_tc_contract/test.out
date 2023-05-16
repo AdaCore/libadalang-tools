@@ -1,0 +1,5 @@
+generate test driver
+generate test driver with instrumentation
+build instrumented test driver
+2 tests run: 2 passed; 0 failed; 0 crashed.
+2nd test input present
