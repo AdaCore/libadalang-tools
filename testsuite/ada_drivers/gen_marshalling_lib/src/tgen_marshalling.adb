@@ -144,7 +144,7 @@ procedure TGen_Marshalling is
 
             if not Include_Subp (Gen_Ctx, Node.As_Basic_Decl, Diags) then
                Libadalang.Helpers.Abort_App
-                  ("Error during parameter translation:"
+                  ("Error during parameter translation: "
                   & To_String (Diags));
             end if;
             return LALCO.Over;

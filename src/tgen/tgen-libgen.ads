@@ -76,7 +76,8 @@ package TGen.Libgen is
    --  library for all the registered types.
    --
    --  Returns False if there is an error translating some of the parameter
-   --  types, reporting a diagnostic string in Diag. In that case, the context
+   --  types, or if some of the types are unsupported for marshalling,
+   --  reporting a diagnostic string in Diag. In that case, the context
    --  is not modified. Otherwise, Diag should be ignored.
 
    procedure Generate

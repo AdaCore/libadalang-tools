@@ -32,6 +32,24 @@ package body TGen.Types.Array_Types is
 
    use TGen.Types.SP;
 
+   ---------------------
+   -- Get_Diagnostics --
+   ---------------------
+
+   function Get_Diagnostics (Self : Array_Typ) return String is
+   begin
+      for Idx_Typ of Self.Index_Types loop
+         declare
+            Idx_Res : constant String := Idx_Typ.Get.Get_Diagnostics;
+         begin
+            if Idx_Res'Length > 0 then
+               return Idx_Res;
+            end if;
+         end;
+      end loop;
+      return Self.Component_Type.Get.Get_Diagnostics;
+   end Get_Diagnostics;
+
    -----------
    -- Image --
    -----------

@@ -1,0 +1,2 @@
+Error during parameter translation: foo.bar.t: Private types declared in nested package are not supported
+>>>program returned status code 1
