@@ -70,6 +70,7 @@ package body Test.Instrument is
      (not L.Is_Null and then not R.Is_Null and then
       L.P_Enclosing_Compilation_Unit = R.P_Enclosing_Compilation_Unit);
 
+   Included_Subps : String_Ordered_Set;
 
    ------------------
    -- Inspect_Spec --
@@ -98,6 +99,8 @@ package body Test.Instrument is
             return Over;
          end if;
 
+         Included_Subps.Include
+           (Image (Node.As_Basic_Decl.P_Unique_Identifying_Name));
 
          return Over;
       end if;
@@ -152,9 +155,12 @@ package body Test.Instrument is
 
       Trace (Me, "instrumenting " & F_Name);
       Unit := CU.F_Body.As_Library_Item.F_Item;
+      Included_Subps.Clear;
       Traverse (Unit, Inspect_Spec'Access);
 
-      if Get_Source_Body (F_Name) /= "" then
+      if Get_Source_Body (F_Name) /= ""
+        and then not Included_Subps.Is_Empty
+      then
          CU := CU.P_Other_Part;
          Trace (Me, "instrumenting " & CU.Unit.Get_Filename);
 
@@ -272,6 +278,8 @@ package body Test.Instrument is
 
             if not From_Same_Unit (D.As_Subp_Body.P_Decl_Part, D) and then
               D.As_Subp_Body.F_Subp_Spec.P_Params'Length > 0
+              and then Included_Subps.Contains
+                         (Image (D.As_Subp_Body.P_Unique_Identifying_Name))
             then
                Process_Subprogram_Body (D.As_Subp_Body);
             else
