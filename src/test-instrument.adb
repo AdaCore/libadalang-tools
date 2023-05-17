@@ -70,7 +70,6 @@ package body Test.Instrument is
      (not L.Is_Null and then not R.Is_Null and then
       L.P_Enclosing_Compilation_Unit = R.P_Enclosing_Compilation_Unit);
 
-   Import_Units : TGen.Strings.String_Set;
 
    ------------------
    -- Inspect_Spec --
@@ -78,7 +77,6 @@ package body Test.Instrument is
 
    function Inspect_Spec (Node : Ada_Node'Class) return Visit_Status is
       Errors : Ada.Strings.Unbounded.Unbounded_String;
-      use TGen.Strings.Ada_Identifier_Vectors;
    begin
       if Kind (Node) = Ada_Package_Decl then
          return Into;
@@ -100,18 +98,6 @@ package body Test.Instrument is
             return Over;
          end if;
 
-         for Param of Node.As_Subp_Decl.F_Subp_Spec.P_Params loop
-            declare
-               Param_Typ : constant TGen.Types.SP.Ref :=
-                 TGen.Types.Translation.Translate
-                   (Param.F_Type_Expr).Res;
-            begin
-               if Param_Typ.Get.Package_Name /= To_Qualified_Name ("standard")
-               then
-                  Import_Units.Include (To_Ada (Param_Typ.Get.Package_Name));
-               end if;
-            end;
-         end loop;
 
          return Over;
       end if;
@@ -208,13 +194,15 @@ package body Test.Instrument is
          Put_New_Line;
          S_Put (0, "with Ada.Streams.Stream_IO; use Ada.Streams.Stream_IO;");
          Put_New_Line;
-         S_Put (0, "with TGen.TGen_Support;");
-         Put_New_Line;
          S_Put (0, "with TGen.Instr_Support;");
          Put_New_Line;
 
-         for U of Import_Units loop
-            S_Put (0, "with " & U & ".TGen_Support;");
+         for U of TGen.Libgen.Required_Support_Packages
+           (TGen_Libgen_Ctx,
+            TGen.LAL_Utils.Convert_Qualified_Name
+              (CU.P_Syntactic_Fully_Qualified_Name))
+         loop
+            S_Put (0, "with " & To_Ada (U) & ";");
             Put_New_Line;
          end loop;
 
