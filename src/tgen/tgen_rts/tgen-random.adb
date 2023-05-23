@@ -340,7 +340,7 @@ package body TGen.Random is
                declare
                   Intermediate_Exp : constant Int_Type :=
                     Int_Type (Rand / MS_Part)
-                    + (LB_Sign * Int_Type (LB_Exp));
+                    + (LB_Sign * Int_Type (LB_Exp)) + 1;
                begin
                   Result_Sign :=
                     (if Intermediate_Exp < 0 then -1 else 1);
