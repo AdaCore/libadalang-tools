@@ -728,7 +728,8 @@ package body Laltools.Partial_GNATPP is
       is
         (Kind in Ada_Package_Body | Ada_Package_Decl |
          Ada_Library_Item | Ada_Subp_Body | Ada_Task_Body | Ada_Decl_Block |
-         Ada_For_Loop_Stmt | Ada_Loop_Stmt | Ada_While_Loop_Stmt);
+         Ada_For_Loop_Stmt | Ada_Loop_Stmt | Ada_While_Loop_Stmt |
+         Ada_If_Stmt_Range);
 
       function Is_Expected_Parent_Node
         (Node : Ada_Node'Class) return Boolean is
@@ -777,6 +778,7 @@ package body Laltools.Partial_GNATPP is
             when Ada_Package_Body | Ada_Package_Decl
                | Ada_Task_Body | Ada_Subp_Body | Ada_Decl_Block
                | Ada_For_Loop_Stmt | Ada_Loop_Stmt | Ada_While_Loop_Stmt
+               | Ada_If_Stmt_Range
                => Offset := Offset + PP_Indentation;
 
             when others => null;
