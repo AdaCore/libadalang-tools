@@ -24,6 +24,7 @@
 with Ada.Command_Line;
 with Ada.Containers; use type Ada.Containers.Count_Type;
 with Ada.Environment_Variables;
+with Ada.IO_Exceptions;
 
 with Interfaces; use type Interfaces.Unsigned_16;
 
@@ -828,6 +829,21 @@ package body Test.Actions is
                   Case_Sensitive => False));
          end if;
       end if;
+
+      --  Check that JSON_Test_Dir is a valid path. If not, checking whether
+      --  the directory exists later on will raise an exception, so replace it
+      --  with a valid but never existing directory name to avoid this.
+
+      declare
+         Dummy_Bool : Boolean;
+      begin
+         Dummy_Bool := Ada.Directories.Exists (Test.Common.JSON_Test_Dir.all);
+      exception
+         when Ada.IO_Exceptions.Name_Error =>
+            Ada.Strings.Unbounded.Free (Test.Common.JSON_Test_Dir);
+            Test.Common.JSON_Test_Dir :=
+              new String'("gnattest_never_existing_dir_name");
+      end;
 
       --  Test vectors
 
