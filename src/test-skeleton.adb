@@ -7359,6 +7359,13 @@ package body Test.Skeleton is
          TP_Mapping_List.Next (TP_Cur);
       end loop;
 
+      if TP_Cur = TP_Mapping_List.No_Element then
+         TP.TP_Name := new String'(TPtarg);
+         TP.DT_List.Append (TD);
+         TP_List.Append (TP);
+         return;
+      end if;
+
       TP := TP_Mapping_List.Element (TP_Cur);
       TP.DT_List.Append (TD);
       TP_List.Replace_Element (TP_Cur, TP);
