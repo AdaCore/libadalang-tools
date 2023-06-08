@@ -6,6 +6,7 @@
 @@--  @_CONSTRAINTS_@ Constraints for anonymous component types.
 @@--  @_SPACING_@ Sequence of spaces used for indentation.
 @@--
+@@INCLUDE@@ util.tmplt
 @@IF@@ @_COMP_SCALAR_@
 @@IF@@ @_CONSTRAINTS_@ /= ""
 @_SPACING_@  @_COMP_PREFIX_@_Size
