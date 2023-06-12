@@ -18,7 +18,7 @@ package Utils.Test_Pkg is
 
    type Some_Booleans is (Syntax_Check, Code_Gen);
    package Some_Boolean_Switches is new Boolean_Switches (Descriptor,
-      Some_Booleans);
+                                                          Some_Booleans);
    package Some_Boolean_Defaults is new Some_Boolean_Switches.Set_Defaults
      ((Syntax_Check => False, Code_Gen => True));
 
@@ -27,7 +27,7 @@ package Utils.Test_Pkg is
 
    type Test_Debug_Switch is (Test_Debug);
    package My_Test_Debug_Switches is new String_Seq_Switches (Descriptor,
-      Test_Debug_Switch);
+                                                              Test_Debug_Switch);
 
    package Test_Debug_Options is new My_Test_Debug_Switches.Set_Syntax
      ((Test_Debug => '!'));

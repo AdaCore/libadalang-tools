@@ -39,7 +39,7 @@ package Utils.Slow_Vectors is
    --     use all type X_Vector;
 
    package Vectors is new Ada.Containers.Vectors (Index_Type, Element_Type,
-      "=");
+                                                  "=");
 
    subtype Vector is Vectors.Vector;
 

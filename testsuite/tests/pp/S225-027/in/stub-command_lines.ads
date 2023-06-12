@@ -34,7 +34,7 @@ package Stub.Command_Lines is
    type Stub_Strings is (Header_File, Output);
 
    package Stub_String_Switches is new String_Switches (Descriptor,
-      Stub_Strings);
+                                                        Stub_Strings);
 
    package Stub_String_Syntax is new Stub_String_Switches.Set_Syntax
      ((Header_File => '=', Output => '='));
@@ -50,7 +50,7 @@ package Stub.Command_Lines is
    --  Update_Body is intended mainly for use by GPS or other text editors
 
    package Stub_Nat_Switches is new Other_Switches (Descriptor, Stub_Nats,
-      Natural, Natural'Image, Natural'Value);
+                                                    Natural, Natural'Image, Natural'Value);
 
    package Stub_Nat_Syntax is new Stub_Nat_Switches.Set_Syntax
      ((Max_Line_Length => '!', Indentation => '!', Update_Body => '='));

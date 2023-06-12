@@ -2404,7 +2404,7 @@ package body Pp.Formatting is
          type Paren_Stack_Element_Array is
            array (Paren_Stack_Index range <>) of Paren_Stack_Element;
          package Paren_Vectors is new Utils.Vectors (Paren_Stack_Index,
-            Paren_Stack_Element, Paren_Stack_Element_Array);
+                                                     Paren_Stack_Element, Paren_Stack_Element_Array);
          Paren_Stack : Paren_Vectors.Vector;
          use Paren_Vectors;
 

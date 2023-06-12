@@ -188,7 +188,7 @@ package body Pp.Actions is
       if Mimic_gcc (Cmd) then
          pragma Assert (False);
          pragma Assert (Directories.Exists (File_Name_File_Name.all),
-            File_Name_File_Name.all & " not found");
+                        File_Name_File_Name.all & " not found");
       else
          File_Name_File_Name :=
            new String'
@@ -971,7 +971,7 @@ package body Pp.Actions is
    type Instr_Index is new Positive;
    type Instr_Array is array (Instr_Index range <>) of Instr;
    package Instr_Vectors is new Utils.Vectors (Instr_Index, Instr,
-      Instr_Array);
+                                               Instr_Array);
    subtype Instr_Vector is Instr_Vectors.Vector;
 
    Tok_Template_Table : array (Ada_Tree_Kind) of Tok_Template;
@@ -1145,7 +1145,7 @@ package body Pp.Actions is
    end Replacements;
 
    procedure Free is new Unchecked_Deallocation (Str_Template,
-      Str_Template_Ptr);
+                                                 Str_Template_Ptr);
 
    function Replace_One
      (Kind : Ada_Tree_Kind; From, To : W_Str) return Str_Template;
@@ -1572,7 +1572,7 @@ package body Pp.Actions is
             begin
                Max_Nesting_Increment :=
                  Nesting_Level_Increment'Max (Max_Nesting_Increment,
-                    Level_Inc);
+                                            Level_Inc);
             end Set_Max;
          begin
             while Kind (Cur) /= Stop loop
@@ -2323,7 +2323,7 @@ package body Pp.Actions is
         Tree_Stack_Index'Base range 0 .. Tree_Stack_Index'Last;
       type Tree_Array is array (Tree_Stack_Index range <>) of Ada_Tree;
       package Tree_Stacks is new Utils.Vectors (Tree_Stack_Index, Ada_Tree,
-         Tree_Array);
+                                                Tree_Array);
       use Tree_Stacks;
       --  use all type Tree_Stacks.Vector;
 
@@ -2688,10 +2688,10 @@ package body Pp.Actions is
                   begin
                      New_Lev :=
                        Nesting_Level'Max (New_Lev,
-                          New_Level (Cur_Level, Between));
+                                        New_Level (Cur_Level, Between));
                      New_Lev :=
                        Nesting_Level'Max (New_Lev,
-                          New_Level (Cur_Level, Post));
+                                        New_Level (Cur_Level, Post));
                      --  ???Shouldn't New_Lev use the entire template?
                      Subtree_To_Ada (Subt, New_Lev, Index);
                   end;
@@ -2947,7 +2947,7 @@ package body Pp.Actions is
                end case;
             end loop;
             pragma Assert (Used = (Subtrees_Index => True),
-               "Not all used: " & Kind'Img);
+                           "Not all used: " & Kind'Img);
          end Interpret_Template;
 
          use Alternative_Templates;

@@ -12,8 +12,8 @@ package LAL_Extensions is
    --  ???Perhaps we should move (some of?) this stuff into package
    --  Libadalang.Analysis.
 
-   package Ada_Node_Vectors is new Utils.Vectors (Index_Type => Positive,
-      Element_Type => Ada_Node, Elements_Array => Ada_Node_Array);
+   package Ada_Node_Vectors is new Utils.Vectors (Index_Type   => Positive,
+                                                  Element_Type => Ada_Node, Elements_Array => Ada_Node_Array);
    subtype Ada_Node_Vector is Ada_Node_Vectors.Vector;
 
    function Childx (Node : Ada_Node'Class; Index : Positive) return Ada_Node;

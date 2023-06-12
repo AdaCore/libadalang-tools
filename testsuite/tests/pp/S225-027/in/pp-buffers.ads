@@ -72,7 +72,7 @@ package Pp.Buffers is
 
    type Marker_Array is array (Marker_Index range <>) of Marker;
    package Marker_Vectors is new Utils.Vectors (Marker_Index, Marker,
-      Marker_Array);
+                                                Marker_Array);
    subtype Marker_Vector is Marker_Vectors.Vector;
 
    type Marker_Vector_Ptr is access all Marker_Vector;
@@ -295,7 +295,7 @@ private
 
    type Marker_Rec_Array is array (Marker range <>) of Marker_Rec;
    package Marker_Rec_Vectors is new Utils.Vectors (Marker, Marker_Rec,
-      Marker_Rec_Array);
+                                                    Marker_Rec_Array);
    subtype Marker_Rec_Vector is Marker_Rec_Vectors.Vector;
    use Marker_Rec_Vectors;
    --  use all type Marker_Rec_Vector;

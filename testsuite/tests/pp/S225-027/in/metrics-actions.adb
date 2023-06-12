@@ -203,7 +203,7 @@ package body METRICS.Actions is
    type Metrix_Ref_Array is array (CU_Symbol range <>) of aliased Metrix_Ref;
 
    package CU_Metrix is new Utils.Vectors (CU_Symbol, Metrix_Ref,
-      Metrix_Ref_Array);
+                                           Metrix_Ref_Array);
    use CU_Metrix;
    Specs  : CU_Metrix.Vector;
    Bodies : CU_Metrix.Vector;
@@ -3630,7 +3630,7 @@ package body METRICS.Actions is
                      begin
                         MM.Vals (Unit_Nesting) :=
                           Metric_Nat'Max (MM.Vals (Unit_Nesting),
-                             Metric_Nat (Start - X) + 1);
+                                        Metric_Nat (Start - X) + 1);
                      end;
                   end loop;
                end;
@@ -3665,7 +3665,7 @@ package body METRICS.Actions is
                      begin
                         MM.Vals (Construct_Nesting) :=
                           Metric_Nat'Max (MM.Vals (Construct_Nesting),
-                             MM.Vals (Current_Construct_Nesting));
+                                        MM.Vals (Current_Construct_Nesting));
                      end;
                   end loop;
                end;

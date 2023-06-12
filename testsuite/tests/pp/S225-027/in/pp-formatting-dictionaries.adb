@@ -34,7 +34,7 @@ package body Pp.Formatting.Dictionaries is
    subtype Opt_Symbol is Syms.Opt_Symbol;
 
    package Name_Sets is new Ada.Containers.Hashed_Sets (Symbol,
-      Syms.Hash_Symbol, Syms.Case_Insensitive_Equal, Syms."=");
+                                                        Syms.Hash_Symbol, Syms.Case_Insensitive_Equal, Syms."=");
 
    use Name_Sets;
    subtype Name_Set is Name_Sets.Set;

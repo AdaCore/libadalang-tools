@@ -261,7 +261,7 @@ package Pp.Scanner is
    type Source_Message_Array is array (Positive range <>) of Source_Message;
 
    package Source_Message_Vectors is new Utils.Vectors (Index_Type => Positive,
-      Element_Type => Source_Message, Elements_Array => Source_Message_Array);
+                                                        Element_Type => Source_Message, Elements_Array => Source_Message_Array);
    subtype Source_Message_Vector is Source_Message_Vectors.Vector;
 
    function Message_Image
@@ -583,7 +583,7 @@ private
    type Fixed_Part_Array is array (Tokn_Index range <>) of Fixed_Part;
 
    package Fixed_Part_Vectors is new Utils.Vectors (Tokn_Index, Fixed_Part,
-      Fixed_Part_Array);
+                                                    Fixed_Part_Array);
    subtype Fixed_Part_Vector is Fixed_Part_Vectors.Vector;
 
    type Tokn_Vec is record

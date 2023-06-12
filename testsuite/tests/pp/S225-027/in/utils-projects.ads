@@ -10,7 +10,7 @@ with Utils.Command_Lines; use Utils.Command_Lines;
 package Utils.Projects is
 
    function Hash is new GNAT.String_Hash.Hash (Character, String,
-      Ada.Containers.Hash_Type);
+                                               Ada.Containers.Hash_Type);
 
    function Hash (S : String_Access) return Ada.Containers.Hash_Type is
      (Hash (S.all));
