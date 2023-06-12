@@ -180,9 +180,9 @@ package body METRICS.Actions is
    procedure Put_Children_Array (A : Children_Array) is
       use Utils.Dbg_Out;
    begin
-      for I in A'Range loop
+      for I in A loop
          Put ("\1: ", Image (I));
-         Put_Child_Record (A (I));
+         Put_Child_Record (Element (A, I));
       end loop;
    end Put_Children_Array;
    pragma Style_Checks (On);
