@@ -267,6 +267,7 @@ procedure Partial_GNATpp is
                Edit := Partial_Formatting_Edit'
                  (Diagnostics    => Messages,
                   Formatted_Node => Enclosing_Node,
+                  Indentation    => 0,
                   Edit           =>
                     Text_Edit'
                       (Location => Output_SL_Range,
