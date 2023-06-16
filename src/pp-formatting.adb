@@ -443,6 +443,51 @@ package body Pp.Formatting is
    is
       use Scanner;
 
+      function Compute_Indentation
+        (Comment_Token : Scanner.Tokn_Cursor;
+         Prev_Token    : Scanner.Tokn_Cursor) return W_Str;
+      --  This function is called only if the use-tabs switch is passed and
+      --  returns the proper indentation text according to the required number
+      --  of tabs and spaces computed based on the current sloc column value
+      --  of the comment token.
+
+      ---------------------------
+      --  Compute_Indentation  --
+      ---------------------------
+
+      function Compute_Indentation
+        (Comment_Token : Scanner.Tokn_Cursor;
+         Prev_Token    : Scanner.Tokn_Cursor) return W_Str
+      is
+         pragma Assert (Arg (Cmd, Use_Tabs)
+                        and then Kind (Prev_Token) = Tab_Token);
+
+         Tab_Str : constant W_Str    := To_W_Str (Text (Prev_Token));
+         Indent  : constant Positive := Sloc_Col (Comment_Token) - 1;
+
+         --  Compute the number of tabs and spaces to get the right
+         --  indentation based on the indentation switch value
+         Tab_Size  : constant Positive := PP_Indentation (Cmd);
+         Tabs_Nb   : constant Integer  := Indent / Tab_Size;
+         Spaces_Nb : constant Integer  := Indent mod Tab_Size;
+
+         Result    : Bounded_W_Str (Max_Length => Natural (Indent));
+      begin
+         if Tabs_Nb > 1 then
+            for I in 1 .. Tabs_Nb loop
+               Append (Result, Tab_Str);
+            end loop;
+
+            if Spaces_Nb /= 0 then
+               for Idx in 1 .. Spaces_Nb loop
+                  Append (Result, ' ');
+               end loop;
+            end if;
+         end if;
+
+         return To_String (Result);
+      end Compute_Indentation;
+
       function Filled_Text
         (Comment_Token : Tokn_Cursor)
          return W_Str;
@@ -455,6 +500,7 @@ package body Pp.Formatting is
       --  This is only aplicable to Fillable_Comment or
       --  Other_Whole_Line_Comment tokens that are not part of a header
       --  comment.
+
       pragma Assert
         (if Arg (Cmd, Comments_Gnat_Beginning)
            and then not Is_Header_Comment (Token_At_Cursor (Comment_Token))
@@ -466,15 +512,28 @@ package body Pp.Formatting is
              else Scanner.Leading_Blanks (Comment_Token) >= 2));
 
       Prev_Tok : constant Tokn_Cursor := Prev (Comment_Token);
-      pragma Assert (if Kind (Comment_Token) in Whole_Line_Comment then
-        Kind (Prev_Tok) in Spaces | EOL_Token | Line_Break_Token);
+      pragma Assert
+        (if Kind (Comment_Token) in Whole_Line_Comment then
+           (if not Arg (Cmd, Use_Tabs) then
+              Kind (Prev_Tok) in Spaces | EOL_Token | Line_Break_Token
+            else
+              Kind (Prev_Tok) in
+                    Spaces | Tab_Token | EOL_Token | Line_Break_Token));
+
       Indentation : constant W_Str :=
         (if Kind (Comment_Token) in Whole_Line_Comment then
-          (if Kind (Prev_Tok) = Spaces then To_W_Str (Text (Prev_Tok)) else "")
+             (if Kind (Prev_Tok) in Spaces then
+                 To_W_Str (Text (Prev_Tok))
+              elsif Arg (Cmd, Use_Tabs)
+                 and then Kind (Prev_Tok) = Tab_Token
+              then
+                 Compute_Indentation (Comment_Token, Prev_Tok)
+              else "")
          else "");
       pragma Assert
         (if Kind (Comment_Token) in Whole_Line_Comment then
-           Indentation'Length = Sloc_Col (Comment_Token) - 1);
+             (if Kind (Prev_Tok) = Spaces then
+                 Indentation'Length = Sloc_Col (Comment_Token) - 1));
       First_Line_Prelude : constant W_Str :=
           "--" & [1 .. Scanner.Leading_Blanks (Comment_Token) => ' '];
       --  String that precedes the comment Text (first line)
@@ -515,7 +574,6 @@ package body Pp.Formatting is
       Text       : W_Str renames Text_NL (Text_NL'First .. Text_NL'Last - 1);
 
    --  Start of processing for Comment_Token_To_Buffer
-
    begin
       Insert (Buffer, First_Line_Prelude);
 
@@ -544,6 +602,10 @@ package body Pp.Formatting is
             while not After_Last (Cur) loop
                if Kind (Cur) in Comment_Kind then
                   Comment_Token_To_Buffer (Buf, Cur, Cmd);
+
+               elsif Kind (Cur) = Tab_Token then
+                  Insert_Tab (Buf);
+
                else
                   Insert_Any (Buf, To_W_Str (Text (Cur)));
                end if;
@@ -899,6 +961,9 @@ package body Pp.Formatting is
          Wide_Character_Encoding =>
            Utils.Command_Lines.Common.Wide_Character_Encoding (Cmd),
          Expand_Tabs             => True,
+         Tab_Len                 => (if Arg (Cmd, Use_Tabs)
+                                     then Natural (PP_Indentation (Cmd))
+                                     else 0),
          Include_Trailing_Spaces => True);
 
       --  The Src_Buf contains a sequence of zero or more OFF and ON
@@ -1018,6 +1083,20 @@ package body Pp.Formatting is
          Partial_GNATPP : Boolean := False);
       --  Expand tabs as necessary to align things
 
+      procedure Insert_Tabs (Lines_Data_P : Lines_Data_Ptr;
+                             Cmd          : Command_Line);
+      --  Replace spaces by tabs instead of spaces when --use-tabs switch is
+      --  passed. The spaces will be replaces by tabs following the logic:
+      --  * use --indentation to know how many spaces a tab has
+      --  * when the indentation corresponds to n*tab_size use n tabs instead
+      --    of spaces
+      --       (i.e., when tab_size=3 6 spaces
+      --              => replaced by 2 tabs)
+      --  * when the indentation does not match n*tab_size, it will use a mix
+      --    of tab characters and normal whitespaces
+      --       (i.e., when tab_size=3 and 8 spaces
+      --              => replaced by 2 tabs and 2 spaces)
+
    end Tok_Phases;
 
    procedure Post_Tree_Phases
@@ -1066,8 +1145,15 @@ package body Pp.Formatting is
          Tok_Phases.Insert_Indentation (Lines_Data_P);
          Tok_Phases.Insert_Alignment (Lines_Data_P, Cmd);
 
-         Tokns_To_Buffer (Lines_Data.Out_Buf, Lines_Data.New_Tokns, Cmd);
+         if Arg (Cmd, Use_Tabs) then
+            --  If the --use-tabs switch is passed then the spaces should be
+            --  replaced by tabs whether this is possible for each indentation,
+            --  otherwise a mix of tabs and spaces should be added instead of
+            --  the spaces composing the indentation of each line.
+            Tok_Phases.Insert_Tabs (Lines_Data_P, Cmd);
+         end if;
 
+         Tokns_To_Buffer (Lines_Data.Out_Buf, Lines_Data.New_Tokns, Cmd);
          Keyword_Casing (Lines_Data_P, Cmd);
          Insert_Form_Feeds (Lines_Data_P, Cmd);
          Copy_Pp_Off_Regions (Input, Lines_Data_P, Pp_Off_Present, Cmd);
@@ -1075,7 +1161,6 @@ package body Pp.Formatting is
          --  The following pass doesn't modify anything; it just checks that
          --  the sequence of tokens we have constructed matches the original
          --  source code (with some allowed exceptions).
-
          Final_Check (Lines_Data_P, Src_Buf, Cmd, Pp_Off_Present);
 
       else
@@ -1104,11 +1189,17 @@ package body Pp.Formatting is
 
          Tok_Phases.Insert_Alignment (Lines_Data_P, Cmd, Partial_GNATPP);
 
-         Tokns_To_Buffer (Lines_Data.Out_Buf, Lines_Data.New_Tokns, Cmd);
+         if Arg (Cmd, Use_Tabs) then
+            --  If the --use-tabs switch is passed then the spaces should be
+            --  replaced by tabs whether this is possible for each indentation,
+            --  otherwise a mix of tabs and spaces should be added instead of
+            --  the spaces composing the indentation of each line.
+            Tok_Phases.Insert_Tabs (Lines_Data_P, Cmd);
+         end if;
 
+         Tokns_To_Buffer (Lines_Data.Out_Buf, Lines_Data.New_Tokns, Cmd);
          Keyword_Casing (Lines_Data_P, Cmd);
       end if;
-
    exception
       when Post_Tree_Phases_Done => null;
    end Post_Tree_Phases;
@@ -1285,7 +1376,8 @@ package body Pp.Formatting is
                function White (X : Positive) return Boolean is
                  (X <= Text'Last
                   and then
-                  (Is_Space (Text (X)) or else Is_Line_Terminator (Text (X))));
+                    (Is_Space (Text (X))
+                     or else Is_Line_Terminator (Text (X))));
                --  True if X points to a space or NL character
 
                pragma Assert
@@ -1310,10 +1402,21 @@ package body Pp.Formatting is
 
             loop
                Next_ss (Tok);
-
                exit when Kind (Tok) not in EOL_Token;
             end loop;
+
+            --  When --use-tabs switch is passed some tabs might be present
+            --  at the beginning of a comment line, so go through them to get
+            --  the next real token kind. This is needed when multiline
+            --  comments needs to be handled.
+            if Arg (Cmd, Use_Tabs) and then Kind (Tok) = Tab_Token then
+               loop
+                  Next (Tok);
+                  exit when Kind (Tok) /= Tab_Token;
+               end loop;
+            end if;
          end loop;
+
       end Collect_Comments;
 
    --  Start of processing for Final_Check_Helper
@@ -1443,7 +1546,7 @@ package body Pp.Formatting is
                elsif Kind (Src_Tok) in EOL_Token then
                   Next_ss (Src_Tok);
 
-               elsif Kind (Out_Tok) in EOL_Token then
+               elsif Kind (Out_Tok) in EOL_Token | Tab_Token then
                   Next_ss (Out_Tok);
 
                --  Else print out debugging information and crash. This avoids
@@ -5823,6 +5926,101 @@ package body Pp.Formatting is
          Clear (Saved_New_Tokns);
          Clear (Tabs);
       end Insert_Alignment_Helper;
+
+      -----------------
+      -- Insert_Tabs --
+      -----------------
+
+      procedure Insert_Tabs (Lines_Data_P : Lines_Data_Ptr;
+                             Cmd          : Command_Line)
+      is
+         Lines_Data      : Lines_Data_Rec renames Lines_Data_P.all;
+
+         New_Tokns       : Scanner.Tokn_Vec renames Lines_Data.New_Tokns;
+         Saved_New_Tokns : Scanner.Tokn_Vec renames Lines_Data.Saved_New_Tokns;
+         Tabs            : Tab_Vector renames Lines_Data.Tabs;
+
+         --  Copy over New_Tokns to Saved_New_Tokns to iterate and create the
+         --  New_Tokns buffer
+         Ignore          : Boolean     := Scanner.Move_Tokns
+           (Target => Saved_New_Tokns, Source => New_Tokns);
+
+         New_Tok   : Tokn_Cursor       := First (Saved_New_Tokns'Access);
+         Tab_Size  : constant Positive := PP_Indentation (Cmd);
+
+         Tabs_Nb   : Integer := 0;
+         Spaces_Nb : Integer := 0;
+
+         procedure Insert_Tab (Col_Nb   : Positive;
+                               Tab_Size : Natural;
+                               Idx      : Natural);
+         --  Apends a tab toke into the current line at the given Col_Nb, having
+         --  the Tab_Size specified as nb of spaces and the index in the line
+         --  corresponds to the given Idx
+
+         procedure Insert_Tab (Col_Nb   : Positive;
+                               Tab_Size : Natural;
+                               Idx      : Natural)
+         is
+            Tab : Tab_Rec := Tab_Rec'
+              (Parent | Tree => Libadalang.Analysis.No_Ada_Node,
+               others => <>);
+
+         begin
+            Tab.Index_In_Line      := Tab_Index_In_Line (Idx);
+            Tab.Col                := Col_Nb;
+            Tab.Num_Blanks         := Tab_Size;
+            Tab.Is_Fake            := False;
+            Tab.Is_Insertion_Point := True;
+            Append (Tabs, Tab);
+            Append_Tab_Tokn (New_Tokns, Last_Index (Tabs), Tab_Size);
+         end Insert_Tab;
+
+         --  Start of Insert_Tabs
+      begin
+         pragma Assert (Is_Empty (New_Tokns));
+         while not After_Last (New_Tok) loop
+            case Kind (New_Tok) is
+               when Spaces =>
+                  if Tokn_Length (New_Tok) >= Tab_Size
+                    and then Sloc_Col (New_Tok) = 1
+                  then
+                     --  Replace spaces in the indentation either by
+                     --   * only tabs when n*tabs_nb == spaces
+                     --   * a mix of tabs and spaces when  n*tabs_nb /= spaces
+                     Tabs_Nb   := Tokn_Length (New_Tok) / Tab_Size;
+                     Spaces_Nb := Tokn_Length (New_Tok) mod Tab_Size;
+
+                     declare
+                        Col     : constant Positive := Sloc_Col (New_Tok);
+                        Crt_Col : Positive := Col;
+                     begin
+                        --  Adds the needed tabs
+                        if Tabs_Nb /= 0 then
+                           for Idx in 1 .. Tabs_Nb loop
+                              Insert_Tab (Crt_Col, Tab_Size, Idx);
+                              Crt_Col := Crt_Col + Tab_Size - 1;
+                           end loop;
+
+                           --  Adds spaces if it is about a mix of tabs & spaces
+                           if Spaces_Nb /= 0 then
+                              Append_Spaces (New_Tokns, Count => Spaces_Nb);
+                           end if;
+                        end if;
+                     end;
+                  else
+                     Append_Tokn (New_Tokns, New_Tok);
+                  end if;
+
+               when others =>
+                  Append_Tokn (New_Tokns, New_Tok);
+            end case;
+
+            Next (New_Tok);
+         end loop;
+
+         Clear (Saved_New_Tokns);
+      end Insert_Tabs;
 
    end Tok_Phases;
 

@@ -31,18 +31,24 @@ with Utils.Predefined_Symbols; use Utils.Predefined_Symbols;
 
 package body Pp.Scanner is
 
+   --  Global variables to make visible tabs handling at some levels without
+   --  depending on PP.Formatting
+   Use_Tabs   : Boolean := False;
+   Tab_Length : Natural := 0;
+
    pragma Warnings (Off, "component not present in type");
 
    use Syms;
 
    Token_To_Symbol_Map : constant array (Same_Text_Kind) of Symbol :=
      [Start_Of_Input | End_Of_Input => Name_Empty,
-      Enabled_LB_Token => Name_NL,
-      Disabled_LB_Token | Tab_Token => Name_Empty,
-      False_End_Of_Line => Name_Empty,
-      True_End_Of_Line_LF => Name_NL,
-      True_End_Of_Line_CR => Name_CR,
+      Enabled_LB_Token      => Name_NL,
+      Disabled_LB_Token     => Name_Empty,
+      False_End_Of_Line     => Name_Empty,
+      True_End_Of_Line_LF   => Name_NL,
+      True_End_Of_Line_CR   => Name_CR,
       True_End_Of_Line_CRLF => Name_CRLF,
+      Tab_Token             => Name_HT,
 
       '!' => Intern ("!"),
       '#' => Intern ("#"),
@@ -340,11 +346,11 @@ package body Pp.Scanner is
    function Length (X : Token) return Natural is
      (X.Sloc.Last - X.Sloc.First + 1);
 
-   procedure Append_Tokn (V : in out Tokn_Vec; X : Token;
-                          Org : String := "Append Token");
+   procedure Append_Tokn (V        : in out Tokn_Vec; X : Token;
+                          Org      : String := "Append Token");
 
-   procedure Append_Tokn (V : in out Tokn_Vec; X : Token;
-                          Org : String := "Append Token") is
+   procedure Append_Tokn (V        : in out Tokn_Vec; X : Token;
+                          Org      : String := "Append Token") is
       --  We require that X.Sloc.First and X.Sloc.Last indicate the right
       --  length, although they don't have to be right. X.Last_Line_Len must be
       --  correct, and X.Sloc.Col for whole-line comments. The other fields of
@@ -371,7 +377,7 @@ package body Pp.Scanner is
          end if;
 
          pragma Assert
-           (if K not in EOL_Token | Comment_Kind then
+           (if K not in EOL_Token | Comment_Kind | Tab_Token then
               Length (X) = Text_Len);
          pragma Assert
            (if K in True_End_Of_Line then
@@ -390,9 +396,17 @@ package body Pp.Scanner is
                  + Text_Len -- Text includes the intermediate NL characters
                  - 1 -- for the extra NL at the end
                  ;
+               Expected_Len_With_Tabs : constant Positive :=
+                 L * (String'("--")'Length + X.Leading_Blanks)
+                 --  Each line is missing the "--  ".
+                 + Text_Len -- Text includes the intermediate NL characters
+                 - 1; -- for the extra NL at the end
             begin
                pragma Assert
-                 (Length (X) in Expected_Len | Expected_Len + (L - 1));
+                 (Length (X) in
+                      Expected_Len | Expected_Len + (L - 1)
+                    | Expected_Len_With_Tabs);
+
                --  The (L - 1) is in case the source has CRLF line endings;
                --  Text does not include the intermediate CR characters.
             end;
@@ -418,6 +432,7 @@ package body Pp.Scanner is
                   --  We don't want two Spaces tokens in a row
                   Prev_Sloc : constant Source_Location := Sloc (Prev);
                begin
+
                   if Kind (Prev) in EOL_Token | Enabled_LB_Token then
                      Result.Line := Prev_Sloc.Line + 1;
                      Result.Col := 1;
@@ -470,7 +485,7 @@ package body Pp.Scanner is
       end case;
    end Append_Tokn;
 
-   procedure Append_Tokn (V : in out Tokn_Vec; X : Tokn_Cursor;
+   procedure Append_Tokn (V   : in out Tokn_Vec; X : Tokn_Cursor;
                           Org : String := "Append Tokn_Cursor") is
    begin
       --  ???It would be more efficient to simply copy over the data, and
@@ -482,8 +497,10 @@ package body Pp.Scanner is
       end if;
    end Append_Tokn;
 
-   procedure Append_Tokn (V : in out Tokn_Vec; X : Same_Text_Kind;
-                          Org : String := "Append Kind")
+   procedure Append_Tokn
+     (V   : in out Tokn_Vec;
+      X   : Same_Text_Kind;
+      Org : String := "Append Kind")
    is
       Tok : Token (Kind => X);
    begin
@@ -495,7 +512,9 @@ package body Pp.Scanner is
    end Append_Tokn;
 
    procedure Append_Tokn
-     (V : in out Tokn_Vec; X : Stored_Text_Kind; Tx : Syms.Symbol;
+     (V   : in out Tokn_Vec;
+      X   : Stored_Text_Kind;
+      Tx  : Syms.Symbol;
       Org : String := "Append Kind&Text")
    is
       Tok : Token (Kind => X);
@@ -511,9 +530,9 @@ package body Pp.Scanner is
    end Append_Tokn;
 
    procedure Append_Spaces
-     (V : in out Tokn_Vec; Count : Natural;
+     (V           : in out Tokn_Vec; Count : Natural;
       Existing_OK : Boolean := False;
-      Org : String := "Append_Spaces") is
+      Org         : String := "Append_Spaces") is
    begin
       pragma Assert (not Is_Empty (V));
       if Count > 0 then
@@ -656,20 +675,36 @@ package body Pp.Scanner is
                end if;
             end;
       end case;
+
       Append_Tokn (V, Tok, Org);
    end Append_Comment_Text;
 
    procedure Append_Tokn_With_Index
-     (V : in out Tokn_Vec; X : Token_Kind; Index : Positive;
-      Org : String := "Append Kind")
+     (V     : in out Tokn_Vec;
+      X     : Token_Kind;
+      Index : Positive;
+      Len   : Natural := 0;
+      Org   : String := "Append Kind")
    is
-      Tok : Token (X);
+      Tok   : Token (X);
    begin
       Tok.Sloc :=
         (First => 1,
-         Last => (if X = Enabled_LB_Token then 1 else 0),
+         Last => (if X in Enabled_LB_Token then 1
+                  else Len),
          others => <>);
       Tok.Index := Index;
+
+      --  Handle global tabs usage related variables initialisation
+      if X = Tab_Token
+        and then not Use_Tabs
+        and then Tab_Length = 0
+        and then Length (Tok) /= 0
+      then
+         Use_Tabs := True;
+         Tab_Length := Length (Tok);
+      end if;
+
       Append_Tokn (V, Tok, Org);
    end Append_Tokn_With_Index;
 
@@ -1263,10 +1298,16 @@ package body Pp.Scanner is
 
          else
             case Cur is
+               when W_HT =>
+                  Tok := (Kind => Tab_Token, Sloc => Tok.Sloc, Index => <>);
+                  while Cur = W_HT loop
+                     Get;
+                  end loop;
+
                when W_NUL =>
                   Tok := (Kind => End_Of_Input, Sloc => Tok.Sloc);
 
-               --  One_Space_Outdent instruction in the Template_Lang
+                  --  One_Space_Outdent instruction in the Template_Lang
 
                when '_' =>
                   Tok := (Kind => '_', Sloc => Tok.Sloc);
@@ -1518,7 +1559,6 @@ package body Pp.Scanner is
 
                when others =>
                   Get;
-
                   Tok := (Kind => Illegal_Character,
                           Sloc => Tok.Sloc, others => <>);
             end case;
@@ -1605,6 +1645,7 @@ package body Pp.Scanner is
                       and then Outp in
                         [1 => NL] | [1 => W_CR] | [W_CR, W_LF],
                     when Reserved_Word => To_Lower (Inp) = Outp,
+                    when Tab_Token => True,
                     when others => Inp = Outp);
             end;
          end if;
@@ -1965,12 +2006,14 @@ package body Pp.Scanner is
          Capitalize (Kind (Tok)'Img) &
          " at " &
          Image (Sloc (Tok)));
+
       if Kind (Tok) in Comment_Kind | Spaces
         or else Tokn_Length (Tok) > 2
       then
          Text_IO.Put
            (Text_IO.Standard_Output, " len = " & Image (Tokn_Length (Tok)));
       end if;
+
       if Kind (Tok) in Whole_Line_Comment then
          Text_IO.Put
            (Text_IO.Standard_Output,
@@ -1978,11 +2021,12 @@ package body Pp.Scanner is
             ", " & Image (Num_Lines (Tok)) & " lines" &
             ", lll = " & Image (Last_Line_Len (Tok)));
       end if;
+
       if Kind (Tok) in Line_Break_Token | Tab_Token then
          Text_IO.Put
-           (Text_IO.Standard_Output,
-            ", idx = " & Image (Index (Tok)));
+           (Text_IO.Standard_Output, ", idx = " & Image (Index (Tok)));
       end if;
+
       if Show_Origin then
          Text_IO.Put (Text_IO.Standard_Output, ", origin = """ &
                         Str (Tok.V.Fixed (Tok.Fi).Origin).S & """");
