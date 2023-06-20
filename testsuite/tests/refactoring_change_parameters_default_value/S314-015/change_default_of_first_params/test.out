@@ -1,5 +1,0 @@
-my_lib.adb
-2:22-2:24  : Integer := 2; 
-my_lib.ads
-2:22-2:24  : Integer := 2; 
-

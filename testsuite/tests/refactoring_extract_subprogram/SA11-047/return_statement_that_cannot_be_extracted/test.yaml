@@ -1,5 +1,0 @@
-title: return_statement_that_cannot_be_extracted
-
-description: extract_subprogram tool test
-
-driver: shell_script

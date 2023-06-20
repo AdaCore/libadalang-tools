@@ -23,7 +23,7 @@
 
 --  Common GNATPP partial selection utilities
 
-with Laltools.Refactor;
+with Ada.Strings.Unbounded;
 
 with Langkit_Support.Slocs;
 
@@ -36,7 +36,6 @@ with Utils.Char_Vectors;
 
 package Laltools.Partial_GNATPP is
 
-   use Laltools.Refactor;
    use Langkit_Support.Slocs;
    use Libadalang.Analysis;
 
@@ -71,6 +70,12 @@ package Laltools.Partial_GNATPP is
    --  PP_Options contains the gnatpp switches to be used during the formatting
    --  process. PP_Messages contains the Error messages issued by gnatpp during
    --  the formatting process.
+
+   type Text_Edit is
+      record
+         Location : Source_Location_Range;
+         Text     : Ada.Strings.Unbounded.Unbounded_String;
+      end record;
 
    type Partial_Formatting_Edit is
       record

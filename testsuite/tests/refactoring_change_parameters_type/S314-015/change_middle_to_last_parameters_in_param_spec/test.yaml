@@ -1,5 +1,0 @@
-title: change_middle_to_last_parameters_in_param_spec
-
-description: refactoring change_parameters_type test
-
-driver: shell_script

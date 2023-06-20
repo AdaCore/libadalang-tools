@@ -1,9 +1,0 @@
-title: multi_element
-
-description: |4
-    Tests that array aggregates with multiple elements using parentheses
-    syntax are converted to square brackets syntax.
-
-driver: shell_script
-
-canonicalize_backslashes: True

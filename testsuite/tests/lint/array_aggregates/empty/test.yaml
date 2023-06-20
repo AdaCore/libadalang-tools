@@ -1,9 +1,0 @@
-title: empty
-
-description: |4
-    Tests that empty array aggregates using parentheses syntax are converted to
-    square brackets syntax.
-
-driver: shell_script
-
-canonicalize_backslashes: True

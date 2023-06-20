@@ -17,22 +17,8 @@ BIN_PROJECTS = \
 
 TESTSUITE_PROJECTS ?= \
 	testsuite/ada_drivers/partial_gnatpp/partial_gnatpp.gpr \
-	testsuite/ada_drivers/refactor_imports/refactor_imports.gpr \
-	testsuite/ada_drivers/outgoing_calls/outgoing_calls.gpr \
-	testsuite/ada_drivers/refactoring_safe_rename/safe_rename.gpr \
-	testsuite/ada_drivers/refactoring_add_parameter/add_parameter.gpr \
-	testsuite/ada_drivers/refactoring_remove_parameter/remove_parameter.gpr \
-	testsuite/ada_drivers/move_parameter/move_parameter.gpr \
-	testsuite/ada_drivers/change_parameter_mode/change_parameter_mode.gpr \
-	testsuite/ada_drivers/refactoring_suppress_separate/suppress_separate.gpr \
-	testsuite/ada_drivers/refactoring_extract_subprogram/extract_subprogram.gpr \
-	testsuite/ada_drivers/refactoring_pull_up_declaration/pull_up_declaration.gpr \
-	testsuite/ada_drivers/refactoring_change_parameters_type/change_parameters_type.gpr \
-	testsuite/ada_drivers/refactoring_change_parameters_default_value/change_parameters_default_value.gpr \
-	testsuite/ada_drivers/refactoring_introduce_parameter/introduce_parameter.gpr \
-	testsuite/ada_drivers/refactoring_sort_dependencies/sort_dependencies.gpr \
-	testsuite/ada_drivers/refactoring_replace_type/replace_type.gpr \
-	testsuite/ada_drivers/gen_marshalling_lib/tgen_marshalling.gpr
+	testsuite/ada_drivers/gen_marshalling_lib/tgen_marshalling.gpr \
+	testsuite/ada_drivers/outgoing_calls/outgoing_calls.gpr
 
 ALL_PROJECTS = \
 	$(BIN_PROJECTS) $(LIB_PROJECTS) $(TESTSUITE_PROJECTS)

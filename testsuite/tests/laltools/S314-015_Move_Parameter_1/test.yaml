@@ -1,6 +1,0 @@
-description: |+
-    This test covers the Move Parameter Forward/Backward for subprograms that
-    are primitives of tagged types and for their calls which may or may not
-    be used with a dot notation.
-
-driver: shell_script

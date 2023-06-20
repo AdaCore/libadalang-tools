@@ -1,9 +1,0 @@
-title: selected_sources
-
-description: |4
-    Tests that array aggregates can process the --sources,-S switch that
-    defines the set of files to be refactored.
-
-driver: shell_script
-
-canonicalize_backslashes: True

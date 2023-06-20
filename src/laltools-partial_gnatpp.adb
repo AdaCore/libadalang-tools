@@ -26,14 +26,12 @@
 with Ada.Assertions;
 with Ada.Characters.Latin_1;
 with Ada.Directories;
-with Ada.Strings.Unbounded;
 with Ada.Strings.Wide_Wide_Fixed;
 with Ada.Text_IO;
 
 with GNAT.Strings;
 
-with Laltools.Common;   use Laltools.Common;
-with Laltools.Refactor; use Laltools.Refactor;
+with Laltools.Common; use Laltools.Common;
 
 with Langkit_Support.Text; use Langkit_Support.Text;
 
@@ -902,17 +900,16 @@ package body Laltools.Partial_GNATPP is
    is
       use Utils.Char_Vectors;
       use Ada.Characters.Latin_1;
-      use Ada.Strings.Unbounded;
 
       type Selected_Line_Record is
          record
             Line_Nb : Line_Number;
-            Line    : Unbounded_String;
+            Line    : Ada.Strings.Unbounded.Unbounded_String;
             SLOC    : Source_Location_Range;
          end record;
       No_Line : constant Selected_Line_Record := Selected_Line_Record'
         (Line_Nb => 0,
-         Line =>  Null_Unbounded_String,
+         Line =>  Ada.Strings.Unbounded.Null_Unbounded_String,
          SLOC => No_Source_Location_Range);
       type Selected_Lines_Arr is
         array (Natural range <>) of Selected_Line_Record;
@@ -981,7 +978,8 @@ package body Laltools.Partial_GNATPP is
          Str : constant String :=
            Char_Vectors.Elems (Buffer)
            (1 .. Char_Vectors.Last_Index (Buffer));
-         Crt_Line : Unbounded_String := Null_Unbounded_String;
+         Crt_Line : Ada.Strings.Unbounded.Unbounded_String :=
+           Ada.Strings.Unbounded.Null_Unbounded_String;
 
          Start_Line   : constant Line_Number := SL_Range.Start_Line;
          Line_Nb      : Natural := 0;
@@ -992,7 +990,7 @@ package body Laltools.Partial_GNATPP is
       begin
          for Idx in Str'Range loop
             Last_Was_Split_Char := False;
-            Append (Crt_Line, Str (Idx));
+            Ada.Strings.Unbounded.Append (Crt_Line, Str (Idx));
             if Str (Idx) = Split_Char then
                Last_Was_Split_Char := True;
                Line_Nb := Line_Nb + 1;
@@ -1004,8 +1002,10 @@ package body Laltools.Partial_GNATPP is
                     (Start_Line   => Crt_Line_Nb,
                      End_Line     => Crt_Line_Nb,
                      Start_Column => 1,
-                     End_Column   => Column_Number (Length (Crt_Line) - 1)));
-               Crt_Line := Null_Unbounded_String;
+                     End_Column   =>
+                       Column_Number
+                         (Ada.Strings.Unbounded.Length (Crt_Line) - 1)));
+               Crt_Line := Ada.Strings.Unbounded.Null_Unbounded_String;
             end if;
          end loop;
 
@@ -1019,7 +1019,9 @@ package body Laltools.Partial_GNATPP is
                  (Start_Line   => Crt_Line_Nb,
                   End_Line     => Crt_Line_Nb,
                   Start_Column => 1,
-                  End_Column   => Column_Number (Length (Crt_Line) - 1)));
+                  End_Column   =>
+                    Column_Number
+                      (Ada.Strings.Unbounded.Length (Crt_Line) - 1)));
          end if;
       end Split_Lines;
 
@@ -1059,13 +1061,14 @@ package body Laltools.Partial_GNATPP is
                                        return Utils.Char_Vectors.Char_Vector
       is
          Sel      : Utils.Char_Vectors.Char_Vector;
-         Crt_Line : Unbounded_String := Null_Unbounded_String;
+         Crt_Line : Ada.Strings.Unbounded.Unbounded_String :=
+           Ada.Strings.Unbounded.Null_Unbounded_String;
       begin
          for Idx in Filtered_Arr'Range loop
             Crt_Line := Filtered_Arr (Idx).Line;
             declare
                S : GNAT.Strings.String_Access :=
-                 new String'(To_String (Crt_Line));
+                 new String'(Ada.Strings.Unbounded.To_String (Crt_Line));
             begin
                if Idx = Filtered_Arr'Last
                  and then S'Last > S'First

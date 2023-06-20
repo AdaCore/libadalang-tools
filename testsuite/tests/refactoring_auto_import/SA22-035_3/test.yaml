@@ -1,6 +1,0 @@
-description:
-    refactor_imports - Type of a generic package instantiation, with the instantiation renamed and nested in a renamed package.
-
-baseline_regexp: True
-
-driver: shell_script

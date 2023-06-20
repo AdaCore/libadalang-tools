@@ -30,8 +30,6 @@ with GNAT.Strings;
 with GNATCOLL.Opt_Parse; use GNATCOLL.Opt_Parse;
 with GNATCOLL.Projects;
 
-with Laltools.Refactor;
-
 with Langkit_Support.Slocs; use Langkit_Support.Slocs;
 
 with Libadalang.Analysis; use Libadalang.Analysis;
@@ -265,7 +263,6 @@ procedure Partial_GNATpp is
 
                Edit : Partial_Formatting_Edit;
 
-               use Laltools.Refactor;
             begin
                Edit := Partial_Formatting_Edit'
                  (Diagnostics    => Messages,
