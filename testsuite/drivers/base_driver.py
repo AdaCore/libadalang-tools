@@ -29,21 +29,7 @@ class BaseDriver(DiffTestDriver):
         "metric",
         "stub",
         "test",
-        "check",
         "laltools",
-        "refactoring_auto_import",
-        "refactoring_add_parameter",
-        "refactoring_introduce_parameter",
-        "refactoring_remove_parameter",
-        "refactoring_change_parameters_type",
-        "refactoring_change_parameters_default_value",
-        "refactoring_safe_rename",
-        "refactoring_extract_subprogram",
-        "refactoring_pull_up_declaration",
-        "refactoring_suppress_separate",
-        "refactoring_sort_dependencies",
-        "refactoring_replace_type",
-        "lint"
     } | WIP_TOOLS
 
     @property
@@ -59,9 +45,7 @@ class BaseDriver(DiffTestDriver):
         for name in self.test_env["test_name"].split("__"):
             if name in self.ALL_TOOLS:
                 return name
-        raise TestAbortWithError(
-            "Cannot guess which tool is tested from test name"
-        )
+        raise TestAbortWithError("Cannot guess which tool is tested from test name")
 
     @property
     def baseline(self):
@@ -74,18 +58,14 @@ class BaseDriver(DiffTestDriver):
                 with open(filename, "rb") as text_f:
                     baseline = text_f.read()
             else:
-                with open(
-                    filename, "r", encoding=self.default_encoding
-                ) as bin_f:
+                with open(filename, "r", encoding=self.default_encoding) as bin_f:
                     baseline = bin_f.read()
         except FileNotFoundError:
             # Allow a missing test baseline file - treat as empty
             return (None, "", is_regexp)
         except Exception as exc:
             raise TestAbortWithError(
-                "cannot read baseline file ({}: {})".format(
-                    type(exc).__name__, exc
-                )
+                "cannot read baseline file ({}: {})".format(type(exc).__name__, exc)
             )
 
         return (filename, baseline, is_regexp)
@@ -93,8 +73,10 @@ class BaseDriver(DiffTestDriver):
     @property
     def test_control_creator(self):
         return YAMLTestControlCreator(
-            {"windows": self.env.target.os.name == "windows",
-             "x86"    : self.env.target.cpu.bits == 32}
+            {
+                "windows": self.env.target.os.name == "windows",
+                "x86": self.env.target.cpu.bits == 32,
+            }
         )
 
     def set_up(self):

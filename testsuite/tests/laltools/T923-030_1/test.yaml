@@ -1,6 +1,0 @@
-description:
-    refactor_imports - This test proves that overloaded subprograms do not cause a duplicated suggestion.
-
-baseline_regexp: True
-
-driver: shell_script

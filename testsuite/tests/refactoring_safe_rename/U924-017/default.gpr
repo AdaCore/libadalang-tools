@@ -1,7 +1,0 @@
-project Default is
-   for Main use ("main.adb");
-   package Compiler is
-      for Switches ("ada") use ("-gnat2022");
-   end Compiler;
-end Default;
-

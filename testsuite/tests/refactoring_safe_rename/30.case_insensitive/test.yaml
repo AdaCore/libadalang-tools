@@ -1,5 +1,0 @@
-description:
-    Refactoring Safe Rename test that confirms that the algorithm does a
-    case insensitive comparisson between the original and the new name.
-
-driver: shell_script

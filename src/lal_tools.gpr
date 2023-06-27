@@ -10,7 +10,7 @@ library project LAL_Tools is
    Library_Type : Library_Type_Type := external ("LIBRARY_TYPE", "static");
 
    for Source_Dirs use
-     (".", "tgen", "tgen/tgen_rts", "lint",
+     (".", "tgen", "tgen/tgen_rts",
       "tgen/templates/marshalling_templates",
       "tgen/templates/json_templates",
       "tgen/templates/type_representation_templates");
@@ -30,8 +30,7 @@ library project LAL_Tools is
       "metrics-main.adb",
       "stub-main.adb",
       "test-main.adb",
-      "utils-var_length_ints-test.adb",
-      "lint-main.adb");
+      "utils-var_length_ints-test.adb");
 
    package Compiler renames LAL_Tools_Common.Compiler;
 

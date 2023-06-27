@@ -1,6 +1,0 @@
-description: |
-    This test checks if the safe rename tool correctly handles
-    projects with separate subprograms whose parent package source
-    has been excluded from the project.
-
-driver: shell_script

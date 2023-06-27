@@ -1,9 +1,0 @@
-title: range_attribute_ref_as_index
-
-description: |4
-    Tests that the indices are not removed in an array aggregate with indices
-    defined by the Range attribute of an array object.
-
-driver: shell_script
-
-canonicalize_backslashes: True

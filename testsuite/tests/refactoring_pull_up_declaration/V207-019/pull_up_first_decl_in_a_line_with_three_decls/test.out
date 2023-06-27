@@ -1,6 +1,0 @@
-main.adb
-4:1-4:1    --  Some comments
-   type Infiltrated_Type_1 is new Integer;
-
-6:1-7:46 
-

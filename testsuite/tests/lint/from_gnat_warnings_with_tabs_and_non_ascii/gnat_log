@@ -1,2 +1,0 @@
-my_package-child_package.adb:13:10: warning: variable "Pipo_Vector" is not referenced [-gnatwu]
-my_package-child_package.adb:13:57: warning: array aggregate using () is an obsolescent syntax, use [] instead [-gnatwj]

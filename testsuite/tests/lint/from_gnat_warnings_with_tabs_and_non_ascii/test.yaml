@@ -1,9 +1,0 @@
-title: from_gnat_warnings_with_tabs
-
-description: |4
-    Tests that sources with tabs and non ascii characters are correctly handled
-    with the --from-gnat-warnings switch.
-
-driver: shell_script
-
-canonicalize_backslashes: True

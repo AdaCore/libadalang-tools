@@ -1,5 +1,0 @@
-description:
-    Refactoring - Rename test that checks if after renaming a Defining_Name,
-    its references remain the same.
-
-driver: shell_script
