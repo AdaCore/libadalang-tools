@@ -378,7 +378,6 @@ package body Pp.Buffers is
    procedure Insert (Buf : in out Buffer; C : W_Char) is
       pragma Assert (C /= W_NUL);
       pragma Assert (not Is_Line_Terminator (C));
-      pragma Assert (C /= W_HT);
    begin
       --  The whole point of this package is that we don't need to adjust the
       --  Markers here! Markers in To_Markers are to the left of the newly
@@ -422,6 +421,12 @@ package body Pp.Buffers is
       Maybe_Adjust_Marker (Buf);
       Append (Buf.To, NL);
    end Insert_NL;
+
+   procedure Insert_Tab (Buf : in out Buffer) is
+   begin
+      Maybe_Adjust_Marker (Buf);
+      Append (Buf.To, W_HT);
+   end Insert_Tab;
 
    procedure Append_Any (Buf : in out Buffer; C : W_Char) is
       pragma Assert (At_End (Buf));
@@ -582,6 +587,7 @@ package body Pp.Buffers is
       Input                   : String;
       Wide_Character_Encoding : System.WCh_Con.WC_Encoding_Method;
       Expand_Tabs             : Boolean := False;
+      Tab_Len                 : Natural;
       Include_Trailing_Spaces : Boolean := False)
    is
       pragma Assert (Expand_Tabs);
@@ -592,9 +598,11 @@ package body Pp.Buffers is
         (Encoding_Method => Wide_Character_Encoding);
       package Brackets_Decoder is new GNAT.Decode_String
         (Encoding_Method => System.WCh_Con.WCEM_Brackets);
-      Ptr     : Natural  := Input'First;
-      C       : W_Char;
-      Tab_Len : constant := 8;
+      Ptr        : Natural  := Input'First;
+      C          : W_Char;
+      Tab_Length : constant Natural := (if Tab_Len /= 0 then Tab_Len else 8);
+      --  The Tab_Len parameter value will be used if not null otherwise the
+      --  default is set to 8.
 
       function At_Brackets_Start return Boolean with
          Pre => Input (Ptr) = '[';
@@ -682,7 +690,7 @@ package body Pp.Buffers is
          if C = W_HT and then Expand_Tabs then
             loop
                Insert_Ada (Buf, ' ', Include_Trailing_Spaces);
-               exit when Buf.Cur_Column mod Tab_Len = 1;
+               exit when Buf.Cur_Column mod Tab_Length = 1;
             end loop;
          elsif Is_Space (C) then
             Insert_Ada (Buf, ' ', Include_Trailing_Spaces);
@@ -743,6 +751,7 @@ package body Pp.Buffers is
          Input                   => Input (First .. Input'Last),
          Wide_Character_Encoding => Wide_Character_Encoding,
          Expand_Tabs             => Expand_Tabs,
+         Tab_Len                 => 0,
          Include_Trailing_Spaces => Include_Trailing_Spaces);
 
       Free (Input);

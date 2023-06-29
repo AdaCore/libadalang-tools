@@ -89,8 +89,7 @@ package Pp.Buffers is
    pragma Inline (At_Beginning);
    --  True if 'point' points to the first character (i.e. position 1)
 
-   function Cur (Buf : Buffer) return W_Char with
-      Post => Cur'Result /= W_HT; -- ???For now
+   function Cur (Buf : Buffer) return W_Char; -- with
    pragma Inline (Cur);
    --  Return the character at 'point'. NUL if At_End.
 
@@ -147,6 +146,9 @@ package Pp.Buffers is
 
    procedure Insert_NL (Buf : in out Buffer);
    --  Same as Insert_Any (Buf, NL)
+
+   procedure Insert_Tab (Buf : in out Buffer);
+   --  Same as Insert_Any (Buf, W_HT)
 
    procedure Append_Any (Buf : in out Buffer; C : W_Char);
 
@@ -218,6 +220,7 @@ package Pp.Buffers is
       Input                   : String;
       Wide_Character_Encoding : System.WCh_Con.WC_Encoding_Method;
       Expand_Tabs             : Boolean := False;
+      Tab_Len                 : Natural;
       Include_Trailing_Spaces : Boolean := False);
    procedure Read_Ada_File
      (Buf                     : in out Buffer;

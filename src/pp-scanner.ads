@@ -591,9 +591,10 @@ private
       case Kind is
          when Line_Break_Token | Tab_Token =>
             Index : Positive;
-            --  This is really of type Line_Break_Index or Tab_Index, but
-            --  we don't want to depend on Pp.Formatting, where those are
+            --  This is really of type Line_Break_Index or Tab_Index, but we
+            --  don't want to depend on Pp.Formatting, where those are
             --  declared. See child package Lines for a well-typed interface.
+
          when Stored_Text_Kind =>
             Text : Syms.Symbol;
             case Kind is
@@ -660,8 +661,11 @@ private
      Pre => Kind (X) in Line_Break_Token | Tab_Token;
 
    procedure Append_Tokn_With_Index
-     (V : in out Tokn_Vec; X : Token_Kind; Index : Positive;
-      Org : String := "Append Kind") with
+     (V     : in out Tokn_Vec;
+      X     : Token_Kind;
+      Index : Positive;
+      Len   : Natural := 0;
+      Org   : String := "Append Kind") with
      Pre => X in Line_Break_Token | Tab_Token;
 
 end Pp.Scanner;

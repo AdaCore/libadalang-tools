@@ -5886,6 +5886,9 @@ package body Pp.Actions is
          Input                   => Elems (Input) (1 .. Last_Index (Input)),
          Wide_Character_Encoding => Wide_Char_Encoding,
          Expand_Tabs             => True,
+         Tab_Len                 => (if Arg (Cmd, Use_Tabs)
+                                     then PP_Indentation (Cmd)
+                                     else 0),
          Include_Trailing_Spaces => False);
       --  Expand tabs unconditionally. This differs from the behavior of
       --  the old gnatpp, which has an option for that (but only for

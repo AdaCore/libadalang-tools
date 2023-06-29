@@ -40,7 +40,7 @@ package Pp.Scanner.Lines is
       Org : String := "Append_Line_Break_Tokn");
 
    procedure Append_Tab_Tokn
-     (V : in out Tokn_Vec; Index : Tab_Index;
+     (V : in out Tokn_Vec; Index : Tab_Index; Tab_Len : Natural := 0;
       Org : String := "Append_Tab_Tokn");
 
    procedure Put_Index_Info (All_LB : Line_Break_Vector; X : Tokn_Cursor)

@@ -258,11 +258,25 @@ package Pp.Command_Lines is
       Vertical_Enum_Types,
       Vertical_Array_Types,
       Vertical_Named_Aggregates,
-      Vertical_Case_Alternatives);
+      Vertical_Case_Alternatives,
+      Use_Tabs);
    --  --source-line-breaks means to keep the line breaks from the source;
    --  do not insert or delete any line breaks. --spaces-only means to insert
    --  and delete spaces as appropriate, but not make any other transformations
    --  (such as changing "end;" to "end X;").
+   --
+   --  --use-tabs means to replace spaces by tabs when this is possible or get
+   --  a mix of tabs and spaces if the number of spaces is not matching exactly
+   --  the tab size.So, when tab formatting is enabled
+   --     * use --indentation to know how many spaces a tab has
+   --     * when the indentation corresponds to n*tab_size use n tabs instead
+   --       of spaces
+   --       (i.e., when tab_size=3 6 spaces
+   --              => replaced by 2 tabs)
+   --     * when the indentation does not match n*tab_size, it will use a mix
+   --       of tab characters and normal whitespaces
+   --       (i.e., when tab_size=3 and 8 spaces
+   --              => replaced by 2 tabs and 2 spaces)
 
    package Pp_Boolean_Switches is new Boolean_Switches
      (Descriptor,
@@ -295,7 +309,8 @@ package Pp.Command_Lines is
        Vertical_Enum_Types => null,
        Vertical_Array_Types => null,
        Vertical_Named_Aggregates => null,
-       Vertical_Case_Alternatives => null]);
+       Vertical_Case_Alternatives => null,
+       Use_Tabs => null]);
 
    package Pp_Boolean_Defaults is new
      Pp_Boolean_Switches.Set_Defaults
@@ -325,7 +340,8 @@ package Pp.Command_Lines is
          Vertical_Enum_Types => False,
          Vertical_Array_Types => False,
          Vertical_Named_Aggregates => False,
-         Vertical_Case_Alternatives => False]);
+         Vertical_Case_Alternatives => False,
+         Use_Tabs => False]);
 
    type Pp_Strings is
      (File_Name_File, -- Not documented

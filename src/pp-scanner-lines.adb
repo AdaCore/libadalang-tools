@@ -36,17 +36,25 @@ package body Pp.Scanner.Lines is
       Org : String := "Append_Line_Break_Tokn") is
    begin
       if Enabled then
-         Append_Tokn_With_Index  (V, Enabled_LB_Token, Positive (Index), Org);
+         Append_Tokn_With_Index
+           (V     => V,
+            X     => Enabled_LB_Token,
+            Index => Positive (Index),
+            Org   => Org);
       else
-         Append_Tokn_With_Index  (V, Disabled_LB_Token, Positive (Index), Org);
+         Append_Tokn_With_Index
+           (V     => V,
+            X     => Disabled_LB_Token,
+            Index => Positive (Index),
+            Org   => Org);
       end if;
    end Append_Line_Break_Tokn;
 
    procedure Append_Tab_Tokn
-     (V : in out Tokn_Vec; Index : Tab_Index;
+     (V : in out Tokn_Vec; Index : Tab_Index; Tab_Len : Natural := 0;
       Org : String := "Append_Tab_Tokn") is
    begin
-      Append_Tokn_With_Index  (V, Tab_Token, Positive (Index), Org);
+      Append_Tokn_With_Index  (V, Tab_Token, Positive (Index), Tab_Len, Org);
    end Append_Tab_Tokn;
 
    procedure Put_Index_Info (All_LB : Line_Break_Vector; X : Tokn_Cursor) is
