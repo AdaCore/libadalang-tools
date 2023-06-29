@@ -595,15 +595,6 @@ private
             --  don't want to depend on Pp.Formatting, where those are
             --  declared. See child package Lines for a well-typed interface.
 
-         --  when Tab_Token =>
-         --     Index : Positive;
-         --   --  This is really of type Tab_Index, but we don't want to depend
-         --     --  on Pp.Formatting, where those are declared.
-         --     --  See child package Lines for a well-typed interface.
-         --     Len : Natural;
-         --   --  Tab length as set by PP_Indentation or 0 by default. Used for
-         --     --  output formatted vector and SLOC computation.
-
          when Stored_Text_Kind =>
             Text : Syms.Symbol;
             case Kind is
