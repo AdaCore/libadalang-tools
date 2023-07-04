@@ -35,8 +35,6 @@ with Laltools.Common; use Laltools.Common;
 
 with Langkit_Support.Text; use Langkit_Support.Text;
 
-with Libadalang.Common; use Libadalang.Common;
-
 with Pp.Actions;
 
 with Utils.Command_Lines;
@@ -139,7 +137,9 @@ package body Laltools.Partial_GNATPP is
    type Search_Direction is (Forward, Backward);
 
    function Lookup
-     (Unit : Analysis_Unit; Token : Token_Reference; Look : Search_Direction)
+     (Unit  : Analysis_Unit;
+      Token : Libadalang.Common.Token_Reference;
+      Look  : Search_Direction)
       return Ada_Node;
    --  Finds the next Ada_Node relative to Token. Look param controls the
    --  search direction. If Token already belongs to an Ada_Node, that node is
@@ -147,9 +147,9 @@ package body Laltools.Partial_GNATPP is
    --  Token = No_Token.
 
    function Next_Non_Whitespace
-     (Token  : Token_Reference;
+     (Token  : Libadalang.Common.Token_Reference;
       Search : Search_Direction)
-      return Token_Reference;
+      return Libadalang.Common.Token_Reference;
    --  Finds the next non white Token_Reference relative to Token. Search
    --  controls the lookup direction. Returns No_Token if no whitespace
    --  is found or if Token = No_Token.
@@ -203,13 +203,14 @@ package body Laltools.Partial_GNATPP is
    ------------
 
    function Lookup
-     (Unit : Analysis_Unit;
-      Token : Token_Reference;
-      Look : Search_Direction)
+     (Unit  : Analysis_Unit;
+      Token : Libadalang.Common.Token_Reference;
+      Look  : Search_Direction)
       return Ada_Node
    is
       Crt_Token      : Token_Reference              := Token;
-      Crt_Token_Kind : Libadalang.Common.Token_Kind := Kind (Data (Crt_Token));
+      Crt_Token_Kind : Libadalang.Common.Token_Kind :=
+        Kind (Libadalang.Common.Data (Crt_Token));
    begin
       --  Nothing to do if Aux_Token <=> Token is a No_Token or already
       --  belongs to an Ada_Node.
@@ -727,7 +728,8 @@ package body Laltools.Partial_GNATPP is
         (Kind in Ada_Package_Body | Ada_Package_Decl |
          Ada_Library_Item | Ada_Subp_Body | Ada_Task_Body | Ada_Decl_Block |
          Ada_For_Loop_Stmt | Ada_Loop_Stmt | Ada_While_Loop_Stmt |
-         Ada_If_Stmt_Range);
+         Ada_If_Stmt_Range | Ada_Case_Stmt_Range |
+         Ada_Case_Stmt_Alternative_Range);
 
       function Is_Expected_Parent_Node
         (Node : Ada_Node'Class) return Boolean is
@@ -776,7 +778,8 @@ package body Laltools.Partial_GNATPP is
             when Ada_Package_Body | Ada_Package_Decl
                | Ada_Task_Body | Ada_Subp_Body | Ada_Decl_Block
                | Ada_For_Loop_Stmt | Ada_Loop_Stmt | Ada_While_Loop_Stmt
-               | Ada_If_Stmt_Range
+               | Ada_If_Stmt_Range | Ada_Case_Stmt_Range
+               | Ada_Case_Stmt_Alternative_Range
                => Offset := Offset + PP_Indentation;
 
             when others => null;
@@ -1293,36 +1296,6 @@ package body Laltools.Partial_GNATPP is
 
    end Format_Selection;
 
-   type Formatting_Region_Type (List_Slice : Boolean) is
-      record
-         Start_Token    : Libadalang.Common.Token_Reference;
-         End_Token      : Libadalang.Common.Token_Reference;
-         Enclosing_Node : Ada_Node;
-         case List_Slice is
-            when True =>
-               Start_Child_Index : Positive;
-               End_Child_Index : Positive;
-            when False =>
-               null;
-         end case;
-      end record;
-
-   function Get_Formatting_Region
-     (Unit        : Analysis_Unit;
-      Input_Range : Source_Location_Range)
-      return Formatting_Region_Type;
-   --  Given an Unit and an Input_Range, returns a Formatting_Region_Type
-   --  which:
-   --    - Start_Token is the first token to be formatted
-   --    - End_Token is the last token to be formatted
-   --    - Enclosing_Node is the node to be formatted
-   --    - List_Slice is set to True if Enclosing_Node is a list and only a
-   --      slice of its elements is to be formatted
-   --      - First_Child_Index is the first element of enclosing node to be
-   --        formatted
-   --      - End_Child_Index is the second element of enclosing node to be
-   --        formatted
-
    -----------
    -- Image --
    -----------
@@ -1669,15 +1642,29 @@ package body Laltools.Partial_GNATPP is
 
       Formatting_Region   : constant Formatting_Region_Type :=
         Get_Formatting_Region (Unit, Input_Selection_Range);
-      Initial_Indentation : constant Natural :=
+      Initial_Indentation : Natural :=
         Get_Initial_Indentation
           (Formatting_Region.Enclosing_Node, PP_Indentation (PP_Options));
+      Previous_Token      : constant Token_Reference :=
+        Previous_Non_Whitespace_Non_Comment_Token
+          (Formatting_Region.Enclosing_Node.Token_Start);
+      Previous_Token_Node : constant Ada_Node :=
+        (if Previous_Token = No_Token then No_Ada_Node
+         else Formatting_Region.Enclosing_Node.Unit.Root.Lookup
+                (Start_Sloc (Sloc_Range (Data (Previous_Token)))));
+      Indentation_Guess   : constant Natural :=
+        (if Previous_Token_Node.Is_Null then 0
+         else Estimate_Indentation (Formatting_Region.Enclosing_Node));
       First_Line_Offset   : constant Natural :=
         Get_First_Line_Offset (Formatting_Region.Enclosing_Node);
 
       Formatted_Text_Ignore : Natural := 0;
 
    begin
+      if Initial_Indentation /= Indentation_Guess then
+         Initial_Indentation := Indentation_Guess;
+      end if;
+
       declare
          Input_Text      : constant Utils.Char_Vectors.Char_Vector :=
            Get_Selection_Text
@@ -1775,9 +1762,197 @@ package body Laltools.Partial_GNATPP is
                      (Formatted_Range,
                       Copy_Slice (Formatted_Text, Formatted_Text_Ignore)),
                  Formatted_Node => Formatting_Region.Enclosing_Node,
+                 Indentation    => Initial_Indentation,
                  Diagnostics    => Diagnostics);
          end;
       end;
    end Format_Selection;
+
+   -----------------------------------------------
+   -- Previous_Non_Whitespace_Non_Comment_Token --
+   -----------------------------------------------
+
+   function Previous_Non_Whitespace_Non_Comment_Token
+     (Token : Token_Reference)
+      return Token_Reference is
+   begin
+      return Result : Token_Reference :=
+               (if Token = No_Token
+                then No_Token
+                else Previous (Token))
+      do
+         while
+           Result /= No_Token
+           and then Kind (Data (Result)) in Ada_Whitespace | Ada_Comment
+         loop
+            Result := Previous (Result);
+         end loop;
+      end return;
+   end Previous_Non_Whitespace_Non_Comment_Token;
+
+   function Parent_Based_Indentation
+     (Parents            : Ada_Node_Array;
+      Indentation        : Positive := 3;
+      Inline_Indentation : Positive := 2)
+      return Natural;
+   --  Computes Indentation starting at zero and incrementing based on the
+   --  Parents kind or returning earlier if finds a parent that always sets
+   --  indentation, for instance, a parameter list.
+
+   ------------------------------
+   -- Parent_Based_Indentation --
+   ------------------------------
+
+   function Parent_Based_Indentation
+     (Parents            : Ada_Node_Array;
+      Indentation        : Positive := 3;
+      Inline_Indentation : Positive := 2)
+      return Natural
+   is
+      Current_Indentation : Natural := 0;
+
+   begin
+      for Parent of Parents loop
+         case Parent.Kind is
+            when Ada_Declarative_Part_Range
+               | Ada_Handled_Stmts_Range
+               | Ada_Loop_Stmt_Range
+               | Ada_For_Loop_Stmt_Range
+               | Ada_While_Loop_Stmt_Range
+               | Ada_If_Stmt_Range
+               | Ada_Case_Stmt_Range
+               | Ada_Case_Stmt_Alternative_Range
+               | Ada_Record_Type_Def_Range
+               | Ada_Generic_Formal_Part_Range =>
+               Current_Indentation := @ + Indentation;
+
+            when Ada_Subp_Spec_Range | Ada_Assign_Stmt_Range =>
+               Current_Indentation := @ + Inline_Indentation;
+
+            when Ada_Dotted_Name_Range =>
+               Current_Indentation :=
+                 Natural (Parent.Sloc_Range.Start_Column) - 1
+                 + Inline_Indentation;
+               exit;
+
+            when Ada_Params_Range =>
+               Current_Indentation :=
+                 Natural (Parent.Sloc_Range.Start_Column) - 1 + 1;
+               exit;
+
+            when Ada_Assoc_List_Range | Ada_Component_List_Range =>
+               Current_Indentation :=
+                 Natural (Parent.Sloc_Range.Start_Column) - 1;
+               exit;
+
+            when others =>
+               null;
+         end case;
+      end loop;
+
+      return Current_Indentation;
+   end Parent_Based_Indentation;
+
+   --------------------------
+   -- Estimate_Indentation --
+   --------------------------
+
+   function Estimate_Indentation
+     (Unit : Analysis_Unit;
+      Line_Number : Langkit_Support.Slocs.Line_Number)
+      return Natural
+   is
+      Token    : constant Token_Reference :=
+        Unit.Lookup_Token (Source_Location'(Line_Number, 1));
+
+      function Get_Relevant_Parents return Ada_Node_Array;
+      --  TODO
+
+      function Get_Relevant_Parents return Ada_Node_Array is
+         Previous : Token_Reference :=
+           (if Token = No_Token then No_Token
+            else Previous_Non_Whitespace_Non_Comment_Token (Token));
+
+      begin
+         if Previous = No_Token then
+            return [];
+         end if;
+
+         if Kind (Data (Previous)) in Ada_Comma | Ada_Dot then
+            Previous :=
+              Previous_Non_Whitespace_Non_Comment_Token (Previous);
+         end if;
+
+         declare
+            Node : constant Ada_Node :=
+              Unit.Root.Lookup (Start_Sloc (Sloc_Range (Data (Previous))));
+
+         begin
+            if Node.Kind in Ada_Subp_Body_Range then
+               if Kind (Data (Previous)) in Ada_Is then
+                  return Node.As_Subp_Body.F_Decls.Parents;
+
+               elsif Kind (Data (Previous)) in Ada_Begin then
+                  return Node.As_Subp_Body.F_Stmts.Parents;
+               end if;
+
+            elsif Node.Kind in Ada_Package_Body_Range then
+               if Kind (Data (Previous)) in Ada_Is then
+                  return Node.As_Package_Body.F_Decls.Parents;
+
+               elsif Kind (Data (Previous)) in Ada_Begin then
+                  return Node.As_Package_Body.F_Stmts.Parents;
+               end if;
+
+            elsif Node.Kind in Ada_Package_Decl_Range then
+               if Kind (Data (Previous)) in Ada_Is then
+                  return Node.As_Package_Decl.F_Public_Part.Parents;
+
+               elsif Kind (Data (Previous)) in Ada_Private then
+                  return Node.As_Package_Decl.F_Private_Part.Parents;
+               end if;
+
+            elsif Node.Kind in Ada_Generic_Package_Internal_Range then
+               if Kind (Data (Previous)) in Ada_Is then
+                  return Node.As_Generic_Package_Internal.F_Public_Part.
+                           Parents;
+
+               elsif Kind (Data (Previous)) in Ada_Private then
+                  return Node.As_Generic_Package_Internal.F_Private_Part.
+                           Parents;
+               end if;
+
+            elsif Node.Kind in Ada_Generic_Formal_Part_Range then
+               if Kind (Data (Previous)) in Ada_Generic then
+                  return Node.As_Generic_Formal_Part.F_Decls.Parents;
+               end if;
+            end if;
+
+            return Node.Parents;
+         end;
+      end Get_Relevant_Parents;
+
+   begin
+
+      return Parent_Based_Indentation (Get_Relevant_Parents);
+   end Estimate_Indentation;
+
+   --------------------------
+   -- Estimate_Indentation --
+   --------------------------
+
+   function Estimate_Indentation
+     (Node               : Ada_Node;
+      Indentation        : Positive := 3;
+      Inline_Indentation : Positive := 2)
+      return Natural
+   is
+      Parents    : constant Ada_Node_Array :=
+        (if Node.Is_Null then [] else  Node.Parents (False));
+
+   begin
+      return
+        Parent_Based_Indentation (Parents, Indentation, Inline_Indentation);
+   end Estimate_Indentation;
 
 end Laltools.Partial_GNATPP;

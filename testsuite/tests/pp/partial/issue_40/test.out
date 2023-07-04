@@ -9,6 +9,6 @@ main.adb(<IfStmt main.adb:4:7-6:11>) - 4:1-6:11
 *************************************
 main.adb(<CallStmt main.adb:5:7-5:29>) - 5:1-5:29
 ^
-         Put_Line (My_Var'Img);$
+      Put_Line (My_Var'Img);$
 *************************************
 

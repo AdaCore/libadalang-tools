@@ -3,19 +3,19 @@
 *************************************
 exception_declaration.ads(<ExceptionDecl ["Singular"] exception_declaration.ads:21:1-21:22>) - 21:1-21:22
 ^
-Singular : exception;$
+   Singular : exception;$
 *************************************
 
 *************************************
 exception_declaration.ads(<ExceptionDecl ["Error"] exception_declaration.ads:22:1-22:22>) - 22:1-22:22
 ^
-Error : exception;$
+   Error : exception;$
 *************************************
 
 *************************************
 exception_declaration.ads(<ExceptionDecl ["Overflow", "Underflow"] exception_declaration.ads:23:1-23:33>) - 23:1-23:33
 ^
-Overflow, Underflow : exception;$
+   Overflow, Underflow : exception;$
 *************************************
 
 *************************************

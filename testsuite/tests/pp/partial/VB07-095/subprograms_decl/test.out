@@ -82,44 +82,44 @@ null_procedure_declaration.ads(<NullSubpDecl ["Simplify"] null_procedure_declara
 *************************************
 abstract_subprogram_declaration.ads(<SubtypeDecl ["Element_Type"] abstract_subprogram_declaration.ads:22:5-22:37>) - 22:1-22:37
 ^
-    subtype Element_Type is Natural;$
+   subtype Element_Type is Natural;$
 *************************************
 
 *************************************
 abstract_subprogram_declaration.ads(<ConcreteTypeDecl ["Set"] abstract_subprogram_declaration.ads:23:5-23:45>) - 23:1-23:45
 ^
-    type Set is abstract tagged null record;$
+   type Set is abstract tagged null record;$
 *************************************
 
 *************************************
 abstract_subprogram_declaration.ads(<AbstractSubpDecl ["Empty"] abstract_subprogram_declaration.ads:25:5-25:43>) - 25:1-25:43
 ^
-    function Empty return Set is abstract;$
+   function Empty return Set is abstract;$
 *************************************
 
 *************************************
 abstract_subprogram_declaration.ads(<AbstractSubpDecl ["Union"] abstract_subprogram_declaration.ads:26:5-26:62>) - 26:1-26:62
 ^
-    function Union (Left, Right : Set) return Set is abstract;$
+   function Union (Left, Right : Set) return Set is abstract;$
 *************************************
 
 *************************************
 abstract_subprogram_declaration.ads(<AbstractSubpDecl ["Intersection"] abstract_subprogram_declaration.ads:27:5-27:69>) - 27:1-27:69
 ^
-    function Intersection (Left, Right : Set) return Set is abstract;$
+   function Intersection (Left, Right : Set) return Set is abstract;$
 *************************************
 
 *************************************
 abstract_subprogram_declaration.ads(<AbstractSubpDecl ["Unit_Set"] abstract_subprogram_declaration.ads:28:5-28:70>) - 28:1-28:70
 ^
-    function Unit_Set (Element : Element_Type) return Set is abstract;$
+   function Unit_Set (Element : Element_Type) return Set is abstract;$
 *************************************
 
 *************************************
 abstract_subprogram_declaration.ads(<AbstractSubpDecl ["Take"] abstract_subprogram_declaration.ads:29:5-30:51>) - 29:1-30:51
 ^
-    procedure Take
-      (Element : out Element_Type; From : in out Set) is abstract;$
+   procedure Take
+     (Element : out Element_Type; From : in out Set) is abstract;$
 *************************************
 
 -----------------------------------------------------------------
