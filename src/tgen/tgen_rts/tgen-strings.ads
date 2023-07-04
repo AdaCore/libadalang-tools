@@ -23,6 +23,7 @@
 --
 --  String manipulation utilities
 
+with Ada.Containers;
 with Ada.Containers.Indefinite_Ordered_Sets;
 with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Ordered_Sets;
@@ -161,6 +162,11 @@ package TGen.Strings is
    function Hash2 (Self : Ada_Qualified_Name) return Ada.Containers.Hash_Type
    is (Ada.Strings.Hash (To_Ada (Self)));
 
+   function Copy_Delete_Last
+     (FQN : Ada_Qualified_Name) return Ada_Qualified_Name with
+     Pre => Ada.Containers.">=" (FQN.Length, 1);
+   --  Return a copy of FQN, deleting the last name in the process.
+
    package Ada_Qualified_Name_Sets is new Ada.Containers.Ordered_Sets
      (Element_Type => Ada_Qualified_Name,
       "="          => Ada_Identifier_Vectors."=");
@@ -173,7 +179,7 @@ package TGen.Strings is
    subtype Ada_Qualified_Name_Sets_Map is Ada_Qualified_Name_Sets_Maps.Map;
 
    function Is_Operator (Op_Name : String) return Boolean;
-   --  Return wether Self is an operator
+   --  Return Whether Self is an operator
 
    function Map_Operator_Name (Op_Name : String) return String with
      Pre => Is_Operator (Op_Name);

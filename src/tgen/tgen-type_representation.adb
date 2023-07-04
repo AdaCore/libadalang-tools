@@ -49,6 +49,10 @@ package body TGen.Type_Representation is
       Constraint_Init : out Unbounded_String);
    --  Return the specification and initialization for a constraint
 
+   ---------------------------------
+   -- Collect_Info_For_Constraint --
+   ---------------------------------
+
    procedure Collect_Info_For_Constraint
      (Ty_Prefix : String;
       Constraint : TGen.Types.Constraints.Constraint'Class;
@@ -555,10 +559,6 @@ package body TGen.Type_Representation is
          Assocs : Translate_Set;
          I : Positive := 1;
 
-         Current_Variant_Index : constant Positive := Variant_Index;
-         --  Save the current variant index as it is incremented by recursive
-         --  calls.
-
       begin
          if Variant = null then
             return;
@@ -630,12 +630,14 @@ package body TGen.Type_Representation is
                   Insert
                     (Assocs,
                      Assoc
-                       ("NESTED_VARIANT_NUMBER", Current_Variant_Index + 1));
+                       ("NESTED_VARIANT_NUMBER", Variant_Index));
                   Collect_Info_For_Variant
                     (Choice.Variant,
                      Ty_Prefix,
                      Variant_Spec,
                      Variant_Init);
+               else
+                  Insert (Assocs, Assoc ("HAS_VARIANT", False));
                end if;
 
                Insert (Assocs, Assoc ("VARIANT_CHOICE_NUMBER", I));

@@ -214,7 +214,7 @@ package TGen.Types.Constraints is
    function Supports_Static_Gen (Self : Anonymous_Typ) return Boolean is
      (Self.Named_Ancestor.Get.Supports_Static_Gen
       and then Self.Subtype_Constraints.Static);
-   --  Wether values for this Typ can be statically generated
+   --  Whether values for this Typ can be statically generated
 
    function Encode (Self : Anonymous_Typ; Val : JSON_Value) return JSON_Value;
 
@@ -225,6 +225,9 @@ package TGen.Types.Constraints is
      (Self : Anonymous_Typ) return Strategy_Type'Class;
 
    procedure Free_Content (Self : in out Anonymous_Typ);
+
+   function Supports_Gen (Self : Anonymous_Typ) return Boolean is
+     (Self.Named_Ancestor.Get.Supports_Gen);
 
    type Instance_Typ is new Typ with record
       Orig_Typ : SP.Ref;
@@ -243,10 +246,13 @@ package TGen.Types.Constraints is
 
    function Supports_Static_Gen (Self : Instance_Typ) return Boolean is
      (False);
-   --  Wether values for this Typ can be statically generated
+   --  Whether values for this Typ can be statically generated
 
    function Get_Diagnostics (Self : Instance_Typ) return String is
      (Self.Orig_Typ.Get.Get_Diagnostics);
+
+   function Supports_Gen (Self : Instance_Typ) return Boolean is
+     (Self.Orig_Typ.Get.Supports_Gen);
 
    overriding function Default_Strategy
      (Self : Instance_Typ) return Strategy_Type'Class

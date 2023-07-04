@@ -25,6 +25,7 @@ with Ada.Command_Line;
 with Ada.Containers; use type Ada.Containers.Count_Type;
 with Ada.Environment_Variables;
 with Ada.IO_Exceptions;
+with Ada.Strings.Unbounded;
 
 with Interfaces; use type Interfaces.Unsigned_16;
 
@@ -53,6 +54,7 @@ with Test.Mapping;
 with Test.Common;
 with Test.Skeleton.Source_Table;
 with Test.Harness.Source_Table;
+with Test.Generation;
 
 with Ada.Directories; use Ada.Directories;
 with Utils.Projects; use Utils.Projects;
@@ -60,10 +62,7 @@ with GNAT.Directory_Operations;
 with Ada.Characters.Handling; use Ada.Characters.Handling;
 with Ada.Text_IO;
 with Ada.Strings.Fixed;
-with Ada.Strings.Unbounded;
 
-with TGen.Context;
-with TGen.Gen_Strategies;
 with TGen.Libgen;
 
 package body Test.Actions is
@@ -864,7 +863,12 @@ package body Test.Actions is
 
       if Arg (Cmd, Gen_Test_Vectors) then
          Test.Common.Generate_Test_Vectors := True;
-         Test.Common.Need_Lib_Support := True;
+         Test.Common.Request_Lib_Support;
+
+         --  Activate the first pass
+
+         Tool.Run_First_Pass := True;
+
          Test.Common.Unparse_Test_Vectors := Arg (Cmd, Unparse);
          declare
             Dir : File_Array_Access;
@@ -877,11 +881,6 @@ package body Test.Actions is
                Cmd_Error_No_Help ("cannot create JSON test directory");
          end;
 
-         TGen.Gen_Strategies.Initialize
-           (Test.Common.TGen_Ctx,
-            Ada.Strings.Unbounded.To_Unbounded_String
-              (Test.Common.JSON_Test_Dir.all));
-
          if Arg (Cmd, Gen_Test_Num) /= null then
             begin
                Test.Common.TGen_Num_Tests :=
@@ -891,24 +890,6 @@ package body Test.Actions is
                   Cmd_Error_No_Help
                     ("--gen-test-num should be a positive integer");
             end;
-         end if;
-
-         if Arg (Cmd, Gen_Unsupported_Behavior) /= null then
-            if Arg (Cmd, Gen_Unsupported_Behavior).all = "no-test" then
-               Test.Common.TGen_Ctx.Unsupported_Type_Behavior :=
-                 TGen.Context.No_Test;
-            elsif Arg (Cmd, Gen_Unsupported_Behavior).all = "commented-out"
-            then
-               Test.Common.TGen_Ctx.Unsupported_Type_Behavior :=
-                 TGen.Context.Commented_Out;
-            else
-               Cmd_Error_No_Help
-                 ("--gen-unsupported-behavior must be one of ""no-test"" or"
-                  & " ""commented-out""");
-            end if;
-         else
-            Test.Common.TGen_Ctx.Unsupported_Type_Behavior :=
-              TGen.Context.No_Test;
          end if;
       end if;
 
@@ -993,6 +974,17 @@ package body Test.Actions is
 
    end Init;
 
+   overriding procedure First_Pass_Post_Process
+     (Tool : in out Test_Tool; Cmd : in out Command_Line)
+   is
+   begin
+      --  We always need the lib support when running the generation harness.
+      TGen.Libgen.Generate
+        (Test.Common.TGen_Libgen_Ctx, TGen.Libgen.All_Parts);
+      Test.Common.Mark_Lib_Support_Generated;
+      Test.Generation.Generate_Build_And_Run (Cmd);
+   end First_Pass_Post_Process;
+
    -----------
    -- Final --
    -----------
@@ -1001,6 +993,14 @@ package body Test.Actions is
       Src_Prj : constant String :=
         Tool.Project_Tree.Root_Project.Project_Path.Display_Full_Name;
    begin
+
+      --  In any case, generate the support library if needed
+
+      if Test.Common.Get_Lib_Support_Status in Test.Common.Needed then
+         TGen.Libgen.Generate
+           (Test.Common.TGen_Libgen_Ctx, TGen.Libgen.All_Parts);
+            Test.Common.Mark_Lib_Support_Generated;
+      end if;
 
       if Status (Tool.Project_Tree.all) = Empty then
          Test.Aggregator.Process_Drivers_List;
@@ -1024,10 +1024,6 @@ package body Test.Actions is
             Test.Harness.Test_Runner_Generator  (Src_Prj);
             Test.Harness.Project_Creator        (Src_Prj);
          end if;
-         if Test.Common.Need_Lib_Support then
-            TGen.Libgen.Generate
-              (Test.Common.TGen_Libgen_Ctx, TGen.Libgen.All_Parts);
-         end if;
          Test.Harness.Generate_Makefile (Src_Prj);
          Test.Harness.Generate_Config;
          Test.Common.Generate_Common_File;
@@ -1042,11 +1038,27 @@ package body Test.Actions is
       end if;
    end Final;
 
-   ---------------------
-   -- Per_File_Action --
-   ---------------------
+   ---------------------------
+   -- First_Per_File_Action --
+   ---------------------------
 
-   procedure Per_File_Action
+   overriding procedure First_Per_File_Action
+     (Tool : in out Test_Tool;
+      Cmd : Command_Line;
+      File_Name : String;
+      Input : String;
+      BOM_Seen : Boolean;
+      Unit : Analysis_Unit)
+   is
+   begin
+      Test.Generation.Process_Source (Unit);
+   end First_Per_File_Action;
+
+   ----------------------------
+   -- Second_Per_File_Action --
+   ----------------------------
+
+   procedure Second_Per_File_Action
      (Tool : in out Test_Tool;
       Cmd : Command_Line;
       File_Name : String;
@@ -1067,13 +1079,13 @@ package body Test.Actions is
       else
          Test.Skeleton.Process_Source (Unit);
       end if;
-   end Per_File_Action;
+   end Second_Per_File_Action;
 
-   -----------------------------
-   -- Per_Invalid_File_Action --
-   -----------------------------
+   ------------------------------------
+   -- Second_Per_Invalid_File_Action --
+   ------------------------------------
 
-   overriding procedure Per_Invalid_File_Action
+   overriding procedure Second_Per_Invalid_File_Action
      (Tool      : in out Test_Tool;
       Cmd       :        Command_Line;
       File_Name :        String)
@@ -1081,7 +1093,7 @@ package body Test.Actions is
       pragma Unreferenced (Tool, Cmd, File_Name);
    begin
       Test.Common.Source_Processing_Failed := True;
-   end Per_Invalid_File_Action;
+   end Second_Per_Invalid_File_Action;
 
    ---------------
    -- Tool_Help --

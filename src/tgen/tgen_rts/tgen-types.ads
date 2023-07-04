@@ -124,7 +124,7 @@ package TGen.Types is
    --  record type must be constrained.
 
    function Supports_Static_Gen (Self : Typ) return Boolean is (False);
-   --  Wether values for this Typ can be statically generated
+   --  Whether values for this Typ can be statically generated
 
    function Default_Strategy (Self : Typ)
       return TGen.Strategies.Strategy_Type'Class;
@@ -143,6 +143,11 @@ package TGen.Types is
    --
    --  Return an empty string if there are no unsupported types in the
    --  transitive closure of Self.
+
+   function Supports_Gen (Self : Typ) return Boolean is (True);
+   --  WHether this type supports value generation. False if this type is
+   --  an unsupported type (tagged type, access type) or if any of its
+   --  components is (transitively) of an unsupported type.
 
    function JSON_Kind (Kind : Typ_Kind) return JSON_Value_Type is
      (case Kind is
@@ -208,6 +213,9 @@ package TGen.Types is
 
    function Get_Diagnostics (Self : Unsupported_Typ) return String is
      (To_Ada (Self.Name) & ": " & (+Self.Reason));
+
+   function Supports_Gen (Self : Unsupported_Typ) return Boolean is (False);
+   --  Unsupported types are unsupported for generation.
 
    function Kind (Self : Unsupported_Typ) return Typ_Kind is (Unsupported);
 

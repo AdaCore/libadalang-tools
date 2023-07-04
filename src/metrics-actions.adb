@@ -4312,11 +4312,11 @@ package body METRICS.Actions is
       end if;
    end Process_CU;
 
-   ---------------------
-   -- Per_File_Action --
-   ---------------------
+   ----------------------------
+   -- Second_Per_File_Action --
+   ----------------------------
 
-   procedure Per_File_Action
+   procedure Second_Per_File_Action
      (Tool : in out Metrics_Tool;
       Cmd : Command_Line;
       File_Name : String;
@@ -4353,7 +4353,7 @@ package body METRICS.Actions is
       else
          Process_CU (Tool, Cmd, File_Name, Unit, Unit_Root);
       end if;
-   end Per_File_Action;
+   end Second_Per_File_Action;
 
    ---------------
    -- Tool_Help --

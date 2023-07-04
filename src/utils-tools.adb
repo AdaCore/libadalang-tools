@@ -41,7 +41,8 @@ package body Utils.Tools is
       File_Name    : String;
       Counter      : Natural;
       Syntax_Error : out Boolean;
-      Reparse      : Boolean := False)
+      Reparse      : Boolean := False;
+      Pass         : Pass_Kind := Second_Pass)
    is
       use GNAT.OS_Lib, GNAT.Byte_Order_Mark;
       --  We read the file into a String, and convert to wide
@@ -112,12 +113,21 @@ package body Utils.Tools is
                Err_Out.Put
                  ("\1\n", Langkit_Support.Diagnostics.To_Pretty_String (D));
             end loop;
-            Per_Invalid_File_Action (Tool, Cmd, File_Name);
+            if Pass = First_Pass then
+               First_Per_Invalid_File_Action (Tool, Cmd, File_Name);
+            else
+               Second_Per_Invalid_File_Action (Tool, Cmd, File_Name);
+            end if;
 
          else
             pragma Assert (not Root (Unit).Is_Null);
-            Per_File_Action
-              (Tool, Cmd, File_Name, Inp, BOM_Seen, Unit);
+            if Pass = First_Pass then
+               First_Per_File_Action
+                 (Tool, Cmd, File_Name, Inp, BOM_Seen, Unit);
+            else
+               Second_Per_File_Action
+                 (Tool, Cmd, File_Name, Inp, BOM_Seen, Unit);
+            end if;
          end if;
          Free (Input);
       end;

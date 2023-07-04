@@ -42,7 +42,7 @@ private
 
    overriding procedure Init
      (Tool : in out Metrics_Tool; Cmd : in out Command_Line);
-   overriding procedure Per_File_Action
+   overriding procedure Second_Per_File_Action
      (Tool : in out Metrics_Tool;
       Cmd : Command_Line;
       File_Name : String;
@@ -132,11 +132,11 @@ private
    --  Init is called first. It creates a Metrix for global information (about
    --  all files).
    --
-   --  Per_File_Action is called for each file. It creates a Metrix for the
-   --  file, and for each relevant unit within the file. Metrics are computed,
-   --  but not printed. We compute all metrics, whether or not they were
-   --  requested on the command line. The commmand line options control which
-   --  metrics are printed.
+   --  Second_Per_File_Action is called for each file. It creates a Metrix for
+   --  the file, and for each relevant unit within the file. Metrics are
+   --  computed but not printed. We compute all metrics, whether or not they
+   --  were requested on the command line. The command line options control
+   --  which metrics are printed.
    --
    --  Final is called. At this point, we have a tree of Metrix. The root is
    --  the all-files/global one. Children of that are per-file Metrix. Children

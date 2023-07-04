@@ -98,8 +98,8 @@ package Pp.Actions is
    --  avoid changing the user's source code.
    --
    --  Note that the gnatpp program does not call this directly; it calls
-   --  Per_File_Action. Format_Vector is for calling from text editors and
-   --  the like. Format_Vector is called from lalstub and partial-gnatpp.
+   --  Second_Per_File_Action. Format_Vector is for calling from text editors
+   --  and the like. Format_Vector is called from lalstub and partial-gnatpp.
 
    procedure Clear_Template_Tables;
    --  Clear all gnatpp's predefined template tables.
@@ -113,7 +113,7 @@ private
       Cmd  : in out Command_Line);
 
    overriding
-   procedure Per_File_Action
+   procedure Second_Per_File_Action
      (Tool      : in out Pp_Tool;
       Cmd       : Command_Line;
       File_Name : String;

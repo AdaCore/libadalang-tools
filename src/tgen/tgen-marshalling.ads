@@ -47,8 +47,9 @@ package TGen.Marshalling is
    function Input_Fname_For_Typ (Typ_FQN : Ada_Qualified_Name) return String;
    --  Name of the input marshalling function for the given type
 
-private
    Global_Prefix   : constant String := "TGen_Marshalling";
+
+private
    Marshalling_Lib : constant String := "TGen.Marshalling_Lib";
 
    function Prefix_For_Typ (Ty_Name : String) return String is

@@ -49,9 +49,14 @@ package TGen.Types.Array_Types is
 
    function Supports_Static_Gen (Self : Array_Typ) return Boolean is
      (Self.Static_Gen);
-   --  Wether values for this Typ can be statically generated
+   --  Whether values for this Typ can be statically generated
 
    function Get_Diagnostics (Self : Array_Typ) return String;
+
+   function Supports_Gen (Self : Array_Typ) return Boolean is
+     (Self.Component_Type.Get.Supports_Gen);
+   --  Index types are discrete; we can always generate them, only the
+   --  component type could prevent us from doing so.
 
    function As_Array_Typ (Self : SP.Ref)
      return Array_Typ'Class is

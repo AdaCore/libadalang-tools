@@ -1,4 +1,4 @@
-with Ada.Containers;      use Ada.Containers;
+with Ada.Containers; use Ada.Containers;
 
 with My_File;             use My_File;
 with My_File.TGen_Values; use My_File.TGen_Values;
@@ -241,6 +241,7 @@ procedure Example_Introspection is
 
    procedure Test_Shape
    is
+      use Component_Maps;
       Rec_Typ : constant Discriminated_Record_Typ'Class := my_file_shape_typ;
    begin
       Assert (Rec_Typ.Mutable);
@@ -320,6 +321,7 @@ procedure Example_Introspection is
 
       declare
          Variant_Choice_Index : Positive := 1;
+         Nested_INdex         : Positive := 1;
       begin
          for Choice of Rec_Typ.Variant.Variant_Choices loop
             if Variant_Choice_Index = 1 then
@@ -428,12 +430,136 @@ procedure Example_Introspection is
                   end;
                end loop;
 
-               --  TODO: check nested variant
+               -- Check nested variant
 
                Assert (Choice.Variant /= null);
+               Assert (+Choice.Variant.Discr_Name = "K");
+               Nested_Index := 1;
+               for Nested_Choice of Choice.Variant.Variant_Choices loop
+                  if Nested_Index = 1 then
+                     declare
+                        Expected_Alt_Set : Alternatives_Set;
+                     begin
+                        Expected_Alt_Set.Insert
+                          (Int_Range'
+                             (Min =>
+                                From_Universal_Image
+                                  (Shape_Kind'Pos (Ellipse)'Image),
+                              Max =>
+                                From_Universal_Image
+                                  (Shape_Kind'Pos (Ellipse)'Image)));
+                        Assert (Nested_Choice.Alt_Set.Equivalent_Sets
+                                  (Expected_Alt_Set));
+                     end;
+                     Assert (Nested_Choice.Variant = null);
+                     Assert (Nested_Choice.Components.Length = 1);
+                     Assert
+                       (+Key (Nested_Choice.Components.First) = "Radius_2");
+                     Assert (Element (Nested_Choice.Components.First)
+                             = standard_positive_Typ_Ref);
+                  elsif Nested_Index = 2 then
+                     Assert (Nested_Choice.Variant = null);
+                     Assert (Nested_Choice.Components.Is_Empty);
+                  end if;
+                  Nested_Index := Nested_Index + 1;
+               end loop;
+               Assert (Nested_Index = 3);
 
+            elsif Variant_Choice_Index = 3 then
 
-            --  TODO: check other variant choices
+               --  third variant choice:
+               --   when Square .. Rectangle =>
+               --      Side     : Positive;
+               --      case K is
+               --         when Rectangle =>
+               --            Side_2 : Positive;
+               --         when others =>
+               --            null;
+               --      end case;
+
+               -- Check variant choices
+
+               declare
+                  Expected_Alt_Set : Alternatives_Set;
+               begin
+                  Expected_Alt_Set.Insert
+                    (Int_Range'
+                       (Min =>
+                          From_Universal_Image (Shape_Kind'Pos (Square)'Image),
+                        Max =>
+                          From_Universal_Image
+                            (Shape_Kind'Pos (Rectangle)'Image)));
+                  Assert (Choice.Alt_Set.Equivalent_Sets (Expected_Alt_Set));
+               end;
+               --  Check Components
+
+               Assert (Choice.Components.Length = 1);
+               Assert (+Key (Choice.Components.First) = "Side");
+               Assert
+                 (Element (Choice.Components.First)
+                  = standard_positive_Typ_Ref);
+
+               --  Check the nested variant
+
+               Assert (Choice.Variant /= null);
+               Assert (+Choice.Variant.Discr_Name = "K");
+               Nested_Index := 1;
+               for Nested_Choice of Choice.Variant.Variant_Choices loop
+                  if Nested_Index = 1 then
+                     declare
+                        Expected_Alt_Set : Alternatives_Set;
+                     begin
+                        Expected_Alt_Set.Insert
+                          (Int_Range'
+                             (Min =>
+                                From_Universal_Image
+                                  (Shape_Kind'Pos (Rectangle)'Image),
+                              Max =>
+                                From_Universal_Image
+                                  (Shape_Kind'Pos (Rectangle)'Image)));
+                        Assert (Nested_Choice.Alt_Set.Equivalent_Sets
+                                  (Expected_Alt_Set));
+                     end;
+                     Assert (Nested_Choice.Variant = null);
+                     Assert (Nested_Choice.Components.Length = 1);
+                     Assert (+Key (Nested_Choice.Components.First) = "Side_2");
+                     Assert (Element (Nested_Choice.Components.First)
+                             = standard_positive_Typ_Ref);
+                  elsif Nested_Index = 2 then
+                     Assert (Nested_Choice.Variant = null);
+                     Assert (Nested_Choice.Components.Is_Empty);
+                  end if;
+                  Nested_Index := Nested_Index + 1;
+               end loop;
+               Assert (Nested_Index = 3);
+
+            elsif Variant_Choice_Index = 4 then
+
+               --  4th variant choice:
+               --  when others =>
+               --     null;
+
+               -- Check variant choices
+
+               declare
+                  Expected_Alt_Set : Alternatives_Set;
+               begin
+                  Expected_Alt_Set.Insert
+                    (Int_Range'
+                       (Min =>
+                          From_Universal_Image (Shape_Kind'Pos (Point)'Image),
+                        Max =>
+                          From_Universal_Image
+                            (Shape_Kind'Pos (Point)'Image)));
+                  Assert (Choice.Alt_Set.Equivalent_Sets (Expected_Alt_Set));
+               end;
+               --  No Components
+
+               Assert (Choice.Components.Is_Empty);
+
+               --  No nested variant
+
+               Assert (Choice.Variant = null);
 
             end if;
             Variant_Choice_Index := Variant_Choice_Index + 1;
@@ -447,9 +573,15 @@ procedure Example_Introspection is
    --  type Shape_Array is array (T2'Base range <>) of Shape;
 
    procedure Test_Shape_Array is
+      Arr_Typ : Unconstrained_Array_Typ renames my_file_shape_array_Typ;
+      Index_Typ : Signed_Int_Typ renames
+        Signed_Int_Typ (Arr_Typ.Index_Types (1).Unchecked_Get.all);
    begin
-      --  TODO
-      null;
+      Assert (Arr_Typ.Num_Dims = 1);
+      Assert (Index_Typ.Is_Static);
+      Assert (Index_Typ.Range_Value.Min = From_Universal_Image (T2'(T2'First)'Image));
+      Assert (Index_Typ.Range_Value.Max = From_Universal_Image (T2'(T2'Last)'Image));
+      Assert (Arr_Typ.Component_Type = my_file_shape_typ_ref);
    end Test_Shape_Array;
 
    --  Testing type introspection for the following type:
@@ -458,9 +590,35 @@ procedure Example_Introspection is
    --  end record;
 
    procedure Test_Small_Shape_Array is
+      use Component_Maps;
+      Rec_Typ : Discriminated_Record_Typ renames my_file_small_shape_array_Typ;
    begin
-      --  TODO
-      null;
+      Assert (Rec_Typ.Discriminant_Types.Length = 1);
+      Assert (+Key (Rec_Typ.Discriminant_Types.First) = "L");
+      Assert (Element (Rec_Typ.Discriminant_Types.First) = my_file_t2_Typ_Ref);
+      Assert (Rec_Typ.Variant = null);
+      Assert (Rec_Typ.Component_Types.Length = 1);
+      Assert (+Key (Rec_Typ.Component_Types.First) = "Content");
+      declare
+         Comp_Typ : Anonymous_Typ renames
+           Anonymous_Typ
+             (Element (Rec_Typ.Component_Types.First).Unchecked_Get.all);
+         Cst      : Index_Constraints renames
+           Index_Constraints (Comp_Typ.Subtype_Constraints.all);
+      begin
+         Assert (Comp_Typ.Named_Ancestor = my_file_shape_array_Typ_Ref);
+         Assert (Cst.Num_Dims = 1);
+         Assert (Cst.Constraint_Array (1).Present);
+         Assert
+           (Cst.Constraint_Array (1).Discrete_Range.Low_Bound.Kind = Static
+            and then Cst.Constraint_Array (1).Discrete_Range.Low_Bound.Int_Val
+                       = From_Universal_Image ("1"));
+         Assert
+           (Cst.Constraint_Array (1).Discrete_Range.High_Bound.Kind
+              = Discriminant
+            and then +Cst.Constraint_Array (1).Discrete_Range.High_Bound
+                     .Disc_Name = "L");
+      end;
    end Test_Small_Shape_Array;
 
    --  Testing type introspection for the following type:
@@ -481,13 +639,136 @@ procedure Example_Introspection is
    --     G5 : Shape;
    --     G6 : Small_Shape_Array;
    --  end record;
-   --  TODO
+
+   procedure Test_R is
+      use Component_Maps;
+      Index : Positive := 1;
+   begin
+      for Comp_Cur in my_file_r_Typ.Component_Types.Iterate loop
+         declare
+            Comp_Name : constant String := +Key (Comp_Cur);
+         begin
+            if Comp_Name = "F1" then
+               Assert (Element (Comp_Cur) = my_file_t1_Typ_Ref);
+            elsif Comp_Name = "F2" then
+               Assert (Element (Comp_Cur) = my_file_t2_Typ_Ref);
+            elsif Comp_Name = "F3" then
+               Assert (Element (Comp_Cur) = my_file_t3_Typ_Ref);
+            elsif Comp_Name = "F4" then
+               Assert (Element (Comp_Cur) = standard_boolean_Typ_Ref);
+            elsif Comp_Name = "F5" then
+               Assert (Element (Comp_Cur) = standard_float_Typ_Ref);
+            elsif Comp_Name in "F6" | "F7" then
+               Assert (Element (Comp_Cur) = standard_long_float_Typ_Ref);
+            elsif Comp_Name = "F8" then
+               Assert (Element (Comp_Cur) = my_file_constr_array_Typ_Ref);
+            elsif Comp_Name = "F9" then
+               Assert (Element (Comp_Cur) = standard_character_Typ_Ref);
+            elsif Comp_Name = "G1" then
+               Assert (Element (Comp_Cur) = my_file_fixed_1_Typ_Ref);
+            elsif Comp_Name = "G2" then
+               Assert (Element (Comp_Cur) = my_file_fixed_2_Typ_Ref);
+            elsif Comp_Name = "G3" then
+               declare
+                  Ano_Typ : Anonymous_Typ renames
+                    Anonymous_Typ (Element (Comp_Cur).Unchecked_Get.all);
+                  Cst     : Index_Constraints renames
+                    Index_Constraints (Ano_Typ.Subtype_Constraints.all);
+               begin
+                  Assert (Ano_Typ.Named_Ancestor = my_file_matrix_Typ_Ref);
+                  Assert (Cst.Num_Dims = 2);
+                  Assert (Cst.Constraint_Array (1).Present);
+                  Assert
+                    (Cst.Constraint_Array (1).Discrete_Range.Low_Bound.Kind
+                       = Static
+                     and then Cst.Constraint_Array (1).Discrete_Range.Low_Bound
+                              .Int_Val = From_Universal_Image ("0"));
+                  Assert
+                    (Cst.Constraint_Array (1).Discrete_Range.High_Bound.Kind
+                       = Static
+                     and then Cst.Constraint_Array (1).Discrete_Range.High_Bound
+                              .Int_Val = From_Universal_Image ("9"));
+                  Assert (Cst.Constraint_Array (2).Present);
+                  Assert
+                    (Cst.Constraint_Array (2).Discrete_Range.Low_Bound.Kind
+                       = Static
+                     and then Cst.Constraint_Array (2).Discrete_Range.Low_Bound
+                              .Int_Val = From_Universal_Image
+                                (Positive'(Character'Pos ('A'))'Image));
+                  Assert
+                    (Cst.Constraint_Array (2).Discrete_Range.High_Bound.Kind
+                       = Static
+                     and then Cst.Constraint_Array (2).Discrete_Range.High_Bound
+                              .Int_Val = From_Universal_Image
+                                (Positive'(Character'Pos ('I'))'Image));
+               end;
+            elsif Comp_Name = "G4" then
+               declare
+                  use Discriminant_Constraint_Maps;
+                  Ano_Typ : Anonymous_Typ renames
+                    Anonymous_Typ (Element (Comp_Cur).Unchecked_Get.all);
+                  Cst     : Discriminant_Constraints renames
+                    Discriminant_Constraints (Ano_Typ.Subtype_Constraints.all);
+                  Discr_Index : Positive := 1;
+               begin
+                  Assert (Ano_Typ.Named_Ancestor = my_file_shape_typ_ref);
+                  for Discr_Cur in Cst.Constraint_Map.Iterate loop
+                     declare
+                        Origin_Discr_Name : constant String :=
+                          +Key (Discr_Cur);
+                     begin
+                        if Origin_Discr_Name = "K" then
+                           Assert (Element (Discr_Cur).Kind = Static);
+                           Assert (Element (Discr_Cur).Int_Val =
+                             From_Universal_Image
+                               (Positive'(Shape_Kind'Pos (Ellipse))'Image));
+                        elsif Origin_Discr_Name = "Name_Size" then
+                           Assert (Element (Discr_Cur).Kind = Static);
+                           Assert (Element (Discr_Cur).Int_Val =
+                             From_Universal_Image ("10"));
+                        else
+                           Assert (False);
+                        end if;
+                     end;
+                     Discr_Index := Discr_Index + 1;
+                  end loop;
+                  Assert (Discr_Index = 3);
+               end;
+            elsif Comp_Name = "G5" then
+               Assert (Element (Comp_Cur) = my_file_shape_Typ_Ref);
+            elsif Comp_Name = "G6" then
+               Assert (Element (Comp_Cur) = my_file_small_shape_array_Typ_Ref);
+            else
+               Assert (False);
+            end if;
+         end;
+         Index := Index + 1;
+      end loop;
+      Assert (Index = 16);
+   end Test_R;
+
 
    --  Testing type introspection for the following type:
    --  type R2 is record
    --     F1, F2 : Boolean := False;
    --  end record with Predicate => F1 or F2;
-   --  TODO
+
+   procedure Test_R2 is
+      use Component_Maps;
+   begin
+      Assert (my_file_r2_Typ.Component_Types.Length = 2);
+      for Comp_Cur in my_file_r2_Typ.Component_Types.iterate loop
+         declare
+            Comp_Name : constant String := +Key (Comp_Cur);
+         begin
+            if Comp_Name in "F1" | "F2" then
+               Assert (Element (Comp_Cur) = standard_boolean_Typ_Ref);
+            else
+               Assert (False);
+            end if;
+         end;
+      end loop;
+   end Test_R2;
 
 begin
    Test_T1;
@@ -500,4 +781,8 @@ begin
    Test_Shape_Kind;
    Test_Name_Size_Ty;
    Test_Shape;
+   Test_Shape_Array;
+   Test_Small_Shape_Array;
+   Test_R;
+   Test_R2;
 end;

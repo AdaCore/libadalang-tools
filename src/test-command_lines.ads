@@ -90,7 +90,6 @@ package Test.Command_Lines is
       Copy_Environment,
       Reporter,
       Gen_Test_Num,
-      Gen_Unsupported_Behavior,
       Serialized_Test_Dir);
 
    package Test_String_Switches is new String_Switches
@@ -110,7 +109,6 @@ package Test.Command_Lines is
        Copy_Environment         => '=',
        Reporter                 => '=',
        Gen_Test_Num             => '=',
-       Gen_Unsupported_Behavior => '=',
        Serialized_Test_Dir      => '=']);
 
    type Test_String_Seqs is (Exclude_From_Stubbing);

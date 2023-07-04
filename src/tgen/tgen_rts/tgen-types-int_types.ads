@@ -45,7 +45,7 @@ package TGen.Types.Int_Types is
 
    function Supports_Static_Gen (Self : Signed_Int_Typ) return Boolean is
      (Self.Is_Static);
-   --  Wether values for this Typ can be statically generated
+   --  Whether values for this Typ can be statically generated
 
    function Low_Bound (Self : Signed_Int_Typ) return Big_Integer with
      Pre => Self.Is_Static;
@@ -76,7 +76,7 @@ package TGen.Types.Int_Types is
 
    function Supports_Static_Gen (Self : Mod_Int_Typ) return Boolean is
      (Self.Is_Static);
-   --  Wether values for this Typ can be statically generated
+   --  Whether values for this Typ can be statically generated
 
    function Image (Self : Mod_Int_Typ) return String;
 

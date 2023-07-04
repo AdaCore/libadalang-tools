@@ -61,10 +61,8 @@ with Test.Mapping; use Test.Mapping;
 with Test.Stub;
 with Utils.Command_Lines; use Utils.Command_Lines;
 with Utils.Environment;
-with Utils_Debug; use Utils_Debug;
 
 with TGen.LAL_Utils;
-with TGen.Gen_Strategies;
 with TGen.JSON;        use TGen.JSON;
 with TGen.JSON.Unparse;
 with TGen.Libgen;
@@ -540,8 +538,6 @@ package body Test.Skeleton is
       Suite_Data_List   : Suites_Data_Type;
       Suite_Data        : Test.Harness.Data_Holder;
 
-      Subp_Cur : Subp_Data_List.Cursor;
-
       Apropriate_Source : Boolean;
 
       CU : Compilation_Unit;
@@ -751,84 +747,6 @@ package body Test.Skeleton is
 
          if Test.Common.Instrument then
             Test.Instrument.Process_Source (The_Unit);
-         end if;
-
-         --  Only include subprograms in the Libgen context if we are
-         --  generating test inputs or if there already are serialized tests.
-
-         if not Data.Is_Generic
-           and then (Test.Common.Generate_Test_Vectors
-                     or else Ada.Directories.Exists
-                               (Test.Common.JSON_Test_Dir.all))
-         then
-            Subp_Cur := Data.Subp_List.First;
-            while Subp_Cur /= Subp_Data_List.No_Element loop
-               declare
-                  Diags : Unbounded_String;
-               begin
-                  case Kind (Element (Subp_Cur).Subp_Declaration) is
-                     when Ada_Basic_Decl =>
-                     if not TGen.Libgen.Include_Subp
-                          (Test.Common.TGen_Libgen_Ctx,
-                           Element (Subp_Cur).Subp_Declaration.As_Basic_Decl,
-                           Diags)
-                     then
-                        Report_Std
-                          ("Warning (tgen) while generating the"
-                           & " support library for "
-                           & Element (Subp_Cur).Subp_Name_Image.all & ":");
-                        Report_Std (To_String (Diags));
-                        Report_Std ("Test harness may not build.");
-                     end if;
-                     if Generate_Test_Vectors then
-                        TGen.Gen_Strategies.Generate_Test_Vectors
-                          (TGen_Ctx,
-                           Test.Common.TGen_Num_Tests,
-                           Element (Subp_Cur).Subp_Declaration.As_Basic_Decl,
-                           Ada.Strings.Unbounded.To_Unbounded_String
-                             (Element (Subp_Cur).Subp_Full_Hash.all));
-                     end if;
-                  when others =>
-                     if Debug_Flag_1 then
-                        Report_Std ("Warning: (TGen) "
-                                    & Base_Name (Data.Unit_File_Name.all)
-                                    & " : Could not generate test vectors for "
-                                    & Element (Subp_Cur).Subp_Text_Name.all
-                                    & " : " & ASCII.LF
-                                    & "Unsupported subprogram declaration kind"
-                                    & ": "
-                                    & Kind_Name
-                                       (Element (Subp_Cur).Subp_Declaration));
-                     end if;
-                  end case;
-               exception
-                  when Exc : Program_Error =>
-                     if Debug_Flag_1 then
-                        Report_Std ("Warning: (TGen) "
-                                    & Base_Name (Data.Unit_File_Name.all)
-                                    & " : Unexpected error generating test"
-                                    & " vectors for "
-                                    & Element (Subp_Cur).Subp_Text_Name.all
-                                    & " : " & ASCII.LF
-                                    & Ada.Exceptions.Exception_Message (Exc));
-                     end if;
-                  when Exc : others =>
-                     if Debug_Flag_1 then
-                        Report_Std ("Warning: (TGen) "
-                                    & Base_Name (Data.Unit_File_Name.all)
-                                    & " : Unexpected error generating test"
-                                    & " vectors for "
-                                    & Element (Subp_Cur).Subp_Text_Name.all
-                                    & " : " & ASCII.LF
-                                    & Ada.Exceptions.Exception_Information
-                                        (Exc));
-                     end if;
-               end;
-               Subp_Data_List.Next (Subp_Cur);
-            end loop;
-            if Generate_Test_Vectors then
-               TGen.Gen_Strategies.Generate_Artifacts (TGen_Ctx);
-            end if;
          end if;
 
          declare
@@ -6885,6 +6803,9 @@ package body Test.Skeleton is
       Subp_Content : JSON_Value := JSON_Null;
       Single_Vec   : JSON_Array;
 
+      Diags : Unbounded_String;
+      --  Diagnostics for TGen.Libgen.Include_Subp
+
       Output_Dir : constant String :=
         Get_Source_Output_Dir (Data.Unit_File_Name.all);
 
@@ -6944,6 +6865,27 @@ package body Test.Skeleton is
            or else Subp_Content.Get ("test_vectors") = Empty_Array
          then
             goto Continue;
+         end if;
+
+         --  Include Subp in the TGen context if we are not unparsing test
+         --  vectors.
+
+         if not Test.Common.Unparse_Test_Vectors then
+            if not TGen.Libgen.Include_Subp
+                     (Test.Common.TGen_Libgen_Ctx,
+                      Subp.Subp_Declaration.As_Basic_Decl,
+                      Diags)
+            then
+               Report_Std
+                 ("Error while loading JSON tests:" & To_String (Diags)
+                  & ASCII.LF & "Tests will not be loaded for " &
+                  Subp.Subp_Name_Image.all);
+               goto Continue;
+            else
+               --  Indicate that we are actually needing the tgen_support lib
+
+               Test.Common.Request_Lib_Support;
+            end if;
          end if;
 
          --  Adding a list of new test cases for Subp
@@ -7040,11 +6982,6 @@ package body Test.Skeleton is
                Put (F, ");");
             end Pp_Subp_Call;
 
-            Support_Packs : constant Ada_Qualified_Name_Sets_Maps
-                                       .Constant_Reference_Type :=
-              TGen.Libgen.Required_Support_Packages
-                (Ctx       => Test.Common.TGen_Libgen_Ctx,
-                 Unit_Name => To_Qualified_Name (Data.Unit_Full_Name.all));
          begin
 
             if Spec_VF.Is_Regular_File then
@@ -7071,10 +7008,6 @@ package body Test.Skeleton is
                Test_Package  => new String'(Test_Unit_Name),
                Original_Type => No_Ada_Node));
 
-            --  Indicate that we are actually needing the tgen_support lib
-
-            Test.Common.Need_Lib_Support := True;
-
             Put_Line (Spec_Kind, "with GNATtest_Generated;");
             New_Line (Spec_Kind);
             Put_Line (Spec_Kind, "package " & Test_Unit_Name & " is");
@@ -7092,14 +7025,21 @@ package body Test.Skeleton is
             Put_Line (Body_Kind, "with Aunit.Assertions;");
             New_Line (Body_Kind);
             Put_Line (Body_Kind, "with TGen.JSON;");
-            for Pack of Support_Packs loop
-               Put_Line (Body_Kind, "with " & To_Ada (Pack) & "; use "
-                         & To_Ada (Pack) & ";");
-            end loop;
 
             if Test.Common.Instrument then
                New_Line (Body_Kind);
                Put_Line (Body_Kind, "with TGen.Instr_Support;");
+            end if;
+
+            if not Test.Common.Unparse_Test_Vectors then
+               for Pack of TGen.Libgen.Required_Support_Packages
+                             (Ctx       => Test.Common.TGen_Libgen_Ctx,
+                              Unit_Name => To_Qualified_Name
+                                             (Data.Unit_Full_Name.all))
+               loop
+                  Put_Line (Body_Kind, "with " & To_Ada (Pack) & "; use "
+                                    & To_Ada (Pack) & ";");
+               end loop;
             end if;
 
             New_Line (Body_Kind);
@@ -8650,7 +8590,7 @@ package body Test.Skeleton is
       Put_New_Line;
       S_Put (0, "with ""gnattest_common.gpr"";");
       Put_New_Line;
-      if Test.Common.Need_Lib_Support then
+      if Get_Lib_Support_Status in Needed | Generated then
          S_Put
            (0,
             "with ""tgen_support" & GNAT.OS_Lib.Directory_Separator
