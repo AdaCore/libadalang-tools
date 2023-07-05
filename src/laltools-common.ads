@@ -475,6 +475,14 @@ package Laltools.Common is
       return Source_Location_Range;
    --  Returns the Source_Location_Range of Decl's header or
    --  No_Source_Location_Range if it does not exist.
+   --  Trailing spaces in the header are ignored, but it must have the exact
+   --  same indentation as Decl and match the following pattern:
+   --
+   --  ---------------------------
+   --  -- <Name_Of_Declaration> --
+   --  ---------------------------
+   --
+   --  <Declaration>
 
    function Get_Compilation_Unit
      (Node : Ada_Node'Class)
