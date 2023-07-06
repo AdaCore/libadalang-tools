@@ -546,8 +546,8 @@ package body Laltools.Common is
       return Boolean
    is (not Node.Is_Null
        and then (Is_Declarative_Part_Owner (Node)
-                 or else Is_Decl_Expr_Owner (Node)
-                 or else Is_Params_Owner (Node)));
+                 or Is_Decl_Expr_Owner (Node)
+                 or Is_Params_Owner (Node)));
 
    -----------------
    --  Get_Params --
@@ -1011,6 +1011,17 @@ package body Laltools.Common is
             Body_Decl_Part :=
               Parent_Declarative_Part_Owner.As_Subp_Body.F_Decls;
             Stmts := Parent_Declarative_Part_Owner.As_Subp_Body.F_Stmts;
+
+         when Ada_Subp_Decl_Range =>
+            declare
+               Body_Part : constant Base_Subp_Body :=
+                 Parent_Declarative_Part_Owner.As_Subp_Decl.P_Body_Part;
+            begin
+               if Body_Part.Kind in Ada_Subp_Body_Range then
+                  Body_Decl_Part := Body_Part.As_Subp_Body.F_Decls;
+                  Stmts := Body_Part.As_Subp_Body.F_Stmts;
+               end if;
+            end;
 
          when Ada_Task_Body_Range =>
             Body_Decl_Part :=
@@ -1640,6 +1651,18 @@ package body Laltools.Common is
             when Ada_Subp_Body_Range =>
                return This_Node.As_Subp_Body.F_Decls;
 
+            when Ada_Subp_Decl_Range =>
+               declare
+                  Body_Part : constant Base_Subp_Body :=
+                    This_Node.As_Subp_Decl.P_Body_Part;
+               begin
+                  return
+                    (if Body_Part.Kind in Ada_Subp_Body_Range then
+                        Body_Part.As_Subp_Body.F_Decls
+                     else
+                        No_Declarative_Part);
+               end;
+
             when Ada_Task_Body_Range =>
                return This_Node.As_Task_Body.F_Decls;
 
@@ -1738,6 +1761,17 @@ package body Laltools.Common is
 
          when Ada_Subp_Body_Range =>
             Body_Decl_Part := Node.As_Subp_Body.F_Decls;
+
+         when Ada_Subp_Decl_Range =>
+            declare
+               Body_Part : constant Base_Subp_Body :=
+                 Node.As_Subp_Decl.P_Body_Part;
+
+            begin
+               if Body_Part.Kind in Ada_Subp_Body_Range then
+                  Body_Decl_Part := Body_Part.As_Subp_Body.F_Decls;
+               end if;
+            end;
 
          when Ada_Task_Body_Range =>
             Body_Decl_Part := Node.As_Task_Body.F_Decls;
@@ -2563,14 +2597,15 @@ package body Laltools.Common is
    is (not Node.Is_Null
        and then Node.Kind in
          Ada_Decl_Block_Range
-           | Ada_Entry_Body_Range
-             | Ada_Package_Body_Range
-               | Ada_Protected_Body_Range
-                 | Ada_Subp_Body_Range
-                   | Ada_Task_Body_Range
-                     | Ada_Base_Package_Decl
-                       | Ada_Protected_Def_Range
-                         | Ada_Task_Def_Range);
+         | Ada_Entry_Body_Range
+         | Ada_Package_Body_Range
+         | Ada_Protected_Body_Range
+         | Ada_Subp_Body_Range
+         | Ada_Subp_Decl_Range
+         | Ada_Task_Body_Range
+         | Ada_Base_Package_Decl
+         | Ada_Protected_Def_Range
+         | Ada_Task_Def_Range);
 
    ------------------------
    -- Is_Decl_Expr_Owner --

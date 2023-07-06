@@ -561,11 +561,8 @@ package Laltools.Common is
      (Node : Ada_Node'Class)
       return Declarative_Part_Vector
      with Pre  => not Node.Is_Null and then Is_Declarative_Part_Owner (Node),
-          Post => not Declarative_Part_Vectors.Is_Empty
-                        (Get_Declarative_Parts'Result)
-                  and then (for all Decl_Part of
-                              Get_Declarative_Parts'Result =>
-                                not Decl_Part.Is_Null);
+          Post => (for all Decl_Part of Get_Declarative_Parts'Result
+                   => not Decl_Part.Is_Null);
    --  Returns a vector with the Declarative_Part, Public_Part and Private_Part
    --  of Owner, if they exist.
 
