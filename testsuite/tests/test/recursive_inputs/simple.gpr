@@ -1,0 +1,6 @@
+project simple is
+
+   for Main use ("main.adb");
+   for Object_Dir use "obj";
+
+end simple;
