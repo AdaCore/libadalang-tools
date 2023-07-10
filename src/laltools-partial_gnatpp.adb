@@ -1814,17 +1814,39 @@ package body Laltools.Partial_GNATPP is
    begin
       for Parent of Parents loop
          case Parent.Kind is
-            when Ada_Declarative_Part_Range
-               | Ada_Handled_Stmts_Range
-               | Ada_Loop_Stmt_Range
+            when Ada_Loop_Stmt_Range
                | Ada_For_Loop_Stmt_Range
                | Ada_While_Loop_Stmt_Range
                | Ada_If_Stmt_Range
                | Ada_Case_Stmt_Range
                | Ada_Case_Stmt_Alternative_Range
                | Ada_Record_Type_Def_Range
-               | Ada_Generic_Formal_Part_Range =>
+               | Ada_Generic_Formal_Part_Range
+               | Ada_Begin_Block_Range
+               | Ada_Decl_Block_Range =>
                Current_Indentation := @ + Indentation;
+
+            when Ada_Declarative_Part_Range =>
+               --  When we type declare, a DeclBlock is created but not a
+               --  DeclarativePart one. Only when you close the block with an
+               --  end the node is created.
+               --  DeclarativePart is a node that adds indentation.
+               --  We cannot simply make DeclBlock also add indentation because
+               --  it would double indent. So only add indentation to
+               --  DeclarativeParts if their parent is not  DeclBlock.
+               if Parent.Parent.Kind not in Ada_Decl_Block_Range then
+                  Current_Indentation := @ + Indentation;
+               end if;
+
+            when Ada_Handled_Stmts_Range =>
+               --  HandledStmts can be children of DeclBlock and BeginBlock.
+               --  These two add indentation, so HandledStmts should not
+               --  double add if its their child.
+               if Parent.Parent.Kind not in
+                 Ada_Begin_Block_Range | Ada_Decl_Block_Range
+               then
+                  Current_Indentation := @ + Indentation;
+               end if;
 
             when Ada_Subp_Spec_Range | Ada_Assign_Stmt_Range =>
                Current_Indentation := @ + Inline_Indentation;
