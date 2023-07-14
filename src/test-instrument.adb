@@ -351,6 +351,21 @@ package body Test.Instrument is
       Put_New_Line;
       S_Put (Pad + 6, "end if;");
       Put_New_Line;
+      Put_New_Line;
+      S_Put
+        (Pad + 6,
+         "TGen.Instr_Support.Recursion_Depth := "
+         & "TGen.Instr_Support.Recursion_Depth + 1;");
+      Put_New_Line;
+      S_Put
+        (Pad + 6,
+         "if TGen.Instr_Support.Recursion_Depth > 1 then");
+      Put_New_Line;
+      S_Put (Pad + 9, "return True;");
+      Put_New_Line;
+      S_Put (Pad + 6, "end if;");
+      Put_New_Line;
+      Put_New_Line;
 
       S_Put
         (Pad + 6,
@@ -412,12 +427,147 @@ package body Test.Instrument is
       Put_New_Line;
       S_Put (Pad + 3, "Dummy_GNATTEST : Boolean := GNATTEST_Dump_Inputs;");
       Put_New_Line;
+      Put_New_Line;
+
+      --  Turn original subprogram into wrapper
       S_Put
-        (Pad,
+        (Pad + 3,
+         Image
+           (Decl.Token_Start,
+            Decl.F_Subp_Spec.F_Subp_Name.Token_End,
+            Decl.Unit.Get_Charset)
+         & "_GNATTEST "
+         & Image
+           (Next (Decl.F_Subp_Spec.F_Subp_Name.Token_End),
+            Decl.F_Subp_Spec.Token_End,
+            Decl.Unit.Get_Charset)
+         & " is ");
+      Put_New_Line;
+
+      S_Put
+        (Pad + 3,
          Image
            (Decl.F_Decls.Token_Start,
-            Decl.Token_End,
+            Decl.F_Stmts.Token_End,
             Decl.Unit.Get_Charset));
+      Put_New_Line;
+      S_Put
+        (Pad + 3,
+         "end "
+         & Node_Image (Decl.F_Subp_Spec.F_Subp_Name)
+         & "_GNATTEST;");
+      Put_New_Line;
+      Put_New_Line;
+
+      --  Call the wrapper and decrease the recursivity counter afterwards
+      S_Put (Pad, "begin");
+      Put_New_Line;
+
+      if Decl.F_Subp_Spec.F_Subp_Kind = Ada_Subp_Kind_Function then
+         S_Put
+           (Pad + 3,
+            "return GNATTEST_Result : "
+            & Node_Image (Decl.F_Subp_Spec.F_Subp_Returns)
+            & " := "
+            & Node_Image (Decl.F_Subp_Spec.F_Subp_Name) & "_GNATTEST (");
+      else
+         S_Put
+           (Pad + 3,
+            Node_Image (Decl.F_Subp_Spec.F_Subp_Name) & " (");
+      end if;
+
+      declare
+         First_Param : Boolean := True;
+      begin
+         for Param of Decl.F_Subp_Spec.P_Params loop
+            for Name of Param.F_Ids loop
+               if First_Param then
+                  First_Param := False;
+                  Put_New_Line;
+               else
+                  S_Put (0, ",");
+                  Put_New_Line;
+               end if;
+               S_Put (Pad + 5, Node_Image (Name));
+            end loop;
+         end loop;
+      end;
+
+      if Decl.F_Subp_Spec.F_Subp_Kind = Ada_Subp_Kind_Function then
+         S_Put (0, ") do");
+      else
+         S_Put (0, ");");
+      end if;
+
+      Put_New_Line;
+      Put_New_Line;
+      S_Put
+        (Pad + 6,
+         "if TGen.Instr_Support.Subp_Hash = """
+         & Mangle_Hash_Full (Decl.P_Decl_Part)
+         & """");
+      Put_New_Line;
+      S_Put
+        (Pad + 8,
+         "and then TGen.Instr_Support.Nesting_Hash = """
+         & GNAT.SHA1.Digest (Get_Nesting (Decl.P_Decl_Part))
+         & """");
+      Put_New_Line;
+      S_Put (Pad + 6, "then");
+      Put_New_Line;
+      S_Put
+        (Pad + 9,
+         "TGen.Instr_Support.Recursion_Depth := "
+         & "TGen.Instr_Support.Recursion_Depth - 1;");
+      Put_New_Line;
+      S_Put (Pad + 6, "end if;");
+
+      Put_New_Line;
+      Put_New_Line;
+      if Decl.F_Subp_Spec.F_Subp_Kind = Ada_Subp_Kind_Function then
+         S_Put (Pad + 3, "end return;");
+      end if;
+      Put_New_Line;
+      Put_New_Line;
+
+      --  If there was an unhandled exception in the original subprogram,
+      --  decrease recursivity counter nad re-raise it.
+      Put_New_Line;
+      Put_New_Line;
+      S_Put (Pad, "exception");
+      Put_New_Line;
+      S_Put (Pad + 3, "when others =>");
+      Put_New_Line;
+      S_Put
+        (Pad + 6,
+         "if TGen.Instr_Support.Subp_Hash = """
+         & Mangle_Hash_Full (Decl.P_Decl_Part)
+         & """");
+      Put_New_Line;
+      S_Put
+        (Pad + 8,
+         "and then TGen.Instr_Support.Nesting_Hash = """
+         & GNAT.SHA1.Digest (Get_Nesting (Decl.P_Decl_Part))
+         & """");
+      Put_New_Line;
+      S_Put (Pad + 6, "then");
+      Put_New_Line;
+      S_Put
+        (Pad + 9,
+         "TGen.Instr_Support.Recursion_Depth := "
+         & "TGen.Instr_Support.Recursion_Depth - 1;");
+      Put_New_Line;
+      S_Put (Pad + 6, "end if;");
+      Put_New_Line;
+      S_Put (Pad + 6, "raise;");
+      Put_New_Line;
+
+      S_Put
+        (Pad,
+         "end "
+         & Node_Image (Decl.F_Subp_Spec.F_Subp_Name)
+         & ";");
+
    end Process_Subprogram_Body;
 
 end Test.Instrument;
