@@ -1,61 +1,52 @@
 variables:
-   # The common part of the URL for cloning from within a CI
-   GIT_CLONE_BASE: https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}:${CI_SERVER_PORT}
+  # The common part of the URL for cloning from within a CI
+  GIT_CLONE_BASE: https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}:${CI_SERVER_PORT}
 
 stages:
   - build_and_test
+  - downstream_ci
 
 #########
 # BUILD #
 #########
 
+.basic-setup:
+  # Temporary: clone the specific branch of ci-fragments
+  # TODO: remove the next 4 lines when this version of ci-fragments is available in the image
+  - cd /tmp
+  - git clone $GIT_CLONE_BASE/eng/it/ci-fragments -b topic/generic_ci_phase_2 --depth 1
+  - export PATH=/tmp/ci-fragments:$PATH
+  - cd -
+  # Use generic_anod_ci here.
+  - generic_anod_ci
+  - cat /tmp/ci_env.sh
+  - . /tmp/ci_env.sh
+
 build_and_test:
   services:
-     - image:sandbox
-     - cpu:8
-     - mem:16
+    - image:e3
+    - cpu:8
+    - mem:16
   stage: build_and_test
+  interruptible: true
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_PIPELINE_SOURCE == 'pipeline'
   script:
-    - . ~/.aws_container_credentials
-    - export PATH=/it/e3/bin:$PATH
-
-    # Tell the anod sandbox to use our repository
-    - cd /it/wave
-    - anod vcs --add-repo libadalang-tools $CI_PROJECT_DIR
-
-    # Figure out if we're on a sync branch
-    - BRANCH=master
-    - if [[ $CI_COMMIT_BRANCH =~ ^sync/ ]]; then
-         BRANCH=$CI_COMMIT_BRANCH;
-      elif [[ $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ ^sync/ ]]; then
-         BRANCH=$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME;
-      fi
-
-    # Setup the 'anod vcs' for the other repos.
-    # Get them from the default branch, or from the same
-    # branch as this if it exists.
-    - for subproject in laltools-testsuite ; do
-         cd /tmp ;
-         git clone $GIT_CLONE_BASE/eng/ide/$subproject ;
-         cd $subproject ;
-         echo "#### for project $subproject..." ;
-         if `git show-ref $BRANCH > /dev/null` ; then
-             echo "### ...using branch $BRANCH" ;
-             git checkout $BRANCH ;
-         else
-             echo "### ...using the default branch" ;
-         fi ;
-         cd /it/wave ;
-         anod vcs --add-repo $subproject /tmp/$subproject ;
-      done ;
+    - !reference [.basic-setup]
 
     # Build and test
-    - anod build libadalang-tools
-    - anod test libadalang-tools
+    - anod build libadalang-tools $ACI_TRACK_QUALIFIER
+    - anod test libadalang-tools  $ACI_TRACK_QUALIFIER
+
+    # Programmatically find the build space name
+    - BUILD_SPACE=`anod eval libadalang-tools --primitive test build_space_name $ACI_TRACK_QUALIFIER | tr -d "'"`
+    - SB_BASE=$ANOD_DEFAULT_SANDBOX_DIR/x86_64-linux/$BUILD_SPACE
+
     - e3-testsuite-report
-        --failure-exit-code 1
-        --xunit-output $CI_PROJECT_DIR/xunit_output.xml
-        x86_64-linux/laltools-test/results/new/
+      --failure-exit-code 1
+      --xunit-output $CI_PROJECT_DIR/xunit_output.xml
+      $SB_BASE/results/new/
 
   artifacts:
     when: always
@@ -63,3 +54,20 @@ build_and_test:
       - xunit_output.xml
     reports:
       junit: xunit_output.xml
+
+downstream_ci:
+  stage: downstream_ci
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      when: manual
+  inherit:
+    variables: false
+  variables:
+    ACI_UPSTREAM_PROJECT_ID: $CI_PROJECT_ID
+    ACI_UPSTREAM_MERGE_REQUEST_IID: $CI_MERGE_REQUEST_IID
+  parallel:
+    matrix:
+      - PROJECT: ["eng/ide/lal-refactor", "eng/ide/ada_language_server"]
+  trigger:
+    strategy: depend
+    project: $PROJECT
