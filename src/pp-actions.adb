@@ -2433,6 +2433,18 @@ package body Pp.Actions is
             "for ! use${record? at mod ~~;~${?~$~$~}end record};");
       end if;
 
+      --  Handling separate overriding keyword when the switch is set
+      if Arg (Cmd, Separate_Overriding) then
+         Replace_Tmp
+           (Ada_Overriding_Not_Overriding,
+            "not overriding",
+            "not overriding$");
+         Replace_Tmp
+           (Ada_Overriding_Overriding,
+            "overriding",
+            "overriding$");
+      end if;
+
       --  Replacements for Indent_Named_Statements
 
       if Arg (Cmd, Indent_Named_Statements) then
