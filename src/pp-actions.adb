@@ -316,6 +316,7 @@ package body Pp.Actions is
             Set_Arg (Cmd, Compact, False);
             Set_Arg (Cmd, Separate_Is, True);
             Set_Arg (Cmd, Separate_Return, True);
+            Set_Arg (Cmd, Separate_Overriding, True);
             Set_Arg (Cmd, Separate_Loop, True);
             Set_Arg (Cmd, Separate_Then, True);
             Set_Arg (Cmd, Separate_Loop_Then, True);
