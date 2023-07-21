@@ -243,6 +243,7 @@ package Pp.Command_Lines is
       End_Id,
       Separate_Is,
       Separate_Return,
+      Separate_Overriding,
       Use_On_New_Line,
       Split_Line_Before_Op,
       Split_Line_Before_Record,
@@ -277,6 +278,10 @@ package Pp.Command_Lines is
    --       of tab characters and normal whitespaces
    --       (i.e., when tab_size=3 and 8 spaces
    --              => replaced by 2 tabs and 2 spaces)
+   --
+   --  --separate-overriding when set allows to put "overriding" keyword on a
+   --  separate line (this is an internal switch, not documented in help and
+   --  used by the formatting switch --layout=tall)
 
    package Pp_Boolean_Switches is new Boolean_Switches
      (Descriptor,
@@ -294,6 +299,7 @@ package Pp.Command_Lines is
        End_Id => null,
        Separate_Is => null,
        Separate_Return => null,
+       Separate_Overriding => null,
        Use_On_New_Line => null,
        Split_Line_Before_Op => null,
        Split_Line_Before_Record => null,
@@ -325,6 +331,7 @@ package Pp.Command_Lines is
          End_Id => True,
          Separate_Is => True,
          Separate_Return => True,
+         Separate_Overriding => False,
          Use_On_New_Line => False,
          Split_Line_Before_Op => False,
          Split_Line_Before_Record => False,

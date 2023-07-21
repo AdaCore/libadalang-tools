@@ -316,6 +316,7 @@ package body Pp.Actions is
             Set_Arg (Cmd, Compact, False);
             Set_Arg (Cmd, Separate_Is, True);
             Set_Arg (Cmd, Separate_Return, True);
+            Set_Arg (Cmd, Separate_Overriding, True);
             Set_Arg (Cmd, Separate_Loop, True);
             Set_Arg (Cmd, Separate_Then, True);
             Set_Arg (Cmd, Separate_Loop_Then, True);
@@ -2430,6 +2431,18 @@ package body Pp.Actions is
            (Ada_Record_Rep_Clause,
             "for ! use record? at mod ~~;~${?~$~$~}end record;",
             "for ! use${record? at mod ~~;~${?~$~$~}end record};");
+      end if;
+
+      --  Handling separate overriding keyword when the switch is set
+      if Arg (Cmd, Separate_Overriding) then
+         Replace_Tmp
+           (Ada_Overriding_Not_Overriding,
+            "not overriding",
+            "not overriding$");
+         Replace_Tmp
+           (Ada_Overriding_Overriding,
+            "overriding",
+            "overriding$");
       end if;
 
       --  Replacements for Indent_Named_Statements
