@@ -36,13 +36,13 @@ with Langkit_Support.Text; use Langkit_Support.Text;
 
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-
 with Ada.Characters.Handling; use Ada.Characters.Handling;
 with Ada.Directories;
 with Ada.Exceptions;
 with Ada.Strings; use Ada.Strings;
 with Ada.Strings.Fixed; use Ada.Strings.Fixed;
+with Ada.Strings.Maps;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with GNATCOLL.Traces; use GNATCOLL.Traces;
 with GNATCOLL.VFS; use GNATCOLL.VFS;
@@ -6939,6 +6939,12 @@ package body Test.Skeleton is
             --  indexes for the given File_Kind, to keep track of the line
             --  index.
 
+            procedure Pp_JSON_Object_Lit
+              (F : File_Kind; Obj : JSON_Value; Indent : Natural);
+            --  Pretty print Obj as a concatenation of multiple Ada strings,
+            --  with line breaks to properly indent the JSON literal string,
+            --  indenting each line by Indent spaces beyond the indent of Com.
+
             --------------
             -- Put_Line --
             --------------
@@ -6981,6 +6987,38 @@ package body Test.Skeleton is
                end loop;
                Put (F, ");");
             end Pp_Subp_Call;
+
+            procedure Pp_JSON_Object_Lit
+              (F : File_Kind; Obj : JSON_Value; Indent : Natural)
+            is
+               use Ada.Strings.Maps;
+               Multiline_JSON : constant Unbounded_String :=
+                 Obj.Write (Compact => False);
+               NL_Set         : constant Character_Set := To_Set (ASCII.LF);
+               Indent_Str     : constant String := [1 .. Indent => ' '];
+               Start          : Positive := 1;
+               Next_NL        : Natural := 0;
+            begin
+               Put (Files (F), Com & Indent_Str & """");
+               loop
+                  Next_NL := Multiline_JSON.Index
+                    (NL_Set, From => Start);
+                  exit when Next_NL = 0;
+                  Put
+                    (Files (F),
+                     Escape (Multiline_JSON.Slice
+                               (Low => Start, High => Next_NL - 1))
+                     & """");
+                  Start := Next_NL + 1;
+                  New_Line (F);
+                  Put (Files (F), Com & Indent_Str & "& """);
+               end loop;
+               Put
+                 (Files (F),
+                  Escape (Multiline_JSON.Slice
+                            (Low => Start, High => Multiline_JSON.Length))
+                  & """");
+            end Pp_JSON_Object_Lit;
 
          begin
 
@@ -7164,15 +7202,15 @@ package body Test.Skeleton is
                         Value : constant Unbounded_String :=
                           +Input_Fname_For_Typ
                           (To_Qualified_Name (Param.Get ("type_name")))
-                          & " (TGen.JSON.Read ("
-                          & """" & Escape (Param.Get ("value").Write) & """"
-                          & "))";
+                          & " (TGen.JSON.Read (";
                      begin
                         Put_Line
                           (Body_Kind,
                            Com & "   Param_" & Param.Get ("name") & " : "
                            & Param.Get ("type_name")
-                           & ":= " & (+Value) & ";");
+                           & ":= " & (+Value));
+                        Pp_JSON_Object_Lit (Body_Kind, Param.Get ("value"), 5);
+                        Put_Line (Body_Kind, "));");
                      end;
                   end if;
                end loop;
