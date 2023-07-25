@@ -4682,7 +4682,7 @@ package body Pp.Actions is
 
          procedure Do_Literal is
             S : constant W_Str := Id_Name (Tree);
-            V : Bounded_W_Str (Max_Length => 100);
+            V : Bounded_W_Str (Max_Length => 256);
 
             function Last_Digit
               (First : Positive; Based : Boolean) return Positive;
