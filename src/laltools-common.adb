@@ -23,6 +23,7 @@
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Characters.Handling;
+with Ada.Characters.Latin_1;
 with Ada.Containers; use Ada.Containers;
 with Ada.Exceptions;
 with Ada.Strings.Fixed;
@@ -1341,6 +1342,14 @@ package body Laltools.Common is
             "-- " & Subprogram_Name & " --");
       --  Checks if Token is the header body
 
+      function Line_Feed_Count
+        (Token : Token_Reference)
+         return Natural
+      is (Ada.Strings.Fixed.Count
+            (To_UTF8 (Text (Token)),
+             String'("" & Ada.Characters.Latin_1.LF)));
+      --  Counts the number of LFs in Token
+
    begin
       --  Do not try to recognize headers on declaration without Defining_Name
       --  nodes or declarations with multiple Defining_Name nodes.
@@ -1353,59 +1362,104 @@ package body Laltools.Common is
 
       declare
          Decl_Name : constant String := To_UTF8 (Decl.P_Defining_Name.Text);
+         --  Calling Decl.P_Defining_Name is safe here because we've checked
+         --  that Decl.P_Defining_Names'Length > 1.
 
          Decl_Start_Token : constant Token_Reference := Decl.Token_Start;
          Aux_Token        : Token_Reference := Decl_Start_Token;
 
-         Header_Start_Token  : Token_Reference;
-         Header_End_Token    : Token_Reference;
+         Header_Start_Token : Token_Reference;
+         Header_End_Token   : Token_Reference;
 
       begin
-         loop
-            Aux_Token := Previous (Aux_Token);
-            exit when Aux_Token = No_Token
-                      or else Kind (Data (Aux_Token)) not in Ada_Whitespace;
-         end loop;
+         --  Start with the first token of Decl
+
+         --  Move backward one token and confirm that:
+         --    - it is a whitespace token with at least one line break and at
+         --      most two
+         Aux_Token := Previous (Aux_Token);
+         if Aux_Token = No_Token
+           or else Kind (Data (Aux_Token)) not in Ada_Whitespace
+           or else Line_Feed_Count (Aux_Token) not in 1 | 2
+         then
+            return No_Source_Location_Range;
+         end if;
+
+         --  Move backward one token and confirm that:
+         --    - it is a whole line comment
+         --    - and then that it is a header edge
+         --    - and then that it starts at the same column as Decl
+         --  If the previous conditions pass then it means this might be a
+         --  header end, so assign save it in Header_End_Token.
+         Aux_Token := Previous (Aux_Token);
          if not Is_Whole_Line_Comment (Aux_Token)
            or else not Is_Header_Edge (Aux_Token, Decl_Name)
+           or else Sloc_Range (Data (Aux_Token)).Start_Column /=
+                     Decl.Sloc_Range.Start_Column
          then
             return No_Source_Location_Range;
          end if;
          Header_End_Token := Aux_Token;
 
-         loop
-            Aux_Token := Previous (Aux_Token);
-            exit when Aux_Token = No_Token
-              or else Kind (Data (Aux_Token)) not in Ada_Whitespace;
-         end loop;
-         if not Is_Whole_Line_Comment (Aux_Token)
-           or else not Is_Header_Body (Aux_Token, Decl_Name)
+         --  Move backward one token and confirm that:
+         --    - it is whitespace token
+         --    - and then that it only has one line break
+         Aux_Token := Previous (Aux_Token);
+         if Aux_Token = No_Token
+           or else Kind (Data (Aux_Token)) not in Ada_Whitespace
+           or else Line_Feed_Count (Aux_Token) /= 1
          then
             return No_Source_Location_Range;
          end if;
 
-         loop
-            Aux_Token := Previous (Aux_Token);
-            exit when Aux_Token = No_Token
-              or else Kind (Data (Aux_Token)) not in Ada_Whitespace;
-         end loop;
+         --  Move backward one token and confirm that:
+         --    - it is a whole line comment
+         --    - and then that it is a header body
+         --    - and then that it starts at the same column as Decl
+         Aux_Token := Previous (Aux_Token);
+         if not Is_Whole_Line_Comment (Aux_Token)
+           or else not Is_Header_Body (Aux_Token, Decl_Name)
+           or else Sloc_Range (Data (Aux_Token)).Start_Column /=
+                     Decl.Sloc_Range.Start_Column
+         then
+            return No_Source_Location_Range;
+         end if;
+
+         --  Move backward one token and confirm that:
+         --    - it is whitespace token
+         --    - and then that it only has one line break
+         Aux_Token := Previous (Aux_Token);
+         if Aux_Token = No_Token
+           or else Kind (Data (Aux_Token)) not in Ada_Whitespace
+           or else Line_Feed_Count (Aux_Token) /= 1
+         then
+            return No_Source_Location_Range;
+         end if;
+
+         --  Move backward one token and confirm that:
+         --    - it is a whole line comment
+         --    - and then that it is a header edge
+         --    - and then that it starts at the same column as Decl
+         --  If the previous conditions pass then it means this is the header
+         --  start, so assign save it in Header_Start_Token.
+         Aux_Token := Previous (Aux_Token);
          if not Is_Whole_Line_Comment (Aux_Token)
            or else not Is_Header_Edge (Aux_Token, Decl_Name)
+           or else Sloc_Range (Data (Aux_Token)).Start_Column /=
+                     Decl.Sloc_Range.Start_Column
          then
             return No_Source_Location_Range;
          end if;
          Header_Start_Token := Aux_Token;
 
-         if Sloc_Range (Data (Header_Start_Token)).Start_Column > 1 then
-            Aux_Token := Previous (Header_Start_Token);
-            if Kind (Data (Aux_Token)) in Ada_Whitespace then
-               Header_Start_Token := Aux_Token;
-            end if;
-         end if;
-
+         --  Header_Start_Token token might not start at column 1. However,
+         --  tt is safe to create a start Source_Location with column
+         --  1 because we confirmed that Header_Start_Token is a whole line
+         --  comment.
          return
            Make_Range
-             (Start_Sloc (Sloc_Range (Data (Header_Start_Token))),
+             (Source_Location'
+                (Sloc_Range (Data (Header_Start_Token)).Start_Line, 1),
               End_Sloc (Sloc_Range (Data (Header_End_Token))));
       end;
    end Get_Basic_Decl_Header_SLOC_Range;
