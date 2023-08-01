@@ -174,6 +174,8 @@ package body TGen.Libgen is
 
       TRD : constant String := To_String (Ctx.Root_Templates_Dir);
 
+      Sorted_Types : Typ_List;
+
    begin
       Create (F_Spec, Out_File, File_Name & ".ads");
       Put (F_Spec, "with TGen.Marshalling_Lib; ");
@@ -279,30 +281,49 @@ package body TGen.Libgen is
 
       --  Generate the marshalling support lib. Make sure to sort the types
       --  in dependency order otherwise we will get access before elaboration
-      --  issues.
+      --  issues when computing the Size_Max constants for each type:
+      --  we need the Size_Max of all the dependencies of the components to be
+      --  available before being able to compute the Size_Max for a composite
+      --  type.
 
-      for T of Sort (Types) loop
+      Sorted_Types := Sort (Types);
 
-         if Is_Supported_Type (T.Get)
+      --  Output the marshalling subprograms for the types with a public part
+      --  first, then create the private part for the package and output the
+      --  marshalling subprograms for the fully private types. Hopefully this
+      --  won't break too much the topological order on the types, otherwise
+      --  we'll need to make marshaller generation much finer grain in order to
+      --  both be able to have the marshaller subprograms declarations respect
+      --  the visibility of the type, and have the implementation details
+      --  generated in the correct order.
 
-           --  We ignore instance types when generating marshallers as they
-           --  are not types per-se, but a convenient way of binding a type
-           --  to its strategy context.
+      for Part in Spec_Part loop
+         for T of Sorted_Types loop
 
-            and then T.Get not in Instance_Typ'Class
-         then
-            if T.Get.Kind in Function_Kind then
-               TGen.Marshalling.JSON_Marshallers
-                 .Generate_TC_Serializers_For_Subp
-                   (F_Spec, F_Body, T.Get, TRD);
-            else
-               TGen.Marshalling.Binary_Marshallers
-                 .Generate_Marshalling_Functions_For_Typ
-                   (F_Spec, F_Body, T.Get, TRD);
-               TGen.Marshalling.JSON_Marshallers
-                 .Generate_Marshalling_Functions_For_Typ
-                   (F_Spec, F_Body, T.Get, TRD);
+            if Is_Supported_Type (T.Get)
+
+            --  We ignore instance types when generating marshallers as they
+            --  are not types per-se, but a convenient way of binding a type
+            --  to its strategy context.
+
+               and then T.Get not in Instance_Typ'Class
+            then
+               if T.Get.Kind in Function_Kind then
+                  TGen.Marshalling.JSON_Marshallers
+                  .Generate_TC_Serializers_For_Subp
+                     (F_Spec, F_Body, T.Get, Part, TRD);
+               else
+                  TGen.Marshalling.Binary_Marshallers
+                  .Generate_Marshalling_Functions_For_Typ
+                     (F_Spec, F_Body, T.Get, Part, TRD);
+                  TGen.Marshalling.JSON_Marshallers
+                  .Generate_Marshalling_Functions_For_Typ
+                     (F_Spec, F_Body, T.Get, Part, TRD);
+               end if;
             end if;
+         end loop;
+         if Part = Pub then
+            Put_Line (F_Spec, "private");
          end if;
       end loop;
 

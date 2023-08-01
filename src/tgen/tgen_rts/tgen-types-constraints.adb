@@ -311,6 +311,7 @@ package body TGen.Types.Constraints is
       end case;
       Res.Get.Name := Self.Named_Ancestor.Get.Name;
       Res.Get.Last_Comp_Unit_Idx := Self.Last_Comp_Unit_Idx;
+      Res.Get.Fully_Private := Self.Named_Ancestor.Get.Fully_Private;
       return Res;
    end As_Named_Typ;
 

@@ -1,4 +1,6 @@
-@@--  Template for a variant choice specification
+@@--  Template for the declarations for a variant choice specification.
+@@--  These declarations go in the body of the value package, in order to
+@@--  be part of the private part and avoid any visibility issues.
 @@--  @_TY_PREFIX_@ Prefix for all of the type declarations
 @@--  @_VARIANT_NUMBER_@ Index of the variant in the record
 @@--  @_VARIANT_CHOICE_NUMBER_@ Index of the variant choice number

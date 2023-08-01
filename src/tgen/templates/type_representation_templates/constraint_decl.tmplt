@@ -1,4 +1,6 @@
-@@--  Template for the specification of any kind of constraint
+@@--  Template for the declarations for any kind of constraint representation.
+@@--  These declarations go in the body of the value package, in order to
+@@--  be part of the private part and avoid any visibility issues.
 @@--
 @@--  Macro to instantiate a discrete constraint.
 @@--  @_$1_@: Kind of the constraint (STATIC, NON_STATIC, DISCRIMINANT)

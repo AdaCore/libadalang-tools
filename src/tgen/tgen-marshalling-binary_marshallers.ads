@@ -28,10 +28,18 @@ package TGen.Marshalling.Binary_Marshallers is
    procedure Generate_Marshalling_Functions_For_Typ
      (F_Spec, F_Body     : File_Type;
       Typ                : TGen.Types.Typ'Class;
+      Part               : Spec_Part;
       Templates_Root_Dir : String);
    --  Generate binary marshalling and unmarshalling functions for Typ. Note
    --  that this function will not operate recursively. It will thus have to
    --  be called for each of the component type of a record for instance.
+   --
+   --  Part determines which part (public or private) of the spec will be
+   --  generated. It is thus necessary to call this subprogram twice in order
+   --  to generate a full spec, taking care to insert a "private" line in
+   --  F_Spec in between the two calls. The body is generated at the same time
+   --  the public part is generated, nothing will be written to F_Body if Part
+   --  is Priv.
    --
    --  If the type does not need a header, we generate:
    --

@@ -233,6 +233,11 @@ package body TGen.Types.Translation is
    function "+" (Text : Unbounded_Text_Type) return Unbounded_String is
      (TGen.Types.Translation."+" (+Text));
 
+   function Decl_Is_Fully_Private (N : Basic_Decl'Class) return Boolean;
+   --  Return whether N is fully private, i.e. whether the first declaration of
+   --  N is in a private part, and can't thus be used outside the private parts
+   --  of its declaration unit or child units.
+
    --------------
    -- PP_Cache --
    --------------
@@ -322,6 +327,26 @@ package body TGen.Types.Translation is
             end if;
          end;
    end New_Eval_As_Int;
+
+   ---------------------------
+   -- Decl_Is_Fully_Private --
+   ---------------------------
+
+   function Decl_Is_Fully_Private (N : Basic_Decl'Class) return Boolean is
+      First_Part : constant Basic_Decl := N.P_All_Parts (1);
+      Sem_Parent : Ada_Node := First_Part.P_Semantic_Parent;
+   begin
+      --  Consider that N is fully private if there is a private part node
+      --  among the chain of semantic parents of the first part of N.
+
+      while not Sem_Parent.Is_Null loop
+         if Sem_Parent.Kind in Ada_Private_Part_Range then
+            return True;
+         end if;
+         Sem_Parent := Sem_Parent.P_Semantic_Parent;
+      end loop;
+      return False;
+   end Decl_Is_Fully_Private;
 
    ------------------------
    -- Translate_Int_Decl --
@@ -2740,6 +2765,8 @@ package body TGen.Types.Translation is
                Res.Res.Set (Anonymous_Typ'
                  (Name                => Ada_Identifier_Vectors.Empty_Vector,
                   Last_Comp_Unit_Idx  => 1,
+                  Fully_Private       =>
+                    Intermediate_Result.Res.Get.Fully_Private,
                   Named_Ancestor      => Intermediate_Result.Res,
                   Subtype_Constraints => new Discrete_Range_Constraint'
                     (Translate_Discrete_Range_Constraint
@@ -2752,6 +2779,8 @@ package body TGen.Types.Translation is
                  (Name                => Ada_Identifier_Vectors.Empty_Vector,
                   Last_Comp_Unit_Idx  => 1,
                   Named_Ancestor      => Intermediate_Result.Res,
+                  Fully_Private       =>
+                    Intermediate_Result.Res.Get.Fully_Private,
                   Subtype_Constraints =>
                     new TGen.Types.Constraints.Constraint'Class'
                     (Translate_Real_Constraints
@@ -2763,6 +2792,8 @@ package body TGen.Types.Translation is
                  (Name                => Ada_Identifier_Vectors.Empty_Vector,
                   Last_Comp_Unit_Idx  => 1,
                   Named_Ancestor      => Intermediate_Result.Res,
+                  Fully_Private       =>
+                    Intermediate_Result.Res.Get.Fully_Private,
                   Subtype_Constraints => new Index_Constraints'
                     (Translate_Index_Constraints
                       (N.As_Subtype_Indication.F_Constraint,
@@ -2780,6 +2811,8 @@ package body TGen.Types.Translation is
                  (Name                => Ada_Identifier_Vectors.Empty_Vector,
                   Last_Comp_Unit_Idx  => 1,
                   Named_Ancestor      => Intermediate_Result.Res,
+                  Fully_Private       =>
+                    Intermediate_Result.Res.Get.Fully_Private,
                   Subtype_Constraints => new Discriminant_Constraints'
                     (Translate_Discriminant_Constraints
                       (N.As_Subtype_Indication.F_Constraint
@@ -3022,6 +3055,7 @@ package body TGen.Types.Translation is
       if Specialized_Res.Success then
          Specialized_Res.Res.Get.Name := FQN;
          Specialized_Res.Res.Get.Last_Comp_Unit_Idx := Comp_Unit_Idx;
+         Specialized_Res.Res.Get.Fully_Private := Decl_Is_Fully_Private (N);
       end if;
 
       return Specialized_Res;
@@ -3119,6 +3153,12 @@ package body TGen.Types.Translation is
       --  Function type was successfully translated
 
       F_Typ.Subp_UID := +UID;
+
+      --  This function can only be used outside of the private part if none of
+      --  its parameter types are fully private.
+
+      F_Typ.Fully_Private :=
+        (for some Param of F_Typ.Component_Types => Param.Get.Fully_Private);
 
       F_Typ_Ref.Set (F_Typ);
       Translation_Cache.Insert (F_Typ.Name, F_Typ_Ref);

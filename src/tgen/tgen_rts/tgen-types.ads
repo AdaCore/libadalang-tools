@@ -50,6 +50,12 @@ package TGen.Types is
       --  Index, in Name, of the last identifier of the compilation unit in
       --  which this type is declared.
 
+      Fully_Private : Boolean;
+      --  Wether this type has no public declaration whatsoever, i.e. it cannot
+      --  be referenced outside of the private part of its declaration package,
+      --  or outside of the private part of child packages of its declaration
+      --  package.
+
    end record;
 
    type Typ_Kind is (Invalid_Kind,

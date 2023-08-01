@@ -9,8 +9,12 @@
 @@--  @_DISCR_NAME_@ Same as above for the discriminants of records.
 @@--  @_COMP_TYP_@ Index types for arrays, and types of the discriminants for
 @@--       records.
+@@--  @_SIZE_MAX_PUB_@ True if the Size_Max function can be declared in the
+@@--       public part. This will be False if one of the discriminant types, or
+@@--       index types is not visible outside of the private part.
 @@--
 @@INCLUDE@@ util.tmplt
+@@IF@@ @_PUB_PART_@ xor @_FULL_PRIV_@
    --  Base operations for @_TY_NAME_@
 
    procedure @_TY_PREFIX_@_Write
@@ -29,6 +33,8 @@
      (@_GLOBAL_PREFIX_@_V : @_TY_NAME_@)
      return Natural;
 
+@@END_IF@@
+@@IF@@ @_PUB_PART_@ xor (@_FULL_PRIV_@ or not @_SIZE_MAX_PUB_@)
    function @_TY_PREFIX_@_Size_Max
 @@IF@@ @_DISCR_NAME_@ /= ""
 @@TABLE'ALIGN_ON(":", ":=")@@
@@ -42,3 +48,4 @@
 @@END_TABLE@@
 @@END_IF@@
      return Natural;
+@@END_IF@@

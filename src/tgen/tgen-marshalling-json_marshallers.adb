@@ -36,6 +36,7 @@ package body TGen.Marshalling.JSON_Marshallers is
    procedure Generate_Marshalling_Functions_For_Typ
      (F_Spec, F_Body     : File_Type;
       Typ                : TGen.Types.Typ'Class;
+      Part               : Spec_Part;
       Templates_Root_Dir : String)
    is
       TRD : constant String :=
@@ -58,7 +59,9 @@ package body TGen.Marshalling.JSON_Marshallers is
          4 => Assoc ("GENERIC_NAME", Generic_Name),
          5 => Assoc ("GLOBAL_PREFIX", Global_Prefix),
          6 => Assoc ("NEEDS_HEADER", Needs_Header (Typ)),
-         7 => Assoc ("IS_SCALAR", Typ in Scalar_Typ'Class)];
+         7 => Assoc ("IS_SCALAR", Typ in Scalar_Typ'Class),
+         8 => Assoc ("PUB_PART", Part = Pub),
+         9 => Assoc ("FULL_PRIV", Typ.Fully_Private)];
 
       function Component_Read
         (Assocs : Translate_Table) return Unbounded_String;
@@ -166,8 +169,10 @@ package body TGen.Marshalling.JSON_Marshallers is
       begin
          Put_Line (F_Spec, Parse (Header_Spec_Template, Assocs));
          New_Line (F_Spec);
-         Put_Line (F_Body, Parse (Header_Body_Template, Assocs));
-         New_Line (F_Body);
+         if Part = Pub then
+            Put_Line (F_Body, Parse (Header_Body_Template, Assocs));
+            New_Line (F_Body);
+         end if;
       end Print_Header;
 
       ------------------
@@ -178,9 +183,11 @@ package body TGen.Marshalling.JSON_Marshallers is
       begin
          Put_Line (F_Spec, Parse (Scalar_Base_Spec_Template, Assocs));
          New_Line (F_Spec);
-         Put_Line
-           (F_Body, Parse (Scalar_Read_Write_Template, Assocs));
-         New_Line (F_Body);
+         if Part = Pub then
+            Put_Line
+              (F_Body, Parse (Scalar_Read_Write_Template, Assocs));
+            New_Line (F_Body);
+         end if;
       end Print_Scalar;
 
       -----------------
@@ -191,9 +198,11 @@ package body TGen.Marshalling.JSON_Marshallers is
       begin
          Put_Line (F_Spec, Parse (Composite_Base_Spec_Template, Assocs));
          New_Line (F_Spec);
-         Put_Line
-           (F_Body, Parse (Array_Read_Write_Template, Assocs));
-         New_Line (F_Body);
+         if Part = Pub then
+            Put_Line
+              (F_Body, Parse (Array_Read_Write_Template, Assocs));
+            New_Line (F_Body);
+         end if;
       end Print_Array;
 
       ------------------
@@ -204,9 +213,11 @@ package body TGen.Marshalling.JSON_Marshallers is
       begin
          Put_Line (F_Spec, Parse (Composite_Base_Spec_Template, Assocs));
          New_Line (F_Spec);
-         Put_Line
-           (F_Body, Parse (Record_Read_Write_Template, Assocs));
-         New_Line (F_Body);
+         if Part = Pub then
+            Put_Line
+              (F_Body, Parse (Record_Read_Write_Template, Assocs));
+            New_Line (F_Body);
+         end if;
       end Print_Record;
 
       ---------------------------
@@ -218,9 +229,11 @@ package body TGen.Marshalling.JSON_Marshallers is
          Put_Line
            (F_Spec, Parse (Header_Wrappers_Spec_Template, Assocs));
          New_Line (F_Spec);
-         Put_Line
-           (F_Body, Parse (Header_Wrappers_Body_Template, Assocs));
-         New_Line (F_Body);
+         if Part = Pub then
+            Put_Line
+              (F_Body, Parse (Header_Wrappers_Body_Template, Assocs));
+            New_Line (F_Body);
+         end if;
       end Print_Header_Wrappers;
 
       procedure Generate_Base_Functions_For_Typ_Instance is new
@@ -242,14 +255,15 @@ package body TGen.Marshalling.JSON_Marshallers is
    begin
       --  Generate the base functions for Typ
 
-      Generate_Base_Functions_For_Typ_Instance (Typ);
+      Generate_Base_Functions_For_Typ_Instance (Typ, Part);
 
       --  If the type can be used as an array index constraint, also generate
       --  the functions for Typ'Base. TODO: we probably should do that iff
       --  the type actually constrains an array.
 
       if Typ in Scalar_Typ'Class then
-         Generate_Base_Functions_For_Typ_Instance (Typ, For_Base => True);
+         Generate_Base_Functions_For_Typ_Instance
+           (Typ, Part, For_Base => True);
       end if;
 
       --  Generate the Input and Output subprograms
@@ -259,12 +273,13 @@ package body TGen.Marshalling.JSON_Marshallers is
          Parse
            (In_Out_Spec_Template, Assocs));
       New_Line (F_Spec);
-
-      Put_Line
-        (F_Body,
-         Parse
-           (In_Out_Body_Template, Assocs));
-      New_Line (F_Body);
+      if Part = Pub then
+         Put_Line
+           (F_Body,
+            Parse
+              (In_Out_Body_Template, Assocs));
+         New_Line (F_Body);
+      end if;
    end Generate_Marshalling_Functions_For_Typ;
 
    --------------------------------------
@@ -274,6 +289,7 @@ package body TGen.Marshalling.JSON_Marshallers is
    procedure Generate_TC_Serializers_For_Subp
      (F_Spec, F_Body     : File_Type;
       FN_Typ             : TGen.Types.Typ'Class;
+      Part               : Spec_Part;
       Templates_Root_Dir : String)
    is
       use Component_Maps;
@@ -292,6 +308,13 @@ package body TGen.Marshalling.JSON_Marshallers is
       Param_Types : Vector_Tag;
       Param_Slugs : Vector_Tag;
    begin
+      --  Nothing to be done when the subprogram is public and we are
+      --  processing the private part.
+
+      if Part = Priv and then not FN_Typ.Fully_Private then
+         return;
+      end if;
+
       if Function_Typ (FN_Typ).Component_Types.Is_Empty then
          return;
       end if;
@@ -322,17 +345,21 @@ package body TGen.Marshalling.JSON_Marshallers is
       Assocs.Insert (Assoc ("PARAM_TY", Param_Types));
       Assocs.Insert (Assoc ("PARAM_SLUG", Param_Slugs));
 
-      --  First generate the spec
+      --  First generate the spec, in the correct part of the spec
 
-      Assocs.Insert (Assoc ("FOR_SPEC", True));
-      Put_Line (F_Spec, Parse (Function_TC_Dump_Template, Assocs));
-      New_Line (F_Spec);
+      if Part = Pub xor FN_Typ.Fully_Private then
+         Assocs.Insert (Assoc ("FOR_SPEC", True));
+         Put_Line (F_Spec, Parse (Function_TC_Dump_Template, Assocs));
+         New_Line (F_Spec);
+      end if;
 
       --  Then the body
 
-      Assocs.Insert (Assoc ("FOR_SPEC", False));
-      Put_Line (F_Body, Parse (Function_TC_Dump_Template, Assocs));
-      New_Line (F_Body);
+      if Part = Pub then
+         Assocs.Insert (Assoc ("FOR_SPEC", False));
+         Put_Line (F_Body, Parse (Function_TC_Dump_Template, Assocs));
+         New_Line (F_Body);
+      end if;
 
    end Generate_TC_Serializers_For_Subp;
 

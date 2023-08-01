@@ -951,7 +951,8 @@ package body TGen.Types.Record_Types is
            (Name                => Disc_Record.Name,
              Last_Comp_Unit_Idx => Disc_Record.Last_Comp_Unit_Idx,
             Component_Types     => Components,
-            Static_Gen          => Disc_Record.Static_Gen);
+            Static_Gen          => Disc_Record.Static_Gen,
+            Fully_Private       => Disc_Record.Fully_Private);
       begin
          Set_Field
            (Result, "components",
