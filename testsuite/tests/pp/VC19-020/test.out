@@ -62,7 +62,7 @@ procedure Main is
         First_Dozen in
           1 .. 2 | 3 | 4 | 5 .. 6 | 7 .. 8 | 9 .. 10 | 11 .. 12 | 13 .. 14;
    function Valid_Response_Code
-     (Val: RFLX.RFLX_Types.Base_Integer) return Boolean is
+     (Val : RFLX.RFLX_Types.Base_Integer) return Boolean is
      (Val in
         16#1#
         | 16#2#
@@ -96,7 +96,7 @@ procedure Main is
           1 .. 2 | 3 | 4 | 5 .. 6 | 7 .. 8 | 9 .. 10 | 11 .. 12 | 13 .. 14;
 
    function Valid_Response_Code
-     (Val : RFLX.RFLX_Types.Base_Integer) return Boolean is
+     (Val: RFLX.RFLX_Types.Base_Integer) return Boolean is
      (Val in
         16#1# | 16#2# | 16#3# | 16#4# | 16#60# | 16#61# | 16#63# | 16#64#
         | 16#65# | 16#66# | 16#67# | 16#68# | 16#69# | 16#6A# | 16#6B# | 16#6C#
