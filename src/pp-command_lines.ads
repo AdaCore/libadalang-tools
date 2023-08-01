@@ -484,7 +484,8 @@ package Pp.Command_Lines is
      Number_Casing_Switches,
      Pragma_Casing_Switches,
      Constant_Casing_Switches,
-     Pp_Nat_Switches;
+     Pp_Nat_Switches,
+     Layout_Switches;
 
    function Obsolete_Alignment_Switch (Cmd : Command_Line) return Boolean is
               (Arg (Cmd, Obsolete_A1)
@@ -494,9 +495,13 @@ package Pp.Command_Lines is
        or else Arg (Cmd, Obsolete_A5));
 
    function Alignment_Enabled (Cmd : Command_Line) return Boolean is
-     (if Arg (Cmd, RM_Style_Spacing) then Explicit (Cmd, Alignment)
+     (if Explicit (Cmd, Layout) then Arg (Cmd, Alignment)
+      elsif Arg (Cmd, RM_Style_Spacing) then Explicit (Cmd, Alignment)
       elsif Arg (Cmd, Obsolete_A0) then Obsolete_Alignment_Switch (Cmd)
       else Arg (Cmd, Alignment) or Obsolete_Alignment_Switch (Cmd));
+   --  Layout controls the alignment. The remaining condition are for legacy
+   --  purposes.
+   --
    --  The old gnatpp had the ability to individually enable different kinds of
    --  alignment with -A1, -A2, -A3, -A4, and -A5. In addition, -A0 turned off
    --  all 5 of those. The new gnatpp does not support that complexity, because

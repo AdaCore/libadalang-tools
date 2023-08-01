@@ -312,7 +312,7 @@ package body Pp.Actions is
          when Tall =>
             Set_Arg (Cmd, Alignment, True);
             Set_Arg (Cmd, Align_Modes, True);
-            Set_Arg (Cmd, RM_Style_Spacing, True);
+            Set_Arg (Cmd, RM_Style_Spacing, False);
             Set_Arg (Cmd, Compact, False);
             Set_Arg (Cmd, Separate_Is, True);
             Set_Arg (Cmd, Separate_Return, True);
@@ -338,7 +338,7 @@ package body Pp.Actions is
          when Compact =>
             Set_Arg (Cmd, Alignment, True);
             Set_Arg (Cmd, Align_Modes, True);
-            Set_Arg (Cmd, RM_Style_Spacing, False);
+            Set_Arg (Cmd, RM_Style_Spacing, True);
             Set_Arg (Cmd, Compact, True);
             Set_Arg (Cmd, Separate_Is, False);
             Set_Arg (Cmd, Separate_Return, False);
