@@ -1,0 +1,9 @@
+description:
+    Test that test harness files generated from JSON tests do not have overly
+    long lines. The types in this file used to generate test files with lines
+    longer than 32766 characters, which is the maximum allowed length in
+    gprbuild.
+
+driver: shell_script
+control:
+    - [XFAIL, 'x86', 'Marshalling not working for 32bits (UB03-008)']
