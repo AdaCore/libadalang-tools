@@ -11,7 +11,10 @@
 @@--                 subprogram.
 @@--  @_INPUT_FN_@   Name of the JSON input function for the parameters of the
 @@--                 subprogram.
-@@--  @_NUM_TESTS_@  Number of tests to be generated for this subprogram
+@@--  @_NUM_TESTS_@  Number of tests to be generated for this subprogram (upper
+@@--                 bound for enumerative strategies)
+@@--  @_ENUM_STRAT_@ Whether the strategy to be used is the default enum one, or
+@@--                 the default one,
 @@INCLUDE@@ json_templates/util.tmplt
 
    --  Test case generation for @_SUBP_NAME_@
@@ -20,13 +23,21 @@
      (Unit_JSON : in out TGen.JSON.JSON_Value)
    is
       Subp  : TGen.Types.SP.Ref renames @_FN_TYP_REF_@;
+@@IF@@ @_ENUM_STRAT_@
+      Strat : TGen.Strategies.Strategy_Type'Class := Subp.Get.Default_Enum_Strategy;
+@@ELSE@@
       Strat : TGen.Strategies.Strategy_Type'Class := Subp.Get.Default_Strategy;
+@@END_IF@@
+
+      Num_Tests : Natural := 0;
    begin
-      for Test_Num in 1 .. @_NUM_TESTS_@ loop
+      Strat.Init;
+      while Strat.Has_Next
+           and then (Num_Tests < @_NUM_TESTS_@ or else @_NUM_TESTS_@ = 0)
+      loop
          Generate_One : declare
-            Values   : constant TGen.JSON.JSON_Value :=
-              Subp.Get.Encode 
-                (Strat.Generate (TGen.Strategies.Disc_Value_Maps.Empty_Map));
+            Values : constant TGen.JSON.JSON_Value :=
+              Subp.Get.Encode (Strat.Generate (TGen.Strategies.Disc_Value_Maps.Empty_Map));
 @@TABLE'ALIGN_ON(":")@@
             Ada_@_PARAM_NAME_@ : @_PARAM_TY_@ :=
               @_INPUT_FN_@ (Values.Get ("components").Get ("@_PARAM_NAME_@"));
@@ -40,6 +51,7 @@
 @@END_TABLE@@
                @_GLOBAL_PREFIX_@_Unit_JSON => Unit_JSON,
                @_GLOBAL_PREFIX_@_Origin => "TGen");
+            Num_Tests := Num_Tests + 1;
          end Generate_One;
       end loop;
    end Gen_@_SUBP_NAME_@_@_SUBP_UID_@;

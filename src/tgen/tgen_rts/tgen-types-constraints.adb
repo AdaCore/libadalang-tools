@@ -40,6 +40,32 @@ package body TGen.Types.Constraints is
       when Non_Static => +Self.Text);
 
    -----------
+   -- Value --
+   -----------
+
+   function Value
+     (Cst          : Discrete_Constraint_Value;
+      Disc_Context : Disc_Value_Map) return Big_Int.Big_Integer
+   is
+      use Disc_Value_Maps;
+      Cur : Cursor;
+   begin
+      case Cst.Kind is
+         when Static =>
+            return Cst.Int_Val;
+         when Discriminant =>
+            Cur := Disc_Context.Find (Cst.Disc_Name);
+            if Cur = No_Element then
+               raise Program_Error with "unknown discriminant value";
+            end if;
+            return Get (Element (Cur));
+         when others =>
+            raise Program_Error with
+              "Can't determine value of non static constraint";
+      end case;
+   end Value;
+
+   -----------
    -- Image --
    -----------
 
@@ -332,6 +358,13 @@ package body TGen.Types.Constraints is
    begin
       return Self.As_Named_Typ.Get.Default_Strategy;
    end Default_Strategy;
+
+   overriding function Default_Enum_Strategy
+     (Self : Anonymous_Typ) return Enum_Strategy_Type'Class
+   is
+   begin
+      return Self.As_Named_Typ.Get.Default_Enum_Strategy;
+   end Default_Enum_Strategy;
 
    ------------------
    -- Free_Content --

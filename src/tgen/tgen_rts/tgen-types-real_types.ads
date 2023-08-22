@@ -33,6 +33,47 @@ package TGen.Types.Real_Types is
 
    type Real_Typ is new Scalar_Typ with null record;
 
+   function Low_Bound_Or_Default (Self : Real_Typ) return Big_Real is
+     (To_Real (0));
+
+   function High_Bound_Or_Default
+     (Self : Real_Typ) return Big_Real is (To_Real (0));
+
+   type Real_Range_Strategy is new Enum_Strategy_Type with
+      record
+         T             : SP.Ref;
+         --  Reference to the type we are generating values for
+
+         Pitch         : Big_Real;
+         --  Spacing between each value to be generated
+
+         Current_Val   : Big_Real;
+         --  Last generated value
+
+         Num_Generated : Natural;
+         --  Number of values that have already been generated
+
+         Total_Values  : Positive;
+         --  Total number of values to be generated
+      end record;
+
+   overriding procedure Init (S : in out Real_Range_Strategy);
+
+   overriding function Has_Next
+     (S : Real_Range_Strategy) return Boolean is
+     (S.Num_Generated < S.Total_Values);
+
+   overriding function Generate
+     (S            : in out Real_Range_Strategy;
+      Disc_Context : Disc_Value_Map) return JSON_Value;
+
+   function Make_Real_Range_Strategy
+     (Self : Real_Typ; Num_Values : Positive) return Enum_Strategy_Type'Class
+     with Pre => Num_Values >= 2;
+
+   overriding function Default_Enum_Strategy
+     (Self : Real_Typ) return Enum_Strategy_Type'Class;
+
    type Float_Typ (Is_Static, Has_Range : Boolean) is new
      Real_Typ (Is_Static => Is_Static) with record
       case Is_Static is
@@ -56,6 +97,14 @@ package TGen.Types.Real_Types is
    function Image (Self : Float_Typ) return String;
 
    function Kind (Self : Float_Typ) return Typ_Kind is (Float_Kind);
+
+   function Low_Bound_Or_Default (Self : Float_Typ) return Big_Real
+   with Pre => Self.Is_Static;
+   --  Return the low bound for Self if it has one explicitly defined, or
+   --  Long_Float'First otherwise.
+
+   function High_Bound_Or_Default (Self : Float_Typ) return Big_Real
+   with Pre => Self.Is_Static;
 
    overriding function Default_Strategy
      (Self : Float_Typ) return Strategy_Type'Class;

@@ -87,7 +87,7 @@ package TGen.Types.Discrete_Types is
      (Self : Discrete_Typ'Class) return Strategy_Type'Class;
    --  Generate a strategy to statically generate (in one pass) values for Self
 
-   type Sample_Strategy_Type is new Strategy_Type
+   type Sample_Strategy_Type is new Random_Strategy_Type
      with record
       T       : SP.Ref;
       Samples : Alternatives_Set_Vector;
@@ -105,7 +105,7 @@ package TGen.Types.Discrete_Types is
 
    type Index_Kind is (Start_Index, End_Index);
 
-   type Array_Index_Strategy_Type is new Strategy_Type with
+   type Array_Index_Strategy_Type is new Random_Strategy_Type with
       record
          T : SP.Ref;
          Average_Size, Min_Size, Max_Size : Natural;
@@ -118,7 +118,7 @@ package TGen.Types.Discrete_Types is
      (S            : in out Array_Index_Strategy_Type;
       Disc_Context : Disc_Value_Map) return JSON_Value;
 
-   type Identity_Constraint_Strategy_Type is new Strategy_Type with
+   type Identity_Constraint_Strategy_Type is new Random_Strategy_Type with
       record
          T          : SP.Ref;
          Constraint : Discrete_Constraint_Value;
@@ -156,6 +156,62 @@ package TGen.Types.Discrete_Types is
      (Self       : Discrete_Typ'Class;
       Constraint : Discrete_Constraint_Value)
       return Strategy_Type'Class;
+
+   --  Enumerated strategy for discrete types
+
+   type First_Last_Type is (First, Last, Unknown);
+
+   type First_Last_Strategy_Type is new Enum_Strategy_Type with
+      record
+         T : SP.Ref;
+
+         Generation : First_Last_Type := First;
+      end record;
+
+   overriding procedure Init (S : in out First_Last_Strategy_Type);
+
+   overriding function Has_Next
+     (S : First_Last_Strategy_Type) return Boolean is
+     (S.Generation /= Unknown);
+
+   overriding function Generate
+     (S            : in out First_Last_Strategy_Type;
+      Disc_Context : Disc_Value_Map) return JSON_Value;
+
+   overriding function Default_Enum_Strategy
+     (Self : Discrete_Typ) return Enum_Strategy_Type'Class;
+   --  The default enumerative strategy for a discrete type returns the first,
+   --  and the last element of the discrete type.
+
+   function Make_Single_Array_Constraint_Strat
+     (T  : SP.Ref; Constraints : Index_Constraint)
+     return Enum_Strategy_Type'Class with
+     Pre => Constraints.Present;
+   --  The strategy returned by this function will generate three values, such
+   --  that the array constrained by this discriminant will be of length 0, 1,
+   --  and 1000, constrained by the bounds of the index type. This assumes that
+   --  the array is only constrained by a single discriminant, and that the
+   --  other bound is static.
+
+   function Make_Dual_Array_Constraint_Strat
+     (T          : SP.Ref;
+      Constraint : Index_Constraint;
+      Disc_Name  : Unbounded_String)
+     return Enum_Strategy_Type'Class with
+     Pre => Constraint.Present
+           and then Constraint.Discrete_Range.Low_Bound.Kind = Discriminant
+           and then Constraint.Discrete_Range.High_Bound.Kind = Discriminant;
+   --  Generates a strategy for a discriminant constraining an array, where the
+   --  low bond and high bound are constrained by discriminants. This
+   --  strategies will generate values close to the low bound of the type, such
+   --  that the length of the array does not exceed 1000.
+   --
+   --  If the discriminant is the low bound, the only values to be generated
+   --  will be the type's low bound and the next big integer, this is to allow
+   --  an empty array to be generated.
+   --  If the discriminant is the high bound of the array, then the values
+   --  generated will be the low bound, the successor the the low bound and
+   --  the low bound + 1000, constrained by the size of the subtype.
 
    function As_Discrete_Typ (Self : SP.Ref) return Discrete_Typ'Class is
      (Discrete_Typ'Class (Self.Unchecked_Get.all));

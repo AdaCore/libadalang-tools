@@ -25,6 +25,7 @@
 
 with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Hashed_Maps;
+with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded.Equal_Case_Insensitive;
 with Ada.Strings.Unbounded.Hash;
 
@@ -48,7 +49,7 @@ package TGen.Types.Record_Types is
    subtype Component_Map is Component_Maps.Map;
    --  Maps for discriminants and components, from their defining name to
    --  their type translation. Since the order of the elements in these maps is
-   --  not specified, initialyzing a record with a positional aggregate will
+   --  not specified, initializing a record with a positional aggregate will
    --  very likely result in an error, a named association should be used
    --  instead.
 
@@ -76,6 +77,35 @@ package TGen.Types.Record_Types is
    function Supports_Gen (Self : Record_Typ) return Boolean is
      (for all Comp of Self.Component_Types => Comp.Get.Supports_Gen);
 
+   package Strategy_Maps is new Ada.Containers.Hashed_Maps
+     (Key_Type        => Unbounded_String,
+      Element_Type    => Strategy_Acc,
+      Hash            => Ada.Strings.Unbounded.Hash,
+      Equivalent_Keys => "=",
+      "="             => "=");
+   subtype Strategy_Map is Strategy_Maps.Map;
+
+   type Record_Strategy_Type is new Random_Strategy_Type with
+      record
+         T                : SP.Ref;
+         Component_Strats : Strategy_Map;
+      end record;
+   --  Strategy to generate record / discriminated record types
+
+   overriding function Generate
+     (S           : in out Record_Strategy_Type;
+      Disc_Values : Disc_Value_Map) return JSON_Value;
+
+   overriding function Default_Strategy
+     (Self : Record_Typ) return Strategy_Type'Class;
+
+   overriding function Default_Enum_Strategy
+     (Self : Record_Typ) return Enum_Strategy_Type'Class;
+   --  Return an enumerative strategy for a record type (with discriminant
+   --  constraints, if they exist, set). This exhaustively enumerates the
+   --  record values, using the component types' default enumerative strategy
+   --  to generate component values.
+
    function As_Record_Typ (Self : SP.Ref)
      return Record_Typ'Class is
      (Record_Typ'Class (Self.Unchecked_Get.all)) with
@@ -83,14 +113,48 @@ package TGen.Types.Record_Types is
             and then (Self.Get.Kind in Record_Typ_Range);
    pragma Inline (As_Record_Typ);
 
+   type Enum_Strat_Component_Info is record
+      Comp_Name : Unbounded_String;
+      --  Name of the component
+
+      Strat : Enum_Strategy_Type_Acc;
+      --  Strategy to use to generate values of this component type. Must be
+      --  an Enum_Strategy_Type'Class.
+
+      Values : JSON_Array;
+      --  List of already-generated values
+
+      Index : Natural := 0;
+      --  Current index into Values
+
+   end record;
+
+   package Component_Info_Vectors is new Ada.Containers.Vectors
+     (Index_Type => Positive, Element_Type => Enum_Strat_Component_Info);
+   subtype Component_Info_Vector is Component_Info_Vectors.Vector;
+
+   type Enum_Record_Strategy_Type is new Enum_Strategy_Type with
+      record
+         Component_Strats : Component_Info_Vector;
+         --  Record type and strategy for each of its component
+
+         Varying_Index : Positive;
+         --  Index of the component which will change for the generation of the
+         --  next element.
+      end record;
+
+   overriding procedure Init (S : in out Enum_Record_Strategy_Type);
+
+   overriding function Has_Next (S : Enum_Record_Strategy_Type) return Boolean;
+
+   overriding function Generate
+     (S            : in out Enum_Record_Strategy_Type;
+      Disc_Context : Disc_Value_Map) return JSON_Value;
+
    type Nondiscriminated_Record_Typ is new Record_Typ with null record;
 
    function Kind (Self : Nondiscriminated_Record_Typ) return Typ_Kind is
      (Non_Disc_Record_Kind);
-
-   overriding function Default_Strategy
-     (Self : Nondiscriminated_Record_Typ) return Strategy_Type'Class;
-   --  Generate a strategy to statically generate (in one pass) values for Self
 
    function As_Nondiscriminated_Record_Typ (Self : SP.Ref)
      return Nondiscriminated_Record_Typ'Class is
@@ -219,6 +283,63 @@ package TGen.Types.Record_Types is
 
    function Supports_Gen (Self : Discriminated_Record_Typ) return Boolean;
 
+   type Disc_Record_Strategy_Type is
+     new Record_Strategy_Type with
+      record
+         Disc_Strats : Strategy_Map;
+      end record;
+
+   overriding function Generate
+     (S            : in out Disc_Record_Strategy_Type;
+      Disc_Context : Disc_Value_Map) return JSON_Value;
+
+   type Disc_Record_Enum_Strat_Type is new Enum_Strategy_Type with record
+      T : SP.Ref;
+      --  Type for which we are generating a value
+
+      Disc_Strat : Enum_Record_Strategy_Type;
+      --  Nondiscriminated strategy used to generate discriminants, in case the
+      --  record is not constrained.
+
+      Current_Comp_Strat : Enum_Record_Strategy_Type;
+      --  Nondiscriminated strategy to generate the components values, once a
+      --  set of discriminant values has been generated.
+
+      Current_Disc_Values : Disc_Value_Map;
+      --  Set of discriminant values we are using for the next generation
+      --  call. This is needed in order to include them in the generated
+      --  JSON_Value.
+
+      All_Comp_Strats : Strategy_Map;
+      --  Cache pointing to strategies for all the possible components. The
+      --  strategies are instantiated on demand, as not all shapes will
+      --  necessarily be explored, and we re-use the strategies for components
+      --  present in multiple generation shapes (e.g. components out of variant
+      --  parts).
+   end record;
+   --  Strategy to generate values for discriminated record types. The
+   --  generation strategy is as follows: First, generate values for all
+   --  discriminants. If the record is constrained, the values are resolved
+   --  from the context. Then, enumerate all the component values for this
+   --  combination of discriminant values. Once this is done, move on to the
+   --  next set of discriminant values, and repeat until there is no
+   --  discriminants to generate.
+
+   overriding procedure Init (S : in out Disc_Record_Enum_Strat_Type);
+
+   overriding function Has_Next
+     (S : Disc_Record_Enum_Strat_Type) return Boolean;
+
+   overriding function Generate
+     (S            : in out Disc_Record_Enum_Strat_Type;
+      Disc_Context : Disc_Value_Map) return JSON_Value;
+
+   function Default_Enum_Strategy
+     (Self : Discriminated_Record_Typ) return Enum_Strategy_Type'Class;
+   --  Generate a default enumerative strategy for a discriminated record type.
+   --  See the documentation of the Disc_Record_Enum_Strat_Type type for more
+   --  information.
+
    function As_Discriminated_Record_Typ
      (Self : SP.Ref) return Discriminated_Record_Typ'Class is
      (Discriminated_Record_Typ'Class (Self.Unchecked_Get.all)) with
@@ -251,9 +372,6 @@ package TGen.Types.Record_Types is
    function JSON_Test_Filename (Self : Function_Typ) return String;
    --  Return the simple name of the file in which tests for Self should be
    --  stored.
-
-   function Default_Strategy
-     (Self : Function_Typ) return Strategy_Type'Class;
 
    function As_Function_Typ
      (Self : SP.Ref) return Function_Typ'Class is

@@ -105,6 +105,17 @@ package body TGen.Types is
       return raise Program_Error with "Static strategy not implemented";
    end Default_Strategy;
 
+   ---------------------------
+   -- Default_Enum_Strategy --
+   ---------------------------
+
+   function Default_Enum_Strategy
+     (Self : Typ) return TGen.Strategies.Enum_Strategy_Type'Class
+   is
+   begin
+      return raise Program_Error with "Enumerative strategy not implemented";
+   end Default_Enum_Strategy;
+
    -------------------------
    -- Try_Generate_Static --
    -------------------------
@@ -114,7 +125,7 @@ package body TGen.Types is
    is
    begin
       if Self.Get.Supports_Static_Gen then
-         return Self.Get.Default_Strategy;
+         return Self.Get.Default_Enum_Strategy;
       else
          return raise Program_Error with
            "Type " & To_Ada (Self.Get.Name)

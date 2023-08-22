@@ -86,7 +86,7 @@ package TGen.Subprograms is
          --  Precondition text
 
          Some_Param_Static    : Boolean := False;
-         --  Whether at lest one of the suprograms parameters supports static
+         --  Whether at least one of the subprograms parameters supports static
          --  (single pass) generation.
 
          All_Params_Static    : Boolean := False;

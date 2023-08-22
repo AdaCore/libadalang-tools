@@ -312,18 +312,7 @@ package body TGen.Types.Discrete_Types is
    function Generate
      (S            : in out Identity_Constraint_Strategy_Type;
       Disc_Context : Disc_Value_Map) return JSON_Value
-   is
-      Result : JSON_Value;
-   begin
-      if S.Constraint.Kind = Discriminant then
-         Result := Disc_Context (S.Constraint.Disc_Name);
-      elsif S.Constraint.Kind = Static then
-         Result := Create (S.Constraint.Int_Val);
-      else
-         raise Program_Error with "unsupported non static constraint";
-      end if;
-      return Result;
-   end Generate;
+   is (Create (Value (S.Constraint, Disc_Context)));
 
    ----------------------------------------------
    -- Generate_Array_Index_Constraint_Strategy --
@@ -397,6 +386,169 @@ package body TGen.Types.Discrete_Types is
       Strat.Constraint := Constraint;
       return Strat;
    end Generate_Identity_Constraint_Strategy;
+
+   ----------
+   -- Init --
+   ----------
+
+   procedure Init (S : in out First_Last_Strategy_Type) is
+   begin
+      S.Generation := First;
+   end Init;
+
+   --------------
+   -- Generate --
+   --------------
+
+   overriding function Generate
+     (S            : in out First_Last_Strategy_Type;
+      Disc_Context : Disc_Value_Map) return JSON_Value
+   is
+      Discrete_T : Discrete_Typ'Class renames
+        Discrete_Typ'Class (S.T.Unchecked_Get.all);
+   begin
+      case S.Generation is
+         when First =>
+            S.Generation := Last;
+            return Create (Discrete_T.Low_Bound);
+         when Last =>
+            S.Generation := Unknown;
+            return Create (Discrete_T.High_Bound);
+         when others =>
+            raise Program_Error;
+      end case;
+   end Generate;
+
+   ---------------------------
+   -- Default_Enum_Strategy --
+   ---------------------------
+
+   overriding function Default_Enum_Strategy
+     (Self : Discrete_Typ) return Enum_Strategy_Type'Class
+   is
+      Strat : First_Last_Strategy_Type;
+   begin
+      SP.From_Element (Strat.T, Self'Unrestricted_Access);
+      return Strat;
+   end Default_Enum_Strategy;
+
+   type Big_Int_Array is array (Positive range <>) of Big_Integer;
+
+   type Sequence_Enum_Strategy (Num_Values : Positive) is
+      new Enum_Strategy_Type with
+   record
+      Values      : Big_Int_Array (1 .. Num_Values);
+      --  Sequence of values to be output
+
+      Current_Val : Positive;
+      --  Index in the above array for the next value to be generated
+   end record;
+
+   overriding procedure Init (S : in out Sequence_Enum_Strategy);
+
+   overriding function Has_Next (S : Sequence_Enum_Strategy) return Boolean;
+
+   overriding function Generate
+     (S            : in out Sequence_Enum_Strategy;
+      Disc_Context : Disc_Value_Map) return JSON_Value;
+
+   ----------
+   -- Init --
+   ----------
+
+   overriding procedure Init (S : in out Sequence_Enum_Strategy) is
+   begin
+      S.Current_Val := 1;
+   end Init;
+
+   --------------
+   -- Has_Next --
+   --------------
+
+   overriding function Has_Next (S : Sequence_Enum_Strategy) return Boolean is
+     (S.Current_Val <= S.Num_Values);
+
+   --------------
+   -- Generate --
+   --------------
+
+   overriding function Generate
+     (S            : in out Sequence_Enum_Strategy;
+      Disc_Context : Disc_Value_Map) return JSON_Value
+   is
+      pragma Unreferenced (Disc_Context);
+      Res : constant JSON_Value := Create (S.Values (S.Current_Val));
+   begin
+      S.Current_Val := S.Current_Val + 1;
+      return Res;
+   end Generate;
+
+   ----------------------------------------
+   -- Make_Single_Array_Constraint_Strat --
+   ----------------------------------------
+
+   function Make_Single_Array_Constraint_Strat
+     (T : SP.Ref; Constraints : Index_Constraint)
+     return Enum_Strategy_Type'Class
+   is
+      Self       : Discrete_Typ'Class renames
+        Discrete_Typ'Class (T.Unchecked_Get.all);
+      Res        : Sequence_Enum_Strategy (3);
+      Disc_Is_LB : constant Boolean :=
+        Constraints.Discrete_Range.Low_Bound.Kind = Discriminant;
+
+      Op  : constant access
+        function (L, R : Valid_Big_Integer) return Valid_Big_Integer :=
+          (if Disc_Is_LB then Big_Int."-"'Access else Big_Int."+"'Access);
+
+      Offsets     : constant Big_Int_Array :=
+        [To_Big_Integer (0), To_Big_Integer (1), To_Big_Integer (1000)];
+      Base        : constant Big_Integer :=
+        (if Disc_Is_LB
+         then Constraints.Discrete_Range.High_Bound.Int_Val
+         else Constraints.Discrete_Range.Low_Bound.Int_Val);
+   begin
+      for I in Offsets'Range loop
+         Res.Values (I) := Op (Base, Offsets (I));
+
+         --  Cap the value to the bounds of the type if needed.
+
+         if Disc_Is_LB and then Res.Values (I) < Self.Low_Bound then
+            Res.Values (I) := Self.Low_Bound;
+         elsif not Disc_Is_LB and then Res.Values (I) > Self.High_Bound then
+            Res.Values (I) := Self.High_Bound;
+         end if;
+      end loop;
+      return Res;
+   end Make_Single_Array_Constraint_Strat;
+
+   --------------------------------------
+   -- Make_Dual_Array_Constraint_Strat --
+   --------------------------------------
+
+   function Make_Dual_Array_Constraint_Strat
+     (T          : SP.Ref;
+      Constraint : Index_Constraint;
+      Disc_Name  : Unbounded_String) return Enum_Strategy_Type'Class
+   is
+      Self         : Discrete_Typ'Class renames
+        Discrete_Typ'Class (T.Unchecked_Get.all);
+      Is_Low_Bound : constant Boolean :=
+        Constraint.Discrete_Range.Low_Bound.Disc_Name = Disc_Name;
+      Res : Sequence_Enum_Strategy (if Is_Low_Bound then 2 else 3);
+   begin
+      Res.Values (1) := Self.Low_Bound;
+      Res.Values (2) := Self.Low_Bound + To_Big_Integer (1);
+      if not Is_Low_Bound then
+         Res.Values (3) := Self.Low_Bound + To_Big_Integer (1000);
+      end if;
+      for I in 2 .. Res.Num_Values loop
+         if Res.Values (I) > Self.High_Bound then
+            Res.Values (I) := Self.High_Bound;
+         end if;
+      end loop;
+      return Res;
+   end Make_Dual_Array_Constraint_Strat;
 
    ----------------------
    -- Default_Strategy --

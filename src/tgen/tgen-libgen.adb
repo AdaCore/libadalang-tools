@@ -66,7 +66,8 @@ package body TGen.Libgen is
       Pack_Name        : Ada_Qualified_Name;
       Harness_Dir      : String;
       Test_Output_Dir  : String;
-      Default_Test_Num : Positive) with
+      Default_Strat    : Default_Strat_Kind;
+      Default_Test_Num : Natural) with
      Pre => Ctx.Generation_Map.Contains (Pack_Name);
    --  Generate one harness unit (spec and body) for the subprograms registered
    --  in Pack_Name.
@@ -854,7 +855,8 @@ package body TGen.Libgen is
       Pack_Name        : Ada_Qualified_Name;
       Harness_Dir      : String;
       Test_Output_Dir  : String;
-      Default_Test_Num : Positive)
+      Default_Strat    : Default_Strat_Kind;
+      Default_Test_Num : Natural)
    is
       use GNATCOLL.VFS;
       use Templates_Parser;
@@ -949,6 +951,7 @@ package body TGen.Libgen is
          begin
             Assocs.Insert (Assoc ("GLOBAL_PREFIX", Global_Prefix));
             Assocs.Insert (Assoc ("NUM_TESTS", Default_Test_Num));
+            Assocs.Insert (Assoc ("ENUM_STRAT", Default_Strat = Stateful));
             Assocs.Insert
               (Assoc ("SUBP_NAME", Subp_Name));
             Assocs.Insert
@@ -1032,7 +1035,8 @@ package body TGen.Libgen is
      (Ctx              : in out Libgen_Context;
       Harness_Dir      : String;
       Test_Output_Dir  : String;
-      Default_Test_Num : Positive := 5)
+      Default_Strat    : Default_Strat_Kind := Stateless;
+      Default_Test_Num : Natural := 5)
    is
       use GNATCOLL.VFS;
       use Types_Per_Package_Maps;
@@ -1098,6 +1102,7 @@ package body TGen.Libgen is
             Key (Unit_Cur),
             Harness_Dir,
             Test_Output_Dir,
+            Default_Strat,
             Default_Test_Num);
       end loop;
       Put_Line (Main_File, "end Generation_Main;");

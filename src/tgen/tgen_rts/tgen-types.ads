@@ -22,7 +22,7 @@
 ------------------------------------------------------------------------------
 --
 --  Internal type representation and associated generation functions.
---  Specialized representations and generation functions are avalaible in the
+--  Specialized representations and generation functions are available in the
 --  various TGen.Types.XXX_Type units.
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
@@ -72,8 +72,8 @@ package TGen.Types is
                      Constrained_Array_Kind,
                      Disc_Record_Kind,
                      Non_Disc_Record_Kind,
-                     Anonymous_Kind,
                      Function_Kind,
+                     Anonymous_Kind,
                      Instance_Kind,
                      Unsupported);
 
@@ -85,7 +85,7 @@ package TGen.Types is
      Typ_Kind range Unconstrained_Array_Kind .. Constrained_Array_Kind;
 
    subtype Record_Typ_Range
-     is Typ_Kind range Disc_Record_Kind .. Non_Disc_Record_Kind;
+     is Typ_Kind range Disc_Record_Kind .. Function_Kind;
 
    subtype Big_Integer is Big_Int.Big_Integer;
 
@@ -135,6 +135,10 @@ package TGen.Types is
    function Default_Strategy (Self : Typ)
       return TGen.Strategies.Strategy_Type'Class;
    --  Return a strategy generating elements of the given type
+
+   function Default_Enum_Strategy
+     (Self : Typ) return TGen.Strategies.Enum_Strategy_Type'Class;
+   --  Return an enumerative strategy generating elements of the given type
 
    function Kind (Self : Typ) return Typ_Kind;
 

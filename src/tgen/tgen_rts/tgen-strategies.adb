@@ -27,6 +27,18 @@ with TGen.Random; use TGen.Random;
 
 package body TGen.Strategies is
 
+   ---------
+   -- "=" --
+   ---------
+
+   function "=" (L, R : Strategy_Type'Class) return Boolean
+   is
+      pragma Unreferenced (L);
+      pragma Unreferenced (R);
+   begin
+      return False;
+   end "=";
+
    --------------
    -- Generate --
    --------------
@@ -49,10 +61,11 @@ package body TGen.Strategies is
       Rnd : constant Float := Rand_Float;
    begin
       if Rnd <= S.Bias then
-         return S.S1.Generate (Disc_Context);
-      else
-         return S.S2.Generate (Disc_Context);
+         if S.S1.Has_Next then
+            return S.S1.Generate (Disc_Context);
+         end if;
       end if;
+      return S.S2.Generate (Disc_Context);
    end Generate;
 
    ----------------------------

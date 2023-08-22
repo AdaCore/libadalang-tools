@@ -22,7 +22,6 @@
 ------------------------------------------------------------------------------
 
 with Ada.Containers;        use Ada.Containers;
-with Ada.Containers.Indefinite_Hashed_Maps;
 with Ada.Strings;           use Ada.Strings;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Unchecked_Deallocation;
@@ -43,6 +42,13 @@ package body TGen.Types.Record_Types is
       Res  : in out Component_Maps.Map);
    --  Fill Res with the list of components in Self that are present given
    --  a map of discriminant constraints.
+
+   function Generate_Record_Typ
+     (T           : SP.Ref;
+      Comp_Strats : in out Strategy_Map;
+      Disc_Values : Disc_Value_Map) return JSON_Value;
+   --  Generate a value for a record type by generating values for its
+   --  components using the strategies defined by the Comp_Strats mapping.
 
    -----------
    -- Image --
@@ -115,7 +121,7 @@ package body TGen.Types.Record_Types is
      (Self : Record_Typ; Val : JSON_Value) return JSON_Value
    is
       use Component_Maps;
-      Components : constant JSON_Value := Val.Get ("components");
+      Components : constant JSON_Value := Val.Get ("components").Clone;
    begin
       return Res : constant JSON_Value := Create_Object do
          for Cur in Self.Component_Types.Iterate loop
@@ -130,6 +136,223 @@ package body TGen.Types.Record_Types is
          Res.Set_Field ("components", Components);
       end return;
    end Encode;
+
+   --  Random generation for record types
+
+   --------------
+   -- Generate --
+   --------------
+
+   function Generate
+     (S           : in out Record_Strategy_Type;
+      Disc_Values : Disc_Value_Map) return JSON_Value
+   is
+      Result : constant JSON_Value := Create_Object;
+   begin
+      --  Set the component values
+
+      Set_Field
+        (Result,
+        "components",
+         Generate_Record_Typ (S.T, S.Component_Strats, Disc_Values));
+      return Result;
+   end Generate;
+
+   ----------------------
+   -- Default_Strategy --
+   ----------------------
+
+   function Default_Strategy
+     (Self : Record_Typ) return Strategy_Type'Class
+   is
+      use Component_Maps;
+
+      Strat : Record_Strategy_Type;
+   begin
+      SP.From_Element (Strat.T, Self'Unrestricted_Access);
+      for Component in Self.Component_Types.Iterate loop
+         declare
+            Comp_Name : constant Unbounded_String := Key (Component);
+         begin
+            Strat.Component_Strats.Insert
+              (Comp_Name,
+               new Strategy_Type'Class'
+                 (Strategy_Type'Class
+                    (Element (Component).Get.Default_Strategy)));
+         end;
+      end loop;
+      return Strat;
+   end Default_Strategy;
+
+   --  Enumerated generation for record types
+
+   ----------
+   -- Init --
+   ----------
+
+   procedure Init (S : in out Enum_Record_Strategy_Type) is
+   begin
+      S.Varying_Index := 1;
+      for Cur in S.Component_Strats.Iterate loop
+         S.Component_Strats.Reference (Cur).Strat.Init;
+         S.Component_Strats.Reference (Cur).Values := Empty_Array;
+         S.Component_Strats.Reference (Cur).Index := 0;
+      end loop;
+   end Init;
+
+   --------------
+   -- Has_Next --
+   --------------
+
+   overriding function Has_Next (S : Enum_Record_Strategy_Type) return Boolean
+   is
+   begin
+
+      --  For null records, S.Varying_Index is used as a flag to indicate that
+      --  we have already generated the null record aggregate. Init sets it to
+      --  1 when the strategy is initialized, so anything other than 1 means
+      --  the value has already been generated.
+
+      if S.Component_Strats.Is_Empty then
+         return S.Varying_Index = 1;
+      end if;
+
+      --  We have generated all the values when the last components has no more
+      --  values to generate, and all the component indices are maxed out.
+
+      return (for some Comp of S.Component_Strats =>
+                Comp.Strat.Has_Next or else Comp.Index < Length (Comp.Values));
+   end Has_Next;
+
+   --------------
+   -- Generate --
+   --------------
+
+   overriding function Generate
+     (S            : in out Enum_Record_Strategy_Type;
+      Disc_Context : Disc_Value_Map) return JSON_Value
+   is
+      use Component_Info_Vectors;
+      Result : constant JSON_Value := Create_Object;
+      Comps  : constant JSON_Value := Create_Object;
+   begin
+
+      --  Handle the case of null records: We'll only generate a single value,
+      --  and use S.Varying_Index as a flag to determine if we have already
+      --  generated a value or not. Init sets it to 1, so increment it to 2 to
+      --  flag that we have generated a value.
+
+      if S.Component_Strats.Is_Empty
+        and then S.Varying_Index = 1
+      then
+         S.Varying_Index := 2;
+         Result.Set_Field ("components", Comps);
+         return Result;
+      end if;
+
+      --  Do the initial generation if needed, when the index of the first
+      --  component is zero, this means we are in the first call, and we need
+      --  to generate a value for all the components but the first for the
+      --  rest of the algorithm to work properly.
+
+      if S.Component_Strats.First_Element.Index = 0 then
+         for Idx in 2 .. Positive (S.Component_Strats.Length) loop
+            declare
+               Comp : constant Reference_Type :=
+                 S.Component_Strats.Reference (Idx);
+            begin
+               Append (Comp.Values, Comp.Strat.Generate (Disc_Context));
+               Comp.Index := 1;
+            end;
+         end loop;
+      end if;
+
+      --  Find the next component that can have its index bumped (either we
+      --  haven't reached the end of the array or it can still generate new
+      --  values).
+
+      loop
+         declare
+            Current_Comp : constant Reference_Type :=
+              S.Component_Strats.Reference (S.Varying_Index);
+         begin
+            --  First case: we still have already-generated values to use for
+            --  this component.
+
+            if Current_Comp.Index < Length (Current_Comp.Values) then
+               Current_Comp.Index := @ + 1;
+               exit;
+
+            --  Second case: We have already used all pre-existing values for
+            --  this component, but we can generate more. Lets do that and
+            --  increment the index.
+
+            elsif Current_Comp.Strat.Has_Next then
+               Append
+                 (Current_Comp.Values,
+                  Current_Comp.Strat.Generate (Disc_Context));
+               Current_Comp.Index := @ + 1;
+               exit;
+
+            --  Last case: There are no new values for this component, we must
+            --  thus make another component vary its index.
+            else
+               pragma Assert
+                 (S.Varying_Index < Positive (S.Component_Strats.Length));
+               S.Varying_Index := S.Varying_Index + 1;
+            end if;
+         end;
+      end loop;
+
+      --  Now that we incremented an index, reset all the indices of the
+      --  previous components.
+
+      for Idx in 1 .. S.Varying_Index - 1 loop
+         S.Component_Strats.Reference (Idx).Index := 1;
+      end loop;
+
+      --  And reset the varying index
+
+      S.Varying_Index := 1;
+
+      --  Generate a value from the current components.
+
+      for Comp of S.Component_Strats loop
+         Comps.Set_Field (+Comp.Comp_Name, Get (Comp.Values, Comp.Index));
+      end loop;
+
+      Result.Set_Field ("components", Comps);
+      return Result;
+   end Generate;
+
+   ---------------------------
+   -- Default_Enum_Strategy --
+   ---------------------------
+
+   function Default_Enum_Strategy
+     (Self : Record_Typ) return Enum_Strategy_Type'Class
+   is
+      Strat : Enum_Record_Strategy_Type;
+   begin
+      for Cur in Self.Component_Types.Iterate loop
+         declare
+            use Component_Maps;
+            Comp_Name : constant Unbounded_String := Key (Cur);
+            Comp_Type : constant SP.Ref := Element (Cur);
+            Comp_Info : constant Enum_Strat_Component_Info :=
+              (Comp_Name => Comp_Name,
+               Strat     => new Enum_Strategy_Type'Class'
+                 (Enum_Strategy_Type'Class
+                      (Comp_Type.Get.Default_Enum_Strategy)),
+               Values    => Empty_Array,
+               Index     => 0);
+         begin
+            Strat.Component_Strats.Append (Comp_Info);
+         end;
+      end loop;
+
+      return Strat;
+   end Default_Enum_Strategy;
 
    ------------------
    -- Free_Variant --
@@ -408,8 +631,8 @@ package body TGen.Types.Record_Types is
       use Component_Maps;
       Disc_Values   : Disc_Value_Map;
       Comp_Map      : Component_Map;
-      Discriminants : constant JSON_Value := Val.Get ("discriminants");
-      Components    : constant JSON_Value := Val.Get ("components");
+      Discriminants : constant JSON_Value := Val.Get ("discriminants").Clone;
+      Components    : constant JSON_Value := Val.Get ("components").Clone;
       Res           : constant JSON_Value := Create_Object;
    begin
       --  Encode the discriminants
@@ -430,10 +653,14 @@ package body TGen.Types.Record_Types is
 
       Comp_Map := Self.Components (Disc_Values);
       for Cur in Comp_Map.Iterate loop
-         Components.Set_Field
-           (To_String (Key (Cur)),
-            Element (Cur).Get.Encode
-            (Components.Get (To_String (Key (Cur)))));
+         declare
+            Comp_Name : constant String := To_String (Key (Cur));
+         begin
+            Components.Set_Field
+              (Comp_Name,
+               Element (Cur).Get.Encode
+               (Components.Get (Comp_Name)));
+         end;
       end loop;
       Res.Set_Field ("components", Components);
       return Res;
@@ -533,61 +760,6 @@ package body TGen.Types.Record_Types is
       end if;
    end Free_Content;
 
-   function "="
-     (L : Strategy_Type'Class;
-      R : Strategy_Type'Class)
-      return Boolean;
-
-   function "="
-     (L : Strategy_Type'Class;
-      R : Strategy_Type'Class)
-      return Boolean
-   is
-      pragma Unreferenced (L);
-      pragma Unreferenced (R);
-   begin
-      return False;
-   end "=";
-   --  TODO: Implement this properly
-
-   --  Static generation
-
-   package Strategy_Maps is new Ada.Containers.Indefinite_Hashed_Maps
-     (Key_Type        => Unbounded_String,
-      Element_Type    => Strategy_Type'Class,
-      Hash            => Ada.Strings.Unbounded.Hash,
-      Equivalent_Keys => "=",
-      "="             => "=");
-   subtype Strategy_Map is Strategy_Maps.Map;
-
-   type Record_Strategy_Type is new Strategy_Type with
-      record
-         T                : SP.Ref;
-         Component_Strats : Strategy_Map;
-         Generate : access function
-           (T                : Record_Typ'Class;
-            Component_Strats : in out Strategy_Map;
-            Disc_Values      : Disc_Value_Map) return JSON_Value;
-      end record;
-
-   overriding function Generate
-     (S           : in out Record_Strategy_Type;
-      Disc_Values : Disc_Value_Map) return JSON_Value;
-
-   --------------
-   -- Generate --
-   --------------
-
-   function Generate
-     (S           : in out Record_Strategy_Type;
-      Disc_Values : Disc_Value_Map) return JSON_Value
-   is
-      T : constant Typ'Class := S.T.Get;
-   begin
-      return
-        S.Generate (Record_Typ (T), S.Component_Strats, Disc_Values);
-   end Generate;
-
    ------------------------
    -- Get_All_Components --
    ------------------------
@@ -625,34 +797,34 @@ package body TGen.Types.Record_Types is
       return Res;
    end Get_All_Components;
 
-   function Generate_Record_Typ
-     (Self        : Record_Typ'Class;
-      Comp_Strats : in out Strategy_Map;
-      Disc_Values : Disc_Value_Map) return JSON_Value;
-
    -------------------------
    -- Generate_Record_Typ --
    -------------------------
 
    function Generate_Record_Typ
-     (Self        : Record_Typ'Class;
+     (T           : SP.Ref;
       Comp_Strats : in out Strategy_Map;
       Disc_Values : Disc_Value_Map) return JSON_Value
    is
+      Rec : Record_Typ'Class renames Record_Typ'Class (T.Unchecked_Get.all);
       Res : constant JSON_Value := Create_Object;
       use Component_Maps;
    begin
-      for Comp in Self.Component_Types.Iterate loop
+      for Comp in Rec.Component_Types.Iterate loop
          declare
             Comp_Name : constant Unbounded_String := Key (Comp);
 
             procedure Generate_Val
               (Comp_Name  : Unbounded_String;
-               Comp_Strat : in out Strategy_Type'Class);
+               Comp_Strat : Strategy_Acc);
+
+            ------------------
+            -- Generate_Val --
+            ------------------
 
             procedure Generate_Val
               (Comp_Name  : Unbounded_String;
-               Comp_Strat : in out Strategy_Type'Class) is
+               Comp_Strat : Strategy_Acc) is
             begin
                Set_Field
                  (Val        => Res,
@@ -662,12 +834,63 @@ package body TGen.Types.Record_Types is
          begin
             --  Generate a value
 
-            Comp_Strats.Update_Element
+            Strategy_Maps.Query_Element
               (Comp_Strats.Find (Comp_Name), Generate_Val'Access);
          end;
       end loop;
       return Res;
    end Generate_Record_Typ;
+
+   procedure Resolve_Disc_Value_From_Ctx
+     (Global_Ctx : Disc_Value_Map;
+      T          : SP.Ref;
+      Local_Ctx  : out Disc_Value_Map) with
+     Pre => (T.Get.Kind in Disc_Record_Kind)
+             and then As_Discriminated_Record_Typ (T).Constrained;
+   --  Given a global context, and a constrained discriminated record type,
+   --  create a discriminant value map suitable for use as a local discriminant
+   --  map.
+
+   procedure Resolve_Disc_Value_From_Ctx
+     (Global_Ctx : Disc_Value_Map;
+      T          : SP.Ref;
+      Local_Ctx  : out Disc_Value_Map)
+   is
+      Disc_Record : Discriminated_Record_Typ renames
+        Discriminated_Record_Typ (T.Unchecked_Get.all);
+   begin
+      Local_Ctx.Clear;
+      for Constraint_Cursor in Disc_Record.Discriminant_Constraint.Iterate
+      loop
+         declare
+            use Discriminant_Constraint_Maps;
+
+            Discriminant_Name : constant Unbounded_String :=
+               Key (Constraint_Cursor);
+            Constraint        : constant Discrete_Constraint_Value :=
+               Element (Constraint_Cursor);
+         begin
+            pragma Assert (Constraint.Kind /= Non_Static);
+            case Constraint.Kind is
+               when Static =>
+                  Local_Ctx.Insert
+                    (Discriminant_Name,
+                     TGen.JSON.Create (Constraint.Int_Val));
+
+               when Discriminant =>
+
+                  --  Make the correspondence here
+
+                  Local_Ctx.Insert
+                    (Discriminant_Name,
+                     Global_Ctx.Element (Constraint.Disc_Name));
+
+               when others =>
+                  raise Program_Error with "unsupported non static generation";
+            end case;
+         end;
+      end loop;
+   end Resolve_Disc_Value_From_Ctx;
 
    function Pick_Samples_For_Disc
      (Variant : Variant_Part_Acc; Disc_Name : Unbounded_String)
@@ -784,67 +1007,7 @@ package body TGen.Types.Record_Types is
       return Default_Strategy;
    end Pick_Strat_For_Disc;
 
-   --  Static strategy for record types
-
-   type Nondisc_Record_Strategy_Type is
-     new Record_Strategy_Type with null record;
-   overriding function Generate
-     (S            : in out Nondisc_Record_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return JSON_Value;
-
-   --------------
-   -- Generate --
-   --------------
-
-   function Generate
-     (S            : in out Nondisc_Record_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return JSON_Value
-   is
-      Result : constant JSON_Value := Create_Object;
-   begin
-      --  Set the component values
-
-      Set_Field
-        (Result, "components",
-         S.Generate (As_Record_Typ (S.T), S.Component_Strats, Disc_Context));
-      return Result;
-   end Generate;
-
-   ----------------------
-   -- Default_Strategy --
-   ----------------------
-
-   function Default_Strategy
-     (Self : Nondiscriminated_Record_Typ) return Strategy_Type'Class
-   is
-      use Component_Maps;
-
-      Strat : Nondisc_Record_Strategy_Type;
-   begin
-      SP.From_Element (Strat.T, Self'Unrestricted_Access);
-      Strat.Generate := Generate_Record_Typ'Access;
-      for Component in Self.Component_Types.Iterate loop
-         declare
-            Comp_Name : constant Unbounded_String := Key (Component);
-         begin
-            Strat.Component_Strats.Insert
-              (Comp_Name, Element (Component).Get.Default_Strategy);
-         end;
-      end loop;
-      return Strat;
-   end Default_Strategy;
-
    --  Static strategy for discriminated record types
-
-   type Disc_Record_Strategy_Type is
-     new Record_Strategy_Type with
-      record
-         Disc_Strats : Strategy_Map;
-      end record;
-
-   overriding function Generate
-     (S            : in out Disc_Record_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return JSON_Value;
 
    --------------
    -- Generate --
@@ -874,49 +1037,20 @@ package body TGen.Types.Record_Types is
          --  If there are constraints, then we have to get their actual value
          --  from the Disc_Values.
 
-         for Constraint_Cursor in Disc_Record.Discriminant_Constraint.Iterate
-         loop
-            declare
-               use Discriminant_Constraint_Maps;
-
-               Discriminant_Name : constant Unbounded_String :=
-                 Key (Constraint_Cursor);
-               Constraint        : constant Discrete_Constraint_Value :=
-                 Element (Constraint_Cursor);
-            begin
-               pragma Assert (Constraint.Kind /= Non_Static);
-               case Constraint.Kind is
-                  when Static =>
-                     Current_Context.Insert
-                       (Discriminant_Name,
-                        TGen.JSON.Create (Constraint.Int_Val));
-
-                  when Discriminant =>
-
-                     --  Make the correspondence here
-
-                     Current_Context.Insert
-                       (Discriminant_Name,
-                        Disc_Context.Element (Constraint.Disc_Name));
-
-                  when others =>
-                     raise Program_Error
-                       with "unsupported non static generation";
-               end case;
-            end;
-         end loop;
+         Resolve_Disc_Value_From_Ctx
+           (Global_Ctx => Disc_Context,
+            T          => S.T,
+            Local_Ctx  => Current_Context);
       else
          for D_Strat_Cursor in S.Disc_Strats.Iterate loop
             declare
-               use Strategy_Maps;
+               procedure Generate_Val
+                 (Disc_Name  : Unbounded_String;
+                  Disc_Strat : Strategy_Acc);
 
                procedure Generate_Val
                  (Disc_Name  : Unbounded_String;
-                  Disc_Strat : in out Strategy_Type'Class);
-
-               procedure Generate_Val
-                 (Disc_Name  : Unbounded_String;
-                  Disc_Strat : in out Strategy_Type'Class)
+                  Disc_Strat : Strategy_Acc)
                is
                begin
                   Current_Context.Insert
@@ -925,7 +1059,7 @@ package body TGen.Types.Record_Types is
                end Generate_Val;
 
             begin
-               S.Disc_Strats.Update_Element
+               Strategy_Maps.Query_Element
                  (D_Strat_Cursor, Generate_Val'Access);
             end;
          end loop;
@@ -947,16 +1081,18 @@ package body TGen.Types.Record_Types is
       declare
          Components : constant Component_Map :=
            Disc_Record.Components (Current_Context);
-         R          : constant Record_Typ :=
+         R          : constant Nondiscriminated_Record_Typ :=
            (Name                => Disc_Record.Name,
              Last_Comp_Unit_Idx => Disc_Record.Last_Comp_Unit_Idx,
             Component_Types     => Components,
             Static_Gen          => Disc_Record.Static_Gen,
             Fully_Private       => Disc_Record.Fully_Private);
+         R_Ref      : SP.Ref;
       begin
+         R_Ref.Set (R);
          Set_Field
            (Result, "components",
-            S.Generate (R, S.Component_Strats, Current_Context));
+            Generate_Record_Typ (R_Ref, S.Component_Strats, Current_Context));
       end;
       return Result;
    end Generate;
@@ -980,22 +1116,24 @@ package body TGen.Types.Record_Types is
          begin
             Strat.Disc_Strats.Insert
               (Disc_Name,
-               Self.Pick_Strat_For_Disc
-                 (Disc_Name, Discrete_Typ'Class
-                      (Element (Disc).Unchecked_Get.all)));
+               new Strategy_Type'Class'
+                 (Self.Pick_Strat_For_Disc
+                    (Disc_Name, Discrete_Typ'Class
+                       (Element (Disc).Unchecked_Get.all))));
          end;
       end loop;
 
       --  Generate the strategies for the record components
 
       SP.From_Element (Strat.T, Self'Unrestricted_Access);
-      Strat.Generate := Generate_Record_Typ'Access;
       for Component in Self.Get_All_Components.Iterate loop
          declare
             Comp_Name : constant Unbounded_String := Key (Component);
          begin
             Strat.Component_Strats.Insert
-              (Comp_Name, Element (Component).Get.Default_Strategy);
+              (Comp_Name,
+               new Strategy_Type'Class'
+                 (Element (Component).Get.Default_Strategy));
          end;
       end loop;
 
@@ -1219,29 +1357,223 @@ package body TGen.Types.Record_Types is
          Constraint);
    end Disc_Constrains_Array;
 
-   ----------------------
-   -- Default_Strategy --
-   ----------------------
+   ----------
+   -- Init --
+   ----------
 
-   function Default_Strategy
-     (Self : Function_Typ) return Strategy_Type'Class
+   overriding procedure Init (S : in out Disc_Record_Enum_Strat_Type) is
+   begin
+      S.Disc_Strat.Init;
+
+      --  Dummy initialize the Current_Component_Strat so that it returns False
+      --  on Has_Next.
+
+      S.Current_Comp_Strat.Varying_Index := 2;
+      S.Current_Comp_Strat.Component_Strats.Clear;
+
+      --  Clear the current discriminant values
+
+      S.Current_Disc_Values.Clear;
+
+      --  Reset all the component strats, if we have some
+
+      for Comp of S.All_Comp_Strats loop
+         Comp.Init;
+      end loop;
+   end Init;
+
+   --------------
+   -- Has_Next --
+   --------------
+
+   overriding function Has_Next
+     (S : Disc_Record_Enum_Strat_Type) return Boolean is
+     (S.Current_Comp_Strat.Has_Next
+      or else S.Disc_Strat.Has_Next);
+
+   --------------
+   -- Generate --
+   --------------
+
+   overriding function Generate
+     (S            : in out Disc_Record_Enum_Strat_Type;
+      Disc_Context : Disc_Value_Map) return JSON_Value
+   is
+      Rec : Discriminated_Record_Typ renames
+        Discriminated_Record_Typ (S.T.Unchecked_Get.all);
+   begin
+
+      --  There are two cases in which we can't generate a new value fro the
+      --  component, but Has_Next still returned True for this type:
+      --  - We have a constrained type, and this is the first call to Generate.
+      --    In that case, grab the discriminant values from the context.
+      --  - We have a unconstrained type, and we can still generate new values
+      --    for the discriminants.
+
+      if not S.Current_Comp_Strat.Has_Next then
+
+         --  First, get new discriminant values
+
+         if Rec.Constrained then
+            Resolve_Disc_Value_From_Ctx
+              (Global_Ctx => Disc_Context,
+               T          => S.T,
+               Local_Ctx  => S.Current_Disc_Values);
+
+            --  Ensure the strat returns False to Has_Next calls once we have
+            --  generated all the values for this discriminant set.
+
+            S.Disc_Strat.Varying_Index := 2;
+         else
+            declare
+               use Component_Maps;
+               New_Discs : constant JSON_Value :=
+                 S.Disc_Strat.Generate (Disc_Context).Get ("components");
+            begin
+               S.Current_Disc_Values.Clear;
+               for Disc_Cur in Rec.Discriminant_Types.Iterate loop
+                  declare
+                     Disc_Name : constant Unbounded_String := Key (Disc_Cur);
+                     Disc_Val  : constant JSON_Value :=
+                       New_Discs.Get (+Disc_Name);
+                  begin
+                     S.Current_Disc_Values.Insert (Disc_Name, Disc_Val);
+                  end;
+               end loop;
+            end;
+         end if;
+
+         --  Then generate a new strat for the relevant components based on the
+         --  discriminant values.
+
+         S.Current_Comp_Strat.Component_Strats.Clear;
+         declare
+            use Component_Maps;
+            Actual_Comps : constant Component_Map :=
+              Rec.Components (S.Current_Disc_Values);
+         begin
+            --  For each of the components that are present in the record,
+            --  based on the current discriminant value, generate or re-use one
+            --  of the strategies.
+
+            for Comp in Actual_Comps.Iterate loop
+               declare
+                  use Strategy_Maps;
+                  Comp_Name  : constant Unbounded_String := Key (Comp);
+                  Comp_Strat : Strategy_Maps.Cursor :=
+                    S.All_Comp_Strats.Find (Comp_Name);
+                  Dummy_Inst : Boolean;
+               begin
+                  --  Generate a new strategy if it is the first time we'll be
+                  --  generating values for this component.
+
+                  if not Has_Element (Comp_Strat) then
+                     S.All_Comp_Strats.Insert
+                       (Key      => Comp_Name,
+                        New_Item => new Strategy_Type'Class'
+                          (Strategy_Type'Class
+                             (Element (Comp).Get.Default_Enum_Strategy)),
+                        Position => Comp_Strat,
+                        Inserted => Dummy_Inst);
+                  end if;
+
+                  --  Clear the component strategy, in case it was already used
+                  --  before.
+
+                  Element (Comp_Strat).Init;
+                  S.Current_Comp_Strat.Component_Strats.Append
+                    (Enum_Strat_Component_Info'
+                       (Comp_Name => Key (Comp),
+                        Strat     =>
+                          Enum_Strategy_Type_Acc (Element (Comp_Strat)),
+                        Values    => Empty_Array,
+                        Index     => 1));
+               end;
+            end loop;
+         end;
+         S.Current_Comp_Strat.Varying_Index := 1;
+         S.Current_Comp_Strat.Init;
+      end if;
+
+      --  Now generate values for this set of components, using the
+      --  non-discriminated record strat.
+
+      declare
+         use Component_Maps;
+         Res : constant JSON_Value :=
+            S.Current_Comp_Strat.Generate (S.Current_Disc_Values);
+         Disc_JSON : constant JSON_Value := Create_Object;
+      begin
+         for Disc_Cur in Rec.Discriminant_Types.Iterate loop
+            Disc_JSON.Set_Field
+              (+Key (Disc_Cur),
+               S.Current_Disc_Values.Element (Key (Disc_Cur)));
+         end loop;
+         Res.Set_Field ("discriminants", Disc_JSON);
+         return Res;
+      end;
+   end Generate;
+
+   function Default_Enum_Strategy
+     (Self : Discriminated_Record_Typ) return Enum_Strategy_Type'Class
    is
       use Component_Maps;
-
-      Strat : Nondisc_Record_Strategy_Type;
+      Res : Disc_Record_Enum_Strat_Type;
    begin
-      SP.From_Element (Strat.T, Self'Unrestricted_Access);
-      Strat.Generate := Generate_Record_Typ'Access;
-      for Component in Self.Component_Types.Iterate loop
-         declare
-            Comp_Name : constant Unbounded_String := Key (Component);
-         begin
-            Strat.Component_Strats.Insert
-              (Comp_Name, Element (Component).Get.Default_Strategy);
-         end;
-      end loop;
-      return Strat;
-   end Default_Strategy;
+      Res.T.From_Element (Self'Unrestricted_Access);
+      Res.Current_Comp_Strat.Component_Strats.Clear;
+      Res.Current_Comp_Strat.Varying_Index := 2;
+      Res.Current_Disc_Values.Clear;
+
+      --  Null record strategy, ensures the first call to Has_Next will
+      --  return True;
+
+      Res.Disc_Strat.Varying_Index := 1;
+      Res.Disc_Strat.Component_Strats.Clear;
+
+      --  The generate appropriate strat if the record is not constrained. Use
+      --  appropriate strategy if a discriminant constrains a record (i.e. cap
+      --  its value so that the length of the array doesn't exceed 1000
+      --  elements).
+
+      if not Self.Constrained then
+         for Disc in Self.Discriminant_Types.Iterate loop
+            declare
+               Active     : Boolean;
+               Constraint : Index_Constraint;
+               Strat      : Enum_Strategy_Type_Acc;
+            begin
+               Self.Disc_Constrains_Array (Key (Disc), Active, Constraint);
+               if Active then
+                  pragma Assert (Constraint.Present);
+                  if Constraint.Discrete_Range.Low_Bound.Kind = Discriminant
+                    and then Constraint.Discrete_Range.High_Bound.Kind =
+                               Discriminant
+                  then
+                     Strat := new Enum_Strategy_Type'Class'
+                       (Make_Dual_Array_Constraint_Strat
+                          (Element (Disc), Constraint, Key (Disc)));
+                  else
+                     Strat := new Enum_Strategy_Type'Class'
+                       (Make_Single_Array_Constraint_Strat
+                          (Element (Disc), Constraint));
+                  end if;
+               else
+                  Strat := new Enum_Strategy_Type'Class'
+                             (Element (Disc).Get.Default_Enum_Strategy);
+               end if;
+               Res.Disc_Strat.Component_Strats.Append
+                 (Enum_Strat_Component_Info'
+                    (Comp_Name => Key (Disc),
+                     Strat     => Strat,
+                     Values    => Empty_Array,
+                     Index     => 0));
+            end;
+         end loop;
+         Res.Disc_Strat.Varying_Index := 1;
+      end if;
+      return Res;
+   end Default_Enum_Strategy;
 
    -----------------
    -- Simple_Name --
