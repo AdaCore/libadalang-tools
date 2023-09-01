@@ -1,0 +1,9 @@
+generate test driver
+generate test driver with instrumentation
+build instrumented test driver
+1 tests run: 1 passed; 0 failed; 0 crashed.
+input for expr func as body dumped
+1 tests run: 1 passed; 0 failed; 0 crashed.
+input for renaming as body dumped
+1 tests run: 1 passed; 0 failed; 0 crashed.
+input for null procedure as body dumped
