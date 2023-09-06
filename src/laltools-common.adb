@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                     Copyright (C) 2021-2023, AdaCore                     --
+--                     Copyright (C) 2021-2022, AdaCore                     --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -1519,6 +1519,55 @@ package body Laltools.Common is
          end if;
       end return;
    end Get_Compilation_Units;
+
+   ------------------------------
+   -- Get_Insert_With_Location --
+   ------------------------------
+
+   function Get_Insert_With_Location
+     (Node      : Compilation_Unit'Class;
+      Pack_Name : Text_Type;
+      Last      : out Boolean)
+      return Source_Location
+   is
+      --  Cover the no with clause case
+      Res                  : Source_Location := Start_Sloc (Node.Sloc_Range);
+      Searching_Insert_Loc : Boolean := True;
+   begin
+      Last := False;
+      for N of Node.F_Prelude loop
+         if N.Kind in Ada_With_Clause_Range then
+            --  Handle list of packages: "with A, B, C;"
+            for P of N.As_With_Clause.F_Packages loop
+               if Pack_Name = P.Text then
+                  --  We are already withed
+                  return No_Source_Location;
+               elsif Searching_Insert_Loc
+                 and then Pack_Name < P.Text
+               then
+                  --  Assuming the with clauses are sorted alphabetically,
+                  --  the insert location is before the first clause higher
+                  --  than us. (Attention we must insert before N and not P)
+                  Last := False;
+                  Res := Start_Sloc (N.Sloc_Range);
+                  Searching_Insert_Loc := False;
+               end if;
+            end loop;
+         end if;
+
+         if Searching_Insert_Loc
+           and then N.Kind in Ada_With_Clause_Range | Ada_Use_Package_Clause
+         then
+            --  If the highest alphabetically, insert it after the last
+            --  with clause. To not split a pair also keep track of the last
+            --  use clause.
+            Last := True;
+            Res := End_Sloc (N.Sloc_Range);
+         end if;
+      end loop;
+
+      return Res;
+   end Get_Insert_With_Location;
 
    ---------------------------
    -- Find_Matching_Parents --

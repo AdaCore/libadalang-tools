@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2021-2023, AdaCore                   --
+--                       Copyright (C) 2021-2022, AdaCore                   --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -493,6 +493,15 @@ package Laltools.Common is
      (Analysis_Unit : Libadalang.Analysis.Analysis_Unit)
       return Compilation_Unit_Vector;
    --  Returns a vector with all Compilation_Unit nodes of Analysis_Unit
+
+   function Get_Insert_With_Location
+     (Node      : Compilation_Unit'Class;
+      Pack_Name : Text_Type;
+      Last      : out Boolean)
+      return Source_Location;
+   --  Returns the Source_Location where to insert a with clause for Pack_Name
+   --  or No_Source_Location if Pack_Name is already withed.
+   --  Last indicates if the location is after the last with/use clause.
 
    function Get_Decl_Block_Declarative_Part (Decl_B : Decl_Block)
                                              return Declarative_Part;
