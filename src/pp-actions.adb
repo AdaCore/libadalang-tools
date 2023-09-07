@@ -763,26 +763,28 @@ package body Pp.Actions is
    begin
       return
         (case Kind is
-            when Ada_Synthetic_Binary_Spec       => null,
-            when Ada_Synthetic_Unary_Spec        => null,
-            when Ada_Synthetic_Formal_Param_Decl => null,
-            when Ada_Synthetic_Subp_Decl         => null,
-            when Ada_Synthetic_Defining_Name     => null,
-            when Ada_Synthetic_Identifier        => null,
-            when Ada_Synthetic_Type_Expr         => null,
-            when Ada_Synthetic_Char_Enum_Lit     => null,
-            --  The above nodes are specific to synthetic predefined operators
-         --  and will never appear in source code.
-            when Ada_Discrete_Base_Subtype_Decl  => null,
-            when Ada_Discrete_Subtype_Name       => null,
-            when Ada_Contract_Case_Assoc         => null,
-            when Ada_Contract_Cases              => null,
-            when Ada_Multi_Dim_Array_Assoc       => null,
-            when Ada_Error_Decl                  => null,
-            when Ada_Error_Stmt                  => null,
-            when Ada_Enum_Subp_Spec              => null,
-            when Ada_Enum_Lit_Synth_Type_Expr    => null,
-            when Ada_Type_Attributes_Repository  => null,
+            when Ada_Synthetic_Binary_Spec                => null,
+            when Ada_Synthetic_Unary_Spec                 => null,
+            when Ada_Synthetic_Formal_Param_Decl          => null,
+            when Ada_Synthetic_Subp_Decl                  => null,
+            when Ada_Synthetic_Defining_Name              => null,
+            when Ada_Synthetic_Identifier                 => null,
+            when Ada_Synthetic_Type_Expr                  => null,
+            when Ada_Synthetic_Char_Enum_Lit              => null,
+            when Ada_Synthetic_Type_Predicate_Object_Decl => null,
+            --  The above nodes are specific to synthetic nodes and will never
+            --  appear in source code.
+
+            when Ada_Discrete_Base_Subtype_Decl => null,
+            when Ada_Discrete_Subtype_Name      => null,
+            when Ada_Contract_Case_Assoc        => null,
+            when Ada_Contract_Cases             => null,
+            when Ada_Multi_Dim_Array_Assoc      => null,
+            when Ada_Error_Decl                 => null,
+            when Ada_Error_Stmt                 => null,
+            when Ada_Enum_Subp_Spec             => null,
+            when Ada_Enum_Lit_Synth_Type_Expr   => null,
+            when Ada_Type_Attributes_Repository => null,
 
             when Ada_Pp_Else_Directive
               | Ada_Pp_Elsif_Directive
