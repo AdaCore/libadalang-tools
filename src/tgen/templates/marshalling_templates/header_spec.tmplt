@@ -9,6 +9,10 @@
 @@--  @_COMP_TYP_@ Index types for arrays, and types of the discriminants for
 @@--       records.
 @@--
+
+@@IF@@ @_PUB_PART_@
+   type @_TY_PREFIX_@_Header_Type is private;
+@@ELSE@@
    --  Definition of a header type and Input and Output functions for @_TY_NAME_@
 
    type @_TY_PREFIX_@_Header_Type is record
@@ -23,7 +27,9 @@
 @@END_TABLE@@
 @@END_IF@@
    end record;
+@@END_IF@@
 
+@@IF@@ @_PUB_PART_@ xor @_FULL_PRIV_@
    function @_TY_PREFIX_@_Input_Header
      (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class)
      return @_TY_PREFIX_@_Header_Type;
@@ -35,3 +41,4 @@
    function @_TY_PREFIX_@_Bit_Size_Header return Natural;
 
    function @_TY_PREFIX_@_Byte_Size_Header return Natural;
+@@END_IF@@

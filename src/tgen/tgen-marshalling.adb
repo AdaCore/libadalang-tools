@@ -405,12 +405,20 @@ package body TGen.Marshalling is
 
    procedure Generate_Base_Functions_For_Typ
      (Typ      : TGen.Types.Typ'Class;
+      Part     : Spec_Part := Pub;
       For_Base : Boolean := False)
    is
       B_Name         : constant String := Typ.Fully_Qualified_Name;
       Ty_Prefix      : constant String := Prefix_For_Typ (Typ.Slug);
       Ty_Name        : constant String :=
         (if For_Base then B_Name & "'Base" else B_Name);
+
+      Common_Assocs : constant Translate_Table :=
+        [1 => Assoc ("GLOBAL_PREFIX", Global_Prefix),
+         2 => Assoc ("TY_PREFIX", Ty_Prefix),
+         3 => Assoc ("TY_NAME", Ty_Name),
+         4 => Assoc ("PUB_PART", (if Part = Pub then True else False)),
+         5 => Assoc ("FULL_PRIV", Typ.Fully_Private)];
 
       type Component_Kind is (Array_Component, Record_Component);
 
@@ -511,14 +519,14 @@ package body TGen.Marshalling is
          Comp_Constraints : constant Tag :=
            Create_Tag_For_Constraints (Comp_Ty);
          Assocs           : constant Translate_Table :=
-           [1 => Assoc ("GLOBAL_PREFIX", Global_Prefix),
-            2 => Assoc ("COMP_PREFIX", Comp_Prefix),
-            3 => Assoc ("COMPONENT", Comp),
-            4 => Assoc ("CONSTRAINTS", Comp_Constraints),
-            5 => Assoc ("COMP_SCALAR", Comp_Scalar),
-            6 => Assoc ("NEEDS_HEADER", Needs_Header (Named_Comp_Ty)),
-            7 => Assoc ("COMPONENT_KIND", Component_Kind'Image (Comp_Kind)),
-            8 => Assoc ("COMPONENT_NAME", Comp_Name)];
+           Common_Assocs
+            & [1 => Assoc ("COMP_PREFIX", Comp_Prefix),
+               2 => Assoc ("COMPONENT", Comp),
+               3 => Assoc ("CONSTRAINTS", Comp_Constraints),
+               4 => Assoc ("COMP_SCALAR", Comp_Scalar),
+               5 => Assoc ("NEEDS_HEADER", Needs_Header (Named_Comp_Ty)),
+               6 => Assoc ("COMPONENT_KIND", Component_Kind'Image (Comp_Kind)),
+               7 => Assoc ("COMPONENT_NAME", Comp_Name)];
          Comp_Kind_Str : constant String :=
            Component_Kind'Image (Comp_Kind);
          pragma Unreferenced (Comp_Kind_Str);
@@ -659,10 +667,10 @@ package body TGen.Marshalling is
 
          declare
             Assocs : constant Translate_Table :=
-              [1 => Assoc ("OBJECT_NAME", Object_Name),
-               2 => Assoc ("DISCR_NAME", Discr_Name),
-               3 => Assoc ("GLOBAL_PREFIX", Global_Prefix),
-               4 => Assoc ("CHOICES", Choices_Tag)];
+              Common_Assocs
+               & [1 => Assoc ("OBJECT_NAME", Object_Name),
+                  2 => Assoc ("DISCR_NAME", Discr_Name),
+                  3 => Assoc ("CHOICES", Choices_Tag)];
 
          begin
             Read_Tag := +Variant_Read_Write
@@ -743,15 +751,13 @@ package body TGen.Marshalling is
 
          declare
             Assocs : constant Translate_Table :=
-              [1  => Assoc ("TY_NAME", Ty_Name),
-               2  => Assoc ("TY_PREFIX", Ty_Prefix),
-               3  => Assoc ("GLOBAL_PREFIX", Global_Prefix),
-               4  => Assoc ("DISCR_NAME", Discr_Name_Tag),
-               5  => Assoc ("FIRST_NAME", First_Name_Tag),
-               6  => Assoc ("LAST_NAME", Last_Name_Tag),
-               7  => Assoc ("COMP_TYP", Comp_Typ_Tag),
-               8  => Assoc ("COMP_PREFIX", Comp_Pref_Tag),
-               9  => Assoc ("ADA_DIM", Ada_Dim_Tag)];
+              Common_Assocs
+              & [1  => Assoc ("DISCR_NAME", Discr_Name_Tag),
+                 2  => Assoc ("FIRST_NAME", First_Name_Tag),
+                 3  => Assoc ("LAST_NAME", Last_Name_Tag),
+                 4  => Assoc ("COMP_TYP", Comp_Typ_Tag),
+                 5  => Assoc ("COMP_PREFIX", Comp_Pref_Tag),
+                 6  => Assoc ("ADA_DIM", Ada_Dim_Tag)];
 
          begin
             Print_Header (Assocs);
@@ -761,14 +767,7 @@ package body TGen.Marshalling is
       --  the size of the header.
 
       elsif not For_Base then
-         declare
-            Assocs : constant Translate_Table :=
-              [1  => Assoc ("TY_NAME", Ty_Name),
-               2  => Assoc ("TY_PREFIX", Ty_Prefix)];
-
-         begin
-            Print_Default_Header (Assocs);
-         end;
+         Print_Default_Header (Common_Assocs);
       end if;
 
       --  3. Generate the body and spec of the base operations
@@ -789,13 +788,11 @@ package body TGen.Marshalling is
                then "Read_Write_Ordinary_Fixed"
                else "Read_Write_Decimal_Fixed");
             Assocs       : constant Translate_Table :=
-              [1 => Assoc ("TY_NAME", Ty_Name),
-               2 => Assoc ("TY_PREFIX", Ty_Prefix),
-               3 => Assoc ("GLOBAL_PREFIX", Global_Prefix),
-               4 => Assoc ("MARSHALLING_LIB", Marshalling_Lib),
-               5 => Assoc ("GENERIC_NAME", Generic_Name),
-               6 => Assoc ("IS_DISCRETE", Typ in Discrete_Typ'Class),
-               7 => Assoc ("FOR_BASE", For_Base)];
+              Common_Assocs
+              & [1 => Assoc ("MARSHALLING_LIB", Marshalling_Lib),
+                 2 => Assoc ("GENERIC_NAME", Generic_Name),
+                 3 => Assoc ("IS_DISCRETE", Typ in Discrete_Typ'Class),
+                 4 => Assoc ("FOR_BASE", For_Base)];
 
          begin
             Print_Scalar (Assocs);
@@ -816,6 +813,14 @@ package body TGen.Marshalling is
             Component_Write    : Unbounded_String;
             Component_Size     : Unbounded_String;
             Component_Size_Max : Unbounded_String;
+
+            --  Check that the Size_Max function can be declared in the public
+            --  part of the support package: this is not the case as soon as
+            --  one of the index types of the array is fully private.
+
+            Size_Max_Pub : constant Boolean :=
+              not (for some Idx_Typ of Array_Typ'Class (Typ).Index_Types
+                   => Idx_Typ.Get.Fully_Private);
          begin
             --  Contruct the calls for the components
 
@@ -829,18 +834,17 @@ package body TGen.Marshalling is
 
             declare
                Assocs : constant Translate_Table :=
-                 [1  => Assoc ("TY_NAME", Ty_Name),
-                  2  => Assoc ("TY_PREFIX", Ty_Prefix),
-                  3  => Assoc ("GLOBAL_PREFIX", Global_Prefix),
-                  4  => Assoc ("COMPONENT_READ", Component_Read),
-                  5  => Assoc ("COMPONENT_WRITE", Component_Write),
-                  6  => Assoc ("COMPONENT_SIZE", Component_Size),
-                  7  => Assoc ("COMPONENT_SIZE_MAX", Component_Size_Max),
-                  8  => Assoc ("COMP_TYP", Named_Comp_Ty.Type_Name),
-                  9  => Assoc ("ADA_DIM", Ada_Dim_Tag),
-                  10 => Assoc ("FIRST_NAME", First_Name_Tag),
-                  11 => Assoc ("LAST_NAME", Last_Name_Tag),
-                  12 => Assoc ("BOUND_TYP", Comp_Typ_Tag)];
+                 Common_Assocs
+                 & [1  => Assoc ("COMPONENT_READ", Component_Read),
+                    2  => Assoc ("COMPONENT_WRITE", Component_Write),
+                    3  => Assoc ("COMPONENT_SIZE", Component_Size),
+                    4  => Assoc ("COMPONENT_SIZE_MAX", Component_Size_Max),
+                    5  => Assoc ("COMP_TYP", Named_Comp_Ty.Type_Name),
+                    6  => Assoc ("ADA_DIM", Ada_Dim_Tag),
+                    7  => Assoc ("FIRST_NAME", First_Name_Tag),
+                    8  => Assoc ("LAST_NAME", Last_Name_Tag),
+                    9  => Assoc ("BOUND_TYP", Comp_Typ_Tag),
+                    10 => Assoc ("SIZE_MAX_PUB", Size_Max_Pub)];
 
             begin
                Print_Array (Assocs);
@@ -866,8 +870,19 @@ package body TGen.Marshalling is
             Variant_Size       : Tag;
             Variant_Size_Max   : Tag;
 
+            --  Check wether the Size_Max function can be placed in the public
+            --  part: This is not the case as soon as one of the discriminants
+            --  is fully private.
+
+            Size_Max_Pub : constant Boolean :=
+              not (Typ in Discriminated_Record_Typ'Class)
+               or else
+                 not (for some Disc_Typ of
+                      Discriminated_Record_Typ'Class (Typ).Discriminant_Types
+                      => Disc_Typ.Get.Fully_Private);
+
          begin
-            --  Contruct the calls for the components
+            --  Construct the calls for the components
 
             Collect_Info_For_Components
               (Record_Typ'Class (Typ).Component_Types,
@@ -876,7 +891,7 @@ package body TGen.Marshalling is
                Object_Name => Object_Name,
                Spacing     => 0);
 
-            --  Contruct the calls for the variant part if any
+            --  Construct the calls for the variant part if any
 
             if Typ in Discriminated_Record_Typ'Class then
                declare
@@ -899,19 +914,18 @@ package body TGen.Marshalling is
 
             declare
                Assocs : constant Translate_Table :=
-                 [1 => Assoc ("TY_NAME", Ty_Name),
-                  2  => Assoc ("TY_PREFIX", Ty_Prefix),
-                  3  => Assoc ("GLOBAL_PREFIX", Global_Prefix),
-                  4  => Assoc ("COMPONENT_READ", Component_Read),
-                  5  => Assoc ("COMPONENT_WRITE", Component_Write),
-                  6  => Assoc ("COMPONENT_SIZE", Component_Size),
-                  7  => Assoc ("COMPONENT_SIZE_MAX", Component_Size_Max),
-                  8  => Assoc ("VARIANT_READ", Variant_Read),
-                  9  => Assoc ("VARIANT_WRITE", Variant_Write),
-                  10 => Assoc ("VARIANT_SIZE", Variant_Size),
-                  11 => Assoc ("VARIANT_SIZE_MAX", Variant_Size_Max),
-                  12 => Assoc ("DISCR_NAME", Discr_Name_Tag),
-                  13 => Assoc ("DISCR_TYP", Comp_Typ_Tag)];
+                 Common_Assocs
+                 & [1  => Assoc ("COMPONENT_READ", Component_Read),
+                    2  => Assoc ("COMPONENT_WRITE", Component_Write),
+                    3  => Assoc ("COMPONENT_SIZE", Component_Size),
+                    4  => Assoc ("COMPONENT_SIZE_MAX", Component_Size_Max),
+                    5  => Assoc ("VARIANT_READ", Variant_Read),
+                    6  => Assoc ("VARIANT_WRITE", Variant_Write),
+                    7  => Assoc ("VARIANT_SIZE", Variant_Size),
+                    8  => Assoc ("VARIANT_SIZE_MAX", Variant_Size_Max),
+                    9  => Assoc ("DISCR_NAME", Discr_Name_Tag),
+                    10 => Assoc ("DISCR_TYP", Comp_Typ_Tag),
+                    11 => Assoc ("SIZE_MAX_PUB", Size_Max_Pub)];
 
             begin
                Print_Record (Assocs);
@@ -925,12 +939,10 @@ package body TGen.Marshalling is
       if Needs_Wrappers (Typ) then
          declare
             Assocs : constant Translate_Table :=
-              [1 => Assoc ("TY_NAME", Ty_Name),
-               2 => Assoc ("TY_PREFIX", Ty_Prefix),
-               3 => Assoc ("GLOBAL_PREFIX", Global_Prefix),
-               4 => Assoc ("DISCR_NAME", Discr_Name_Tag),
-               5 => Assoc ("DISCR_TYP", Comp_Typ_Tag),
-               6 => Assoc ("DISCR_PREFIX", Comp_Pref_Tag)];
+              Common_Assocs
+              & [1 => Assoc ("DISCR_NAME", Discr_Name_Tag),
+                 2 => Assoc ("DISCR_TYP", Comp_Typ_Tag),
+                 3 => Assoc ("DISCR_PREFIX", Comp_Pref_Tag)];
 
          begin
             Print_Header_Wrappers (Assocs);

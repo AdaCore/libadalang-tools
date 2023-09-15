@@ -43,9 +43,9 @@ package body TGen.Type_Representation is
    procedure Collect_Info_For_Constraint
      (Ty_Prefix : String;
       Constraint : TGen.Types.Constraints.Constraint'Class;
-      Constraint_Spec_Template : String;
+      Constraint_Decl_Template : String;
       Constraint_Init_Template : String;
-      Constraint_Spec : out Unbounded_String;
+      Constraint_Decl : out Unbounded_String;
       Constraint_Init : out Unbounded_String);
    --  Return the specification and initialization for a constraint
 
@@ -56,9 +56,9 @@ package body TGen.Type_Representation is
    procedure Collect_Info_For_Constraint
      (Ty_Prefix : String;
       Constraint : TGen.Types.Constraints.Constraint'Class;
-      Constraint_Spec_Template : String;
+      Constraint_Decl_Template : String;
       Constraint_Init_Template : String;
-      Constraint_Spec : out Unbounded_String;
+      Constraint_Decl : out Unbounded_String;
       Constraint_Init : out Unbounded_String)
    is
       Assocs : Translate_Set;
@@ -327,16 +327,16 @@ package body TGen.Type_Representation is
 
       --  Now we can generate the constraint template
 
-      Constraint_Spec := Parse (Constraint_Spec_Template, Assocs);
+      Constraint_Decl := Parse (Constraint_Decl_Template, Assocs);
       Constraint_Init := Parse (Constraint_Init_Template, Assocs);
    end Collect_Info_For_Constraint;
 
    procedure Collect_Info_For_Anonymous_Typ
      (T : Anonymous_Typ'Class;
-      Anonymous_Typ_Spec_Template, Anonymous_Typ_Init_Template : String;
-      Constraint_Spec_Template, Constraint_Init_Template : String;
-      T_Spec, T_Init : out Unbounded_String);
-   --  Return the specification and initialization for an anonymous type
+      Anonymous_Typ_Decl_Template, Anonymous_Typ_Init_Template : String;
+      Constraint_Decl_Template, Constraint_Init_Template : String;
+      T_Decl, T_Init : out Unbounded_String);
+   --  Return the declarations and initialization for an anonymous type
 
    ------------------------------------
    -- Collect_Info_For_Anonymous_Typ --
@@ -344,9 +344,9 @@ package body TGen.Type_Representation is
 
    procedure Collect_Info_For_Anonymous_Typ
      (T : Anonymous_Typ'Class;
-      Anonymous_Typ_Spec_Template, Anonymous_Typ_Init_Template : String;
-      Constraint_Spec_Template, Constraint_Init_Template : String;
-      T_Spec, T_Init : out Unbounded_String)
+      Anonymous_Typ_Decl_Template, Anonymous_Typ_Init_Template : String;
+      Constraint_Decl_Template, Constraint_Init_Template : String;
+      T_Decl, T_Init : out Unbounded_String)
    is
       Ty_Prefix : constant String := T.Slug;
       Ty_Name   : constant String := T.Fully_Qualified_Name;
@@ -363,35 +363,35 @@ package body TGen.Type_Representation is
 
       if T.Subtype_Constraints /= null then
          declare
-            Constraint_Spec, Constraint_Init : Unbounded_String;
+            Constraint_Decl, Constraint_Init : Unbounded_String;
          begin
             Collect_Info_For_Constraint
               (Ty_Prefix,
                T.Subtype_Constraints.all,
-               Constraint_Spec_Template,
+               Constraint_Decl_Template,
                Constraint_Init_Template,
-               Constraint_Spec,
+               Constraint_Decl,
                Constraint_Init);
 
             Insert (Assocs, Assoc ("HAS_CONSTRAINT", True));
-            Insert (Assocs, Assoc ("CONSTRAINT_SPEC", Constraint_Spec));
+            Insert (Assocs, Assoc ("CONSTRAINT_SPEC", Constraint_Decl));
             Insert (Assocs, Assoc ("CONSTRAINT_INIT", Constraint_Init));
          end;
       end if;
 
-      T_Spec := Parse (Anonymous_Typ_Spec_Template, Assocs);
+      T_Decl := Parse (Anonymous_Typ_Decl_Template, Assocs);
       T_Init := Parse (Anonymous_Typ_Init_Template, Assocs);
    end Collect_Info_For_Anonymous_Typ;
 
    procedure Collect_Info_For_Instance_Typ
      (T : Instance_Typ'Class;
-      Instance_Typ_Spec_Template, Instance_Typ_Init_Template : String;
-      T_Spec, T_Init : out Unbounded_String);
+      Instance_Typ_Decl_Template, Instance_Typ_Init_Template : String;
+      T_Decl, T_Init : out Unbounded_String);
 
    procedure Collect_Info_For_Instance_Typ
      (T : Instance_Typ'Class;
-      Instance_Typ_Spec_Template, Instance_Typ_Init_Template : String;
-      T_Spec, T_Init : out Unbounded_String)
+      Instance_Typ_Decl_Template, Instance_Typ_Init_Template : String;
+      T_Decl, T_Init : out Unbounded_String)
    is
       Ty_Prefix : constant String := T.Slug;
       Ty_Name   : constant String := T.Fully_Qualified_Name;
@@ -404,20 +404,20 @@ package body TGen.Type_Representation is
 
       Insert (Assocs, Assoc ("ORIG_TY_PREFIX", T.Orig_Typ.Get.Slug));
 
-      T_Spec := Parse (Instance_Typ_Spec_Template, Assocs);
+      T_Decl := Parse (Instance_Typ_Decl_Template, Assocs);
       T_Init := Parse (Instance_Typ_Init_Template, Assocs);
    end Collect_Info_For_Instance_Typ;
 
    procedure Collect_Info_For_Scalar_Typ
      (T : Scalar_Typ'Class;
-      Scalar_Typ_Spec_Template, Scalar_Typ_Init_Template : String;
-      Scalar_Typ_Spec : out Unbounded_String;
+      Scalar_Typ_Decl_Template, Scalar_Typ_Init_Template : String;
+      Scalar_Typ_Decl : out Unbounded_String;
       Scalar_Typ_Init : out Unbounded_String);
 
    procedure Collect_Info_For_Scalar_Typ
      (T : Scalar_Typ'Class;
-      Scalar_Typ_Spec_Template, Scalar_Typ_Init_Template : String;
-      Scalar_Typ_Spec : out Unbounded_String;
+      Scalar_Typ_Decl_Template, Scalar_Typ_Init_Template : String;
+      Scalar_Typ_Decl : out Unbounded_String;
       Scalar_Typ_Init : out Unbounded_String)
    is
       Ty_Prefix : constant String := T.Slug;
@@ -446,7 +446,7 @@ package body TGen.Type_Representation is
          raise Program_Error;
       end if;
 
-      Scalar_Typ_Spec := Parse (Scalar_Typ_Spec_Template, Assocs);
+      Scalar_Typ_Decl := Parse (Scalar_Typ_Decl_Template, Assocs);
       Scalar_Typ_Init := Parse (Scalar_Typ_Init_Template, Assocs);
    end Collect_Info_For_Scalar_Typ;
 
@@ -479,7 +479,7 @@ package body TGen.Type_Representation is
 
       procedure Collect_Info_For_Component
         (T : TGen.Types.Typ'Class;
-         Anonymous_Spec      : out Unbounded_String;
+         Anonymous_Decl      : out Unbounded_String;
          Anonymous_Init      : out Unbounded_String;
          Component_Ty_Prefix : out Unbounded_String);
       --  Return the specification and initialization for the instantiation of
@@ -488,20 +488,20 @@ package body TGen.Type_Representation is
       procedure Collect_Info_For_Variant
         (Variant : Variant_Part_Acc;
          Ty_Prefix : String;
-         Variant_Spec : in out Unbounded_String;
+         Variant_Decl : in out Unbounded_String;
          Variant_Init : in out Unbounded_String);
       --  Return the specification and initialization for a variant. Note that
       --  Variant_Index is incremented every time this procedure is called.
 
       procedure Collect_Info_For_Record
         (T               : Record_Typ'Class;
-         Record_Typ_Spec : out Unbounded_String;
+         Record_Typ_Decl : out Unbounded_String;
          Record_Typ_Init : out Unbounded_String);
       --  Return the specification and initialization for a record type
 
       procedure Collect_Info_For_Array
         (T : Array_Typ'Class;
-         Array_Typ_Spec : out Unbounded_String;
+         Array_Typ_Decl : out Unbounded_String;
          Array_Typ_Init : out Unbounded_String);
       --  Return the specification and initialization for an array type
 
@@ -511,7 +511,7 @@ package body TGen.Type_Representation is
 
       procedure Collect_Info_For_Component
         (T                   : TGen.Types.Typ'Class;
-         Anonymous_Spec      : out Unbounded_String;
+         Anonymous_Decl      : out Unbounded_String;
          Anonymous_Init      : out Unbounded_String;
          Component_Ty_Prefix : out Unbounded_String) is
       begin
@@ -532,14 +532,22 @@ package body TGen.Type_Representation is
                          (Trim (Anonymous_Ty_Index'Image))));
                Collect_Info_For_Anonymous_Typ
                  (Ano_Typ,
-                  Anonymous_Typ_Spec_Template,
+                  Anonymous_Typ_Decl_Template,
                   Anonymous_Typ_Init_Template,
-                  Constraint_Spec_Template,
+                  Constraint_Decl_Template,
                   Constraint_Init_Template,
-                  Anonymous_Spec,
+                  Anonymous_Decl,
                   Anonymous_Init);
                Component_Ty_Prefix := +Ano_Typ.Slug;
                Anonymous_Ty_Index := Anonymous_Ty_Index + 1;
+
+               --  Add the type reference declaration in the body declarative
+               --  part, as the only uses of this type reference will be
+               --  accessed through the parent record type ref.
+
+               Anonymous_Decl :=
+                 Anonymous_Decl
+                 & (+(Ano_Typ.Slug & "_Typ_Ref : TGen.Types.SP.Ref;"));
             end;
          else
             Component_Ty_Prefix := +T.Slug;
@@ -553,7 +561,7 @@ package body TGen.Type_Representation is
       procedure Collect_Info_For_Variant
         (Variant : Variant_Part_Acc;
          Ty_Prefix : String;
-         Variant_Spec : in out Unbounded_String;
+         Variant_Decl : in out Unbounded_String;
          Variant_Init : in out Unbounded_String)
       is
          Assocs : Translate_Set;
@@ -572,7 +580,7 @@ package body TGen.Type_Representation is
             declare
                Low_Bounds, High_Bounds : Vector_Tag;
                Comp_Names, Comp_Types_Prefix : Vector_Tag;
-               Anonymous_Typ_Inits, Anonymous_Typ_Specs : Unbounded_String;
+               Anonymous_Typ_Inits, Anonymous_Typ_Decls : Unbounded_String;
             begin
                --  Fill in the component for this variant
 
@@ -581,18 +589,18 @@ package body TGen.Type_Representation is
                      use Component_Maps;
                      Component_Name : constant Unbounded_String :=
                        Key (Comp);
-                     Anonymous_Typ_Init, Anonymous_Typ_Spec : Unbounded_String;
+                     Anonymous_Typ_Init, Anonymous_Typ_Decl : Unbounded_String;
                      Component_Ty_Prefix : Unbounded_String;
                   begin
                      Collect_Info_For_Component
                        (Element (Comp).Get,
-                        Anonymous_Typ_Spec,
+                        Anonymous_Typ_Decl,
                         Anonymous_Typ_Init,
                         Component_Ty_Prefix);
                      Anonymous_Typ_Inits :=
                        Anonymous_Typ_Inits & Anonymous_Typ_Init;
-                     Anonymous_Typ_Specs :=
-                       Anonymous_Typ_Specs & Anonymous_Typ_Spec;
+                     Anonymous_Typ_Decls :=
+                       Anonymous_Typ_Decls & Anonymous_Typ_Decl;
                      Comp_Names := Comp_Names & Component_Name;
                      Comp_Types_Prefix :=
                        Comp_Types_Prefix & Component_Ty_Prefix;
@@ -602,7 +610,7 @@ package body TGen.Type_Representation is
                --  Insert the anonymous type declarations
 
                Insert
-                 (Assocs, Assoc ("ANONYMOUS_TYP_SPEC", Anonymous_Typ_Specs));
+                 (Assocs, Assoc ("ANONYMOUS_TYP_SPEC", Anonymous_Typ_Decls));
                Insert
                  (Assocs, Assoc ("ANONYMOUS_TYP_INIT", Anonymous_Typ_Inits));
                Insert (Assocs, Assoc ("COMP_NAME", Comp_Names));
@@ -634,7 +642,7 @@ package body TGen.Type_Representation is
                   Collect_Info_For_Variant
                     (Choice.Variant,
                      Ty_Prefix,
-                     Variant_Spec,
+                     Variant_Decl,
                      Variant_Init);
                else
                   Insert (Assocs, Assoc ("HAS_VARIANT", False));
@@ -642,9 +650,9 @@ package body TGen.Type_Representation is
 
                Insert (Assocs, Assoc ("VARIANT_CHOICE_NUMBER", I));
 
-               Variant_Spec :=
-                 Variant_Spec
-                 & String'(Parse (Variant_Choice_Spec_Template, Assocs));
+               Variant_Decl :=
+                 Variant_Decl
+                 & String'(Parse (Variant_Choice_Decl_Template, Assocs));
                Variant_Init :=
                  Variant_Init
                  & String'(Parse (Variant_Choice_Init_Template, Assocs));
@@ -666,8 +674,8 @@ package body TGen.Type_Representation is
             Insert
               (Assocs, Assoc ("VARIANT_CHOICE_NUMBER", Variant_Choice_Number));
             Insert (Assocs, Assoc ("DISCR_NAME", Variant.Discr_Name));
-            Variant_Spec :=
-              Variant_Spec & String'(Parse (Variant_Spec_Template, Assocs));
+            Variant_Decl :=
+              Variant_Decl & String'(Parse (Variant_Decl_Template, Assocs));
             Variant_Init :=
               Variant_Init & String'(Parse (Variant_Init_Template, Assocs));
          end;
@@ -679,20 +687,20 @@ package body TGen.Type_Representation is
 
       procedure Collect_Info_For_Record
         (T               : Record_Typ'Class;
-         Record_Typ_Spec : out Unbounded_String;
+         Record_Typ_Decl : out Unbounded_String;
          Record_Typ_Init : out Unbounded_String)
       is
          Discr_Names : Vector_Tag;
          Discr_Types : Vector_Tag;
          Comp_Names : Vector_Tag;
          Comp_Types : Vector_Tag;
-         Anonymous_Typ_Inits, Anonymous_Typ_Specs : Unbounded_String;
+         Anonymous_Typ_Inits, Anonymous_Typ_Decls : Unbounded_String;
       begin
          if T in Discriminated_Record_Typ'Class then
             declare
                Disc_T : constant Discriminated_Record_Typ'Class :=
                  Discriminated_Record_Typ'Class (T);
-               Variant_Spec, Variant_Init : Unbounded_String;
+               Variant_Decl, Variant_Init : Unbounded_String;
             begin
                Insert
                  (Assocs, Assoc ("RECORD_TYP", "Discriminated_Record_Typ"));
@@ -704,18 +712,18 @@ package body TGen.Type_Representation is
 
                if Disc_T.Constrained then
                   declare
-                     Constraint_Spec, Constraint_Init : Unbounded_String;
+                     Constraint_Decl, Constraint_Init : Unbounded_String;
                   begin
                      Collect_Info_For_Constraint
                        (Ty_Prefix,
                         Discriminant_Constraints'
                           (Constraint_Map => Disc_T.Discriminant_Constraint),
-                        Constraint_Spec_Template,
+                        Constraint_Decl_Template,
                         Constraint_Init_Template,
-                        Constraint_Spec,
+                        Constraint_Decl,
                         Constraint_Init);
                      Insert
-                       (Assocs, Assoc ("CONSTRAINT_SPEC", Constraint_Spec));
+                       (Assocs, Assoc ("CONSTRAINT_SPEC", Constraint_Decl));
                      Insert
                        (Assocs, Assoc ("CONSTRAINT_INIT", Constraint_Init));
                   end;
@@ -727,13 +735,13 @@ package body TGen.Type_Representation is
                   Collect_Info_For_Variant
                     (Variant        => Disc_T.Variant,
                      Ty_Prefix      => Ty_Prefix,
-                     Variant_Spec   => Variant_Spec,
+                     Variant_Decl   => Variant_Decl,
                      Variant_Init   => Variant_Init);
 
                   Insert
                     (Assocs, Assoc ("HAS_VARIANT_PART", True));
                   Insert
-                    (Assocs, Assoc ("VARIANT_SPEC", Variant_Spec));
+                    (Assocs, Assoc ("VARIANT_SPEC", Variant_Decl));
                   Insert
                     (Assocs, Assoc ("VARIANT_INIT", Variant_Init));
                   Insert
@@ -745,17 +753,17 @@ package body TGen.Type_Representation is
                      use Component_Maps;
                      Discr_Name : constant Unbounded_String := Key (Cur);
                      Discr_Ty_Prefix : Unbounded_String;
-                     Anonymous_Typ_Init, Anonymous_Typ_Spec : Unbounded_String;
+                     Anonymous_Typ_Init, Anonymous_Typ_Decl : Unbounded_String;
                   begin
                      Collect_Info_For_Component
                        (Element (Cur).Get,
-                        Anonymous_Typ_Spec,
+                        Anonymous_Typ_Decl,
                         Anonymous_Typ_Init,
                         Discr_Ty_Prefix);
                      Anonymous_Typ_Inits :=
                        Anonymous_Typ_Inits & Anonymous_Typ_Init;
-                     Anonymous_Typ_Specs :=
-                       Anonymous_Typ_Specs & Anonymous_Typ_Spec;
+                     Anonymous_Typ_Decls :=
+                       Anonymous_Typ_Decls & Anonymous_Typ_Decl;
                      Discr_Names := Discr_Names & Discr_Name;
                      Discr_Types := Discr_Types & Discr_Ty_Prefix;
                   end;
@@ -776,17 +784,17 @@ package body TGen.Type_Representation is
                use Component_Maps;
                Comp_Name : constant Unbounded_String := Key (Cur);
                Comp_Ty_Prefix : Unbounded_String;
-               Anonymous_Typ_Init, Anonymous_Typ_Spec : Unbounded_String;
+               Anonymous_Typ_Init, Anonymous_Typ_Decl : Unbounded_String;
             begin
                Collect_Info_For_Component
                  (Element (Cur).Get,
-                  Anonymous_Typ_Spec,
+                  Anonymous_Typ_Decl,
                   Anonymous_Typ_Init,
                   Comp_Ty_Prefix);
                Anonymous_Typ_Inits :=
                  Anonymous_Typ_Inits & Anonymous_Typ_Init;
-               Anonymous_Typ_Specs :=
-                 Anonymous_Typ_Specs & Anonymous_Typ_Spec;
+               Anonymous_Typ_Decls :=
+                 Anonymous_Typ_Decls & Anonymous_Typ_Decl;
                Comp_Names := Comp_Names & Comp_Name;
                Comp_Types := Comp_Types & Comp_Ty_Prefix;
             end;
@@ -794,13 +802,13 @@ package body TGen.Type_Representation is
 
          --  Print the templates
 
-         Insert (Assocs, Assoc ("ANONYMOUS_TYP_SPEC", Anonymous_Typ_Specs));
+         Insert (Assocs, Assoc ("ANONYMOUS_TYP_SPEC", Anonymous_Typ_Decls));
          Insert (Assocs, Assoc ("ANONYMOUS_TYP_INIT", Anonymous_Typ_Inits));
          Insert (Assocs, Assoc ("COMP_NAME", Comp_Names));
          Insert (Assocs, Assoc ("COMP_TYPE", Comp_Types));
          Insert (Assocs, Assoc ("DISCR_NAME", Discr_Names));
          Insert (Assocs, Assoc ("DISCR_TYPE", Discr_Types));
-         Record_Typ_Spec := Parse (Record_Typ_Spec_Template, Assocs);
+         Record_Typ_Decl := Parse (Record_Typ_Decl_Template, Assocs);
          Record_Typ_Init := Parse (Record_Typ_Init_Template, Assocs);
 
       end Collect_Info_For_Record;
@@ -811,11 +819,11 @@ package body TGen.Type_Representation is
 
       procedure Collect_Info_For_Array
         (T : Array_Typ'Class;
-         Array_Typ_Spec : out Unbounded_String;
+         Array_Typ_Decl : out Unbounded_String;
          Array_Typ_Init : out Unbounded_String)
       is
          Index_Ty_Prefixes : Vector_Tag;
-         Anonymous_Typ_Inits, Anonymous_Typ_Specs : Unbounded_String;
+         Anonymous_Typ_Inits, Anonymous_Typ_Decls : Unbounded_String;
       begin
          --  Fill the number of dimension
 
@@ -825,17 +833,17 @@ package body TGen.Type_Representation is
 
          declare
             Component_Ty_Prefix : Unbounded_String;
-            Anonymous_Typ_Init, Anonymous_Typ_Spec : Unbounded_String;
+            Anonymous_Typ_Init, Anonymous_Typ_Decl : Unbounded_String;
          begin
             Collect_Info_For_Component
               (T.Component_Type.Get,
-               Anonymous_Typ_Spec,
+               Anonymous_Typ_Decl,
                Anonymous_Typ_Init,
                Component_Ty_Prefix);
             Anonymous_Typ_Inits :=
               Anonymous_Typ_Inits & Anonymous_Typ_Init;
-            Anonymous_Typ_Specs :=
-              Anonymous_Typ_Specs & Anonymous_Typ_Spec;
+            Anonymous_Typ_Decls :=
+              Anonymous_Typ_Decls & Anonymous_Typ_Decl;
             Insert
               (Assocs, Assoc ("COMPONENT_TY_PREFIX", Component_Ty_Prefix));
          end;
@@ -845,17 +853,17 @@ package body TGen.Type_Representation is
          for Index_T of T.Index_Types loop
             declare
                Index_Ty_Prefix : Unbounded_String;
-               Anonymous_Typ_Init, Anonymous_Typ_Spec : Unbounded_String;
+               Anonymous_Typ_Init, Anonymous_Typ_Decl : Unbounded_String;
             begin
                Collect_Info_For_Component
                  (Index_T.Get,
                   Anonymous_Typ_Init,
-                  Anonymous_Typ_Spec,
+                  Anonymous_Typ_Decl,
                   Index_Ty_Prefix);
                Anonymous_Typ_Inits :=
                  Anonymous_Typ_Inits & Anonymous_Typ_Init;
-               Anonymous_Typ_Specs :=
-                 Anonymous_Typ_Specs & Anonymous_Typ_Spec;
+               Anonymous_Typ_Decls :=
+                 Anonymous_Typ_Decls & Anonymous_Typ_Decl;
                Index_Ty_Prefixes := Index_Ty_Prefixes & Index_Ty_Prefix;
             end;
          end loop;
@@ -863,7 +871,7 @@ package body TGen.Type_Representation is
 
          --  Done with anonymous types
 
-         Insert (Assocs, Assoc ("ANONYMOUS_TYP_SPEC", Anonymous_Typ_Specs));
+         Insert (Assocs, Assoc ("ANONYMOUS_TYP_SPEC", Anonymous_Typ_Decls));
          Insert (Assocs, Assoc ("ANONYMOUS_TYP_INIT", Anonymous_Typ_Inits));
 
          --  Deal with index constraints for constrained arrays
@@ -872,25 +880,25 @@ package body TGen.Type_Representation is
             declare
                T_Const : constant Constrained_Array_Typ'Class :=
                  Constrained_Array_Typ'Class (T);
-               Constraint_Spec, Constraint_Init : Unbounded_String;
+               Constraint_Decl, Constraint_Init : Unbounded_String;
             begin
                Collect_Info_For_Constraint
                  (Ty_Prefix,
                   Index_Constraints'
                     (T_Const.Num_Dims, T_Const.Index_Constraints),
-                  Constraint_Spec_Template,
+                  Constraint_Decl_Template,
                   Constraint_Init_Template,
-                  Constraint_Spec,
+                  Constraint_Decl,
                   Constraint_Init);
                Insert (Assocs, Assoc ("ARRAY_TYP", "Constrained_Array_Typ"));
-               Insert (Assocs, Assoc ("CONSTRAINT_SPEC", Constraint_Spec));
+               Insert (Assocs, Assoc ("CONSTRAINT_SPEC", Constraint_Decl));
                Insert (Assocs, Assoc ("CONSTRAINT_INIT", Constraint_Init));
             end;
          else
             pragma Assert (T in Unconstrained_Array_Typ'Class);
             Insert (Assocs, Assoc ("ARRAY_TYP", "Unconstrained_Array_Typ"));
          end if;
-         Array_Typ_Spec := Parse (Array_Typ_Spec_Template, Assocs);
+         Array_Typ_Decl := Parse (Array_Typ_Decl_Template, Assocs);
          Array_Typ_Init := Parse (Array_Typ_Init_Template, Assocs);
 
       end Collect_Info_For_Array;
@@ -941,56 +949,63 @@ package body TGen.Type_Representation is
 
       if Typ in Record_Typ'Class then
          declare
-            Record_Typ_Init, Record_Typ_Spec : Unbounded_String;
+            Record_Typ_Init, Record_Typ_Decl : Unbounded_String;
          begin
             Collect_Info_For_Record
               (Record_Typ'Class (Typ),
-               Record_Typ_Spec,
+               Record_Typ_Decl,
                Record_Typ_Init);
-            Put_Line (F_Spec, +Record_Typ_Spec);
+            Put_Line
+              (F_Spec, "   " & Ty_Prefix & "_Typ_Ref : TGen.Types.SP.Ref;");
+            Put_Line (F_Body, +Record_Typ_Decl);
             Init_Package_Code := Init_Package_Code & Record_Typ_Init;
          end;
 
       elsif Typ in Anonymous_Typ'Class then
          declare
-            Anonymous_Typ_Init, Anonymous_Typ_Spec : Unbounded_String;
+            Anonymous_Typ_Init, Anonymous_Typ_Decl : Unbounded_String;
          begin
             Collect_Info_For_Anonymous_Typ
               (Anonymous_Typ'Class (Typ),
-               Anonymous_Typ_Spec_Template,
+               Anonymous_Typ_Decl_Template,
                Anonymous_Typ_Init_Template,
-               Constraint_Spec_Template,
+               Constraint_Decl_Template,
                Constraint_Init_Template,
-               Anonymous_Typ_Spec,
+               Anonymous_Typ_Decl,
                Anonymous_Typ_Init);
-
-            Put_Line (F_Spec, +Anonymous_Typ_Spec);
+            Put_Line (F_Spec, "   " & Anonymous_Typ'Class (Typ).Slug
+                              & "_Typ_Ref : SP.Ref;");
+            Put_Line (F_Body, +Anonymous_Typ_Decl);
             Init_Package_Code := Init_Package_Code & Anonymous_Typ_Init;
          end;
 
       elsif Typ in Instance_Typ'Class then
          declare
-            Instance_Typ_Init, Instance_Typ_Spec : Unbounded_String;
+            Instance_Typ_Init, Instance_Typ_Decl : Unbounded_String;
          begin
             Collect_Info_For_Instance_Typ
               (Instance_Typ'Class (Typ),
-               Instance_Spec_Template,
+               Instance_Decl_Template,
                Instance_Init_Template,
-               Instance_Typ_Spec,
+               Instance_Typ_Decl,
                Instance_Typ_Init);
-            Put_Line (F_Spec, +Instance_Typ_Spec);
+            Put_Line
+              (F_Spec, "   " & Ty_Prefix & "_Typ_Ref : TGen.Types.SP.Ref;");
+            Put_Line (F_Body, +Instance_Typ_Decl);
             Init_Package_Code := Init_Package_Code & Instance_Typ_Init;
          end;
 
       elsif Typ in Array_Typ'Class then
          declare
-            Array_Typ_Init, Array_Typ_Spec : Unbounded_String;
+            Array_Typ_Init, Array_Typ_Decl : Unbounded_String;
          begin
             Collect_Info_For_Array
               (Array_Typ'Class (Typ),
-               Array_Typ_Spec,
+               Array_Typ_Decl,
                Array_Typ_Init);
-            Put_Line (F_Spec, +Array_Typ_Spec);
+            Put_Line
+              (F_Spec, "   " & Ty_Prefix & "_Typ_Ref : TGen.Types.SP.Ref;");
+            Put_Line (F_Body, +Array_Typ_Decl);
             Init_Package_Code := Init_Package_Code & Array_Typ_Init;
          end;
 
@@ -1012,15 +1027,17 @@ package body TGen.Type_Representation is
          end if;
 
          declare
-            Scalar_Typ_Spec, Scalar_Typ_Init : Unbounded_String;
+            Scalar_Typ_Decl, Scalar_Typ_Init : Unbounded_String;
          begin
             Collect_Info_For_Scalar_Typ
               (Scalar_Typ'Class (Typ),
-               Scalar_Typ_Spec_Template,
+               Scalar_Typ_Decl_Template,
                Scalar_Typ_Init_Template,
-               Scalar_Typ_Spec,
+               Scalar_Typ_Decl,
                Scalar_Typ_Init);
-            Put_Line (F_Spec, +Scalar_Typ_Spec);
+            Put_Line
+              (F_Spec, "   " & Ty_Prefix & "_Typ_Ref : TGen.Types.SP.Ref;");
+            Put_Line (F_Body, +Scalar_Typ_Decl);
             Init_Package_Code := Init_Package_Code & Scalar_Typ_Init;
          end;
 

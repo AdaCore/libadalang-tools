@@ -1,4 +1,7 @@
-@@--  Template for the specification of a scalar type representation.
+@@--  Template for the declarations for a scalar type representation.
+@@--  These declarations go in the body of the value package, in order to
+@@--  be part of the private part and avoid any visibility issues.
+@@--
 @@--  @_TY_PREFIX_@ Prefix used to prefix all entities for the current type.
 @@--  @_TY_NAME_@ Name of the current type.
 @@--  @_SCALAR_TYP_@ Kind of the discrete typ
@@ -104,4 +107,3 @@
        others => <>);
 
 @@END_IF@@
-   @_TY_PREFIX_@_Typ_Ref : TGen.Types.SP.Ref;

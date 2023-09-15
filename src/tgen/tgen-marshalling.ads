@@ -49,6 +49,8 @@ package TGen.Marshalling is
 
    Global_Prefix   : constant String := "TGen_Marshalling";
 
+   type Spec_Part is (Pub, Priv);
+
 private
    Marshalling_Lib : constant String := "TGen.Marshalling_Lib";
 
@@ -113,6 +115,7 @@ private
 
    procedure Generate_Base_Functions_For_Typ
      (Typ                : TGen.Types.Typ'Class;
+      Part               : Spec_Part := Pub;
       For_Base           : Boolean := False)
    with Pre => (if For_Base then Typ in Scalar_Typ'Class)
      and then Typ not in Anonymous_Typ'Class
@@ -231,4 +234,8 @@ private
    --
    --  They also marshall the header and add some padding so that there is
    --  enough room to read a correct value if the header is mutated.
+   --
+   --  Part may be used to control which part of the spec (public or private)
+   --  is generated, if the templates support the tag, otherwise, it has no
+   --  effect.
 end TGen.Marshalling;

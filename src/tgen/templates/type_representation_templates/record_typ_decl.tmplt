@@ -1,4 +1,7 @@
-@@--  Template for the specification of a record type representation.
+@@--  Template for the declarations for a record type representation.
+@@--  These declarations go in the body of the value package, in order to
+@@--  be part of the private part and avoid any visibility issues.
+@@--
 @@--  @_TY_PREFIX_@ Prefix used to prefix all entities for the current type.
 @@--  @_TY_NAME_@ Name of the current type.
 @@--  @_RECORD_TYP_@ Kind of the record type. Can be either Function_Typ,
@@ -25,5 +28,3 @@
  @@END_IF@@
        Static_Gen => True,
        others     => <>);
-
-   @_TY_PREFIX_@_Typ_Ref : TGen.Types.SP.Ref;

@@ -13,6 +13,7 @@ with TGen.Types.Constraints; use TGen.Types.Constraints;
 with TGen.Types.Enum_Types; use TGen.Types.Enum_Types;
 with TGen.Types.Discrete_Types; use TGen.Types.Discrete_Types;
 with TGen.Types.Int_Types; use TGen.Types.Int_Types;
+with TGen.Types.Real_Types; use TGen.Types.Real_Types;
 with TGen.Types.Record_Types; use TGen.Types.Record_Types;
 
 procedure Example_Introspection is
@@ -34,13 +35,13 @@ procedure Example_Introspection is
    -------------
 
    procedure Test_T1 is
+      T1_Typ : Signed_Int_Typ renames
+        Signed_Int_Typ (my_file_t1_Typ_Ref.Unchecked_Get.all);
    begin
       Assert
-        (my_file_t1_Typ.Range_Value.Min =
-           my_file_t1_Typ_Conversions.To_Big_Integer (1 - 2 ** 31));
+        (T1_Typ.Range_Value.Min = To_Big_Integer (1 - 2 ** 31));
       Assert
-        (my_file_t1_Typ.Range_Value.Max =
-           my_file_t1_Typ_Conversions.To_Big_Integer (2 ** 31 - 1));
+        (T1_Typ.Range_Value.Max = To_Big_Integer (2 ** 31 - 1));
    end Test_T1;
 
    --  Testing introspection over the following type:
@@ -51,13 +52,13 @@ procedure Example_Introspection is
    -------------
 
    procedure Test_T2 is
+      T2_Typ : Signed_Int_Typ renames
+         Signed_Int_Typ (my_file_t2_Typ_Ref.Unchecked_Get.all);
    begin
       Assert
-        (my_file_t2_Typ.Range_Value.Min =
-           my_file_t2_Typ_Conversions.To_Big_Integer (0));
+        (T2_Typ.Range_Value.Min = To_Big_Integer (0));
       Assert
-        (my_file_t2_Typ.Range_Value.Max =
-           my_file_t2_Typ_Conversions.To_Big_Integer (100));
+        (T2_Typ.Range_Value.Max = To_Big_Integer (100));
    end Test_T2;
 
 
@@ -70,7 +71,8 @@ procedure Example_Introspection is
 
    procedure Test_T3 is
    begin
-      Assert (To_Integer (my_file_t3_Typ.Mod_Value) = 2**16);
+      Assert (To_Integer
+                (As_Mod_Int_Typ (my_file_t3_Typ_Ref).Mod_Value) = 2**16);
    end Test_T3;
 
    --  Testing introspection over the following type:
@@ -83,31 +85,31 @@ procedure Example_Introspection is
 
    procedure Test_Constr_Array
    is
+      my_file_constr_array_Typ : Constrained_Array_Typ renames
+        Constrained_Array_Typ (my_file_constr_array_Typ_Ref.Unchecked_Get.all);
       Idx_Constraint : constant Index_Constraint :=
            my_file_constr_array_Typ.Index_Constraints (1);
       Comp_Type : constant Signed_Int_Typ'Class :=
-         As_Signed_Int_Typ
-             (As_Named_Typ
-                (As_Anonymous_Typ (my_file_constr_array_Typ.Component_Type)));
+        Signed_Int_Typ
+          (As_Named_Typ
+            (As_Anonymous_Typ (my_file_constr_array_Typ.Component_Type))
+            .Unchecked_Get.all);
    begin
       Assert (my_file_constr_array_Typ.Num_Dims = 1);
       Assert
-        (Comp_Type.Range_Value.Min =
-           standard_integer_Typ_Conversions.To_Big_Integer (0));
+        (Comp_Type.Range_Value.Min = To_Big_Integer (0));
       Assert
-        (Comp_Type.Range_Value.Max =
-           standard_integer_Typ_Conversions.To_Big_Integer (Integer'Last));
+        (Comp_Type.Range_Value.Max = To_Big_Integer (Integer'Last));
 
       --  The bounds are contained in the index constraint and not in the
       --  index type, which is the base type.
 
       Assert
-        (Idx_Constraint.Discrete_Range.Low_Bound.Int_Val =
-           standard_positive_Typ_Conversions.To_Big_Integer (1));
+        (Idx_Constraint.Discrete_Range.Low_Bound.Int_Val = To_Big_Integer (1));
 
       Assert
         (Idx_Constraint.Discrete_Range.High_Bound.Int_Val =
-           standard_positive_Typ_Conversions.To_Big_Integer (10));
+           To_Big_Integer (10));
    end Test_Constr_Array;
 
    --  Testing introspection over the following type:
@@ -119,6 +121,8 @@ procedure Example_Introspection is
 
    procedure Test_Matrix
    is
+      my_file_matrix_Typ : Unconstrained_Array_Typ renames
+        Unconstrained_Array_Typ (my_file_matrix_Typ_Ref.Unchecked_Get.all);
       First_Index_Type : constant Signed_Int_Typ'Class :=
         As_Signed_Int_Typ (my_file_matrix_Typ.Index_Types (1));
       Second_Index_Type : constant Char_Typ'Class :=
@@ -128,11 +132,9 @@ procedure Example_Introspection is
    begin
       Assert (my_file_matrix_Typ.Num_Dims = 2);
       Assert
-        (First_Index_Type.Range_Value.Min =
-           standard_natural_Typ_Conversions.To_Big_Integer (Natural'First));
+        (First_Index_Type.Range_Value.Min = To_Big_Integer (Natural'First));
       Assert
-        (First_Index_Type.Range_Value.Max =
-           standard_natural_Typ_Conversions.To_Big_Integer (Natural'Last));
+        (First_Index_Type.Range_Value.Max = To_Big_Integer (Natural'Last));
 
       --  TODO: add test for character type second index
 
@@ -146,6 +148,8 @@ procedure Example_Introspection is
    ------------------
 
    procedure Test_Fixed_1 is
+      my_file_fixed_1_Typ : Ordinary_Fixed_Typ renames
+        Ordinary_Fixed_Typ (my_file_fixed_1_Typ_Ref.Unchecked_Get.all);
    begin
       Assert
         (my_file_fixed_1_Typ.Delta_Value = From_Universal_Image ("0.0001"));
@@ -164,6 +168,8 @@ procedure Example_Introspection is
    ------------------
 
    procedure Test_Fixed_2 is
+      my_file_fixed_2_Typ : Decimal_Fixed_Typ renames
+        Decimal_Fixed_Typ (my_file_fixed_2_Typ_Ref.Unchecked_Get.all);
    begin
       Assert
         (my_file_fixed_2_Typ.Delta_Value =
@@ -186,6 +192,8 @@ procedure Example_Introspection is
 
    procedure Test_Shape_Kind is
       use Enum_Literal_Maps;
+      my_file_shape_kind_Typ : Other_Enum_Typ renames
+        Other_Enum_Typ (my_file_shape_kind_Typ_Ref.Unchecked_Get.all);
    begin
       for Cur in my_file_shape_kind_Typ.Literals.Iterate loop
          Assert
@@ -202,13 +210,13 @@ procedure Example_Introspection is
    -----------------------
 
    procedure Test_Name_Size_Ty is
+      my_file_name_Size_ty_typ : Signed_Int_Typ renames
+        Signed_Int_Typ (my_file_name_size_ty_Typ_Ref.Unchecked_Get.all);
    begin
       Assert
-        (my_file_name_size_ty_Typ.Range_Value.Min =
-           my_file_name_size_ty_Typ_Conversions.To_Big_Integer (0));
+        (my_file_name_size_ty_Typ.Range_Value.Min = To_Big_Integer (0));
       Assert
-        (my_file_name_size_ty_Typ.Range_Value.Max =
-           my_file_name_size_ty_Typ_Conversions.To_Big_Integer (30));
+        (my_file_name_size_ty_Typ.Range_Value.Max = To_Big_Integer (30));
    end Test_Name_Size_Ty;
 
    --  Testing type introspection for the following type:
@@ -242,7 +250,8 @@ procedure Example_Introspection is
    procedure Test_Shape
    is
       use Component_Maps;
-      Rec_Typ : constant Discriminated_Record_Typ'Class := my_file_shape_typ;
+      Rec_Typ : Discriminated_Record_Typ renames
+        Discriminated_Record_Typ (my_file_shape_typ_ref.Unchecked_Get.all);
    begin
       Assert (Rec_Typ.Mutable);
 
@@ -573,7 +582,9 @@ procedure Example_Introspection is
    --  type Shape_Array is array (T2'Base range <>) of Shape;
 
    procedure Test_Shape_Array is
-      Arr_Typ : Unconstrained_Array_Typ renames my_file_shape_array_Typ;
+      Arr_Typ : Unconstrained_Array_Typ renames
+        Unconstrained_Array_Typ
+          (my_file_shape_array_Typ_Ref.Unchecked_Get.all);
       Index_Typ : Signed_Int_Typ renames
         Signed_Int_Typ (Arr_Typ.Index_Types (1).Unchecked_Get.all);
    begin
@@ -591,7 +602,9 @@ procedure Example_Introspection is
 
    procedure Test_Small_Shape_Array is
       use Component_Maps;
-      Rec_Typ : Discriminated_Record_Typ renames my_file_small_shape_array_Typ;
+      Rec_Typ : Discriminated_Record_Typ renames
+        Discriminated_Record_Typ
+          (my_file_small_shape_array_Typ_Ref.Unchecked_Get.all);
    begin
       Assert (Rec_Typ.Discriminant_Types.Length = 1);
       Assert (+Key (Rec_Typ.Discriminant_Types.First) = "L");
@@ -643,6 +656,9 @@ procedure Example_Introspection is
    procedure Test_R is
       use Component_Maps;
       Index : Positive := 1;
+      my_file_r_Typ : Nondiscriminated_Record_Typ renames
+        Nondiscriminated_Record_Typ
+          (my_file_r_Typ_Ref.Unchecked_Get.all);
    begin
       for Comp_Cur in my_file_r_Typ.Component_Types.Iterate loop
          declare
@@ -755,6 +771,8 @@ procedure Example_Introspection is
 
    procedure Test_R2 is
       use Component_Maps;
+      my_file_r2_typ : Nondiscriminated_Record_Typ renames
+        Nondiscriminated_Record_Typ (my_file_r2_Typ_Ref.Unchecked_Get.all);
    begin
       Assert (my_file_r2_Typ.Component_Types.Length = 2);
       for Comp_Cur in my_file_r2_Typ.Component_Types.iterate loop

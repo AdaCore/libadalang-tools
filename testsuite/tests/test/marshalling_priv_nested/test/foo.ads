@@ -5,5 +5,6 @@ package Foo is
    private
       type T is new Integer;
    end Bar;
+   use Bar;
    function Ident (X : T) return T is (Ident_Nested (X));
 end Foo;

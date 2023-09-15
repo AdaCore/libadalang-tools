@@ -6,6 +6,7 @@
 @@--  @_FOR_BASE_@ True if we are doing the generation for the base type.
 @@--
 @@INCLUDE@@ util.tmplt
+@@IF@@ @_PUB_PART_@ xor @_FULL_PRIV_@
    --  Base operations for @_TY_NAME_@
 
    procedure @_TY_PREFIX_@_Write@_BASE_SUFFIX()_@
@@ -19,3 +20,4 @@
       @_GLOBAL_PREFIX_@_V     : out @_TY_NAME_@;
       @_GLOBAL_PREFIX_@_First : @_TY_NAME_@ := @_TY_NAME_@'First;
       @_GLOBAL_PREFIX_@_Last  : @_TY_NAME_@ := @_TY_NAME_@'Last);
+@@END_IF@@

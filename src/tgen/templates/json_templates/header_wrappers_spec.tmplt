@@ -4,6 +4,7 @@
 @@--  @_TY_PREFIX_@ Prefix used to prefix all entities for the current type.
 @@--  @_TY_NAME_@ Name of the current type.
 @@--
+@@IF@@ @_PUB_PART_@ xor @_FULL_PRIV_@
 
    procedure @_TY_PREFIX_@_Write_All
      (@_GLOBAL_PREFIX_@_JSON : in out TGen.JSON.JSON_Value;
@@ -12,3 +13,4 @@
    procedure @_TY_PREFIX_@_Read_All
      (@_GLOBAL_PREFIX_@_JSON : TGen.JSON.JSON_Value;
       @_GLOBAL_PREFIX_@_V    : out @_TY_NAME_@);
+@@END_IF@@
