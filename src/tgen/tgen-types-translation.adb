@@ -337,9 +337,14 @@ package body TGen.Types.Translation is
       Sem_Parent : Ada_Node := First_Part.P_Semantic_Parent;
    begin
       --  Consider that N is fully private if there is a private part node
-      --  among the chain of semantic parents of the first part of N.
+      --  among the chain of semantic parents of the first part of N, until we
+      --  reach a library level package declaration.
 
-      while not Sem_Parent.Is_Null loop
+      while not Sem_Parent.Is_Null
+           and then
+             not (Sem_Parent.Kind in Ada_Package_Decl_Range
+                  and then Sem_Parent.Parent.Kind in Ada_Library_Item_Range)
+      loop
          if Sem_Parent.Kind in Ada_Private_Part_Range then
             return True;
          end if;
