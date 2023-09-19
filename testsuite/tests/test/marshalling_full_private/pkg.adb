@@ -10,4 +10,6 @@ package body Pkg is
       null;
    end Bar;
 
+   procedure Baz (S : UTF_8_Lines) is null;
+
 end Pkg;
