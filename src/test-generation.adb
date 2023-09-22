@@ -156,11 +156,11 @@ package body Test.Generation is
       --  Generate the harness
 
       TGen.Libgen.Generate_Harness
-           (Test.Common.TGen_Libgen_Ctx,
-            Harness_Dir,
-            Test.Common.JSON_Test_Dir.all,
-            Test.Common.TGen_Strat_Kind,
-            Test.Common.TGen_Num_Tests);
+        (Test.Common.TGen_Libgen_Ctx,
+         Harness_Dir,
+         Test.Common.JSON_Test_Dir.all,
+         Test.Common.TGen_Strat_Kind,
+         Test.Common.TGen_Num_Tests);
 
       --  Build the harness. For this, reuse the gpr options passed on the
       --  command line.

@@ -67,7 +67,8 @@ package body TGen.Libgen is
       Harness_Dir      : String;
       Test_Output_Dir  : String;
       Default_Strat    : Default_Strat_Kind;
-      Default_Test_Num : Natural) with
+      Default_Test_Num : Natural;
+      Bin_Tests        : Boolean) with
      Pre => Ctx.Generation_Map.Contains (Pack_Name);
    --  Generate one harness unit (spec and body) for the subprograms registered
    --  in Pack_Name.
@@ -856,7 +857,8 @@ package body TGen.Libgen is
       Harness_Dir      : String;
       Test_Output_Dir  : String;
       Default_Strat    : Default_Strat_Kind;
-      Default_Test_Num : Natural)
+      Default_Test_Num : Natural;
+      Bin_Tests        : Boolean)
    is
       use GNATCOLL.VFS;
       use Templates_Parser;
@@ -902,6 +904,11 @@ package body TGen.Libgen is
          Out_File,
          +Full_Name (Out_Dir / (+To_Filename (Pack_Name) & ".adb")));
 
+      if Bin_Tests then
+         Put_Line (F_Body, "with Ada.Streams.Stream_IO;");
+         Put_Line (F_Body, "with Ada.Strings.Fixed;");
+      end if;
+
       Put_Line (F_Body, "with TGen.JSON;");
       Put_Line (F_Body, "with TGen.Types;");
       Put_Line (F_Body, "with TGen.Strategies;");
@@ -936,6 +943,7 @@ package body TGen.Libgen is
             Param_Names : Vector_Tag;
             Param_Types : Vector_Tag;
             Input_FNs   : Vector_Tag;
+            Output_FNs  : Vector_Tag;
             Real_Name   : constant String :=
               As_Function_Typ (Subp).Simple_Name;
             Subp_Name   : constant String :=
@@ -946,8 +954,11 @@ package body TGen.Libgen is
             Concrete_Typ : SP.Ref;
             --  Shortcut to hold the concrete type of a parameter
 
-            Params : constant Component_Map :=
+            Params : Component_Map renames
               As_Function_Typ (Subp).Component_Types;
+            Param_Cur : Component_Maps.Cursor;
+            Ordered_Params : String_Vectors.Vector renames
+              As_Function_Typ (Subp).Param_Order;
          begin
             Assocs.Insert (Assoc ("GLOBAL_PREFIX", Global_Prefix));
             Assocs.Insert (Assoc ("NUM_TESTS", Default_Test_Num));
@@ -959,7 +970,8 @@ package body TGen.Libgen is
             Assocs.Insert
               (Assoc
                 ("FN_TYP_REF", Subp.Get.Slug & "_Typ_Ref"));
-            for Param_Cur in Params.Iterate loop
+            for Param_Name of Ordered_Params loop
+               Param_Cur := Params.Find (Param_Name);
                Param_Names.Append (Unbounded_String (Key (Param_Cur)));
                if Element (Param_Cur).Get.Kind in Anonymous_Kind then
                   Concrete_Typ :=
@@ -972,10 +984,23 @@ package body TGen.Libgen is
                end if;
                Param_Types.Append (Concrete_Typ.Get.Fully_Qualified_Name);
                Input_FNs.Append (Input_Fname_For_Typ (Concrete_Typ.Get.Name));
+               Output_FNs.Append
+                 (Output_Fname_For_Typ (Concrete_Typ.Get.Name));
             end loop;
             Assocs.Insert (Assoc ("PARAM_NAME", Param_Names));
             Assocs.Insert (Assoc ("PARAM_TY", Param_Types));
             Assocs.Insert (Assoc ("INPUT_FN", Input_FNs));
+            Assocs.Insert (Assoc ("OUTPUT_FN", Output_FNs));
+            Assocs.Insert
+              (Assoc
+                 ("TC_NAME",
+                  Unbounded_String'
+                    (Test_Output_Dir & GNAT.OS_Lib.Directory_Separator
+                     & (+Subp_Name) & "-"
+                     & (+As_Function_Typ (Subp).Long_UID))));
+            Assocs.Insert
+              (Assoc
+                 ("TC_FORMAT", String'(if Bin_Tests then "BIN" else "JSON")));
             Put_Line (F_Body, Parse (+Template_Path.Full_Name, Assocs));
             New_Line (F_Body);
          end;
@@ -984,13 +1009,15 @@ package body TGen.Libgen is
       --  Generate the body of the global generation routine
 
       Put_Line (F_Body, "   procedure Generate is");
-      Put_Line (F_Body, "      Dumper : constant TGen.JSON.Utils"
-                        & ".JSON_Auto_IO :=");
-      Put_Line (F_Body, "        TGen.JSON.Utils.Create ("""
-                        & Test_Output_Dir & GNAT.OS_Lib.Directory_Separator
-                        & To_Filename (Original_Unit) & ".json"");");
-      Put_Line (F_Body, "      Unit_JSON : TGen.JSON.JSON_Value := Dumper"
-                        & ".Get_JSON_Ref;");
+      if not Bin_Tests then
+         Put_Line (F_Body, "      Dumper : constant TGen.JSON.Utils"
+                           & ".JSON_Auto_IO :=");
+         Put_Line (F_Body, "        TGen.JSON.Utils.Create ("""
+                           & Test_Output_Dir & GNAT.OS_Lib.Directory_Separator
+                           & To_Filename (Original_Unit) & ".json"");");
+         Put_Line (F_Body, "      Unit_JSON : TGen.JSON.JSON_Value := Dumper"
+                           & ".Get_JSON_Ref;");
+      end if;
       Put_Line (F_Body, "   begin");
       for Subp of Subps loop
          declare
@@ -1005,7 +1032,7 @@ package body TGen.Libgen is
               (F_Body,
                "      Gen_" & Subp_Name & '_'
                & To_String (As_Function_Typ (Subp).Subp_UID)
-               & " (Unit_JSON);");
+               & (if Bin_Tests then ";" else " (Unit_JSON);"));
          end;
       end loop;
       if Ada.Containers."=" (Subps.Length, 0) then
@@ -1036,7 +1063,8 @@ package body TGen.Libgen is
       Harness_Dir      : String;
       Test_Output_Dir  : String;
       Default_Strat    : Default_Strat_Kind := Stateless;
-      Default_Test_Num : Natural := 5)
+      Default_Test_Num : Natural := 5;
+      Bin_Tests        : Boolean := False)
    is
       use GNATCOLL.VFS;
       use Types_Per_Package_Maps;
@@ -1103,7 +1131,8 @@ package body TGen.Libgen is
             Harness_Dir,
             Test_Output_Dir,
             Default_Strat,
-            Default_Test_Num);
+            Default_Test_Num,
+            Bin_Tests);
       end loop;
       Put_Line (Main_File, "end Generation_Main;");
       Close (Main_File);

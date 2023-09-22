@@ -144,6 +144,8 @@ package TGen.Templates is
         Template_Folder & "array_typ_decl.tmplt";
       Array_Typ_Init_Template : constant String :=
         Template_Folder & "array_typ_init.tmplt";
+      Function_Typ_Init_Template : constant String :=
+        Template_Folder & "function_typ_init.tmplt";
    end Type_Representation;
 
 end TGen.Templates;

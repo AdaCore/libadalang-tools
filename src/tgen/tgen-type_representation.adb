@@ -690,10 +690,12 @@ package body TGen.Type_Representation is
          Record_Typ_Decl : out Unbounded_String;
          Record_Typ_Init : out Unbounded_String)
       is
-         Discr_Names : Vector_Tag;
-         Discr_Types : Vector_Tag;
-         Comp_Names : Vector_Tag;
-         Comp_Types : Vector_Tag;
+         Discr_Names        : Vector_Tag;
+         Discr_Types        : Vector_Tag;
+         Comp_Names         : Vector_Tag;
+         Comp_Types         : Vector_Tag;
+         Comp_Names_Ordered : Vector_Tag;
+
          Anonymous_Typ_Inits, Anonymous_Typ_Decls : Unbounded_String;
       begin
          if T in Discriminated_Record_Typ'Class then
@@ -800,6 +802,16 @@ package body TGen.Type_Representation is
             end;
          end loop;
 
+         --  If this type is a function type, also get the order of the
+         --  components.
+
+         if T in Function_Typ'Class then
+            for Comp_Name of Function_Typ'Class (T).Param_Order loop
+               Comp_Names_Ordered := Comp_Names_Ordered & Comp_Name;
+            end loop;
+            Insert (Assocs, Assoc ("COMP_NAME_ORD", Comp_Names_Ordered));
+         end if;
+
          --  Print the templates
 
          Insert (Assocs, Assoc ("ANONYMOUS_TYP_SPEC", Anonymous_Typ_Decls));
@@ -809,7 +821,14 @@ package body TGen.Type_Representation is
          Insert (Assocs, Assoc ("DISCR_NAME", Discr_Names));
          Insert (Assocs, Assoc ("DISCR_TYPE", Discr_Types));
          Record_Typ_Decl := Parse (Record_Typ_Decl_Template, Assocs);
-         Record_Typ_Init := Parse (Record_Typ_Init_Template, Assocs);
+         if T in Function_Typ'Class then
+            Record_Typ_Init := Parse (Function_Typ_Init_Template, Assocs);
+         else
+            Record_Typ_Init := Null_Unbounded_String;
+         end if;
+         Record_Typ_Init :=
+           Record_Typ_Init
+           & Unbounded_String'(Parse (Record_Typ_Init_Template, Assocs));
 
       end Collect_Info_For_Record;
 

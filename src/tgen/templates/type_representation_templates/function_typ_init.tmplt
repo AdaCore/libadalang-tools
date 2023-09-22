@@ -1,11 +1,7 @@
 @@--  Template for the initialization of a function type representation.
 @@--  @_TY_PREFIX_@ Prefix used to prefix all entities for the current type.
-@@--  @_COMP_NAME_@ Component names
-@@--  @_COMP_TYPE_@ Component type prefix
+@@--  @_COMP_NAME_ORD_@ Component names
 
 @@TABLE@@
-   @_TY_PREFIX_@_Typ.Component_Types.Insert
-      (TGen.Strings."+" ("@_COMP_NAME_@"),
-       @_COMP_TYPE_@_Typ_Ref);
+   @_TY_PREFIX_@_Typ.Param_Order.Append (TGen.Strings."+" ("@_COMP_NAME_ORD_@"));
 @@END_TABLE@@
-   @_TY_PREFIX_@_Typ_Ref.Set (@_TY_PREFIX_@_Typ);
