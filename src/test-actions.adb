@@ -1164,6 +1164,10 @@ package body Test.Actions is
       Put (" --test-duration                - Show timing for each test\n");
       Put (" --test-filtering               - Add test filtering option to generated driver\n");
       Put (" --no-test-filtering            - Suppress test filtering in generated driver\n");
+      Put (" --gen-test-vectors             - Generate test inputs for supported subprograms (experimental)\n");
+      Put (" --gen-test-num=n               - Specify the number of test inputs to be generated (experimental, defaults to 5)\n");
+      Put (" --serialized-test-dir=dir      - Specify in which directory test inputs should be generated (experimental)\n");
+      Put (" --dump-test-inputs             - Dump input values of the subprogram under test as blobs during harness execution (experimental)\n");
       Put ("\n");
 
       Put ("Tests execution mode options:\n");
