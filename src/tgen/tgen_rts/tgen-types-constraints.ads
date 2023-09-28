@@ -70,6 +70,13 @@ package TGen.Types.Constraints is
    end record;
    --  A constraint value for a discrete type
 
+   function Value
+     (Cst          : Discrete_Constraint_Value;
+      Disc_Context : Disc_Value_Map) return Big_Int.Big_Integer;
+   --  Return the integer value of Cst, looking up the context for the
+   --  discriminant value if needed. Raises Program_Error if the value of the
+   --  constraint could not be determined.
+
    subtype Real_Constraint_Value_Kind is
      Constraint_Value_Kind range Static .. Non_Static;
 
@@ -223,6 +230,9 @@ package TGen.Types.Constraints is
 
    overriding function Default_Strategy
      (Self : Anonymous_Typ) return Strategy_Type'Class;
+
+   overriding function Default_Enum_Strategy
+     (Self : Anonymous_Typ) return Enum_Strategy_Type'Class;
 
    procedure Free_Content (Self : in out Anonymous_Typ);
 

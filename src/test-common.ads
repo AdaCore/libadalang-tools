@@ -392,6 +392,9 @@ package Test.Common is
    TGen_Libgen_Ctx : TGen.Libgen.Libgen_Context;
    --  Context for the support library generation
 
+   TGen_Strat_Kind : TGen.Libgen.Default_Strat_Kind := TGen.Libgen.Stateless;
+   --  Kind of strategy to use for test value generation
+
    type Lib_Support_Status is (Not_Needed, Needed, Generated);
 
    procedure Request_Lib_Support;
@@ -404,8 +407,9 @@ package Test.Common is
    procedure Mark_Lib_Support_Generated;
    --  Flag that the TGen support library has already been generated
 
-   TGen_Num_Tests : Positive := 5;
-   --  Number of tests to be generated for each procedure
+   TGen_Num_Tests : Natural := 5;
+   --  Number of tests to be generated for each procedure (or upper limit if
+   --  using enumerative strategies).
 
    Common_Package_Name     : constant String := "Gnattest_Generated";
    --  Root package name for common generated files

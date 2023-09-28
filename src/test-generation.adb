@@ -159,6 +159,7 @@ package body Test.Generation is
            (Test.Common.TGen_Libgen_Ctx,
             Harness_Dir,
             Test.Common.JSON_Test_Dir.all,
+            Test.Common.TGen_Strat_Kind,
             Test.Common.TGen_Num_Tests);
 
       --  Build the harness. For this, reuse the gpr options passed on the
@@ -184,6 +185,8 @@ package body Test.Generation is
       Build_Args.Append ("-gnatyN");
 
       if Debug_Flag_1 then
+         Build_Args.Append ("-g");
+         Build_Args.Append ("-O0");
          PP_Cmd (Build_Args'Access);
       end if;
       Ret_Status := Run (Build_Args);

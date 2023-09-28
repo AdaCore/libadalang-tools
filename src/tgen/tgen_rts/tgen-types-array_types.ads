@@ -102,6 +102,79 @@ package TGen.Types.Array_Types is
      (Self : Constrained_Array_Typ) return Strategy_Type'Class;
    --  Generate a strategy for the generation for a Constrained_Array_Typ
 
+   type Constr_Array_Enum_Strat is new Enum_Strategy_Type with record
+      Arr_T : SP.Ref;
+      --  Type of the array for which we are generating values
+
+      Comp_Strat : Enum_Strategy_Type_Acc;
+      --  Enumerative strategy for the component type
+
+      Has_Generated : Boolean;
+      --  There's only a single value to be generated as the size of the array
+      --  is fixed, use this flag to determine wether we have already generated
+      --  it or not.
+   end record;
+   --  Strategy to generate a value for a constrained array, using an
+   --  enumerative strategy for the component. Computing permutations among the
+   --  various elements of the array would result in a combinatorial explosion,
+   --  so the strategy only generates a single value for the type, consisting
+   --  of an array with the elements generated in sequence from the component
+   --  strat, starting over if there are more elements in the array than what
+   --  the strategy can generate.
+
+   procedure Init (S : in out Constr_Array_Enum_Strat);
+
+   overriding function Has_Next (S : Constr_Array_Enum_Strat) return Boolean;
+
+   overriding function Generate
+     (S            : in out Constr_Array_Enum_Strat;
+      Disc_Context : Disc_Value_Map) return JSON_Value;
+
+   overriding function Default_Enum_Strategy
+     (Self : Constrained_Array_Typ) return Enum_Strategy_Type'Class;
+   --  Generate an enumerative strategy for the generation of a
+   --  Constrained_Array_Typ. The default enumerative strategy yields a single
+   --  array whose components are generated using the component's type default
+   --  enumerative strategy. Note that there is no combinatorial enumeration
+   --  over the component values: we simply use the component's type strategy
+   --  and if we have exhausted all of its elements, we copy an arbitrary
+   --  previously generated value.
+
+   type Nat_Array is array (Natural range <>) of Natural;
+
+   type Unconst_Array_Enum_Strat (Num_Sizes : Positive) is
+     new Constr_Array_Enum_Strat with record
+      Sizes : Nat_Array (1 .. Num_Sizes);
+      --  Target length for each of the values to be generated. This is the
+      --  same length for each dimension, and is clipped depending on the
+      --  actual bounds of the index type.
+
+      Current_Size : Natural;
+      --  Index in the above array to keep track of what the next size we will
+      --  need to generate is.
+   end record;
+
+   procedure Init (S : in out Unconst_Array_Enum_Strat);
+
+   overriding function Has_Next (S : Unconst_Array_Enum_Strat) return Boolean;
+
+   overriding function Generate
+     (S            : in out Unconst_Array_Enum_Strat;
+      Disc_Context : Disc_Value_Map) return JSON_Value;
+
+   function Make_Unconst_Array_Enum_Strat
+     (Arr_T : Unconstrained_Array_Typ;
+      Sizes : Nat_Array) return Unconst_Array_Enum_Strat'Class;
+
+   overriding function Default_Enum_Strategy
+     (Self : Unconstrained_Array_Typ) return Enum_Strategy_Type'Class;
+   --  Generate a enumerative strategy for the generation of a
+   --  Unconstrained_Array_Typ. This operates in the same manner as the
+   --  constrained array default enumerative strategy, excepts that we generate
+   --  arrays of four different sizes: 0, 1, 10 and 1000. This is bounded
+   --  by the unconstrained array index type so the maximal-size array can be
+   --  less.
+
    procedure Is_Constrained_By_Variable
      (Self       : Constrained_Array_Typ;
       Var_Name   : Unbounded_String;

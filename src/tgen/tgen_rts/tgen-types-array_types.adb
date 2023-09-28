@@ -27,6 +27,7 @@ with TGen.Numerics;             use TGen.Numerics;
 with TGen.Random;               use TGen.Random;
 with TGen.Strings;              use TGen.Strings;
 with TGen.Types.Discrete_Types; use TGen.Types.Discrete_Types;
+with TGen.Types.Int_Types;
 
 package body TGen.Types.Array_Types is
 
@@ -206,7 +207,6 @@ package body TGen.Types.Array_Types is
    end record;
 
    type Size_Interval_Array is array (Natural range <>) of Size_Interval;
-   type Nat_Array is array (Natural range <>) of Natural;
 
    generic
       type Element_Type is private;
@@ -327,7 +327,7 @@ package body TGen.Types.Array_Types is
      of Index_Strategies_Type;
 
    type Array_Strategy_Type (Num_Dims : Positive) is
-     new Strategy_Type with
+     new Random_Strategy_Type with
       record
          T                         : SP.Ref;
          Generate_Element_Strategy : Strategy_Acc;
@@ -345,6 +345,17 @@ package body TGen.Types.Array_Types is
       Generate_Element_Strat : in out Strategy_Type'Class;
       Generate_Index_Strat   : in out Index_Strategy_Array)
       return JSON_Value;
+
+   function Generate_Enum_Array
+     (Arr_T       : Array_Typ'Class;
+      Comp_Strat  : Enum_Strategy_Type_Acc;
+      Bounds      : Index_Values_Array;
+      Disc_Values : Disc_Value_Map) return JSON_Value;
+   --  Generate an array value from the strategy defined in Comp_Strat, with as
+   --  many elements as defined by Bounds for each dimension. This does not
+   --  create a "dimensions" field in the JSON result, it needs to be added by
+   --  the caller if the type for which a value is being generated is
+   --  unconstrained. The values in the returned array will be already encoded.
 
    ------------
    -- Length --
@@ -691,5 +702,266 @@ package body TGen.Types.Array_Types is
       end if;
       return Result;
    end Encode;
+
+   ----------
+   -- Init --
+   ----------
+
+   procedure Init (S : in out Unconst_Array_Enum_Strat) is
+   begin
+      S.Current_Size := 1;
+      Init (Constr_Array_Enum_Strat (S));
+   end Init;
+
+   --------------
+   -- Has_Next --
+   --------------
+
+   overriding function Has_Next
+     (S : Unconst_Array_Enum_Strat) return Boolean is
+     (S.Current_Size < S.Num_Sizes);
+
+   --------------
+   -- Generate --
+   --------------
+
+   overriding function Generate
+     (S            : in out Unconst_Array_Enum_Strat;
+      Disc_Context : Disc_Value_Map) return JSON_Value
+   is
+      Arr_T  : Unconstrained_Array_Typ renames
+        Unconstrained_Array_Typ (S.Arr_T.Unchecked_Get.all);
+      Bounds : Index_Values_Array (1 .. Arr_T.Num_Dims);
+      Len    : Natural renames S.Sizes (S.Current_Size);
+      Res    : JSON_Value;
+   begin
+      --  Generate arrays where each dimension is of size Len, or the whole
+      --  range of the index type if it is smaller than what is requested, with
+      --  a low bound equal to the first element of the index type.
+
+      --  First compute the bounds
+
+      for I in 1 .. Bounds'Length loop
+         declare
+            LB : constant Big_Integer :=
+              As_Discrete_Typ (Arr_T.Index_Types (I)).Low_Bound;
+            HB : constant Big_Integer :=
+              As_Discrete_Typ (Arr_T.Index_Types (I)).High_Bound;
+
+            Is_Singleton_Index_Type : constant Boolean :=
+              LB + To_Big_Integer (1) > HB;
+            --  Whether the index type consists of a single element
+
+            Is_Signed_Int_Typ : constant Boolean :=
+              As_Discrete_Typ (Arr_T.Index_Types (I)) in
+                TGen.Types.Int_Types.Signed_Int_Typ'Class;
+            --  Whether this is a modular or enum type
+
+         begin
+            --  Special-case the zero-length array case. Do not generate a
+            --  zero-length array if the index type is not a signed int type
+            --  as we have no base type to declare to instantiate an empty
+            --  array index constraint.
+
+            if Is_Singleton_Index_Type and then not Is_Signed_Int_Typ then
+               Len := 1;
+            end if;
+
+            if Len = 0 then
+               if Is_Signed_Int_Typ then
+
+                  --  Use the (1 .. 0) to generate an empty array when the
+                  --  index type is a signed int type as this always in the
+                  --  base type range.
+
+                  Bounds (I).Low_Bound := To_Big_Integer (1);
+                  Bounds (I).High_Bound := To_Big_Integer (0);
+               else
+                  Bounds (I).Low_Bound := LB + To_Big_Integer (1);
+                  Bounds (I).High_Bound := LB;
+               end if;
+            else
+               Bounds (I).Low_Bound := LB;
+               Bounds (I).High_Bound := Min
+                 (LB + To_Big_Integer (Len - 1), HB);
+            end if;
+         end;
+      end loop;
+
+      --  Then generate the values
+
+      Res := Generate_Enum_Array (Arr_T, S.Comp_Strat, Bounds, Disc_Context);
+
+      --  Finally generate the "dimension" part of the unconstrained array from
+      --  the bounds.
+
+      declare
+         Dimension_JSON  : JSON_Value;
+         Dimensions_JSON : JSON_Array;
+      begin
+         for Bound of Bounds loop
+            Dimension_JSON := Create_Object;
+            Dimension_JSON.Set_Field ("First", Create (Bound.Low_Bound));
+            Dimension_JSON.Set_Field ("Last", Create (Bound.High_Bound));
+            Append (Dimensions_JSON, Dimension_JSON);
+         end loop;
+         Res.Set_Field ("dimensions", Dimensions_JSON);
+      end;
+
+      S.Current_Size := S.Current_Size + 1;
+      return Res;
+   end Generate;
+
+   -----------------------------------
+   -- Make_Unconst_Array_Enum_Strat --
+   -----------------------------------
+
+   function Make_Unconst_Array_Enum_Strat
+     (Arr_T : Unconstrained_Array_Typ;
+      Sizes : Nat_Array) return Unconst_Array_Enum_Strat'Class
+   is
+   begin
+      return Res : Unconst_Array_Enum_Strat (Num_Sizes => Sizes'Length) do
+         Res.Current_Size := 1;
+         Res.Arr_T.From_Element (Arr_T'Unrestricted_Access);
+         Res.Comp_Strat := new Enum_Strategy_Type'Class'
+           (Enum_Strategy_Type'Class
+              (Arr_T.Component_Type.Get.Default_Enum_Strategy));
+         Res.Has_Generated := False;
+         Res.Sizes := Sizes;
+      end return;
+   end Make_Unconst_Array_Enum_Strat;
+
+   overriding function Default_Enum_Strategy
+     (Self : Unconstrained_Array_Typ) return Enum_Strategy_Type'Class is
+     (Self.Make_Unconst_Array_Enum_Strat ([0, 1, 10, 1000]));
+
+   -------------------------
+   -- Generate_Enum_Array --
+   -------------------------
+
+   function Generate_Enum_Array
+     (Arr_T       : Array_Typ'Class;
+      Comp_Strat  : Enum_Strategy_Type_Acc;
+      Bounds      : Index_Values_Array;
+      Disc_Values : Disc_Value_Map) return JSON_Value
+   is
+      Res        : constant JSON_Value := Create_Object;
+      Big_1      : constant Big_Integer := Big_Int.To_Big_Integer (1);
+      Total_Size : Big_Integer := Big_1;
+      Values     : JSON_Array;
+      Idx        : Positive := 1;
+      --  Idx points to the next item we need to copy in case we have no more
+      --  values to generate.
+
+   begin
+      --  Start by computing the actual dimensions of the flattened array
+
+      for Bound of Bounds loop
+         Total_Size :=
+           Total_Size * (Bound.High_Bound - Bound.Low_Bound + Big_1);
+      end loop;
+
+      --  Then generate as many values as required. As in the random
+      --  generation, pre-encode the values as they can't be used as a
+      --  parameter to generate something else.
+
+      Comp_Strat.Init;
+
+      for I in 1 .. To_Integer (Total_Size) loop
+         if Comp_Strat.Has_Next then
+            Append
+              (Values,
+               Arr_T.Component_Type.Get.Encode
+                 (Comp_Strat.Generate (Disc_Values)));
+         else
+            Append (Values, Get (Values, Idx));
+            Idx := Idx + 1;
+         end if;
+      end loop;
+
+      --  Encode the sizes as well
+
+      declare
+         Sizes_JSON : JSON_Array;
+      begin
+         for Index_Value of Bounds loop
+            Append
+              (Sizes_JSON,
+               Create
+                 (To_String
+                      (Index_Value.High_Bound - Index_Value.Low_Bound + 1)));
+         end loop;
+         Set_Field (Res, "sizes", Sizes_JSON);
+      end;
+
+      Res.Set_Field ("array", Values);
+      return Res;
+   end Generate_Enum_Array;
+
+   ----------
+   -- Init --
+   ----------
+
+   procedure Init (S : in out Constr_Array_Enum_Strat) is
+   begin
+      S.Has_Generated := False;
+   end Init;
+
+   --------------
+   -- Has_Next --
+   --------------
+
+   function Has_Next (S : Constr_Array_Enum_Strat) return Boolean is
+     (not S.Has_Generated);
+
+   --------------
+   -- Generate --
+   --------------
+
+   overriding function Generate
+     (S            : in out Constr_Array_Enum_Strat;
+      Disc_Context : Disc_Value_Map) return JSON_Value
+   is
+      Arr_T  : Constrained_Array_Typ'Class renames
+        Constrained_Array_Typ'Class (S.Arr_T.Unchecked_Get.all);
+      Bounds : Index_Values_Array (1 ..  Arr_T.Num_Dims);
+   begin
+      S.Has_Generated := True;
+      for Dim in 1 .. Arr_T.Num_Dims loop
+         if not Arr_T.Index_Constraints (Dim).Present then
+            Bounds (Dim).Low_Bound :=
+              As_Discrete_Typ (Arr_T.Index_Types (Dim)).Low_Bound;
+                        Bounds (Dim).High_Bound :=
+              As_Discrete_Typ (Arr_T.Index_Types (Dim)).High_Bound;
+         else
+            Bounds (Dim).Low_Bound :=
+              Value
+                (Arr_T.Index_Constraints (Dim).Discrete_Range.Low_Bound,
+                 Disc_Context);
+            Bounds (Dim).High_Bound :=
+              Value
+                (Arr_T.Index_Constraints (Dim).Discrete_Range.High_Bound,
+                 Disc_Context);
+         end if;
+      end loop;
+      return Generate_Enum_Array (Arr_T, S.Comp_Strat, Bounds, Disc_Context);
+   end Generate;
+
+   ---------------------------
+   -- Default_Enum_Strategy --
+   ---------------------------
+
+   function Default_Enum_Strategy
+     (Self : Constrained_Array_Typ) return Enum_Strategy_Type'Class
+   is
+      Res : Constr_Array_Enum_Strat;
+   begin
+      Res.Arr_T.From_Element (Self'Unrestricted_Access);
+      Res.Comp_Strat := new Enum_Strategy_Type'Class'
+        (Self.Component_Type.Get.Default_Enum_Strategy);
+      Res.Has_Generated := False;
+      return Res;
+   end Default_Enum_Strategy;
 
 end TGen.Types.Array_Types;

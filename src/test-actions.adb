@@ -865,6 +865,10 @@ package body Test.Actions is
          Test.Common.Generate_Test_Vectors := True;
          Test.Common.Request_Lib_Support;
 
+         if Arg (Cmd, Enum_Strat) then
+            Test.Common.TGen_Strat_Kind := TGen.Libgen.Stateful;
+         end if;
+
          --  Activate the first pass
 
          Tool.Run_First_Pass := True;
@@ -884,11 +888,11 @@ package body Test.Actions is
          if Arg (Cmd, Gen_Test_Num) /= null then
             begin
                Test.Common.TGen_Num_Tests :=
-                 Positive'Value (Arg (Cmd, Gen_Test_Num).all);
+                 Natural'Value (Arg (Cmd, Gen_Test_Num).all);
             exception
                when others =>
                   Cmd_Error_No_Help
-                    ("--gen-test-num should be a positive integer");
+                    ("--gen-test-num should be a natural integer");
             end;
          end if;
       end if;
@@ -978,7 +982,8 @@ package body Test.Actions is
      (Tool : in out Test_Tool; Cmd : in out Command_Line)
    is
    begin
-      --  We always need the lib support when running the generation harness.
+      --  We always need the lib support when running the generation harness
+
       TGen.Libgen.Generate
         (Test.Common.TGen_Libgen_Ctx, TGen.Libgen.All_Parts);
       Test.Common.Mark_Lib_Support_Generated;

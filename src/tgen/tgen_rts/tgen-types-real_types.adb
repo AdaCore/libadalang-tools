@@ -30,6 +30,62 @@ with TGen.Random;  use TGen.Random;
 
 package body TGen.Types.Real_Types is
 
+   ----------
+   -- Init --
+   ----------
+
+   overriding procedure Init (S : in out Real_Range_Strategy) is
+      LB : Big_Real renames
+        Real_Typ'Class (S.T.Unchecked_Get.all).Low_Bound_Or_Default;
+      HB : Big_Real renames
+        Real_Typ'Class (S.T.Unchecked_Get.all).High_Bound_Or_Default;
+   begin
+      S.Num_Generated := 0;
+      S.Pitch := (HB - LB) / To_Real (S.Total_Values - 1);
+      S.Current_Val := LB;
+   end Init;
+
+   --------------
+   -- Generate --
+   --------------
+
+   overriding function Generate
+     (S            : in out Real_Range_Strategy;
+      Disc_Context : Disc_Value_Map) return JSON_Value
+   is
+      Res : constant JSON_Value := Create_Object;
+   begin
+      if S.Num_Generated /= 0 then
+         S.Current_Val := S.Current_Val + S.Pitch;
+      end if;
+      S.Num_Generated := S.Num_Generated + 1;
+      Res.Set_Field ("quotient", True);
+      Res.Set_Field ("value", Create (To_Quotient_String (S.Current_Val)));
+      return Res;
+   end Generate;
+
+   ------------------------------
+   -- Make_Real_Range_Strategy --
+   ------------------------------
+
+   function Make_Real_Range_Strategy
+     (Self : Real_Typ; Num_Values : Positive) return Enum_Strategy_Type'Class
+   is
+      Res : Real_Range_Strategy;
+   begin
+      SP.From_Element (Res.T, Self'Unrestricted_Access);
+      Res.Total_Values := Num_Values;
+      return Res;
+   end Make_Real_Range_Strategy;
+
+   ---------------------------
+   -- Default_Enum_Strategy --
+   ---------------------------
+
+   overriding function Default_Enum_Strategy
+     (Self : Real_Typ) return Enum_Strategy_Type'Class is
+     (Make_Real_Range_Strategy (Self, 3));
+
    function Image (Self : Float_Typ) return String is
      (Typ (Self).Image & ": Real Type"
       & (if Self.Is_Static
@@ -39,6 +95,25 @@ package body TGen.Types.Real_Types is
                       & " .. " & Big_Reals.To_String (Self.Range_Value.Max)
                  else "")
          else " (non static)"));
+
+   function Low_Bound_Or_Default (Self : Float_Typ) return Big_Real is
+   begin
+      if Self.Has_Range then
+         return Self.Range_Value.Min;
+      else
+         return -To_Real (10) ** (4 * Self.Digits_Value);
+      end if;
+   end Low_Bound_Or_Default;
+
+   function High_Bound_Or_Default (Self : Float_Typ) return Big_Real is
+   begin
+      if Self.Has_Range then
+         return Self.Range_Value.Max;
+      else
+         --  return the minimum bound specified by the RM
+         return To_Real (10) ** (4 * Self.Digits_Value);
+      end if;
+   end High_Bound_Or_Default;
 
    function Image (Self : Ordinary_Fixed_Typ) return String is
      (Typ (Self).Image & ": Ordinary Fixed Point"

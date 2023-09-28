@@ -51,7 +51,8 @@ package Test.Command_Lines is
       Test_Filtering_File_IO,
       Serialized_Test_Dir,
       Dump_Test_Inputs,
-      Unparse);
+      Unparse,
+      Enum_Strat);
 
    package Test_Boolean_Switches is new Boolean_Switches
      (Descriptor,
