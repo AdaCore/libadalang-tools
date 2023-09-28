@@ -1,7 +1,5 @@
 with "libadalang.gpr";
 with "templates_parser.gpr";
-with "vss_text";
-with "vss_json";
 with "lal_tools_common.gpr";
 
 library project LAL_Tools is
