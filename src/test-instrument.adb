@@ -63,7 +63,7 @@ package body Test.Instrument is
    procedure Process_Package_Body (Decl : Basic_Decl);
    --  Generates instrumented package body
 
-   procedure Process_Subprogram_Body (Decl : Subp_Body);
+   procedure Process_Subprogram_Body (Decl : Base_Subp_Body);
    --  Generates instrumented subprogran body
 
    function From_Same_Unit (L, R : Ada_Node'Class) return Boolean is
@@ -271,21 +271,66 @@ package body Test.Instrument is
             else
                Process_Package_Body (D.As_Basic_Decl);
             end if;
-         elsif D.Kind = Ada_Subp_Body then
-            --  Atm only regular subprogram bodies are processed. Body stubs,
-            --  renamings-as-body as well as renamings-as-spec and expression
-            --  functions declared in the spec are ignored.
+
+            --  Atm only the following constructs are processed (given that
+            --  corresponding specifications are declare in the unit spec):
+            --    *  regular subprogram body;
+            --    *  expression function body;
+            --    *  renaming as body;
+            --    *  null procedure.
+            --  Everything else is ignored.
+         elsif D.Kind in Ada_Subp_Body then
 
             if not From_Same_Unit (D.As_Subp_Body.P_Decl_Part, D) and then
               D.As_Subp_Body.F_Subp_Spec.P_Params'Length > 0
               and then Included_Subps.Contains
                          (Image (D.As_Subp_Body.P_Unique_Identifying_Name))
             then
-               Process_Subprogram_Body (D.As_Subp_Body);
+               Process_Subprogram_Body (D.As_Base_Subp_Body);
             else
                S_Put (Padding (D), Node_Image (D));
             end if;
             Put_New_Line;
+
+         elsif D.Kind in Ada_Expr_Function then
+
+            if not From_Same_Unit (D.As_Expr_Function.P_Decl_Part, D) and then
+              D.As_Expr_Function.F_Subp_Spec.P_Params'Length > 0
+              and then Included_Subps.Contains
+                         (Image (D.As_Expr_Function.P_Unique_Identifying_Name))
+            then
+               Process_Subprogram_Body (D.As_Base_Subp_Body);
+            else
+               S_Put (Padding (D), Node_Image (D));
+            end if;
+            Put_New_Line;
+
+         elsif D.Kind in Ada_Null_Subp_Decl then
+
+            if not From_Same_Unit (D.As_Null_Subp_Decl.P_Decl_Part, D) and then
+              D.As_Null_Subp_Decl.F_Subp_Spec.P_Params'Length > 0
+              and then Included_Subps.Contains
+                (Image (D.As_Null_Subp_Decl.P_Unique_Identifying_Name))
+            then
+               Process_Subprogram_Body (D.As_Base_Subp_Body);
+            else
+               S_Put (Padding (D), Node_Image (D));
+            end if;
+            Put_New_Line;
+
+         elsif D.Kind in Ada_Subp_Renaming_Decl then
+
+            if not From_Same_Unit (D.As_Subp_Renaming_Decl.P_Decl_Part, D)
+              and then D.As_Subp_Renaming_Decl.F_Subp_Spec.P_Params'Length > 0
+              and then Included_Subps.Contains
+                (Image (D.As_Subp_Renaming_Decl.P_Unique_Identifying_Name))
+            then
+               Process_Subprogram_Body (D.As_Base_Subp_Body);
+            else
+               S_Put (Padding (D), Node_Image (D));
+            end if;
+            Put_New_Line;
+
          else
             S_Put (Padding (D), Node_Image (D));
             Put_New_Line;
@@ -309,17 +354,45 @@ package body Test.Instrument is
    -- Process_Subprogram_Body --
    -----------------------------
 
-   procedure Process_Subprogram_Body (Decl : Subp_Body) is
+   procedure Process_Subprogram_Body (Decl : Base_Subp_Body) is
       Pad : constant Natural := Padding (Decl);
 
       use TGen.Strings.Ada_Identifier_Vectors;
    begin
-      S_Put
-        (Pad,
-         Image
-           (Decl.Token_Start,
-            Previous (Decl.F_Decls.Token_Start),
-            Decl.Unit.Get_Charset));
+      if Decl.Kind = Ada_Subp_Body then
+         S_Put
+           (Pad,
+            Image
+              (Decl.Token_Start,
+               Previous (Decl.As_Subp_Body.F_Decls.Token_Start),
+               Decl.Unit.Get_Charset));
+      elsif Decl.Kind = Ada_Expr_Function then
+         S_Put
+           (Pad,
+            Image
+              (Decl.Token_Start,
+               Previous (Decl.As_Expr_Function.F_Expr.Token_Start),
+               Decl.Unit.Get_Charset));
+      elsif Decl.Kind = Ada_Null_Subp_Decl then
+         S_Put
+           (Pad,
+            Image
+              (Decl.Token_Start,
+               Decl.As_Null_Subp_Decl.F_Subp_Spec.Token_End,
+               Decl.Unit.Get_Charset)
+            & " is");
+      elsif Decl.Kind = Ada_Subp_Renaming_Decl then
+         S_Put
+           (Pad,
+            Image
+              (Decl.Token_Start,
+               Previous (Decl.As_Subp_Renaming_Decl.F_Renames.Token_Start),
+               Decl.Unit.Get_Charset)
+            & " is");
+      else
+         raise Instrumentation_Error with
+           "unsupported body kind: " & Decl.Image;
+      end if;
       Put_New_Line;
 
       S_Put (Pad + 3, "function GNATTEST_Dump_Inputs return Boolean is");
@@ -440,24 +513,54 @@ package body Test.Instrument is
          & Image
            (Next (Decl.F_Subp_Spec.F_Subp_Name.Token_End),
             Decl.F_Subp_Spec.Token_End,
-            Decl.Unit.Get_Charset)
-         & " is ");
-      Put_New_Line;
-
-      S_Put
-        (Pad + 3,
-         Image
-           (Decl.F_Decls.Token_Start,
-            Decl.F_Stmts.Token_End,
             Decl.Unit.Get_Charset));
-      Put_New_Line;
-      S_Put
-        (Pad + 3,
-         "end "
-         & Node_Image (Decl.F_Subp_Spec.F_Subp_Name)
-         & "_GNATTEST;");
-      Put_New_Line;
-      Put_New_Line;
+
+      if Decl.Kind = Ada_Subp_Body then
+         Put_New_Line;
+         S_Put (1, "is");
+         Put_New_Line;
+         S_Put
+           (Pad + 3,
+            Image
+              (Decl.As_Subp_Body.F_Decls.Token_Start,
+               Decl.As_Subp_Body.F_Stmts.Token_End,
+               Decl.Unit.Get_Charset));
+      elsif Decl.Kind = Ada_Expr_Function then
+         Put_New_Line;
+         S_Put (1, "is");
+         Put_New_Line;
+         S_Put (Pad, "begin");
+         Put_New_Line;
+         S_Put
+           (Pad + 3,
+            "return "
+            & Node_Image (Decl.As_Expr_Function.F_Expr)
+            & ";");
+         Put_New_Line;
+      elsif Decl.Kind = Ada_Subp_Renaming_Decl then
+         S_Put
+           (1,
+            Node_Image (Decl.As_Subp_Renaming_Decl.F_Renames)
+            & ";");
+         Put_New_Line;
+      elsif Decl.Kind = Ada_Null_Subp_Decl then
+         S_Put (1, "is null;");
+         Put_New_Line;
+      else
+         raise Instrumentation_Error with
+           "unsupported body kind: " & Decl.Image;
+      end if;
+
+      if Decl.Kind not in Ada_Subp_Renaming_Decl | Ada_Null_Subp_Decl then
+         Put_New_Line;
+         S_Put
+           (Pad + 3,
+            "end "
+            & Node_Image (Decl.F_Subp_Spec.F_Subp_Name)
+            & "_GNATTEST;");
+         Put_New_Line;
+         Put_New_Line;
+      end if;
 
       --  Call the wrapper and decrease the recursivity counter afterwards
       S_Put (Pad, "begin");
@@ -473,7 +576,7 @@ package body Test.Instrument is
       else
          S_Put
            (Pad + 3,
-            Node_Image (Decl.F_Subp_Spec.F_Subp_Name) & " (");
+            Node_Image (Decl.F_Subp_Spec.F_Subp_Name) & "_GNATTEST  (");
       end if;
 
       declare
