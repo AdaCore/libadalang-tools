@@ -3098,6 +3098,8 @@ package body TGen.Types.Translation is
       Parent_Decl : constant Basic_Decl := N.P_Parent_Basic_Decl;
       UID         : constant String :=
         Test.Common.Mangle_Hash_16 (Subp => Parent_Decl);
+      Long_UID    : constant String :=
+        Test.Common.Mangle_Hash_Full (Subp => Parent_Decl);
    begin
 
       F_Typ.Last_Comp_Unit_Idx := Comp_Unit_Idx;
@@ -3135,6 +3137,7 @@ package body TGen.Types.Translation is
                         when Ada_Mode_Default | Ada_Mode_In => In_Mode,
                         when Ada_Mode_In_Out                => In_Out_Mode,
                         when others                         => Out_Mode));
+                  F_Typ.Param_Order.Append (+Id.As_Defining_Name.Text);
                end loop;
             else
                return Current_Typ;
@@ -3158,6 +3161,7 @@ package body TGen.Types.Translation is
       --  Function type was successfully translated
 
       F_Typ.Subp_UID := +UID;
+      F_Typ.Long_UID := +Long_UID;
 
       --  This function can only be used outside of the private part if none of
       --  its parameter types are fully private.

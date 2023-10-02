@@ -11,15 +11,21 @@
 @@--                 subprogram.
 @@--  @_INPUT_FN_@   Name of the JSON input function for the parameters of the
 @@--                 subprogram.
+@@--  @_OUTPUT_FN_@  Name of the binary output function name for the parameter
+@@--                 of the subprogram.
 @@--  @_NUM_TESTS_@  Number of tests to be generated for this subprogram (upper
 @@--                 bound for enumerative strategies)
 @@--  @_ENUM_STRAT_@ Whether the strategy to be used is the default enum one, or
 @@--                 the default one,
+@@--  @_TC_FORMAT_@  Format in which the test cases should be dumped, either
+@@--                 BIN or JSON.
+@@--  @_TC_NAME_@    Filename for the binary test case files.
 @@INCLUDE@@ json_templates/util.tmplt
 
-   --  Test case generation for @_SUBP_NAME_@
+@@IF@@ @_TC_FORMAT_@ = JSON
+   --  Test case generation for @_SUBP_NAME_@ (dumping to a JSON Value)
 
-   procedure Gen_@_SUBP_NAME_@_@_SUBP_UID_@ 
+   procedure Gen_@_SUBP_NAME_@_@_SUBP_UID_@
      (Unit_JSON : in out TGen.JSON.JSON_Value)
    is
       Subp  : TGen.Types.SP.Ref renames @_FN_TYP_REF_@;
@@ -43,8 +49,6 @@
               @_INPUT_FN_@ (Values.Get ("components").Get ("@_PARAM_NAME_@"));
 @@END_TABLE@@
          begin
-            --  TODO: Add pre/post validation and coverage computation
-
             @_SUBP_NAME_@_Dump_TC
 @@TABLE'ALIGN_ON(":")@@
               @_LPAR()_@@_GLOBAL_PREFIX_@_@_PARAM_NAME_@ => Ada_@_PARAM_NAME_@,
@@ -55,3 +59,38 @@
          end Generate_One;
       end loop;
    end Gen_@_SUBP_NAME_@_@_SUBP_UID_@;
+
+@@ELSE@@
+   --  Test case generation for @_SUBP_NAME_@ (dumping to a binary file)
+
+   procedure Gen_@_SUBP_NAME_@_@_SUBP_UID_@
+   is
+      Subp  : TGen.Types.SP.Ref renames @_FN_TYP_REF_@;
+      Strat : TGen.Strategies.Strategy_Type'Class := Subp.Get.Default_Strategy;
+      File  : Ada.Streams.Stream_IO.File_Type;
+      Stream : Ada.Streams.Stream_IO.Stream_Access;
+   begin
+      for Test_Num in 1 .. @_NUM_TESTS_@ loop
+         Generate_One : declare
+            Values   : constant TGen.JSON.JSON_Value :=
+              Subp.Get.Encode
+                (Strat.Generate (TGen.Strategies.Disc_Value_Maps.Empty_Map));
+@@TABLE'ALIGN_ON(":")@@
+            Ada_@_PARAM_NAME_@ : @_PARAM_TY_@ :=
+              @_INPUT_FN_@ (Values.Get ("components").Get ("@_PARAM_NAME_@"));
+@@END_TABLE@@
+         begin
+            Ada.Streams.Stream_IO.Create
+              (File,
+               Name =>
+                 "@_TC_NAME_@-" & Ada.Strings.Fixed.Trim
+                   (Positive'Image (Test_Num), Ada.Strings.Both));
+            Stream := Ada.Streams.Stream_IO.Stream (File);
+@@TABLE@@
+            @_OUTPUT_FN_@ (Stream, Ada_@_PARAM_NAME_@);
+@@END_TABLE@@
+            Ada.Streams.Stream_IO.Close (File);
+         end Generate_One;
+      end loop;
+   end Gen_@_SUBP_NAME_@_@_SUBP_UID_@;
+@@END_IF@@
