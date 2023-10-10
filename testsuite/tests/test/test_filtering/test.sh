@@ -18,6 +18,8 @@ echo "bad sloc from cmd"
 h/test_runner --routines=bad_sloc.ads:123
 echo "bad sloc from file"
 h/test_runner --routines=@bad_list.txt
+echo "overloads"
+h/test_runner --routines=overloads.ads:3 --routines=overloads.ads:5
 rm -rf h
 gnattest -P p -q --no-test-filtering-file-io
 gprbuild -q -P h/test_driver.gpr

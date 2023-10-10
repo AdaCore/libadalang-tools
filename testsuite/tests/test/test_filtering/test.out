@@ -29,5 +29,9 @@ bad sloc from cmd
 no subprogram corresponds to sloc bad_sloc.ads:123; aborting
 bad sloc from file
 no subprogram corresponds to sloc bad_sloc2.ads:321; aborting
+overloads
+overloads.ads:3:4: info: corresponding test PASSED
+overloads.ads:5:4: info: corresponding test PASSED
+2 tests run: 2 passed; 0 failed; 0 crashed.
 file support off
 no subprogram corresponds to sloc @list.txt; aborting

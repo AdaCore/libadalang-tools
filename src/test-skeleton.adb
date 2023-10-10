@@ -7405,12 +7405,17 @@ package body Test.Skeleton is
 
       for TR_Cur in TP_Mapping_List.Reference (TP_List, TP).TR_List.Iterate
       loop
-         if TR_Mapping_List.Element (TR_Cur).TR_Name.all
-           = Subp.Subp_Text_Name.all
-         then
-            TR := TR_Cur;
-            exit;
-         end if;
+         declare
+            Elem : constant TR_Mapping := TR_Mapping_List.Element (TR_Cur);
+         begin
+            if Elem.TR_Name.all = Subp.Subp_Text_Name.all
+              and then Elem.Decl_Line = Natural (Subp_Name_Span.Start_Line)
+              and then Elem.Column = Natural (Subp_Name_Span.Start_Column)
+            then
+               TR := TR_Cur;
+               exit;
+            end if;
+         end;
       end loop;
 
       --  If it does not exist create it
