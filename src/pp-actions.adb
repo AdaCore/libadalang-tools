@@ -5307,6 +5307,10 @@ package body Pp.Actions is
             K : constant Ada_Node_Kind_Type :=
             (if Is_Attr_Name then Parent_Tree.Kind
              elsif Decl.Is_Null then Null_Kind
+             elsif Decl.Kind
+               in Ada_Synthetic_Type_Predicate_Object_Decl_Range
+             then
+                Decl.Parent.Kind
              else Decl.Kind);
 
             Is_Constant_Name : constant Boolean :=
