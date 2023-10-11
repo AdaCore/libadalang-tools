@@ -16,6 +16,7 @@ abstract project LAL_Tools_Common is
               ("-fPIC",
                "-gnatX",
                "-gnatyg",
+               "-gnatf",
                "-gnatwae",
                "-gnatw.u", -- warn inappropriate use of unordered enums
                "-g",

@@ -9,6 +9,7 @@ library project LAL_Tools is
 
    for Source_Dirs use
      (".", "tgen", "tgen/tgen_rts",
+      "tgen/templates",
       "tgen/templates/marshalling_templates",
       "tgen/templates/json_templates",
       "tgen/templates/type_representation_templates");

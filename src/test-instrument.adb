@@ -218,7 +218,8 @@ package body Test.Instrument is
       end if;
 
       TGen.Libgen.Generate
-        (TGen_Libgen_Ctx, TGen.Libgen.Marshalling_Part);
+        (TGen_Libgen_Ctx,
+         Part => [TGen.Libgen.Marshalling_Part => True, others => False]);
 
    exception
       when Ex : Langkit_Support.Errors.Property_Error =>
