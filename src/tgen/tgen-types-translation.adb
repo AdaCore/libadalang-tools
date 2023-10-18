@@ -744,7 +744,7 @@ package body TGen.Types.Translation is
             case Kind (Subtype_Constraint) is
                when Ada_Delta_Constraint_Range =>
                   Delta_Expr :=
-                    Subtype_Constraint.As_Delta_Constraint.F_Digits;
+                    Subtype_Constraint.As_Delta_Constraint.F_Delta;
 
                when Ada_Range_Constraint_Range =>
 
