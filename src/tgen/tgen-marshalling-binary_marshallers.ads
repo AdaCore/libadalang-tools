@@ -21,14 +21,13 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Text_IO; use Ada.Text_IO;
-
 package TGen.Marshalling.Binary_Marshallers is
 
    procedure Generate_Marshalling_Functions_For_Typ
-     (F_Spec, F_Body     : File_Type;
+     (Spec_Part          : US_Access;
+      Private_Part       : US_Access;
+      Body_Part          : US_Access;
       Typ                : TGen.Types.Typ'Class;
-      Part               : Spec_Part;
       Templates_Root_Dir : String);
    --  Generate binary marshalling and unmarshalling functions for Typ. Note
    --  that this function will not operate recursively. It will thus have to

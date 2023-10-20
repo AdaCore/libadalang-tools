@@ -4,7 +4,6 @@
 @@--  @_TY_NAME_@ Name of the current type.
 @@--  @_NEEDS_HEADER_@ True if the current type needs a header.
 @@--
-@@IF@@ @_PUB_PART_@ xor @_FULL_PRIV_@
    --  Input and Output functions for @_TY_NAME_@
 
    function @_TY_PREFIX_@_Output
@@ -13,4 +12,3 @@
    function @_TY_PREFIX_@_Input
      (@_GLOBAL_PREFIX_@_JSON : TGen.JSON.JSON_Value)
      return @_TY_NAME_@;
-@@END_IF@@

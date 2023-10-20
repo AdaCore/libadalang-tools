@@ -3,15 +3,10 @@
 @@--  @_TY_PREFIX_@ Prefix used to prefix all entities for the current type.
 @@--  @_TY_NAME_@ Name of the current type or of its base type if we are
 @@--       doing the generation for the base type.
+@@--  @_FOR_BASE_@ True if we are doing the generation for the base type.
 @@--
 @@INCLUDE@@ util.tmplt
+  --  Private extensions of the functions encoding 'First and 'Last
 
-   --  Base operations for @_TY_NAME_@
-
-   procedure @_TY_PREFIX_@_Write@_BASE_SUFFIX()_@
-     (@_GLOBAL_PREFIX_@_JSON  : in out TGen.JSON.JSON_Value;
-      @_GLOBAL_PREFIX_@_V     : @_TY_NAME_@);
-
-   procedure @_TY_PREFIX_@_Read@_BASE_SUFFIX()_@
-     (@_GLOBAL_PREFIX_@_JSON  : TGen.JSON.JSON_Value;
-      @_GLOBAL_PREFIX_@_V     : out @_TY_NAME_@);
+   function @_TY_PREFIX_@_First@_BASE_SUFFIX()_@ return @_TY_NAME_@ is (@_TY_NAME_@'First);
+   function @_TY_PREFIX_@_Last@_BASE_SUFFIX()_@ return @_TY_NAME_@ is (@_TY_NAME_@'Last);

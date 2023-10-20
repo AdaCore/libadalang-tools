@@ -9,7 +9,6 @@
 @@--  @_COMP_TYP_@ Index types for arrays, and types of the discriminants for
 @@--       records.
 @@--
-@@IF@@ @_PUB_PART_@ xor @_FULL_PRIV_@
    --  Definition of a header type and Input and Output functions for @_TY_NAME_@
 
    function @_TY_PREFIX_@_Input_Header
@@ -19,4 +18,3 @@
    procedure @_TY_PREFIX_@_Output_Header
      (@_GLOBAL_PREFIX_@_JSON : in out TGen.JSON.JSON_Value;
       @_GLOBAL_PREFIX_@_V    : @_TY_NAME_@);
-@@END_IF@@

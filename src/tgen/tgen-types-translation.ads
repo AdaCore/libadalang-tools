@@ -28,6 +28,8 @@ with Ada.Containers.Hashed_Maps;
 
 with Libadalang.Analysis;
 
+with TGen.Context; use TGen.Context;
+
 package TGen.Types.Translation is
 
    package LAL renames Libadalang.Analysis;

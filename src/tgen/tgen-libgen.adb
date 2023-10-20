@@ -299,35 +299,62 @@ package body TGen.Libgen is
       --  the visibility of the type, and have the implementation details
       --  generated in the correct order.
 
-      for Part in Spec_Part loop
+      declare
+         Spec_Part, Private_Part, Body_Part : aliased Unbounded_String;
+
+         Spec_Part_Acc : US_Access;
+         --  This indicates where we should write the specification
+         --  declarations for the current type (private or public spec). It
+         --  points to Private_Part, if the type is fully private (i.e. the
+         --  parent package of its first part is a private package), or to
+         --  Spec_Part otherwise.
+
+      begin
          for T of Sorted_Types loop
 
             if Is_Supported_Type (T.Get)
 
-            --  We ignore instance types when generating marshallers as they
-            --  are not types per-se, but a convenient way of binding a type
-            --  to its strategy context.
+              --  We ignore instance types when generating marshallers as they
+              --  are not types per-se, but a convenient way of binding a type
+              --  to its strategy context.
 
-               and then T.Get not in Instance_Typ'Class
+              and then T.Get not in Instance_Typ'Class
             then
+               Spec_Part_Acc :=
+                 (if T.Get.Fully_Private
+                  then Private_Part'Unrestricted_Access
+                  else Spec_Part'Unrestricted_Access);
                if T.Get.Kind in Function_Kind then
                   TGen.Marshalling.JSON_Marshallers
-                  .Generate_TC_Serializers_For_Subp
-                     (F_Spec, F_Body, T.Get, Part, TRD);
+                    .Generate_TC_Serializers_For_Subp
+                      (Spec_Part_Acc,
+                       Private_Part'Unrestricted_Access,
+                       Body_Part'Unrestricted_Access,
+                       T.Get,
+                       TRD);
                else
                   TGen.Marshalling.Binary_Marshallers
-                  .Generate_Marshalling_Functions_For_Typ
-                     (F_Spec, F_Body, T.Get, Part, TRD);
+                    .Generate_Marshalling_Functions_For_Typ
+                      (Spec_Part_Acc,
+                       Private_Part'Unrestricted_Access,
+                       Body_Part'Unrestricted_Access,
+                       T.Get,
+                       TRD);
                   TGen.Marshalling.JSON_Marshallers
-                  .Generate_Marshalling_Functions_For_Typ
-                     (F_Spec, F_Body, T.Get, Part, TRD);
+                    .Generate_Marshalling_Functions_For_Typ
+                      (Spec_Part_Acc,
+                       Private_Part'Unrestricted_Access,
+                       Body_Part'Unrestricted_Access,
+                       T.Get,
+                       TRD);
                end if;
             end if;
          end loop;
-         if Part = Pub then
-            Put_Line (F_Spec, "private");
-         end if;
-      end loop;
+         Put_Line (F_Body, +Body_Part);
+         Put_Line (F_Spec, +Spec_Part);
+         Put_Line (F_Spec, "private");
+         Put_Line (F_Spec, +Private_Part);
+      end;
 
       Put_Line (F_Body, "end " & Ada_Pack_Name & ";");
       Close (F_Body);

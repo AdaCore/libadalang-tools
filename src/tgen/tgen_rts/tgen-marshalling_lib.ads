@@ -129,17 +129,9 @@ package TGen.Marshalling_Lib is
       type T is (<>);
    package Read_Write_Discrete_JSON is
 
-      procedure Write
-        (JSON   : in out TGen.JSON.JSON_Value;
-         V      : T;
-         First  : T := T'First;
-         Last   : T := T'Last);
+      procedure Write (JSON : in out TGen.JSON.JSON_Value; V : T);
 
-      procedure Read
-        (JSON  : TGen.JSON.JSON_Value;
-         V     : out T;
-         First : T := T'First;
-         Last  : T := T'Last);
+      procedure Read (JSON : TGen.JSON.JSON_Value; V : out T);
 
    end Read_Write_Discrete_JSON;
 
@@ -174,17 +166,10 @@ package TGen.Marshalling_Lib is
       type T is delta <> digits <>;
    package Read_Write_Decimal_Fixed_JSON is
 
-      procedure Write
-        (JSON   : in out TGen.JSON.JSON_Value;
-         V      : T;
-         First  : T := T'First;
-         Last   : T := T'Last);
+      procedure Write (JSON : in out TGen.JSON.JSON_Value; V : T);
 
       procedure Read
-        (JSON  : TGen.JSON.JSON_Value;
-         V     : out T;
-         First : T := T'First;
-         Last  : T := T'Last);
+        (JSON : TGen.JSON.JSON_Value; V : out T);
 
    end Read_Write_Decimal_Fixed_JSON;
 
@@ -219,17 +204,9 @@ package TGen.Marshalling_Lib is
       type T is delta <>;
    package Read_Write_Ordinary_Fixed_JSON is
 
-      procedure Write
-        (JSON   : in out TGen.JSON.JSON_Value;
-         V      : T;
-         First  : T := T'First;
-         Last   : T := T'Last);
+      procedure Write (JSON : in out TGen.JSON.JSON_Value; V : T);
 
-      procedure Read
-        (JSON  : TGen.JSON.JSON_Value;
-         V     : out T;
-         First : T := T'First;
-         Last  : T := T'Last);
+      procedure Read (JSON : TGen.JSON.JSON_Value; V : out T);
 
    end Read_Write_Ordinary_Fixed_JSON;
 
@@ -274,17 +251,9 @@ package TGen.Marshalling_Lib is
       type T is digits <>;
    package Read_Write_Float_JSON is
 
-      procedure Write
-        (JSON   : in out TGen.JSON.JSON_Value;
-         V      : T;
-         First  : T := T'First;
-         Last   : T := T'Last);
+      procedure Write (JSON : in out TGen.JSON.JSON_Value; V : T);
 
-      procedure Read
-        (JSON  : TGen.JSON.JSON_Value;
-         V     : out T;
-         First : T := T'First;
-         Last  : T := T'Last);
+      procedure Read (JSON : TGen.JSON.JSON_Value; V : out T);
 
    end Read_Write_Float_JSON;
 

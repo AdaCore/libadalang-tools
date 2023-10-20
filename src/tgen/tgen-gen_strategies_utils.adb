@@ -343,6 +343,7 @@ package body TGen.Gen_Strategies_Utils is
                                 Name               => R.Name,
                                 Last_Comp_Unit_Idx => R.Last_Comp_Unit_Idx,
                                 Fully_Private      => R.Fully_Private,
+                                Private_Extension  => R.Private_Extension,
                                 Static_Gen         => R.Static_Gen,
                                 Component_Types    => V.Components,
                                 Mutable            => False,

@@ -6,27 +6,28 @@
 @@--  @_FOR_BASE_@ True if we are doing the generation for the base type.
 @@--
 @@INCLUDE@@ util.tmplt
-@@IF@@ @_PUB_PART_@ xor @_FULL_PRIV_@
    --  Base operations for @_TY_NAME_@
+
+   function @_TY_PREFIX_@_First@_BASE_SUFFIX()_@ return @_TY_NAME_@;
+   function @_TY_PREFIX_@_Last@_BASE_SUFFIX()_@ return @_TY_NAME_@;
 
    procedure @_TY_PREFIX_@_Write@_BASE_SUFFIX()_@
      (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class;
       @_GLOBAL_PREFIX_@_Buffer : in out Unsigned_8;
       @_GLOBAL_PREFIX_@_Offset : in out Offset_Type;
       @_GLOBAL_PREFIX_@_V      : @_TY_NAME_@;
-      @_GLOBAL_PREFIX_@_First  : @_TY_NAME_@ := @_TY_NAME_@'First;
-      @_GLOBAL_PREFIX_@_Last   : @_TY_NAME_@ := @_TY_NAME_@'Last);
+      @_GLOBAL_PREFIX_@_First  : @_TY_NAME_@ := @_TY_PREFIX_@_First@_BASE_SUFFIX()_@;
+      @_GLOBAL_PREFIX_@_Last   : @_TY_NAME_@ := @_TY_PREFIX_@_Last@_BASE_SUFFIX()_@);
 
    procedure @_TY_PREFIX_@_Read@_BASE_SUFFIX()_@
      (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class;
       @_GLOBAL_PREFIX_@_Buffer : in out Unsigned_8;
       @_GLOBAL_PREFIX_@_Offset : in out Offset_Type;
       @_GLOBAL_PREFIX_@_V      : out @_TY_NAME_@;
-      @_GLOBAL_PREFIX_@_First  : @_TY_NAME_@ := @_TY_NAME_@'First;
-      @_GLOBAL_PREFIX_@_Last   : @_TY_NAME_@ := @_TY_NAME_@'Last);
+      @_GLOBAL_PREFIX_@_First  : @_TY_NAME_@ := @_TY_PREFIX_@_First@_BASE_SUFFIX()_@;
+      @_GLOBAL_PREFIX_@_Last   : @_TY_NAME_@ := @_TY_PREFIX_@_Last@_BASE_SUFFIX()_@);
 
    function @_TY_PREFIX_@_Size@_BASE_SUFFIX()_@
-     (@_GLOBAL_PREFIX_@_First  : @_TY_NAME_@ := @_TY_NAME_@'First;
-      @_GLOBAL_PREFIX_@_Last   : @_TY_NAME_@ := @_TY_NAME_@'Last)
+     (@_GLOBAL_PREFIX_@_First  : @_TY_NAME_@ := @_TY_PREFIX_@_First@_BASE_SUFFIX()_@;
+      @_GLOBAL_PREFIX_@_Last   : @_TY_NAME_@ := @_TY_PREFIX_@_Last@_BASE_SUFFIX()_@)
       return Natural;
-@@END_IF@@

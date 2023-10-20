@@ -21,14 +21,13 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Text_IO; use Ada.Text_IO;
-
 package TGen.Marshalling.JSON_Marshallers is
 
    procedure Generate_Marshalling_Functions_For_Typ
-     (F_Spec, F_Body     : File_Type;
+     (Spec_Part          : US_Access;
+      Private_Part       : US_Access;
+      Body_Part          : US_Access;
       Typ                : TGen.Types.Typ'Class;
-      Part               : Spec_Part;
       Templates_Root_Dir : String);
    --  Generate JSON marshalling and unmarshalling functions for Typ. Note that
    --  this function will not operate recursively. It will thus have to be
@@ -63,9 +62,10 @@ package TGen.Marshalling.JSON_Marshallers is
    --  parameter passed to the marshallers as it makes the JSON bigger.
 
    procedure Generate_TC_Serializers_For_Subp
-     (F_Spec, F_Body     : File_Type;
+     (Spec_Part          : US_Access;
+      Private_Part       : US_Access;
+      Body_Part          : US_Access;
       FN_Typ             : TGen.Types.Typ'Class;
-      Part               : Spec_Part;
       Templates_Root_Dir : String) with
       Pre => FN_Typ.Kind = Function_Kind;
    --  Generate a test-case serializer for FN_Typ:
@@ -79,12 +79,5 @@ package TGen.Marshalling.JSON_Marshallers is
    --
    --  The generated procedure also has a Origin parameter which can be used
    --  to specify which tool produced the test case.
-   --
-   --  Part determines which part (public or private) of the spec will be
-   --  generated. It is thus necessary to call this subprogram twice in order
-   --  to generate a full spec, taking care to insert a "private" line in
-   --  F_Spec in between the two calls. The body is generated at the same time
-   --  the public part is generated, nothing will be written to F_Body if Part
-   --  is Priv.
 
 end TGen.Marshalling.JSON_Marshallers;

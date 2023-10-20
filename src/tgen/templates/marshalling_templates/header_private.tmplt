@@ -1,4 +1,4 @@
-@@--  Template for the spec part of the header handling.
+@@--  Template for the private part of the header handling.
 @@--  @_GLOBAL_PREFIX_@ Prefix used to prefix all entities local to the unit.
 @@--  @_TY_PREFIX_@ Prefix used to prefix all entities for the current type.
 @@--  @_TY_NAME_@ Name of the current type.
@@ -9,17 +9,17 @@
 @@--  @_COMP_TYP_@ Index types for arrays, and types of the discriminants for
 @@--       records.
 @@--
+   --  Definition of a header type and Input and Output functions for @_TY_NAME_@
 
-   type @_TY_PREFIX_@_Header_Type is private;
-
-   function @_TY_PREFIX_@_Input_Header
-     (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class)
-     return @_TY_PREFIX_@_Header_Type;
-
-   procedure @_TY_PREFIX_@_Output_Header
-     (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class;
-      @_GLOBAL_PREFIX_@_V      : @_TY_NAME_@);
-
-   function @_TY_PREFIX_@_Bit_Size_Header return Natural;
-
-   function @_TY_PREFIX_@_Byte_Size_Header return Natural;
+   type @_TY_PREFIX_@_Header_Type is record
+@@IF@@ @_FIRST_NAME_@ /= ""
+@@TABLE'ALIGN_ON(":")@@
+      @_FIRST_NAME_@ : @_COMP_TYP_@'Base;
+      @_LAST_NAME_@ : @_COMP_TYP_@'Base;
+@@END_TABLE@@
+@@ELSE@@
+@@TABLE'ALIGN_ON(":")@@
+      @_DISCR_NAME_@ : @_COMP_TYP_@;
+@@END_TABLE@@
+@@END_IF@@
+   end record;
