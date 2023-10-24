@@ -1086,7 +1086,8 @@ package body TGen.Types.Record_Types is
              Last_Comp_Unit_Idx => Disc_Record.Last_Comp_Unit_Idx,
             Component_Types     => Components,
             Static_Gen          => Disc_Record.Static_Gen,
-            Fully_Private       => Disc_Record.Fully_Private);
+            Fully_Private       => Disc_Record.Fully_Private,
+            Private_Extension   => Disc_Record.Private_Extension);
          R_Ref      : SP.Ref;
       begin
          R_Ref.Set (R);

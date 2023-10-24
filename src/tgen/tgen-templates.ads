@@ -38,8 +38,12 @@ package TGen.Templates is
         Template_Folder & "component_size.tmplt";
       Composite_Base_Spec_Template  : constant String :=
         Template_Folder & "composite_base_spec.tmplt";
+      Composite_Size_Max_Template   : constant String :=
+        Template_Folder & "composite_size_max.tmplt";
       Header_Body_Template          : constant String :=
         Template_Folder & "header_body.tmplt";
+      Header_Private_Template       : constant String :=
+        Template_Folder & "header_private.tmplt";
       Default_Header_Spec_Template  : constant String :=
      Template_Folder & "default_header_spec.tmplt";
       Header_Spec_Template          : constant String :=
@@ -60,6 +64,8 @@ package TGen.Templates is
         Template_Folder & "record_size.tmplt";
       Scalar_Base_Spec_Template     : constant String :=
         Template_Folder & "scalar_base_spec.tmplt";
+      Scalar_Base_Private_Template  : constant String :=
+        Template_Folder & "scalar_base_private.tmplt";
       Scalar_Read_Write_Template    : constant String :=
         Template_Folder & "scalar_read_write.tmplt";
       Variant_Read_Write_Template   : constant String :=

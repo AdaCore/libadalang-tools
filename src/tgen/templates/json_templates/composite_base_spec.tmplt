@@ -5,7 +5,6 @@
 @@--  @_TY_NAME_@ Name of the current type.
 @@--
 @@INCLUDE@@ util.tmplt
-@@IF@@ @_PUB_PART_@ xor @_FULL_PRIV_@
    --  Base operations for @_TY_NAME_@
 
    procedure @_TY_PREFIX_@_Write
@@ -15,4 +14,3 @@
    procedure @_TY_PREFIX_@_Read
      (@_GLOBAL_PREFIX_@_JSON : TGen.JSON.JSON_Value;
       @_GLOBAL_PREFIX_@_V    : out @_TY_NAME_@);
-@@END_IF@@

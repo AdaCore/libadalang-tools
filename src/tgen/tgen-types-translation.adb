@@ -2738,13 +2738,12 @@ package body TGen.Types.Translation is
    function Translate
      (N : LAL.Type_Expr; Verbose : Boolean := False) return Translation_Result
    is
-      Type_Decl_Node : Base_Type_Decl;
+      Type_Decl_Node      : Base_Type_Decl;
       Intermediate_Result : Translation_Result;
    begin
       if Kind (N) in Ada_Anonymous_Type_Range then
          Type_Decl_Node := N.As_Anonymous_Type.F_Type_Decl.As_Base_Type_Decl;
       else
-
          --  For now, work on the full view of the type that we are trying to
          --  translate. If this proves useless/problematic this can be
          --  revisited.
@@ -2772,6 +2771,8 @@ package body TGen.Types.Translation is
                   Last_Comp_Unit_Idx  => 1,
                   Fully_Private       =>
                     Intermediate_Result.Res.Get.Fully_Private,
+                  Private_Extension   =>
+                    Intermediate_Result.Res.Get.Private_Extension,
                   Named_Ancestor      => Intermediate_Result.Res,
                   Subtype_Constraints => new Discrete_Range_Constraint'
                     (Translate_Discrete_Range_Constraint
@@ -2786,6 +2787,8 @@ package body TGen.Types.Translation is
                   Named_Ancestor      => Intermediate_Result.Res,
                   Fully_Private       =>
                     Intermediate_Result.Res.Get.Fully_Private,
+                  Private_Extension   =>
+                    Intermediate_Result.Res.Get.Private_Extension,
                   Subtype_Constraints =>
                     new TGen.Types.Constraints.Constraint'Class'
                     (Translate_Real_Constraints
@@ -2799,6 +2802,8 @@ package body TGen.Types.Translation is
                   Named_Ancestor      => Intermediate_Result.Res,
                   Fully_Private       =>
                     Intermediate_Result.Res.Get.Fully_Private,
+                  Private_Extension   =>
+                    Intermediate_Result.Res.Get.Private_Extension,
                   Subtype_Constraints => new Index_Constraints'
                     (Translate_Index_Constraints
                       (N.As_Subtype_Indication.F_Constraint,
@@ -2818,6 +2823,8 @@ package body TGen.Types.Translation is
                   Named_Ancestor      => Intermediate_Result.Res,
                   Fully_Private       =>
                     Intermediate_Result.Res.Get.Fully_Private,
+                  Private_Extension   =>
+                    Intermediate_Result.Res.Get.Private_Extension,
                   Subtype_Constraints => new Discriminant_Constraints'
                     (Translate_Discriminant_Constraints
                       (N.As_Subtype_Indication.F_Constraint
@@ -3061,6 +3068,8 @@ package body TGen.Types.Translation is
          Specialized_Res.Res.Get.Name := FQN;
          Specialized_Res.Res.Get.Last_Comp_Unit_Idx := Comp_Unit_Idx;
          Specialized_Res.Res.Get.Fully_Private := Decl_Is_Fully_Private (N);
+         Specialized_Res.Res.Get.Private_Extension :=
+           Basic_Decl'(N.P_All_Parts (1)).As_Base_Type_Decl.P_Is_Private;
       end if;
 
       return Specialized_Res;

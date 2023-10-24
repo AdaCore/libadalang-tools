@@ -4,7 +4,7 @@
 @@--  @_TY_NAME_@ Name of the current type.
 @@--  @_NEEDS_HEADER_@ True if the current type needs a header.
 @@--
-@@IF@@ @_PUB_PART_@ xor @_FULL_PRIV_@
+
    --  Input and Output functions for @_TY_NAME_@
 
    procedure @_TY_PREFIX_@_Output
@@ -24,4 +24,3 @@
      (@_GLOBAL_PREFIX_@_Header : not null access Root_Stream_Type'Class;
       @_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class)
      return @_TY_NAME_@;
-@@END_IF@@

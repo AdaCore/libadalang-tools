@@ -56,6 +56,10 @@ package TGen.Types is
       --  or outside of the private part of child packages of its declaration
       --  package.
 
+      Private_Extension : Boolean;
+      --  Whether this type has a private extension. Note that if Fully_Private
+      --  is True, this field will be False.
+
    end record;
 
    type Typ_Kind is (Invalid_Kind,

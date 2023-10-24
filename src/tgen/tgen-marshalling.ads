@@ -100,7 +100,8 @@ private
       --  Output a default header type for constrained types that do not
       --  normally require a header.
 
-      with procedure Print_Scalar (Assocs : Translate_Table);
+      with procedure Print_Scalar
+        (Assocs : Translate_Table; For_Base : Boolean);
       --  Output a scalar (un)marshallers
 
       with procedure Print_Array (Assocs : Translate_Table);
@@ -114,9 +115,8 @@ private
       --  the type's header and the type's component(s).
 
    procedure Generate_Base_Functions_For_Typ
-     (Typ                : TGen.Types.Typ'Class;
-      Part               : Spec_Part := Pub;
-      For_Base           : Boolean := False)
+     (Typ      : TGen.Types.Typ'Class;
+      For_Base : Boolean := False)
    with Pre => (if For_Base then Typ in Scalar_Typ'Class)
      and then Typ not in Anonymous_Typ'Class
      and then Typ not in Instance_Typ'Class;
@@ -234,8 +234,9 @@ private
    --
    --  They also marshall the header and add some padding so that there is
    --  enough room to read a correct value if the header is mutated.
-   --
-   --  Part may be used to control which part of the spec (public or private)
-   --  is generated, if the templates support the tag, otherwise, it has no
-   --  effect.
+
+   procedure Put_Line (Str : US_Access; Added : String);
+
+   procedure New_Line (Str : US_Access);
+
 end TGen.Marshalling;

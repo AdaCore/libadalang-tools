@@ -422,13 +422,7 @@ package body TGen.Marshalling_Lib is
       -- Write --
       -----------
 
-      procedure Write
-        (JSON   : in out TGen.JSON.JSON_Value;
-         V      : T;
-         First  : T := T'First;
-         Last   : T := T'Last)
-      is
-         pragma Unreferenced (First, Last);
+      procedure Write (JSON : in out TGen.JSON.JSON_Value; V : T) is
       begin
          JSON := Create (T'Image (V));
       end Write;
@@ -437,13 +431,7 @@ package body TGen.Marshalling_Lib is
       -- Read --
       ----------
 
-      procedure Read
-        (JSON  : TGen.JSON.JSON_Value;
-         V     : out T;
-         First : T := T'First;
-         Last  : T := T'Last)
-      is
-         pragma Unreferenced (First, Last);
+      procedure Read (JSON : TGen.JSON.JSON_Value; V : out T) is
       begin
          V := T'Value (Get (JSON));
       end Read;
@@ -536,13 +524,8 @@ package body TGen.Marshalling_Lib is
       -----------
 
       pragma Warnings (Off, "formal parameter * is read but never assigned");
-      procedure Write
-        (JSON   : in out TGen.JSON.JSON_Value;
-         V      : T;
-         First  : T := T'First;
-         Last   : T := T'Last)
+      procedure Write (JSON : in out TGen.JSON.JSON_Value; V : T)
       is
-         pragma Unreferenced (First, Last);
          V_Big_Real : constant TGen.Big_Reals.Big_Real :=
            T_Conversions.To_Big_Real (V);
       begin
@@ -555,13 +538,7 @@ package body TGen.Marshalling_Lib is
       -- Read --
       ----------
 
-      procedure Read
-        (JSON  : TGen.JSON.JSON_Value;
-         V     : out T;
-         First : T := T'First;
-         Last  : T := T'Last)
-      is
-         pragma Unreferenced (First, Last);
+      procedure Read (JSON : TGen.JSON.JSON_Value; V : out T) is
       begin
          --  Decode the big real from the string encoded as a quotient string
 
@@ -658,13 +635,8 @@ package body TGen.Marshalling_Lib is
       -----------
 
       pragma Warnings (Off, "formal parameter * is read but never assigned");
-      procedure Write
-        (JSON   : in out TGen.JSON.JSON_Value;
-         V      : T;
-         First  : T := T'First;
-         Last   : T := T'Last)
+      procedure Write (JSON : in out TGen.JSON.JSON_Value; V : T)
       is
-         pragma Unreferenced (First, Last);
          V_Big_Real : constant TGen.Big_Reals.Big_Real :=
            T_Conversions.To_Big_Real (V);
       begin
@@ -677,13 +649,7 @@ package body TGen.Marshalling_Lib is
       -- Read --
       ----------
 
-      procedure Read
-        (JSON  : TGen.JSON.JSON_Value;
-         V     : out T;
-         First : T := T'First;
-         Last  : T := T'Last)
-      is
-         pragma Unreferenced (First, Last);
+      procedure Read (JSON : TGen.JSON.JSON_Value; V : out T) is
       begin
          --  Decode the big real from the string encoded as a quotient string
 
@@ -1140,13 +1106,8 @@ package body TGen.Marshalling_Lib is
       -----------
 
       pragma Warnings (Off, "formal parameter * is read but never assigned");
-      procedure Write
-        (JSON   : in out TGen.JSON.JSON_Value;
-         V      : T;
-         First  : T := T'First;
-         Last   : T := T'Last)
+      procedure Write (JSON : in out TGen.JSON.JSON_Value; V : T)
       is
-         pragma Unreferenced (First, Last);
          V_Big_Real : constant TGen.Big_Reals.Big_Real :=
            T_Conversions.To_Big_Real (V);
       begin
@@ -1159,13 +1120,7 @@ package body TGen.Marshalling_Lib is
       -- Read --
       ----------
 
-      procedure Read
-        (JSON  : TGen.JSON.JSON_Value;
-         V     : out T;
-         First : T := T'First;
-         Last  : T := T'Last)
-      is
-         pragma Unreferenced (First, Last);
+      procedure Read (JSON : TGen.JSON.JSON_Value; V : out T) is
       begin
          --  Decode the big real from the string encoded as a quotient string
 

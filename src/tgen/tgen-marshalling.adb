@@ -21,6 +21,7 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Characters.Latin_1;
 with Ada.Numerics.Big_Numbers.Big_Integers;
 use  Ada.Numerics.Big_Numbers.Big_Integers;
 with Ada.Strings;                  use Ada.Strings;
@@ -405,7 +406,6 @@ package body TGen.Marshalling is
 
    procedure Generate_Base_Functions_For_Typ
      (Typ      : TGen.Types.Typ'Class;
-      Part     : Spec_Part := Pub;
       For_Base : Boolean := False)
    is
       B_Name         : constant String := Typ.Fully_Qualified_Name;
@@ -416,9 +416,7 @@ package body TGen.Marshalling is
       Common_Assocs : constant Translate_Table :=
         [1 => Assoc ("GLOBAL_PREFIX", Global_Prefix),
          2 => Assoc ("TY_PREFIX", Ty_Prefix),
-         3 => Assoc ("TY_NAME", Ty_Name),
-         4 => Assoc ("PUB_PART", (if Part = Pub then True else False)),
-         5 => Assoc ("FULL_PRIV", Typ.Fully_Private)];
+         3 => Assoc ("TY_NAME", Ty_Name)];
 
       type Component_Kind is (Array_Component, Record_Component);
 
@@ -795,7 +793,7 @@ package body TGen.Marshalling is
                  4 => Assoc ("FOR_BASE", For_Base)];
 
          begin
-            Print_Scalar (Assocs);
+            Print_Scalar (Assocs, For_Base);
          end;
 
       --  3.2 For array types, we generate the calls for the components and we
@@ -813,14 +811,6 @@ package body TGen.Marshalling is
             Component_Write    : Unbounded_String;
             Component_Size     : Unbounded_String;
             Component_Size_Max : Unbounded_String;
-
-            --  Check that the Size_Max function can be declared in the public
-            --  part of the support package: this is not the case as soon as
-            --  one of the index types of the array is fully private.
-
-            Size_Max_Pub : constant Boolean :=
-              not (for some Idx_Typ of Array_Typ'Class (Typ).Index_Types
-                   => Idx_Typ.Get.Fully_Private);
          begin
             --  Contruct the calls for the components
 
@@ -843,8 +833,7 @@ package body TGen.Marshalling is
                     6  => Assoc ("ADA_DIM", Ada_Dim_Tag),
                     7  => Assoc ("FIRST_NAME", First_Name_Tag),
                     8  => Assoc ("LAST_NAME", Last_Name_Tag),
-                    9  => Assoc ("BOUND_TYP", Comp_Typ_Tag),
-                    10 => Assoc ("SIZE_MAX_PUB", Size_Max_Pub)];
+                    9  => Assoc ("BOUND_TYP", Comp_Typ_Tag)];
 
             begin
                Print_Array (Assocs);
@@ -869,18 +858,6 @@ package body TGen.Marshalling is
             Variant_Write      : Tag;
             Variant_Size       : Tag;
             Variant_Size_Max   : Tag;
-
-            --  Check wether the Size_Max function can be placed in the public
-            --  part: This is not the case as soon as one of the discriminants
-            --  is fully private.
-
-            Size_Max_Pub : constant Boolean :=
-              not (Typ in Discriminated_Record_Typ'Class)
-               or else
-                 not (for some Disc_Typ of
-                      Discriminated_Record_Typ'Class (Typ).Discriminant_Types
-                      => Disc_Typ.Get.Fully_Private);
-
          begin
             --  Construct the calls for the components
 
@@ -924,9 +901,7 @@ package body TGen.Marshalling is
                     7  => Assoc ("VARIANT_SIZE", Variant_Size),
                     8  => Assoc ("VARIANT_SIZE_MAX", Variant_Size_Max),
                     9  => Assoc ("DISCR_NAME", Discr_Name_Tag),
-                    10 => Assoc ("DISCR_TYP", Comp_Typ_Tag),
-                    11 => Assoc ("SIZE_MAX_PUB", Size_Max_Pub)];
-
+                    10 => Assoc ("DISCR_TYP", Comp_Typ_Tag)];
             begin
                Print_Record (Assocs);
             end;
@@ -1110,5 +1085,23 @@ package body TGen.Marshalling is
    begin
       return Prefix_For_Typ (To_Symbol (Typ_FQN, '_')) & "_Input";
    end Input_Fname_For_Typ;
+
+   --------------
+   -- Put_Line --
+   --------------
+
+   procedure Put_Line (Str : US_Access; Added : String) is
+   begin
+      Append (Str.all, Added & Ada.Characters.Latin_1.LF);
+   end Put_Line;
+
+   --------------
+   -- New_Line --
+   --------------
+
+   procedure New_Line (Str : US_Access) is
+   begin
+      Append (Str.all, Ada.Characters.Latin_1.LF);
+   end New_Line;
 
 end TGen.Marshalling;

@@ -190,4 +190,6 @@ package TGen.Strings is
      (To_Filename (FQN) & ".json");
    --  Convert FQN to a filename, and append the ".json" extension
 
+   type US_Access is access all Unbounded_String;
+
 end TGen.Strings;
