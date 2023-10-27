@@ -27,4 +27,9 @@ package TGen is
    pragma Preelaborate;
 
    Version : constant String := "0.0";
+
+   Precondition_Error : exception;
+   --  Precondition raised by tgen wrappers if the precondition of an
+   --  analyzed subprogram does not hold.
+
 end TGen;

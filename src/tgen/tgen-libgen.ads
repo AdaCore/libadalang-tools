@@ -25,6 +25,7 @@
 --  generation).
 
 with Ada.Containers.Ordered_Maps;
+with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded;       use Ada.Strings.Unbounded;
 
 with GNATCOLL.VFS;
@@ -38,10 +39,13 @@ with TGen.Parse_Strategy; use TGen.Parse_Strategy;
 package TGen.Libgen is
    package LAL renames Libadalang.Analysis;
 
-   type Any_Library_Part is
-     (Marshalling_Part, Test_Generation_Part, All_Parts);
-   --  Parts of the support library that can be generated. At the moment only
-   --  Marshalling is implemented, with Test_Generation coming soon.
+   type Library_Parts is
+     (Marshalling_Part, Test_Generation_Part, Wrappers_Part);
+   type Any_Library_Part is array (Library_Parts) of Boolean;
+   All_Parts : constant Any_Library_Part :=
+     [Marshalling_Part     => True,
+      Test_Generation_Part => True,
+      Wrappers_Part        => True];
 
    type Libgen_Context is private;
 
@@ -127,11 +131,23 @@ private
    use TGen.Context;
 
    package Types_Per_Package_Maps is new Ada.Containers.Ordered_Maps
-        (Key_Type     => Ada_Qualified_Name,
-         Element_Type => Typ_Set,
-         "="          => Typ_Sets."=");
+     (Key_Type     => Ada_Qualified_Name,
+      Element_Type => Typ_Set,
+      "="          => Typ_Sets."=");
 
    subtype Types_Per_Package_Map is Types_Per_Package_Maps.Map;
+
+   package Ada_Node_Vectors is new Ada.Containers.Vectors
+     (Index_Type   => Positive,
+      Element_Type => LAL.Ada_Node,
+      "="          => LAL.Equals);
+   subtype Ada_Node_Vector is Ada_Node_Vectors.Vector;
+
+   package Ada_Node_Vectors_Maps is new Ada.Containers.Ordered_Maps
+     (Key_Type     => Ada_Qualified_Name,
+      Element_Type => Ada_Node_Vectors.Vector,
+      "="          => Ada_Node_Vectors."=");
+   subtype Ada_Node_Vectors_Map is Ada_Node_Vectors_Maps.Map;
 
    type Libgen_Context is record
       Output_Dir : Unbounded_String;
@@ -168,6 +184,9 @@ private
       Generation_Map : Types_Per_Package_Map;
       --  Map of generation unit names to function types for which we should
       --  create a value generation harness.
+
+      Included_Subps : Ada_Node_Vectors_Map;
+      --  List of subprograms included for tgen support
 
    end record;
 

@@ -359,12 +359,14 @@ package TGen.Types.Record_Types is
    type Function_Typ is new Record_Typ with record
       Subp_UID : Unbounded_String;
       Long_UID : Unbounded_String;
-      Ret_Typ : SP.Ref;
+      Ret_Typ  : SP.Ref;
+
       Param_Modes : Param_Mode_Map;
       Param_Order : String_Vectors.Vector;
       --  Order in which the parameters appear in the subprogram profile.
       --  Required in order to dump the parameter values in the correct order
       --  when generating values in binary format.
+
    end record;
 
    function Kind (Self : Function_Typ) return Typ_Kind is

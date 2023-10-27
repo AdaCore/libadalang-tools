@@ -985,7 +985,10 @@ package body Test.Actions is
       --  We always need the lib support when running the generation harness
 
       TGen.Libgen.Generate
-        (Test.Common.TGen_Libgen_Ctx, TGen.Libgen.All_Parts);
+        (Test.Common.TGen_Libgen_Ctx,
+         [TGen.Libgen.Marshalling_Part     => True,
+          TGen.Libgen.Test_Generation_Part => True,
+          TGen.Libgen.Wrappers_Part        => False]);
       Test.Common.Mark_Lib_Support_Generated;
       Test.Generation.Generate_Build_And_Run (Cmd);
    end First_Pass_Post_Process;
@@ -1003,7 +1006,10 @@ package body Test.Actions is
 
       if Test.Common.Get_Lib_Support_Status in Test.Common.Needed then
          TGen.Libgen.Generate
-           (Test.Common.TGen_Libgen_Ctx, TGen.Libgen.All_Parts);
+           (Test.Common.TGen_Libgen_Ctx,
+           [TGen.Libgen.Marshalling_Part     => True,
+            TGen.Libgen.Test_Generation_Part => True,
+            TGen.Libgen.Wrappers_Part        => False]);
             Test.Common.Mark_Lib_Support_Generated;
       end if;
 

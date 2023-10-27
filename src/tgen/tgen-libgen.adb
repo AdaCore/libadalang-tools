@@ -44,6 +44,7 @@ with TGen.Types.Constraints;  use TGen.Types.Constraints;
 with TGen.Types.Record_Types; use TGen.Types.Record_Types;
 with TGen.Types.Translation;  use TGen.Types.Translation;
 with TGen.Types;              use TGen.Types;
+with TGen.Wrappers;           use TGen.Wrappers;
 
 package body TGen.Libgen is
 
@@ -55,11 +56,16 @@ package body TGen.Libgen is
    --  are declared in Pack_Name.
 
    procedure Generate_Value_Gen_Library
-     (Ctx        : Libgen_Context;
-      Pack_Name  : Ada_Qualified_Name) with
+     (Ctx       : Libgen_Context;
+      Pack_Name : Ada_Qualified_Name) with
      Pre => Ctx.Strat_Types_Per_Package.Contains (Pack_Name);
    --  Generate the type representation library files (spec and body) for the
    --  types that are declared in Pack_Name.
+
+   procedure Generate_Wrappers_Library
+     (Ctx       : Libgen_Context;
+      Pack_Name : Ada_Qualified_Name);
+   --  Generate the function wrappers
 
    procedure Generate_Harness_Unit
      (Ctx              : Libgen_Context;
@@ -77,12 +83,21 @@ package body TGen.Libgen is
    --  Replace occurrences of reserved namespaces (such as standard) with our
    --  owns (tgen).
 
+   function Library_Package
+     (Pack_Name         : Ada_Qualified_Name;
+      TGen_Library_Name : String) return Ada_Qualified_Name;
    function Support_Library_Package
-     (Pack_Name : Ada_Qualified_Name) return Ada_Qualified_Name;
+     (Pack_Name : Ada_Qualified_Name) return Ada_Qualified_Name
+   is (Library_Package (Pack_Name, "TGen_Support"));
    function Value_Library_Package
-     (Pack_Name : Ada_Qualified_Name) return Ada_Qualified_Name;
+     (Pack_Name : Ada_Qualified_Name) return Ada_Qualified_Name
+   is (Library_Package (Pack_Name, "TGen_Values"));
+   function Wrapper_Library_Package
+     (Pack_Name : Ada_Qualified_Name) return Ada_Qualified_Name
+   is (Library_Package (Pack_Name, "TGen_Wrappers"));
    function Generation_Harness_Package
-     (Pack_Name : Ada_Qualified_Name) return Ada_Qualified_Name;
+     (Pack_Name : Ada_Qualified_Name) return Ada_Qualified_Name
+   is (Library_Package (Pack_Name, "TGen_Generation"));
    --  Name of the support library package
 
    procedure Append_Types
@@ -109,47 +124,20 @@ package body TGen.Libgen is
       end if;
    end Replace_Standard;
 
-   -----------------------------
-   -- Support_Library_Package --
-   -----------------------------
+   ---------------------
+   -- Library_Package --
+   ---------------------
 
-   function Support_Library_Package
-     (Pack_Name : Ada_Qualified_Name) return Ada_Qualified_Name
+   function Library_Package
+     (Pack_Name         : Ada_Qualified_Name;
+      TGen_Library_Name : String) return Ada_Qualified_Name
    is
-      Support_Pack_Name : Ada_Qualified_Name := Pack_Name.Copy;
+      Result : Ada_Qualified_Name := Pack_Name.Copy;
    begin
-      Replace_Standard (Support_Pack_Name);
-      Support_Pack_Name.Append (TGen.Strings.Ada_Identifier (+"TGen_Support"));
-      return Support_Pack_Name;
-   end Support_Library_Package;
-
-   ---------------------------
-   -- Value_Library_Package --
-   ---------------------------
-
-   function Value_Library_Package
-     (Pack_Name : Ada_Qualified_Name) return Ada_Qualified_Name
-   is
-      Support_Pack_Name : Ada_Qualified_Name := Pack_Name.Copy;
-   begin
-      Replace_Standard (Support_Pack_Name);
-      Support_Pack_Name.Append (TGen.Strings.Ada_Identifier (+"TGen_Values"));
-      return Support_Pack_Name;
-   end Value_Library_Package;
-
-   --------------------------------
-   -- Generation_Harness_Package --
-   --------------------------------
-
-   function Generation_Harness_Package
-     (Pack_Name : Ada_Qualified_Name) return Ada_Qualified_Name
-   is
-      Gen_Pack_Name : Ada_Qualified_Name := Pack_Name.Copy;
-   begin
-      Replace_Standard (Gen_Pack_Name);
-      Gen_Pack_Name.Append (TGen.Strings.Ada_Identifier (+"TGen_Generation"));
-      return Gen_Pack_Name;
-   end Generation_Harness_Package;
+      Replace_Standard (Result);
+      Result.Append (TGen.Strings.Ada_Identifier (+TGen_Library_Name));
+      return Result;
+   end Library_Package;
 
    ------------------------------
    -- Generate_Support_Library --
@@ -367,8 +355,8 @@ package body TGen.Libgen is
    --------------------------------
 
    procedure Generate_Value_Gen_Library
-     (Ctx        : Libgen_Context;
-      Pack_Name  : Ada_Qualified_Name)
+     (Ctx       : Libgen_Context;
+      Pack_Name : Ada_Qualified_Name)
    is
       use Templates_Parser;
       F_Spec           : File_Type;
@@ -508,6 +496,46 @@ package body TGen.Libgen is
       Put_Line (F_Spec, "end " & Ada_Pack_Name & ";");
       Close (F_Spec);
    end Generate_Value_Gen_Library;
+
+   -------------------------------
+   -- Generate_Wrappers_Library --
+   -------------------------------
+
+   procedure Generate_Wrappers_Library
+     (Ctx       : Libgen_Context;
+      Pack_Name : Ada_Qualified_Name)
+   is
+      F_Spec           : File_Type;
+      F_Body           : File_Type;
+      Ada_Pack_Name    : constant String := To_Ada (Pack_Name);
+      File_Name        : constant String :=
+        Ada.Directories.Compose
+          (Containing_Directory => To_String (Ctx.Output_Dir),
+           Name                 => To_Filename (Pack_Name));
+   begin
+      Create (F_Spec, Out_File, File_Name & ".ads");
+      Create (F_Body, Out_File, File_Name & ".adb");
+
+      Put_Line (F_Spec, "package " & Ada_Pack_Name & " is");
+
+      Put_Line (F_Body, "with TGen;");
+      New_Line (F_Body);
+      Put_Line (F_Body, "package body " & Ada_Pack_Name & " is");
+      New_Line (F_Body);
+
+      for Subp of Ctx.Included_Subps.Element (Pack_Name) loop
+         Generate_Wrapper_For_Subprogram
+           (F_Spec             => F_Spec,
+            F_Body             => F_Body,
+            Subprogram         => Subp.As_Basic_Decl,
+            Templates_Root_Dir => To_String (Ctx.Root_Templates_Dir));
+      end loop;
+
+      Put_Line (F_Body, "end " & Ada_Pack_Name & ";");
+      Close (F_Body);
+      Put_Line (F_Spec, "end " & Ada_Pack_Name & ";");
+      Close (F_Spec);
+   end Generate_Wrappers_Library;
 
    ------------------
    -- Append_Types --
@@ -736,6 +764,20 @@ package body TGen.Libgen is
                Generation_Harness_Package'Access);
          end if;
 
+         --  Add it to the list of included subprograms in the context
+
+         declare
+            Dummy_Inserted : Boolean;
+            Cur            : Ada_Node_Vectors_Maps.Cursor;
+         begin
+            Ctx.Included_Subps.Insert
+              (Wrapper_Library_Package (Fct_Ref.Get.Compilation_Unit_Name),
+               [],
+               Cur,
+               Dummy_Inserted);
+            Ctx.Included_Subps.Reference (Cur).Append (Subp.As_Ada_Node);
+         end;
+
          return True;
       end;
    end Include_Subp;
@@ -815,7 +857,7 @@ package body TGen.Libgen is
 
       --  Generate all support packages
 
-      if Part in Marshalling_Part | All_Parts then
+      if Part (Marshalling_Part) then
          for Cur in Ctx.Types_Per_Package.Iterate loop
             --  If all types are not supported, do not generate a support
             --  library.
@@ -827,7 +869,7 @@ package body TGen.Libgen is
             end if;
          end loop;
       end if;
-      if Part in Test_Generation_Part | All_Parts then
+      if Part (Test_Generation_Part) then
          for Cur in Ctx.Strat_Types_Per_Package.Iterate loop
             --  If all types are not supported, do not generate a support
             --  library.
@@ -837,6 +879,11 @@ package body TGen.Libgen is
             then
                Generate_Value_Gen_Library (Ctx, Key (Cur));
             end if;
+         end loop;
+      end if;
+      if Part (Wrappers_Part) then
+         for Cur in Ctx.Included_Subps.Iterate loop
+            Generate_Wrappers_Library (Ctx, Ada_Node_Vectors_Maps.Key (Cur));
          end loop;
       end if;
       Ctx.Lib_Support_Generated := True;

@@ -3167,6 +3167,7 @@ package body TGen.Types.Translation is
       else
          F_Typ.Ret_Typ := SP.Null_Ref;
       end if;
+
       --  Function type was successfully translated
 
       F_Typ.Subp_UID := +UID;
