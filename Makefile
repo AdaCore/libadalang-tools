@@ -121,5 +121,5 @@ install-bin-strip:
 install-tgen:
 	mkdir -p "$(DESTDIR)/share/tgen"
 	cp -r src/tgen/tgen_rts "$(DESTDIR)/share/tgen/"
-	cp -r src/tgen/templates "$(DESTDIR)/share/tgen/"
+	cp -r share/tgen/templates "$(DESTDIR)/share/tgen/"
 
