@@ -260,8 +260,8 @@ templates_path = os.path.join(laltools_root, "share", "tgen", "templates")
 pkg_ads_path = os.path.join("test", "pkg.ads")
 tgen_marsh_path = str(shutil.which("tgen_marshalling"))
 run(
-    f"tgen_marshalling -P test/test.gpr --templates-dir={templates_path}"
-    f" -o tgen_support {pkg_ads_path}"
+    f"tgen_marshalling -P test/test.gpr --templates-dir='{templates_path}'"
+    f" -o tgen_support '{pkg_ads_path}'"
 )
 
 # Then, build the test project
