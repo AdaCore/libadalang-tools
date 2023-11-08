@@ -81,23 +81,24 @@ package body Utils.Drivers is
 
       Global_Report_Dir   : String_Ref;
 
-      procedure Include_One (File_Name : String);
-      --  Include File_Name in the Ignored set below
-
       Ignored : String_Set;
       --  Set of file names mentioned in the --ignore=... switch
 
-      procedure Include_One (File_Name : String) is
-      begin
-         Include (Ignored, File_Name);
-      end Include_One;
-
       procedure Process_Files is
          N_File_Names : constant Natural :=
-           Num_File_Names (Cmd) - Arg_Length (Cmd, Ignore);
+           Num_File_Names (Cmd);
 
          Counter        : Natural := N_File_Names;
          Has_Syntax_Err : Boolean := False;
+
+         procedure Include_One (File_Name : String);
+         --  Include File_Name in the Ignored set above
+
+         procedure Include_One (File_Name : String) is
+         begin
+            Include (Ignored, File_Name);
+            Counter := Counter - 1;
+         end Include_One;
 
          use Directories;
       begin
