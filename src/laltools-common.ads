@@ -318,8 +318,7 @@ package Laltools.Common is
      (Node : Ada_Node'Class)
       return Ada_List_Hashed_Set
      with Post => (for all List of Find_Enclosing_Declarative_Parts'Result =>
-                     List.Kind in Ada_Ada_Node_List_Range
-                                     | Ada_Basic_Decl_List_Range);
+                     List.Kind in Ada_Ada_Node_List_Range);
    --  Finds the Declarative_Parts or Decl_Expr of the first scope visible by
    --  Node. In this context, scope is the nearest union of Ada_List'Class
    --  nodes where declarations can be done.
@@ -392,7 +391,6 @@ package Laltools.Common is
       return Ada_List_Hashed_Set
      with Post => (for all List of Find_Enclosing_Scopes'Result =>
                      List.Kind in Ada_Ada_Node_List_Range
-                                    | Ada_Basic_Decl_List_Range
                                     | Ada_Param_Spec_List_Range);
    --  Union between Find_Enclosing_Declarative_Parts and
    --  Find_Enclosing_Param_Spec_Lists.
@@ -401,8 +399,7 @@ package Laltools.Common is
      (Node : Ada_Node'Class)
       return Ada_List_Hashed_Set
      with Post => (for all List of Find_Visible_Declarative_Parts'Result =>
-                     List.Kind in Ada_Ada_Node_List_Range
-                                   | Ada_Basic_Decl_List_Range);
+                     List.Kind in Ada_Ada_Node_List_Range);
    --  Find all Declarative_Part and Decl_Expr nodes visible by Node
    --  (excluding the ones visible by a use clause).
    --  Returns an empty vector if Node.Is_Null.
@@ -419,7 +416,6 @@ package Laltools.Common is
       return Ada_List_Hashed_Set
      with Post => (for all List of Find_Visible_Scopes'Result =>
                      List.Kind in Ada_Ada_Node_List_Range
-                                    | Ada_Basic_Decl_List_Range
                                     | Ada_Param_Spec_List_Range);
    --  Union between Find_Visible_Declarative_Parts and
    --  Find_Visible_Param_Spec_Lists.
