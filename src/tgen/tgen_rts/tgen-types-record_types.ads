@@ -374,6 +374,14 @@ package TGen.Types.Record_Types is
       --  Required in order to dump the parameter values in the correct order
       --  when generating values in binary format.
 
+      Globals : Component_Maps.Map;
+      --  List of global variables for which we should generate values. The
+      --  criteria is as follows:
+      --    * The global is marked as input of the subprogram (see
+      --      documentation of the Global aspect).
+      --    * The type of the global variable is supported by TGen.
+      --    * The global variable is not a constant value.
+
    end record;
 
    function Kind (Self : Function_Typ) return Typ_Kind is
@@ -391,6 +399,15 @@ package TGen.Types.Record_Types is
    function JSON_Test_Filename (Self : Function_Typ) return String;
    --  Return the simple name of the file in which tests for Self should be
    --  stored.
+
+   overriding function Default_Strategy
+     (Self : Function_Typ) return Strategy_Type'Class;
+
+   overriding function Default_Enum_Strategy
+     (Self : Function_Typ) return Enum_Strategy_Type'Class;
+
+   function Encode
+     (Self : Function_Typ; Val : JSON_Value) return JSON_Value;
 
    function As_Function_Typ
      (Self : SP.Ref) return Function_Typ'Class is

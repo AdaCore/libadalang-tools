@@ -46,7 +46,7 @@
               Subp.Get.Encode (Strat.Generate (TGen.Strategies.Disc_Value_Maps.Empty_Map));
 @@TABLE'ALIGN_ON(":")@@
             Ada_@_PARAM_NAME_@ : @_PARAM_TY_@ :=
-              @_INPUT_FN_@ (Values.Get ("components").Get ("@_PARAM_NAME_@"));
+              @_INPUT_FN_@ (Values.Get ("param_values").Get ("@_PARAM_NAME_@"));
 @@END_TABLE@@
          begin
             @_SUBP_NAME_@_Dump_TC
@@ -77,7 +77,7 @@
                 (Strat.Generate (TGen.Strategies.Disc_Value_Maps.Empty_Map));
 @@TABLE'ALIGN_ON(":")@@
             Ada_@_PARAM_NAME_@ : @_PARAM_TY_@ :=
-              @_INPUT_FN_@ (Values.Get ("components").Get ("@_PARAM_NAME_@"));
+              @_INPUT_FN_@ (Values.Get ("param_values").Get ("@_PARAM_NAME_@"));
 @@END_TABLE@@
          begin
             Ada.Streams.Stream_IO.Create
