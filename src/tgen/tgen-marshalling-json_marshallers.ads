@@ -21,6 +21,8 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
+with TGen.Types.Record_Types; use TGen.Types.Record_Types;
+
 package TGen.Marshalling.JSON_Marshallers is
 
    procedure Generate_Marshalling_Functions_For_Typ
@@ -65,9 +67,8 @@ package TGen.Marshalling.JSON_Marshallers is
      (Spec_Part          : US_Access;
       Private_Part       : US_Access;
       Body_Part          : US_Access;
-      FN_Typ             : TGen.Types.Typ'Class;
-      Templates_Root_Dir : String) with
-      Pre => FN_Typ.Kind = Function_Kind;
+      FN_Typ             : Function_Typ'Class;
+      Templates_Root_Dir : String);
    --  Generate a test-case serializer for FN_Typ:
    --
    --  This generates a procedure, with the same parameters as the subprogram

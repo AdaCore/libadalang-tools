@@ -319,7 +319,7 @@ package body TGen.Libgen is
                       (Spec_Part_Acc,
                        Private_Part'Unrestricted_Access,
                        Body_Part'Unrestricted_Access,
-                       T.Get,
+                       As_Function_Typ (T),
                        TRD);
                else
                   TGen.Marshalling.Binary_Marshallers

@@ -23,9 +23,8 @@
 
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 
-with TGen.Strings;            use TGen.Strings;
+with TGen.Strings; use TGen.Strings;
 with TGen.Templates;
-with TGen.Types.Record_Types; use TGen.Types.Record_Types;
 
 package body TGen.Marshalling.JSON_Marshallers is
 
@@ -279,7 +278,7 @@ package body TGen.Marshalling.JSON_Marshallers is
      (Spec_Part          : US_Access;
       Private_Part       : US_Access;
       Body_Part          : US_Access;
-      FN_Typ             : TGen.Types.Typ'Class;
+      FN_Typ             : Function_Typ'Class;
       Templates_Root_Dir : String)
    is
       use Component_Maps;
@@ -294,39 +293,67 @@ package body TGen.Marshalling.JSON_Marshallers is
       use Templates.JSON_Marshalling;
 
       Assocs : Translate_Set;
+
       Param_Names : Vector_Tag;
       Param_Types : Vector_Tag;
       Param_Slugs : Vector_Tag;
+
+      Global_Names       : Vector_Tag;
+      Global_Types       : Vector_Tag;
+      Global_Slugs       : Vector_Tag;
+      Global_Types_Slugs : Vector_Tag;
    begin
-      if Function_Typ (FN_Typ).Component_Types.Is_Empty then
+      if FN_Typ.Component_Types.Is_Empty then
          return;
       end if;
       Assocs.Insert (Assoc ("GLOBAL_PREFIX", Global_Prefix));
       Assocs.Insert
         (Assoc ("PROC_NAME",
-         (if Is_Operator (Function_Typ (FN_Typ).Simple_Name)
-         then Map_Operator_Name (Function_Typ (FN_Typ).Simple_Name)
-         else (Function_Typ (FN_Typ).Simple_Name))));
-      Assocs.Insert (Assoc ("PROC_UID", Function_Typ (FN_Typ).Subp_UID));
-      if Function_Typ (FN_Typ).Ret_Typ /= SP.Null_Ref then
+         (if Is_Operator (FN_Typ.Simple_Name)
+         then Map_Operator_Name (FN_Typ.Simple_Name)
+         else (FN_Typ.Simple_Name))));
+      Assocs.Insert (Assoc ("PROC_UID", FN_Typ.Subp_UID));
+      if FN_Typ.Ret_Typ /= SP.Null_Ref then
          Assocs.Insert (Assoc
            ("PROC_RETURN_TY",
-            Function_Typ (FN_Typ).Ret_Typ.Get.Fully_Qualified_Name));
+            FN_Typ.Ret_Typ.Get.Fully_Qualified_Name));
       else
          Assocs.Insert (Assoc ("PROC_RETURN_TY", ""));
       end if;
-      for Param_Cur in Function_Typ (FN_Typ).Component_Types.Iterate loop
+
+      --  Deal with the parameters of the subprogram
+
+      for Param_Cur in FN_Typ.Component_Types.Iterate loop
          Param_Names.Append (Unbounded_String (Key (Param_Cur)));
          Param_Types.Append
-           (To_Ada (Function_Typ (FN_Typ).Component_Types
+           (To_Ada (FN_Typ.Component_Types
                     .Constant_Reference (Param_Cur).Get.Name));
          Param_Slugs.Append
-           (To_Symbol (Function_Typ (FN_Typ).Component_Types
+           (To_Symbol (FN_Typ.Component_Types
                        .Constant_Reference (Param_Cur).Get.Name, '_'));
       end loop;
       Assocs.Insert (Assoc ("PARAM_NAME", Param_Names));
       Assocs.Insert (Assoc ("PARAM_TY", Param_Types));
-      Assocs.Insert (Assoc ("PARAM_SLUG", Param_Slugs));
+      Assocs.Insert (Assoc ("PARAM_TY_SLUG", Param_Slugs));
+
+      --  Deal with the global inputs of the subprogram
+
+      for Global_Cur in FN_Typ.Globals.Iterate loop
+         Global_Names.Append (Key (Global_Cur));
+         Global_Types.Append
+           (To_Ada (FN_Typ.Globals.Constant_Reference (Global_Cur).Get.Name));
+         Global_Types_Slugs.Append
+           (To_Symbol (FN_Typ.Globals
+            .Constant_Reference (Global_Cur).Get.Name, '_'));
+         Global_Slugs.Append
+           (To_Symbol
+              (To_Qualified_Name (+Key (Global_Cur)),
+               Sep => '_'));
+      end loop;
+      Assocs.Insert (Assoc ("GLOBAL_NAME", Global_Names));
+      Assocs.Insert (Assoc ("GLOBAL_TY", Global_Types));
+      Assocs.Insert (Assoc ("GLOBAL_TY_SLUG", Global_Types_Slugs));
+      Assocs.Insert (Assoc ("GLOBAL_SLUG", Global_Slugs));
 
       --  First generate the spec, in the correct part of the spec
 
