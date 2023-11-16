@@ -414,6 +414,10 @@ package body TGen.Type_Representation is
       Scalar_Typ_Decl : out Unbounded_String;
       Scalar_Typ_Init : out Unbounded_String);
 
+   ---------------------------------
+   -- Collect_Info_For_Scalar_Typ --
+   ---------------------------------
+
    procedure Collect_Info_For_Scalar_Typ
      (T : Scalar_Typ'Class;
       Scalar_Typ_Decl_Template, Scalar_Typ_Init_Template : String;

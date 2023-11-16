@@ -6988,6 +6988,10 @@ package body Test.Skeleton is
                Put (F, ");");
             end Pp_Subp_Call;
 
+            ------------------------
+            -- Pp_JSON_Object_Lit --
+            ------------------------
+
             procedure Pp_JSON_Object_Lit
               (F : File_Kind; Obj : JSON_Value; Indent : Natural)
             is

@@ -1515,6 +1515,10 @@ package body TGen.Types.Record_Types is
       end;
    end Generate;
 
+   ---------------------------
+   -- Default_Enum_Strategy --
+   ---------------------------
+
    function Default_Enum_Strategy
      (Self : Discriminated_Record_Typ) return Enum_Strategy_Type'Class
    is

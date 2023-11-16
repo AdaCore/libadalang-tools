@@ -1295,7 +1295,7 @@ package body TGen.Types.Translation is
                begin
                   if not Index_Trans.Success then
                      Failure_Reason :=
-                     "Failed to translate type of the index dimention"
+                     "Failed to translate type of the index dimension"
                      & Current_Index'Image & ": " & Index_Trans.Diagnostics;
                      goto Failed_UC_Translation;
                   end if;
@@ -3350,6 +3350,10 @@ package body TGen.Types.Translation is
       return Result;
    end Translate;
 
+   -----------------------
+   -- Print_Cache_Stats --
+   -----------------------
+
    procedure Print_Cache_Stats is
    begin
       New_Line;
@@ -3357,6 +3361,10 @@ package body TGen.Types.Translation is
       Put_Line ("Cache hits  :" & Cache_Hits'Image);
       Put_Line ("Cache misses:" & Cache_Miss'Image);
    end Print_Cache_Stats;
+
+   -----------------
+   -- Clear_Cache --
+   -----------------
 
    procedure Clear_Cache is
    begin

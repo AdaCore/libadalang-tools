@@ -229,22 +229,23 @@ package body TGen.Dependency_Graph is
    begin
       --  Create the nodes of the graph
 
-         for T of Types loop
-            Create_Node (G, T);
+      for T of Types loop
+         Create_Node (G, T);
+      end loop;
+
+      --  Create the edges
+
+      for T of Types loop
+         for Dep of Type_Dependencies (T) loop
+
+            --  Filter out type dependencies that don't belong to this
+            --  package
+
+            if Types.Contains (Dep) then
+               Create_Edge (G, Dep, T);
+            end if;
          end loop;
-
-         --  Create the edges
-
-         for T of Types loop
-            for Dep of Type_Dependencies (T) loop
-               --  Filter out type dependencies that don't belong to this
-               --  package
-
-               if Types.Contains (Dep) then
-                  Create_Edge (G, Dep, T);
-               end if;
-            end loop;
-         end loop;
+      end loop;
 
          --  Sort the types
 
