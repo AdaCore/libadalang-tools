@@ -179,6 +179,13 @@ package TGen.Types is
    procedure Free_Content (Self : in out Typ) is null;
    --  Helper for shared pointers
 
+   function FQN (Self : Typ) return String is (To_Ada (Self.Name));
+   --  Return the fully qualified name for the type
+
+   function Simple_Name (Self : Typ) return String is
+     (+Unbounded_String (Self.Name.Last_Element));
+   --  Return the simple name for the type
+
    type Scalar_Typ (Is_Static : Boolean) is new Typ with null record;
 
    function Get_Diagnostics (Self : Scalar_Typ) return String is ("");

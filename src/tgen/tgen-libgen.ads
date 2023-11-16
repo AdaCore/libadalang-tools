@@ -26,15 +26,17 @@
 
 with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Vectors;
-with Ada.Strings.Unbounded;       use Ada.Strings.Unbounded;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with GNATCOLL.VFS;
 
 with Libadalang.Analysis;
 
 with TGen.Context;
+with TGen.Wrappers;       use TGen.Wrappers;
 with TGen.Strings;
 with TGen.Parse_Strategy; use TGen.Parse_Strategy;
+with TGen.Types;
 
 package TGen.Libgen is
    package LAL renames Libadalang.Analysis;
@@ -137,17 +139,16 @@ private
 
    subtype Types_Per_Package_Map is Types_Per_Package_Maps.Map;
 
-   package Ada_Node_Vectors is new Ada.Containers.Vectors
+   package Subp_Info_Vectors is new Ada.Containers.Vectors
      (Index_Type   => Positive,
-      Element_Type => LAL.Ada_Node,
-      "="          => LAL.Equals);
-   subtype Ada_Node_Vector is Ada_Node_Vectors.Vector;
+      Element_Type => Subp_Information);
+   subtype Subp_Info_Vector is Subp_Info_Vectors.Vector;
 
-   package Ada_Node_Vectors_Maps is new Ada.Containers.Ordered_Maps
+   package Subp_Info_Vectors_Maps is new Ada.Containers.Ordered_Maps
      (Key_Type     => Ada_Qualified_Name,
-      Element_Type => Ada_Node_Vectors.Vector,
-      "="          => Ada_Node_Vectors."=");
-   subtype Ada_Node_Vectors_Map is Ada_Node_Vectors_Maps.Map;
+      Element_Type => Subp_Info_Vector,
+      "="          => Subp_Info_Vectors."=");
+   subtype Subp_Info_Vectors_Map is Subp_Info_Vectors_Maps.Map;
 
    type Libgen_Context is record
       Output_Dir : Unbounded_String;
@@ -185,8 +186,10 @@ private
       --  Map of generation unit names to function types for which we should
       --  create a value generation harness.
 
-      Included_Subps : Ada_Node_Vectors_Map;
-      --  List of subprograms included for tgen support
+      Included_Subps : Subp_Info_Vectors_Map;
+      --  Map of package name to list of subprograms included. We store some
+      --  information to be able to retrieve the subprogram specification +
+      --  the precondition.
 
    end record;
 

@@ -21,15 +21,28 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with Ada.Text_IO;           use Ada.Text_IO;
 
 with Libadalang.Analysis; use Libadalang.Analysis;
 
+with TGen.Types;              use TGen.Types;
+with TGen.Types.Record_Types; use TGen.Types.Record_Types;
+
 package TGen.Wrappers is
+
+   type Subp_Information is record
+      T : TGen.Types.SP.Ref;
+      --  Specification of the subprogram (pointer to a Function_Typ)
+
+      Pre : Unbounded_String;
+      --  Precondition string of the subprogram
+   end record;
 
    procedure Generate_Wrapper_For_Subprogram
      (F_Spec, F_Body     : File_Type;
-      Subprogram         : Basic_Decl;
+      Subprogram         : Function_Typ;
+      Precond            : Ada_Node;
       Templates_Root_Dir : String);
    --  Generate a wrapper function for the given subprogram. A wrapper wraps
    --  the call to the original function by checking that the precondition

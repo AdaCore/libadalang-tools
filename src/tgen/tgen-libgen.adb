@@ -30,7 +30,9 @@ with GNAT.OS_Lib;
 
 with Langkit_Support.Text; use Langkit_Support.Text;
 
-with Libadalang.Analysis; use Libadalang.Analysis;
+with Libadalang.Analysis;  use Libadalang.Analysis;
+with Libadalang.Common;
+with Libadalang.Unparsing; use Libadalang.Unparsing;
 
 with Templates_Parser;
 
@@ -44,7 +46,6 @@ with TGen.Types.Constraints;  use TGen.Types.Constraints;
 with TGen.Types.Record_Types; use TGen.Types.Record_Types;
 with TGen.Types.Translation;  use TGen.Types.Translation;
 with TGen.Types;              use TGen.Types;
-with TGen.Wrappers;           use TGen.Wrappers;
 
 package body TGen.Libgen is
 
@@ -524,11 +525,23 @@ package body TGen.Libgen is
       New_Line (F_Body);
 
       for Subp of Ctx.Included_Subps.Element (Pack_Name) loop
-         Generate_Wrapper_For_Subprogram
-           (F_Spec             => F_Spec,
-            F_Body             => F_Body,
-            Subprogram         => Subp.As_Basic_Decl,
-            Templates_Root_Dir => To_String (Ctx.Root_Templates_Dir));
+         declare
+            LAL_Context : constant Libadalang.Analysis.Analysis_Context :=
+              Create_Context;
+            Unit        : Libadalang.Analysis.Analysis_Unit;
+         begin
+            Unit := Libadalang.Analysis.Get_From_Buffer
+              (LAL_Context,
+               Filename => "Dummy",
+               Buffer   => +Subp.Pre,
+               Rule     => Libadalang.Common.Expr_Rule);
+            Generate_Wrapper_For_Subprogram
+              (F_Spec             => F_Spec,
+               F_Body             => F_Body,
+               Subprogram         => Function_Typ (As_Function_Typ (Subp.T)),
+               Precond            => Unit.Root,
+               Templates_Root_Dir => To_String (Ctx.Root_Templates_Dir));
+         end;
       end loop;
 
       Put_Line (F_Body, "end " & Ada_Pack_Name & ";");
@@ -639,9 +652,8 @@ package body TGen.Libgen is
 
       Dummy_Inserted : Boolean;
 
-      Spec : constant Base_Subp_Spec := Subp.P_Subp_Spec_Or_Null;
-
-      Trans_Res : constant Translation_Result := Translate (Spec);
+      Trans_Res : constant Translation_Result :=
+        Translate (Subp.As_Basic_Decl);
 
    begin
       if not Trans_Res.Success then
@@ -768,14 +780,22 @@ package body TGen.Libgen is
 
          declare
             Dummy_Inserted : Boolean;
-            Cur            : Ada_Node_Vectors_Maps.Cursor;
+            Cur            : Subp_Info_Vectors_Maps.Cursor;
+            Pre_Aspect     : constant Unbounded_Text_Type :=
+              To_Unbounded_Text (To_Text ("Pre"));
+            Subp_Info      : Subp_Information;
          begin
+            if Subp.P_Has_Aspect (Pre_Aspect) then
+               Subp_Info.Pre :=
+                 +Unparse (Subp.P_Get_Aspect_Spec_Expr (Pre_Aspect));
+            end if;
+            Subp_Info.T := Fct_Ref;
             Ctx.Included_Subps.Insert
               (Wrapper_Library_Package (Fct_Ref.Get.Compilation_Unit_Name),
                [],
                Cur,
                Dummy_Inserted);
-            Ctx.Included_Subps.Reference (Cur).Append (Subp.As_Ada_Node);
+            Ctx.Included_Subps.Reference (Cur).Append (Subp_Info);
          end;
 
          return True;
@@ -883,7 +903,7 @@ package body TGen.Libgen is
       end if;
       if Part (Wrappers_Part) then
          for Cur in Ctx.Included_Subps.Iterate loop
-            Generate_Wrappers_Library (Ctx, Ada_Node_Vectors_Maps.Key (Cur));
+            Generate_Wrappers_Library (Ctx, Subp_Info_Vectors_Maps.Key (Cur));
          end loop;
       end if;
       Ctx.Lib_Support_Generated := True;

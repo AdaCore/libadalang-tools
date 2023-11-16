@@ -23,9 +23,6 @@
 
 with Ada.Containers.Ordered_Sets;
 with Ada.Containers.Vectors;
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-
-with Langkit_Support.Text; use Langkit_Support.Text;
 
 with Libadalang.Common; use Libadalang.Common;
 
@@ -69,14 +66,18 @@ package body TGen.Wrappers is
    --  is there to propagate the negation to literals (and puts (not E) in
    --  DNF).
 
-   function Subprogram_Wrapper_Specification
-     (Subprogram : Basic_Decl) return String;
+   function Subprogram_Wrapper_Specification (F : Function_Typ) return String;
    --  Return the code for the wrapper specification
 
    procedure Write_Wrapper
      (F_Body            : File_Type;
       Call_To_Orig_Subp : String;
       Formula           : Formula_Type);
+
+   function Subp_Kind (F : Function_Typ) return Ada_Subp_Kind is
+     (if F.Ret_Typ.Is_Null
+      then Ada_Subp_Kind_Procedure
+      else Ada_Subp_Kind_Function);
 
    ---------
    -- Dnf --
@@ -198,65 +199,39 @@ package body TGen.Wrappers is
    -- Subprogram_Wrapper_Specification --
    --------------------------------------
 
-   function Subprogram_Wrapper_Specification
-     (Subprogram : Basic_Decl) return String
+   function Subprogram_Wrapper_Specification (F : Function_Typ) return String
    is
-      Result          : Unbounded_String;
-      Designated_Decl : Basic_Decl := Subprogram;
+      Kind : constant Ada_Subp_Kind := Subp_Kind (F);
+      Result : Unbounded_String;
    begin
-      --  If this is a generic instantiation, grab the synthetic designated
-      --  declaration.
-
-      if Kind (Subprogram) = Ada_Generic_Subp_Instantiation then
-         Designated_Decl :=
-           Subprogram.As_Generic_Subp_Instantiation.P_Designated_Generic_Decl;
-      end if;
-
       declare
-         Subp_Spec : constant Base_Subp_Spec :=
-           Designated_Decl.P_Subp_Spec_Or_Null;
-         Subp_Kind : constant Ada_Subp_Kind :=
-           Subp_Spec.As_Subp_Spec.F_Subp_Kind;
-         Params    : constant Param_Spec_Array := Subp_Spec.P_Params;
       begin
-         case Subp_Kind is
-            when Ada_Subp_Kind_Function =>
-               Append (Result, "function ");
+         case Kind is
             when Ada_Subp_Kind_Procedure =>
                Append (Result, "procedure ");
+            when Ada_Subp_Kind_Function =>
+               Append (Result, "function ");
          end case;
 
-         Append (Result, +Subprogram.P_Defining_Name.F_Name.Text);
+         Append (Result, F.Simple_Name);
 
          --  Then, deal with the parameters
 
-         if Params'Length /= 0 then
+         if not F.Param_Order.Is_Empty then
             Append (Result, "(");
-            for I in Params'Range loop
+            for Param_Name of F.Param_Order loop
                declare
-                  Param : constant Param_Spec := Params (I);
-                  Ids   : constant Defining_Name_List := Param.F_Ids;
-                  Cur   : Positive := Ids.Defining_Name_List_First;
+                  Param_Type : constant SP.Ref :=
+                    F.Component_Types.Element (Param_Name);
                begin
-                  if I /= Params'First then
-                     Append (Result, "; ");
-                  end if;
-                  while Ids.Defining_Name_List_Has_Element (Cur) loop
-                     if Cur /= Ids.Defining_Name_List_First then
-                        Append (Result, ", ");
-                     end if;
-                     Append
-                       (Result,
-                        +Ids.Defining_Name_List_Element (Cur).F_Name.Text);
-                     Cur := Ids.Defining_Name_List_Next (Cur);
-                  end loop;
+                  Append (Result, Param_Name);
                   Append (Result, " : ");
-                  Append (Result, +Param.F_Mode.Text & " ");
                   Append
-                    (Result,
-                     +Param.F_Type_Expr
-                     .P_Designated_Type_Decl
-                     .P_Fully_Qualified_Name);
+                    (Result, Image (F.Param_Modes.Element (Param_Name)) & " ");
+                  Append (Result, Param_Type.Get.FQN & " ");
+                  if Param_Name /= F.Param_Order.Last_Element then
+                     Append (Result, " ; ");
+                  end if;
                end;
             end loop;
             Append (Result, ")");
@@ -264,11 +239,9 @@ package body TGen.Wrappers is
 
          --  Then, deal with the return type expression if this is a function
 
-         if Subp_Kind = Ada_Subp_Kind_Function then
+         if Kind = Ada_Subp_Kind_Function then
             Append (Result, " return ");
-            Append
-              (Result,
-               +Subp_Spec.P_Returns.P_Designated_Type_Decl.F_Name.Text);
+            Append (Result, To_Ada (F.Ret_Typ.Get.Name));
          end if;
 
          return To_String (Result);
@@ -281,17 +254,11 @@ package body TGen.Wrappers is
 
    procedure Generate_Wrapper_For_Subprogram
      (F_Spec, F_Body     : File_Type;
-      Subprogram         : Basic_Decl;
+      Subprogram         : Function_Typ;
+      Precond            : Ada_Node;
       Templates_Root_Dir : String)
    is
-      FQN_Name : constant String :=
-        +Subprogram.P_Defining_Name.P_Fully_Qualified_Name;
-      F_Name   : constant Text_Type :=
-        Subprogram.P_Defining_Name.F_Name.Text;
-
-      Subp_Spec : constant Base_Subp_Spec := Subprogram.P_Subp_Spec_Or_Null;
-      Subp_Kind : constant Ada_Subp_Kind := Subp_Spec.As_Subp_Spec.F_Subp_Kind;
-      Params    : constant Param_Spec_Array := Subp_Spec.P_Params;
+      use type Ada.Containers.Count_Type;
 
       Subp_Spec_String : constant String :=
         Subprogram_Wrapper_Specification (Subprogram);
@@ -304,39 +271,26 @@ package body TGen.Wrappers is
    begin
       --  Compute the call to the original function
 
-      case Subp_Kind is
+      case Subp_Kind (Subprogram) is
          when Ada_Subp_Kind_Function =>
             Append (Call_To_User_Subp, "return ");
          when Ada_Subp_Kind_Procedure =>
             null;
       end case;
 
-      Append (Call_To_User_Subp, FQN_Name);
+      Append (Call_To_User_Subp, Subprogram.FQN);
 
-      if Params'Size > 0 then
+      if Subprogram.Param_Order.Length > 0 then
          Append (Call_To_User_Subp, " (");
       end if;
 
-      for I in Params'Range loop
-         declare
-            Ids : constant Defining_Name_List := Params (I).F_Ids;
-            Cur : Positive := Defining_Name_List_First (Ids);
-         begin
-            while Defining_Name_List_Has_Element (Ids, Cur) loop
-               Append
-                 (Call_To_User_Subp,
-                  +Defining_Name_List_Element (Ids, Cur).Text);
-               Cur := Defining_Name_List_Next (Ids, Cur);
-               if Defining_Name_List_Has_Element (Ids, Cur) then
-                  Append (Call_To_User_Subp, ", ");
-               end if;
-            end loop;
-         end;
-         if I /= Params'Last then
+      for Param_Name of Subprogram.Param_Order loop
+         Append (Call_To_User_Subp, Param_Name);
+         if Param_Name /= Subprogram.Param_Order.Last_Element then
             Append (Call_To_User_Subp, ", ");
          end if;
       end loop;
-      if Params'Size > 0 then
+      if Subprogram.Param_Order.Length > 0 then
          Append (Call_To_User_Subp, ");");
       end if;
 
@@ -351,12 +305,11 @@ package body TGen.Wrappers is
 
       --  Check whether there is a precondition attached to this subprogram
 
-      if Subprogram.P_Has_Aspect (+String'("Pre")) then
+      if not Precond.Is_Null then
          declare
             --  Get the formula for the precondition
 
-            F : constant Formula_Type :=
-              Dnf (Subprogram.P_Get_Aspect_Spec_Expr (+String'("Pre")));
+            F : constant Formula_Type := Dnf (Precond.As_Expr);
          begin
             --  Then, write the wrapper
 
@@ -375,7 +328,7 @@ package body TGen.Wrappers is
       else
          Put_Line (F_Body, "      " & (+Call_To_User_Subp));
       end if;
-      Put_Line (F_Body, "   end " & (+F_Name) & ";");
+      Put_Line (F_Body, "   end " & Subprogram.Simple_Name & ";");
       New_Line (F_Body);
 
    end Generate_Wrapper_For_Subprogram;

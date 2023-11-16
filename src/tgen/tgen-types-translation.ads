@@ -53,7 +53,7 @@ package TGen.Types.Translation is
    --  Translate N to TGen's internal type representation
 
    function Translate
-     (N       : LAL.Base_Subp_Spec;
+     (N       : LAL.Basic_Decl;
       Verbose : Boolean := False) return Translation_Result;
 
    package Translation_Maps is new Ada.Containers.Hashed_Maps
