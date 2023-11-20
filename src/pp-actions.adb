@@ -763,15 +763,15 @@ package body Pp.Actions is
    begin
       return
         (case Kind is
-            when Ada_Synthetic_Binary_Spec                => null,
-            when Ada_Synthetic_Unary_Spec                 => null,
-            when Ada_Synthetic_Formal_Param_Decl          => null,
-            when Ada_Synthetic_Subp_Decl                  => null,
-            when Ada_Synthetic_Defining_Name              => null,
-            when Ada_Synthetic_Identifier                 => null,
-            when Ada_Synthetic_Type_Expr                  => null,
-            when Ada_Synthetic_Char_Enum_Lit              => null,
-            when Ada_Synthetic_Type_Predicate_Object_Decl => null,
+            when Ada_Synthetic_Binary_Spec       => null,
+            when Ada_Synthetic_Unary_Spec        => null,
+            when Ada_Synthetic_Formal_Param_Decl => null,
+            when Ada_Synthetic_Subp_Decl         => null,
+            when Ada_Synthetic_Defining_Name     => null,
+            when Ada_Synthetic_Identifier        => null,
+            when Ada_Synthetic_Type_Expr         => null,
+            when Ada_Synthetic_Char_Enum_Lit     => null,
+            when Ada_Synthetic_Object_Decl       => null,
             --  The above nodes are specific to synthetic nodes and will never
             --  appear in source code.
 
@@ -5308,7 +5308,7 @@ package body Pp.Actions is
             (if Is_Attr_Name then Parent_Tree.Kind
              elsif Decl.Is_Null then Null_Kind
              elsif Decl.Kind
-               in Ada_Synthetic_Type_Predicate_Object_Decl_Range
+               in Ada_Synthetic_Object_Decl_Range
              then
                 Decl.Parent.Kind
              else Decl.Kind);
