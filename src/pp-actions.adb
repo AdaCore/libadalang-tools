@@ -1157,6 +1157,8 @@ package body Pp.Actions is
            when Ada_For_Loop_Spec => null,
            when Ada_For_Loop_Var_Decl =>
              L ("!? : ~~~"),
+           when Ada_For_Loop_Iter_Filter =>
+             L ("!"),
            when Ada_While_Loop_Spec =>
              L ("while[ !]"),
            when Ada_Abort_Stmt =>
