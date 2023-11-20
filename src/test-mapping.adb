@@ -587,7 +587,7 @@ package body Test.Mapping is
                            (if Put_If then "if" else "elsif")
                            & " Starts_With (SLOC, """
                            & Src & ":" & Trim (TC.Line'Img, Both)
-                           & """) then");
+                           & ":"") then");
                         if TC.Origin in Gnattest_Generated
                           | Test_Case_Generated
                         then
