@@ -94,11 +94,18 @@ package body TGen.Dependency_Graph is
                end if;
             end loop;
          when Function_Kind =>
-            for Comp_Typ of As_Function_Typ (T).Component_Types
+            for Param_Typ of As_Function_Typ (T).Component_Types
             loop
-               Res.Include (Comp_Typ);
+               Res.Include (Param_Typ);
                if Transitive then
-                  Res.Union (Type_Dependencies (Comp_Typ, Transitive));
+                  Res.Union (Type_Dependencies (Param_Typ, Transitive));
+               end if;
+            end loop;
+            for Global_Typ of As_Function_Typ (T).Globals
+            loop
+               Res.Include (Global_Typ);
+               if Transitive then
+                  Res.Union (Type_Dependencies (Global_Typ, Transitive));
                end if;
             end loop;
          when Disc_Record_Kind =>
