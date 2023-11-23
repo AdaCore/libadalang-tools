@@ -5,6 +5,7 @@ BUILD_MODE ?= dev
 LIBRARY_TYPE ?= static
 LALTOOLS_SET ?= all
 PROCESSORS ?= 0
+BUILD_ROOT ?=
 
 ALL_LIBRARY_TYPES = static static-pic relocatable
 ALL_BUILD_MODES = dev prod AddressSanitizer
@@ -24,17 +25,28 @@ TESTSUITE_PROJECTS ?= \
 ALL_PROJECTS = \
 	$(BIN_PROJECTS) $(LIB_PROJECTS) $(TESTSUITE_PROJECTS)
 
+ifeq ($(BUILD_ROOT),)
+RELOCATE_BUILD=
+BIN=bin
+else
+# build artifacts are relocated to $(BUILD_ROOT)
+RELOCATE_BUILD=--relocate-build-tree=$(BUILD_ROOT) --root-dir=.
+BIN=$(BUILD_ROOT)/bin
+endif
+
+GPRBUILD = gprbuild -v -k -p -j$(PROCESSORS) $(RELOCATE_BUILD)
+
 .PHONY: all
 all:
 	which gprbuild
 	which gcc
 	for proj in $(ALL_PROJECTS) ; do \
-		gprbuild -v -k \
+		$(GPRBUILD) \
 			-XLIBRARY_TYPE=$(LIBRARY_TYPE) \
 			-XXMLADA_BUILD=$(LIBRARY_TYPE) \
 			-XLALTOOLS_BUILD_MODE=$(BUILD_MODE) \
 			-XLALTOOLS_SET=$(LALTOOLS_SET) \
-			-P $$proj -p -j$(PROCESSORS) ; \
+			-P $$proj ; \
 	done
 
 .PHONY: lib
@@ -44,10 +56,10 @@ lib:
 	for proj in $(LIB_PROJECTS) ; do \
 		for kind in $(ALL_LIBRARY_TYPES) ; do \
 			rm -f obj/lib/$$kind/*.lexch; \
-			gprbuild -v -k \
+			$(GPRBUILD) \
 				-XLIBRARY_TYPE=$$kind \
 				-XLALTOOLS_BUILD_MODE=$(BUILD_MODE) \
-				-P $$proj -p -j$(PROCESSORS) ; \
+				-P $$proj ; \
 		done ; \
 	done
 
@@ -56,12 +68,12 @@ bin:
 	which gprbuild
 	which gcc
 	for proj in $(BIN_PROJECTS) ; do \
-		gprbuild -v -k \
+		$(GPRBUILD) \
 			-XLIBRARY_TYPE=$(LIBRARY_TYPE) \
 			-XXMLADA_BUILD=$(LIBRARY_TYPE) \
 			-XLALTOOLS_BUILD_MODE=$(BUILD_MODE) \
 			-XLALTOOLS_SET=$(LALTOOLS_SET) \
-			-P $$proj -p -j$(PROCESSORS) ; \
+			-P $$proj ; \
 	done
 
 .PHONY: testsuite_drivers
@@ -69,17 +81,17 @@ testsuite_drivers:
 	which gprbuild
 	which gcc
 	for proj in $(TESTSUITE_PROJECTS) ; do \
-		gprbuild -v -k \
+		$(GPRBUILD) \
 			-XLIBRARY_TYPE=$(LIBRARY_TYPE) \
 			-XXMLADA_BUILD=$(LIBRARY_TYPE) \
 			-XLALTOOLS_BUILD_MODE=$(BUILD_MODE) \
 			-XLALTOOLS_SET=$(LALTOOLS_SET) \
-			-P $$proj -p -j$(PROCESSORS) ; \
+			-P $$proj ; \
 	done
 
 .PHONY: test
 test: all
-	bin/utils-var_length_ints-test
+	$(BIN)/utils-var_length_ints-test
 	testsuite/testsuite.py
 
 .PHONY: clean
@@ -87,7 +99,7 @@ clean:
 	for proj in $(ALL_PROJECTS) ; do \
 		for build_mode in $(ALL_BUILD_MODES) ; do \
 			for library_type in $(ALL_LIBRARY_TYPES) ; do \
-				gprclean \
+				gprclean $(RELOCATE_BUILD) \
 					-XLIBRARY_TYPE=$$library_type \
 					-XLALTOOLS_BUILD_MODE=$$build_mode \
 					-q -P $$proj; \
@@ -99,7 +111,7 @@ clean:
 install-lib:
 	for proj in $(LIB_PROJECTS) ; do \
 		for kind in $(ALL_LIBRARY_TYPES) ; do \
-			gprinstall \
+			gprinstall $(RELOCATE_BUILD) \
 				-XLIBRARY_TYPE=$$kind \
 				-XLALTOOLS_BUILD_MODE=$(BUILD_MODE) \
 				--prefix="$(DESTDIR)" \
@@ -113,7 +125,7 @@ install-lib:
 .PHONY: install-bin-strip
 install-bin-strip:
 	mkdir -p "$(DESTDIR)"
-	cp -r bin "$(DESTDIR)/"
+	cp -r "$(BIN)" "$(DESTDIR)/"
 	# Don't strip debug builds
 	test "$(BUILD_MODE)" = dev || strip "$(DESTDIR)/bin/"*
 
@@ -122,4 +134,3 @@ install-tgen:
 	mkdir -p "$(DESTDIR)/share/tgen"
 	cp -r src/tgen/tgen_rts "$(DESTDIR)/share/tgen/"
 	cp -r share/tgen/templates "$(DESTDIR)/share/tgen/"
-
