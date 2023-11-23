@@ -1,25 +1,33 @@
 @@--  Template to generate a generation routine for a given
 @@--  subprogram.
 @@--  @_GLOBAL_PREFIX_@ Prefix used to prefix all local entities to the unit.
-@@--  @_SUBP_NAME_@  Simple name of the subprogram for which test vectors will
-@@--                 be generated.
-@@--  @_SUBP_UID_@   UID of the subprogram
+@@--  @_SUBP_NAME_@ Simple name of the subprogram for which test vectors will
+@@--                be generated.
+@@--  @_SUBP_UID_@ UID of the subprogram
 @@--  @_FN_TYP_REF_@ Name of the SP.Ref representing this subp in the value
 @@--                 library.
 @@--  @_PARAM_NAME_@ Simple name of the parameters of the subprogram
-@@--  @_PARAM_TY_@   Fully qualified name of the type of the parameters of the
-@@--                 subprogram.
-@@--  @_INPUT_FN_@   Name of the JSON input function for the parameters of the
-@@--                 subprogram.
-@@--  @_OUTPUT_FN_@  Name of the binary output function name for the parameter
-@@--                 of the subprogram.
-@@--  @_NUM_TESTS_@  Number of tests to be generated for this subprogram (upper
-@@--                 bound for enumerative strategies)
+@@--  @_PARAM_TY_@ Fully qualified name of the type of the parameters of the
+@@--               subprogram.
+@@--  @_GLOBAL_NAME_@ Fully qualified names of the global inputs of the
+@@--                  subprogram.
+@@--  @_GLOBAL_SLUG_@ Slugs (that can be used as identifiers) for the global
+@@--                  inputs of the subprogram.
+@@--  @_INPUT_FN_@ Name of the JSON input function for the parameters of the
+@@--               subprogram.
+@@--  @_OUTPUT_FN_@ Name of the binary output function name for the parameter
+@@--                of the subprogram.
+@@--  @_GLOBAL_INPUT_FN_@ Name of the JSON input function for the global inputs
+@@--                      of the subprogram.
+@@--  @_GLOBAL_OUTPUT_FN_@ Name of the binary output function name for the
+@@--                       global inputs of the subprogram.
+@@--  @_NUM_TESTS_@ Number of tests to be generated for this subprogram (upper
+@@--                bound for enumerative strategies)
 @@--  @_ENUM_STRAT_@ Whether the strategy to be used is the default enum one, or
 @@--                 the default one,
-@@--  @_TC_FORMAT_@  Format in which the test cases should be dumped, either
-@@--                 BIN or JSON.
-@@--  @_TC_NAME_@    Filename for the binary test case files.
+@@--  @_TC_FORMAT_@ Format in which the test cases should be dumped, either
+@@--                BIN or JSON.
+@@--  @_TC_NAME_@ Filename for the binary test case files.
 @@INCLUDE@@ json_templates/util.tmplt
 
 @@IF@@ @_TC_FORMAT_@ = JSON
@@ -28,6 +36,7 @@
    procedure Gen_@_SUBP_NAME_@_@_SUBP_UID_@
      (Unit_JSON : in out TGen.JSON.JSON_Value)
    is
+      use type TGen.JSON.JSON_Value;
       Subp  : TGen.Types.SP.Ref renames @_FN_TYP_REF_@;
 @@IF@@ @_ENUM_STRAT_@
       Strat : TGen.Strategies.Strategy_Type'Class := Subp.Get.Default_Enum_Strategy;
@@ -49,9 +58,21 @@
               @_INPUT_FN_@ (Values.Get ("param_values").Get ("@_PARAM_NAME_@"));
 @@END_TABLE@@
          begin
+           if Values.Has_Field ("global_values")
+              and then Values.Get ("global_values") /= TGen.JSON.JSON_Null
+           then
+              null;
+@@TABLE@@
+              @_GLOBAL_NAME_@ :=
+                @_GLOBAL_INPUT_FN_@ (Values.Get ("global_values").Get ("@_GLOBAL_NAME_@"));
+@@END_TABLE@@
+            end if;
             @_SUBP_NAME_@_Dump_TC
 @@TABLE'ALIGN_ON(":")@@
               @_LPAR()_@@_GLOBAL_PREFIX_@_@_PARAM_NAME_@ => Ada_@_PARAM_NAME_@,
+@@END_TABLE@@
+@@TABLE'ALIGN_ON(":")@@
+               @_GLOBAL_PREFIX_@_@_GLOBAL_SLUG_@ => @_GLOBAL_NAME_@,
 @@END_TABLE@@
                @_GLOBAL_PREFIX_@_Unit_JSON => Unit_JSON,
                @_GLOBAL_PREFIX_@_Origin => "TGen");
@@ -80,6 +101,15 @@
               @_INPUT_FN_@ (Values.Get ("param_values").Get ("@_PARAM_NAME_@"));
 @@END_TABLE@@
          begin
+           if Values.Has_Field ("global_values")
+              and then Values.Get ("global_values") /= TGen.JSON.JSON_Null
+           then
+              null;
+@@TABLE@@
+              @_GLOBAL_NAME_@ :=
+                @_GLOBAL_INPUT_FN_@ (Values.Get ("global_values").Get ("@_GLOBAL_NAME_@"));
+@@END_TABLE@@
+            end if;
             Ada.Streams.Stream_IO.Create
               (File,
                Name =>
@@ -88,6 +118,9 @@
             Stream := Ada.Streams.Stream_IO.Stream (File);
 @@TABLE@@
             @_OUTPUT_FN_@ (Stream, Ada_@_PARAM_NAME_@);
+@@END_TABLE@@
+@@TABLE@@
+            @_GLOBAL_OUTPUT_FN_@ (Stream, @_GLOBAL_NAME_@);
 @@END_TABLE@@
             Ada.Streams.Stream_IO.Close (File);
          end Generate_One;
