@@ -1291,7 +1291,7 @@ package body TGen.Types.Translation is
 
                declare
                   Index_Trans : constant Translation_Result :=
-                  Translate (Index_Typ, Verbose_Diag);
+                    Translate (Index_Typ, Verbose_Diag);
                begin
                   if not Index_Trans.Success then
                      Failure_Reason :=
