@@ -37,6 +37,7 @@ package body TGen.Marshalling.JSON_Marshallers is
       Private_Part       : US_Access;
       Body_Part          : US_Access;
       Typ                : TGen.Types.Typ'Class;
+      Constrains_Array   : Boolean;
       Templates_Root_Dir : String)
    is
       TRD : constant String :=
@@ -249,11 +250,10 @@ package body TGen.Marshalling.JSON_Marshallers is
 
       Generate_Base_Functions_For_Typ_Instance (Typ);
 
-      --  If the type can be used as an array index constraint, also generate
-      --  the functions for Typ'Base. TODO: we probably should do that iff
-      --  the type actually constrains an array.
+      --  If the type is used as an array index constraint, also generate the
+      --  functions for Typ'Base.
 
-      if Typ in Scalar_Typ'Class then
+      if Constrains_Array then
          Generate_Base_Functions_For_Typ_Instance (Typ, For_Base => True);
       end if;
 
