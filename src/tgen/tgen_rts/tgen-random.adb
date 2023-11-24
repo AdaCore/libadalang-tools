@@ -21,6 +21,7 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Environment_Variables;
 with Ada.Numerics.Generic_Elementary_Functions;
 with Ada.Unchecked_Conversion;
 
@@ -456,6 +457,21 @@ package body TGen.Random is
       end case;
    end Random;
 
+   Seed_Env_Var : constant String := "TGEN_RANDOM_SEED";
 begin
-   GNAT.Random_Numbers.Reset (Generator_Instance);
+   if Ada.Environment_Variables.Exists (Seed_Env_Var) then
+      declare
+         use GNAT.Random_Numbers;
+         Var_Value : constant String :=
+           Ada.Environment_Variables.Value (Seed_Env_Var);
+         Init      : Initialization_Vector (1 .. Var_Value'Length);
+      begin
+         for Idx in Var_Value'Range loop
+            Init (Idx) := Unsigned_32 (Character'Pos (Var_Value (Idx)));
+         end loop;
+         GNAT.Random_Numbers.Reset (Generator_Instance, Init);
+      end;
+   else
+      GNAT.Random_Numbers.Reset (Generator_Instance);
+   end if;
 end TGen.Random;

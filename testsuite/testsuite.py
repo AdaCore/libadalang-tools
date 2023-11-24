@@ -78,6 +78,10 @@ class Testsuite(e3.testsuite.Testsuite):
         # Turn on strict mode for gnattest to catch real errors
         os.environ["GNATTEST_STRICT"] = "TRUE"
 
+        # Set a fixed seed for TGen random generation, in order to keep the
+        # testsuite deterministic.
+        os.environ["TGEN_RANDOM_SEED"] = "FIXED_SEED"
+
 
 if __name__ == "__main__":
     Testsuite(os.path.dirname(__file__)).testsuite_main()
