@@ -84,30 +84,24 @@ package body TGen.Types.Translation is
    --  flaged as non static.
 
    function Translate_Int_Decl
-     (Decl : Base_Type_Decl) return Translation_Result with
-      Pre => Decl.P_Is_Int_Type;
+     (Decl : Base_Type_Decl) return Translation_Result;
 
    function Translate_Enum_Decl
      (Decl           : Base_Type_Decl;
       Root_Enum_Decl : Base_Type_Decl)
-      return Translation_Result with
-     Pre => Decl.P_Is_Static_Decl and then Decl.P_Is_Enum_Type;
+      return Translation_Result;
 
    function Translate_Char_Decl
-     (Decl : Base_Type_Decl) return Translation_Result with
-     Pre => Decl.P_Is_Static_Decl and then Decl.P_Is_Enum_Type;
+     (Decl : Base_Type_Decl) return Translation_Result;
 
    function Translate_Float_Decl
-     (Decl : Base_Type_Decl) return Translation_Result with
-     Pre => Decl.P_Is_Static_Decl and then Decl.P_Is_Float_Type;
+     (Decl : Base_Type_Decl) return Translation_Result;
 
    function Translate_Ordinary_Fixed_Decl
-     (Decl : Base_Type_Decl) return Translation_Result with
-     Pre => Decl.P_Is_Static_Decl and then Decl.P_Is_Fixed_Point;
+     (Decl : Base_Type_Decl) return Translation_Result;
 
    function Translate_Decimal_Fixed_Decl
-     (Decl : Base_Type_Decl) return Translation_Result with
-     Pre => Decl.P_Is_Static_Decl and then Decl.P_Is_Fixed_Point;
+     (Decl : Base_Type_Decl) return Translation_Result;
 
    procedure Translate_Float_Range
      (Decl      :     Base_Type_Decl;
