@@ -30,7 +30,7 @@ RELOCATE_BUILD=
 BIN=bin
 else
 # build artifacts are relocated to $(BUILD_ROOT)
-RELOCATE_BUILD=--relocate-build-tree=$(BUILD_ROOT) --root-dir=.
+RELOCATE_BUILD=--relocate-build-tree="$(BUILD_ROOT)" --root-dir=.
 BIN=$(BUILD_ROOT)/bin
 endif
 
