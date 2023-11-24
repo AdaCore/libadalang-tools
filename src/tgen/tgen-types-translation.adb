@@ -2940,7 +2940,8 @@ package body TGen.Types.Translation is
              (Reason => To_Unbounded_String
                 ("Anonymous array or access type unsupported"),
             others   => <>));
-      elsif Text.Image (Type_Name.P_Fully_Qualified_Name) = "System.Address"
+      elsif Text.Image (N.P_Root_Type.P_Fully_Qualified_Name)
+        = "System.Address"
       then
 
          --  Special case for System.Address, which is actually defined as a
