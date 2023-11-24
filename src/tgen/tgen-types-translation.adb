@@ -3094,7 +3094,7 @@ package body TGen.Types.Translation is
    ---------------
 
    function Translate
-     (N       : LAL.Base_Subp_Spec;
+     (N       : LAL.Basic_Decl;
       Verbose : Boolean := False) return Translation_Result
    is
       F_Typ         : Function_Typ;
@@ -3104,16 +3104,22 @@ package body TGen.Types.Translation is
         Unbounded_Text_Type_Array'(N.P_Enclosing_Compilation_Unit.P_Decl
                                    .P_Fully_Qualified_Name_Array)'Last;
 
-      Parent_Decl : constant Basic_Decl := N.P_Parent_Basic_Decl;
       UID         : constant String :=
-        Test.Common.Mangle_Hash_16 (Subp => Parent_Decl);
+        Test.Common.Mangle_Hash_16 (Subp => N);
       Long_UID    : constant String :=
-        Test.Common.Mangle_Hash_Full (Subp => Parent_Decl);
+        Test.Common.Mangle_Hash_Full (Subp => N);
+
+      Designated_Decl : Basic_Decl := N;
    begin
+
+      if Kind (N) = Ada_Generic_Subp_Instantiation then
+         Designated_Decl :=
+           N.As_Generic_Subp_Instantiation.P_Designated_Generic_Decl;
+      end if;
 
       F_Typ.Last_Comp_Unit_Idx := Comp_Unit_Idx;
       F_Typ.Name :=
-        Convert_Qualified_Name (Parent_Decl.P_Fully_Qualified_Name_Array)
+        Convert_Qualified_Name (N.P_Fully_Qualified_Name_Array)
         & TGen.Strings.Ada_Identifier
            (Ada.Strings.Unbounded.To_Unbounded_String (UID));
 
@@ -3128,45 +3134,52 @@ package body TGen.Types.Translation is
          end if;
       end;
 
-      for Param of N.P_Params loop
-         declare
-            Current_Typ : constant Translation_Result :=
-              Translate (Param.F_Type_Expr, Verbose);
-         begin
-            if Current_Typ.Success then
+      declare
+         Subp_Spec : constant Base_Subp_Spec :=
+           Designated_Decl.P_Subp_Spec_Or_Null;
+      begin
+         for Param of Subp_Spec.P_Params loop
+            declare
+               Current_Typ : constant Translation_Result :=
+                 Translate (Param.F_Type_Expr.P_Designated_Type_Decl, Verbose);
+            begin
+               if Current_Typ.Success then
 
-               for Id of Param.F_Ids loop
-                  F_Typ.Component_Types.Insert
-                    (Key      => +Id.As_Defining_Name.Text,
-                     New_Item => Current_Typ.Res);
-                  F_Typ.Param_Modes.Insert
-                    (Key      => +Id.As_Defining_Name.Text,
-                     New_Item =>
-                       (case Param.F_Mode is
-                        when Ada_Mode_Default | Ada_Mode_In => In_Mode,
-                        when Ada_Mode_In_Out                => In_Out_Mode,
-                        when others                         => Out_Mode));
-                  F_Typ.Param_Order.Append (+Id.As_Defining_Name.Text);
-               end loop;
-            else
-               return Current_Typ;
-            end if;
-         end;
-      end loop;
+                  for Id of Param.F_Ids loop
+                     F_Typ.Component_Types.Insert
+                       (Key      => +Id.As_Defining_Name.Text,
+                        New_Item => Current_Typ.Res);
+                     F_Typ.Param_Modes.Insert
+                       (Key      => +Id.As_Defining_Name.Text,
+                        New_Item =>
+                          (case Param.F_Mode is
+                              when Ada_Mode_Default | Ada_Mode_In => In_Mode,
+                              when Ada_Mode_In_Out                =>
+                                In_Out_Mode,
+                              when others                         =>
+                                Out_Mode));
+                     F_Typ.Param_Order.Append (+Id.As_Defining_Name.Text);
+                  end loop;
+               else
+                  return Current_Typ;
+               end if;
+            end;
+         end loop;
 
-      if not N.P_Returns.Is_Null then
-         declare
-            Ret : constant Translation_Result :=
-              Translate (N.P_Returns, Verbose);
-         begin
-            if not Ret.Success then
-               return (False, Ret.Diagnostics);
-            end if;
-            F_Typ.Ret_Typ := Ret.Res;
-         end;
-      else
-         F_Typ.Ret_Typ := SP.Null_Ref;
-      end if;
+         if not Subp_Spec.P_Returns.Is_Null then
+            declare
+               Ret : constant Translation_Result :=
+                 Translate (Subp_Spec.P_Returns, Verbose);
+            begin
+               if not Ret.Success then
+                  return (False, Ret.Diagnostics);
+               end if;
+               F_Typ.Ret_Typ := Ret.Res;
+            end;
+         else
+            F_Typ.Ret_Typ := SP.Null_Ref;
+         end if;
+      end;
 
       --  Function type was successfully translated
 

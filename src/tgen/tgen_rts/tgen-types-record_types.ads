@@ -348,6 +348,13 @@ package TGen.Types.Record_Types is
    pragma Inline (As_Discriminated_Record_Typ);
 
    type Parameter_Mode is (In_Mode, In_Out_Mode, Out_Mode);
+
+   function Image (P_Mode : Parameter_Mode) return String is
+     (case P_Mode is
+         when In_Mode     => "in",
+         when Out_Mode    => "out",
+         when In_Out_Mode => "in out");
+
    package Parameter_Mode_Maps is new Ada.Containers.Hashed_Maps
      (Key_Type        => Unbounded_String,
       Element_Type    => Parameter_Mode,
@@ -372,9 +379,14 @@ package TGen.Types.Record_Types is
    function Kind (Self : Function_Typ) return Typ_Kind is
      (Function_Kind);
 
-   function Simple_Name (Self : Function_Typ) return String;
-   --  Return the simple name associated with this subprogram,
-   --  removing unit name prefix and the trailing hash.
+   function FQN (Self : Function_Typ) return String;
+  --  Return the fully qualified name associated with this subprogram,
+  --  removing the trailing hash.
+
+   function Simple_Name (Self : Function_Typ) return String is
+      (+Unbounded_String (Self.Name.Element (Self.Name.Last_Index - 1)));
+  --  Return the simple name associated with this subprogram,
+  --  removing unit name prefix and the trailing hash.
 
    function JSON_Test_Filename (Self : Function_Typ) return String;
    --  Return the simple name of the file in which tests for Self should be

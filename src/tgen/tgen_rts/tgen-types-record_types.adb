@@ -1576,15 +1576,16 @@ package body TGen.Types.Record_Types is
       return Res;
    end Default_Enum_Strategy;
 
-   -----------------
-   -- Simple_Name --
-   -----------------
+   ---------
+   -- FQN --
+   ---------
 
-   function Simple_Name (Self : Function_Typ) return String is
+   function FQN (Self : Function_Typ) return String is
+      Result : Ada_Qualified_Name := Self.Name.Copy;
    begin
-      return To_String (Unbounded_String
-        (Self.Name.Element (Self.Name.Last_Index - 1)));
-   end Simple_Name;
+      Result.Delete_Last;
+      return To_Ada (Result);
+   end FQN;
 
    ------------------------
    -- JSON_Test_Filename --
