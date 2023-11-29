@@ -1515,6 +1515,10 @@ package body TGen.Types.Record_Types is
       end;
    end Generate;
 
+   ---------------------------
+   -- Default_Enum_Strategy --
+   ---------------------------
+
    function Default_Enum_Strategy
      (Self : Discriminated_Record_Typ) return Enum_Strategy_Type'Class
    is
@@ -1593,5 +1597,243 @@ package body TGen.Types.Record_Types is
 
    function JSON_Test_Filename (Self : Function_Typ) return String is
      (To_Filename (Self.Compilation_Unit_Name) & ".json");
+
+   ------------
+   -- Encode --
+   ------------
+
+   function Encode
+     (Self : Function_Typ; Val : JSON_Value) return JSON_Value
+   is
+      use Component_Maps;
+      Params  : constant JSON_Value := Val.Get ("param_values").Clone;
+      Globals : constant JSON_Value := Val.Get ("global_values").Clone;
+   begin
+      return Res : constant JSON_Value := Create_Object do
+         for Cur in Self.Component_Types.Iterate loop
+            declare
+               Param_Name : constant String := To_String (Key (Cur));
+               Param_Val  : constant JSON_Value := Params.Get (Param_Name);
+            begin
+               Params.Set_Field
+                 (Param_Name, Element (Cur).Get.Encode (Param_Val));
+            end;
+         end loop;
+         for Cur in Self.Globals.Iterate loop
+            declare
+               Global_Name : constant String := To_String (Key (Cur));
+               Global_Val  : constant JSON_Value := Globals.Get (Global_Name);
+            begin
+               Globals.Set_Field
+                 (Global_Name, Element (Cur).Get.Encode (Global_Val));
+            end;
+         end loop;
+         Res.Set_Field ("param_values", Params);
+         Res.Set_Field ("global_values", Globals);
+      end return;
+   end Encode;
+
+   type Function_Strategy_Type is new Random_Strategy_Type with
+      record
+         T                : SP.Ref;
+         Component_Strats : Strategy_Map;
+      end record;
+   --  Strategy to generate test case vectors for subprograms
+
+   function Generate
+     (S           : in out Function_Strategy_Type;
+      Disc_Values : Disc_Value_Map) return JSON_Value;
+
+   --------------
+   -- Generate --
+   --------------
+
+   function Generate
+     (S           : in out Function_Strategy_Type;
+      Disc_Values : Disc_Value_Map) return JSON_Value
+   is
+      use Component_Maps;
+      FN_Typ : constant Function_Typ'Class := As_Function_Typ (S.T);
+      Result : constant JSON_Value := Create_Object;
+
+      Generated_Value : JSON_Value;
+
+      Param_Values  : constant JSON_Value := Create_Object;
+      Global_Values : constant JSON_Value := Create_Object;
+   begin
+      --  Generate the parameter values + global values
+
+      declare
+         FN_As_Rec_Typ     : Record_Typ;
+         FN_As_Rec_Typ_Ref : SP.Ref;
+      begin
+         FN_As_Rec_Typ.Component_Types := FN_Typ.Component_Types;
+         for Cur in FN_Typ.Globals.Iterate loop
+            FN_As_Rec_Typ.Component_Types.Insert (Key (Cur), Element (Cur));
+         end loop;
+         SP.Set (FN_As_Rec_Typ_Ref, FN_As_Rec_Typ);
+         Generated_Value :=
+           Generate_Record_Typ
+             (FN_As_Rec_Typ_Ref, S.Component_Strats, Disc_Values);
+      end;
+
+      --  Set the component values
+
+      for Cur in FN_Typ.Component_Types.Iterate loop
+         declare
+            Param_Name : constant String := +Key (Cur);
+         begin
+            if Generated_Value.Has_Field (Param_Name) then
+               Param_Values.Set_Field
+                 (Param_Name,
+                  JSON_Value'(Generated_Value.Get (Param_Name)));
+            end if;
+         end;
+      end loop;
+      for Cur in FN_Typ.Globals.Iterate loop
+         declare
+            Global_Name : constant String := +Key (Cur);
+         begin
+            if Generated_Value.Has_Field (Global_Name) then
+               Global_Values.Set_Field
+                 (Global_Name,
+                  JSON_Value'(Generated_Value.Get (Global_Name)));
+            end if;
+         end;
+      end loop;
+      Set_Field (Result, "param_values", Param_Values);
+      Set_Field (Result, "global_values", Global_Values);
+      return Result;
+   end Generate;
+
+   ----------------------
+   -- Default_Strategy --
+   ----------------------
+
+   overriding function Default_Strategy
+     (Self : Function_Typ) return Strategy_Type'Class
+   is
+      use Component_Maps;
+
+      Strat : Function_Strategy_Type;
+
+      procedure Process_Components (Comps : Component_Map);
+
+      ------------------------
+      -- Process_Components --
+      ------------------------
+
+      procedure Process_Components (Comps : Component_Map) is
+      begin
+         for Component in Comps.Iterate loop
+            declare
+               Comp_Name : constant Unbounded_String := Key (Component);
+            begin
+               Strat.Component_Strats.Insert
+                 (Comp_Name,
+                  new Strategy_Type'Class'
+                    (Element (Component).Get.Default_Strategy));
+            end;
+         end loop;
+      end Process_Components;
+   begin
+      SP.From_Element (Strat.T, Self'Unrestricted_Access);
+      Process_Components (Self.Component_Types);
+      Process_Components (Self.Globals);
+      return Strat;
+   end Default_Strategy;
+
+   type Enum_Function_Strategy_Type is new Enum_Record_Strategy_Type with
+      record
+         T : SP.Ref;
+         --  Reference to the function type, to know parameter and global
+         --  names.
+
+      end record;
+
+   overriding function Generate
+     (S            : in out Enum_Function_Strategy_Type;
+      Disc_Context : Disc_Value_Map) return JSON_Value;
+
+   --------------
+   -- Generate --
+   --------------
+
+   overriding function Generate
+     (S            : in out Enum_Function_Strategy_Type;
+      Disc_Context : Disc_Value_Map) return JSON_Value
+   is
+      use Component_Maps;
+      Intermediate_Result : constant JSON_Value :=
+        Generate (Enum_Record_Strategy_Type (S), Disc_Context)
+          .Get ("components");
+      T                   : constant Function_Typ'Class :=
+        As_Function_Typ (S.T);
+
+      Result        : constant JSON_Value := Create_Object;
+      Param_Values  : constant JSON_Value := Create_Object;
+      Global_Values : constant JSON_Value := Create_Object;
+   begin
+      for Param_Cur in T.Component_Types.Iterate loop
+         declare
+            Name : constant String := +Key (Param_Cur);
+         begin
+            Param_Values.Set_Field
+              (Name, JSON_Value'(Intermediate_Result.Get (Name)));
+         end;
+      end loop;
+      for Global_Cur in T.Globals.Iterate loop
+         declare
+            Name : constant String := +Key (Global_Cur);
+         begin
+            Global_Values.Set_Field
+              (Name, JSON_Value'(Intermediate_Result.Get (Name)));
+         end;
+      end loop;
+      Result.Set_Field ("param_values", Param_Values);
+      Result.Set_Field ("global_values", Global_Values);
+      return Result;
+   end Generate;
+
+   ---------------------------
+   -- Default_Enum_Strategy --
+   ---------------------------
+
+   function Default_Enum_Strategy
+     (Self : Function_Typ) return Enum_Strategy_Type'Class
+   is
+      Strat : Enum_Function_Strategy_Type;
+
+      procedure Process_Components (Components : Component_Map);
+
+      ------------------------
+      -- Process_Components --
+      ------------------------
+
+      procedure Process_Components (Components : Component_Map) is
+      begin
+         for Cur in Components.Iterate loop
+            declare
+               use Component_Maps;
+               Comp_Name : constant Unbounded_String := Key (Cur);
+               Comp_Type : constant SP.Ref := Element (Cur);
+               Comp_Info : constant Enum_Strat_Component_Info :=
+                 (Comp_Name => Comp_Name,
+                  Strat     => new Enum_Strategy_Type'Class'
+                    (Comp_Type.Get.Default_Enum_Strategy),
+                  Values    => Empty_Array,
+                  Index     => 0);
+            begin
+               Strat.Component_Strats.Append (Comp_Info);
+            end;
+         end loop;
+      end Process_Components;
+
+   begin
+      SP.Set (Strat.T, Self);
+      Process_Components (Self.Component_Types);
+      Process_Components (Self.Globals);
+      return Strat;
+   end Default_Enum_Strategy;
 
 end TGen.Types.Record_Types;

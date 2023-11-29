@@ -6799,9 +6799,10 @@ package body Test.Skeleton is
 
       Unit_Raw_Content : GNAT.Strings.String_Access;
 
-      Unit_Content : JSON_Value := JSON_Null;
-      Subp_Content : JSON_Value := JSON_Null;
-      Single_Vec   : JSON_Array;
+      Unit_Content  : JSON_Value := JSON_Null;
+      Subp_Content  : JSON_Value := JSON_Null;
+      Param_Values  : JSON_Array;
+      Global_Values : JSON_Array;
 
       Diags : Unbounded_String;
       --  Diagnostics for TGen.Libgen.Include_Subp
@@ -6930,7 +6931,7 @@ package body Test.Skeleton is
 
             procedure Pp_Subp_Call
               (F : File_Type; Initial_Pad : Natural := 0);
-            --  Output a call to subp with the values in Single_Vec, indented
+            --  Output a call to subp with the values in Param_Values, indented
             --  by Initial_Pad amount.
 
             procedure Put_Line (F : File_Kind; S : String);
@@ -6975,18 +6976,23 @@ package body Test.Skeleton is
             begin
                Put (F, Pad_Str & Subp_Content.Get ("fully_qualified_name")
                     & " (");
-               for Param_Id in Single_Vec loop
+               for Param_Id in Param_Values loop
                   Put
                     (F,
-                     Array_Element (Single_Vec, Param_Id).Get ("name") & " => "
+                     Array_Element (Param_Values, Param_Id)
+                     .Get ("name") & " => "
                      & "Param_"
-                     & Array_Element (Single_Vec, Param_Id).Get ("name"));
-                  if Array_Has_Element (Single_Vec, Param_Id + 1) then
+                     & Array_Element (Param_Values, Param_Id).Get ("name"));
+                  if Array_Has_Element (Param_Values, Param_Id + 1) then
                      Put (F, ", ");
                   end if;
                end loop;
                Put (F, ");");
             end Pp_Subp_Call;
+
+            ------------------------
+            -- Pp_JSON_Object_Lit --
+            ------------------------
 
             procedure Pp_JSON_Object_Lit
               (F : File_Kind; Obj : JSON_Value; Indent : Natural)
@@ -7111,7 +7117,11 @@ package body Test.Skeleton is
                   Origin            => Test_Case_Generated,
                   Subp              => Subp);
 
-               Single_Vec := Test_Vec.Get ("param_values");
+               Param_Values := Test_Vec.Get ("param_values");
+               Global_Values :=
+                 (if Test_Vec.Has_Field ("global_values")
+                  then Test_Vec.Get ("global_values")
+                  else TGen.JSON.Empty_Array);
 
                Put_Line
                  (Spec_Kind,
@@ -7167,17 +7177,15 @@ package body Test.Skeleton is
                   Instrument_Setup := False;
                end if;
 
-               for Param of Single_Vec loop
+               for Param of Param_Values loop
                   if Test.Common.Unparse_Test_Vectors then
 
-                     --  If the user requested unparsing the tests, generate
-                     --  a single declaration holding the _unparsed_ parameter
-                     --  value.
+                     --  If the user requested unparsing the tests, write
+                     --  the unparsed parameter value.
 
                      declare
                         Unparsed_JSON : constant JSON_Value :=
-                          TGen.JSON.Unparse.Unparse
-                            (Param.Get ("value"));
+                          TGen.JSON.Unparse.Unparse (Param.Get ("value"));
                         Constraints   : Unbounded_String;
                         Value         : Unbounded_String;
                      begin
@@ -7214,7 +7222,49 @@ package body Test.Skeleton is
                      end;
                   end if;
                end loop;
+
                Put_Line (Body_Kind, Com & "begin");
+               for Global of Global_Values loop
+                  if Test.Common.Unparse_Test_Vectors then
+
+                     --  If the user requested unparsing the tests, set the
+                     --  global to its unparsed value.
+
+                     declare
+                        Unparsed_JSON : constant JSON_Value :=
+                          TGen.JSON.Unparse.Unparse (Global.Get ("value"));
+                        Constraints   : Unbounded_String;
+                        Value         : Unbounded_String;
+                     begin
+                        if Has_Field (Unparsed_JSON, "constraints") then
+                           Constraints := Get (Unparsed_JSON, "constraints");
+                        end if;
+                        Value := Get (Unparsed_JSON, "value");
+
+                        Put_Line
+                          (Body_Kind,
+                           Com & Global.Get ("name") & " " & (+Constraints)
+                           &  " := " & (+Value) & ";");
+                     end;
+                  else
+                     --  Otherwise (unparsing not requested), retrieve the
+                     --  value using the JSON unmarshaller.
+
+                     declare
+                        Value : constant Unbounded_String :=
+                          +Input_Fname_For_Typ
+                          (To_Qualified_Name (Global.Get ("type_name")))
+                          & " (TGen.JSON.Read (";
+                     begin
+                        Put_Line
+                          (Body_Kind,
+                           Com & Global.Get ("name") & ":= " & (+Value));
+                        Pp_JSON_Object_Lit
+                          (Body_Kind, Global.Get ("value"), 5);
+                        Put_Line (Body_Kind, "));");
+                     end;
+                  end if;
+               end loop;
                if Is_Function then
                   Put_Line (Body_Kind, Com & "   declare");
                   Put_Line (Body_Kind, Com & "      Ret_Val : "

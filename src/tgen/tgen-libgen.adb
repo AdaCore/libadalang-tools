@@ -319,7 +319,7 @@ package body TGen.Libgen is
                       (Spec_Part_Acc,
                        Private_Part'Unrestricted_Access,
                        Body_Part'Unrestricted_Access,
-                       T.Get,
+                       As_Function_Typ (T),
                        TRD);
                else
                   TGen.Marshalling.Binary_Marshallers
@@ -1033,14 +1033,22 @@ package body TGen.Libgen is
       for Subp of Subps loop
          declare
             use Component_Maps;
+
             Assocs : Translate_Set;
+
             Param_Names : Vector_Tag;
             Param_Types : Vector_Tag;
             Input_FNs   : Vector_Tag;
             Output_FNs  : Vector_Tag;
-            Real_Name   : constant String :=
+
+            Global_Names      : Vector_Tag;
+            Global_Slugs      : Vector_Tag;
+            Global_Input_FNs  : Vector_Tag;
+            Global_Output_FNs : Vector_Tag;
+
+            Real_Name : constant String :=
               As_Function_Typ (Subp).Simple_Name;
-            Subp_Name   : constant String :=
+            Subp_Name : constant String :=
               (if Is_Operator (Real_Name)
                then Map_Operator_Name (Real_Name)
                else Real_Name);
@@ -1048,11 +1056,13 @@ package body TGen.Libgen is
             Concrete_Typ : SP.Ref;
             --  Shortcut to hold the concrete type of a parameter
 
-            Params : Component_Map renames
+            Params         : Component_Map renames
               As_Function_Typ (Subp).Component_Types;
-            Param_Cur : Component_Maps.Cursor;
+            Param_Cur      : Component_Maps.Cursor;
             Ordered_Params : String_Vectors.Vector renames
               As_Function_Typ (Subp).Param_Order;
+            Globals        : Component_Map renames
+              As_Function_Typ (Subp).Globals;
          begin
             Assocs.Insert (Assoc ("GLOBAL_PREFIX", Global_Prefix));
             Assocs.Insert (Assoc ("NUM_TESTS", Default_Test_Num));
@@ -1063,7 +1073,10 @@ package body TGen.Libgen is
               (Assoc ("SUBP_UID", As_Function_Typ (Subp).Subp_UID));
             Assocs.Insert
               (Assoc
-                ("FN_TYP_REF", Subp.Get.Slug & "_Typ_Ref"));
+                 ("FN_TYP_REF", Subp.Get.Slug & "_Typ_Ref"));
+
+            --  Deal with parameters
+
             for Param_Name of Ordered_Params loop
                Param_Cur := Params.Find (Param_Name);
                Param_Names.Append (Unbounded_String (Key (Param_Cur)));
@@ -1083,8 +1096,36 @@ package body TGen.Libgen is
             end loop;
             Assocs.Insert (Assoc ("PARAM_NAME", Param_Names));
             Assocs.Insert (Assoc ("PARAM_TY", Param_Types));
+
+            --  Deal with globals
+
+            for Global_Cur in Globals.Iterate loop
+               Global_Names.Append (Key (Global_Cur));
+               Global_Slugs.Append
+                 (To_Symbol
+                    (To_Qualified_Name (+Key (Global_Cur)),
+                     Sep => '_'));
+               if Element (Global_Cur).Get.Kind in Anonymous_Kind then
+                  Concrete_Typ :=
+                    As_Anonymous_Typ (Element (Global_Cur)).Named_Ancestor;
+               elsif Element (Global_Cur).Get.Kind in Instance_Kind then
+                  Concrete_Typ :=
+                    As_Instance_Typ (Element (Global_Cur)).Orig_Typ;
+               else
+                  Concrete_Typ := Element (Global_Cur);
+               end if;
+               Global_Input_FNs.Append
+                 (Input_Fname_For_Typ (Concrete_Typ.Get.Name));
+               Global_Output_FNs.Append
+                 (Output_Fname_For_Typ (Concrete_Typ.Get.Name));
+            end loop;
+            Assocs.Insert (Assoc ("GLOBAL_NAME", Global_Names));
+            Assocs.Insert (Assoc ("GLOBAL_SLUG", Global_Slugs));
+
             Assocs.Insert (Assoc ("INPUT_FN", Input_FNs));
             Assocs.Insert (Assoc ("OUTPUT_FN", Output_FNs));
+            Assocs.Insert (Assoc ("GLOBAL_INPUT_FN", Global_Input_FNs));
+            Assocs.Insert (Assoc ("GLOBAL_OUTPUT_FN", Global_Output_FNs));
             Assocs.Insert
               (Assoc
                  ("TC_NAME",

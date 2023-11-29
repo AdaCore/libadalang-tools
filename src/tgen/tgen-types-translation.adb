@@ -42,6 +42,7 @@ with TGen.Types.Enum_Types;      use TGen.Types.Enum_Types;
 with TGen.Types.Int_Types;       use TGen.Types.Int_Types;
 with TGen.Types.Real_Types;      use TGen.Types.Real_Types;
 with TGen.Types.Record_Types;    use TGen.Types.Record_Types;
+with TGen.Marshalling;
 with TGen.Numerics;
 
 package body TGen.Types.Translation is
@@ -52,6 +53,8 @@ package body TGen.Types.Translation is
    --  Exception raised when the translation of a type that should be static
    --  ends up not being static, due to missing bits in the static evaluator
    --  in LAL.
+
+   package LALCO renames Libadalang.Common;
 
    function New_Eval_As_Int
      (Node : Expr'Class) return GNATCOLL.GMP.Integers.Big_Integer;
@@ -1292,7 +1295,7 @@ package body TGen.Types.Translation is
                begin
                   if not Index_Trans.Success then
                      Failure_Reason :=
-                     "Failed to translate type of the index dimention"
+                     "Failed to translate type of the index dimension"
                      & Current_Index'Image & ": " & Index_Trans.Diagnostics;
                      goto Failed_UC_Translation;
                   end if;
@@ -3084,6 +3087,148 @@ package body TGen.Types.Translation is
          return Translate_Internal (N, Verbose_Diag, True);
    end Translate_Internal;
 
+   function Process_Globals
+     (N : Expr; Verbose : Boolean) return Component_Map;
+   --  Return the list of globals specified in the global aspect. See the
+   --  documentation of the Globals field of the
+   --  TGen.Types.Record_Types.Function_Typ type for more information.
+
+   ---------------------
+   -- Process_Globals --
+   ---------------------
+
+   function Process_Globals
+     (N : Expr; Verbose : Boolean) return Component_Map
+   is
+      Result : Component_Map;
+
+      procedure Process_Global (N : LAL.Name);
+
+      --------------------
+      -- Process_Global --
+      --------------------
+
+      procedure Process_Global (N : LAL.Name) is
+         Global : constant Basic_Decl := N.P_Referenced_Decl;
+      begin
+
+         if Kind (Global) = Ada_Object_Decl then
+            declare
+               Obj_Decl : constant Object_Decl := Global.As_Object_Decl;
+            begin
+               --  If the global is a constant, ignore it
+
+               if not Obj_Decl.F_Has_Constant then
+                  declare
+                     Global_Typ_Translation : constant Translation_Result :=
+                       Translate (Global.As_Object_Decl.F_Type_Expr, Verbose);
+                  begin
+                     if Global_Typ_Translation.Success then
+                        if TGen.Marshalling.Is_Supported_Type
+                          (Global_Typ_Translation.Res.Get)
+                        then
+                           Result.Insert
+                             (+To_Ada
+                                (Convert_Qualified_Name
+                                     (Obj_Decl.P_Fully_Qualified_Name_Array)),
+                              Global_Typ_Translation.Res);
+                        end if;
+                     else
+                        if Verbose then
+                           Put_Line
+                             ("Warning: ignoring global "
+                              & (+Obj_Decl.P_Fully_Qualified_Name)
+                             & " (translation failure).");
+                        end if;
+                     end if;
+                  end;
+               end if;
+            end;
+         end if;
+      end Process_Global;
+
+   begin
+      case Kind (N) is
+         when Ada_Aggregate =>
+            for Assoc of N.As_Aggregate.F_Assocs loop
+               if Kind (Assoc) = Ada_Aggregate_Assoc then
+                  declare
+                     Aggr_Assoc  : constant Aggregate_Assoc :=
+                       Assoc.As_Aggregate_Assoc;
+                     Designator  : Identifier;
+                     Designators : constant Alternatives_List :=
+                       Aggr_Assoc.F_Designators;
+                  begin
+                     --  Grab the globals annotation, if any (input,
+                     --  output ...).
+
+                     declare
+                        Designators_List : Ada_Node_List renames
+                          Ada_Node_List (Designators);
+                        Fst              : constant Positive :=
+                          Ada_Node_List_First (Designators_List);
+                     begin
+                        if Ada_Node_List_Has_Element (Designators_List, Fst)
+                        then
+                           declare
+                              Fst_Elem : constant Ada_Node'Class :=
+                                Ada_Node_List_Element (Designators_List, Fst);
+                           begin
+                              if Kind (Fst_Elem) = LALCO.Ada_Identifier then
+                                 Designator := Fst_Elem.As_Identifier;
+                              end if;
+                           end;
+                        end if;
+                     end;
+
+                     if Designator.Is_Null then
+
+                        --  In this case, we have a list of global variables,
+                        --  e.g. "with Global => (A, B, C)".
+
+                        declare
+                           Assoc_Expr : constant Expr := Aggr_Assoc.F_R_Expr;
+                        begin
+                           if Kind (Assoc_Expr) in LALCO.Ada_Name
+                           then
+                              Process_Global (Assoc_Expr.As_Name);
+                           end if;
+                        end;
+
+                     else
+                        --  We are in the case where the user explicitly
+                        --  specified the globals kind, e.g.
+                        --  "with Global => (Input => (<global>))". Grab the
+                        --  Input + In_Out annotated globals.
+
+                        declare
+                           Globals_Kind : constant String :=
+                             +To_Lower (Designator.Text);
+                        begin
+                           if Globals_Kind in "input" | "in_out" then
+                              for Cur in Process_Globals
+                                (Aggr_Assoc.F_R_Expr, Verbose).Iterate
+                              loop
+                                 Result.Insert
+                                   (Component_Maps.Key (Cur),
+                                    Component_Maps.Element (Cur));
+                              end loop;
+                           end if;
+                        end;
+                     end if;
+                  end;
+               end if;
+            end loop;
+
+         when LALCO.Ada_Name =>
+            Process_Global (N.As_Name);
+
+         when others =>
+            null;
+      end case;
+      return Result;
+   end Process_Globals;
+
    ---------------
    -- Translate --
    ---------------
@@ -3106,7 +3251,6 @@ package body TGen.Types.Translation is
 
       Designated_Decl : Basic_Decl := N;
    begin
-
       if Kind (N) = Ada_Generic_Subp_Instantiation then
          Designated_Decl :=
            N.As_Generic_Subp_Instantiation.P_Designated_Generic_Decl;
@@ -3187,11 +3331,28 @@ package body TGen.Types.Translation is
       F_Typ.Fully_Private :=
         (for some Param of F_Typ.Component_Types => Param.Get.Fully_Private);
 
+      --  Check the globals through the Globals aspect
+
+      declare
+         Global_Aspect : constant Unbounded_Text_Type :=
+           To_Unbounded_Text (To_Text ("Global"));
+      begin
+         if N.P_Has_Aspect (Global_Aspect) then
+            F_Typ.Globals :=
+              Process_Globals
+                (N.P_Get_Aspect_Spec_Expr (Global_Aspect), Verbose);
+         end if;
+      end;
+
       F_Typ_Ref.Set (F_Typ);
       Translation_Cache.Insert (F_Typ.Name, F_Typ_Ref);
       Result.Res := F_Typ_Ref;
       return Result;
    end Translate;
+
+   -----------------------
+   -- Print_Cache_Stats --
+   -----------------------
 
    procedure Print_Cache_Stats is
    begin
@@ -3200,6 +3361,10 @@ package body TGen.Types.Translation is
       Put_Line ("Cache hits  :" & Cache_Hits'Image);
       Put_Line ("Cache misses:" & Cache_Miss'Image);
    end Print_Cache_Stats;
+
+   -----------------
+   -- Clear_Cache --
+   -----------------
 
    procedure Clear_Cache is
    begin

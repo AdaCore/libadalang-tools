@@ -414,6 +414,10 @@ package body TGen.Type_Representation is
       Scalar_Typ_Decl : out Unbounded_String;
       Scalar_Typ_Init : out Unbounded_String);
 
+   ---------------------------------
+   -- Collect_Info_For_Scalar_Typ --
+   ---------------------------------
+
    procedure Collect_Info_For_Scalar_Typ
      (T : Scalar_Typ'Class;
       Scalar_Typ_Decl_Template, Scalar_Typ_Init_Template : String;
@@ -690,11 +694,10 @@ package body TGen.Type_Representation is
          Record_Typ_Decl : out Unbounded_String;
          Record_Typ_Init : out Unbounded_String)
       is
-         Discr_Names        : Vector_Tag;
-         Discr_Types        : Vector_Tag;
-         Comp_Names         : Vector_Tag;
-         Comp_Types         : Vector_Tag;
-         Comp_Names_Ordered : Vector_Tag;
+         Discr_Names : Vector_Tag;
+         Discr_Types : Vector_Tag;
+         Comp_Names  : Vector_Tag;
+         Comp_Types  : Vector_Tag;
 
          Anonymous_Typ_Inits, Anonymous_Typ_Decls : Unbounded_String;
       begin
@@ -806,10 +809,28 @@ package body TGen.Type_Representation is
          --  components.
 
          if T in Function_Typ'Class then
-            for Comp_Name of Function_Typ'Class (T).Param_Order loop
-               Comp_Names_Ordered := Comp_Names_Ordered & Comp_Name;
-            end loop;
-            Insert (Assocs, Assoc ("COMP_NAME_ORD", Comp_Names_Ordered));
+            declare
+               Function_Type : constant Function_Typ := Function_Typ (T);
+
+               Comp_Names_Ordered : Vector_Tag;
+               Global_Names       : Vector_Tag;
+               Global_Types       : Vector_Tag;
+            begin
+               for Comp_Name of Function_Type.Param_Order loop
+                  Comp_Names_Ordered := Comp_Names_Ordered & Comp_Name;
+               end loop;
+               Insert (Assocs, Assoc ("COMP_NAME_ORD", Comp_Names_Ordered));
+
+               --  Deal with globals
+
+               for Cur in Function_Type.Globals.Iterate loop
+                  Global_Names := Global_Names & Component_Maps.Key (Cur);
+                  Global_Types :=
+                    Global_Types & Component_Maps.Element (Cur).Get.Slug;
+               end loop;
+               Insert (Assocs, Assoc ("GLOBAL_NAME", Global_Names));
+               Insert (Assocs, Assoc ("GLOBAL_TYPE", Global_Types));
+            end;
          end if;
 
          --  Print the templates

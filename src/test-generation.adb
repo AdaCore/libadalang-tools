@@ -52,6 +52,12 @@ package body Test.Generation is
    function Traverse_Helper (Node : Ada_Node'Class) return Visit_Status is
       Diags : Unbounded_String;
    begin
+      --  Do not traverse package bodies
+
+      if Node.Kind in Ada_Package_Body then
+         return Over;
+      end if;
+
       --  Collect all types used as parameters in subprogram declarations.
       --  Skip generic subprogram declarations as we only care about the
       --  instantiations. Also skip subprograms with zero parameters as we do
