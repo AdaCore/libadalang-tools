@@ -799,8 +799,9 @@ package body Pp.Actions is
             when Ada_Bracket_Delta_Aggregate     => null,
             when Ada_Delta_Aggregate             => null,
             when Ada_Decl_Expr                   => null,
-            --  ??? Ada 2020 related expressions, needs to be implemented. See
-            --  T519-017.
+            when Ada_Simple_Decl_Stmt            => null,
+            --  ??? Ada 2020 or -gnatx related expressions, needs to be
+            --  implemented. See T519-017.
 
             when Ada_Abstract_State_Decl         => null,
             when Ada_Abstract_State_Decl_Expr    => null,
