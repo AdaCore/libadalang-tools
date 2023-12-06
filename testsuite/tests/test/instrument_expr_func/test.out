@@ -1,0 +1,13 @@
+generate test driver
+generate test driver with instrumentation
+build instrumented test driver
+1 tests run: 1 passed; 0 failed; 0 crashed.
+input for expr func dumped
+1 tests run: 1 passed; 0 failed; 0 crashed.
+input for func with private expr func as body dumped
+1 tests run: 1 passed; 0 failed; 0 crashed.
+input for nested expr func dumped
+1 tests run: 1 passed; 0 failed; 0 crashed.
+input for expr func from bodyless spec dumped
+1 tests run: 1 passed; 0 failed; 0 crashed.
+input for nested expr func from bodyless spec dumped

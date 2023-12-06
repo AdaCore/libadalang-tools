@@ -117,6 +117,7 @@ package Test.Skeleton.Source_Table is
    function Get_Source_Project_Name    (Source_Name : String) return String;
    function Get_Source_Unit_Name       (Source_Name : String) return String;
    function Get_Source_Instr_Dir       (Source_Name : String) return String;
+   function Get_Source_Instr_Body      (Source_Name : String) return String;
 
    procedure Mark_Sourse_Stubbed (Source_Name : String);
    function Source_Stubbed (Source_Name : String) return Boolean;
