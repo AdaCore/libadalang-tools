@@ -2,6 +2,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 package body Pkg is
 
+   procedure Test_Null (B : Boolean) is null;
    procedure Test_Cst (B : Boolean) is null;
 
    procedure Test_Supported (B : Boolean) is

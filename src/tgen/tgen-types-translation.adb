@@ -3111,6 +3111,11 @@ package body TGen.Types.Translation is
       procedure Process_Global (N : LAL.Name) is
          Global : constant Basic_Decl := N.P_Referenced_Decl;
       begin
+         --  Ignore cases such as Global => null
+
+         if Global.Is_Null then
+            return;
+         end if;
 
          if Kind (Global) = Ada_Object_Decl then
             declare
