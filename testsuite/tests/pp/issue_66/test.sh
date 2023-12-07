@@ -1,2 +1,2 @@
-gnatpp test.adb --pipe
+gnatpp test.adb --pipe -W8
 
