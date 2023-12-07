@@ -30,51 +30,57 @@ Pkg.Supported_Global is  1954668933
 Pkg.Supported_Global is  1954668933
 Pkg.Supported_Global is  1954668933
 Pkg.Supported_Global is  3
-Pkg.Supported_Global is  18834966
-Pkg.Supported_Global is  378901556
 Pkg.Supported_Global is  5743901
 Pkg.Supported_Global is -9
 Pkg.Supported_Global is -280550153
-pkg.ads:12:4: info: corresponding test PASSED
-pkg.ads:12:4: info: corresponding test PASSED
-pkg.ads:12:4: info: corresponding test PASSED
-pkg.ads:12:4: info: corresponding test PASSED
-pkg.ads:12:4: info: corresponding test PASSED
-pkg.ads:12:4: info: corresponding test PASSED
-pkg.ads:22:4: info: corresponding test PASSED
-pkg.ads:22:4: info: corresponding test PASSED
-pkg.ads:22:4: info: corresponding test PASSED
-pkg.ads:22:4: info: corresponding test PASSED
-pkg.ads:22:4: info: corresponding test PASSED
-pkg.ads:22:4: info: corresponding test PASSED
-pkg.ads:19:4: info: corresponding test PASSED
-pkg.ads:19:4: info: corresponding test PASSED
-pkg.ads:19:4: info: corresponding test PASSED
-pkg.ads:19:4: info: corresponding test PASSED
-pkg.ads:19:4: info: corresponding test PASSED
-pkg.ads:19:4: info: corresponding test PASSED
-pkg.ads:25:4: info: corresponding test PASSED
-pkg.ads:25:4: info: corresponding test PASSED
-pkg.ads:25:4: info: corresponding test PASSED
-pkg.ads:25:4: info: corresponding test PASSED
-pkg.ads:25:4: info: corresponding test PASSED
-pkg.ads:25:4: info: corresponding test PASSED
-pkg.ads:16:4: info: corresponding test PASSED
-pkg.ads:16:4: info: corresponding test PASSED
-pkg.ads:16:4: info: corresponding test PASSED
-pkg.ads:16:4: info: corresponding test PASSED
-pkg.ads:16:4: info: corresponding test PASSED
-pkg.ads:16:4: info: corresponding test PASSED
+Pkg.Supported_Global is  18183605
+Pkg.Supported_Global is  8
 pkg.ads:14:4: info: corresponding test PASSED
 pkg.ads:14:4: info: corresponding test PASSED
 pkg.ads:14:4: info: corresponding test PASSED
 pkg.ads:14:4: info: corresponding test PASSED
 pkg.ads:14:4: info: corresponding test PASSED
 pkg.ads:14:4: info: corresponding test PASSED
+pkg.ads:24:4: info: corresponding test PASSED
+pkg.ads:24:4: info: corresponding test PASSED
+pkg.ads:24:4: info: corresponding test PASSED
+pkg.ads:24:4: info: corresponding test PASSED
+pkg.ads:24:4: info: corresponding test PASSED
+pkg.ads:24:4: info: corresponding test PASSED
+pkg.ads:21:4: info: corresponding test PASSED
+pkg.ads:21:4: info: corresponding test PASSED
+pkg.ads:21:4: info: corresponding test PASSED
+pkg.ads:21:4: info: corresponding test PASSED
+pkg.ads:21:4: info: corresponding test PASSED
+pkg.ads:21:4: info: corresponding test PASSED
+pkg.ads:27:4: info: corresponding test PASSED
+pkg.ads:27:4: info: corresponding test PASSED
+pkg.ads:27:4: info: corresponding test PASSED
+pkg.ads:27:4: info: corresponding test PASSED
+pkg.ads:27:4: info: corresponding test PASSED
+pkg.ads:27:4: info: corresponding test PASSED
+pkg.ads:12:4: info: corresponding test PASSED
+pkg.ads:12:4: info: corresponding test PASSED
+pkg.ads:12:4: info: corresponding test PASSED
+pkg.ads:12:4: info: corresponding test PASSED
+pkg.ads:12:4: info: corresponding test PASSED
+pkg.ads:18:4: info: corresponding test PASSED
+pkg.ads:18:4: info: corresponding test PASSED
+pkg.ads:18:4: info: corresponding test PASSED
+pkg.ads:18:4: info: corresponding test PASSED
+pkg.ads:18:4: info: corresponding test PASSED
+pkg.ads:18:4: info: corresponding test PASSED
+pkg.ads:16:4: info: corresponding test PASSED
+pkg.ads:16:4: info: corresponding test PASSED
+pkg.ads:16:4: info: corresponding test PASSED
+pkg.ads:16:4: info: corresponding test PASSED
+pkg.ads:16:4: info: corresponding test PASSED
+pkg.ads:16:4: info: corresponding test PASSED
 pkg.ads:12:4: error: corresponding test FAILED: Test not implemented. (pkg-test_data-tests.adb:45)
 pkg.ads:14:4: error: corresponding test FAILED: Test not implemented. (pkg-test_data-tests.adb:66)
 pkg.ads:16:4: error: corresponding test FAILED: Test not implemented. (pkg-test_data-tests.adb:87)
-pkg.ads:19:4: error: corresponding test FAILED: Test not implemented. (pkg-test_data-tests.adb:108)
-pkg.ads:22:4: error: corresponding test FAILED: Test not implemented. (pkg-test_data-tests.adb:129)
-pkg.ads:25:4: error: corresponding test FAILED: Test not implemented. (pkg-test_data-tests.adb:150)
-42 tests run: 36 passed; 6 failed; 0 crashed.
+pkg.ads:18:4: error: corresponding test FAILED: Test not implemented. (pkg-test_data-tests.adb:108)
+pkg.ads:21:4: error: corresponding test FAILED: Test not implemented. (pkg-test_data-tests.adb:129)
+pkg.ads:24:4: error: corresponding test FAILED: Test not implemented. (pkg-test_data-tests.adb:150)
+pkg.ads:27:4: error: corresponding test FAILED: Test not implemented. (pkg-test_data-tests.adb:171)
+48 tests run: 41 passed; 7 failed; 0 crashed.

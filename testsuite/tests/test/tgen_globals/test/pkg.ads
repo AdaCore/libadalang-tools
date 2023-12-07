@@ -9,6 +9,8 @@ package Pkg is
 
    Cst : constant Integer := 2;
 
+   procedure Test_Null (B : Boolean) with Global => null;
+
    procedure Test_Cst (B : Boolean) with Global => Cst;
 
    procedure Test_Supported (B : Boolean)  with Global => Supported_Global;
