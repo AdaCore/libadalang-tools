@@ -1444,7 +1444,8 @@ package body TGen.Types.Translation is
             declare
                Index_Type : constant Translation_Result :=
                  Translate
-                   (Index.F_Subtype_Indication.As_Type_Expr, Verbose_Diag);
+                   (Index.F_Subtype_Name.As_Name.P_Name_Designated_Type,
+                    Verbose_Diag);
             begin
                if Index_Type.Success then
                   Res_Typ.Index_Types (Current_Index_Type) := Index_Type.Res;
