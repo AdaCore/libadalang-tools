@@ -771,18 +771,20 @@ package body Pp.Actions is
             when Ada_Synthetic_Identifier        => null,
             when Ada_Synthetic_Type_Expr         => null,
             when Ada_Synthetic_Char_Enum_Lit     => null,
-            --  The above nodes are specific to synthetic predefined operators
-         --  and will never appear in source code.
-            when Ada_Discrete_Base_Subtype_Decl  => null,
-            when Ada_Discrete_Subtype_Name       => null,
-            when Ada_Contract_Case_Assoc         => null,
-            when Ada_Contract_Cases              => null,
-            when Ada_Multi_Dim_Array_Assoc       => null,
-            when Ada_Error_Decl                  => null,
-            when Ada_Error_Stmt                  => null,
-            when Ada_Enum_Subp_Spec              => null,
-            when Ada_Enum_Lit_Synth_Type_Expr    => null,
-            when Ada_Type_Attributes_Repository  => null,
+            when Ada_Synthetic_Object_Decl       => null,
+            --  The above nodes are specific to synthetic nodes and will never
+            --  appear in source code.
+
+            when Ada_Discrete_Base_Subtype_Decl => null,
+            when Ada_Discrete_Subtype_Name      => null,
+            when Ada_Contract_Case_Assoc        => null,
+            when Ada_Contract_Cases             => null,
+            when Ada_Multi_Dim_Array_Assoc      => null,
+            when Ada_Error_Decl                 => null,
+            when Ada_Error_Stmt                 => null,
+            when Ada_Enum_Subp_Spec             => null,
+            when Ada_Enum_Lit_Synth_Type_Expr   => null,
+            when Ada_Type_Attributes_Repository => null,
 
             when Ada_Pp_Else_Directive
               | Ada_Pp_Elsif_Directive
@@ -799,8 +801,9 @@ package body Pp.Actions is
             when Ada_Bracket_Delta_Aggregate     => null,
             when Ada_Delta_Aggregate             => null,
             when Ada_Decl_Expr                   => null,
-            --  ??? Ada 2020 related expressions, needs to be implemented. See
-            --  T519-017.
+            when Ada_Simple_Decl_Stmt            => null,
+            --  ??? Ada 2020 or -gnatx related expressions, needs to be
+            --  implemented. See T519-017.
 
             when Ada_Abstract_State_Decl         => null,
             when Ada_Abstract_State_Decl_Expr    => null,
@@ -1155,6 +1158,8 @@ package body Pp.Actions is
            when Ada_For_Loop_Spec => null,
            when Ada_For_Loop_Var_Decl =>
              L ("!? : ~~~"),
+           when Ada_For_Loop_Iter_Filter =>
+             L ("!"),
            when Ada_While_Loop_Spec =>
              L ("while[ !]"),
            when Ada_Abort_Stmt =>
