@@ -57,7 +57,7 @@ package TGen.Context is
 
    package Typ_Sets is new Ada.Containers.Ordered_Sets
      (Element_Type => SP.Ref,
-      "=" => SP."=");
+      "="          => SP."=");
    subtype Typ_Set is Typ_Sets.Set;
 
    package Typ_Lists is new Ada.Containers.Doubly_Linked_Lists

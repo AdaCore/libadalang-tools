@@ -191,6 +191,9 @@ private
       --  information to be able to retrieve the subprogram specification +
       --  the precondition.
 
+      Array_Index_Types : Typ_Set;
+      --  Set of types used to instantiate array index constraints
+
    end record;
 
 end TGen.Libgen;

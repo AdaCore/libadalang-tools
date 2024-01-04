@@ -30,17 +30,14 @@ package TGen.Marshalling.JSON_Marshallers is
       Private_Part       : US_Access;
       Body_Part          : US_Access;
       Typ                : TGen.Types.Typ'Class;
+      Constrains_Array   : Boolean;
       Templates_Root_Dir : String);
    --  Generate JSON marshalling and unmarshalling functions for Typ. Note that
    --  this function will not operate recursively. It will thus have to be
    --  called for each of the component type of a record for instance.
-   --
-   --  Part determines which part (public or private) of the spec will be
-   --  generated. It is thus necessary to call this subprogram twice in order
-   --  to generate a full spec, taking care to insert a "private" line in
-   --  F_Spec in between the two calls. The body is generated at the same time
-   --  the public part is generated, nothing will be written to F_Body if Part
-   --  is Priv.
+   --  Constrains_Array indicates whether the type is used as an array index
+   --  constraints, meaning that we have to generate marshalling functions for
+   --  the base type as well.
    --
    --  We generate the following functions:
    --

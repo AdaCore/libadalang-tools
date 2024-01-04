@@ -42,6 +42,7 @@ with TGen.Marshalling;        use TGen.Marshalling;
 with TGen.Marshalling.Binary_Marshallers;
 with TGen.Marshalling.JSON_Marshallers;
 with TGen.Type_Representation;
+with TGen.Types.Array_Types;  use TGen.Types.Array_Types;
 with TGen.Types.Constraints;  use TGen.Types.Constraints;
 with TGen.Types.Record_Types; use TGen.Types.Record_Types;
 with TGen.Types.Translation;  use TGen.Types.Translation;
@@ -328,6 +329,8 @@ package body TGen.Libgen is
                        Private_Part'Unrestricted_Access,
                        Body_Part'Unrestricted_Access,
                        T.Get,
+                       T.Get.Kind in Discrete_Typ_Range
+                         and then Ctx.Array_Index_Types.Contains (T),
                        TRD);
                   TGen.Marshalling.JSON_Marshallers
                     .Generate_Marshalling_Functions_For_Typ
@@ -335,6 +338,7 @@ package body TGen.Libgen is
                        Private_Part'Unrestricted_Access,
                        Body_Part'Unrestricted_Access,
                        T.Get,
+                       Ctx.Array_Index_Types.Contains (T),
                        TRD);
                end if;
             end if;
@@ -728,6 +732,17 @@ package body TGen.Libgen is
 
          Fct_Ref.Set (Fct_Typ);
          Subp_Types := Type_Dependencies (Fct_Ref, Transitive => True);
+
+         --  Store all the array index constraint types
+
+         for T of Subp_Types loop
+            if T.Get.Kind in Constrained_Array_Kind | Unconstrained_Array_Kind
+            then
+               for Index_Typ of As_Array_Typ (T).Index_Types loop
+                  Ctx.Array_Index_Types.Include (Index_Typ);
+               end loop;
+            end if;
+         end loop;
 
          --  Ctx.Types_Per_Package contains the types for which marshallers
          --  will be generated (with the exclusion of instance types and
