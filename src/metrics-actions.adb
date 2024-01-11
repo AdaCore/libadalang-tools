@@ -2432,12 +2432,17 @@ package body METRICS.Actions is
       end Xsd_File_Name;
 
       procedure Print_Computed_Metric
-        (T : Template; Metric : Metrics_Enum; C_Metric : Computed_Metrics);
+        (T        : Formatted_Output.Template;
+         Metric   : Metrics_Enum;
+         C_Metric : Computed_Metrics);
       --  Print a "computed metric". Metric is the base metric, C_Metric is the
       --  computed metric based on that.
 
       procedure Print_Computed_Metric
-        (T : Template; Metric : Metrics_Enum; C_Metric : Computed_Metrics) is
+        (T        : Formatted_Output.Template;
+         Metric   : Metrics_Enum;
+         C_Metric : Computed_Metrics)
+      is
       begin
          if Gen_Text (Cmd) and then Metrics_To_Compute (Metric) then
             if Global_M.Vals (Metric) > 0 then
