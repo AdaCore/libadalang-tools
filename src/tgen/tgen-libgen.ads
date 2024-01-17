@@ -35,8 +35,8 @@ with Libadalang.Analysis;
 with TGen.Context;
 with TGen.Wrappers;       use TGen.Wrappers;
 with TGen.Strings;
+with TGen.Types;          use TGen.Types;
 with TGen.Parse_Strategy; use TGen.Parse_Strategy;
-with TGen.Types;
 
 package TGen.Libgen is
    package LAL renames Libadalang.Analysis;
@@ -71,6 +71,11 @@ package TGen.Libgen is
       User_Project_Path  : GNATCOLL.VFS.Virtual_File;
       Root_Templates_Dir : GNATCOLL.VFS.Virtual_File) return Libgen_Context;
    --  Same as above, but with virtual files
+
+   function Supported_Subprogram (Subp : LAL.Basic_Decl'Class) return SP.Ref;
+   --  If the Subp is a supported subprogram profile, return a Function_Typ,
+   --  otherwise return an Unsupported_Typ with the reason why it is not
+   --  supported inlined in the Unsupported_Typ.Reason field.
 
    function Include_Subp
      (Ctx  : in out Libgen_Context;

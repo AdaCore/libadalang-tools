@@ -1,5 +1,4 @@
-Units remaining: 3     Units remaining: 2     Units remaining: 1      warning: (gnattest) Pkg.Test_Data.Tests has dangling test(s)
-
+Units remaining: 3     Units remaining: 2     Units remaining: 1     
 Pkg.Supported_Global is  3
 Pkg.Supported_Global is -577200006
 Pkg.Supported_Global is  1250692866
