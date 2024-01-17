@@ -225,8 +225,10 @@ package TGen.Types.Constraints is
 
    function Encode (Self : Anonymous_Typ; Val : JSON_Value) return JSON_Value;
 
-   function Get_Diagnostics (Self : Anonymous_Typ) return String is
-     (Self.Named_Ancestor.Get.Get_Diagnostics);
+   function Get_Diagnostics
+     (Self   : Anonymous_Typ;
+      Prefix : String := "") return String_Vector is
+     (Self.Named_Ancestor.Get.Get_Diagnostics (Prefix));
 
    overriding function Default_Strategy
      (Self : Anonymous_Typ) return Strategy_Type'Class;
@@ -258,8 +260,10 @@ package TGen.Types.Constraints is
      (False);
    --  Whether values for this Typ can be statically generated
 
-   function Get_Diagnostics (Self : Instance_Typ) return String is
-     (Self.Orig_Typ.Get.Get_Diagnostics);
+   function Get_Diagnostics
+     (Self   : Instance_Typ;
+      Prefix : String := "") return String_Vector is
+     (Self.Orig_Typ.Get.Get_Diagnostics (Prefix));
 
    function Supports_Gen (Self : Instance_Typ) return Boolean is
      (Self.Orig_Typ.Get.Supports_Gen);

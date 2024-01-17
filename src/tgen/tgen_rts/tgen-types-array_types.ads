@@ -51,7 +51,9 @@ package TGen.Types.Array_Types is
      (Self.Static_Gen);
    --  Whether values for this Typ can be statically generated
 
-   function Get_Diagnostics (Self : Array_Typ) return String;
+   function Get_Diagnostics
+     (Self   : Array_Typ;
+      Prefix : String := "") return String_Vector;
 
    function Supports_Gen (Self : Array_Typ) return Boolean is
      (Self.Component_Type.Get.Supports_Gen);

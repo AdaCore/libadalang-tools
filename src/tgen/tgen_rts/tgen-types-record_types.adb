@@ -50,6 +50,10 @@ package body TGen.Types.Record_Types is
    --  Generate a value for a record type by generating values for its
    --  components using the strategies defined by the Comp_Strats mapping.
 
+   function Get_Diagnostics
+     (Comps : Component_Map; Prefix : String) return String_Vector;
+   --  Return the diagnostics for a list of component types
+
    -----------
    -- Image --
    -----------
@@ -98,19 +102,32 @@ package body TGen.Types.Record_Types is
    -- Get_Diagnostics --
    ---------------------
 
-   function Get_Diagnostics (Self : Record_Typ) return String is
+   function Get_Diagnostics
+     (Comps  : Component_Map;
+      Prefix : String) return String_Vector
+   is
       use Component_Maps;
+      Res : String_Vector;
    begin
-      for Comp_Cur in Self.Component_Types.Iterate loop
-         declare
-            Diags : constant String := Element (Comp_Cur).Get.Get_Diagnostics;
-         begin
-            if Diags'Length > 0 then
-               return Diags;
-            end if;
-         end;
+      for Comp_Cur in Comps.Iterate loop
+         Res.Append_Vector
+           (Element (Comp_Cur).Get.Get_Diagnostics
+            (Prefix & (+Key (Comp_Cur))));
       end loop;
-      return "";
+      return Res;
+   end Get_Diagnostics;
+
+   ---------------------
+   -- Get_Diagnostics --
+   ---------------------
+
+   function Get_Diagnostics
+     (Self   : Record_Typ;
+      Prefix : String := "") return String_Vector
+   is
+      Rec_Prefix : constant String := To_Ada (Self.Name);
+   begin
+      return Get_Diagnostics (Self.Component_Types, Prefix & Rec_Prefix & ".");
    end Get_Diagnostics;
 
    ------------
@@ -670,10 +687,14 @@ package body TGen.Types.Record_Types is
    -- Get_Diagnostics --
    ---------------------
 
-   function Get_Diagnostics (Self : Discriminated_Record_Typ) return String is
-      Comp_Res : constant String := Record_Typ (Self).Get_Diagnostics;
+   function Get_Diagnostics
+     (Self   : Discriminated_Record_Typ;
+      Prefix : String := "") return String_Vector
+   is
+      Rec_Prefix : constant String := To_Ada (Self.Name);
+      Res        : String_Vector := Record_Typ (Self).Get_Diagnostics (Prefix);
 
-      function Inspect_Variant (Var : Variant_Part_Acc) return String;
+      function Inspect_Variant (Var : Variant_Part_Acc) return String_Vector;
       --  Inspect the variant part for unsupported types, and return the first
       --  diagnostics found, if any.
 
@@ -681,37 +702,25 @@ package body TGen.Types.Record_Types is
       -- Inspect_Variant --
       ---------------------
 
-      function Inspect_Variant (Var : Variant_Part_Acc) return String is
+      function Inspect_Variant (Var : Variant_Part_Acc) return String_Vector
+      is
+         Res : String_Vector;
       begin
          if Var = null then
-            return "";
+            return String_Vectors.Empty_Vector;
          end if;
          for Choice of Var.Variant_Choices loop
-            for Comp of Choice.Components loop
-               declare
-                  Diags : constant String := Comp.Get.Get_Diagnostics;
-               begin
-                  if Diags'Length > 0 then
-                     return Diags;
-                  end if;
-               end;
-            end loop;
-            declare
-               Subvar_Res : constant String :=
-                 Inspect_Variant (Choice.Variant);
-            begin
-               if Subvar_Res'Length > 0 then
-                  return Subvar_Res;
-               end if;
-            end;
+            Res.Append_Vector
+              (Get_Diagnostics (Choice.Components, Rec_Prefix & "."));
+            Res.Append_Vector (Inspect_Variant (Choice.Variant));
          end loop;
-         return "";
+         return Res;
       end Inspect_Variant;
    begin
-      if Comp_Res'Length > 0 then
-         return Comp_Res;
-      end if;
-      return Inspect_Variant (Self.Variant);
+      Res.Append_Vector
+        (Get_Diagnostics (Self.Discriminant_Types, Rec_Prefix & "."));
+      Res.Append_Vector (Inspect_Variant (Self.Variant));
+      return Res;
    end Get_Diagnostics;
 
    ------------------
@@ -1835,5 +1844,22 @@ package body TGen.Types.Record_Types is
       Process_Components (Self.Globals);
       return Strat;
    end Default_Enum_Strategy;
+
+   ---------------------
+   -- Get_Diagnostics --
+   ---------------------
+
+   function Get_Diagnostics
+     (Self   : Function_Typ;
+      Prefix : String := "") return String_Vector
+   is
+      Global_Prefix : constant String := "(global input of " & Self.FQN & ") ";
+      Res           : String_Vector;
+   begin
+      Res.Append_Vector
+        (Get_Diagnostics (Self.Component_Types, Self.FQN & "."));
+      Res.Append_Vector (Get_Diagnostics (Self.Globals, Global_Prefix));
+      return Res;
+   end Get_Diagnostics;
 
 end TGen.Types.Record_Types;

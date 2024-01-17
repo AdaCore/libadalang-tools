@@ -1,0 +1,8 @@
+description:
+
+    Test that TGen emits the right diagnostics if a type is unsupported, and
+    also check that it produces a compilable support library in this case.
+
+driver: shell_script
+control:
+    - [XFAIL, 'x86', 'Marshalling not working for 32bits (UB03-008)']

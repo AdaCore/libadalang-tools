@@ -151,4 +151,23 @@ package body TGen.Types is
       Self.Free_Content;
    end Free_Content_Wide;
 
+   ---------------------
+   -- Get_Diagnostics --
+   ---------------------
+
+   function Get_Diagnostics
+     (Self   : Unsupported_Typ;
+      Prefix : String := "") return String_Vector
+   is
+      Diag : Unbounded_String;
+   begin
+      if Prefix'Length /= 0 then
+         Diag := +Prefix & ": ";
+      end if;
+      Diag :=
+        Diag & To_Ada (Self.Name) & " is not supported ("
+        & (+Self.Reason) & ")";
+      return String_Vectors.To_Vector (Diag, 1);
+   end Get_Diagnostics;
+
 end TGen.Types;

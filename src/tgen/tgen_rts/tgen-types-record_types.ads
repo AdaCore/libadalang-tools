@@ -64,7 +64,9 @@ package TGen.Types.Record_Types is
 
    function Image (Self : Record_Typ) return String;
 
-   function Get_Diagnostics (Self : Record_Typ) return String;
+   function Get_Diagnostics
+     (Self   : Record_Typ;
+      Prefix : String := "") return String_Vector;
 
    function Image_Internal
      (Self    : Record_Typ;
@@ -244,7 +246,9 @@ package TGen.Types.Record_Types is
 
    function Image (Self : Discriminated_Record_Typ) return String;
 
-   function Get_Diagnostics (Self : Discriminated_Record_Typ) return String;
+   function Get_Diagnostics
+     (Self   : Discriminated_Record_Typ;
+      Prefix : String := "") return String_Vector;
 
    overriding function Default_Strategy
      (Self : Discriminated_Record_Typ) return Strategy_Type'Class;
@@ -408,6 +412,10 @@ package TGen.Types.Record_Types is
 
    function Encode
      (Self : Function_Typ; Val : JSON_Value) return JSON_Value;
+
+   function Get_Diagnostics
+     (Self   : Function_Typ;
+      Prefix : String := "") return String_Vector;
 
    function As_Function_Typ
      (Self : SP.Ref) return Function_Typ'Class is

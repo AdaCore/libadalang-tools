@@ -56,6 +56,7 @@ package TGen.Strings is
    package String_Vectors is new Ada.Containers.Vectors
      (Index_Type   => Positive,
       Element_Type => Ada.Strings.Unbounded.Unbounded_String);
+   subtype String_Vector is String_Vectors.Vector;
 
    package String_Ordered_Sets is new
      Ada.Containers.Indefinite_Ordered_Sets

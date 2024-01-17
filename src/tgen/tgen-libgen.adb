@@ -666,11 +666,13 @@ package body TGen.Libgen is
       end if;
 
       declare
-         Unsupported_Diags : constant String :=
+         Unsupported_Diags : constant String_Vector :=
            Trans_Res.Res.Get.Get_Diagnostics;
       begin
-         if Unsupported_Diags'Length > 0 then
-            Diag := To_Unbounded_String (Unsupported_Diags);
+         if not String_Vectors.Is_Empty (Unsupported_Diags) then
+            for D of Unsupported_Diags loop
+               Diag := Diag & D & Ada.Characters.Latin_1.LF;
+            end loop;
             return False;
          end if;
       end;
