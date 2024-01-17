@@ -24,7 +24,4 @@ package Pkg is
    procedure Test_In_Out (B : Boolean)
      with Global => (In_Out => Supported_Global);
 
-   procedure Test_Mix (B : Boolean)
-     with Global => (Supported_Global, Unsupported_Global, Cst, Global.Supported_Global);
-
 end Pkg;

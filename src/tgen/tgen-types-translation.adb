@@ -42,7 +42,6 @@ with TGen.Types.Enum_Types;      use TGen.Types.Enum_Types;
 with TGen.Types.Int_Types;       use TGen.Types.Int_Types;
 with TGen.Types.Real_Types;      use TGen.Types.Real_Types;
 with TGen.Types.Record_Types;    use TGen.Types.Record_Types;
-with TGen.Marshalling;
 with TGen.Numerics;
 
 package body TGen.Types.Translation is
@@ -3088,34 +3087,46 @@ package body TGen.Types.Translation is
          return Translate_Internal (N, Verbose_Diag, True);
    end Translate_Internal;
 
-   function Process_Globals
-     (N : Expr; Verbose : Boolean) return Component_Map;
-   --  Return the list of globals specified in the global aspect. See the
-   --  documentation of the Globals field of the
+   function Translate_Globals
+     (N : Expr; Verbose : Boolean) return Translation_Result;
+   --  Return the list of globals specified in the global aspect, which are
+   --  returned encapsulated in a Record_Typ (for conveniency purposes) if the
+   --  translation of the globals type is successful. If one of the globals
+   --  is not supported, returned an unsuccessful Translation_Result.
+   --
+   --  See the documentation of the Globals field of the
    --  TGen.Types.Record_Types.Function_Typ type for more information.
 
    ---------------------
    -- Process_Globals --
    ---------------------
 
-   function Process_Globals
-     (N : Expr; Verbose : Boolean) return Component_Map
+   function Translate_Globals
+     (N : Expr; Verbose : Boolean) return Translation_Result
    is
-      Result : Component_Map;
+      Rec : Nondiscriminated_Record_Typ;
+      --  Record_Typ encapsulating the globals (that are stored in
+      --  Rec.Component_Types).
 
-      procedure Process_Global (N : LAL.Name);
+      Diagnostics : Unbounded_String;
+      Result      : Translation_Result (Success => True);
+
+      function Process_Global (N : LAL.Name) return Boolean;
+      --  Process the given global. If the global type translation result is
+      --  not succesful, return False and store in the local Diagnostics the
+      --  diagnostics.
 
       --------------------
       -- Process_Global --
       --------------------
 
-      procedure Process_Global (N : LAL.Name) is
+      function Process_Global (N : LAL.Name) return Boolean is
          Global : constant Basic_Decl := N.P_Referenced_Decl;
       begin
          --  Ignore cases such as Global => null
 
          if Global.Is_Null then
-            return;
+            return True;
          end if;
 
          if Kind (Global) = Ada_Object_Decl then
@@ -3130,27 +3141,20 @@ package body TGen.Types.Translation is
                        Translate (Global.As_Object_Decl.F_Type_Expr, Verbose);
                   begin
                      if Global_Typ_Translation.Success then
-                        if TGen.Marshalling.Is_Supported_Type
-                          (Global_Typ_Translation.Res.Get)
-                        then
-                           Result.Insert
-                             (+To_Ada
-                                (Convert_Qualified_Name
-                                     (Obj_Decl.P_Fully_Qualified_Name_Array)),
-                              Global_Typ_Translation.Res);
-                        end if;
+                        Rec.Component_Types.Insert
+                          (+To_Ada
+                             (Convert_Qualified_Name
+                                  (Obj_Decl.P_Fully_Qualified_Name_Array)),
+                           Global_Typ_Translation.Res);
                      else
-                        if Verbose then
-                           Put_Line
-                             ("Warning: ignoring global "
-                              & (+Obj_Decl.P_Fully_Qualified_Name)
-                             & " (translation failure).");
-                        end if;
+                        Diagnostics := Global_Typ_Translation.Diagnostics;
+                        return False;
                      end if;
                   end;
                end if;
             end;
          end if;
+         return True;
       end Process_Global;
 
    begin
@@ -3197,7 +3201,9 @@ package body TGen.Types.Translation is
                         begin
                            if Kind (Assoc_Expr) in LALCO.Ada_Name
                            then
-                              Process_Global (Assoc_Expr.As_Name);
+                              if not Process_Global (Assoc_Expr.As_Name) then
+                                 raise Translation_Error with +Diagnostics;
+                              end if;
                            end if;
                         end;
 
@@ -3212,13 +3218,20 @@ package body TGen.Types.Translation is
                              +To_Lower (Designator.Text);
                         begin
                            if Globals_Kind in "input" | "in_out" then
-                              for Cur in Process_Globals
-                                (Aggr_Assoc.F_R_Expr, Verbose).Iterate
-                              loop
-                                 Result.Insert
-                                   (Component_Maps.Key (Cur),
-                                    Component_Maps.Element (Cur));
-                              end loop;
+                              declare
+                                 Global_Comps : constant Component_Map :=
+                                   As_Record_Typ
+                                     (Translate_Globals
+                                        (Aggr_Assoc.F_R_Expr, Verbose).Res)
+                                       .Component_Types;
+                              begin
+                                 for Cur in Global_Comps.Iterate
+                                 loop
+                                    Rec.Component_Types.Insert
+                                      (Component_Maps.Key (Cur),
+                                       Component_Maps.Element (Cur));
+                                 end loop;
+                              end;
                            end if;
                         end;
                      end if;
@@ -3227,13 +3240,16 @@ package body TGen.Types.Translation is
             end loop;
 
          when LALCO.Ada_Name =>
-            Process_Global (N.As_Name);
+            if not Process_Global (N.As_Name) then
+               raise Translation_Error with +Diagnostics;
+            end if;
 
          when others =>
             null;
       end case;
+      Result.Res.Set (Rec);
       return Result;
-   end Process_Globals;
+   end Translate_Globals;
 
    ---------------
    -- Translate --
@@ -3345,8 +3361,10 @@ package body TGen.Types.Translation is
       begin
          if N.P_Has_Aspect (Global_Aspect) then
             F_Typ.Globals :=
-              Process_Globals
-                (N.P_Get_Aspect_Spec_Expr (Global_Aspect), Verbose);
+              As_Record_Typ
+                (Translate_Globals
+                   (N.P_Get_Aspect_Spec_Expr (Global_Aspect), Verbose).Res)
+                .Component_Types;
          end if;
       end;
 
@@ -3354,6 +3372,11 @@ package body TGen.Types.Translation is
       Translation_Cache.Insert (F_Typ.Name, F_Typ_Ref);
       Result.Res := F_Typ_Ref;
       return Result;
+   exception
+      when Exc : Translation_Error =>
+         return (Success     => False,
+                 Diagnostics => To_Unbounded_String
+                   (Ada.Exceptions.Exception_Message (Exc)));
    end Translate;
 
    -----------------------
