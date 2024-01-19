@@ -88,17 +88,22 @@ package body Laltools.Common is
    --------------
 
    function Contains
-     (Token   : Token_Reference;
-      Pattern : Wide_Wide_String;
-      As_Word : Boolean;
-      Span    : out Source_Location_Range)
+     (Token          : Token_Reference;
+      Pattern        : Wide_Wide_String;
+      As_Word        : Boolean;
+      Span           : out Source_Location_Range;
+      Case_Sensitive : Boolean := False)
       return Boolean
    is
-      T    : constant Text_Type :=
-        Ada.Wide_Wide_Characters.Handling.To_Lower (Text (Token));
-      Idx  : constant Integer := Ada.Strings.Wide_Wide_Fixed.Index
-        (T, Pattern);
-      Last : Integer;
+      T              : constant Text_Type :=
+        (if Case_Sensitive then Text (Token)
+         else Ada.Wide_Wide_Characters.Handling.To_Lower (Text (Token)));
+      Actual_Pattern : constant Wide_Wide_String :=
+        (if Case_Sensitive then Pattern
+         else Ada.Wide_Wide_Characters.Handling.To_Lower (Pattern));
+      Idx            : constant Integer := Ada.Strings.Wide_Wide_Fixed.Index
+        (T, Actual_Pattern);
+      Last           : Integer;
 
       function Is_Word_Delimiter (C : Wide_Wide_Character) return Boolean;
 

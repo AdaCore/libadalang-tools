@@ -175,14 +175,16 @@ package Laltools.Common is
    --  This is convenient for containers with Compilation_Unit elements.
 
    function Contains
-     (Token   : Token_Reference;
-      Pattern : Wide_Wide_String;
-      As_Word : Boolean;
-      Span    : out Source_Location_Range)
+     (Token          : Token_Reference;
+      Pattern        : Wide_Wide_String;
+      As_Word        : Boolean;
+      Span           : out Source_Location_Range;
+      Case_Sensitive : Boolean := False)
       return Boolean;
    --  Return True if the Token text contains Pattern and set position in Span.
    --  Checks whether the Token's Pattern is delimited by word delimiters
    --  if As_Word is True.
+   --  Set Case_Sensitive to True if casing should be taken into account.
 
    function Count_Param_Spec_Parameters
      (Param_Spec : Libadalang.Analysis.Param_Spec'Class)
