@@ -21,6 +21,7 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Characters.Latin_1;
 with Ada.Command_Line;
 with Ada.Containers;
 with Ada.Directories;
@@ -46,7 +47,6 @@ with TGen.Types.Array_Types;  use TGen.Types.Array_Types;
 with TGen.Types.Constraints;  use TGen.Types.Constraints;
 with TGen.Types.Record_Types; use TGen.Types.Record_Types;
 with TGen.Types.Translation;  use TGen.Types.Translation;
-with TGen.Types;              use TGen.Types;
 
 package body TGen.Libgen is
 
@@ -627,6 +627,42 @@ package body TGen.Libgen is
                      User_Project_Path  => +User_Project_Path.Full_Name);
    end Create;
 
+   --------------------------
+   -- Supported_Subprogram --
+   --------------------------
+
+   function Supported_Subprogram (Subp : LAL.Basic_Decl'Class) return SP.Ref
+   is
+      Reason    : Unbounded_String;
+      Trans_Res : constant Translation_Result :=
+        Translate (Subp.As_Basic_Decl);
+   begin
+      if Trans_Res.Success then
+         declare
+            Unsupported_Diags : constant String_Vector :=
+              Trans_Res.Res.Get.Get_Diagnostics;
+         begin
+            if String_Vectors.Is_Empty (Unsupported_Diags) then
+               return Trans_Res.Res;
+            else
+               for D of Unsupported_Diags loop
+                  Reason := Reason & D & Ada.Characters.Latin_1.LF;
+               end loop;
+            end if;
+         end;
+      else
+         Reason := Trans_Res.Diagnostics;
+      end if;
+      declare
+         Typ_Res : constant Unsupported_Typ :=
+           Unsupported_Typ'(Reason => Reason, others => <>);
+         Res     : SP.Ref;
+      begin
+         Res.Set (Typ_Res);
+         return Res;
+      end;
+   end Supported_Subprogram;
+
    ------------------
    -- Include_Subp --
    ------------------
@@ -656,24 +692,12 @@ package body TGen.Libgen is
 
       Dummy_Inserted : Boolean;
 
-      Trans_Res : constant Translation_Result :=
-        Translate (Subp.As_Basic_Decl);
-
+      Trans_Res : constant SP.Ref := Supported_Subprogram (Subp);
    begin
-      if not Trans_Res.Success then
-         Diag := Trans_Res.Diagnostics;
+      if Trans_Res.Get.Kind = Unsupported then
+         Diag := Unsupported_Typ (Trans_Res.Unchecked_Get.all).Reason;
          return False;
       end if;
-
-      declare
-         Unsupported_Diags : constant String :=
-           Trans_Res.Res.Get.Get_Diagnostics;
-      begin
-         if Unsupported_Diags'Length > 0 then
-            Diag := To_Unbounded_String (Unsupported_Diags);
-            return False;
-         end if;
-      end;
 
       if Support_Packs = No_Element then
          Ctx.Support_Packs_Per_Unit.Insert
@@ -703,10 +727,12 @@ package body TGen.Libgen is
       end if;
 
       declare
-         Fct_Typ : Function_Typ'Class :=
-           Function_Typ'Class (Trans_Res.Res.Unchecked_Get.all);
-         Fct_Ref : SP.Ref;
+         Orig_Fct_Ref : SP.Ref;
+         Fct_Typ      : Function_Typ'Class := As_Function_Typ (Trans_Res);
+         Fct_Ref      : SP.Ref;
       begin
+         Orig_Fct_Ref.Set (Fct_Typ);
+
          --  Check strategies. TODO???: integrate it into the type translation
          --  when this is more than a proof of concept.
 
@@ -762,7 +788,7 @@ package body TGen.Libgen is
          --  of whole testcase serializers.
 
          Append_Types
-           (Typ_Sets.To_Set (Trans_Res.Res),
+           (Typ_Sets.To_Set (Orig_Fct_Ref),
             Ctx.Types_Per_Package,
             Support_Library_Package'Access);
 

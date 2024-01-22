@@ -25,11 +25,4 @@ package body Pkg is
       Put_Line ("Pkg.Supported_Global is " & Integer'Image (Supported_Global));
    end Test_In_Out;
 
-   procedure Test_Mix (B : Boolean) is
-   begin
-      Put_Line ("Pkg.Supported_Global is " & Integer'Image (Supported_Global));
-      Put_Line ("Global.Supported_Global is "
-                & Integer'Image (Global.Supported_Global));
-   end Test_Mix;
-
 end Pkg;

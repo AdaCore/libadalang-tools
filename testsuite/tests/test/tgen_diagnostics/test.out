@@ -1,0 +1,33 @@
+Error during parameter translation of subprogram Pkg.Test_Unsupported_Global:
+(global input of pkg.test_unsupported_global) pkg.unsupported_global: system.address is not supported (System.Address unsupported)
+
+gnattest: Error while processing <SubpDecl ["Test_Unsupported_Global"] pkg.ads:24:4-25:40>:
+(global input of pkg.test_unsupported_global) pkg.unsupported_global: system.address is not supported (System.Address unsupported)
+
+gnattest: Error while processing <SubpDecl ["Test_Unsupported_Rec"] pkg.ads:27:4-27:57>:
+pkg.unsupported_rec.Unsupported: pkg.int_access is not supported (Access types are not supported)
+
+gnattest: Error while processing <SubpDecl ["Test_Unsupported_Variant"] pkg.ads:29:4-29:72>:
+pkg.unsupported_variant_in_rec.Unsupported_1: pkg.int_access is not supported (Access types are not supported)
+pkg.unsupported_variant_in_rec.Unsupported_2: pkg.int_access is not supported (Access types are not supported)
+
+gnattest: Error while processing <SubpDecl ["Test_Unsupported_Array"] pkg.ads:31:4-31:61>:
+pkg.test_unsupported_array.P: pkg.int_access is not supported (Access types are not supported)
+
+gnattest: Error while processing <SubpDecl ["Test_Unsupported_Multi"] pkg.ads:33:4-34:52>:
+pkg.unsupported_rec.Unsupported: pkg.int_access is not supported (Access types are not supported)
+pkg.test_unsupported_multi.P2: pkg.int_access is not supported (Access types are not supported)
+
+Units remaining: 2     Units remaining: 1     
+pkg.ads:36:4: info: corresponding test PASSED
+pkg.ads:36:4: info: corresponding test PASSED
+pkg.ads:36:4: info: corresponding test PASSED
+pkg.ads:36:4: info: corresponding test PASSED
+pkg.ads:36:4: info: corresponding test PASSED
+pkg.ads:24:4: error: corresponding test FAILED: Test not implemented. (pkg-test_data-tests.adb:45)
+pkg.ads:27:4: error: corresponding test FAILED: Test not implemented. (pkg-test_data-tests.adb:66)
+pkg.ads:29:4: error: corresponding test FAILED: Test not implemented. (pkg-test_data-tests.adb:87)
+pkg.ads:31:4: error: corresponding test FAILED: Test not implemented. (pkg-test_data-tests.adb:108)
+pkg.ads:33:4: error: corresponding test FAILED: Test not implemented. (pkg-test_data-tests.adb:129)
+pkg.ads:36:4: error: corresponding test FAILED: Test not implemented. (pkg-test_data-tests.adb:150)
+11 tests run: 5 passed; 6 failed; 0 crashed.

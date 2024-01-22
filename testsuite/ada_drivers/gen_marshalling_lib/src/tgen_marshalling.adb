@@ -30,7 +30,8 @@ with Libadalang.Analysis;
 with Libadalang.Common;   use Libadalang.Common;
 with Libadalang.Helpers;
 
-with TGen.Libgen; use TGen.Libgen;
+with TGen.LAL_Utils; use TGen.LAL_Utils;
+with TGen.Libgen;    use TGen.Libgen;
 
 procedure TGen_Marshalling is
    package LAL renames Libadalang.Analysis;
@@ -84,6 +85,12 @@ procedure TGen_Marshalling is
       Arg_Type => Unbounded_String,
       Default_Val => Null_Unbounded_String);
 
+   package Skip_Unsupported is new Parse_Flag
+     (Parser   => App.Args.Parser,
+      Long     => "--skip-unsupported",
+      Help     =>
+         "Skip unsupported programs instead of aborting with an exception");
+
    ---------------
    -- App_Setup --
    ---------------
@@ -120,7 +127,6 @@ procedure TGen_Marshalling is
      (Job_Ctx : Libadalang.Helpers.App_Job_Context; Unit : LAL.Analysis_Unit)
    is
       pragma Unreferenced (Job_Ctx);
-      Diags : Unbounded_String;
 
       function Traverse_Helper
         (Node : LAL.Ada_Node'Class) return LALCO.Visit_Status;
@@ -128,6 +134,7 @@ procedure TGen_Marshalling is
       function Traverse_Helper
         (Node : LAL.Ada_Node'Class) return LALCO.Visit_Status
       is
+         Diags : Unbounded_String;
       begin
          --  Collect all types used as parameters in subprogram declarations.
          --  Skip generic subprogram declarations as we only care about the
@@ -143,9 +150,13 @@ procedure TGen_Marshalling is
             end if;
 
             if not Include_Subp (Gen_Ctx, Node.As_Basic_Decl, Diags) then
-               Libadalang.Helpers.Abort_App
-                  ("Error during parameter translation: "
-                  & To_String (Diags));
+               Put_Line
+                 ("Error during parameter translation of subprogram "
+                  & (+Node.As_Basic_Decl.P_Fully_Qualified_Name) & ":");
+               Put_Line (To_String (Diags));
+               if not Skip_Unsupported.Get then
+                  Libadalang.Helpers.Abort_App;
+               end if;
             end if;
             return LALCO.Over;
          end if;

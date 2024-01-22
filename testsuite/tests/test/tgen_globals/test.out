@@ -11,30 +11,18 @@ Pkg.Supported_Global is  1207654044
 Pkg.Supported_Global is  60588
 Pkg.Supported_Global is -531894861
 Pkg.Supported_Global is  898089
+Pkg.Supported_Global is  898089
+Pkg.Supported_Global is  898089
+Pkg.Supported_Global is  898089
+Pkg.Supported_Global is  898089
+Pkg.Supported_Global is  898089
+Pkg.Supported_Global is  898089
 Pkg.Supported_Global is  3
-Global.Supported_Global is  0
-Pkg.Supported_Global is  32122
-Global.Supported_Global is -7940
 Pkg.Supported_Global is  0
-Global.Supported_Global is -205
-Pkg.Supported_Global is  321855245
-Global.Supported_Global is -276851564
-Pkg.Supported_Global is -800655095
-Global.Supported_Global is -510338258
-Pkg.Supported_Global is  1954668933
-Global.Supported_Global is -1405241068
-Pkg.Supported_Global is  1954668933
-Pkg.Supported_Global is  1954668933
-Pkg.Supported_Global is  1954668933
-Pkg.Supported_Global is  1954668933
-Pkg.Supported_Global is  1954668933
-Pkg.Supported_Global is  1954668933
-Pkg.Supported_Global is  3
-Pkg.Supported_Global is  5743901
-Pkg.Supported_Global is -9
-Pkg.Supported_Global is -280550153
-Pkg.Supported_Global is  18183605
-Pkg.Supported_Global is  8
+Pkg.Supported_Global is -276851564
+Pkg.Supported_Global is  1275105366
+Pkg.Supported_Global is -1395462211
+Pkg.Supported_Global is  1002216731
 pkg.ads:14:4: info: corresponding test PASSED
 pkg.ads:14:4: info: corresponding test PASSED
 pkg.ads:14:4: info: corresponding test PASSED
@@ -53,12 +41,6 @@ pkg.ads:21:4: info: corresponding test PASSED
 pkg.ads:21:4: info: corresponding test PASSED
 pkg.ads:21:4: info: corresponding test PASSED
 pkg.ads:21:4: info: corresponding test PASSED
-pkg.ads:27:4: info: corresponding test PASSED
-pkg.ads:27:4: info: corresponding test PASSED
-pkg.ads:27:4: info: corresponding test PASSED
-pkg.ads:27:4: info: corresponding test PASSED
-pkg.ads:27:4: info: corresponding test PASSED
-pkg.ads:27:4: info: corresponding test PASSED
 pkg.ads:12:4: info: corresponding test PASSED
 pkg.ads:12:4: info: corresponding test PASSED
 pkg.ads:12:4: info: corresponding test PASSED
@@ -82,5 +64,4 @@ pkg.ads:16:4: error: corresponding test FAILED: Test not implemented. (pkg-test_
 pkg.ads:18:4: error: corresponding test FAILED: Test not implemented. (pkg-test_data-tests.adb:108)
 pkg.ads:21:4: error: corresponding test FAILED: Test not implemented. (pkg-test_data-tests.adb:129)
 pkg.ads:24:4: error: corresponding test FAILED: Test not implemented. (pkg-test_data-tests.adb:150)
-pkg.ads:27:4: error: corresponding test FAILED: Test not implemented. (pkg-test_data-tests.adb:171)
-48 tests run: 41 passed; 7 failed; 0 crashed.
+41 tests run: 35 passed; 6 failed; 0 crashed.

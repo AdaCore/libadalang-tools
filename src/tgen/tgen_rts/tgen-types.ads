@@ -150,8 +150,13 @@ package TGen.Types is
    --  Encore Val so that all internal representations get turned into actual
    --  Ada values. i.e. Enum positions gets turned into enum literals.
 
-   function Get_Diagnostics (Self : Typ) return String is
-     (To_Ada (Self.Name) & ": Non specialized type translation not supported");
+   function Get_Diagnostics
+     (Self   : Typ;
+      Prefix : String := "") return String_Vector is
+     (String_Vectors.To_Vector
+        (+To_Ada (Self.Name)
+         & ": Non specialized type translation not supported",
+        1));
    --  Return a diagnostic string detailing the reason why Self is / depends on
    --  an unsupported type.
    --
@@ -188,7 +193,10 @@ package TGen.Types is
 
    type Scalar_Typ (Is_Static : Boolean) is new Typ with null record;
 
-   function Get_Diagnostics (Self : Scalar_Typ) return String is ("");
+   function Get_Diagnostics
+     (Self   : Scalar_Typ;
+      Prefix : String := "") return String_Vector is
+     (String_Vectors.Empty_Vector);
    --  If we get a successful translation to a Scalar_Typ descendent, we should
    --  be able to generate anything.
 
@@ -232,8 +240,9 @@ package TGen.Types is
       --  Why this type is not supported.
    end record;
 
-   function Get_Diagnostics (Self : Unsupported_Typ) return String is
-     (To_Ada (Self.Name) & ": " & (+Self.Reason));
+   function Get_Diagnostics
+     (Self   : Unsupported_Typ;
+      Prefix : String := "") return String_Vector;
 
    function Supports_Gen (Self : Unsupported_Typ) return Boolean is (False);
    --  Unsupported types are unsupported for generation.

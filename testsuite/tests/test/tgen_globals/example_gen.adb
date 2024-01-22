@@ -77,21 +77,6 @@ begin
       TGen_Marshalling_Unit_JSON            => Unit_JSON,
       TGen_Marshalling_Origin               => "Dummy");
 
-   --  For the following procedure:
-   --
-   --  procedure Test_Mix (B : Boolean)
-   --    with Global => (Supported_Global, Unsupported_Global, Cst);
-   --
-   --  We should produce a value for the global Supported_Global as it is an
-   --  implicit input of the subprogram. The others are not supported, so we
-   --  should not produce a value for them.
-
-   test_mix_Dump_TC
-     (TGen_Marshalling_B                    => False,
-      TGen_Marshalling_Pkg_Supported_Global => 3,
-      TGen_Marshalling_Unit_JSON            => Unit_JSON,
-      TGen_Marshalling_Origin               => "Dummy");
-
    Put_Line (Unit_JSON.Write (Compact => False));
 
 end;

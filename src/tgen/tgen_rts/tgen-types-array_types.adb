@@ -37,18 +37,17 @@ package body TGen.Types.Array_Types is
    -- Get_Diagnostics --
    ---------------------
 
-   function Get_Diagnostics (Self : Array_Typ) return String is
+   function Get_Diagnostics
+     (Self   : Array_Typ;
+      Prefix : String := "") return String_Vector
+   is
+      Res : String_Vector;
    begin
       for Idx_Typ of Self.Index_Types loop
-         declare
-            Idx_Res : constant String := Idx_Typ.Get.Get_Diagnostics;
-         begin
-            if Idx_Res'Length > 0 then
-               return Idx_Res;
-            end if;
-         end;
+         Res.Append_Vector (Idx_Typ.Get.Get_Diagnostics (Prefix));
       end loop;
-      return Self.Component_Type.Get.Get_Diagnostics;
+      Res.Append_Vector (Self.Component_Type.Get.Get_Diagnostics (Prefix));
+      return Res;
    end Get_Diagnostics;
 
    -----------
