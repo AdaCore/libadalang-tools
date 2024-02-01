@@ -206,8 +206,8 @@ package TGen.Types.Constraints is
 
    function As_Anonymous_Typ (Self : SP.Ref) return Anonymous_Typ'Class is
      (Anonymous_Typ'Class (Self.Unchecked_Get.all)) with
-     Pre => (not SP.Is_Null (Self))
-            and then (Self.Get.Kind in Anonymous_Kind);
+     Pre => not SP.Is_Null (Self)
+            and then Self.Get.Kind in Anonymous_Kind;
    pragma Inline (As_Anonymous_Typ);
 
    function Image (Self : Anonymous_Typ) return String;
@@ -250,8 +250,8 @@ package TGen.Types.Constraints is
 
    function As_Instance_Typ (Self : SP.Ref) return Instance_Typ'Class is
      (Instance_Typ'Class (Self.Unchecked_Get.all)) with
-     Pre => (not SP.Is_Null (Self))
-            and then (Self.Get.Kind in Instance_Kind);
+     Pre => not SP.Is_Null (Self)
+            and then Self.Get.Kind in Instance_Kind;
    pragma Inline (As_Instance_Typ);
 
    function Image (Self : Instance_Typ) return String;
