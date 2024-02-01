@@ -167,7 +167,8 @@ package Pp.Buffers is
    --  end. The function version returns the new current character.
 
    procedure Delete_Char (Buf : in out Buffer) with
-     Pre => not At_End (Buf) and then False;
+     Pre => not At_End (Buf),
+     Unreferenced;
    --  Delete the character at 'point', leaving 'point' at the following one.
    --  ???This causes "duplicate marker" errors; currently not used.
 

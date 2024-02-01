@@ -854,7 +854,7 @@ package body TGen.Types.Record_Types is
      (Global_Ctx : Disc_Value_Map;
       T          : SP.Ref;
       Local_Ctx  : out Disc_Value_Map) with
-     Pre => (T.Get.Kind in Disc_Record_Kind)
+     Pre => T.Get.Kind in Disc_Record_Kind
              and then As_Discriminated_Record_Typ (T).Constrained;
    --  Given a global context, and a constrained discriminated record type,
    --  create a discriminant value map suitable for use as a local discriminant

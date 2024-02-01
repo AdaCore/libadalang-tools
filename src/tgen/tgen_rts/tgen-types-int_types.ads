@@ -60,8 +60,8 @@ package TGen.Types.Int_Types is
    function As_Signed_Int_Typ (Self : SP.Ref)
      return Signed_Int_Typ'Class is
      (Signed_Int_Typ'Class (Self.Unchecked_Get.all)) with
-     Pre => (not SP.Is_Null (Self))
-            and then (Self.Get.Kind in Signed_Int_Kind);
+     Pre => not SP.Is_Null (Self)
+            and then Self.Get.Kind in Signed_Int_Kind;
    pragma Inline (As_Signed_Int_Typ);
 
    type Mod_Int_Typ (Is_Static : Boolean) is new
@@ -87,8 +87,8 @@ package TGen.Types.Int_Types is
 
    function As_Mod_Int_Typ (Self : SP.Ref) return Mod_Int_Typ'Class is
      (Mod_Int_Typ'Class (Self.Unchecked_Get.all)) with
-     Pre => (not SP.Is_Null (Self))
-            and then (Self.Get.Kind in Mod_Int_Kind);
+     Pre => not SP.Is_Null (Self)
+            and then Self.Get.Kind in Mod_Int_Kind;
    pragma Inline (As_Mod_Int_Typ);
 
    generic

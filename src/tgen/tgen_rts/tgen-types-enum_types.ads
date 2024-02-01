@@ -69,8 +69,8 @@ package TGen.Types.Enum_Types is
 
    function As_Char_Typ (Self : SP.Ref) return Char_Typ'Class is
      (Char_Typ'Class (Self.Unchecked_Get.all)) with
-     Pre => (not SP.Is_Null (Self))
-            and then (Self.Get.Kind in Char_Kind);
+     Pre => not SP.Is_Null (Self)
+            and then Self.Get.Kind in Char_Kind;
    pragma Inline (As_Char_Typ);
 
    type Bool_Typ is new Enum_Typ with null record;
@@ -91,8 +91,8 @@ package TGen.Types.Enum_Types is
 
    function As_Bool_Typ (Self : SP.Ref) return Bool_Typ'Class is
      (Bool_Typ'Class (Self.Unchecked_Get.all)) with
-     Pre => (not SP.Is_Null (Self))
-            and then (Self.Get.Kind in Bool_Kind);
+     Pre => not SP.Is_Null (Self)
+            and then Self.Get.Kind in Bool_Kind;
    pragma Inline (As_Bool_Typ);
 
    package Enum_Literal_Maps is new Ada.Containers.Ordered_Maps
@@ -130,8 +130,8 @@ package TGen.Types.Enum_Types is
 
    function As_Other_Enum_Typ (Self : SP.Ref) return Other_Enum_Typ'Class is
      (Other_Enum_Typ'Class (Self.Unchecked_Get.all)) with
-     Pre => (not SP.Is_Null (Self))
-            and then (Self.Get.Kind in Enum_Kind);
+     Pre => not SP.Is_Null (Self)
+            and then Self.Get.Kind in Enum_Kind;
    pragma Inline (As_Other_Enum_Typ);
 
 end TGen.Types.Enum_Types;

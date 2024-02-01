@@ -112,8 +112,8 @@ package TGen.Types.Real_Types is
 
    function As_Float_Typ (Self : SP.Ref) return Float_Typ'Class is
      (Float_Typ'Class (Self.Unchecked_Get.all)) with
-     Pre => (not SP.Is_Null (Self))
-            and then (Self.Get.Kind in Float_Kind);
+     Pre => not SP.Is_Null (Self)
+            and then Self.Get.Kind in Float_Kind;
    pragma Inline (As_Float_Typ);
 
    type Ordinary_Fixed_Typ (Is_Static : Boolean) is new
@@ -152,8 +152,8 @@ package TGen.Types.Real_Types is
    function As_Ordinary_Fixed_Typ (Self : SP.Ref)
      return Ordinary_Fixed_Typ'Class is
      (Ordinary_Fixed_Typ'Class (Self.Unchecked_Get.all)) with
-     Pre => (not SP.Is_Null (Self))
-            and then (Self.Get.Kind in Fixed_Kind);
+     Pre => not SP.Is_Null (Self)
+            and then Self.Get.Kind in Fixed_Kind;
    pragma Inline (As_Ordinary_Fixed_Typ);
 
    type Decimal_Fixed_Typ (Is_Static, Has_Range : Boolean) is new
@@ -197,8 +197,8 @@ package TGen.Types.Real_Types is
    function As_Decimal_Fixed_Typ (Self : SP.Ref)
      return Decimal_Fixed_Typ'Class is
      (Decimal_Fixed_Typ'Class (Self.Unchecked_Get.all)) with
-     Pre => (not SP.Is_Null (Self))
-            and then (Self.Get.Kind in Decimal_Kind);
+     Pre => not SP.Is_Null (Self)
+            and then Self.Get.Kind in Decimal_Kind;
    pragma Inline (As_Decimal_Fixed_Typ);
 
    generic

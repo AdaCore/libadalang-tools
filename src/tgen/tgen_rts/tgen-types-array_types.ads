@@ -63,8 +63,8 @@ package TGen.Types.Array_Types is
    function As_Array_Typ (Self : SP.Ref)
      return Array_Typ'Class is
      (Array_Typ'Class (Self.Unchecked_Get.all)) with
-     Pre => (not SP.Is_Null (Self))
-       and then (Self.Get.Kind in Array_Typ_Range);
+     Pre => not SP.Is_Null (Self)
+       and then Self.Get.Kind in Array_Typ_Range;
    pragma Inline (As_Array_Typ);
 
    type Unconstrained_Array_Typ is new Array_Typ with null record;
@@ -85,8 +85,8 @@ package TGen.Types.Array_Types is
    function As_Unconstrained_Array_Typ (Self : SP.Ref)
      return Unconstrained_Array_Typ'Class is
      (Unconstrained_Array_Typ'Class (Self.Unchecked_Get.all)) with
-     Pre => (not SP.Is_Null (Self))
-            and then (Self.Get.Kind in Unconstrained_Array_Kind);
+     Pre => not SP.Is_Null (Self)
+            and then Self.Get.Kind in Unconstrained_Array_Kind;
    pragma Inline (As_Unconstrained_Array_Typ);
 
    type Constrained_Array_Typ (Num_Dims : Positive) is new
@@ -191,8 +191,8 @@ package TGen.Types.Array_Types is
    function As_Constrained_Array_Typ (Self : SP.Ref)
      return Constrained_Array_Typ'Class is
      (Constrained_Array_Typ'Class (Self.Unchecked_Get.all)) with
-     Pre => (not SP.Is_Null (Self))
-            and then (Self.Get.Kind in Constrained_Array_Kind);
+     Pre => not SP.Is_Null (Self)
+            and then Self.Get.Kind in Constrained_Array_Kind;
    pragma Inline (As_Constrained_Array_Typ);
 
 end TGen.Types.Array_Types;

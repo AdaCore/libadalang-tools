@@ -111,8 +111,8 @@ package TGen.Types.Record_Types is
    function As_Record_Typ (Self : SP.Ref)
      return Record_Typ'Class is
      (Record_Typ'Class (Self.Unchecked_Get.all)) with
-     Pre => (not SP.Is_Null (Self))
-            and then (Self.Get.Kind in Record_Typ_Range);
+     Pre => not SP.Is_Null (Self)
+            and then Self.Get.Kind in Record_Typ_Range;
    pragma Inline (As_Record_Typ);
 
    type Enum_Strat_Component_Info is record
@@ -161,8 +161,8 @@ package TGen.Types.Record_Types is
    function As_Nondiscriminated_Record_Typ (Self : SP.Ref)
      return Nondiscriminated_Record_Typ'Class is
      (Nondiscriminated_Record_Typ'Class (Self.Unchecked_Get.all)) with
-     Pre => (not SP.Is_Null (Self))
-            and then (Self.Get.Kind in Non_Disc_Record_Kind);
+     Pre => not SP.Is_Null (Self)
+            and then Self.Get.Kind in Non_Disc_Record_Kind;
    pragma Inline (As_Nondiscriminated_Record_Typ);
 
    type Variant_Part;
@@ -347,8 +347,8 @@ package TGen.Types.Record_Types is
    function As_Discriminated_Record_Typ
      (Self : SP.Ref) return Discriminated_Record_Typ'Class is
      (Discriminated_Record_Typ'Class (Self.Unchecked_Get.all)) with
-     Pre => (not SP.Is_Null (Self))
-            and then (Self.Get.Kind in Disc_Record_Kind);
+     Pre => not SP.Is_Null (Self)
+            and then Self.Get.Kind in Disc_Record_Kind;
    pragma Inline (As_Discriminated_Record_Typ);
 
    type Parameter_Mode is (In_Mode, In_Out_Mode, Out_Mode);
@@ -420,8 +420,8 @@ package TGen.Types.Record_Types is
    function As_Function_Typ
      (Self : SP.Ref) return Function_Typ'Class is
      (Function_Typ'Class (Self.Unchecked_Get.all)) with
-     Pre => (not SP.Is_Null (Self))
-            and then (Self.Get.Kind in Function_Kind);
+     Pre => not SP.Is_Null (Self)
+            and then Self.Get.Kind in Function_Kind;
    pragma Inline (As_Function_Typ);
 
 end TGen.Types.Record_Types;
