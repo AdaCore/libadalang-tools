@@ -7529,7 +7529,10 @@ package body Test.Skeleton is
               (TR_Name   => new String'(Subp.Subp_Text_Name.all),
                Line      => Natural (Subp_Name_Span.Start_Line),
                Column    => Natural (Subp_Name_Span.Start_Column),
+               TR_Hash   => new String'(Subp.Subp_Full_Hash.all),
                Decl_Line => Natural (Subp_Span.Start_Line),
+               Decl_File =>
+                 new String'(Subp.Subp_Declaration.Unit.Get_Filename),
                others    => <>));
          TR := TP_Mapping_List.Reference (TP_List, TP).TR_List.Last;
       end if;
@@ -7546,6 +7549,12 @@ package body Test.Skeleton is
       begin
          TR_Ref.TC_List.Append (TC);
       end;
+
+      --  Record whether this test package contains any generated tests
+
+      if Origin = Test_Case_Generated then
+         TP_List.Reference (TP).Has_Gen_Tests := True;
+      end if;
    end Add_TR;
 
    ------------

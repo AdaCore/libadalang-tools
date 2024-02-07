@@ -86,6 +86,9 @@ package Test.Mapping is
       Column    : Natural;
       --  Sloc for the subprogram under test
 
+      TR_Hash   : String_Access;
+      --  Full hash for the subprogram under test
+
       TC_List   : TC_Mapping_List.List;
       --  List of testcases holding the information above, if there are
       --  several.
@@ -95,6 +98,9 @@ package Test.Mapping is
       --  this one points at the first line of declaration. This is needed
       --  to properly support cases with "overriding/not overriding" decorators
       --  in test filtering, as decorator usually takes an extra line.
+
+      Decl_File : String_Access;
+      --  Full filename in which the subprogram under test is declared
    end record;
    --  Stores info on individual subprogram under test and collection of
    --  corresponding test cases (if any).
@@ -126,6 +132,7 @@ package Test.Mapping is
       TearDown_Column : Natural;
       TR_List         : TR_Mapping_List.List;
       DT_List         : DT_Mapping_List.List;
+      Has_Gen_Tests   : Boolean := False;
    end record;
    --  Stores info on individual test package, all it's test routines and
    --  dangling tests.
