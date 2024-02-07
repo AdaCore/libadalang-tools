@@ -912,6 +912,14 @@ package body TGen.Libgen is
                    & " (""-gnatg"", ""-gnatyN"", ""-gnatws"");");
          Put_Line (Prj_File, "      end case;");
          Put_Line (Prj_File, "   end Compiler;");
+         New_Line (Prj_File);
+
+         --  Exclude all units from coverage analysis. Only the units from the
+         --  user project are of interest, the rest are testing artifacts.
+
+         Put_Line (Prj_File, "   package Coverage is");
+         Put_Line (Prj_File, "      for Units use ();");
+         Put_Line (Prj_File, "   end Coverage;");
          Put_Line (Prj_File, "end TGen_support;");
          Close (Prj_File);
       end;

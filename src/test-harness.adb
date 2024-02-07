@@ -1145,15 +1145,22 @@ package body Test.Harness is
       S_Put (0, "project Test_Driver is");
       Put_New_Line;
       Put_New_Line;
-      S_Put
-           (3,
-            "for Origin_Project use """
-            & (+Relative_Path
-                 (Create (+Source_Prj),
-                   Create (+Harness_Dir.all)))
-            & """;");
-      Put_New_Line;
-      Put_New_Line;
+
+      --  When using the test generation features, do not emit an origin
+      --  project attribute, otherwise gnatcov will not process the harness
+      --  project at all.
+
+      if not Test.Common.Harness_Has_Gen_Tests then
+         S_Put
+            (3,
+               "for Origin_Project use """
+               & (+Relative_Path
+                  (Create (+Source_Prj),
+                     Create (+Harness_Dir.all)))
+               & """;");
+         Put_New_Line;
+         Put_New_Line;
+      end if;
       S_Put (3, "for Target use Gnattest_Common'Target;");
       Put_New_Line;
       Put_New_Line;
@@ -2813,21 +2820,29 @@ package body Test.Harness is
             & " is");
          Put_New_Line;
          Put_New_Line;
-         if Relocatable_Harness then
-            S_Put
-              (3,
-               "for Origin_Project use external "
-               & "(""ORIGIN_PROJECT_DIR"", """") & """
-               & Base_Name (Source_Prj)
-               & """;");
-         else
-            S_Put
-              (3,
-               "for Origin_Project use """
-               & (+Relative_Path
-                 (Create (+Source_Prj),
-                      Create (+Normalize_Pathname (Dir_Name (P.Path_TD.all)))))
-               & """;");
+
+         --  When using the test generation features, do not emit an origin
+         --  project attribute, otherwise gnatcov will not process the harness
+         --  project at all.
+
+         if not Test.Common.Harness_Has_Gen_Tests then
+            if Relocatable_Harness then
+               S_Put
+               (3,
+                "for Origin_Project use external "
+                & "(""ORIGIN_PROJECT_DIR"", """") & """
+                & Base_Name (Source_Prj)
+                & """;");
+            else
+               S_Put
+               (3,
+                "for Origin_Project use """
+                & (+Relative_Path
+                    (Create (+Source_Prj),
+                        Create
+                          (+Normalize_Pathname (Dir_Name (P.Path_TD.all)))))
+                & """;");
+            end if;
          end if;
          Put_New_Line;
          Put_New_Line;
@@ -3255,21 +3270,29 @@ package body Test.Harness is
             & P.Name_TD.all
             & " is");
          Put_New_Line;
-         if Relocatable_Harness then
-            S_Put
-              (3,
-               "for Origin_Project use external "
-               & "(""ORIGIN_PROJECT_DIR"", """") & """
-               & Base_Name (P.Path_Of_Extended.all)
-               & """;");
-         else
-            S_Put
-              (3,
-               "for Origin_Project use """
-               & (+Relative_Path
-                 (Create (+P.Path_Of_Extended.all),
-                      Create (+Normalize_Pathname (Dir_Name (P.Path_TD.all)))))
-               & """;");
+
+         --  When using the test generation features, do not emit an origin
+         --  project attribute, otherwise gnatcov will not process the harness
+         --  project at all.
+
+         if not Test.Common.Harness_Has_Gen_Tests then
+            if Relocatable_Harness then
+               S_Put
+               (3,
+                "for Origin_Project use external "
+                & "(""ORIGIN_PROJECT_DIR"", """") & """
+                & Base_Name (P.Path_Of_Extended.all)
+                & """;");
+            else
+               S_Put
+               (3,
+                "for Origin_Project use """
+                & (+Relative_Path
+                     (Create (+P.Path_Of_Extended.all),
+                        Create
+                          (+Normalize_Pathname (Dir_Name (P.Path_TD.all)))))
+                & """;");
+            end if;
          end if;
          Put_New_Line;
          Put_New_Line;
@@ -3560,22 +3583,28 @@ package body Test.Harness is
             end loop;
          end if;
 
-         Put_New_Line;
-         if Relocatable_Harness then
-            S_Put
-              (3,
-               "for Origin_Project use external "
-               & "(""ORIGIN_PROJECT_DIR"", """") & """
-               & Base_Name (Source_Prj)
-               & """;");
-         else
-            S_Put
-              (3,
-               "for Origin_Project use """
-               & (+Relative_Path
-                 (Create (+Source_Prj),
-                      Create (+Normalize_Pathname (Harness_Dir.all))))
-               & """;");
+         --  When using the test generation features, do not emit an origin
+         --  project attribute, otherwise gnatcov will not process the harness
+         --  project at all.
+
+         if not Test.Common.Harness_Has_Gen_Tests then
+            Put_New_Line;
+            if Relocatable_Harness then
+               S_Put
+               (3,
+                "for Origin_Project use external "
+                & "(""ORIGIN_PROJECT_DIR"", """") & """
+                & Base_Name (Source_Prj)
+                & """;");
+            else
+               S_Put
+               (3,
+                "for Origin_Project use """
+                & (+Relative_Path
+                     (Create (+Source_Prj),
+                        Create (+Normalize_Pathname (Harness_Dir.all))))
+                & """;");
+            end if;
          end if;
          Put_New_Line;
          Put_New_Line;
