@@ -656,18 +656,6 @@ package body TGen.Types.Translation is
                        others       => <>));
       end if;
       return Res;
-   exception
-      when Exc : Translation_Error =>
-         if Verbose_Diag then
-            Put_Line
-              ("Warning: could not determine static properties of" & " type" &
-               Decl.Image & " : " & Ada.Exceptions.Exception_Message (Exc));
-         end if;
-         Res.Res.Set
-           (Float_Typ'(Is_Static => False,
-                       Has_Range => False,
-                       others    => <>));
-         return Res;
    end Translate_Float_Decl;
 
    -----------------------------------
@@ -1090,6 +1078,11 @@ package body TGen.Types.Translation is
                     (Num => Min_Eval.Real_Result.Numerator.Image,
                      Den => Min_Eval.Real_Result.Denominator.Image);
                   Min_Static := True;
+               exception
+                  when Exc : Storage_Error =>
+                     raise Translation_Error with
+                       "Technical limitation: "
+                        & Ada.Exceptions.Exception_Message (Exc);
                end;
             else
                Min_Text := +Node.F_Range.As_Bin_Op.F_Left.Text;
@@ -1108,6 +1101,11 @@ package body TGen.Types.Translation is
                     (Num => Max_Eval.Real_Result.Numerator.Image,
                      Den => Max_Eval.Real_Result.Denominator.Image);
                   Max_Static := True;
+               exception
+                  when Exc : Storage_Error =>
+                     raise Translation_Error with
+                       "Technical limitation: "
+                        & Ada.Exceptions.Exception_Message (Exc);
                end;
             else
                Max_Text := +Node.F_Range.As_Bin_Op.F_Right.Text;
@@ -3085,6 +3083,12 @@ package body TGen.Types.Translation is
                       & Ada.Exceptions.Exception_Message (Exc));
          end if;
          return Translate_Internal (N, Verbose_Diag, True);
+      when Exc : Translation_Error =>
+         return
+           (Success => False,
+            Diagnostics =>
+              +(Image (Type_Name.Text) & ": "
+                & Ada.Exceptions.Exception_Message (Exc)));
    end Translate_Internal;
 
    function Translate_Globals
