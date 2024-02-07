@@ -52,7 +52,8 @@ package Test.Command_Lines is
       Serialized_Test_Dir,
       Dump_Test_Inputs,
       Unparse,
-      Enum_Strat);
+      Enum_Strat,
+      Minimize);
 
    package Test_Boolean_Switches is new Boolean_Switches
      (Descriptor,
@@ -91,7 +92,8 @@ package Test.Command_Lines is
       Copy_Environment,
       Reporter,
       Gen_Test_Num,
-      Serialized_Test_Dir);
+      Serialized_Test_Dir,
+      Cov_Level);
 
    package Test_String_Switches is new String_Switches
      (Descriptor,
@@ -110,7 +112,8 @@ package Test.Command_Lines is
        Copy_Environment         => '=',
        Reporter                 => '=',
        Gen_Test_Num             => '=',
-       Serialized_Test_Dir      => '=']);
+       Serialized_Test_Dir      => '=',
+       Cov_Level                => '=']);
 
    type Test_String_Seqs is (Exclude_From_Stubbing);
 
