@@ -9,6 +9,7 @@
 @@--  @_TY_PREFIX_@ Prefix used to prefix all entities for the current type.
 @@--  @_TY_NAME_@ Name of the current type.
 @@--  @_DISCR_NAME_@ Names of the discriminants of the current type.
+@@--  @_DISCR_TYP_@ Types of the discriminants of the current type.
 @@--  @_CHOICES_@ Vector of choices for the variant part.
 @@--  @_COMPONENT_SIZE_MAX_@ Vector of calls to Size_Max for all the
 @@--       components of the current type.
@@ -25,21 +26,25 @@
 @@IF@@ (@_COMPONENT_SIZE_MAX_@ = "") and (@_VARIANT_PART_@ = "")
 @_SPACING_@   null;
 @@ELSE@@
-@_SPACING_@   if @_GLOBAL_PREFIX_@_@_DISCR_NAME_@_D_Max /= @_GLOBAL_PREFIX_@_@_DISCR_NAME_@_D_Min
-@_SPACING_@     or else @_GLOBAL_PREFIX_@_@_DISCR_NAME_@_D_Min in @_CHOICES_@
-@_SPACING_@   then
-@_SPACING_@      @_GLOBAL_PREFIX_@_Nb_Bits := @_GLOBAL_PREFIX_@_Init;
+@_SPACING_@   declare
+@_SPACING_@      use type @_DISCR_TYP_@;
+@_SPACING_@   begin
+@_SPACING_@      if @_GLOBAL_PREFIX_@_@_DISCR_NAME_@_D_Max /= @_GLOBAL_PREFIX_@_@_DISCR_NAME_@_D_Min
+@_SPACING_@        or else @_GLOBAL_PREFIX_@_@_DISCR_NAME_@_D_Min in @_CHOICES_@
+@_SPACING_@      then
+@_SPACING_@         @_GLOBAL_PREFIX_@_Nb_Bits := @_GLOBAL_PREFIX_@_Init;
 @@TABLE'TERSE@@
-@_SPACING_@      @_GLOBAL_PREFIX_@_Nb_Bits := @_GLOBAL_PREFIX_@_Nb_Bits +
+@_SPACING_@         @_GLOBAL_PREFIX_@_Nb_Bits := @_GLOBAL_PREFIX_@_Nb_Bits +
 @_COMPONENT_SIZE_MAX_@
 @@END_TABLE@@
 @@IF@@ @_VARIANT_PART_@ /= ""
 @_VARIANT_PART_@
 @@END_IF@@
-@_SPACING_@      if @_GLOBAL_PREFIX_@_Nb_Bits > @_GLOBAL_PREFIX_@_Upper then
-@_SPACING_@         @_GLOBAL_PREFIX_@_Upper := @_GLOBAL_PREFIX_@_Nb_Bits;
+@_SPACING_@         if @_GLOBAL_PREFIX_@_Nb_Bits > @_GLOBAL_PREFIX_@_Upper then
+@_SPACING_@            @_GLOBAL_PREFIX_@_Upper := @_GLOBAL_PREFIX_@_Nb_Bits;
+@_SPACING_@         end if;
 @_SPACING_@      end if;
-@_SPACING_@   end if;
+@_SPACING_@   end;
 @@END_IF@@
 @@END_TABLE@@
 @_SPACING_@end;

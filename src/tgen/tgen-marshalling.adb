@@ -591,9 +591,10 @@ package body TGen.Marshalling is
          Spacing       : Natural;
          Object_Name   : String)
       is
-         Discr_Name : constant String := +V.Discr_Name;
-         Discr_Typ  : constant TGen.Types.Typ'Class :=
+         Discr_Name    : constant String := +V.Discr_Name;
+         Discr_Typ     : constant TGen.Types.Typ'Class :=
            Discriminants (V.Discr_Name).Get;
+         Discr_Typ_FQN : constant String := Discr_Typ.Fully_Qualified_Name;
 
          Choices_Tag          : Matrix_Tag;
          Comp_Read_Tag        : Matrix_Tag;
@@ -668,7 +669,8 @@ package body TGen.Marshalling is
               Common_Assocs
                & [1 => Assoc ("OBJECT_NAME", Object_Name),
                   2 => Assoc ("DISCR_NAME", Discr_Name),
-                  3 => Assoc ("CHOICES", Choices_Tag)];
+                  3 => Assoc ("DISCR_TYP", Discr_Typ_FQN),
+                  4 => Assoc ("CHOICES", Choices_Tag)];
 
          begin
             Read_Tag := +Variant_Read_Write
@@ -829,7 +831,8 @@ package body TGen.Marshalling is
                     2  => Assoc ("COMPONENT_WRITE", Component_Write),
                     3  => Assoc ("COMPONENT_SIZE", Component_Size),
                     4  => Assoc ("COMPONENT_SIZE_MAX", Component_Size_Max),
-                    5  => Assoc ("COMP_TYP", Named_Comp_Ty.Type_Name),
+                    5  => Assoc
+                      ("COMP_TYP", Named_Comp_Ty.Fully_Qualified_Name),
                     6  => Assoc ("ADA_DIM", Ada_Dim_Tag),
                     7  => Assoc ("FIRST_NAME", First_Name_Tag),
                     8  => Assoc ("LAST_NAME", Last_Name_Tag),
@@ -1061,7 +1064,8 @@ package body TGen.Marshalling is
    is
    begin
       if Typ in Enum_Typ'Class then
-         return Lit_Image (Enum_Typ'Class (Typ), V);
+         return To_Ada (Typ.Package_Name) & "."
+                & Lit_Image (Enum_Typ'Class (Typ), V);
       else
          return Trim (To_String (V), Left);
       end if;
