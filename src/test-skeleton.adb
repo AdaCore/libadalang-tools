@@ -198,6 +198,10 @@ package body Test.Skeleton is
       Unit_File_Name : String_Access;
       --  Full name of the file, containing the CU
 
+      Has_Gen_Tests : Boolean := False;
+      --  Whether this unit has generated tests that were expanded into
+      --  a test unit.
+
       case Data_Kind is
          --  Indicates which data storing structures are used, determines the
          --  way of suite generation.
@@ -435,13 +439,16 @@ package body Test.Skeleton is
    --  Generates test package spec and body. Save in TP_List information about
    --  generated tests.
 
-   procedure Output_Generated_Tests
+   function Output_Generated_Tests
      (Data            : Data_Holder;
       Suite_Data_List : in out Suites_Data_Type;
-      TP_List         : in out TP_Mapping_List.List);
+      TP_List         : in out TP_Mapping_List.List) return Boolean;
    --  Create test packages containing all the generated tests from TGen,
    --  loading them from file. Fill the suite info as we create new test cases,
    --  and save in TP_List information about generated tests.
+   --
+   --  Return True if a test package was created and at least one test was
+   --  generated.
 
    procedure Generate_Procedure_Wrapper (Current_Subp : Subp_Info);
    --  Prints a test-case specific wrapper for tested procedure
@@ -465,13 +472,15 @@ package body Test.Skeleton is
       Overloading_N  : Natural;
       Commented_Out  : Boolean := False;
       Use_Short_Name : Boolean := True;
-      Type_Name      : String  := "");
+      Type_Name      : String  := "";
+      Add_Cov_Dump   : Boolean := False);
 
    procedure Put_Closing_Comment_Section
      (Subp           : Subp_Info;
       Overloading_N  : Natural;
       Commented_Out  : Boolean := False;
-      Use_Short_Name : Boolean := True);
+      Use_Short_Name : Boolean := True;
+      Add_Cov_Dump   : Boolean := False);
 
    function Sanitize_TC_Name (TC_Name : String) return String;
    --  Processes the name of the test case in such a way that it could be used
@@ -765,11 +774,17 @@ package body Test.Skeleton is
                --  Save information about generated test cases
 
             begin
+               --  Output generated JSON tests first, to determine whether at
+               --  least one was found for the unit. If not, there is no point
+               --  in dumping the traces for user-written test.
+               --  This is recorded in the Data holder.
+
+               if Ada.Directories.Exists (Test.Common.JSON_Test_Dir.all) then
+                  Data.Has_Gen_Tests :=
+                    Output_Generated_Tests (Data, Suite_Data_List, TP_List);
+               end if;
                Generate_Nested_Hierarchy (Data);
                Generate_Test_Package (Data, TP_List);
-               if Ada.Directories.Exists (Test.Common.JSON_Test_Dir.all) then
-                  Output_Generated_Tests (Data, Suite_Data_List, TP_List);
-               end if;
                Add_Test_List (Data.Unit_File_Name.all, TP_List);
                TP_List.Clear;
             end;
@@ -5324,7 +5339,8 @@ package body Test.Skeleton is
                         Elem_Numbers.Element
                           (Current_Subp.Subp_Declaration),
                         Use_Short_Name => MD.Short_Name_Used,
-                        Type_Name => Current_Type.Main_Type_Text_Name.all);
+                        Type_Name      => Current_Type.Main_Type_Text_Name.all,
+                        Add_Cov_Dump   => Data.Has_Gen_Tests);
 
                      if Is_Unimplemented_Test (MD.TR_Text) then
                         TR_SLOC_Buffer.Append
@@ -5429,7 +5445,8 @@ package body Test.Skeleton is
                        (Subp_Data_List.Element (Subp_Cur),
                         Elem_Numbers.Element
                           (Current_Subp.Subp_Declaration),
-                        Use_Short_Name => MD.Short_Name_Used);
+                        Use_Short_Name => MD.Short_Name_Used,
+                        Add_Cov_Dump   => Data.Has_Gen_Tests);
                      New_Line_Count;
 
                   end if;
@@ -5484,7 +5501,8 @@ package body Test.Skeleton is
 
                      Put_Opening_Comment_Section
                        (Stub, 0, True, False,
-                        Current_Type.Main_Type_Text_Name.all);
+                        Current_Type.Main_Type_Text_Name.all,
+                        Add_Cov_Dump => Data.Has_Gen_Tests);
 
                      Add_DT
                        (TP_List,
@@ -5508,7 +5526,8 @@ package body Test.Skeleton is
                        (Stub,
                         0,
                         True,
-                        False);
+                        False,
+                        Add_Cov_Dump => Data.Has_Gen_Tests);
                      New_Line_Count;
                   end;
                end if;
@@ -6508,7 +6527,8 @@ package body Test.Skeleton is
                           (Subp_Data_List.Element (Subp_Cur),
                            Elem_Numbers.Element
                              (Current_Subp.Subp_Declaration),
-                           Use_Short_Name => MD.Short_Name_Used);
+                           Use_Short_Name => MD.Short_Name_Used,
+                           Add_Cov_Dump   => Data.Has_Gen_Tests);
 
                         if Is_Unimplemented_Test (MD.TR_Text) then
                            TR_SLOC_Buffer.Append
@@ -6612,7 +6632,8 @@ package body Test.Skeleton is
                           (Subp_Data_List.Element (Subp_Cur),
                            Elem_Numbers.Element
                              (Current_Subp.Subp_Declaration),
-                           Use_Short_Name => MD.Short_Name_Used);
+                           Use_Short_Name => MD.Short_Name_Used,
+                           Add_Cov_Dump   => Data.Has_Gen_Tests);
                         New_Line_Count;
 
                      end if;
@@ -6679,7 +6700,8 @@ package body Test.Skeleton is
                         end if;
 
                         Put_Opening_Comment_Section
-                          (Stub, 0, True, MD.Short_Name_Used);
+                          (Stub, 0, True, MD.Short_Name_Used,
+                           Add_Cov_Dump => Data.Has_Gen_Tests);
 
                         Add_DT
                           (TP_List,
@@ -6700,7 +6722,11 @@ package body Test.Skeleton is
                         end loop;
 
                         Put_Closing_Comment_Section
-                          (Stub, 0, True, MD.Short_Name_Used);
+                          (Stub,
+                           0,
+                           True,
+                           MD.Short_Name_Used,
+                           Add_Cov_Dump => Data.Has_Gen_Tests);
                         New_Line_Count;
                      end;
                   end if;
@@ -6781,10 +6807,10 @@ package body Test.Skeleton is
    -- Output_Generated_Tests --
    ----------------------------
 
-   procedure Output_Generated_Tests
+   function Output_Generated_Tests
      (Data            : Data_Holder;
       Suite_Data_List : in out Suites_Data_Type;
-      TP_List         : in out TP_Mapping_List.List)
+      TP_List         : in out TP_Mapping_List.List) return Boolean
    is
       use TGen.Strings;
 
@@ -6832,19 +6858,19 @@ package body Test.Skeleton is
    begin
       --  We do not support non-instanciated generic packages
       if Data.Data_Kind /= Declaration_Data or else Data.Is_Generic then
-         return;
+         return False;
       end if;
 
       --  Skip if there's no JSON file for this unit
       if not JSON_Unit_File.Is_Regular_File
         and then not Is_Readable (JSON_Unit_File)
       then
-         return;
+         return False;
       end if;
 
       Unit_Raw_Content := GNATCOLL.VFS.Read_File (JSON_Unit_File);
       if Unit_Raw_Content in null then
-         return;
+         return False;
       end if;
 
       Unit_Content := Read
@@ -7265,6 +7291,12 @@ package body Test.Skeleton is
                      end;
                   end if;
                end loop;
+
+               --  Add marker to reset coverage buffers
+
+               Put_Line
+                 (Body_Kind,
+                  Com & "   pragma Annotate (Xcov, Reset_Buffers);");
                if Is_Function then
                   Put_Line (Body_Kind, Com & "   declare");
                   Put_Line (Body_Kind, Com & "      Ret_Val : "
@@ -7284,8 +7316,29 @@ package body Test.Skeleton is
                   Pp_Subp_Call (Files (Body_Kind), 3);
                end if;
                New_Line (Body_Kind);
+
+               --  Dump the coverage buffers
+
+               Put_Line
+                 (Body_Kind,
+                  Com & "   pragma Annotate (Xcov, Dump_Buffers, """
+                  & Subp.Subp_Full_Hash.all & "-gen-"
+                  & Trim (Integer'Image (Test_Count - 1), Both) & """);");
+               New_Line (Body_Kind);
+
                Put_Line (Body_Kind, Com & "exception");
                Put_Line (Body_Kind, Com & "   when Exc : others =>");
+
+               --  Also dump the trace in case something crashed in the test.
+               --  It remains interesting coverage input.
+
+               Put_Line
+                 (Body_Kind,
+                  Com & "      pragma Annotate (Xcov, Dump_Buffers, """
+                  & Subp.Subp_Full_Hash.all & "-gen-"
+                  & Trim (Integer'Image (Test_Count - 1), Both) & """);");
+               New_Line (Body_Kind);
+
                Put_Line (Body_Kind, Com & "      AUnit.Assertions.Assert");
                Put_Line (Body_Kind, Com & "        (False,");
                Put_Line
@@ -7356,7 +7409,7 @@ package body Test.Skeleton is
       end loop;
 
       GNAT.Strings.Free (Unit_Raw_Content);
-
+      return True;
    end Output_Generated_Tests;
 
    ------------
@@ -7476,7 +7529,10 @@ package body Test.Skeleton is
               (TR_Name   => new String'(Subp.Subp_Text_Name.all),
                Line      => Natural (Subp_Name_Span.Start_Line),
                Column    => Natural (Subp_Name_Span.Start_Column),
+               TR_Hash   => new String'(Subp.Subp_Full_Hash.all),
                Decl_Line => Natural (Subp_Span.Start_Line),
+               Decl_File =>
+                 new String'(Subp.Subp_Declaration.Unit.Get_Filename),
                others    => <>));
          TR := TP_Mapping_List.Reference (TP_List, TP).TR_List.Last;
       end if;
@@ -7493,6 +7549,12 @@ package body Test.Skeleton is
       begin
          TR_Ref.TC_List.Append (TC);
       end;
+
+      --  Record whether this test package contains any generated tests
+
+      if Origin = Test_Case_Generated then
+         TP_List.Reference (TP).Has_Gen_Tests := True;
+      end if;
    end Add_TR;
 
    ------------
@@ -8254,7 +8316,8 @@ package body Test.Skeleton is
      (Subp           : Subp_Info;
       Overloading_N  : Natural;
       Commented_Out  : Boolean := False;
-      Use_Short_Name : Boolean := True)
+      Use_Short_Name : Boolean := True;
+      Add_Cov_Dump   : Boolean := False)
    is
       Overloading_Prefix : String_Access;
    begin
@@ -8274,6 +8337,13 @@ package body Test.Skeleton is
 
       S_Put (0, "--  begin read only");
       New_Line_Count;
+
+      if Add_Cov_Dump then
+         S_Put
+           (6, "pragma Annotate (Xcov, Dump_Buffers, """
+               & Subp.Subp_Full_Hash.all & """);");
+         New_Line_Count;
+      end if;
 
       if Commented_Out then
          S_Put
@@ -8312,7 +8382,8 @@ package body Test.Skeleton is
       Overloading_N  : Natural;
       Commented_Out  : Boolean := False;
       Use_Short_Name : Boolean := True;
-      Type_Name      : String  := "")
+      Type_Name      : String  := "";
+      Add_Cov_Dump   : Boolean := False)
    is
       Hash_Length_Used : constant := 15;
       Hash_First : constant Integer := Subp.Subp_Full_Hash'First;
@@ -8580,6 +8651,23 @@ package body Test.Skeleton is
          New_Line_Count;
          S_Put (6, "Dummy_GNATTEST : Boolean := GNATTEST_Set_Current_Test;");
          Put_New_Line;
+      end if;
+
+      if Add_Cov_Dump then
+         S_Put (6, "function GNATTEST_Reset_Cov return Boolean is");
+         New_Line_Count;
+         S_Put (6, "begin");
+         New_Line_Count;
+         S_Put (9, "pragma Annotate (Xcov, Reset_Buffers);");
+         New_Line_Count;
+         S_Put (9, "return True;");
+         New_Line_Count;
+         S_Put (6, "end GNATTEST_Reset_Cov;");
+         New_Line_Count;
+         New_Line_Count;
+         S_Put (6, "Dummy_GNATTEST_Reset_Cov : constant Boolean :="
+                   & " GNATTEST_Reset_Cov;");
+         New_Line_Count;
       end if;
 
       S_Put (0, "--  end read only");

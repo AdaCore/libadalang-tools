@@ -26,12 +26,12 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with GNAT.OS_Lib;
 
 with Test.Actions;
-with Test.Common;                use Test.Common;
+with Test.Common;        use Test.Common;
 with Test.Command_Lines;
-with Utils.Command_Lines.Common; use Utils.Command_Lines.Common;
-with Utils_Debug;                use Utils_Debug;
-with Utils.Drivers;              use Utils.Drivers;
-with Utils.Environment;          use Utils.Environment;
+with Test.Subprocess;    use Test.Subprocess;
+with Utils_Debug;        use Utils_Debug;
+with Utils.Drivers;      use Utils.Drivers;
+with Utils.Environment;  use Utils.Environment;
 
 with GNATCOLL.OS.Process;
 
@@ -128,33 +128,15 @@ package body Test.Generation is
 
    procedure Generate_Build_And_Run (Cmd : Command_Line) is
       use GNATCOLL.OS.Process;
-      use Common_String_Seq_Switches;
       Directory_Separator : Character renames GNAT.OS_Lib.Directory_Separator;
-      type Arg_List_Acc is access all Argument_List;
-      Build_Args    : aliased Argument_List;
-      Run_Args      : aliased Argument_List;
+
+      Build_Args    : Argument_List;
+      Run_Args      : Argument_List;
       Harness_Dir   : constant String :=
         Tool_Temp_Dir.all & Directory_Separator & "tgen_Harness";
-      Ext_Vars : constant String_Ref_Array := Arg (Cmd, External_Variable);
-      Ret_Status    : Integer;
       Ext_Acc       : GNAT.OS_Lib.String_Access :=
         GNAT.OS_Lib.Get_Executable_Suffix;
       Ext           : constant String := Ext_Acc.all;
-
-      procedure PP_Cmd (Cmd : Arg_List_Acc);
-
-      ------------
-      -- PP_Cmd --
-      ------------
-
-      procedure PP_Cmd (Cmd : Arg_List_Acc) is
-         Result : Unbounded_String;
-      begin
-         for Arg of Cmd.all loop
-            Result := Result & Arg & " ";
-         end loop;
-         Report_Err ("Running " & To_String (Result));
-      end PP_Cmd;
 
    begin
       GNAT.OS_Lib.Free (Ext_Acc);
@@ -178,11 +160,7 @@ package body Test.Generation is
       Build_Args.Append ("-P");
       Build_Args.Append
         (Harness_Dir & Directory_Separator & "tgen_generation_harness.gpr");
-      for Var of Ext_Vars loop
-         if Var not in null then
-            Build_Args.Append ("-X" & Var.all);
-         end if;
-      end loop;
+      Populate_X_Vars (Build_Args, Cmd);
 
       --  Suppress all warning/info messages and style checks
 
@@ -193,30 +171,13 @@ package body Test.Generation is
       if Debug_Flag_1 then
          Build_Args.Append ("-g");
          Build_Args.Append ("-O0");
-         PP_Cmd (Build_Args'Access);
       end if;
-      Ret_Status := Run (Build_Args);
-      if Ret_Status /= 0 then
-         Report_Err ("Build of generation harness exited with status"
-                     & Ret_Status'Image);
-         Clean_Up;
-         GNAT.OS_Lib.OS_Exit (1);
-      end if;
+      Run (Build_Args, "Build of the test generation harness");
 
       Run_Args.Append
         (Harness_Dir & Directory_Separator & "obj" & Directory_Separator
          & "generation_main" & Ext);
-
-      if Debug_Flag_1 then
-         PP_Cmd (Run_Args'Access);
-      end if;
-      Ret_Status := Run (Run_Args);
-      if Ret_Status /= 0 then
-         Report_Err ("Run of generation harness exited with status"
-                     & Ret_Status'Image);
-         Clean_Up;
-         GNAT.OS_Lib.OS_Exit (1);
-      end if;
+      Run (Run_Args, "Execution of the test generation harness");
    end Generate_Build_And_Run;
 
 end Test.Generation;

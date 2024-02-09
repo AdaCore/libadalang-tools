@@ -407,6 +407,9 @@ package Test.Common is
    procedure Mark_Lib_Support_Generated;
    --  Flag that the TGen support library has already been generated
 
+   function Harness_Has_Gen_Tests return Boolean;
+   --  Return whether the harness contains any generated tests
+
    TGen_Num_Tests : Natural := 5;
    --  Number of tests to be generated for each procedure (or upper limit if
    --  using enumerative strategies).

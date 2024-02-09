@@ -23,6 +23,7 @@
 
 with Libadalang.Common;         use Libadalang.Common;
 
+with Ada.Directories;
 with Ada.Text_IO;               use Ada.Text_IO;
 with Ada.IO_Exceptions;
 with Ada.Exceptions;            use Ada.Exceptions;
@@ -1252,5 +1253,17 @@ package body Test.Common is
    begin
       Need_Lib_Support := Generated;
    end Mark_Lib_Support_Generated;
+
+   ---------------------------
+   -- Harness_Has_Gen_Tests --
+   ---------------------------
+
+   function Harness_Has_Gen_Tests return Boolean is
+     (Need_Lib_Support = Generated
+      and then JSON_Test_Dir /= null
+      and then Ada.Directories.Exists (JSON_Test_Dir.all));
+
+   --  The harness can only have generated tests if the support library has
+   --  been generated, and the JSON_Test dir exists.
 
 end Test.Common;

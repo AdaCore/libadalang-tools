@@ -55,6 +55,7 @@ with Test.Common;
 with Test.Skeleton.Source_Table;
 with Test.Harness.Source_Table;
 with Test.Generation;
+with Test.Suite_Min;
 
 with Ada.Directories; use Ada.Directories;
 with Utils.Projects; use Utils.Projects;
@@ -1038,6 +1039,20 @@ package body Test.Actions is
          Test.Harness.Generate_Makefile (Src_Prj);
          Test.Harness.Generate_Config;
          Test.Common.Generate_Common_File;
+
+         --  We need to minimize the testsuite before generating the mapping
+         --  file, as the generation of this file clears the mapping data
+         --  structure.
+
+         if Arg (Cmd, Minimize) then
+            if Test.Common.Harness_Has_Gen_Tests then
+               Test.Suite_Min.Minimize_Suite (Cmd);
+            else
+               Test.Common.Report_Err
+                 ("No generated tests found in the harness,"
+                  & " nothing to do in the minimization phase.");
+            end if;
+         end if;
          Test.Mapping.Generate_Mapping_File;
 
       end if;
