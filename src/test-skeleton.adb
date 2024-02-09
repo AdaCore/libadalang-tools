@@ -7532,7 +7532,8 @@ package body Test.Skeleton is
                TR_Hash   => new String'(Subp.Subp_Full_Hash.all),
                Decl_Line => Natural (Subp_Span.Start_Line),
                Decl_File =>
-                 new String'(Subp.Subp_Declaration.Unit.Get_Filename),
+                 new String'(Ada.Directories.Simple_Name
+                               (Subp.Subp_Declaration.Unit.Get_Filename)),
                others    => <>));
          TR := TP_Mapping_List.Reference (TP_List, TP).TR_List.Last;
       end if;

@@ -50,7 +50,8 @@ package body Test.Suite_Min is
    procedure Minimize_Unit
      (Unit_Mapping   : TP_Mapping;
       Cov_Cmd        : GNATCOLL.OS.Process.Argument_List;
-      Covered, Total : out Natural);
+      Covered, Total : out Natural;
+      Subp_Filter    : String_Ref := null);
    --  Minimize all the generated tests for all the procedures that have
    --  at least one such test. Use Cov_Cmd as base "gnatcov coverage" command.
    --  Total and Covered correspond to the number of obligations respectively
@@ -66,6 +67,9 @@ package body Test.Suite_Min is
    --  in the Subp_JSON object. Use Cov_Cmd as base "gnatcov coverage" command.
    --  Total and Covered correspond to the number of obligations respectively
    --  covered  by all the traces and in total for the subprogram.
+   --
+   --  If Subp_Filter is not null, only minimize tests subprograms for which
+   --  the declaration sloc is equal to Subp_Filter.all.
 
    procedure Get_Cov_For_Trace
      (Trace     : String;
@@ -86,6 +90,11 @@ package body Test.Suite_Min is
    --  Total corresponds to the total number of obligations to be
    --  covered, and Covered corresponds to the number of such obligations that
    --  were covered by the trace, and the coverage data in the checkpoint.
+
+   function Unit_Has_Subp
+     (Unit_Mapping : TP_Mapping; Subp_Sloc : String_Ref) return Boolean;
+   --  Check whether any of the subprograms of interest in Unit_Mapping have a
+   --  declaration sloc matching Subp_Sloc.
 
    --------------------
    -- Minimize_Suite --
@@ -114,6 +123,8 @@ package body Test.Suite_Min is
       Ext         : constant String := Ext_Acc.all;
       Cov_Lev_Sw  : constant String_Ref :=
         Arg (Cmd, Test.Command_Lines.Cov_Level);
+      Subp_Filter : constant String_Ref :=
+        Arg (Cmd, Test.Command_Lines.Minimization_Filter);
       Ret_Status  : Integer;
       Env         : Environment_Dict;
 
@@ -221,6 +232,9 @@ package body Test.Suite_Min is
 
       Run_Cmd.Append
         (Harness_Dir_Str.all & Dir_Sep & "test_runner" & Ext);
+      if Present (Subp_Filter) then
+         Run_Cmd.Append ("--routines=" & Subp_Filter.all);
+      end if;
       Env.Insert ("GNATCOV_TRACE_FILE", Trace_Dir);
       if Real_Verbose then
          PP_Cmd (Run_Cmd, "Running");
@@ -262,9 +276,17 @@ package body Test.Suite_Min is
             declare
                Unit_Cov, Unit_Tot : Natural;
             begin
-               Minimize_Unit (Unit_Mapping, Cov_Cmd, Unit_Cov, Unit_Tot);
-               Covered := Covered + Unit_Cov;
-               Total   := Total + Unit_Tot;
+               --  Do not visit the unit if it doesn't contain any subp of
+               --  interest.
+
+               if not Present (Subp_Filter)
+                 or else Unit_Has_Subp (Unit_Mapping, Subp_Filter)
+               then
+                  Minimize_Unit
+                    (Unit_Mapping, Cov_Cmd, Unit_Cov, Unit_Tot, Subp_Filter);
+                  Covered := Covered + Unit_Cov;
+                  Total   := Total + Unit_Tot;
+               end if;
             end;
          end loop;
       end loop;
@@ -283,7 +305,8 @@ package body Test.Suite_Min is
       Harness_Cmd.Append ("gnattest" & Ext);
 
       --  Copy the command line of the current gnattest invocation, filtering
-      --  out the --gen-test-vectors and --minimize arguments.
+      --  out the --gen-test-vectors, --minimize and --minimization-filter
+      --  arguments.
 
       for J in 1 .. Argument_Count loop
          declare
@@ -291,6 +314,7 @@ package body Test.Suite_Min is
          begin
             if not Has_Prefix (Sw, "--gen-test-vectors")
               and then not Has_Prefix (Sw, "--minimize")
+              and then not Has_Prefix (Sw, "--minimization-filter")
             then
                Harness_Cmd.Append (Sw);
             end if;
@@ -309,7 +333,8 @@ package body Test.Suite_Min is
    procedure Minimize_Unit
      (Unit_Mapping   : TP_Mapping;
       Cov_Cmd        : GNATCOLL.OS.Process.Argument_List;
-      Covered, Total : out Natural)
+      Covered, Total : out Natural;
+      Subp_Filter    : String_Ref := null)
    is
       use GNAT.Strings;
       Unit_JSON     : JSON_Value;
@@ -351,11 +376,16 @@ package body Test.Suite_Min is
 
       for TR_Mapping of Unit_Mapping.TR_List loop
          declare
-            Subp_UID  : String renames TR_Mapping.TR_Hash.all;
-            Subp_JSON : constant JSON_Value := Unit_JSON.Get (Subp_UID);
+            Subp_UID           : String renames TR_Mapping.TR_Hash.all;
+            Subp_JSON          : constant JSON_Value :=
+              Unit_JSON.Get (Subp_UID);
             Subp_Cov, Subp_Tot : Natural;
+            Subp_Sloc          : constant String :=
+              TR_Mapping.Decl_File.all & ":" & Image (TR_Mapping.Decl_Line);
          begin
-            if not Subp_JSON.Is_Empty then
+            if not Subp_JSON.Is_Empty
+              and then (Subp_Filter = null or else Subp_Sloc = Subp_Filter.all)
+            then
 
                --  JSON_Value has a by-reference semantic, so the underlying
                --  JSON tree will get modified.
@@ -558,5 +588,23 @@ package body Test.Suite_Min is
             & " obligation" & (if Covered > 1 then "s" else ""));
       end if;
    end Get_Cov_For_Trace;
+
+   -------------------
+   -- Unit_Has_Subp --
+   -------------------
+
+   function Unit_Has_Subp
+     (Unit_Mapping : TP_Mapping; Subp_Sloc : String_Ref) return Boolean
+   is
+   begin
+      for Subp_Mapping of Unit_Mapping.TR_List loop
+         if Subp_Mapping.Decl_File.all & ":"
+            & Image (Subp_Mapping.Decl_Line) = Subp_Sloc.all
+         then
+            return True;
+         end if;
+      end loop;
+      return False;
+   end Unit_Has_Subp;
 
 end Test.Suite_Min;
