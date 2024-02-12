@@ -1040,9 +1040,9 @@ package body Test.Actions is
          Test.Harness.Generate_Config;
          Test.Common.Generate_Common_File;
 
-         --  We need to minimize the testsuite before generating the mapping
-         --  file, as the generation of this file clears the mapping data
-         --  structure.
+         --  Only generate the mapping file if we are not minimizing.
+         --  Otherwise, the gnattest subprocess will take care of generating it
+         --  once all the redundant tests are removed.
 
          if Arg (Cmd, Minimize) then
             if Test.Common.Harness_Has_Gen_Tests then
@@ -1051,9 +1051,11 @@ package body Test.Actions is
                Test.Common.Report_Err
                  ("No generated tests found in the harness,"
                   & " nothing to do in the minimization phase.");
+               Test.Mapping.Generate_Mapping_File;
             end if;
+         else
+            Test.Mapping.Generate_Mapping_File;
          end if;
-         Test.Mapping.Generate_Mapping_File;
 
       end if;
 
