@@ -291,7 +291,7 @@ package body Test.Suite_Min is
          end loop;
       end loop;
 
-      if Real_Verbose then
+      if not Test.Common.Quiet then
          Report_Std
            ("Covered" & Covered'Image & " out of" & Total'Image
             & " obligation"
