@@ -29,23 +29,33 @@ with GNAT.Regpat;
 with GNAT.Strings;
 
 with Test.Command_Lines;
-with Test.Mapping;               use Test.Mapping;
-with Test.Subprocess;            use Test.Subprocess;
-with Utils_Debug;                use Utils_Debug;
-with Utils.Environment;          use Utils.Environment;
-with Utils.String_Utilities;     use Utils.String_Utilities;
+with Test.Mapping;           use Test.Mapping;
+with Test.Subprocess;        use Test.Subprocess;
+with Utils_Debug;            use Utils_Debug;
+with Utils.Environment;      use Utils.Environment;
+with Utils.Strings;          use Utils.Strings;
+with Utils.String_Utilities;
 
 with TGen.JSON;    use TGen.JSON;
 with TGen.Strings; use TGen.Strings;
 
 with GNATCOLL.OS.FS;
 with GNATCOLL.OS.Process;
+with GNATCOLL.Projects;
 with GNATCOLL.VFS;        use GNATCOLL.VFS;
 
 package body Test.Suite_Min is
 
    Dir_Sep : Character renames
      GNAT.OS_Lib.Directory_Separator;
+
+   function Image (X : Integer) return String renames
+     Utils.String_Utilities.Image;
+   --  Return the image of X, without the leading space for positive numbers.
+   --
+   --  Renaming to avoid pulling in visibility all other functions from
+   --  Utils.String_Utilities, which would conflict with the ones in
+   --  Utils.String;
 
    procedure Minimize_Unit
      (Unit_Mapping   : TP_Mapping;
@@ -96,6 +106,13 @@ package body Test.Suite_Min is
    --  Check whether any of the subprograms of interest in Unit_Mapping have a
    --  declaration sloc matching Subp_Sloc.
 
+   function Get_Cov_Level (Cmd : Command_Line) return String;
+   --  Get the coverage level specified either through the --cov-level switch,
+   --  or extract it from the user project's Coverage package. This will look
+   --  into the Switches attribute, first in the "coverage" switches then in
+   --  the "*" switches if nothing was found. Return the empty string if there
+   --  was no coverage level switch found.
+
    --------------------
    -- Minimize_Suite --
    --------------------
@@ -121,12 +138,11 @@ package body Test.Suite_Min is
       Ext_Acc     : GNAT.OS_Lib.String_Access :=
         GNAT.OS_Lib.Get_Executable_Suffix;
       Ext         : constant String := Ext_Acc.all;
-      Cov_Lev_Sw  : constant String_Ref :=
-        Arg (Cmd, Test.Command_Lines.Cov_Level);
       Subp_Filter : constant String_Ref :=
         Arg (Cmd, Test.Command_Lines.Minimization_Filter);
       Ret_Status  : Integer;
       Env         : Environment_Dict;
+      Cov_Level   : constant String := Get_Cov_Level (Cmd);
 
       Real_Verbose : constant Boolean :=
         Test.Common.Verbose or else Debug_Flag_1 or else Debug_Flag_2;
@@ -195,8 +211,8 @@ package body Test.Suite_Min is
       --  on the command line, or modify gnatcov to disregard the
       --  Origin_Project attribute when searching for manual indications.
 
-      if Present (Cov_Lev_Sw) then
-         Instr_Cmd.Append ("-c" & Cov_Lev_Sw.all);
+      if Cov_Level /= "" then
+         Instr_Cmd.Append ("-c" & Cov_Level);
       end if;
       Run
         (Instr_Cmd,
@@ -262,8 +278,9 @@ package body Test.Suite_Min is
       Cov_Cmd.Append ("coverage");
       Cov_Cmd.Append ("-P" & Harness_Dir_Str.all & "test_driver.gpr");
       Populate_X_Vars (Cov_Cmd, Cmd);
-      Cov_Cmd.Append
-        ((if Present (Cov_Lev_Sw) then "-c" & Cov_Lev_Sw.all else ""));
+      if Cov_Level /= "" then
+         Cov_Cmd.Append ("-c" & Cov_Level);
+      end if;
 
       --  Use the report format to extract a synthetic coverage metric, as
       --  parsing the XML document seems a bit overkill for what we are trying
@@ -606,5 +623,90 @@ package body Test.Suite_Min is
       end loop;
       return False;
    end Unit_Has_Subp;
+
+   -------------------
+   -- Get_Cov_Level --
+   -------------------
+
+   function Get_Cov_Level (Cmd : Command_Line) return String is
+      use GNATCOLL.Projects;
+
+      function Get_Cov_Sw
+        (Args : GNAT.Strings.String_List_Access) return String;
+      --  Return the value of the last --level or -c switch in Args, or the
+      --  empty string if not found.
+
+      User_Prj           : constant Project_Type :=
+        Test.Common.Source_Project_Tree.Root_Project;
+      Switches_Attribute : constant Attribute_Pkg_List :=
+        Build ("Coverage", "Switches");
+      Switches           : GNAT.Strings.String_List_Access;
+
+      function Get_Cov_Sw
+        (Args : GNAT.Strings.String_List_Access) return String
+      is
+         use GNAT.Strings;
+      begin
+         if Args = null then
+            return "";
+         end if;
+         for I in reverse Args.all'Range loop
+            declare
+               Arg : String renames Args (I).all;
+            begin
+               if Has_Prefix (Arg, "-c") then
+                  return Arg (Arg'First + 2 .. Arg'Last);
+               elsif Has_Prefix (Arg, "--level") then
+
+                  --  Two cases, either "--level=<value>" or "--level <value>".
+                  --  In the latter case, the value we are interested in is in
+                  --  the next argument in the list.
+
+                  if Arg'Length >= 8 and then Arg (Arg'First + 7) = '=' then
+                     return Arg (Arg'First + 8 .. Arg'Last);
+                  elsif I < Args.all'Last then
+                     return Args.all (I + 1).all;
+                  end if;
+               end if;
+            end;
+         end loop;
+         return "";
+      end Get_Cov_Sw;
+
+      Cmd_Line_Sw : constant String_Ref :=
+        Test.Command_Lines.Test_String_Switches.Arg
+          (Cmd, Test.Command_Lines.Cov_Level);
+
+   begin
+      --  Command line switch takes precedence
+
+      if Present (Cmd_Line_Sw) then
+         return Cmd_Line_Sw.all;
+      end if;
+
+      --  Otherwise check the coverage switches
+
+      if User_Prj.Has_Attribute (Switches_Attribute, "coverage") then
+         Switches := User_Prj.Attribute_Value (Switches_Attribute, "coverage");
+         declare
+            Level : constant String := Get_Cov_Sw (Switches);
+         begin
+            GNAT.Strings.Free (Switches);
+            if Level /= "" then
+               return Level;
+            end if;
+         end;
+      end if;
+
+      --  Then the switches applicable to all gnatcov commands
+
+      if User_Prj.Has_Attribute (Switches_Attribute, "*") then
+         Switches := User_Prj.Attribute_Value (Switches_Attribute, "*");
+         return Level : constant String := Get_Cov_Sw (Switches) do
+            GNAT.Strings.Free (Switches);
+         end return;
+      end if;
+      return "";
+   end Get_Cov_Level;
 
 end Test.Suite_Min;
