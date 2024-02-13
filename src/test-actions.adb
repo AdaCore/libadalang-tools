@@ -799,6 +799,10 @@ package body Test.Actions is
 
       --  JSON Tests
 
+      if Arg (Cmd, Minimize) then
+         Test.Common.Minimize := True;
+      end if;
+
       if Arg (Cmd, Serialized_Test_Dir) /= null then
          if not GNAT.OS_Lib.Is_Absolute_Path
            (Arg (Cmd, Serialized_Test_Dir).all)
@@ -1044,7 +1048,7 @@ package body Test.Actions is
          --  Otherwise, the gnattest subprocess will take care of generating it
          --  once all the redundant tests are removed.
 
-         if Arg (Cmd, Minimize) then
+         if Test.Common.Minimize then
             if Test.Common.Harness_Has_Gen_Tests then
                Test.Suite_Min.Minimize_Suite (Cmd);
             else
