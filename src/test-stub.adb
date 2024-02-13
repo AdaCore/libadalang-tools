@@ -2535,6 +2535,17 @@ package body Test.Stub is
          Type_Decl := Type_Decl.P_Previous_Part;
       end loop;
 
+      declare
+         Insts : constant Generic_Instantiation_Array :=
+           Type_Decl.P_Generic_Instantiations;
+      begin
+         for Inst of Insts loop
+            if Is_Private (Inst) then
+               return True;
+            end if;
+         end loop;
+      end;
+
       return Is_Private (Type_Decl);
    end Is_Fully_Private;
 
