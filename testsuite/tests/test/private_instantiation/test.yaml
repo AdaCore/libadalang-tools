@@ -1,0 +1,7 @@
+description:
+    Test checking that parameter type that comes from
+    a generic package instantiated in private part
+    are properly ignored and not put into setter.
+
+driver: shell_script
+
