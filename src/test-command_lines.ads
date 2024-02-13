@@ -93,7 +93,8 @@ package Test.Command_Lines is
       Reporter,
       Gen_Test_Num,
       Serialized_Test_Dir,
-      Cov_Level);
+      Cov_Level,
+      Minimization_Filter);
 
    package Test_String_Switches is new String_Switches
      (Descriptor,
@@ -113,7 +114,8 @@ package Test.Command_Lines is
        Reporter                 => '=',
        Gen_Test_Num             => '=',
        Serialized_Test_Dir      => '=',
-       Cov_Level                => '=']);
+       Cov_Level                => '=',
+       Minimization_Filter      => '=']);
 
    type Test_String_Seqs is (Exclude_From_Stubbing);
 

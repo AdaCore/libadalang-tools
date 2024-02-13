@@ -5340,7 +5340,8 @@ package body Test.Skeleton is
                           (Current_Subp.Subp_Declaration),
                         Use_Short_Name => MD.Short_Name_Used,
                         Type_Name      => Current_Type.Main_Type_Text_Name.all,
-                        Add_Cov_Dump   => Data.Has_Gen_Tests);
+                        Add_Cov_Dump   =>
+                          Data.Has_Gen_Tests and then Minimize);
 
                      if Is_Unimplemented_Test (MD.TR_Text) then
                         TR_SLOC_Buffer.Append
@@ -5446,7 +5447,8 @@ package body Test.Skeleton is
                         Elem_Numbers.Element
                           (Current_Subp.Subp_Declaration),
                         Use_Short_Name => MD.Short_Name_Used,
-                        Add_Cov_Dump   => Data.Has_Gen_Tests);
+                        Add_Cov_Dump   =>
+                          Data.Has_Gen_Tests and then Minimize);
                      New_Line_Count;
 
                   end if;
@@ -5502,7 +5504,7 @@ package body Test.Skeleton is
                      Put_Opening_Comment_Section
                        (Stub, 0, True, False,
                         Current_Type.Main_Type_Text_Name.all,
-                        Add_Cov_Dump => Data.Has_Gen_Tests);
+                        Add_Cov_Dump => Data.Has_Gen_Tests and then Minimize);
 
                      Add_DT
                        (TP_List,
@@ -5527,7 +5529,7 @@ package body Test.Skeleton is
                         0,
                         True,
                         False,
-                        Add_Cov_Dump => Data.Has_Gen_Tests);
+                        Add_Cov_Dump => Data.Has_Gen_Tests and then Minimize);
                      New_Line_Count;
                   end;
                end if;
@@ -6528,7 +6530,8 @@ package body Test.Skeleton is
                            Elem_Numbers.Element
                              (Current_Subp.Subp_Declaration),
                            Use_Short_Name => MD.Short_Name_Used,
-                           Add_Cov_Dump   => Data.Has_Gen_Tests);
+                           Add_Cov_Dump   =>
+                             Data.Has_Gen_Tests and then Minimize);
 
                         if Is_Unimplemented_Test (MD.TR_Text) then
                            TR_SLOC_Buffer.Append
@@ -6633,7 +6636,8 @@ package body Test.Skeleton is
                            Elem_Numbers.Element
                              (Current_Subp.Subp_Declaration),
                            Use_Short_Name => MD.Short_Name_Used,
-                           Add_Cov_Dump   => Data.Has_Gen_Tests);
+                           Add_Cov_Dump   =>
+                             Data.Has_Gen_Tests and then Minimize);
                         New_Line_Count;
 
                      end if;
@@ -6701,7 +6705,8 @@ package body Test.Skeleton is
 
                         Put_Opening_Comment_Section
                           (Stub, 0, True, MD.Short_Name_Used,
-                           Add_Cov_Dump => Data.Has_Gen_Tests);
+                           Add_Cov_Dump =>
+                             Data.Has_Gen_Tests and then Minimize);
 
                         Add_DT
                           (TP_List,
@@ -6726,7 +6731,8 @@ package body Test.Skeleton is
                            0,
                            True,
                            MD.Short_Name_Used,
-                           Add_Cov_Dump => Data.Has_Gen_Tests);
+                           Add_Cov_Dump =>
+                             Data.Has_Gen_Tests and then Minimize);
                         New_Line_Count;
                      end;
                   end if;
@@ -7292,11 +7298,14 @@ package body Test.Skeleton is
                   end if;
                end loop;
 
-               --  Add marker to reset coverage buffers
+               --  Add marker to reset coverage buffers if suite minimization
+               --  is enabled.
 
-               Put_Line
-                 (Body_Kind,
-                  Com & "   pragma Annotate (Xcov, Reset_Buffers);");
+               if Minimize then
+                  Put_Line
+                    (Body_Kind,
+                     Com & "   pragma Annotate (Xcov, Reset_Buffers);");
+               end if;
                if Is_Function then
                   Put_Line (Body_Kind, Com & "   declare");
                   Put_Line (Body_Kind, Com & "      Ret_Val : "
@@ -7318,13 +7327,14 @@ package body Test.Skeleton is
                New_Line (Body_Kind);
 
                --  Dump the coverage buffers
-
-               Put_Line
-                 (Body_Kind,
-                  Com & "   pragma Annotate (Xcov, Dump_Buffers, """
-                  & Subp.Subp_Full_Hash.all & "-gen-"
-                  & Trim (Integer'Image (Test_Count - 1), Both) & """);");
-               New_Line (Body_Kind);
+               if Minimize then
+                  Put_Line
+                    (Body_Kind,
+                     Com & "   pragma Annotate (Xcov, Dump_Buffers, """
+                     & Subp.Subp_Full_Hash.all & "-gen-"
+                     & Trim (Integer'Image (Test_Count - 1), Both) & """);");
+                  New_Line (Body_Kind);
+               end if;
 
                Put_Line (Body_Kind, Com & "exception");
                Put_Line (Body_Kind, Com & "   when Exc : others =>");
@@ -7332,12 +7342,14 @@ package body Test.Skeleton is
                --  Also dump the trace in case something crashed in the test.
                --  It remains interesting coverage input.
 
-               Put_Line
-                 (Body_Kind,
-                  Com & "      pragma Annotate (Xcov, Dump_Buffers, """
-                  & Subp.Subp_Full_Hash.all & "-gen-"
-                  & Trim (Integer'Image (Test_Count - 1), Both) & """);");
-               New_Line (Body_Kind);
+               if Minimize then
+                  Put_Line
+                    (Body_Kind,
+                     Com & "      pragma Annotate (Xcov, Dump_Buffers, """
+                     & Subp.Subp_Full_Hash.all & "-gen-"
+                     & Trim (Integer'Image (Test_Count - 1), Both) & """);");
+                  New_Line (Body_Kind);
+               end if;
 
                Put_Line (Body_Kind, Com & "      AUnit.Assertions.Assert");
                Put_Line (Body_Kind, Com & "        (False,");
@@ -7532,7 +7544,8 @@ package body Test.Skeleton is
                TR_Hash   => new String'(Subp.Subp_Full_Hash.all),
                Decl_Line => Natural (Subp_Span.Start_Line),
                Decl_File =>
-                 new String'(Subp.Subp_Declaration.Unit.Get_Filename),
+                 new String'(Ada.Directories.Simple_Name
+                               (Subp.Subp_Declaration.Unit.Get_Filename)),
                others    => <>));
          TR := TP_Mapping_List.Reference (TP_List, TP).TR_List.Last;
       end if;

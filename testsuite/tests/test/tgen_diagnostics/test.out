@@ -24,10 +24,10 @@ pkg.ads:36:4: info: corresponding test PASSED
 pkg.ads:36:4: info: corresponding test PASSED
 pkg.ads:36:4: info: corresponding test PASSED
 pkg.ads:36:4: info: corresponding test PASSED
-pkg.ads:24:4: error: corresponding test FAILED: Test not implemented. (pkg-test_data-tests.adb:52)
-pkg.ads:27:4: error: corresponding test FAILED: Test not implemented. (pkg-test_data-tests.adb:81)
-pkg.ads:29:4: error: corresponding test FAILED: Test not implemented. (pkg-test_data-tests.adb:110)
-pkg.ads:31:4: error: corresponding test FAILED: Test not implemented. (pkg-test_data-tests.adb:139)
-pkg.ads:33:4: error: corresponding test FAILED: Test not implemented. (pkg-test_data-tests.adb:168)
-pkg.ads:36:4: error: corresponding test FAILED: Test not implemented. (pkg-test_data-tests.adb:197)
+pkg.ads:24:4: error: corresponding test FAILED: Test not implemented. (pkg-test_data-tests.adb:45)
+pkg.ads:27:4: error: corresponding test FAILED: Test not implemented. (pkg-test_data-tests.adb:66)
+pkg.ads:29:4: error: corresponding test FAILED: Test not implemented. (pkg-test_data-tests.adb:87)
+pkg.ads:31:4: error: corresponding test FAILED: Test not implemented. (pkg-test_data-tests.adb:108)
+pkg.ads:33:4: error: corresponding test FAILED: Test not implemented. (pkg-test_data-tests.adb:129)
+pkg.ads:36:4: error: corresponding test FAILED: Test not implemented. (pkg-test_data-tests.adb:150)
 11 tests run: 5 passed; 6 failed; 0 crashed.

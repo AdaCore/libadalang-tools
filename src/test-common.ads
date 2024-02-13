@@ -432,6 +432,9 @@ package Test.Common is
    Instrument : Boolean := False;
    --  Whether we should instrument sources
 
+   Minimize   : Boolean := False;
+   --  Whether we should run the minimization pass for generated test cases
+
    Instr_Suffix : constant String := "-gnattest-instr";
    --  Suffix for object subdirs containing instrumented sources
 private

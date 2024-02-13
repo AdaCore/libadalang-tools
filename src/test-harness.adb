@@ -1146,11 +1146,11 @@ package body Test.Harness is
       Put_New_Line;
       Put_New_Line;
 
-      --  When using the test generation features, do not emit an origin
+      --  When using the test minimization features, do not emit an origin
       --  project attribute, otherwise gnatcov will not process the harness
       --  project at all.
 
-      if not Test.Common.Harness_Has_Gen_Tests then
+      if not Test.Common.Minimize then
          S_Put
             (3,
                "for Origin_Project use """
@@ -2821,11 +2821,11 @@ package body Test.Harness is
          Put_New_Line;
          Put_New_Line;
 
-         --  When using the test generation features, do not emit an origin
+         --  When using the test minimization features, do not emit an origin
          --  project attribute, otherwise gnatcov will not process the harness
          --  project at all.
 
-         if not Test.Common.Harness_Has_Gen_Tests then
+         if not Test.Common.Minimize then
             if Relocatable_Harness then
                S_Put
                (3,
@@ -3271,11 +3271,11 @@ package body Test.Harness is
             & " is");
          Put_New_Line;
 
-         --  When using the test generation features, do not emit an origin
+         --  When using the test minimization features, do not emit an origin
          --  project attribute, otherwise gnatcov will not process the harness
          --  project at all.
 
-         if not Test.Common.Harness_Has_Gen_Tests then
+         if not Test.Common.Minimize then
             if Relocatable_Harness then
                S_Put
                (3,
@@ -3583,11 +3583,11 @@ package body Test.Harness is
             end loop;
          end if;
 
-         --  When using the test generation features, do not emit an origin
+         --  When using the test minimization features, do not emit an origin
          --  project attribute, otherwise gnatcov will not process the harness
          --  project at all.
 
-         if not Test.Common.Harness_Has_Gen_Tests then
+         if not Test.Common.Minimize then
             Put_New_Line;
             if Relocatable_Harness then
                S_Put
