@@ -71,6 +71,10 @@ package body Test.Skeleton.Source_Table is
       Corresponding_Body : String_Access := null;
       --  Set in Stub Mode for package specs.
 
+      Theoretical_Body   : String_Access := null;
+      --  Set for creating an instrumented body in case a bodyless spec would
+      --  nned a body due to expression functions.
+
       Stub_Data_Base_Spec : String_Access;
       Stub_Data_Base_Body : String_Access;
       --  Different projects in the hierarchy may have different naming
@@ -259,11 +263,14 @@ package body Test.Skeleton.Source_Table is
             New_SF_Record.Inst_Dir := new String'
               (Display_Full_Name
                  (P.Object_Dir / (+(To_Lower (P.Name) & Instr_Suffix))));
-            if Given_File /= Other_File
-              and then Is_Regular_File (Other_File.Display_Full_Name)
-            then
-               New_SF_Record.Corresponding_Body :=
-                 new String'(Other_File.Display_Full_Name);
+            if Given_File /= Other_File then
+               if Is_Regular_File (Other_File.Display_Full_Name) then
+                  New_SF_Record.Corresponding_Body :=
+                    new String'(Other_File.Display_Full_Name);
+               else
+                  New_SF_Record.Theoretical_Body :=
+                    new String'(Other_File.Display_Full_Name);
+               end if;
             end if;
          end;
       end if;
@@ -584,6 +591,28 @@ package body Test.Skeleton.Source_Table is
          return SFR.Corresponding_Body.all;
       end if;
    end Get_Source_Body;
+
+   ---------------------------
+   -- Get_Source_Instr_Body --
+   ---------------------------
+
+   function Get_Source_Instr_Body (Source_Name : String) return String
+   is
+      SN : constant String :=
+        Normalize_Pathname
+          (Name           => Source_Name,
+           Resolve_Links  => False,
+           Case_Sensitive => False);
+      SFR : SF_Record;
+   begin
+      SFR := Source_File_Table.Element (SF_Table, SN);
+
+      if SFR.Theoretical_Body = null then
+         return "";
+      else
+         return SFR.Theoretical_Body.all;
+      end if;
+   end Get_Source_Instr_Body;
 
    -----------------------------
    --  Get_Source_Output_Dir  --
