@@ -2706,15 +2706,16 @@ package body Laltools.Common is
       Trace     : GNATCOLL.Traces.Trace_Handle;
       Imprecise : in out Boolean) return Boolean
    is
-      Definition     : Defining_Name;
-      This_Imprecise : Boolean := False;
+      Definition : Defining_Name;
+      Ref_Kind   : Libadalang.Common.Ref_Result_Kind;
    begin
       if Node.As_Ada_Node /= No_Ada_Node
         and then Node.Kind in Ada_Name
       then
          Definition := Laltools.Common.Resolve_Name
-           (Node.As_Name, Trace, This_Imprecise);
-         Imprecise := Imprecise or This_Imprecise;
+           (Node.As_Name, Trace, Ref_Kind);
+         Imprecise :=
+           Ref_Kind in Libadalang.Common.Error | Libadalang.Common.Imprecise;
          return Definition /= No_Defining_Name
            and then Definition.P_Basic_Decl.Kind =
              Ada_Enum_Literal_Decl;
@@ -2942,13 +2943,12 @@ package body Laltools.Common is
    function Resolve_Name
      (Name_Node : Name;
       Trace     : GNATCOLL.Traces.Trace_Handle;
-      Imprecise : out Boolean) return Defining_Name
+      Ref_Kind  : out Libadalang.Common.Ref_Result_Kind) return Defining_Name
    is
-      Result : Defining_Name;
+      Result          : Defining_Name;
       Failsafe_Result : Refd_Def;
    begin
-      Imprecise := False;
-
+      Ref_Kind := Precise;
       if Name_Node.Is_Null then
          return No_Defining_Name;
       --  P_Failsafe_Referenced_Def_Name doesn't work on the decl itself
@@ -2957,14 +2957,12 @@ package body Laltools.Common is
       else
          Failsafe_Result := Name_Node.P_Failsafe_Referenced_Def_Name
            (Imprecise_Fallback => True);
+         Ref_Kind := Kind (Failsafe_Result);
          case Kind (Failsafe_Result) is
-            when Precise =>
-            --  Nothing extra to do here
+            when Precise | Imprecise =>
+               --  Nothing extra to do here
                null;
-            when Libadalang.Common.Imprecise =>
-               Imprecise := True;
             when Error =>
-               Imprecise := True;
                return No_Defining_Name;
             when No_Ref =>
                return No_Defining_Name;
@@ -2982,7 +2980,7 @@ package body Laltools.Common is
    exception
       when E : Property_Error =>
          Log (Trace, E);
-         Imprecise := True;
+         Ref_Kind := Error;
          return No_Defining_Name;
    end Resolve_Name;
 
