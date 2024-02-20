@@ -91,4 +91,41 @@ package TGen.Wrappers is
    --  Note: this would also require drastic changes in the value generation as
    --  (as we would need to generate values for them).
 
+   Source_Package_Renaming : constant String := "TGen_Original_Package";
+   --  Package name to be used to rename the original package when generating
+   --  wrappers to avoid shadowing. This happens when a subprogram has
+   --  parameters with the same name as the package in which it is declared.
+   --
+   --  For instance, given the following package declaration:
+   --
+   --  package Foo is
+   --     procedure Bar (Foo : Integer) with
+   --       Pre => True;
+   --  end Foo;
+   --
+   --  The generated wrapper for Bar will look like:
+   --
+   --  procedure Bar (Foo : standard.Integer) is
+   --  begin
+   --     if not True then
+   --        raise TGen.Precondition_Error;
+   --     end if;
+   --     Foo.Bar (Foo);
+   --  end Bar;
+   --
+   --  In the body above, Foo designates the parameter, so Foo.Bar is undefined
+   --  and the wrapper does not compile.
+   --
+   --  By introducing a package renaming, the wrapper package now looks like
+   --
+   --  package TGen_Original_Package renames Foo;
+   --
+   --  procedure Bar (Foo : standard.Integer) is
+   --  begin
+   --     --  ...
+   --     TGen_Original_Package.Bar (Foo);
+   --  end Bar;
+   --
+   --  This solves the masking issue.
+
 end TGen.Wrappers;

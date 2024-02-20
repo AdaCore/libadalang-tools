@@ -1,0 +1,10 @@
+with "test/tgen_support/tgen_support.gpr";
+with "tgen_rts.gpr";
+
+project Test_Wrapper is
+
+    for Object_Dir use "obj";
+    for Source_Dirs use (".");
+    for Main use ("main.adb");
+
+end Test_Wrapper;
