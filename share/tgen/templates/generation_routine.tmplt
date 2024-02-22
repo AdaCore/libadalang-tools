@@ -67,9 +67,9 @@
                 @_GLOBAL_INPUT_FN_@ (Values.Get ("global_values").Get ("@_GLOBAL_NAME_@"));
 @@END_TABLE@@
             end if;
-            @_SUBP_NAME_@_Dump_TC
+            @_SUBP_NAME_@_Dump_TC (
 @@TABLE'ALIGN_ON(":")@@
-              @_LPAR()_@@_GLOBAL_PREFIX_@_@_PARAM_NAME_@ => Ada_@_PARAM_NAME_@,
+               @_GLOBAL_PREFIX_@_@_PARAM_NAME_@ => Ada_@_PARAM_NAME_@,
 @@END_TABLE@@
 @@TABLE'ALIGN_ON(":")@@
                @_GLOBAL_PREFIX_@_@_GLOBAL_SLUG_@ => @_GLOBAL_NAME_@,

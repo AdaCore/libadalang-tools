@@ -745,12 +745,17 @@ package body TGen.Libgen is
                Ctx.Strategy_Map);
          end if;
 
+         --  Fill out the support package map with the parameter types and the
+         --  global types.
+
          for Param of Fct_Typ.Component_Types loop
-
-            --  Fill out the support package map
-
             Ctx.Support_Packs_Per_Unit.Reference (Support_Packs).Include
               (Support_Library_Package (Param.Get.Compilation_Unit_Name));
+         end loop;
+
+         for Glob of Fct_Typ.Globals loop
+            Ctx.Support_Packs_Per_Unit.Reference (Support_Packs).Include
+              (Support_Library_Package (Glob.Get.Compilation_Unit_Name));
          end loop;
 
          --  Get the transitive closure of the types on which the parameters'

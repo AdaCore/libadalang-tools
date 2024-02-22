@@ -37,9 +37,14 @@ with GNATCOLL.OS.Process;
 
 with Libadalang.Common; use Libadalang.Common;
 
+with Langkit_Support.Text;
+
 with TGen.Libgen; use TGen.Libgen;
 
 package body Test.Generation is
+
+   Global_Aspect_Name : constant Langkit_Support.Text.Unbounded_Text_Type :=
+     Langkit_Support.Text.To_Unbounded_Text ("Global");
 
    function Traverse_Helper (Node : Ada_Node'Class) return Visit_Status;
    --  If node is a subprogram declaration (regular or generic instantiation),
@@ -60,18 +65,26 @@ package body Test.Generation is
 
       --  Collect all types used as parameters in subprogram declarations.
       --  Skip generic subprogram declarations as we only care about the
-      --  instantiations. Also skip subprograms with zero parameters as we do
-      --  not yet support generation for global variables as inputs.
+      --  instantiations. Also skip subprograms with zero parameters if there
+      --  is no Global aspect attached.
 
       if Node.Kind in Ada_Basic_Decl
          and then Node.As_Basic_Decl.P_Is_Subprogram
          and then not (Node.Kind in Ada_Enum_Literal_Decl)
-         and then Node.As_Basic_Decl.P_Subp_Spec_Or_Null.P_Params'Length > 0
       then
          --  Skip generic subp decls (these will be processed if they are
          --  instantiated).
 
          if Node.As_Basic_Decl.P_Canonical_Part.Kind in Ada_Generic_Decl
+         then
+            return Over;
+         end if;
+
+         --  Check, if the subprogram has zero parameters. If so, only add it
+         --  to the generation context if it has a global annotation.
+
+         if Node.As_Basic_Decl.P_Subp_Spec_Or_Null.P_Params'Length = 0
+           and then not Node.As_Basic_Decl.P_Has_Aspect (Global_Aspect_Name)
          then
             return Over;
          end if;
