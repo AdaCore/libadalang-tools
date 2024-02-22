@@ -303,7 +303,7 @@ package body TGen.Marshalling.JSON_Marshallers is
       Global_Slugs       : Vector_Tag;
       Global_Types_Slugs : Vector_Tag;
    begin
-      if FN_Typ.Component_Types.Is_Empty then
+      if FN_Typ.Component_Types.Is_Empty and then FN_Typ.Globals.Is_Empty then
          return;
       end if;
       Assocs.Insert (Assoc ("GLOBAL_PREFIX", Global_Prefix));

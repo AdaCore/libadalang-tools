@@ -7007,7 +7007,7 @@ package body Test.Skeleton is
                Pad_Str : constant String (1 .. Initial_Pad) := [others => ' '];
             begin
                Put (F, Pad_Str & Subp_Content.Get ("fully_qualified_name")
-                    & " (");
+                    & (if Length (Param_Values) /= 0 then " (" else ""));
                for Param_Id in Param_Values loop
                   Put
                     (F,
@@ -7019,7 +7019,10 @@ package body Test.Skeleton is
                      Put (F, ", ");
                   end if;
                end loop;
-               Put (F, ");");
+               if Length (Param_Values) /= 0 then
+                  Put (F, ")");
+               end if;
+               Put (F, ";");
             end Pp_Subp_Call;
 
             ------------------------

@@ -17,9 +17,9 @@
 
    --  Test Case JSON dumper for @_PROC_NAME_@
 
-   procedure @_PROC_NAME_@_Dump_TC
+   procedure @_PROC_NAME_@_Dump_TC (
 @@TABLE'ALIGN_ON(":")@@
-     @_LPAR()_@@_GLOBAL_PREFIX_@_@_PARAM_NAME_@ : @_PARAM_TY_@;
+     @_GLOBAL_PREFIX_@_@_PARAM_NAME_@ : @_PARAM_TY_@;
 @@END_TABLE@@
 @@TABLE'ALIGN_ON(":")@@
       @_GLOBAL_PREFIX_@_@_GLOBAL_SLUG_@ : @_GLOBAL_TY_@ := @_GLOBAL_NAME_@;
