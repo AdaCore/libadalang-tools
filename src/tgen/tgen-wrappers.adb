@@ -268,7 +268,21 @@ package body TGen.Wrappers is
       Call_To_User_Subp : Unbounded_String;
       --  Call to the original user subprogram
 
+      Local_Package_Name : Ada_Qualified_Name;
+      --  Name of the subprogram in its compilation unit. This is its fully
+      --  qualified name, from which the compilation unit's fully qualified
+      --  name has been removed.
+
    begin
+      --  Compute local name. Do not take into account the last element as this
+      --  is its hash.
+
+      for I in
+         Subprogram.Last_Comp_Unit_Idx + 1 .. Subprogram.Name.Last_Index - 1
+      loop
+         Local_Package_Name.Append (Subprogram.Name.Element (I));
+      end loop;
+
       --  Compute the call to the original function
 
       case Subp_Kind (Subprogram) is
@@ -278,7 +292,9 @@ package body TGen.Wrappers is
             null;
       end case;
 
-      Append (Call_To_User_Subp, Subprogram.FQN);
+      Append
+        (Call_To_User_Subp,
+         Source_Package_Renaming & "." & To_Ada (Local_Package_Name));
 
       if Subprogram.Param_Order.Length > 0 then
          Append (Call_To_User_Subp, " (");

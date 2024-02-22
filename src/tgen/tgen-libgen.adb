@@ -517,7 +517,10 @@ package body TGen.Libgen is
         Ada.Directories.Compose
           (Containing_Directory => To_String (Ctx.Output_Dir),
            Name                 => To_Filename (Pack_Name));
+      Origin_Package   : Ada_Qualified_Name := Pack_Name;
    begin
+      Origin_Package.Delete_Last;
+
       Create (F_Spec, Out_File, File_Name & ".ads");
       Create (F_Body, Out_File, File_Name & ".adb");
 
@@ -526,6 +529,14 @@ package body TGen.Libgen is
       Put_Line (F_Body, "with TGen;");
       New_Line (F_Body);
       Put_Line (F_Body, "package body " & Ada_Pack_Name & " is");
+      New_Line (F_Body);
+
+      --  Put a renaming for the origin package. This is used to make
+      --  references to its entities when a parameter name or subprogram name
+      --  shadows the package.
+
+      Put_Line (F_Body, "package " & Source_Package_Renaming & " renames "
+                        & To_Ada (Origin_Package) & ";");
       New_Line (F_Body);
 
       for Subp of Ctx.Included_Subps.Element (Pack_Name) loop
