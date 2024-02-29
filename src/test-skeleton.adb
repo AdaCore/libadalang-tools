@@ -578,6 +578,8 @@ package body Test.Skeleton is
          Suite_Data.TR_List.Clear;
          Suite_Data.ITR_List.Clear;
          Suite_Data.LTR_List.Clear;
+
+         Close_File;
       end Cleanup;
 
       ----------------------------
