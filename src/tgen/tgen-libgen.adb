@@ -870,11 +870,15 @@ package body TGen.Libgen is
       use Types_Per_Package_Maps;
       Output_Dir : constant String := To_String (Ctx.Output_Dir);
    begin
-      if not Is_Directory (Create (+Output_Dir)) then
-         Ada.Directories.Create_Path (Output_Dir);
-      end if;
+      --  Delete any previously generated support library to avoid having
+      --  stale sources.
 
-      --  Genenerate project file
+      if Is_Directory (Create (+Output_Dir)) then
+         Ada.Directories.Delete_Tree (Output_Dir);
+      end if;
+      Ada.Directories.Create_Path (Output_Dir);
+
+      --  Generate the project file
 
       declare
          Prj_File : File_Type;
