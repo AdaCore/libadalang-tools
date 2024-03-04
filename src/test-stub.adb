@@ -369,6 +369,8 @@ package body Test.Stub is
          Data.Elem_Tree.Clear;
          Data.Flat_List.Clear;
          Data.Limited_Withed_Units.Clear;
+
+         Close_File;
       end Cleanup;
 
       ------------------------

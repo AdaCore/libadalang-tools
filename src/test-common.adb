@@ -861,7 +861,9 @@ package body Test.Common is
 
    procedure Close_File is
    begin
-      Char_Sequential_IO.Close (Output_File);
+      if Char_Sequential_IO.Is_Open (Output_File) then
+         Char_Sequential_IO.Close (Output_File);
+      end if;
    end Close_File;
 
    ------------------
