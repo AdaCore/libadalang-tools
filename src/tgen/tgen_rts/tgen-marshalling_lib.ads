@@ -23,14 +23,19 @@
 
 with Ada.Streams;
 with Interfaces; use Interfaces;
+with System;
 
 with TGen.JSON; use TGen.JSON;
 
 package TGen.Marshalling_Lib is
 
    Invalid_Value : exception;
+   --  Exception raised by the marshallers when reading an invalid value from
+   --  a stream.
 
    type Offset_Type is mod 8;
+
+   type Biggest_Int is mod System.Max_Binary_Modulus;
 
    procedure Write_Padding
      (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
