@@ -150,13 +150,6 @@ package body Test.Stub is
    function Requires_Body (N : Ada_Node) return Boolean;
    --  Checks if a body sample should be created for an element
 
-   function Get_Declaration
-     (Elem : Subtype_Indication)
-      return Base_Type_Decl
-   is
-     (Elem.F_Name.P_Relative_Name.As_Name.P_Referenced_Decl.As_Base_Type_Decl);
-   --  Returns declaration of corresponding parameter type
-
    -------------------------------
    -- Setter package generation --
    -------------------------------
@@ -2334,7 +2327,7 @@ package body Test.Stub is
          Subtype_Ind := Param_Type.As_Subtype_Indication;
       end if;
 
-      Type_Decl := Get_Declaration (Subtype_Ind);
+      Type_Decl := Subtype_Ind.P_Designated_Type_Decl;
 
       if Type_Decl.Kind in Ada_Generic_Formal then
          return False;
@@ -2385,7 +2378,7 @@ package body Test.Stub is
    --------------------------
 
    function Get_Access_Type_Name (Elem : Subtype_Indication) return String is
-      Decl      : constant Base_Type_Decl := Get_Declaration (Elem);
+      Decl      : constant Base_Type_Decl := Elem.P_Designated_Type_Decl;
       Attr_Suff : constant String :=
         (if Elem.F_Name.Kind = Ada_Attribute_Ref then
             "_" & Node_Image (Elem.F_Name.As_Attribute_Ref.F_Attribute)
@@ -2408,7 +2401,7 @@ package body Test.Stub is
          declare
             S : String :=
               Encode
-                (Decl.As_Basic_Decl.P_Fully_Qualified_Name,
+                (Decl.P_Defining_Name.P_Fully_Qualified_Name,
                  Decl.Unit.Get_Charset)
               & Attr_Suff & "_Access";
          begin
@@ -2456,7 +2449,7 @@ package body Test.Stub is
          Subtype_Ind := Param_Type.As_Subtype_Indication;
       end if;
 
-      Decl := Get_Declaration (Subtype_Ind);
+      Decl := Subtype_Ind.P_Designated_Type_Decl;
 
       if To_Lower (Get_Nesting (Decl)) = "standard" then
          return Overall_Image;
@@ -2545,7 +2538,7 @@ package body Test.Stub is
          Subtype_Ind := Param_Type.As_Subtype_Indication;
       end if;
 
-      Type_Decl := Get_Declaration (Subtype_Ind);
+      Type_Decl := Subtype_Ind.P_Designated_Type_Decl;
 
       if Type_Decl.Kind in Ada_Generic_Formal then
          return False;
@@ -2629,14 +2622,13 @@ package body Test.Stub is
          Subtype_Ind := Param_Type.As_Subtype_Indication;
       end if;
 
-      Type_Decl := Get_Declaration (Subtype_Ind).P_Canonical_Type;
+      Type_Decl := Subtype_Ind.P_Designated_Type_Decl.P_Canonical_Type;
       if Type_Decl.Kind = Ada_Classwide_Type_Decl
-        and then Get_Declaration (Subtype_Ind).Kind = Ada_Subtype_Decl
+        and then Subtype_Ind.P_Designated_Type_Decl.Kind = Ada_Subtype_Decl
       then
          Type_Decl :=
-           Get_Declaration
-             (Subtype_Ind).As_Subtype_Decl.F_Subtype.F_Name.P_Relative_Name.
-                P_Referenced_Decl.As_Base_Type_Decl;
+           Subtype_Ind.P_Designated_Type_Decl.As_Subtype_Decl.F_Subtype
+           .P_Designated_Type_Decl;
       end if;
 
       while not Type_Decl.Is_Null loop
@@ -2696,7 +2688,7 @@ package body Test.Stub is
          Subtype_Ind := Param_Type.As_Subtype_Indication;
       end if;
 
-      Type_Decl := Get_Declaration (Subtype_Ind);
+      Type_Decl := Subtype_Ind.P_Designated_Type_Decl;
 
       declare
          Insts : constant Generic_Instantiation_Array :=
@@ -3127,7 +3119,7 @@ package body Test.Stub is
 
    procedure Add_Unconstrained_Type_To_Dictionary (Elem : Subtype_Indication)
    is
-      Encl : Ada_Node := Get_Declaration (Elem).As_Ada_Node;
+      Encl : Ada_Node := Elem.P_Designated_Type_Decl.As_Ada_Node;
       Dict_Elem : Access_Dictionary_Entry;
 
       D_Cur : Access_Dictionaries.Cursor;
@@ -3141,7 +3133,7 @@ package body Test.Stub is
          Encl := Encl.Parent;
       end loop;
 
-      Dict_Elem.Type_Decl := Get_Declaration (Elem).As_Ada_Node;
+      Dict_Elem.Type_Decl := Elem.P_Designated_Type_Decl.As_Ada_Node;
 
       D_Cur := Dictionary.First;
       while D_Cur /= Access_Dictionaries.No_Element loop
