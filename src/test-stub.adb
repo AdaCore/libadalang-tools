@@ -2160,8 +2160,18 @@ package body Test.Stub is
 
       function Can_Declare_Variable (Param_Type : Type_Expr) return Boolean is
          Param_Type_Name : Libadalang.Analysis.Name;
-         Attr_Name        : Identifier;
+         Attr_Name       : Identifier;
+         Type_Decl       : Base_Type_Decl;
       begin
+         Type_Decl := Param_Type.P_Designated_Type_Decl;
+         if Type_Decl.Is_Null then
+            if not Quiet then
+               Report_Err
+                 ("Could not determine type referenced by "
+                  & Param_Type.Image);
+            end if;
+            return False;
+         end if;
 
          if Is_Only_Limited_Withed (Param_Type) then
             return False;
@@ -2177,11 +2187,21 @@ package body Test.Stub is
             end if;
          end if;
 
-         return
-           Get_Declaration
-             (Param_Type.As_Subtype_Indication).P_Is_Definite_Subtype
-                (Param_Type);
-
+         return Type_Decl.P_Is_Definite_Subtype (Param_Type);
+      exception
+         when Ex : Property_Error =>
+            if not Verbose then
+               Trace
+               (Me,
+                  "Could not determine if type " & Param_Type.Image
+                  & " is definite");
+            else
+               Report_Err
+                 ("Could not determine if type " & Param_Type.Image
+                  & " is definite, assuming it is not.");
+            end if;
+            Report_Ex (Ex);
+            return False;
       end Can_Declare_Variable;
 
    begin
