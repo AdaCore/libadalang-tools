@@ -1983,7 +1983,7 @@ package body Test.Harness is
          Put_New_Line;
          S_Put (0, "with Gnattest_Generated.Persistent;");
          Put_New_Line;
-         S_Put (0, "with AUnit.Reporter.GNATtest;");
+         S_Put (0, "with AUnit.Reporter." & Reporter_Name.all & ";");
          Put_New_Line;
          S_Put (0, "with AUnit.Run;");
          Put_New_Line;
@@ -2068,7 +2068,13 @@ package body Test.Harness is
          end if;
          Put_New_Line;
 
-         S_Put (3, "Reporter : AUnit.Reporter.GNATtest.GNATtest_Reporter;");
+         S_Put
+           (3,
+            "Reporter : AUnit.Reporter."
+            & Reporter_Name.all
+            & "."
+            & Reporter_Name.all
+            & "_Reporter;");
          Put_New_Line;
          S_Put (3, "GT_Options : AUnit_Options := Default_Options;");
          Put_New_Line;
@@ -2185,7 +2191,7 @@ package body Test.Harness is
          Put_New_Line;
          S_Put (0, "with Gnattest_Generated.Persistent;");
          Put_New_Line;
-         S_Put (0, "with AUnit.Reporter.GNATtest;");
+         S_Put (0, "with AUnit.Reporter." & Reporter_Name.all & ";");
          Put_New_Line;
          S_Put (0, "with AUnit.Run;");
          Put_New_Line;
@@ -2268,7 +2274,13 @@ package body Test.Harness is
          end if;
          Put_New_Line;
 
-         S_Put (3, "Reporter : AUnit.Reporter.GNATtest.GNATtest_Reporter;");
+         S_Put
+           (3,
+            "Reporter : AUnit.Reporter."
+            & Reporter_Name.all
+            & "."
+            & Reporter_Name.all
+            & "_Reporter;");
          Put_New_Line;
          S_Put (3, "GT_Options : AUnit_Options := Default_Options;");
          Put_New_Line;
@@ -2525,7 +2537,7 @@ package body Test.Harness is
          Put_New_Line;
          S_Put (0, "with Gnattest_Generated.Persistent;");
          Put_New_Line;
-         S_Put (0, "with AUnit.Reporter.GNATtest;");
+         S_Put (0, "with AUnit.Reporter." & Reporter_Name.all & ";");
          Put_New_Line;
          S_Put (0, "with AUnit.Run;");
          Put_New_Line;
@@ -2685,7 +2697,13 @@ package body Test.Harness is
          end if;
          Put_New_Line;
 
-         S_Put (3, "Reporter : AUnit.Reporter.GNATtest.GNATtest_Reporter;");
+         S_Put
+           (3,
+            "Reporter : AUnit.Reporter."
+            & Reporter_Name.all
+            & "."
+            & Reporter_Name.all
+            & "_Reporter;");
          Put_New_Line;
          S_Put (3, "GT_Options : AUnit_Options := Default_Options;");
          Put_New_Line;
