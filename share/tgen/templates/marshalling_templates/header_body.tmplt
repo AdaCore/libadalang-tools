@@ -5,10 +5,14 @@
 @@--  @_FIRST_NAME_@ Names of the components for the 'First attributes. Only
 @@--       set if the current type is an array.
 @@--  @_LAST_NAME_@ Same as above for the 'Last attributes.
+@@--  @_COMP_TYP_@ Type name of the index type or discriminant type
 @@--  @_ADA_DIM_@ Suffixes of the array attributes for each dimension.
 @@--  @_DISCR_NAME_@ Same as above for the discriminants of records.
 @@--  @_COMP_PREFIX_@ Prefixes used for all entity of the index types
 @@--       for arrays, and of the discriminants for records.
+@@--  @_IS_ENUM_@ Boolean, indicates if the index type is an enumerated type
+@@--  @_ARR_LIMIT_@ Number of elements in one dimension beyond which the array
+@@--       instantiation should not be done.
 @@--
 @@INCLUDE@@ util.tmplt
    --  Input and Output subprograms for headers of type @_TY_NAME_@
@@ -68,6 +72,26 @@
       return @_TY_NAME_@
    is
    begin
+@@IF@@ @_FIRST_NAME_@ /= ""
+@@TABLE@@
+      declare
+         use type @_COMP_TYP_@;
+         HB : @_COMP_TYP_@ renames @_GLOBAL_PREFIX_@_H.@_LAST_NAME_@;
+         LB : @_COMP_TYP_@ renames @_GLOBAL_PREFIX_@_H.@_FIRST_NAME_@;
+      begin
+@@IF@@ @_IS_ENUM_@
+         if @_COMP_TYP_@'Pos (HB) > @_COMP_TYP_@'Pos (LB)
+           and then Biggest_Int (@_COMP_TYP_@'Pos (HB) - @_COMP_TYP_@'Pos (LB))
+                  > @_ARR_LIMIT_@
+@@ELSE@@
+         if HB > LB and then Biggest_Int (HB - LB) > @_ARR_LIMIT_@
+@@END_IF@@
+         then
+            raise TGen.Marshalling_Lib.Invalid_Value;
+         end if;
+      end;
+@@END_TABLE@@
+@@END_IF@@
       pragma Warnings (Off, "variable ""@_GLOBAL_PREFIX_@_V"" is read but never assigned");
       return @_GLOBAL_PREFIX_@_V : @_TY_NAME_@
 @@IF@@ @_FIRST_NAME_@ /= ""

@@ -1,0 +1,8 @@
+description:
+    Test that reading an array from a blob that has a dimension greater
+    that the limit set through the TGEN_ARRAY_LIMIT environment variable
+    does raise an exception.
+
+driver: shell_script
+control:
+    - [XFAIL, 'x86', 'Marshalling not working for 32bits (UB03-008)']

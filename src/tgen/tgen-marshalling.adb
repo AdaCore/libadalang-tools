@@ -22,6 +22,7 @@
 ------------------------------------------------------------------------------
 
 with Ada.Characters.Latin_1;
+with Ada.Environment_Variables;
 with Ada.Numerics.Big_Numbers.Big_Integers;
 use  Ada.Numerics.Big_Numbers.Big_Integers;
 with Ada.Strings;                  use Ada.Strings;
@@ -36,6 +37,18 @@ with TGen.Types.Real_Types;        use TGen.Types.Real_Types;
 with TGen.Types.Record_Types;      use TGen.Types.Record_Types;
 
 package body TGen.Marshalling is
+
+   ----------------------
+   --  Local Variables --
+   ----------------------
+
+   Array_Length_Limit_Env_Var : constant String := "TGEN_ARRAY_LIMIT";
+   --  Name of the environment variable to be used during generation of the
+   --  marshallers to override the default array length limit.
+
+   Array_Length_Limit : Positive := 1000;
+   --  Limit in the number of elements beyond which the marshallers will not
+   --  even try to create an object, and instead raise an Invalid_Error.
 
    -----------------------
    -- Local Subprograms --
@@ -81,7 +94,8 @@ package body TGen.Marshalling is
       Fst_Name_Tag : in out Tag;
       Lst_Name_Tag : in out Tag;
       Typ_Tag      : in out Tag;
-      Pref_Tag     : in out Tag);
+      Pref_Tag     : in out Tag;
+      Is_Enum_Tag  : in out Tag);
    --  Compute the tags for the bounds of an unconstrained array type:
    --    * Fst_Name_Tag contains the names of the objects corresponding to
    --      the lower bounds: First_1, ...,
@@ -90,6 +104,7 @@ package body TGen.Marshalling is
    --    * Typ_Tag contains the index types: First_Index ..., and
    --    * Pref_Tag contains the prefix associated to the index base types:
    --      Global_Prefix_First_Index_Base...
+   --    * Is_Enum_Tag contains wether each index type is a enumerated type
 
    function Create_Tags_For_Array_Dims (A_Typ : Array_Typ'Class) return Tag;
    --  Compute the string to be associated to array attributes for each
@@ -323,7 +338,8 @@ package body TGen.Marshalling is
       Fst_Name_Tag : in out Tag;
       Lst_Name_Tag : in out Tag;
       Typ_Tag      : in out Tag;
-      Pref_Tag     : in out Tag)
+      Pref_Tag     : in out Tag;
+      Is_Enum_Tag  : in out Tag)
    is
       First_Name_Tmplt : constant String := "First_@_DIM_@";
       Last_Name_Tmplt  : constant String := "Last_@_DIM_@";
@@ -345,6 +361,9 @@ package body TGen.Marshalling is
 
             Typ_Tag := Typ_Tag & Index_Type;
             Pref_Tag := Pref_Tag & Index_Pref;
+            Is_Enum_Tag :=
+              Is_Enum_Tag & (U_Typ.Index_Types (I).Get.Kind
+                               in Bool_Kind | Char_Kind | Enum_Kind);
          end;
       end loop;
    end Create_Tags_For_Array_Bounds;
@@ -701,6 +720,7 @@ package body TGen.Marshalling is
       Last_Name_Tag  : Tag;
       Comp_Typ_Tag   : Tag;
       Comp_Pref_Tag  : Tag;
+      Is_Enum_Tag    : Tag;
       Ada_Dim_Tag    : constant Tag :=
         (if Typ in Array_Typ'Class
          then Create_Tags_For_Array_Dims (Array_Typ'Class (Typ))
@@ -723,7 +743,11 @@ package body TGen.Marshalling is
 
                Create_Tags_For_Array_Bounds
                  (U_Typ,
-                  First_Name_Tag, Last_Name_Tag, Comp_Typ_Tag, Comp_Pref_Tag);
+                  First_Name_Tag,
+                  Last_Name_Tag,
+                  Comp_Typ_Tag,
+                  Comp_Pref_Tag,
+                  Is_Enum_Tag);
             end;
 
          else
@@ -757,7 +781,9 @@ package body TGen.Marshalling is
                  3  => Assoc ("LAST_NAME", Last_Name_Tag),
                  4  => Assoc ("COMP_TYP", Comp_Typ_Tag),
                  5  => Assoc ("COMP_PREFIX", Comp_Pref_Tag),
-                 6  => Assoc ("ADA_DIM", Ada_Dim_Tag)];
+                 6  => Assoc ("ADA_DIM", Ada_Dim_Tag),
+                 7  => Assoc ("IS_ENUM", Is_Enum_Tag),
+                 8  => Assoc ("ARR_LIMIT", Array_Length_Limit)];
 
          begin
             Print_Header (Assocs);
@@ -1107,5 +1133,26 @@ package body TGen.Marshalling is
    begin
       Append (Str.all, Ada.Characters.Latin_1.LF);
    end New_Line;
+
+begin
+
+   if Ada.Environment_Variables.Exists (Array_Length_Limit_Env_Var) then
+      declare
+         Env_Val : Positive;
+      begin
+         Env_Val :=
+           Positive'Value
+             (Ada.Environment_Variables.Value (Array_Length_Limit_Env_Var));
+         Array_Length_Limit := Env_Val;
+      exception
+         when Constraint_Error =>
+            Put_Line
+              (File => Standard_Error,
+               Item => "Warning: Could not interpret value of the "
+                       & Array_Length_Limit_Env_Var & "environment variable as"
+                       & " a positive, defaulting to"
+                       & Array_Length_Limit'Image);
+      end;
+   end if;
 
 end TGen.Marshalling;
