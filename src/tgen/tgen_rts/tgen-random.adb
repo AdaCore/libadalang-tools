@@ -21,11 +21,17 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Calendar; use Ada.Calendar;
 with Ada.Environment_Variables;
 with Ada.Numerics.Generic_Elementary_Functions;
 with Ada.Unchecked_Conversion;
 
+with TGen.Logging;
+
 package body TGen.Random is
+
+   Random_Trace : constant TGen.Logging.GNATCOLL_Trace :=
+     TGen.Logging.Create_Trace ("RANDOM");
 
    ---------------
    -- Draw_Bits --
@@ -458,20 +464,21 @@ package body TGen.Random is
    end Random;
 
    Seed_Env_Var : constant String := "TGEN_RANDOM_SEED";
+   Seed         : Unsigned_32;
+   Y2K          : constant Time :=
+     Time_Of (Year => 2000, Month => 1, Day => 1, Seconds => 0.0);
+   --  First day of Year 2000, to get a duration
+
+   function To_U64 is
+     new Ada.Unchecked_Conversion (Duration, Interfaces.Unsigned_64);
+
 begin
    if Ada.Environment_Variables.Exists (Seed_Env_Var) then
-      declare
-         use GNAT.Random_Numbers;
-         Var_Value : constant String :=
-           Ada.Environment_Variables.Value (Seed_Env_Var);
-         Init      : Initialization_Vector (1 .. Var_Value'Length);
-      begin
-         for Idx in Var_Value'Range loop
-            Init (Idx) := Unsigned_32 (Character'Pos (Var_Value (Idx)));
-         end loop;
-         GNAT.Random_Numbers.Reset (Generator_Instance, Init);
-      end;
+      Seed :=
+        Unsigned_32'Value (Ada.Environment_Variables.Value (Seed_Env_Var));
    else
-      GNAT.Random_Numbers.Reset (Generator_Instance);
+      Seed := Unsigned_32'Mod (To_U64 (Clock - Y2K));
    end if;
+   Random_Trace.Trace ("Random generator seed is " & Unsigned_32'Image (Seed));
+   GNAT.Random_Numbers.Reset (Generator_Instance, Seed);
 end TGen.Random;

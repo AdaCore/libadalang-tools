@@ -80,7 +80,7 @@ class Testsuite(e3.testsuite.Testsuite):
 
         # Set a fixed seed for TGen random generation, in order to keep the
         # testsuite deterministic.
-        os.environ["TGEN_RANDOM_SEED"] = "FIXED_SEED"
+        os.environ["TGEN_RANDOM_SEED"] = "1234"
 
 
 if __name__ == "__main__":
