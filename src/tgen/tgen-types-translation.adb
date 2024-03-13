@@ -1356,7 +1356,49 @@ package body TGen.Types.Translation is
 
                if not Has_Constraints then
                   Res_Typ.Index_Constraints (Current_Index) :=
-                  (Present => False);
+                    (Present => False);
+
+                  --  Check if the index type is a subtype with constraints. If
+                  --  this is the case, update the constraints accordingly.
+
+                  if LAL.Kind (Constraint) = LALCO.Ada_Identifier then
+                     declare
+                        Id_Type_Res : constant Translation_Result :=
+                          Translate
+                            (Constraint.As_Identifier.P_Referenced_Decl
+                             .As_Base_Type_Decl);
+                     begin
+                        if Id_Type_Res.Success then
+                           declare
+                              FQN : constant String :=
+                                To_Ada (Id_Type_Res.Res.Get.Name);
+                           begin
+                              if Id_Type_Res.Res.Get.Kind in Enum_Kind then
+                                 Min_Text :=
+                                   +(FQN & "'Pos (" & FQN & "'First)");
+                                 Max_Text :=
+                                   +(FQN & "'Pos (" & FQN & "'Last)");
+                              else
+                                 --  Necessarily a signed integer type, or a
+                                 --  modular type.
+
+                                 Min_Text := +(FQN & "'First");
+                                 Max_Text := +(FQN & "'Last");
+                              end if;
+                           end;
+                           Res_Typ.Index_Constraints (Current_Index) :=
+                             (Present    => True,
+                              Discrete_Range =>
+                                (Low_Bound  =>
+                                   (Kind => Non_Static,
+                                    Text => +Min_Text),
+                                 High_Bound =>
+                                   (Kind => Non_Static,
+                                    Text => +Max_Text)));
+                        end if;
+
+                     end;
+                  end if;
                elsif Max_Static and then not Min_Static then
                   Res_Typ.Index_Constraints (Current_Index) :=
                   (Present        => True,
