@@ -303,7 +303,7 @@ package body TGen.Random is
 
          Nb_Values_Between :=
            Unsigned_Type
-             (HB_Sign * Int_Type (HB_Exp) - LB_Sign * Int_Type (LB_Exp))
+             (HB_Sign * Int_Type (HB_Exp) - LB_Sign * Int_Type (LB_Exp) - 1)
                * MS_Part;
 
          Nb_Values :=
