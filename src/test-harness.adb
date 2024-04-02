@@ -3910,8 +3910,9 @@ package body Test.Harness is
             S_Put (0, "# The coverage switches are default ones, they may"
                    & " need to be adjusted to fit your coverage needs.");
             Put_New_Line;
-            S_Put (0, "SWITCHES_COVERAGE=-cstmt -adhtml "
-                   & "--output-dir=dhtml-report");
+            S_Put (0, "SWITCHES_COVERAGE=-cstmt -axcov+,dhtml "
+                   & "--output-dir="
+                   & GNATCOLL.VFS."+" (Object_Dir (Root_Prj).Full_Name));
             Switches_From_Default := True;
          end if;
          Put_New_Line;
