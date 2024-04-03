@@ -4238,7 +4238,7 @@ package body Test.Harness is
       if not Target_Native then
          S_Put (0, "inst-coverage: BUILDERFLAGS+="
                 & "--implicit-with=$(if $(GNATCOV_RTS),$(GNATCOV_RTS),"
-                & "gnatcov_rts_full.gpr)");
+                & "gnatcov_rts.gpr)");
          Put_New_Line;
       end if;
       S_Put (0, "inst-coverage: gnatcov-consolidate");
