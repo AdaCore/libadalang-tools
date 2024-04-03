@@ -320,7 +320,8 @@ package body Laltools.Subprogram_Hierarchy is
 
       if Aux_Decl.Kind in Ada_Generic_Subp_Instantiation_Range then
          Aux_Decl :=
-           Aux_Decl.As_Generic_Subp_Instantiation.P_Designated_Generic_Decl;
+           Aux_Decl.As_Generic_Subp_Instantiation
+           .P_Designated_Generic_Decl.As_Basic_Decl;
       end if;
 
       if Aux_Decl.Kind in Ada_Generic_Subp_Internal_Range

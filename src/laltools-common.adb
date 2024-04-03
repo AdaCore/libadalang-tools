@@ -2356,7 +2356,7 @@ package body Laltools.Common is
 
       procedure Process_Top_Level_Decl (TLD : Basic_Decl) is
          --  Designated_Generic_Decl
-         DGD : Basic_Decl;
+         DGD : Generic_Decl;
 
       begin
          if not TLD.Is_Null then
