@@ -30,6 +30,7 @@ with GNATCOLL.Traces;
 with Langkit_Support.Slocs;
 
 with Libadalang.Analysis;
+with Libadalang.Common;
 with Libadalang.Helpers;
 
 with Laltools.Common;
@@ -138,8 +139,10 @@ procedure Outgoing_Calls is
       pragma Unreferenced (Context);
 
       Calls : Laltools.Common.References_By_Subprogram.Map;
-      Dummy_Trace        : GNATCOLL.Traces.Trace_Handle;
-      Dummy_Imprecise    : Boolean := False;
+
+      Ignore_Imprecise : Libadalang.Common.Ref_Result_Kind :=
+        Libadalang.Common.No_Ref;
+      Ignore_Trace     : GNATCOLL.Traces.Trace_Handle;
 
       use type LALAnalysis.Defining_Name;
 
@@ -156,9 +159,9 @@ procedure Outgoing_Calls is
            Laltools.Common.Get_Node_As_Name (Subp_Call.As_Ada_Node);
       begin
          --  First try to resolve the called function.
-
-         Call_Definition := Laltools.Common.Resolve_Name
-           (Subp_Call_Name, Dummy_Trace, Dummy_Imprecise);
+         Call_Definition :=
+           Laltools.Common.Resolve_Name
+             (Subp_Call_Name, Ignore_Trace, Ignore_Imprecise);
 
          if Call_Definition /= LALAnalysis.No_Defining_Name then
             if Calls.Contains (Call_Definition) then
@@ -211,7 +214,8 @@ procedure Outgoing_Calls is
       end if;
 
       Node_Defining_Name :=
-        Laltools.Common.Resolve_Name (Node_Name, Dummy_Trace, Dummy_Imprecise);
+        Laltools.Common.Resolve_Name
+          (Node_Name, Ignore_Trace, Ignore_Imprecise);
 
       if Node_Defining_Name = LALAnalysis.No_Defining_Name then
          Ada.Text_IO.Put_Line ("Node is not a defining name.");
@@ -224,8 +228,8 @@ procedure Outgoing_Calls is
       Laltools.Call_Hierarchy.Find_Outgoing_Calls
         (Definition => Node_Defining_Name,
          Callback   => Callback'Access,
-         Trace      => Dummy_Trace,
-         Imprecise  => Dummy_Imprecise);
+         Trace      => Ignore_Trace,
+         Imprecise  => Ignore_Imprecise);
 
       Print_References_By_Subprogram_Map (Calls);
    end Job_Post_Process;

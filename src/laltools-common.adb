@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                     Copyright (C) 2021-2023, AdaCore                     --
+--                     Copyright (C) 2021-2024, AdaCore                     --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -2571,7 +2571,7 @@ package body Laltools.Common is
    function Is_Call
      (Node      : Ada_Node'Class;
       Trace     : GNATCOLL.Traces.Trace_Handle;
-      Imprecise : in out Boolean) return Boolean is
+      Imprecise : in out Ref_Result_Kind) return Boolean is
    begin
       return Node.As_Ada_Node /= No_Ada_Node
         and then Node.Kind in Ada_Name
@@ -2704,18 +2704,16 @@ package body Laltools.Common is
    function Is_Enum_Literal
      (Node      : Ada_Node'Class;
       Trace     : GNATCOLL.Traces.Trace_Handle;
-      Imprecise : in out Boolean) return Boolean
+      Imprecise : in out Ref_Result_Kind) return Boolean
    is
       Definition : Defining_Name;
-      Ref_Kind   : Libadalang.Common.Ref_Result_Kind;
+
    begin
       if Node.As_Ada_Node /= No_Ada_Node
         and then Node.Kind in Ada_Name
       then
          Definition := Laltools.Common.Resolve_Name
-           (Node.As_Name, Trace, Ref_Kind);
-         Imprecise :=
-           Ref_Kind in Libadalang.Common.Error | Libadalang.Common.Imprecise;
+           (Node.As_Name, Trace, Imprecise);
          return Definition /= No_Defining_Name
            and then Definition.P_Basic_Decl.Kind =
              Ada_Enum_Literal_Decl;
@@ -2821,9 +2819,9 @@ package body Laltools.Common is
    --------------------
 
    function List_Bodies_Of
-     (Definition         : Defining_Name;
-      Trace              : GNATCOLL.Traces.Trace_Handle;
-      Imprecise          : in out Boolean)
+     (Definition : Defining_Name;
+      Trace      : GNATCOLL.Traces.Trace_Handle;
+      Imprecise  : in out Ref_Result_Kind)
       return Bodies_List.List
    is
       List       : Bodies_List.List;
@@ -2874,7 +2872,7 @@ package body Laltools.Common is
 
          Loop_Count := Loop_Count + 1;
          if Loop_Count > 5 then
-            Imprecise := True;
+            Imprecise := Libadalang.Common.Imprecise;
             exit;
          end if;
       end loop;

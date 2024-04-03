@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                       Copyright (C) 2021-2023, AdaCore                   --
+--                       Copyright (C) 2021-2024, AdaCore                   --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -749,7 +749,7 @@ package Laltools.Common is
    function Is_Call
      (Node      : Ada_Node'Class;
       Trace     : GNATCOLL.Traces.Trace_Handle;
-      Imprecise : in out Boolean) return Boolean;
+      Imprecise : in out Ref_Result_Kind) return Boolean;
    --  Check if a node is a call and an identifier. Enum literals
    --  in DottedName are excluded.
 
@@ -777,7 +777,7 @@ package Laltools.Common is
    function Is_Enum_Literal
      (Node      : Ada_Node'Class;
       Trace     : GNATCOLL.Traces.Trace_Handle;
-      Imprecise : in out Boolean) return Boolean;
+      Imprecise : in out Ref_Result_Kind) return Boolean;
    --  Check if a node is an enum literal.
 
    function Is_Renamable (Node : Ada_Node'Class) return Boolean;
@@ -816,13 +816,13 @@ package Laltools.Common is
    --  Returns how many Param_Spec nodes L has.
 
    function List_Bodies_Of
-     (Definition         : Defining_Name;
-      Trace              : GNATCOLL.Traces.Trace_Handle;
-      Imprecise          : in out Boolean)
+     (Definition : Defining_Name;
+      Trace      : GNATCOLL.Traces.Trace_Handle;
+      Imprecise  : in out Ref_Result_Kind)
       return Bodies_List.List;
    --  List all the bodies of Definition. This does not list the bodies of the
-   --  parent. It sets Imprecise to True if any request returns
-   --  imprecise results.
+   --  parent. It sets Imprecise to Libadalang.Common.Imprecise if any request
+   --  returns imprecise results.
 
    procedure Merge
      (Left  : in out Source_Location_Range_Map;
@@ -832,7 +832,7 @@ package Laltools.Common is
    function Resolve_Name
      (Name_Node : Name;
       Trace     : GNATCOLL.Traces.Trace_Handle;
-      Ref_Kind  : out Libadalang.Common.Ref_Result_Kind)
+      Ref_Kind  : out Ref_Result_Kind)
       return Defining_Name;
    --  Return the definition node (canonical part) of the given name.
 

@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                    Copyright (C) 2021-2022, AdaCore                      --
+--                    Copyright (C) 2021-2024, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -59,7 +59,7 @@ package body Laltools.Call_Hierarchy is
       Callback   : not null access procedure
         (Subp_Call : Ada_Node'Class);
       Trace      : GNATCOLL.Traces.Trace_Handle;
-      Imprecise  : in out Boolean)
+      Imprecise  : in out Ref_Result_Kind)
    is
 
       function Process_Body_Children (N : Ada_Node'Class)
