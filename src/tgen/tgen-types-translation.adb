@@ -3321,7 +3321,8 @@ package body TGen.Types.Translation is
    begin
       if Kind (N) = Ada_Generic_Subp_Instantiation then
          Designated_Decl :=
-           N.As_Generic_Subp_Instantiation.P_Designated_Generic_Decl;
+           N.As_Generic_Subp_Instantiation
+           .P_Designated_Generic_Decl.As_Basic_Decl;
       end if;
 
       F_Typ.Last_Comp_Unit_Idx := Comp_Unit_Idx;

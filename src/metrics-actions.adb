@@ -3741,7 +3741,7 @@ package body METRICS.Actions is
             begin
                declare
                   pragma Assert (Node = M.Node);
-                  G : constant Basic_Decl :=
+                  G : constant Generic_Decl :=
                     Node.As_Generic_Instantiation.P_Designated_Generic_Decl;
                   Spec : constant Subp_Spec :=
                     G.As_Generic_Subp_Decl.F_Subp_Decl
