@@ -19,3 +19,6 @@ testsuite/tests/internal
 
 # Clang artifacts
 .clang-format
+
+# VScode settings, updated by ancr
+.vscode/settings.jon
