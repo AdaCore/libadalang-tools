@@ -4108,8 +4108,7 @@ package body Test.Harness is
         (0,
          ASCII.HT
          & "$(GPRBUILD) $(BUILDERFLAGS) -P$*.gpr $(GPRFLAGS)"
-         & " -o $(notdir $*)$(EXE_EXT) --src-subdirs=gnatcov-instr "
-         & "--implicit-with=gnatcov_rts");
+         & " -o $(notdir $*)$(EXE_EXT) --src-subdirs=gnatcov-instr");
       Put_New_Line;
       Put_New_Line;
 
@@ -4231,12 +4230,10 @@ package body Test.Harness is
          Put_New_Line;
       end if;
 
-      if not Target_Native then
-         S_Put (0, "inst-coverage: BUILDERFLAGS+="
+      S_Put (0, "inst-coverage: BUILDERFLAGS+="
                 & "--implicit-with=$(if $(GNATCOV_RTS),$(GNATCOV_RTS),"
                 & "gnatcov_rts.gpr)");
-         Put_New_Line;
-      end if;
+      Put_New_Line;
       S_Put (0, "inst-coverage: gnatcov-consolidate");
       Put_New_Line;
       Put_New_Line;
