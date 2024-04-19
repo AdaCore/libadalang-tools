@@ -4031,8 +4031,7 @@ package body Test.Harness is
         (0,
          ASCII.HT
          & "$(GNATCOV) run -P$*.gpr $(SWITCHES_RUN) $(GPRFLAGS)"
-         & " -o $*-gnattest.trace --projects="
-         & Source_Project_Tree.Root_Project.Name);
+         & " -o $*-gnattest.trace");
       if Stub_Mode_ON or else Separate_Drivers then
          S_Put (0, " --units=@$(dir $*)units.list");
       end if;
@@ -4050,7 +4049,6 @@ package body Test.Harness is
         (0,
          ASCII.HT
          & "$(GNATCOV) coverage --save-checkpoint=$*-gnattest.ckpt"
-         & " --projects=" & Source_Project_Tree.Root_Project.Name
          & " -P$*.gpr $(GPRFLAGS) $(SWITCHES_COVERAGE) --cancel-annotate"
          & " $*-gnattest.trace");
       if Separate_Drivers or else Stub_Mode_ON then
@@ -4093,8 +4091,7 @@ package body Test.Harness is
       S_Put
         (0,
          ASCII.HT
-         & "$(GNATCOV) instrument -P$< $(SWITCHES_INSTRUMENT) $(GPRFLAGS)"
-         & " --projects=" & Source_Project_Tree.Root_Project.Name);
+         & "$(GNATCOV) instrument -P$< $(SWITCHES_INSTRUMENT) $(GPRFLAGS)");
       if Separate_Drivers or else Stub_Mode_ON then
          S_Put (0, " --units=@$(dir $*)units.list");
       end if;
@@ -4184,7 +4181,6 @@ package body Test.Harness is
          ASCII.HT
          & "$(GNATCOV) coverage --save-checkpoint=$*-gnattest.ckpt"
          & " -P$*.gpr $(GPRFLAGS) $(SWITCHES_COVERAGE) --cancel-annotate"
-         & " --projects=" & Source_Project_Tree.Root_Project.Name
          & " $*-gnattest_td.srctrace");
       if Separate_Drivers or else Stub_Mode_ON then
          S_Put (0, " --units=@$(dir $*)units.list");
