@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                    Copyright (C) 2021-2022, AdaCore                      --
+--                    Copyright (C) 2021-2024, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -61,7 +61,8 @@ package Pp.Command_Lines is
       Separate_Label, -- Not documented
       Separate_Stmt_Name, -- Not documented
       Test, -- Not documented
-      Warnings); -- Not documented
+      Warnings, -- Not documented
+      Keep_Going);
 
    package Pp_Flag_Switches is new Flag_Switches
      (Descriptor,
@@ -93,7 +94,8 @@ package Pp.Command_Lines is
        Separate_Label => null, -- Not documented
        Separate_Stmt_Name => null, -- Not documented
        Test => null, -- Not documented
-       Warnings => +"-w"]); -- Not documented
+       Warnings => +"-w", -- Not documented
+       Keep_Going => +"-k"]);
 
    package Pp_Flag_Shorthands_N is new Pp_Flag_Switches.Set_Shorthands
      ([No_Tab => +"-N", -- Not documented

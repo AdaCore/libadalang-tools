@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                    Copyright (C) 2021-2023, AdaCore                      --
+--                    Copyright (C) 2021-2024, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -129,7 +129,10 @@ private
    overriding
    procedure Tool_Help (Tool : Pp_Tool);
 
-   type Pp_Tool is new Tool_State with null record;
+   type Pp_Tool is new Tool_State with
+     record
+       Failed : Boolean := False;
+     end record;
 
    --  For Debugging:
 
