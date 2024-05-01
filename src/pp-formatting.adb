@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2001-2022, AdaCore                    --
+--                      Copyright (C) 2001-2024, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -4239,6 +4239,7 @@ package body Pp.Formatting is
                           or else (not Insert_Blank_Lines (Cmd)
                                      and then Kind (Src_Tok) /= End_Of_Input)
                           or else Prev_Prev_Tok_Kind in Comment_Kind
+                          or else Prev_Prev_Tok_Kind in ';'
                           or else Next_Tok_Kind in Comment_Kind
                         then
                            Append_Temp_Line_Break
