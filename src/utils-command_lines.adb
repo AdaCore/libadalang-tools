@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                    Copyright (C) 2021-2022, AdaCore                      --
+--                    Copyright (C) 2021-2024, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -337,6 +337,21 @@ package body Utils.Command_Lines is
       begin
          Cmd.Sw (To_All (Switch)).Boolean_Val := Val;
       end Set_Arg;
+
+      -----------------------------
+      -- Set_Arg_If_Not_Explicit --
+      -----------------------------
+
+      procedure Set_Arg_If_Not_Explicit
+        (Cmd    : in out Command_Line;
+         Switch : Switches;
+         Value  : Boolean := True)
+      is
+      begin
+         if not Explicit (Cmd, Switch) then
+            Set_Arg (Cmd, Switch, Value);
+         end if;
+      end Set_Arg_If_Not_Explicit;
 
       function Explicit
         (Cmd : Command_Line; Switch : Switches) return Boolean is

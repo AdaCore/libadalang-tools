@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                    Copyright (C) 2021-2022, AdaCore                      --
+--                    Copyright (C) 2021-2024, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -264,6 +264,12 @@ package Utils.Command_Lines is
       procedure Set_Arg
         (Cmd : in out Command_Line; Switch : Switches; Val : Boolean := True);
       --  Set the given switch to Val.
+
+      procedure Set_Arg_If_Not_Explicit
+        (Cmd    : in out Command_Line;
+         Switch : Switches;
+         Value  : Boolean := True);
+      --  Set the given Switch to Value if it was not explicitly set.
 
       function Explicit (Cmd : Command_Line; Switch : Switches) return Boolean;
       --  True if the switch was specified explicitly, as opposed to being
