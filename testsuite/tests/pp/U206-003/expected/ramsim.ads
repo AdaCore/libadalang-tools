@@ -16,6 +16,7 @@ package RAMSim is
      new Bus_Device (Vendor_Id, Device_Id, Port, Native_Endian) with record
         Controller : RAMsim_Control;
      end record;
+
    --  A comment about RAMsim_Ref before
 
    type RAMsim_Ref is access all RAMsim_Device'Class;
@@ -24,6 +25,7 @@ package RAMSim is
    --  A comment about Device_Setup
    overriding procedure Device_Setup
      (Self : in out RAMsim_Device);
+
    --  A comment about ..
    overriding procedure Device_Init
      (Self : in out RAMsim_Device);
