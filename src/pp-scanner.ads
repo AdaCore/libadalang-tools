@@ -21,11 +21,13 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Utils.Char_Vectors;
-with Utils.Vectors;
-with Utils.Symbols;
+with Ada.Text_IO;
 
 with Pp.Buffers;
+
+with Utils.Char_Vectors;
+with Utils.Symbols;
+with Utils.Vectors;
 
 private with Utils.Var_Length_Ints;
 
@@ -558,11 +560,14 @@ package Pp.Scanner is
    --  Checks that X and Y are the same except for Slocs and line breaks; raise
    --  an exception if not.
 
-   procedure Put_Token (Tok : Tokn_Cursor);
+   procedure Put_Token
+     (Tok  : Tokn_Cursor;
+      File : Ada.Text_IO.File_Type := Ada.Text_IO.Standard_Output);
    procedure Put_Tokens
-     (First     : Tokn_Cursor;
+     (First      : Tokn_Cursor;
       After_Last : Tokn_Cursor;
-      Highlight : Tokn_Cursor);
+      Highlight  : Tokn_Cursor;
+      File       : Ada.Text_IO.File_Type := Ada.Text_IO.Standard_Output);
    --  Put token(s) to standard output (even if Text_IO.Current_Output has been
    --  redirected). The tokens come out in compilable form, one per line, with
    --  the text of the token first, and the other information commented out.
@@ -570,10 +575,17 @@ package Pp.Scanner is
    --  should have identical semantics to the original Ada code. First and Last
    --  indicate a slice of Tokens, and we tolerate out-of-bounds indices.
    --  We draw a comment line before Highlight.
-   procedure Put_Tokens (Highlight : Tokn_Cursor; Num_Toks : Tokn_Index := 8);
+   procedure Put_Tokens
+     (Highlight : Tokn_Cursor;
+      Num_Toks  : Tokn_Index := 8;
+      File      : Ada.Text_IO.File_Type := Ada.Text_IO.Standard_Output);
    --  Num_Toks is the number of tokens before and after Highlight to print
-   procedure Put_Tokens (Tokens : Tokn_Vec);
-   procedure Put_Tokns (Tok : Tokn_Cursor);
+   procedure Put_Tokens
+     (Tokens : Tokn_Vec;
+      File   : Ada.Text_IO.File_Type := Ada.Text_IO.Standard_Output);
+   procedure Put_Tokns
+     (Tok  : Tokn_Cursor;
+      File : Ada.Text_IO.File_Type := Ada.Text_IO.Standard_Output);
    --  This puts all the tokens in the vector that Tok points to, highlighting
    --  Tok.
 
