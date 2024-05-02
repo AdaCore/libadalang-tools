@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                    Copyright (C) 2021-2023, AdaCore                      --
+--                    Copyright (C) 2021-2024, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -278,10 +278,10 @@ package body Pp.Actions is
                Set_Arg (Cmd, Indent_Named_Statements, False);
                Set_Arg (Cmd, Insert_Blank_Lines, False);
                Set_Arg (Cmd, Preserve_Blank_Lines, False);
-               Set_Arg (Cmd, Comments_Unchanged, False);
-               Set_Arg (Cmd, Comments_Gnat_Beginning, False);
-               Set_Arg (Cmd, Comments_Fill, False);
-               Set_Arg (Cmd, Comments_Special, False);
+               Set_Arg_If_Not_Explicit (Cmd, Comments_Unchanged, False);
+               Set_Arg_If_Not_Explicit (Cmd, Comments_Gnat_Beginning, False);
+               Set_Arg_If_Not_Explicit (Cmd, Comments_Fill, False);
+               Set_Arg_If_Not_Explicit (Cmd, Comments_Special, False);
             end if;
 
          when Minimal =>
@@ -304,10 +304,10 @@ package body Pp.Actions is
             Set_Arg (Cmd, Indent_Named_Statements, False);
             Set_Arg (Cmd, Insert_Blank_Lines, False);
             Set_Arg (Cmd, Preserve_Blank_Lines, True);
-            Set_Arg (Cmd, Comments_Unchanged, True);
-            Set_Arg (Cmd, Comments_Gnat_Beginning, False);
-            Set_Arg (Cmd, Comments_Fill, False);
-            Set_Arg (Cmd, Comments_Special, False);
+            Set_Arg_If_Not_Explicit (Cmd, Comments_Unchanged, True);
+            Set_Arg_If_Not_Explicit (Cmd, Comments_Gnat_Beginning, False);
+            Set_Arg_If_Not_Explicit (Cmd, Comments_Fill, False);
+            Set_Arg_If_Not_Explicit (Cmd, Comments_Special, False);
 
          when Tall =>
             Set_Arg (Cmd, Alignment, True);
@@ -330,10 +330,10 @@ package body Pp.Actions is
             Set_Arg (Cmd, Indent_Named_Statements, True);
             Set_Arg (Cmd, Insert_Blank_Lines, True);
             Set_Arg (Cmd, Preserve_Blank_Lines, False);
-            Set_Arg (Cmd, Comments_Unchanged, False);
-            Set_Arg (Cmd, Comments_Gnat_Beginning, True);
-            Set_Arg (Cmd, Comments_Fill, False);
-            Set_Arg (Cmd, Comments_Special, True);
+            Set_Arg_If_Not_Explicit (Cmd, Comments_Unchanged, False);
+            Set_Arg_If_Not_Explicit (Cmd, Comments_Gnat_Beginning, True);
+            Set_Arg_If_Not_Explicit (Cmd, Comments_Fill, False);
+            Set_Arg_If_Not_Explicit (Cmd, Comments_Special, True);
 
          when Compact =>
             Set_Arg (Cmd, Alignment, True);
@@ -355,10 +355,10 @@ package body Pp.Actions is
             Set_Arg (Cmd, Indent_Named_Statements, False);
             Set_Arg (Cmd, Insert_Blank_Lines, False);
             Set_Arg (Cmd, Preserve_Blank_Lines, False);
-            Set_Arg (Cmd, Comments_Unchanged, False);
-            Set_Arg (Cmd, Comments_Gnat_Beginning, True);
-            Set_Arg (Cmd, Comments_Fill, True);
-            Set_Arg (Cmd, Comments_Special, True);
+            Set_Arg_If_Not_Explicit (Cmd, Comments_Unchanged, False);
+            Set_Arg_If_Not_Explicit (Cmd, Comments_Gnat_Beginning, True);
+            Set_Arg_If_Not_Explicit (Cmd, Comments_Fill, True);
+            Set_Arg_If_Not_Explicit (Cmd, Comments_Special, True);
       end case;
 
       pragma Assert (Environment.Initial_Dir = Current_Directory);
