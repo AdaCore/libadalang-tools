@@ -3,5 +3,9 @@ description:
     test generation after the test-case dump.
 
 driver: shell_script
+
+resources:
+    tc_dump: .
+
 control:
     - [XFAIL, 'x86', 'Marshalling not working for 32bits (UB03-008)']
