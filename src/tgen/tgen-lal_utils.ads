@@ -31,6 +31,8 @@ with TGen.Strings; use TGen.Strings;
 
 package TGen.LAL_Utils is
 
+   package LAL renames Libadalang.Analysis;
+
    function "+" (Text : Text_Type) return String renames To_UTF8;
 
    function "+" (Str : String) return Text_Type renames From_UTF8;
@@ -69,5 +71,16 @@ package TGen.LAL_Utils is
    --  for Subp should be stored. It has no extension, so it can be suffixed
    --  or prefixed with anything to differentiate various test cases for the
    --  same subprogram.
+
+   function Ultimate_Enclosing_Compilation_Unit
+     (Subp : LAL.Basic_Decl'Class) return LAL.Unbounded_Text_Type_Array;
+   --  Return the ultimate enclosing compilation unit, going up the
+   --  instantiation chains if the given Subp is a generic instantiation.
+   --
+   --  TODO??? to properly deal with generics, we should actually generate
+   --  a generic child package for them, that we should then instantiate at
+   --  the instantiation points of the generic. As this is a lot of work,
+   --  provide best effort support: generate support for the generic inst. in
+   --  the child package of the package containing the generic instantiation.
 
 end TGen.LAL_Utils;

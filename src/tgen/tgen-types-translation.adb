@@ -2951,8 +2951,7 @@ package body TGen.Types.Translation is
          else No_Defining_Name);
 
       Comp_Unit_Idx : constant Positive :=
-        Unbounded_Text_Type_Array'(N.P_Enclosing_Compilation_Unit.P_Decl
-                                   .P_Fully_Qualified_Name_Array)'Last;
+        Ultimate_Enclosing_Compilation_Unit (LAL.Basic_Decl'Class (N))'Last;
 
       FQN : constant Ada_Qualified_Name :=
         Convert_Qualified_Name (Type_Name.P_Fully_Qualified_Name_Array);
@@ -3309,8 +3308,7 @@ package body TGen.Types.Translation is
       F_Typ_Ref     : SP.Ref;
       Result        : Translation_Result (Success => True);
       Comp_Unit_Idx : constant Positive :=
-        Unbounded_Text_Type_Array'(N.P_Enclosing_Compilation_Unit.P_Decl
-                                   .P_Fully_Qualified_Name_Array)'Last;
+        Ultimate_Enclosing_Compilation_Unit (N)'Last;
 
       UID         : constant String :=
         Test.Common.Mangle_Hash_16 (Subp => N);
@@ -3319,6 +3317,10 @@ package body TGen.Types.Translation is
 
       Designated_Decl : Basic_Decl := N;
    begin
+      --  TODO??? when traversing generic instantiations with the
+      --  tgen_marshalling testsuite driver, their kind is Ada_Subp_Decl.
+      --  Investigate why.
+
       if Kind (N) = Ada_Generic_Subp_Instantiation then
          Designated_Decl :=
            N.As_Generic_Subp_Instantiation
