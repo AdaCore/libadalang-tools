@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2013-2022, AdaCore                    --
+--                      Copyright (C) 2013-2024, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -158,6 +158,7 @@ package body Pp.Buffers is
 
    procedure Dump_Buf (Buf : Buffer) is
       use Dbg_Out;
+      Saved_Output_Enabled : constant Boolean := Dbg_Out.Output_Enabled;
    begin
       Dbg_Out.Output_Enabled := True;
       Put
@@ -177,6 +178,7 @@ package body Pp.Buffers is
       if At_End (Buf) then
          Put ("At_End\n");
       end if;
+      Dbg_Out.Output_Enabled := Saved_Output_Enabled;
    end Dump_Buf;
 
    procedure Dump_Buffer (Buf : Buffer) is

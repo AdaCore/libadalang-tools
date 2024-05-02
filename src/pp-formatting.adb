@@ -230,10 +230,11 @@ package body Pp.Formatting is
    --  is terminated by NL.
 
    procedure Raise_Token_Mismatch
-     (Message              : String;
-      Lines_Data           : Lines_Data_Rec;
-      Src_Buf              : Buffer;
-      Src_Tok, Out_Tok     : Scanner.Tokn_Cursor);
+     (Message    : String;
+      Lines_Data : Lines_Data_Rec;
+      Src_Buf    : Buffer;
+      Src_Tok    : Scanner.Tokn_Cursor;
+      Out_Tok    : Scanner.Tokn_Cursor);
    --  Called when either Insert_Comments_And_Blank_Lines or Final_Check finds
    --  a mismatch. Prints debugging information and raises Token_Mismatch.
 
@@ -1204,11 +1205,16 @@ package body Pp.Formatting is
       when Post_Tree_Phases_Done => null;
    end Post_Tree_Phases;
 
+   --------------------------
+   -- Raise_Token_Mismatch --
+   --------------------------
+
    procedure Raise_Token_Mismatch
-     (Message              : String;
-      Lines_Data           : Lines_Data_Rec;
-      Src_Buf              : Buffer;
-      Src_Tok, Out_Tok     : Scanner.Tokn_Cursor)
+     (Message    : String;
+      Lines_Data : Lines_Data_Rec;
+      Src_Buf    : Buffer;
+      Src_Tok    : Scanner.Tokn_Cursor;
+      Out_Tok    : Scanner.Tokn_Cursor)
    is
       Out_Buf : Buffer renames Lines_Data.Out_Buf;
 
@@ -1228,20 +1234,31 @@ package body Pp.Formatting is
       Error_Sloc := To_Langkit (Sloc (Src_Tok));
 
       if Enable_Token_Mismatch then
-         Utils.Dbg_Out.Output_Enabled := True;
-         Err_Out.Put ("Src_Buf:\n");
-         Dump_Buf (Src_Buf);
-         Err_Out.Put ("Out_Buf:\n");
-         Dump_Buf (Out_Buf);
+         declare
+            Saved_Output_Enabled : constant Boolean :=
+              Utils.Dbg_Out.Output_Enabled;
 
-         Err_Out.Put
-           ("\1: Token mismatch: \2 --> \3\n",
-            Message, Txt (Src_Tok), Txt (Out_Tok));
-         Err_Out.Put ("Src tokens:\n");
-         Put_Tokens (Highlight => Src_Tok);
-         Err_Out.Put ("========================================\n");
-         Err_Out.Put ("Out tokens:\n");
-         Put_Tokens (Highlight => Out_Tok);
+         begin
+            Utils.Dbg_Out.Output_Enabled := True;
+            Err_Out.Put ("Token Mismatch\n");
+            Err_Out.Put ("Src_Buf:\n");
+            Dump_Buf (Src_Buf);
+            Err_Out.Put ("========================================\n");
+            Err_Out.Put ("Out_Buf:\n");
+            Dump_Buf (Out_Buf);
+
+            Err_Out.Put
+              ("\1: Token mismatch: \2 --> \3\n",
+               Message, Txt (Src_Tok), Txt (Out_Tok));
+            Err_Out.Put ("Src tokens:\n");
+            Put_Tokens
+              (Highlight => Src_Tok, File => Ada.Text_IO.Standard_Error);
+            Err_Out.Put ("========================================\n");
+            Err_Out.Put ("Out tokens:\n");
+            Put_Tokens
+              (Highlight => Out_Tok, File => Ada.Text_IO.Standard_Error);
+            Utils.Dbg_Out.Output_Enabled := Saved_Output_Enabled;
+         end;
       end if;
 
       raise Token_Mismatch;

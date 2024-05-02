@@ -21,4 +21,4 @@ testsuite/tests/internal
 .clang-format
 
 # VScode settings, updated by ancr
-.vscode/settings.jon
+.vscode

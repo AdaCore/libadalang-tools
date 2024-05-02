@@ -393,7 +393,6 @@ package body Pp.Actions is
       --  files. We don't need any file locking here, because all the inner
       --  processes that were writing to the File_Name_File have finished.
 
-      pragma Unreferenced (Tool);
       use Ada.Text_IO;
       File_Name_File : File_Type;
       Ignored : Boolean;
@@ -446,6 +445,10 @@ package body Pp.Actions is
             when X : Move_Failure =>
                Cmd_Error (Ada.Exceptions.Exception_Message (X));
          end;
+      end if;
+
+      if Tool.Failed then
+         raise Command_Line_Error_No_Tool_Name;
       end if;
    end Final;
 
@@ -6032,8 +6035,6 @@ package body Pp.Actions is
       BOM_Seen  : Boolean;
       Unit      : Analysis_Unit)
    is
-      pragma Unreferenced (Tool);
-
       Output_Mode : constant Output_Modes := Get_Output_Mode (Cmd);
       Do_Diff     : constant Boolean := Output_Mode in Replace_Modes;
 
@@ -6312,7 +6313,12 @@ package body Pp.Actions is
                end;
             end loop;
 
-            raise Command_Line_Error_No_Tool_Name;
+            if Arg (Cmd, Keep_Going) then
+               Tool.Failed := True;
+
+            else
+               raise Command_Line_Error_No_Tool_Name;
+            end if;
          end if;
       end;
 
@@ -6390,6 +6396,7 @@ package body Pp.Actions is
       Put (" -q, --quiet      - Quiet mode\n");
       Put (" -v, --verbose    - Verbose mode\n");
       Put (" -dd              - Progress indicator verbose mode\n");
+      Put (" -k, --keep-going - Keep going after errors formatting a source file\n");
       Put (" --version        - Display version and exit\n");
       Put (" --help           - Display usage and exit\n");
       Put ("\n\n");

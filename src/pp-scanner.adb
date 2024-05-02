@@ -3,7 +3,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2012-2022, AdaCore                    --
+--                      Copyright (C) 2012-2024, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -22,7 +22,6 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Text_IO;
 with Ada.Unchecked_Conversion;
 
 with Pp.Error_Slocs; use Pp.Error_Slocs;
@@ -1979,89 +1978,120 @@ package body Pp.Scanner is
       end loop;
    end Check_Same_Tokens;
 
-   procedure Put_Token (Tok : Tokn_Cursor) is
+   ---------------
+   -- Put_Token --
+   ---------------
+
+   procedure Put_Token
+     (Tok  : Tokn_Cursor;
+      File : Ada.Text_IO.File_Type := Ada.Text_IO.Standard_Output)
+   is
    begin
       if Is_Nil (Tok) then
-         Text_IO.Put_Line (Text_IO.Standard_Output, " -- <nil token??>");
+         Ada.Text_IO.Put_Line (File, " -- <nil token??>");
+
          return;
       end if;
 
       if Kind (Tok) in Comment_Kind then
-         Text_IO.Put
-           (Text_IO.Standard_Output,
-            "--" & [1 .. Leading_Blanks (Tok) => ' ']);
+         Ada.Text_IO.Put (File, "--" & [1 .. Leading_Blanks (Tok) => ' ']);
       end if;
+
       for C of Str (Text (Tok)).S loop
          if Kind (Tok) in Comment_Kind and then C = ASCII.LF then
-            Text_IO.Put (Text_IO.Standard_Output, "$");
+            Ada.Text_IO.Put (File, "$");
+
          else
-            Text_IO.Put (Text_IO.Standard_Output, C);
+            Ada.Text_IO.Put (File, C);
          end if;
       end loop;
-      Text_IO.Put
-        (Text_IO.Standard_Output,
-         " -- #" &
-         Image (Integer (Get_Tokn_Index (Tok))) &
-         "  " &
-         Capitalize (Kind (Tok)'Img) &
-         " at " &
-         Image (Sloc (Tok)));
+
+      Ada.Text_IO.Put
+        (File,
+         " -- #"
+         & Image (Integer (Get_Tokn_Index (Tok)))
+         & "  "
+         & Capitalize (Kind (Tok)'Img)
+         & " at "
+         & Image (Sloc (Tok)));
 
       if Kind (Tok) in Comment_Kind | Spaces
         or else Tokn_Length (Tok) > 2
       then
-         Text_IO.Put
-           (Text_IO.Standard_Output, " len = " & Image (Tokn_Length (Tok)));
+         Ada.Text_IO.Put (File, " len = " & Image (Tokn_Length (Tok)));
       end if;
 
       if Kind (Tok) in Whole_Line_Comment then
-         Text_IO.Put
-           (Text_IO.Standard_Output,
-            ", width = " & Image (Width (Tok)) &
-            ", " & Image (Num_Lines (Tok)) & " lines" &
-            ", lll = " & Image (Last_Line_Len (Tok)));
+         Ada.Text_IO.Put
+           (File,
+            ", width = "
+            & Image (Width (Tok))
+            & ", "
+            & Image (Num_Lines (Tok))
+            & " lines"
+            & ", lll = "
+            & Image (Last_Line_Len (Tok)));
       end if;
 
       if Kind (Tok) in Line_Break_Token | Tab_Token then
-         Text_IO.Put
-           (Text_IO.Standard_Output, ", idx = " & Image (Index (Tok)));
+         Ada.Text_IO.Put (File, ", idx = " & Image (Index (Tok)));
       end if;
 
       if Show_Origin then
-         Text_IO.Put (Text_IO.Standard_Output, ", origin = """ &
-                        Str (Tok.V.Fixed (Tok.Fi).Origin).S & """");
+         Ada.Text_IO.Put
+           (File,
+            ", origin = """
+            & Str (Tok.V.Fixed (Tok.Fi).Origin).S
+            & """");
       end if;
-      Text_IO.Put_Line (Text_IO.Standard_Output, "");
+
+      Text_IO.Put_Line (File, "");
    end Put_Token;
 
+   ----------------
+   -- Put_Tokens --
+   ----------------
+
    procedure Put_Tokens
-     (First     : Tokn_Cursor;
+     (First      : Tokn_Cursor;
       After_Last : Tokn_Cursor;
-      Highlight : Tokn_Cursor)
+      Highlight  : Tokn_Cursor;
+      File       : Ada.Text_IO.File_Type := Ada.Text_IO.Standard_Output)
    is
       Tok : Tokn_Cursor := First;
+
    begin
       while Tok /= After_Last loop
          if Tok = Highlight then
-            Text_IO.Put_Line
-              (Text_IO.Standard_Output, "================++++++++++++++++");
+            Ada.Text_IO.Put_Line (File, "================++++++++++++++++");
          end if;
 
-         Put_Token (Tok);
+         Put_Token (Tok, File);
          Next (Tok);
       end loop;
-      Text_IO.Put_Line
-        (Text_IO.Standard_Output,
-         "New_Sloc_First = " & First.V.New_Sloc_First'Img);
+
+      Ada.Text_IO.Put_Line
+        (File, "New_Sloc_First = " & First.V.New_Sloc_First'Img);
    end Put_Tokens;
 
+   ----------------
+   -- Put_Tokens --
+   ----------------
+
    procedure Put_Tokens
-     (Highlight : Tokn_Cursor; Num_Toks : Tokn_Index := 8)
+     (Highlight : Tokn_Cursor;
+      Num_Toks  : Tokn_Index := 8;
+      File      : Ada.Text_IO.File_Type := Ada.Text_IO.Standard_Output)
    is
       First : constant Tokn_Cursor := Pred (Highlight, Num_Toks);
       Last : constant Tokn_Cursor := Succ (Highlight, Num_Toks);
+
    begin
-      Put_Tokens (First, After_Last => Next (Last), Highlight => Highlight);
+      Put_Tokens
+        (First      => First,
+         After_Last => Next (Last),
+         Highlight  => Highlight,
+         File       => File);
    end Put_Tokens;
 
    function Last (V : Tokn_Vec_Ref) return Tokn_Cursor is
@@ -2075,31 +2105,48 @@ package body Pp.Scanner is
       end return;
    end Last;
 
-   procedure Put_Tokens (Tokens : Tokn_Vec) is
+   ----------------
+   -- Put_Tokens --
+   ----------------
+
+   procedure Put_Tokens
+     (Tokens : Tokn_Vec;
+      File   : Ada.Text_IO.File_Type := Ada.Text_IO.Standard_Output)
+   is
    begin
       if Is_Empty (Tokens) then
-         Text_IO.Put_Line (Text_IO.Standard_Output, "empty tokens");
-         Text_IO.Put_Line
-           (Text_IO.Standard_Output,
-            "New_Sloc_First = " & Tokens.New_Sloc_First'Img);
+         Ada.Text_IO.Put_Line (File, "empty tokens");
+         Ada.Text_IO.Put_Line
+           (File, "New_Sloc_First = " & Tokens.New_Sloc_First'Img);
+
       else
          declare
             F : constant Tokn_Cursor := First (Tokens'Unrestricted_Access);
             L : constant Tokn_Cursor :=
               Next (Last (Tokens'Unrestricted_Access));
+
          begin
-            Put_Tokens (F, L, L);
+            Put_Tokens
+              (First => F, After_Last => L, Highlight => L, File => File);
          end;
       end if;
    end Put_Tokens;
 
-   procedure Put_Tokns (Tok : Tokn_Cursor) is
+   ---------------
+   -- Put_Tokns --
+   ---------------
+
+   procedure Put_Tokns
+     (Tok  : Tokn_Cursor;
+      File : Ada.Text_IO.File_Type := Ada.Text_IO.Standard_Output)
+   is
       Tokens : Tokn_Vec renames Tok.V.all;
-      F : constant Tokn_Cursor := First (Tokens'Unrestricted_Access);
-      L : constant Tokn_Cursor :=
+      F      : constant Tokn_Cursor := First (Tokens'Unrestricted_Access);
+      L      : constant Tokn_Cursor :=
         Next (Last (Tokens'Unrestricted_Access));
+
    begin
-      Put_Tokens (F, L, Highlight => Tok);
+      Put_Tokens (First => F, After_Last => L, Highlight => Tok, File => File);
    end Put_Tokns;
 
 end Pp.Scanner;

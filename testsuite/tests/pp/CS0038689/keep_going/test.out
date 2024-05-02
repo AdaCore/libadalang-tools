@@ -1,0 +1,9 @@
+package Test_1 is
+   type Foo;
+end Test_X;
+package Test_2 is
+   type Foo;
+end Test_X;
+Exit code was 1 as expected
+test_1.ads:1:1: Error formatting node (CompilationUnit). Keeping the initial input selection unchanged
+test_2.ads:1:1: Error formatting node (CompilationUnit). Keeping the initial input selection unchanged
