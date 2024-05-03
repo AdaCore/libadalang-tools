@@ -1,0 +1,4 @@
+system_under_test.ads:2:06: warning: "System.Arith_128" is an internal GNAT unit [-gnatwi]
+system_under_test.ads:2:06: warning: use of this unit is non-portable and version-dependent [-gnatwi]
+system_under_test.ads:3:06: warning: "System.Image_F" is an internal GNAT unit [-gnatwi]
+system_under_test.ads:3:06: warning: use of this unit is non-portable and version-dependent [-gnatwi]
