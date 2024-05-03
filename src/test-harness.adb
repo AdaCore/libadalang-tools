@@ -3700,10 +3700,13 @@ package body Test.Harness is
       Single_Driver : constant Boolean :=
         not (Stub_Mode_ON or else Separate_Drivers);
 
+      Exe_Ext : constant String :=
+        (if Dir_Separator = '\' then ".exe" else "");
+
       Target_Driver : constant String :=
         Base_Name (Root_Prj.Attribute_Value
                    (Compiler_Driver_Attribute, Index => "ada"),
-                   Suffix => (if Dir_Separator = '\' then ".exe" else ""));
+                   Suffix => Exe_Ext);
 
       Target_Native : constant Boolean := Target_Driver = "gcc";
 
@@ -3759,7 +3762,14 @@ package body Test.Harness is
             S_Put (0, "# The instrument switches are default ones, they may"
                    & " need to be adjusted to fit your coverage needs.");
             Put_New_Line;
-            S_Put (0, "SWITCHES_INSTRUMENT=-cstmt --dump-trigger=atexit");
+            if Target_Native then
+               S_Put (0, "SWITCHES_INSTRUMENT=-cstmt --dump-trigger=atexit");
+            else
+               S_Put
+                 (0,
+                  "SWITCHES_INSTRUMENT=-cstmt --dump-trigger=main-end"
+                  & " --dump-channel=base64-stdout");
+            end if;
             Switches_From_Default := True;
          end if;
          Put_New_Line;
@@ -3858,6 +3868,78 @@ package body Test.Harness is
 
       end if;
 
+      --  Generate a run-cross.sh if in cross mode, and if it doesn't yet exist
+
+      if not Target_Native
+        and then not File_Exists (Harness_Dir.all & "run-cross.sh")
+      then
+         Create (Harness_Dir.all & "run-cross.sh");
+         S_Put
+           (0,
+            "# This script is meant to execute the various test drivers in");
+         Put_New_Line;
+         S_Put
+           (0,
+            "# a cross environment, where gnattest does not necessarily have");
+         Put_New_Line;
+         S_Put
+           (0,
+            "# the knowledge to do it properly.");
+         Put_New_Line;
+         Put_New_Line;
+         S_Put
+           (0,
+            "# It is invoked by the Makefile, with the path to the");
+         Put_New_Line;
+         S_Put
+           (0,
+            "# executable as first argument, and the path to where the");
+         Put_New_Line;
+         S_Put
+           (0,
+            "# gnatcov trace file must be created as second argument, so");
+         Put_New_Line;
+         S_Put
+           (0,
+            "# that the rest of the Makefile execution proceeds correctly.");
+         Put_New_Line;
+         Put_New_Line;
+         S_Put
+           (0,
+            "# When first generated, the script executes the program through");
+         Put_New_Line;
+         S_Put
+           (0,
+            "# gnatemu, assuming a base64 encoded trace being output on the");
+         Put_New_Line;
+         S_Put
+           (0,
+            "# serial port, then converts it to a proper trace.");
+         Put_New_Line;
+         Put_New_Line;
+         S_Put
+           (0,
+            "# It can be modified by the user, gnattest will not overwrite");
+         Put_New_Line;
+         S_Put
+           (0,
+            "# it once it has been generated once.");
+         Put_New_Line;
+         Put_New_Line;
+         S_Put
+          (0,
+           Target & "-gnatemu" & Exe_Ext & " --serial=file:$2.b64 "
+           & (if Root_Prj.Has_Attribute (Board_Attribute)
+              then "--board=" & Root_Prj.Attribute_Value (Board_Attribute)
+              else "")
+           & " $1");
+         Put_New_Line;
+         S_Put
+           (0, "gnatcov" & Exe_Ext & " extract-base64-trace $2.b64 $2");
+         Put_New_Line;
+         Close_File;
+      end if;
+
       --  Generate actual Makefile no matter what
 
       Create (Harness_Dir.all & "Makefile");
@@ -3876,6 +3958,14 @@ package body Test.Harness is
              & "EXE_EXT=");
       Put_New_Line;
       S_Put (0, "endif");
+      Put_New_Line;
+      Put_New_Line;
+      S_Put
+        (0,
+         "# Persistent settings for coverage commands, these will not"
+         & " be overwritten when regenerating the harness");
+      Put_New_Line;
+      S_Put (0, "include coverage_settings.mk");
       Put_New_Line;
       Put_New_Line;
       S_Put (0, "# Executables");
@@ -3905,9 +3995,16 @@ package body Test.Harness is
       Put_New_Line;
       S_Put (0, "# Project-specific switches");
       Put_New_Line;
-      S_Put (0, "# To be defined to customize the build");
+      S_Put
+        (0,
+         "# To be defined to customize the build. TARGET and RTSFLAGS are"
+         & " defined in coverage_settings.mk");
       Put_New_Line;
-      S_Put (0, "GPRFLAGS=");
+      if not Target_Native then
+         S_Put (0, "GPRFLAGS?=--target=$(TARGET) $(RTSFLAGS)");
+      else
+         S_Put (0, "GPRFLAGS=");
+      end if;
       Put_New_Line;
       Put_New_Line;
 
@@ -3953,11 +4050,9 @@ package body Test.Harness is
       Put_New_Line;
       S_Put (0, "BIN_CKPTS = $(patsubst %,%-gnatcov-cov,$(PRJS))");
       Put_New_Line;
+      S_Put (0, "INSTR_TARGETS = $(patsubst %,%-gnatcov-inst,$(PRJS))");
       Put_New_Line;
-      S_Put (0, "# Settings for coverage commands, these will not be"
-             & " overwritten when regenerating the harness");
-      Put_New_Line;
-      S_Put (0, "include coverage_settings.mk");
+      S_Put (0, "INSTR_BUILD_TARGETS = $(patsubst %,%-cov-build,$(PRJS))");
       Put_New_Line;
       Put_New_Line;
 
@@ -4108,7 +4203,9 @@ package body Test.Harness is
         (0,
          ASCII.HT
          & "$(GPRBUILD) $(BUILDERFLAGS) -P$*.gpr $(GPRFLAGS)"
-         & " -o $(notdir $*)$(EXE_EXT) --src-subdirs=gnatcov-instr");
+         & " -o $(notdir $*)$(EXE_EXT) --src-subdirs=gnatcov-instr"
+         & " --implicit-with=$(if $(GNATCOV_RTS),$(GNATCOV_RTS),"
+         & "gnatcov_rts.gpr)");
       Put_New_Line;
       Put_New_Line;
 
@@ -4119,51 +4216,21 @@ package body Test.Harness is
       S_Put (0, ASCII.HT & "@echo -e '\n'Running $*.gpr:");
       Put_New_Line;
 
-      --  The logic here is a bit tricky: the commands to run an instrumented
-      --  program are significantly different on a native target and on a cross
-      --  target, but having separate targets for the run step would imply to
-      --  also have separate rules for the coverage and report steps, which are
-      --  the same command regardless of the target.
-      --
-      --  To avoid duplicating all the instrumented targets I try to only have
-      --  a single rule for running the program. It is a bit more complicated,
-      --  given that for cross configs, this requires two commands whereas only
-      --  one is needed for native configs.
-
-      --  Cross, first command, run intrumented program on gnatemu
+      --  For source traces, we can't rely on a "gnatcov run" executable to
+      --  handle both the native and cross case. For cross applications, defer
+      --  the execution to an external script that can be modified by the user
+      --  (and not overwritten by gnattest)
 
       if not Target_Native then
-         S_Put (0, ASCII.HT & "$(if $(run_cross), \");
-         Put_New_Line;
+         S_Put
+           (0,
+            ASCII.HT & "sh run-cross.sh $*$(EXE_EXT) $*-gnattest_td.srctrace");
+      else
          S_Put
            (0,
             ASCII.HT
-            & "$(TARGET)-gnatemu"
-            & " --serial=file:$*-gnattest_td.b64trace"
-            & " $(if $(GNATEMU_BOARD), --board=$(GNATEMU_BOARD),)"
-            & " $*$(EXE_EXT), \");
-         Put_New_Line;
-      end if;
-
-      --  Native, first (and only) command, run the instrumented program
-
-      S_Put
-        (0,
-         ASCII.HT
-         & "GNATCOV_TRACE_FILE=$*-gnattest_td.srctrace"
-         & (if Single_Driver then " ./" else " ") & "$*$(EXE_EXT)");
-
-      --  Cross, second command, convert base64 trace into regular trace
-
-      if not Target_Native then
-         S_Put (0, ")");
-         Put_New_Line;
-         S_Put (0, ASCII.HT & "$(if $(run_cross),");
-         S_Put
-           (0,
-            ASCII.HT
-            & "$(GNATCOV) extract-base64-trace $*-gnattest_td.b64trace"
-            & " $*-gnattest_td.srctrace)");
+            & "GNATCOV_TRACE_FILE=$*-gnattest_td.srctrace"
+             & (if Single_Driver then " ./" else " ") & "$*$(EXE_EXT)");
       end if;
 
       Put_New_Line;
@@ -4230,38 +4297,15 @@ package body Test.Harness is
          Put_New_Line;
       end if;
 
-      S_Put (0, "inst-coverage: BUILDERFLAGS+="
-                & "--implicit-with=$(if $(GNATCOV_RTS),$(GNATCOV_RTS),"
-                & "gnatcov_rts.gpr)");
-      Put_New_Line;
-      S_Put (0, "inst-coverage: gnatcov-consolidate");
+      S_Put (0, "coverage: gnatcov-consolidate");
       Put_New_Line;
       Put_New_Line;
 
-      if not Target_Native then
-         S_Put (0, "# Specific settings for intrumented cross runs");
-         Put_New_Line;
-         S_Put (0, "inst-coverage-cross: SWITCHES_INSTRUMENT+="
-                & "--dump-trigger=main-end --dump-channel=base64-stdout "
-                & "--target=$(TARGET) $(RTSFLAG)");
-         Put_New_Line;
-         S_Put (0, "inst-coverage-cross: BUILDERFLAGS+="
-                & "--target=$(TARGET) $(RTSFLAG)"
-                & " --implicit-with=$(if $(GNATCOV_RTS),$(GNATCOV_RTS),"
-                & "gnatcov_rts.gpr)");
-         Put_New_Line;
-         S_Put (0, "inst-coverage-cross: run_cross=cross");
-         Put_New_Line;
-         S_Put (0, "inst-coverage-cross: SWITCHES_COVERAGE+="
-                & "--target=$(TARGET) $(RTSFLAG)");
-         Put_New_Line;
-         S_Put (0, "inst-coverage-cross: gnatcov-consolidate");
-         Put_New_Line;
-         Put_New_Line;
-         S_Put (0, "coverage: bin-coverage-cross");
-      else
-         S_Put (0, "coverage: inst-coverage");
-      end if;
+      S_Put (0, "instrument-all: $(INSTR_TARGETS)");
+      Put_New_Line;
+      Put_New_Line;
+
+      S_Put (0, "instr-build-all: $(INSTR_BUILD_TARGETS)");
       Put_New_Line;
       Put_New_Line;
 
