@@ -2219,6 +2219,10 @@ package body Test.Stub is
                    As_Type_Decl.F_Type_Def.Kind = Ada_Type_Access_Def
                  and then not Param_Type.As_Anonymous_Type.F_Type_Decl.
                    As_Type_Decl.F_Type_Def.As_Type_Access_Def.F_Has_Constant
+                 and then not Is_Limited
+                   (Param_Type.As_Anonymous_Type.F_Type_Decl.As_Type_Decl
+                    .F_Type_Def.As_Type_Access_Def.F_Subtype_Indication
+                    .As_Type_Expr)
                then
                   for N of Name_List loop
                      SP.Name := new String'(Node_Image (N));
@@ -2623,12 +2627,8 @@ package body Test.Stub is
       end if;
 
       Type_Decl := Subtype_Ind.P_Designated_Type_Decl.P_Canonical_Type;
-      if Type_Decl.Kind = Ada_Classwide_Type_Decl
-        and then Subtype_Ind.P_Designated_Type_Decl.Kind = Ada_Subtype_Decl
-      then
-         Type_Decl :=
-           Subtype_Ind.P_Designated_Type_Decl.As_Subtype_Decl.F_Subtype
-           .P_Designated_Type_Decl;
+      if Type_Decl.Kind = Ada_Classwide_Type_Decl then
+         Type_Decl := Type_Decl.As_Classwide_Type_Decl.P_Specific_Type;
       end if;
 
       while not Type_Decl.Is_Null loop
