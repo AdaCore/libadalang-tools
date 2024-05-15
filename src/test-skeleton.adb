@@ -924,14 +924,6 @@ package body Test.Skeleton is
       --  Detects if Arg and its incomplete declaration (if present)
       --  are both in private part.
 
-      function Is_Ghost_Code (Decl : Basic_Decl) return Boolean;
-      --  Detects if given declaration is ghost.
-      --  If some defining name of Decl is not ghost, then consider the whole
-      --  decl as not ghost. This approximation should be fine given that we
-      --  do not process ghost code. This means that we may be processing a bit
-      --  more code than necessary, but we won't be missing any non-ghost
-      --  cases.
-
       procedure Check_Type_For_Elaboration (Type_Dec : Base_Type_Decl);
       --  Checking if is any of parent types have pragma
       --  Preelaborable_Initialization. This might cause
@@ -1382,9 +1374,7 @@ package body Test.Skeleton is
          end Update_Name_Frequency;
       begin
 
-         if Node.Kind in Ada_Basic_Decl
-           and then Is_Ghost_Code (Node.As_Basic_Decl)
-         then
+         if not Common_Subp_Node_Filter (Node) then
             return Over;
          end if;
 
@@ -1398,12 +1388,6 @@ package body Test.Skeleton is
 
          if Node.Kind = Ada_Package_Decl and then Inside_Inst then
             --  No processing for packages nested inside generic ones
-            return Over;
-         end if;
-
-         if
-           Node.Kind in Ada_Protected_Type_Decl | Ada_Single_Protected_Decl
-         then
             return Over;
          end if;
 
@@ -2175,25 +2159,6 @@ package body Test.Skeleton is
 
          return Is_Private (Type_Part);
       end Is_Fully_Private;
-
-      -------------------
-      -- Is_Ghost_Code --
-      -------------------
-
-      function Is_Ghost_Code (Decl : Basic_Decl) return Boolean is
-      begin
-
-         if Is_Null (Decl.P_Defining_Name) then
-            return Decl.P_Is_Ghost_Code;
-         else
-            --  We consider that as soon as one of the defining names in
-            --  Decl is not ghost, then the whole declaration is not ghost
-            --  as well.
-
-            return (for all Name of Decl.P_Defining_Names
-                      => Name.P_Is_Ghost_Code);
-         end if;
-      end Is_Ghost_Code;
 
       -----------------------
       -- Test_Types_Linked --

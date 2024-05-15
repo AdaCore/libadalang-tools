@@ -186,6 +186,18 @@ package Test.Common is
      is (Element.Sloc_Range.Start_Column);
    --  Returns the number on the first line/column of the element
 
+   function Common_Subp_Node_Filter (Node : Ada_Node'Class) return Boolean;
+   --  Preliminary node filter for the LAL tree traversal common to the harness
+   --  generation and test input generation.
+
+   function Is_Ghost_Code (Decl : Basic_Decl) return Boolean;
+   --  Detects if given declaration is ghost.
+   --  If some defining name of Decl is not ghost, then consider the whole
+   --  decl as not ghost. This approximation should be fine given that we
+   --  do not process ghost code. This means that we may be processing a bit
+   --  more code than necessary, but we won't be missing any non-ghost
+   --  cases.
+
    --------------------
    -- Stub exclusion --
    --------------------

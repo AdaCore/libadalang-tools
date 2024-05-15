@@ -63,6 +63,10 @@ package body Test.Generation is
          return Over;
       end if;
 
+      if not Common_Subp_Node_Filter (Node) then
+         return Over;
+      end if;
+
       --  Collect all types used as parameters in subprogram declarations.
       --  Skip generic subprogram declarations as we only care about the
       --  instantiations. Also skip subprograms with zero parameters if there
