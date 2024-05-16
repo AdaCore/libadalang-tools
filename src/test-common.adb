@@ -1268,4 +1268,48 @@ package body Test.Common is
    --  The harness can only have generated tests if the support library has
    --  been generated, and the JSON_Test dir exists.
 
+   ----------------------------
+   -- Common_Subp_Node_Filter --
+   ----------------------------
+
+   function Common_Subp_Node_Filter (Node : Ada_Node'Class) return Boolean is
+   begin
+      --  No support for ghost code
+
+      if Node.Kind in Ada_Basic_Decl
+        and then Is_Ghost_Code (Node.As_Basic_Decl)
+      then
+         return False;
+      end if;
+
+      --  No support for protected entities
+
+      if Node.Kind in Ada_Single_Protected_Decl | Ada_Protected_Type_Decl
+                     | Ada_Protected_Body | Ada_Protected_Body_Stub
+      then
+         return False;
+      end if;
+
+      return True;
+   end Common_Subp_Node_Filter;
+
+   -------------------
+   -- Is_Ghost_Code --
+   -------------------
+
+   function Is_Ghost_Code (Decl : Basic_Decl) return Boolean is
+   begin
+
+      if Is_Null (Decl.P_Defining_Name) then
+         return Decl.P_Is_Ghost_Code;
+      else
+      --  We consider that as soon as one of the defining names in
+      --  Decl is not ghost, then the whole declaration is not ghost
+      --  as well.
+
+         return (for all Name of Decl.P_Defining_Names
+                 => Name.P_Is_Ghost_Code);
+      end if;
+   end Is_Ghost_Code;
+
 end Test.Common;
