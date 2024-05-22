@@ -805,6 +805,11 @@ package body Pp.Actions is
             when Ada_Delta_Aggregate             => null,
             when Ada_Decl_Expr                   => null,
             when Ada_Simple_Decl_Stmt            => null,
+            when Ada_Format_String_Literal
+              | Ada_Format_String_Chunk
+              | Ada_Format_String_Tok_End
+              | Ada_Format_String_Tok_Mid
+              | Ada_Format_String_Tok_Start => null,
             --  ??? Ada 2020 or -gnatx related expressions, needs to be
             --  implemented. See T519-017.
 
