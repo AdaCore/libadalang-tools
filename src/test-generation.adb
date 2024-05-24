@@ -71,11 +71,19 @@ package body Test.Generation is
       --  Skip generic subprogram declarations as we only care about the
       --  instantiations. Also skip subprograms with zero parameters if there
       --  is no Global aspect attached.
+      --
+      --  Ada_Subp_Decl designates all "regular" subprograms, excluding enum
+      --  literals, entries, generic formal subprograms and abstract
+      --  subprograms with the exception of expression functions, null
+      --  procedures and subprogram renamings which are considered as
+      --  subprogram bodies in LAL.
 
-      if Node.Kind in Ada_Basic_Decl
-         and then Node.As_Basic_Decl.P_Is_Subprogram
-         and then not (Node.Kind in Ada_Enum_Literal_Decl)
+      if Node.Kind in Ada_Subp_Decl
+        | Ada_Expr_Function
+        | Ada_Null_Subp_Decl
+        | Ada_Subp_Renaming_Decl
       then
+
          --  Skip generic subp decls (these will be processed if they are
          --  instantiated).
 
