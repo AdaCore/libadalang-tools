@@ -3189,7 +3189,8 @@ package body TGen.Types.Translation is
                         Rec.Component_Types.Insert
                           (+To_Ada
                              (Convert_Qualified_Name
-                                  (Obj_Decl.P_Fully_Qualified_Name_Array)),
+                                  (N.P_Referenced_Defining_Name
+                                   .P_Fully_Qualified_Name_Array)),
                            Global_Typ_Translation.Res);
                      else
                         Diagnostics := Global_Typ_Translation.Diagnostics;
