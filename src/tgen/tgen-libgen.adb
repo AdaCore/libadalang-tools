@@ -1010,6 +1010,16 @@ package body TGen.Libgen is
       return Ctx.Support_Packs_Per_Unit.Constant_Reference (Unit_Name);
    end Required_Support_Packages;
 
+   ----------------------------
+   -- Is_Generation_Required --
+   ----------------------------
+
+   function Is_Generation_Required
+     (Ctx : Libgen_Context) return Boolean is
+   begin
+      return not Ctx.Generation_Map.Is_Empty;
+   end Is_Generation_Required;
+
    ---------------------------
    -- Generate_Harness_Unit --
    ---------------------------
