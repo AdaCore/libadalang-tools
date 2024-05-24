@@ -121,6 +121,12 @@ package TGen.Libgen is
 
    type Default_Strat_Kind is (Stateful, Stateless);
 
+   function Is_Generation_Required
+     (Ctx : Libgen_Context) return Boolean;
+   --  Return whether the given context require test case vector generation.
+   --  This returns False when every included subprogram is not supported by
+   --  TGen, or when no subprogram was included.
+
    procedure Generate_Harness
      (Ctx              : in out Libgen_Context;
       Harness_Dir      : String;

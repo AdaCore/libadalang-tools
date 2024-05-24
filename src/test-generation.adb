@@ -158,6 +158,14 @@ package body Test.Generation is
    begin
       GNAT.OS_Lib.Free (Ext_Acc);
 
+      --  Check if we have a non empty list of subprograms to generate test
+      --  case vectors for.
+
+      if not Test.Common.TGen_Libgen_Ctx.Is_Generation_Required then
+         Report_Std ("No subprogram supported for test case generation.");
+         return;
+      end if;
+
       --  Generate the harness
 
       TGen.Libgen.Generate_Harness
