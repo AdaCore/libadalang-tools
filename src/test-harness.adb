@@ -3937,7 +3937,7 @@ package body Test.Harness is
 
          --  Also output the contents of the file to the terminal so that
          --  GNATstudio can parse the test results and display them.
-         S_Put(0, "cat $2.b64");
+         S_Put (0, "cat $2.b64");
          Put_New_Line;
 
          S_Put
