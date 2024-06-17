@@ -1,0 +1,17 @@
+Units remaining: 4     
+package Test_1 is
+   type Foo;
+end Test_1;
+Units remaining: 3     
+package Test_2 is
+   type Foo;
+end Test_2;
+Units remaining: 2     
+package Test_3 is
+   type Foo;
+end Test_3;
+Units remaining: 1     
+package Test_4 is
+   type Foo;
+end Test_4;
+
