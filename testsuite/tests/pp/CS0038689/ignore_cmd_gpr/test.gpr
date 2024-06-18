@@ -1,0 +1,6 @@
+project Test is
+   for Source_Dirs use (".");
+   package Pretty_Printer is
+      for Default_Switches ("Ada") use ("--ignore", "ignore_2.txt");
+   end Pretty_Printer;
+end Test;

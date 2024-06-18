@@ -93,8 +93,7 @@ package body Utils.Drivers is
       end Include_One;
 
       procedure Process_Files is
-         N_File_Names : constant Natural :=
-           Num_File_Names (Cmd) - Arg_Length (Cmd, Ignore);
+         N_File_Names : constant Natural := Num_File_Names (Cmd);
 
          Counter        : Natural := N_File_Names;
          Has_Syntax_Err : Boolean := False;
@@ -107,6 +106,7 @@ package body Utils.Drivers is
          for Ignored_Arg of Arg (Cmd, Ignore) loop
             Read_File_Names_From_File (Ignored_Arg.all, Include_One'Access);
          end loop;
+
          if Tool.Run_First_Pass then
             if Arg (Cmd, Verbose) then
                Err_Out.Put ("First pass:\n");
@@ -117,7 +117,6 @@ package body Utils.Drivers is
                      Err_Out.Put ("[\1] \2\n", Image (Counter), F_Name.all);
                   end if;
 
-                  Counter := Counter - 1;
                   Has_Syntax_Err := False;
                   Process_File
                     (Tool,
@@ -130,6 +129,8 @@ package body Utils.Drivers is
                      Utils.Syntax_Errors := True;
                   end if;
                end if;
+
+               Counter := Counter - 1;
             end loop;
 
             pragma Assert (Counter = 0);
@@ -139,6 +140,9 @@ package body Utils.Drivers is
                Err_Out.Put ("Second pass:\n");
             end if;
          end if;
+
+         Counter := N_File_Names;
+
          for F_Name of File_Names (Cmd) loop
             if not Contains (Ignored, Simple_Name (F_Name.all)) then
                if Arg (Cmd, Verbose) then
@@ -147,7 +151,6 @@ package body Utils.Drivers is
                   Err_Out.Put ("Units remaining: \1     \r", Image (Counter));
                end if;
 
-               Counter := Counter - 1;
                Has_Syntax_Err := False;
                Process_File
                  (Tool,
@@ -161,6 +164,7 @@ package body Utils.Drivers is
                end if;
             end if;
 
+            Counter := Counter - 1;
          end loop;
          pragma Assert (Counter = 0);
       end Process_Files;
