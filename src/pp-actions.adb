@@ -288,7 +288,7 @@ package body Pp.Actions is
             Set_Arg (Cmd, Alignment, False);
             Set_Arg (Cmd, Align_Modes, False);
             Set_Arg (Cmd, RM_Style_Spacing, False);
-            Set_Arg (Cmd, Compact, True);
+            Set_Arg (Cmd, Compact, False);
             Set_Arg (Cmd, Separate_Is, False);
             Set_Arg (Cmd, Separate_Return, False);
             Set_Arg (Cmd, Separate_Loop, False);
@@ -304,6 +304,7 @@ package body Pp.Actions is
             Set_Arg (Cmd, Indent_Named_Statements, False);
             Set_Arg (Cmd, Insert_Blank_Lines, False);
             Set_Arg (Cmd, Preserve_Blank_Lines, True);
+            Set_Arg (Cmd, Source_Line_Breaks, True);
             Set_Arg_If_Not_Explicit (Cmd, Comments_Unchanged, True);
             Set_Arg_If_Not_Explicit (Cmd, Comments_Gnat_Beginning, False);
             Set_Arg_If_Not_Explicit (Cmd, Comments_Fill, False);
