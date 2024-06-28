@@ -4328,8 +4328,8 @@ package body Pp.Formatting is
 
                      else
                         declare
-                           Indentation          : Natural := 0;
-                           P                    : Tokn_Cursor := New_Tok;
+                           Indentation : Natural := 0;
+                           P           : Tokn_Cursor := New_Tok;
                         begin
 
                            case Kind (New_Tok) is
@@ -4340,6 +4340,24 @@ package body Pp.Formatting is
                                  while Kind (P) not in Line_Break_Token loop
                                     P := Prev (P);
                                  end loop;
+
+                                 --  Detect the cases when renaming a procedure
+                                 --  and the specification contains a default
+                                 --  value. In that case look backward for the
+                                 --  LB before the ":=" to get the right
+                                 --  indentation value for the new line break.
+
+                                 if Kind (New_Tok) in Res_Renames
+                                   and then Kind (Prev_ss (New_Tok)) = ')'
+                                   and then Kind (Prev (P)) = Colon_Equal
+                                 then
+                                    --  Looking for the line break before ':='
+                                    P := Prev (P);
+                                    while Kind (P) not in Line_Break_Token loop
+                                       P := Prev (P);
+                                    end loop;
+                                 end if;
+
                                  declare
                                     LB : Line_Break renames
                                       All_LB (Line_Break_Token_Index (P));
