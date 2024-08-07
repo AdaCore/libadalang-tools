@@ -8,6 +8,6 @@ echo "build instrumented test driver"
 gprbuild -q -P gnattest/harness/test_driver.gpr --src-subdirs=gnattest-instr --implicit-with=gnattest/harness/tgen_support/tgen_support.gpr
 
 gnattest/harness/test_runner
-if ls ./sqrt-*-2 1> /dev/null 2>&1; then
+if ls ./tgen_test_inputs/sqrt-*-2 1> /dev/null 2>&1; then
     echo "2nd test input present"
 fi

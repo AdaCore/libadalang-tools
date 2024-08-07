@@ -777,8 +777,8 @@ package body Test.Instrument is
 
       S_Put
         (Pad + 6,
-         "Create (GNATTEST_F, Out_File, """
-         & TGen.LAL_Utils.Default_Blob_Test_Filename (Decl_Decl)
+         "Create (GNATTEST_F, Out_File, TGen.Instr_Support.Output_Dir"
+         & " & """ & TGen.LAL_Utils.Default_Blob_Test_Filename (Decl_Decl)
          & "-"" & TGen.Instr_Support.Test_Input_Number);");
       Put_New_Line;
       S_Put
@@ -792,17 +792,17 @@ package body Test.Instrument is
 
       for Param of Decl.F_Subp_Spec.P_Params loop
          declare
-            Param_Typ : constant TGen.Types.Typ'Class :=
-              TGen.Types.Translation.Translate
-                (Param.F_Type_Expr).Res.Unchecked_Get.all;
+            Param_Typ : constant TGen.Types.SP.Ref :=
+              TGen.Types.Translation.Translate (Param.F_Type_Expr).Res;
          begin
 
-            if Param_Typ.Package_Name = To_Qualified_Name ("standard") then
+            if Param_Typ.Get.Package_Name = To_Qualified_Name ("standard") then
                for Name of Param.F_Ids loop
                   S_Put
                     (Pad + 6,
                       "TGen.TGen_Support."
-                     & TGen.Marshalling.Output_Fname_For_Typ (Param_Typ.Name)
+                     & TGen.Marshalling.Output_Fname_For_Typ
+                         (Param_Typ.Get.Name)
                      & " (GNATTEST_S, "
                      & Node_Image (Name)
                      & ");");
@@ -812,9 +812,10 @@ package body Test.Instrument is
                for Name of Param.F_Ids loop
                   S_Put
                     (Pad + 6,
-                     To_Ada (Param_Typ.Package_Name)
+                     To_Ada (Param_Typ.Get.Package_Name)
                      & ".TGen_Support."
-                     & TGen.Marshalling.Output_Fname_For_Typ (Param_Typ.Name)
+                     & TGen.Marshalling.Output_Fname_For_Typ
+                         (Param_Typ.Get.Name)
                      & " (GNATTEST_S, "
                      & Node_Image (Name)
                      & ");");
