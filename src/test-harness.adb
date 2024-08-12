@@ -740,6 +740,10 @@ package body Test.Harness is
             S_Put (0, "with Gnattest_Generated.Mapping;");
             Put_New_Line;
          end if;
+         if not Harness_Only and then Test.Common.Instrument then
+            S_Put (0, "with TGen.Instr_Support;");
+            Put_New_Line;
+         end if;
       end if;
       S_Put (0, "with Gnattest_Generated.Persistent;");
       Put_New_Line;
@@ -914,7 +918,9 @@ package body Test.Harness is
          else
             S_Put
               (11, "(""-skeleton-default= -passed-tests= -exit-status="
-               & (if Test_Filtering then " -routines="")" else """)"));
+               & (if Test_Filtering then " -routines=" else "")
+               & (if Test.Common.Instrument then " o:" else "")
+               & """)");
          end if;
          Put_New_Line;
          S_Put (9, "is");
@@ -1049,6 +1055,13 @@ package body Test.Harness is
          Put_New_Line;
          S_Put (15, "end if;");
          Put_New_Line;
+         --  -o
+         if not Harness_Only and then Test.Common.Instrument then
+            S_Put (12, "when 'o' =>");
+            Put_New_Line;
+            S_Put (15, "TGen.Instr_Support.Set_Output_Dir (Parameter);");
+            Put_New_Line;
+         end if;
          S_Put (12, "when others => null;");
          Put_New_Line;
          S_Put (9, "end case;");
