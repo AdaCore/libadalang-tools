@@ -776,6 +776,7 @@ package body Pp.Actions is
             when Ada_Synthetic_Type_Expr         => null,
             when Ada_Synthetic_Char_Enum_Lit     => null,
             when Ada_Synthetic_Object_Decl       => null,
+            when Ada_Synthetic_Renaming_Clause   => null,
             --  The above nodes are specific to synthetic nodes and will never
             --  appear in source code.
 
@@ -831,7 +832,7 @@ package body Pp.Actions is
                  | Ada_Unconstrained_Array_Indices              =>
                L ("(?~,# ~~)"),
             when Ada_Unconstrained_Array_Index                  =>
-              L ("! range <>"),
+              L ("! /range <>"),
             when Ada_Aspect_Assoc                               =>
               L ("!*? ^=># ~~~_"),
             when Ada_At_Clause                                  =>
@@ -865,7 +866,7 @@ package body Pp.Actions is
             when Ada_Null_Subp_Decl                             =>
               L ("?~~ ~!", " is null", Aspects, ";"),
             when Ada_Subp_Renaming_Decl                         =>
-              L ("?~~ ~!!", Aspects, ";"),
+              L ("?~~ ~! !", Aspects, ";"),
             when Ada_Subp_Decl                                  =>
               L ("?~~ ~!", Aspects, ";"),
             when Ada_Subp_Body_Stub                             =>
@@ -929,7 +930,7 @@ package body Pp.Actions is
            when Ada_Enum_Literal_Decl =>
              L ("!"),
            when Ada_Exception_Decl =>
-             L ("?~,# ~~ ^: exception!", Aspects, ";"),
+             L ("?~,# ~~ ^: exception? ~~~", Aspects, ";"),
            when Ada_Generic_Package_Instantiation =>
              L ("package ! is new !?[# (~,#1 ~)]~", Aspects, ";"),
            when Ada_Generic_Subp_Instantiation =>
@@ -947,9 +948,9 @@ package body Pp.Actions is
            when Ada_Generic_Formal_Package =>
              L ("with !"),
            when Ada_Generic_Package_Renaming_Decl =>
-             L ("generic package ! renames !", Aspects, ";"),
+             L ("generic package ! !", Aspects, ";"),
            when Ada_Generic_Subp_Renaming_Decl =>
-             L ("generic ! ! renames !", Aspects, ";"),
+             L ("generic ! ! !", Aspects, ";"),
            when Ada_Generic_Subp_Decl =>
              L ("generic$", "!", "!;"),
            when Ada_Generic_Subp_Internal =>
@@ -958,15 +959,15 @@ package body Pp.Actions is
              L ("?~,# ~~ ^: constant ^2:=[# !];"),
            when Ada_Object_Decl =>
               L
-                ("?~,# ~~ ^:[#1? ~~~? ~~~? ~~~ !]? ^2:=[# ~~]~!",
+                ("?~,# ~~ ^:[#1? ~~~? ~~~? ~~~ !]? ^2:=[# ~~]~? ~~~",
                  Aspects,
                  ";"),
            when Ada_Extended_Return_Stmt_Object_Decl =>
              L ("?~,# ~~ ^:? ~~~? ~~~? ~~~ !? ^2:=[# ~~]~!", Aspects),
            when Ada_No_Type_Object_Renaming_Decl =>
-              L ("?~,# ~~? ~~~? ~~~? ~~~? ~~~? ~~~!", Aspects, ";"),
+              L ("?~,# ~~? ~~~? ~~~? ~~~? ~~~? ~~~ !", Aspects, ";"),
            when Ada_Package_Renaming_Decl =>
-             L ("package !!", Aspects, ";"),
+             L ("package ! !", Aspects, ";"),
            when Ada_Single_Protected_Decl =>
              L ("protected !",
                 Aspects_Is,
@@ -1103,8 +1104,8 @@ package body Pp.Actions is
            when Ada_Pragma_Argument_Assoc => null,
            when Ada_Pragma_Node => null,
            when Ada_Component_Clause => null, -- ?
-           when Ada_Renaming_Clause | Ada_Synthetic_Renaming_Clause =>
-             L ("? renames[# ~~]~"),
+           when Ada_Renaming_Clause =>
+             L ("renames [#!]"),
            when Ada_Select_Stmt =>
              L ("select",
                 "!",
@@ -1750,7 +1751,8 @@ package body Pp.Actions is
          Enum_Array_Decl_Alt,
          Type_Decl_Alt,
          Formal_Type_Decl_Alt,
-         Boxy_Constrained_Alt);
+         Boxy_Constrained_Alt,
+         Unconstrained_Array_Index_Alt);
 
       Str_Alt_Table : array (Alt_Templates) of Str_Template_Ptr;
 
@@ -2009,7 +2011,8 @@ package body Pp.Actions is
             Enum_Array_Decl_Alt => L ("type !! is$[!]", Aspects, ";"),
             Type_Decl_Alt => L ("type !! is[# !]", Aspects, ";"),
             Formal_Type_Decl_Alt => L ("type !! is[# !]?~~~", Aspects, ";"),
-            Boxy_Constrained_Alt => L ("(?~,# ~~)")];
+            Boxy_Constrained_Alt => L ("(?~,# ~~)"),
+            Unconstrained_Array_Index_Alt => L ("! range ! .. <>")];
 
          for Alt in Alt_Templates loop
             declare
@@ -4017,6 +4020,7 @@ package body Pp.Actions is
          procedure Do_Task_Def;
          procedure Do_Type_Decl;
          procedure Do_Def_Or_Usage_Name;
+         procedure Do_Unconstrained_Array_Index;
 
          procedure Do_Others; -- anything not listed above
 
@@ -5340,6 +5344,15 @@ package body Pp.Actions is
             Append_And_Put (New_Tokns, Ident, W_Intern (With_Casing));
          end Do_Def_Or_Usage_Name;
 
+         procedure Do_Unconstrained_Array_Index is
+         begin
+            if Tree.As_Unconstrained_Array_Index.F_Lower_Bound.Is_Null then
+               Interpret_Template;
+            else
+               Interpret_Alt_Template (Unconstrained_Array_Index_Alt);
+            end if;
+         end Do_Unconstrained_Array_Index;
+
       --  Start of processing for Subtree_To_Ada
 
       begin
@@ -5470,6 +5483,9 @@ package body Pp.Actions is
 
             when Ada_Ada_List =>
                Do_List;
+
+            when Ada_Unconstrained_Array_Index =>
+               Do_Unconstrained_Array_Index;
 
             when others =>
                Do_Others;
