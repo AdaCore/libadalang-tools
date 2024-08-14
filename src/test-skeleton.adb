@@ -1024,16 +1024,17 @@ package body Test.Skeleton is
                end if;
 
                declare
-                  Gen_Name : constant Libadalang.Analysis.Name :=
-                    Node.As_Generic_Package_Instantiation.F_Generic_Pkg_Name;
-                  Gen_Decl : Basic_Decl :=
-                    Gen_Name.P_Relative_Name.As_Name.P_Referenced_Decl;
+                  Gen_Decl : Generic_Decl :=
+                    Node
+                      .As_Generic_Package_Instantiation
+                      .P_Designated_Generic_Decl;
                begin
                   if Gen_Decl.Is_Null then
                      return Over;
                   end if;
 
-                  Gen_Decl := Gen_Decl.P_Get_Uninstantiated_Node.As_Basic_Decl;
+                  Gen_Decl :=
+                    Gen_Decl.P_Get_Uninstantiated_Node.As_Generic_Decl;
 
                   --  No processing for instantiations of nested generics,
                   --  also if corresponding generic is not processed (or going
@@ -1180,16 +1181,17 @@ package body Test.Skeleton is
             end if;
 
             declare
-               Gen_Name : constant Libadalang.Analysis.Name :=
-                 Node.As_Generic_Package_Instantiation.F_Generic_Pkg_Name;
-               Gen_Decl : Basic_Decl :=
-                 Gen_Name.P_Relative_Name.As_Name.P_Referenced_Decl;
+               Gen_Decl : Generic_Decl :=
+                 Node
+                   .As_Generic_Package_Instantiation
+                   .P_Designated_Generic_Decl;
             begin
                if Gen_Decl.Is_Null then
                   return Over;
                end if;
 
-               Gen_Decl := Gen_Decl.P_Get_Uninstantiated_Node.As_Basic_Decl;
+               Gen_Decl :=
+                 Gen_Decl.P_Get_Uninstantiated_Node.As_Generic_Decl;
 
                --  No processing for instantiations of nested generics,
                --  also if corresponding generic is not processed (or going
@@ -1404,16 +1406,17 @@ package body Test.Skeleton is
             end if;
 
             declare
-               Gen_Name : constant Libadalang.Analysis.Name :=
-                 Node.As_Generic_Package_Instantiation.F_Generic_Pkg_Name;
-               Gen_Decl : Basic_Decl :=
-                 Gen_Name.P_Relative_Name.As_Name.P_Referenced_Decl;
+               Gen_Decl : Generic_Decl :=
+                 Node
+                   .As_Generic_Package_Instantiation
+                   .P_Designated_Generic_Decl;
             begin
                if Gen_Decl.Is_Null then
                   return Over;
                end if;
 
-               Gen_Decl := Gen_Decl.P_Get_Uninstantiated_Node.As_Basic_Decl;
+               Gen_Decl :=
+                 Gen_Decl.P_Get_Uninstantiated_Node.As_Generic_Decl;
 
                --  No processing for instantiations of nested generics,
                --  also if corresponding generic is not processed (or going
