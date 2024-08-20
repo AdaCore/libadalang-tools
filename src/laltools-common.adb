@@ -22,16 +22,12 @@
 ------------------------------------------------------------------------------
 
 with Ada.Assertions; use Ada.Assertions;
-with Ada.Characters.Handling;
 with Ada.Characters.Latin_1;
 with Ada.Containers; use Ada.Containers;
 with Ada.Exceptions;
 with Ada.Strings.Fixed;
 with Ada.Strings.Wide_Wide_Fixed;
 with Ada.Wide_Wide_Characters.Handling;
-
-with GNATCOLL.Projects;
-with GNATCOLL.VFS;
 
 with GNAT.Traceback.Symbolic;
 
