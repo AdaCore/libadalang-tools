@@ -42,6 +42,7 @@ with Libadalang.Common; use Libadalang.Common;
 
 with Langkit_Support.Slocs; use Langkit_Support.Slocs;
 with Langkit_Support.Text; use Langkit_Support.Text;
+with Libadalang.Helpers;
 
 package Laltools.Common is
 
@@ -534,6 +535,12 @@ package Laltools.Common is
      (Token : Token_Reference)
       return Boolean;
    --  Checks if Token is a whole line Ada_Comment
+
+   function Get_Ada_Analysis_Units
+     (Source_Provider  : Libadalang.Helpers.Source_Provider;
+      Analysis_Context : Libadalang.Analysis.Analysis_Context)
+      return Analysis_Unit_Array;
+   --  Get all Ada Analysis Units from Source_Provider using Analysis_Context
 
    function Get_Declarative_Part
      (Node         : Ada_Node'Class;
