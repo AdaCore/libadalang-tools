@@ -32,6 +32,7 @@ with Ada.Wide_Wide_Characters.Handling;
 with GNAT.Traceback.Symbolic;
 
 with Libadalang.Iterators;
+with Libadalang.Project_Provider;
 
 with Laltools.Subprogram_Hierarchy; use Laltools.Subprogram_Hierarchy;
 
@@ -1548,6 +1549,30 @@ package body Laltools.Common is
          Parent := Parent.Parent;
       end loop;
    end Find_Matching_Parents;
+
+   ----------------------------
+   -- Get_Ada_Analysis_Units --
+   ----------------------------
+
+   function Get_Ada_Analysis_Units
+     (Source_Provider  : Libadalang.Helpers.Source_Provider;
+      Analysis_Context : Libadalang.Analysis.Analysis_Context)
+      return Analysis_Unit_Array
+   is
+      use Ada.Strings.Unbounded;
+      use Libadalang.Project_Provider;
+
+      Filenames : constant Filename_Vectors.Vector :=
+        Source_Files (Source_Provider.Project.all, Whole_Project);
+
+   begin
+      return Result : Analysis_Unit_Array (1 .. Natural (Filenames.Length)) do
+         for I in Result'Range loop
+            Result (I) :=
+              Analysis_Context.Get_From_File (To_String (Filenames (I)));
+         end loop;
+      end return;
+   end Get_Ada_Analysis_Units;
 
    -------------------------------------
    -- Get_Decl_Block_Declarative_Part --
