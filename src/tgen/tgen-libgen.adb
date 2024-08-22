@@ -21,7 +21,6 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Characters.Latin_1;
 with Ada.Command_Line;
 with Ada.Containers;
 with Ada.Directories;
@@ -644,29 +643,21 @@ package body TGen.Libgen is
 
    function Supported_Subprogram (Subp : LAL.Basic_Decl'Class) return SP.Ref
    is
-      Reason    : Unbounded_String;
+      Diags     : String_Vectors.Vector;
       Trans_Res : constant Translation_Result :=
         Translate (Subp.As_Basic_Decl);
    begin
       if Trans_Res.Success then
-         declare
-            Unsupported_Diags : constant String_Vector :=
-              Trans_Res.Res.Get.Get_Diagnostics;
-         begin
-            if String_Vectors.Is_Empty (Unsupported_Diags) then
-               return Trans_Res.Res;
-            else
-               for D of Unsupported_Diags loop
-                  Reason := Reason & D & Ada.Characters.Latin_1.LF;
-               end loop;
-            end if;
-         end;
+         Diags := Trans_Res.Res.Get.Get_Diagnostics;
+         if Diags.Is_Empty then
+            return Trans_Res.Res;
+         end if;
       else
-         Reason := Trans_Res.Diagnostics;
+         Diags := String_Vectors.To_Vector (Trans_Res.Diagnostics, 1);
       end if;
       declare
-         Typ_Res : constant Unsupported_Typ :=
-           Unsupported_Typ'(Reason => Reason, others => <>);
+         Typ_Res : constant Unsupported_Types :=
+           Unsupported_Types'(Diags => Diags, others => <>);
          Res     : SP.Ref;
       begin
          Res.Set (Typ_Res);
@@ -679,9 +670,9 @@ package body TGen.Libgen is
    ------------------
 
    function Include_Subp
-     (Ctx  : in out Libgen_Context;
-      Subp : Basic_Decl'Class;
-      Diag : out Unbounded_String) return Boolean
+     (Ctx   : in out Libgen_Context;
+      Subp  : Basic_Decl'Class;
+      Diags : out String_Vectors.Vector) return Boolean
    is
       use Ada_Qualified_Name_Sets_Maps;
 
@@ -706,7 +697,7 @@ package body TGen.Libgen is
       Trans_Res : constant SP.Ref := Supported_Subprogram (Subp);
    begin
       if Trans_Res.Get.Kind = Unsupported then
-         Diag := Unsupported_Typ (Trans_Res.Unchecked_Get.all).Reason;
+         Diags := Trans_Res.Get.Get_Diagnostics;
          return False;
       end if;
 
@@ -983,13 +974,13 @@ package body TGen.Libgen is
    --------------
 
    function Generate
-     (Ctx  : in out Libgen_Context;
-      Subp : LAL.Basic_Decl'Class;
-      Diag : out Unbounded_String;
-      Part : Any_Library_Part := All_Parts) return Boolean
+     (Ctx   : in out Libgen_Context;
+      Subp  : LAL.Basic_Decl'Class;
+      Diags : out String_Vectors.Vector;
+      Part  : Any_Library_Part := All_Parts) return Boolean
    is
    begin
-      if Include_Subp (Ctx, Subp, Diag) then
+      if Include_Subp (Ctx, Subp, Diags) then
          Generate (Ctx, Part);
       else
          return False;

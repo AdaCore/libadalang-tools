@@ -40,6 +40,7 @@ with Libadalang.Common; use Libadalang.Common;
 with Langkit_Support.Text;
 
 with TGen.Libgen; use TGen.Libgen;
+with TGen.Strings;
 
 package body Test.Generation is
 
@@ -55,7 +56,8 @@ package body Test.Generation is
    ---------------------
 
    function Traverse_Helper (Node : Ada_Node'Class) return Visit_Status is
-      Diags : Unbounded_String;
+      use TGen.Strings;
+      Diags : String_Vector;
    begin
       --  Do not traverse package bodies
 
@@ -107,7 +109,7 @@ package body Test.Generation is
 
             Report_Err
               ("Error while processing " & Node.Image & ":" & ASCII.LF
-               & To_String (Diags));
+               & Join (Diags) & ASCII.LF);
          end if;
          return Over;
       end if;

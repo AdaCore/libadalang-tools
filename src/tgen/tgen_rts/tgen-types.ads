@@ -238,6 +238,7 @@ package TGen.Types is
    type Unsupported_Typ is new Typ with record
       Reason : Unbounded_String;
       --  Why this type is not supported.
+
    end record;
 
    function Get_Diagnostics
@@ -254,5 +255,18 @@ package TGen.Types is
    function Image (Self : Access_Typ) return String;
 
    type Formal_Typ is new Unsupported_Typ with null record;
+
+   type Unsupported_Types is new Typ with record
+      Diags : String_Vectors.Vector;
+      --  Why this type is not supported.
+
+   end record;
+
+   function Get_Diagnostics
+     (Self   : Unsupported_Types;
+      Prefix : String := "") return String_Vector
+   is (Self.Diags);
+
+   function Kind (Self : Unsupported_Types) return Typ_Kind is (Unsupported);
 
 end TGen.Types;

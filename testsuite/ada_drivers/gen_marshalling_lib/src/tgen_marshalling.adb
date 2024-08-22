@@ -32,6 +32,7 @@ with Libadalang.Helpers;
 
 with TGen.LAL_Utils; use TGen.LAL_Utils;
 with TGen.Libgen;    use TGen.Libgen;
+with TGen.Strings;   use TGen.Strings;
 
 procedure TGen_Marshalling is
    package LAL renames Libadalang.Analysis;
@@ -134,7 +135,7 @@ procedure TGen_Marshalling is
       function Traverse_Helper
         (Node : LAL.Ada_Node'Class) return LALCO.Visit_Status
       is
-         Diags : Unbounded_String;
+         Diags : String_Vector;
       begin
          --  Collect all types used as parameters in subprogram declarations.
          --  Skip generic subprogram declarations as we only care about the
@@ -153,7 +154,7 @@ procedure TGen_Marshalling is
                Put_Line
                  ("Error during parameter translation of subprogram "
                   & (+Node.As_Basic_Decl.P_Fully_Qualified_Name) & ":");
-               Put_Line (To_String (Diags));
+               Put_Line (Join (Diags) & ASCII.LF);
                if not Skip_Unsupported.Get then
                   Libadalang.Helpers.Abort_App;
                end if;

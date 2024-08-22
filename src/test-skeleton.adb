@@ -6806,7 +6806,7 @@ package body Test.Skeleton is
       Param_Values  : JSON_Array;
       Global_Values : JSON_Array;
 
-      Diags : Unbounded_String;
+      Diags : String_Vector;
       --  Diagnostics for TGen.Libgen.Include_Subp
 
       Output_Dir : constant String :=
@@ -6875,12 +6875,12 @@ package body Test.Skeleton is
 
          if not Test.Common.Unparse_Test_Vectors then
             if not TGen.Libgen.Include_Subp
-                     (Test.Common.TGen_Libgen_Ctx,
-                      Subp.Subp_Declaration.As_Basic_Decl,
-                      Diags)
+              (Test.Common.TGen_Libgen_Ctx,
+               Subp.Subp_Declaration.As_Basic_Decl,
+               Diags)
             then
                Report_Std
-                 ("Error while loading JSON tests:" & To_String (Diags)
+                 ("Error while loading JSON tests:" & Join (Diags)
                   & ASCII.LF & "Tests will not be loaded for " &
                   Subp.Subp_Name_Image.all);
                goto Continue;
