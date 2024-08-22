@@ -2895,8 +2895,7 @@ package body TGen.Types.Translation is
       use Translation_Maps;
 
       Full_Decl : constant Base_Type_Decl := N.P_Full_View;
-      FQN       : constant Ada_Qualified_Name :=
-        Convert_Qualified_Name (Full_Decl.P_Fully_Qualified_Name_Array);
+
    begin
       --  Do not memoize anonymous types
 
@@ -2906,6 +2905,8 @@ package body TGen.Types.Translation is
 
       declare
          Cache_T : SP.Ref;
+         FQN     : constant Ada_Qualified_Name :=
+           Convert_Qualified_Name (Full_Decl.P_Fully_Qualified_Name_Array);
       begin
          --  If we have the type name in the cache, return it
 
@@ -2954,7 +2955,9 @@ package body TGen.Types.Translation is
         Ultimate_Enclosing_Compilation_Unit (LAL.Basic_Decl'Class (N))'Last;
 
       FQN : constant Ada_Qualified_Name :=
-        Convert_Qualified_Name (Type_Name.P_Fully_Qualified_Name_Array);
+        (if not Type_Name.Is_Null
+         then Convert_Qualified_Name (Type_Name.P_Fully_Qualified_Name_Array)
+         else Ada_Identifier_Vectors.Empty);
 
       First_Part : constant Basic_Decl'Class := N.P_All_Parts (1);
       --  First part of the declaration. Used to determine whether the type we
