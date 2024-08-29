@@ -22,9 +22,27 @@
 ------------------------------------------------------------------------------
 
 with Ada.Characters.Handling;
-with Ada.Characters.Latin_1;
 
 package body TGen.Strings is
+
+   ----------
+   -- Join --
+   ----------
+
+   function Join
+     (V   : String_Vector;
+      Sep : Character := Ada.Characters.Latin_1.LF) return String
+   is
+      Result : Unbounded_String;
+   begin
+      for I in V.First_Index .. V.Last_Index loop
+         Append (Result, V (I));
+         if I /= V.Last_Index then
+            Append (Result, Sep);
+         end if;
+      end loop;
+      return +Result;
+   end Join;
 
    --------------
    -- New_Line --

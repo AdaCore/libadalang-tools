@@ -78,9 +78,9 @@ package TGen.Libgen is
    --  supported inlined in the Unsupported_Typ.Reason field.
 
    function Include_Subp
-     (Ctx  : in out Libgen_Context;
-      Subp : LAL.Basic_Decl'Class;
-      Diag : out Unbounded_String) return Boolean;
+     (Ctx   : in out Libgen_Context;
+      Subp  : LAL.Basic_Decl'Class;
+      Diags : out TGen.Strings.String_Vectors.Vector) return Boolean;
    --  Register all the types in the parameters of Subp in the set of types for
    --  which the marshalling library will be generated. This procedures does
    --  not actually generate any sources, call Generate to create the support
@@ -88,21 +88,21 @@ package TGen.Libgen is
    --
    --  Returns False if there is an error translating some of the parameter
    --  types, or if some of the types are unsupported for marshalling,
-   --  reporting a diagnostic string in Diag. In that case, the context
-   --  is not modified. Otherwise, Diag should be ignored.
+   --  and report diagnostics in Diags. In that case, the context is not
+   --  modified. Otherwise, Diags should be ignored.
 
    procedure Generate
      (Ctx : in out Libgen_Context; Part : Any_Library_Part := All_Parts);
    --  Output all of the support library files
 
    function Generate
-     (Ctx  : in out Libgen_Context;
-      Subp : LAL.Basic_Decl'Class;
-      Diag : out Unbounded_String;
-      Part : Any_Library_Part := All_Parts) return Boolean;
+     (Ctx   : in out Libgen_Context;
+      Subp  : LAL.Basic_Decl'Class;
+      Diags : out TGen.Strings.String_Vectors.Vector;
+      Part  : Any_Library_Part := All_Parts) return Boolean;
    --  Shortcut for
    --
-   --     if Include_Subp (Ctx, Subp, Diags) then
+   --     if Include_Subp (Ctx, Subp, Diag) then
    --       Generate (Ctx);
    --     else
    --        return False;

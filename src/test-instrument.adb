@@ -114,7 +114,7 @@ package body Test.Instrument is
    ------------------
 
    function Inspect_Spec (Node : Ada_Node'Class) return Visit_Status is
-      Errors : Ada.Strings.Unbounded.Unbounded_String;
+      Diags : String_Vector;
    begin
       if Kind (Node) = Ada_Package_Decl then
          return Into;
@@ -139,11 +139,9 @@ package body Test.Instrument is
          end if;
 
          if not TGen.Libgen.Include_Subp
-           (TGen_Libgen_Ctx,
-            Node.As_Basic_Decl,
-            Errors)
+           (TGen_Libgen_Ctx, Node.As_Basic_Decl, Diags)
          then
-            Report_Std (Ada.Strings.Unbounded.To_String (Errors));
+            Report_Std (Join (Diags) & ASCII.LF);
             return Over;
          end if;
 

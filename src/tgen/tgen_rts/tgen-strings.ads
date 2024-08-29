@@ -23,6 +23,7 @@
 --
 --  String manipulation utilities
 
+with Ada.Characters.Latin_1;
 with Ada.Containers;
 with Ada.Containers.Indefinite_Ordered_Sets;
 with Ada.Containers.Ordered_Maps;
@@ -57,6 +58,10 @@ package TGen.Strings is
      (Index_Type   => Positive,
       Element_Type => Ada.Strings.Unbounded.Unbounded_String);
    subtype String_Vector is String_Vectors.Vector;
+
+   function Join
+     (V   : String_Vector;
+      Sep : Character := Ada.Characters.Latin_1.LF) return String;
 
    package String_Ordered_Sets is new
      Ada.Containers.Indefinite_Ordered_Sets
