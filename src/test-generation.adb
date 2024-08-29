@@ -69,6 +69,15 @@ package body Test.Generation is
          return Over;
       end if;
 
+      --  Skip any non-instantiated generic decl, they will be processed as
+      --  part of a generic instantiation, if any.
+
+      if Node.Kind in Ada_Generic_Decl
+        and then Node.P_Generic_Instantiations'Length = 0
+      then
+         return Over;
+      end if;
+
       --  Collect all types used as parameters in subprogram declarations.
       --  Skip generic subprogram declarations as we only care about the
       --  instantiations. Also skip subprograms with zero parameters if there
@@ -85,14 +94,6 @@ package body Test.Generation is
         | Ada_Null_Subp_Decl
         | Ada_Subp_Renaming_Decl
       then
-
-         --  Skip generic subp decls (these will be processed if they are
-         --  instantiated).
-
-         if Node.As_Basic_Decl.P_Canonical_Part.Kind in Ada_Generic_Decl
-         then
-            return Over;
-         end if;
 
          --  Check, if the subprogram has zero parameters. If so, only add it
          --  to the generation context if it has a global annotation.
