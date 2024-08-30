@@ -1,0 +1,8 @@
+description:
+    Regression test. Check that TGen does not crash when there is a subprogram
+    with an anonymous type parameter. It used to call P_Fully_Qualified_Name on
+    it, which resulted in a crash.
+
+driver: shell_script
+control:
+    - [XFAIL, 'x86', 'Marshalling not working for 32bits (UB03-008)']
