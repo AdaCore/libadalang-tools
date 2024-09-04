@@ -28,7 +28,12 @@ with Ada.Text_IO; use Ada.Text_IO;
 with GNAT.OS_Lib;
 with GNAT.Strings;
 with GNATCOLL.Opt_Parse; use GNATCOLL.Opt_Parse;
-with GNATCOLL.Projects;
+with GPR2.Containers;
+with GPR2.Project.Attribute;
+with GPR2.Project.Attribute_Index;
+with GPR2.Project.Registry.Attribute;
+with GPR2.Project.Registry.Pack;
+with GPR2.Project.View;
 
 with Langkit_Support.Slocs; use Langkit_Support.Slocs;
 
@@ -57,6 +62,11 @@ with Laltools.Partial_GNATPP;
 --  -EC, --end-column      Column of the last statement to extract
 
 procedure Partial_GNATpp is
+
+   PP_Pack                  : constant GPR2.Package_Id :=
+     GPR2."+" ("pretty_printer");
+   PP_Default_Switches_Attr : constant GPR2.Q_Attribute_Id :=
+     (PP_Pack, GPR2."+" ("default_switches"));
 
    procedure Partial_GNATpp_App_Setup
      (Context : App_Context;
@@ -190,33 +200,38 @@ procedure Partial_GNATpp is
                Utils.Command_Lines.Common.Project_File,
                To_String (Partial_GNATpp_App.Args.Project_File.Get));
 
-            --  Check if this project has a "Pretty_Printer" package with
-            --  additional switches. If so, do a second and final parse to
-            --  update PP_Options with these.
+            --  If this project has a "Pretty_Printer" package with additional
+            --  switches, do a second and final parse to update PP_Options with
+            --  these.
             declare
-               use GNATCOLL.Projects;
-               use GNAT.OS_Lib;
-
-               Project          : constant Project_Type :=
-                  Root_Project (Context.Provider.Project.all);
-               PP_Switches      : constant Attribute_Pkg_List :=
-                  Build ("Pretty_Printer", "Default_Switches");
-               PP_Switches_Text : Argument_List_Access := null;
-
+               Project          : constant GPR2.Project.View.Object :=
+                  Context.Provider.Project.Root_Project;
+               Attr_Value       : constant GPR2.Project.Attribute.Object :=
+                 Project.Attribute
+                   (Name  => PP_Default_Switches_Attr,
+                    Index => GPR2.Project.Attribute_Index.Create ("ada"));
             begin
-               if Has_Attribute (Project, PP_Switches, "ada") then
-                  PP_Switches_Text :=
-                     Attribute_Value (Project, PP_Switches, "ada");
-                  if PP_Switches_Text /= null then
+               if Attr_Value.Is_Defined then
+                  declare
+                     use GNAT.OS_Lib;
+
+                     GPR_Values : constant GPR2.Containers.Source_Value_List :=
+                       Attr_Value.Values;
+                     Values     : Argument_List_Access :=
+                       new Argument_List (1 .. Natural (GPR_Values.Length));
+                  begin
+                     for I in Values.all'Range loop
+                        Values (I) := new String'(GPR_Values (I).Text);
+                     end loop;
                      Parse
-                        (PP_Switches_Text,
+                       (Values,
                         PP_Options,
                         Phase              => Project_File,
                         Callback           => null,
                         Collect_File_Names => False,
                         Ignore_Errors      => True);
-                     Free (PP_Switches_Text);
-                  end if;
+                     Free (Values);
+                  end;
                end if;
             end;
          end if;
@@ -287,5 +302,14 @@ procedure Partial_GNATpp is
    end Partial_GNATpp_App_Setup;
 
 begin
+   GPR2.Project.Registry.Pack.Add
+     (PP_Pack, GPR2.Project.Registry.Pack.Everywhere);
+   GPR2.Project.Registry.Attribute.Add
+     (Name                 => PP_Default_Switches_Attr,
+      Index_Type           => GPR2.Project.Registry.Attribute.Language_Index,
+      Value                => GPR2.Project.Registry.Attribute.List,
+      Value_Case_Sensitive => True,
+      Is_Allowed_In        => GPR2.Project.Registry.Attribute.Everywhere);
+
    Partial_GNATpp_App.Run;
 end Partial_GNATpp;

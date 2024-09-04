@@ -1,6 +1,6 @@
 with Ada.Streams;
 
-package Main_Package is
+package Pkg is
 
    type Parent_Tagged_Record_Type is tagged record
       A : Integer;
@@ -18,4 +18,4 @@ package Main_Package is
      (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
       Item   : Child_Tagged_Record_Type_Access);
 
-end Main_Package;
+end Pkg;
