@@ -1,9 +1,17 @@
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 WITH System.Multiprocessors.Dispatching_Domains;
 PACKAGE p IS
    TASK t IS
       ENTRY set (core_affinity : IN Natural; success : OUT Boolean);
    END t;
 END p;
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 WITH System.Multiprocessors.Dispatching_Domains;
 PACKAGE p IS
    TASK t IS

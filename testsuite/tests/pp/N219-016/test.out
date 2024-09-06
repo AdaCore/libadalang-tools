@@ -1,3 +1,7 @@
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 package Records is
 
   type Uncompact_Type is record
@@ -19,6 +23,10 @@ package Records is
   end record;
 
 end Records;
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 package Records is
 
   type Uncompact_Type is

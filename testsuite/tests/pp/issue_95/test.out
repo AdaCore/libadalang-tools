@@ -1,3 +1,7 @@
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 package Test is
 
    procedure Test_P (V1 : in out My_Type; V2 : in out My_Other_Type);
@@ -14,6 +18,10 @@ package Test is
    not overriding function Test_F2 (Item : in Object) return String;
 
 end Test;
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 package Test is
 
    procedure Test_P (V1 : in out My_Type; V2 : in out My_Other_Type);

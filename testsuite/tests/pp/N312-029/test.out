@@ -1,3 +1,7 @@
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 procedure Sample_Formatting is
 
 begin
@@ -34,6 +38,10 @@ begin
    end My_Begin_Block;
 
 end Sample_Formatting;
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 procedure Sample_Formatting is
 
 begin

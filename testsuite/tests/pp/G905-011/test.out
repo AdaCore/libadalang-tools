@@ -1,3 +1,7 @@
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 procedure Gnatpp_Array_Formatting is
    type Rec_T is record
@@ -21,6 +25,10 @@ procedure Gnatpp_Array_Formatting is
 begin
    null;
 end Gnatpp_Array_Formatting;
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 with Ada.Text_IO;
 procedure Gnatpp_Exdentation is
    A_String_1   : constant String  := "abc";
@@ -44,6 +52,10 @@ begin
          Integer'Image (An_Integer_3 + An_Integer_4) & ASCII.LF);
    end if;
 end Gnatpp_Exdentation;
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 procedure Junk is
 begin
    Test

@@ -1,3 +1,7 @@
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 --  This file has CRLF line endings,^M
 --  but no CRLF after the last line.^M
 ^M

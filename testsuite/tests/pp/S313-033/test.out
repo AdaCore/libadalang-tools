@@ -1,3 +1,7 @@
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 procedure Mixed_Keywords is
 
    --  This test uses post-Ada-83 reserved words as identifiers and as reserved
