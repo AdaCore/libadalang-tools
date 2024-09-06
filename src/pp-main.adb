@@ -36,11 +36,18 @@ procedure Pp.Main is
 
    Tool : Actions.Pp_Tool;
    Cmd  : Utils.Command_Lines.Command_Line
-            (Pp.Command_Lines.Descriptor'Access);
+     (Pp.Command_Lines.Descriptor'Access);
 
 begin
    --  By default, send errors to stdout
    Utils.Err_Out.Output_Enabled := True;
+
+   --  Deprecation message to advertise about GNATformat
+   Utils.Err_Out.Put
+     ("\n\1\n",
+      "WARNING: GNATpp will be baselined soon. Please switch "
+      & "to GNATformat, the new Ada code formatter, for future use.");
+   Utils.Err_Out.Put ("-------\n\n");
 
    --  Override trace settings by parsing the config file
    GNATCOLL.Traces.Parse_Config_File;
