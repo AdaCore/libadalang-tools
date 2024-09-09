@@ -49,6 +49,10 @@ with TGen.Types.Translation;  use TGen.Types.Translation;
 
 package body TGen.Libgen is
 
+   Array_Limit_Frozen : Boolean := False;
+   --  If True, calls to Set_Array_Limit will raise a Constraint_Error.
+   --  Should be set by any call to Include_Subp or Supported_Subprogram.
+
    procedure Generate_Support_Library
      (Ctx        : Libgen_Context;
       Pack_Name  : Ada_Qualified_Name) with
@@ -647,6 +651,7 @@ package body TGen.Libgen is
       Trans_Res : constant Translation_Result :=
         Translate (Subp.As_Basic_Decl);
    begin
+      Array_Limit_Frozen := True;
       if Trans_Res.Success then
          Diags := Trans_Res.Res.Get.Get_Diagnostics;
          if Diags.Is_Empty then
@@ -1351,5 +1356,18 @@ package body TGen.Libgen is
          end if;
          raise;
    end Generate_Harness;
+
+   --------------------------
+   -- Set_Array_Size_Limit --
+   --------------------------
+
+   procedure Set_Array_Size_Limit (Limit : Positive) is
+   begin
+      if Array_Limit_Frozen then
+         raise Constraint_Error with
+           "Attempting to modify array size limit after it has been frozen.";
+      end if;
+      TGen.Marshalling.Set_Array_Size_Limit (Limit);
+   end Set_Array_Size_Limit;
 
 end TGen.Libgen;

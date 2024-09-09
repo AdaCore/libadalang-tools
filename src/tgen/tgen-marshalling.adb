@@ -783,7 +783,7 @@ package body TGen.Marshalling is
                  5  => Assoc ("COMP_PREFIX", Comp_Pref_Tag),
                  6  => Assoc ("ADA_DIM", Ada_Dim_Tag),
                  7  => Assoc ("IS_ENUM", Is_Enum_Tag),
-                 8  => Assoc ("ARR_LIMIT", Array_Length_Limit)];
+                 8  => Assoc ("ARR_LIMIT", Get_Array_Size_Limit)];
 
          begin
             Print_Header (Assocs);
@@ -1133,6 +1133,21 @@ package body TGen.Marshalling is
    begin
       Append (Str.all, Ada.Characters.Latin_1.LF);
    end New_Line;
+
+   --------------------------
+   -- Get_Array_Size_Limit --
+   --------------------------
+
+   function Get_Array_Size_Limit return Positive is (Array_Length_Limit);
+
+   --------------------------
+   -- Set_Array_Size_Limit --
+   --------------------------
+
+   procedure Set_Array_Size_Limit (Limit : Positive) is
+   begin
+      Array_Length_Limit := Limit;
+   end Set_Array_Size_Limit;
 
 begin
 
