@@ -2963,7 +2963,7 @@ package body TGen.Types.Translation is
       --  First part of the declaration. Used to determine whether the type we
       --  are translating is private or not.
 
-      Specialized_Res : Translation_Result (Success => True);
+      Specialized_Res : Translation_Result;
 
    begin
       Verbose_Diag := Verbose;
@@ -2980,6 +2980,8 @@ package body TGen.Types.Translation is
          --  declarations or anonymous access types, both of which we don't
          --  intend to support.
 
+         Specialized_Res := (Success => True, others => <>);
+
          Specialized_Res.Res.Set
            (Unsupported_Typ'
              (Reason => To_Unbounded_String
@@ -2993,6 +2995,7 @@ package body TGen.Types.Translation is
          --  modular integer but for which we do not want to generate any
          --  values.
 
+         Specialized_Res := (Success => True, others => <>);
          Specialized_Res.Res.Set (Unsupported_Typ'
            (Reason => To_Unbounded_String ("System.Address unsupported"),
             others => <>));
@@ -3002,6 +3005,7 @@ package body TGen.Types.Translation is
          --  We are dealing with a private type declared in a nested package,
          --  consider this as unsupported.
 
+         Specialized_Res := (Success => True, others => <>);
          Specialized_Res.Res.Set (Unsupported_Typ'
            (Reason =>
               To_Unbounded_String
@@ -3009,6 +3013,7 @@ package body TGen.Types.Translation is
                  & " supported"),
             others => <>));
       elsif Root_Type.P_Is_Formal then
+         Specialized_Res := (Success => True, others => <>);
          Specialized_Res.Res.Set (Formal_Typ'
            (Reason =>
               To_Unbounded_String ("Generic formal types are unsupported"),
@@ -3020,10 +3025,12 @@ package body TGen.Types.Translation is
           (Node       => N,
            Other_Type => N.P_Bool_Type.As_Base_Type_Decl)
       then
+         Specialized_Res := (Success => True, others => <>);
          Specialized_Res.Res.Set (Bool_Typ'(Is_Static => True, others => <>));
       elsif Root_Type.P_Is_Enum_Type then
 
          if not Is_Static then
+            Specialized_Res := (Success => True, others => <>);
             Specialized_Res.Res.Set (Other_Enum_Typ'
               (Is_Static => False, others => <>));
          end if;
@@ -3045,6 +3052,7 @@ package body TGen.Types.Translation is
          if Is_Static then
             Specialized_Res := Translate_Float_Decl (N);
          else
+            Specialized_Res := (Success => True, others => <>);
             Specialized_Res.Res.Set
               (Float_Typ'
                (Is_Static => False,
@@ -3059,6 +3067,7 @@ package body TGen.Types.Translation is
             if Is_Static then
                Specialized_Res := Translate_Ordinary_Fixed_Decl (N);
             else
+               Specialized_Res := (Success => True, others => <>);
                Specialized_Res.Res.Set
                  (Ordinary_Fixed_Typ'
                     (Is_Static => False,
@@ -3068,6 +3077,7 @@ package body TGen.Types.Translation is
             if Is_Static then
                Specialized_Res := Translate_Decimal_Fixed_Decl (N);
             else
+               Specialized_Res := (Success => True, others => <>);
                Specialized_Res.Res.Set
                  (Decimal_Fixed_Typ'
                     (Is_Static => False,
@@ -3081,6 +3091,7 @@ package body TGen.Types.Translation is
 
       elsif Root_Type.P_Is_Record_Type then
          if Root_Type.P_Is_Tagged_Type then
+            Specialized_Res := (Success => True, others => <>);
             Specialized_Res.Res.Set
               (Unsupported_Typ'
                 (Reason => To_Unbounded_String ("tagged types not supported"),
@@ -3090,12 +3101,14 @@ package body TGen.Types.Translation is
          end if;
 
       elsif Root_Type.P_Is_Access_Type then
+         Specialized_Res := (Success => True, others => <>);
          Specialized_Res.Res.Set
            (Access_Typ'
               (Reason =>
                  To_Unbounded_String ("Access types are not supported"),
                others => <>));
       else
+         Specialized_Res := (Success => True, others => <>);
          Specialized_Res.Res.Set
            (Unsupported_Typ'
               (Reason => To_Unbounded_String ("Unknown type kind"),
