@@ -1,8 +1,16 @@
 test number 1
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 PACKAGE a1 IS
      I : Integer;
 END a1;
 test number 2
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 PACKAGE a IS
      TYPE Int IS RANGE 1 .. 10;
      X : Int;
@@ -12,6 +20,18 @@ PACKAGE a IS
      Z : Float;
 END a;
 test number 3
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 ----------------
 src_c/c.ads
 PACKAGE C IS

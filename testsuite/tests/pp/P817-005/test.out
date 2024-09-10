@@ -1,3 +1,7 @@
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 package Example_With_Comments is
 
    type Log_Type is
@@ -17,6 +21,10 @@ package Example_With_Comments is
      Pre => progname'Length <= 64 and filename'Length <= 4_096;
 
 end Example_With_Comments;
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 package Example_With_Comments is -- end of line
 
    type Log_Type is

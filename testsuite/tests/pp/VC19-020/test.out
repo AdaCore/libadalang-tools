@@ -1,5 +1,9 @@
 Testing --layout switch
 1 --layout=default
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 procedure Main is
    type My_Range is range 1 .. 100;
    subtype First_Dozen is My_Range with
@@ -34,6 +38,10 @@ begin
 end Main;
 ---------------------------------------------------
 2 --layout=minimal
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 procedure Main is
    type My_Range is range 1 .. 100;
    subtype First_Dozen is My_Range with
@@ -49,6 +57,10 @@ begin
 end Main;
 ---------------------------------------------------
 3 --layout=tall
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 procedure Main is
 
    type My_Range is range 1 .. 100;
@@ -84,6 +96,10 @@ begin
 end Main;
 ---------------------------------------------------
 4 --layout=compact
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 procedure Main is
    type My_Range is range 1 .. 100;
    subtype First_Dozen is My_Range with

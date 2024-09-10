@@ -1,11 +1,23 @@
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 package P is
    My_Integer : Integer          := Some_Function (A - B);
    X          : constant Boolean := False;
 end P;
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 package P is
    My_Integer: Integer := Some_Function(A - B);
    X: constant Boolean := False;
 end P;
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 package P is
    My_Integer: Integer          := Some_Function(A - B);
    X         : constant Boolean := False;

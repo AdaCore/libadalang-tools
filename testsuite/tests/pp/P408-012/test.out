@@ -1,3 +1,7 @@
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 procedure Pretty is
 
     package Ip is
@@ -46,6 +50,10 @@ begin
     null;
 
 end Pretty;
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 procedure Pretty is
 
     package Ip is

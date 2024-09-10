@@ -1,3 +1,7 @@
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 function Cvt is new Unchecked_Conversion
   (Source => Integer, Target => Tds_Unsigned_T);
 -- Add Cvt for Tds_Integer_T if it is ever different from Integer.

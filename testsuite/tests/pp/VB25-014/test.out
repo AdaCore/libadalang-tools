@@ -1,4 +1,8 @@
 Default layout
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 procedure Main is
    type My_Enum is
      (One,
@@ -9,6 +13,10 @@ begin
    null;
 end Main;
 Minimal layout
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 procedure Main is
    type My_Enum is (One, Two, Three,
                     Four);
@@ -16,12 +24,20 @@ begin
    null;
 end Main;
 Compact layout
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 procedure Main is
    type My_Enum is (One, Two, Three, Four);
 begin
    null;
 end Main;
 Tall layout
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 procedure Main is
 
    type My_Enum is
@@ -34,6 +50,10 @@ begin
    null;
 end Main;
 Shorthand Tall layout with space syntax
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 procedure Main is
 
    type My_Enum is

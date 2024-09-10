@@ -1,3 +1,7 @@
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 pragma Ada_95;
 pragma Warnings (Off);
 pragma Source_File_Name (ada_main, Spec_File_Name => "b__test069.2.ads");
@@ -316,6 +320,10 @@ package body ada_main is
    --  END Object file/option list
 
 end ada_main;
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 pragma Ada_95;
 pragma Warnings (Off);
 with System;
@@ -747,6 +755,10 @@ package ada_main is
    --  END ELABORATION ORDER
 
 end ada_main;
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 pragma Ada_95;
 pragma Warnings (Off);
 pragma Source_File_Name (ada_main, Spec_File_Name => "b__test070.2.ads");
@@ -1013,6 +1025,10 @@ package body ada_main is
    --  END Object file/option list
 
 end ada_main;
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 pragma Ada_95;
 pragma Warnings (Off);
 with System;
@@ -1381,6 +1397,10 @@ package ada_main is
    --  END ELABORATION ORDER
 
 end ada_main;
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 package Csc_Channel.Version_Handling is
    type T_Version_Handling is limited interface;
    type T_Version_Handling_Class_Access is access all T_Version_Handling'Class;
@@ -1392,6 +1412,10 @@ package Csc_Channel.Version_Handling is
       P1      :    out Lang.Primitifs.T_Uint;
       P2      :    out Lang.Primitifs.T_Uint) is abstract;
 end Csc_Channel.Version_Handling;
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 procedure Gnatpp_Array_Formatting is
    type Rec_T is record
@@ -1415,6 +1439,10 @@ procedure Gnatpp_Array_Formatting is
 begin
    null;
 end Gnatpp_Array_Formatting;
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 with Ada.Text_IO;
 procedure Gnatpp_Exdentation is
    A_String_1   : constant String  := "abc";
@@ -1438,6 +1466,10 @@ begin
          Integer'Image (An_Integer_3 + An_Integer_4) & ASCII.LF);
    end if;
 end Gnatpp_Exdentation;
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 procedure Loop_Then is
    X_012345,
    X_0123456,
@@ -1578,6 +1610,10 @@ begin
       null;
    end loop;
 end Loop_Then;
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 procedure Ors is
 begin
    Rcc.Ahb1enr :=
@@ -1588,6 +1624,10 @@ begin
      RCC_Bits.Ahb1enr.Gpiogen or RCC_Bits.Ahb1enr.Gpiohen or
      RCC_Bits.Ahb1enr.Gpioien;
 end Ors;
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 procedure Pretty is
 
    package IP is
@@ -1675,6 +1715,10 @@ begin
    null;
 
 end Pretty;
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 procedure Separate_Thens is
    X_0123456789,
    X_01234567890,
@@ -1745,7 +1789,15 @@ begin
       null;
    end if;
 end Separate_Thens;
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 procedure Test070;
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 with Ada.Text_IO;
 with test_gnatpp;
 
@@ -1759,6 +1811,10 @@ begin
 
    Ada.Text_IO.Put_Line ("Test070 End");
 end test070;
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 procedure Junk is
 begin
    Test
@@ -1766,6 +1822,10 @@ begin
       "CHECK THAT BASED REAL LITERALS WITH BASES " &
       "2 THROUGH 16 ALL YIELD CORRECT VALUES");
 end Junk;
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 package test_gnatpp is
 
    type development_switch is

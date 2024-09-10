@@ -1,4 +1,8 @@
 test_OK
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 procedure test_OK is
 
    val : Integer := 0;
@@ -10,6 +14,10 @@ begin
 end test_OK;
 0
 test_NOK
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 Syntax errors in test_NOK.adb
 8:4: Skipped token val
 8:8: Skipped token :=

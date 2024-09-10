@@ -1,25 +1,53 @@
 gnatpp --pipe abc.ads
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 package Abc is
 end Abc;
 gnatpp --replace_backup abc.ads
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 package Abc is end;
 package Abc is
 end Abc;
 gnatpp --replace_backup abc.ads
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 gnatpp: file abc.ads.npp exists
  use '--replace-force-backup' option to override
 gnatpp --replace_force_backup abc.ads
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 package Abc is end;
 package Abc is
 end Abc;
 gnatpp --replace_backup --output-dir=out abc.ads
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 package Abc is end;
 package Abc is
 end Abc;
 gnatpp --replace_backup --output-dir=out abc.ads
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 gnatpp: file out/abc.ads.npp exists
  use '--replace-force-backup' option to override
 gnatpp --replace_force_backup --output-dir=out abc.ads
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 package Abc is end;
 package Abc is
 end Abc;

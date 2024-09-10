@@ -1,3 +1,7 @@
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 procedure Loop_Then is
    X_012345, X_0123456, X_01234567,
    X_012345678, X_0123456789,
@@ -181,6 +185,10 @@ begin
    end loop;
 end Loop_Then;
 separate-loop
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 procedure Loop_Then is
    X_012345, X_0123456, X_01234567,
    X_012345678, X_0123456789,
@@ -367,6 +375,10 @@ begin
    end loop;
 end Loop_Then;
 separate-then
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 procedure Loop_Then is
    X_012345, X_0123456, X_01234567,
    X_012345678, X_0123456789,
@@ -561,6 +573,10 @@ begin
    end loop;
 end Loop_Then;
 separate-loop-then
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 procedure Loop_Then is
    X_012345, X_0123456, X_01234567,
    X_012345678, X_0123456789,
@@ -758,6 +774,10 @@ begin
    end loop;
 end Loop_Then;
 separate-loop separate-then
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 procedure Loop_Then is
    X_012345, X_0123456, X_01234567,
    X_012345678, X_0123456789,
@@ -955,6 +975,10 @@ begin
    end loop;
 end Loop_Then;
 no-separate-loop
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 procedure Loop_Then is
    X_012345, X_0123456, X_01234567,
    X_012345678, X_0123456789,
@@ -1131,6 +1155,10 @@ begin
    end loop;
 end Loop_Then;
 no-separate-then
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 procedure Loop_Then is
    X_012345, X_0123456, X_01234567,
    X_012345678, X_0123456789,
@@ -1305,6 +1333,10 @@ begin
    end loop;
 end Loop_Then;
 no-separate-loop-then
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 procedure Loop_Then is
    X_012345, X_0123456, X_01234567,
    X_012345678, X_0123456789,
@@ -1472,6 +1504,10 @@ begin
    end loop;
 end Loop_Then;
 no-separate-loop no-separate-then
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 procedure Loop_Then is
    X_012345, X_0123456, X_01234567,
    X_012345678, X_0123456789,

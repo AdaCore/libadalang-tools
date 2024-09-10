@@ -1,3 +1,7 @@
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 pragma Ada_95;
 pragma Warnings (Off);
 pragma Source_File_Name (ada_main, Spec_File_Name => "b__test069.2.ads");

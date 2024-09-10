@@ -1,9 +1,17 @@
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 procedure P is
    pragma Warnings (Off);
    --  Explain why we turned warnings off.
 begin
    null;
 end P;
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 procedure P is
    pragma Warnings (Off);
 
@@ -12,6 +20,10 @@ procedure P is
 begin
    null;
 end P;
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 package body Q is
 
    procedure P is

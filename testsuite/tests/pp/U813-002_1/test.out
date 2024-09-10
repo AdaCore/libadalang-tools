@@ -1,10 +1,6 @@
-with Ada.Text_IO; use Ada.Text_IO;
-procedure Main is
-   Corge_Garply : Integer  := 1;
-   Foo_Bar      : constant := 1;
-begin
-   Put_Line (Foo_Bar'Image);
-end Main;
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
 
 with Ada.Text_IO; use Ada.Text_IO;
 procedure Main is
@@ -13,6 +9,22 @@ procedure Main is
 begin
    Put_Line (Foo_Bar'Image);
 end Main;
+
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
+with Ada.Text_IO; use Ada.Text_IO;
+procedure Main is
+   Corge_Garply : Integer  := 1;
+   Foo_Bar      : constant := 1;
+begin
+   Put_Line (Foo_Bar'Image);
+end Main;
+
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
 
 with Ada.Text_IO; use Ada.Text_IO;
 procedure Main is
@@ -22,6 +34,10 @@ begin
    Put_Line (foo_Bar'Image);
 end Main;
 
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 with Ada.Text_IO; use Ada.Text_IO;
 procedure Main is
    Corge_Garply : Integer  := 1;
@@ -30,6 +46,10 @@ begin
    Put_Line (FOO_BAR'Image);
 end Main;
 
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
+
 with Ada.Text_IO; use Ada.Text_IO;
 procedure Main is
    Corge_Garply : Integer  := 1;
@@ -37,6 +57,10 @@ procedure Main is
 begin
    Put_Line (foo_bar'Image);
 end Main;
+
+
+WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+-------
 
 with Ada.Text_IO; use Ada.Text_IO;
 procedure Main is
