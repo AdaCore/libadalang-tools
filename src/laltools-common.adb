@@ -1563,7 +1563,7 @@ package body Laltools.Common is
       use Libadalang.Project_Provider;
 
       Filenames : constant Filename_Vectors.Vector :=
-        Source_Files (Source_Provider.Project.all, Whole_Project);
+        Source_Files (Source_Provider.Project, Whole_Project);
 
    begin
       return Result : Analysis_Unit_Array (1 .. Natural (Filenames.Length)) do

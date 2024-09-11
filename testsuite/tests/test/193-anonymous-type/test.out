@@ -1,6 +1,6 @@
 test.gpr:3:23: warning: object directory "obj" not found
-Error during parameter translation of subprogram Main_Package.Child_Tagged_Record_Type_Access_Output:
-main_package.child_tagged_record_type_access_output.Stream:  is not supported (Anonymous array or access type unsupported)
-main_package.child_tagged_record_type_access_output.Item: main_package.child_tagged_record_type_access is not supported (Access types are not supported)
+Error during parameter translation of subprogram Pkg.Child_Tagged_Record_Type_Access_Output:
+pkg.child_tagged_record_type_access_output.Stream:  is not supported (Anonymous array or access type unsupported)
+pkg.child_tagged_record_type_access_output.Item: pkg.child_tagged_record_type_access is not supported (Access types are not supported)
 
 >>>program returned status code 1

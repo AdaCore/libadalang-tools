@@ -25,7 +25,7 @@
 
 with Ada.Text_IO; use Ada.Text_IO;
 
-procedure Protected_Object_Type_Decl
+procedure Protected_Obj_Type_Decl
 is
 
    protected type P_Obj_Type is
@@ -52,4 +52,4 @@ begin
    Obj.Set (5);
    Put_Line ("Number is: "
              & Integer'Image (Obj.Get));
-end Protected_Object_Type_Decl;
+end Protected_Obj_Type_Decl;
