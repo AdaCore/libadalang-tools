@@ -1,0 +1,7 @@
+description:
+    Check that TGen properly rejects types declared in generic instantiations
+    that are library items.
+
+driver: shell_script
+control:
+    - [XFAIL, 'x86', 'Marshalling not working for 32bits (UB03-008)']
