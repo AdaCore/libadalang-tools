@@ -3013,8 +3013,11 @@ package body TGen.Types.Translation is
          then N.P_Defining_Name
          else No_Defining_Name);
 
+      Comp_Unit_Decl : constant Basic_Decl :=
+        Ultimate_Enclosing_Compilation_Unit (N.As_Basic_Decl);
+
       Comp_Unit_Idx : constant Positive :=
-        Ultimate_Enclosing_Compilation_Unit (LAL.Basic_Decl'Class (N))'Last;
+        Comp_Unit_Decl.P_Fully_Qualified_Name_Array'Last;
 
       FQN : constant Ada_Qualified_Name :=
         (if not Type_Name.Is_Null
@@ -3049,6 +3052,24 @@ package body TGen.Types.Translation is
              (Reason => To_Unbounded_String
                 ("Anonymous array or access type unsupported"),
             others   => <>));
+
+      --  Types that are declared in a library level generic instantiation are
+      --  not supported at the moment, as the support packages would need to be
+      --  generic instances themselves (with other rules to follow), see
+      --  RM 10.1.1 (17/3, 18).
+      --
+      --  TODO??? Investigate if there are issues in generating the helper
+      --  packages as non-child units in this case, see #184.
+
+      elsif Comp_Unit_Decl.Kind in Ada_Generic_Instantiation then
+         Specialized_Res := (Success => True, others => <>);
+         Specialized_Res.Res.Set
+           (Unsupported_Typ'
+              (Reason => To_Unbounded_String
+                 ("types declared a generic package instantiation that is a"
+                  & " library item are unsupported"),
+               others => <>));
+
       elsif Text.Image (N.P_Root_Type.P_Fully_Qualified_Name)
         = "System.Address"
       then
@@ -3387,7 +3408,8 @@ package body TGen.Types.Translation is
       F_Typ_Ref     : SP.Ref;
       Result        : Translation_Result (Success => True);
       Comp_Unit_Idx : constant Positive :=
-        Ultimate_Enclosing_Compilation_Unit (N)'Last;
+        Ultimate_Enclosing_Compilation_Unit (N)
+        .P_Fully_Qualified_Name_Array'Last;
 
       UID         : constant String :=
         Test.Common.Mangle_Hash_16 (Subp => N);
