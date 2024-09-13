@@ -3,6 +3,8 @@
 @@--  @_FOR_SPEC_@ Boolean determining is the template is parsed as a
 @@--               specification or as a body.
 @@--  @_PROC_NAME_@ Name of the subprogram for which we want to dump a TC.
+@@--  @_PROC_FQN_@  Fully Qualified Name of the subprogram for which we
+@@--                want to dump a TC.
 @@--  @_PROC_RETURN_TY_@ name of the return type of the subprogram
 @@--  @_PARAM_NAME_@ Simple names of the parameters of the subprogram.
 @@--  @_PARAM_TY_@ Ada names of the types of the parameters of the subprogram
@@ -51,7 +53,7 @@
          Subp_Vectors := Subp_JSON.Get ("test_vectors");
       else
          Subp_JSON := TGen.JSON.Create_Object;
-         Subp_JSON.Set_Field ("fully_qualified_name", "@_PROC_NAME_@");
+         Subp_JSON.Set_Field ("fully_qualified_name", "@_PROC_FQN_@");
          Subp_JSON.Set_Field ("generation_complete", True);
 @@IF@@ @_PROC_RETURN_TY_@ /= ""
          Subp_JSON.Set_Field ("return_type", "@_PROC_RETURN_TY_@");

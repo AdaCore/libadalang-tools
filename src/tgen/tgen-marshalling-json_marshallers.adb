@@ -23,6 +23,8 @@
 
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 
+with Utils.String_Utilities;
+
 with TGen.Strings; use TGen.Strings;
 with TGen.Templates;
 
@@ -312,6 +314,9 @@ package body TGen.Marshalling.JSON_Marshallers is
          (if Is_Operator (FN_Typ.Simple_Name)
          then Map_Operator_Name (FN_Typ.Simple_Name)
          else (FN_Typ.Simple_Name))));
+      Assocs.Insert (Assoc
+        ("PROC_FQN",
+         Utils.String_Utilities.Escape_String_Literal (FN_Typ.FQN)));
       Assocs.Insert (Assoc ("PROC_UID", FN_Typ.Subp_UID));
       if FN_Typ.Ret_Typ /= SP.Null_Ref then
          Assocs.Insert (Assoc

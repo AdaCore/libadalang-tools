@@ -395,6 +395,10 @@ package TGen.Types.Record_Types is
   --  Return the fully qualified name associated with this subprogram,
   --  removing the trailing hash.
 
+   function Slug (Self : Function_Typ) return String;
+   --  Return a unique identifier for Typ. This transforms the names of
+   --  operators.
+
    function Simple_Name (Self : Function_Typ) return String is
       (+Unbounded_String (Self.Name.Element (Self.Name.Last_Index - 1)));
   --  Return the simple name associated with this subprogram,

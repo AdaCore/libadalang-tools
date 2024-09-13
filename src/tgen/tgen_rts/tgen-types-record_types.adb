@@ -1862,4 +1862,27 @@ package body TGen.Types.Record_Types is
       return Res;
    end Get_Diagnostics;
 
+   ----------
+   -- Slug --
+   ----------
+
+   function Slug (Self : Function_Typ) return String is
+      Temp : Ada_Qualified_Name;
+   begin
+      --  Build a new qualified name, replacing operator names by an
+      --  ada-compliant identifier.
+
+      for Id of Self.Name loop
+         if Is_Operator (+Unbounded_String (Id)) then
+            Temp.Append
+              (New_Item =>
+                 Ada_Identifier (+Map_Operator_Name (+Unbounded_String (Id))),
+               Count    => 1);
+         else
+            Temp.Append (New_Item => Id, Count => 1);
+         end if;
+      end loop;
+      return To_Symbol (Temp, '_');
+   end Slug;
+
 end TGen.Types.Record_Types;
