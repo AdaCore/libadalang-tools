@@ -54,7 +54,7 @@
             Values : constant TGen.JSON.JSON_Value :=
               Subp.Get.Encode (Strat.Generate (TGen.Strategies.Disc_Value_Maps.Empty_Map));
 @@TABLE'ALIGN_ON(":")@@
-            Ada_@_PARAM_NAME_@ : @_PARAM_TY_@ :=
+            Ada_@_PARAM_NAME_@ : TGen.TGen_Std.@_PARAM_TY_@ :=
               @_INPUT_FN_@ (Values.Get ("param_values").Get ("@_PARAM_NAME_@"));
 @@END_TABLE@@
          begin
@@ -97,7 +97,7 @@
               Subp.Get.Encode
                 (Strat.Generate (TGen.Strategies.Disc_Value_Maps.Empty_Map));
 @@TABLE'ALIGN_ON(":")@@
-            Ada_@_PARAM_NAME_@ : @_PARAM_TY_@ :=
+            Ada_@_PARAM_NAME_@ : TGen.TGen_Std.@_PARAM_TY_@ :=
               @_INPUT_FN_@ (Values.Get ("param_values").Get ("@_PARAM_NAME_@"));
 @@END_TABLE@@
          begin

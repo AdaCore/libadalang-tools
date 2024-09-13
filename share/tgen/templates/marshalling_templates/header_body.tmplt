@@ -46,7 +46,7 @@
      (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class;
       @_GLOBAL_PREFIX_@_Buffer : in out Unsigned_8;
       @_GLOBAL_PREFIX_@_Offset : in out Offset_Type;
-      @_GLOBAL_PREFIX_@_V      : @_TY_NAME_@)
+      @_GLOBAL_PREFIX_@_V      : TGen.TGen_Std.@_TY_NAME_@)
    is
    begin
 @@IF@@ @_FIRST_NAME_@ /= ""
@@ -69,19 +69,19 @@
 
    function @_TY_PREFIX_@_Init_From_Header
      (@_GLOBAL_PREFIX_@_H : @_TY_PREFIX_@_Header_Type)
-      return @_TY_NAME_@
+      return TGen.TGen_Std.@_TY_NAME_@
    is
    begin
 @@IF@@ @_FIRST_NAME_@ /= ""
 @@TABLE@@
       declare
-         use type @_COMP_TYP_@;
-         HB : @_COMP_TYP_@ renames @_GLOBAL_PREFIX_@_H.@_LAST_NAME_@;
-         LB : @_COMP_TYP_@ renames @_GLOBAL_PREFIX_@_H.@_FIRST_NAME_@;
+         use type TGen.TGen_Std.@_COMP_TYP_@;
+         HB : TGen.TGen_Std.@_COMP_TYP_@ renames @_GLOBAL_PREFIX_@_H.@_LAST_NAME_@;
+         LB : TGen.TGen_Std.@_COMP_TYP_@ renames @_GLOBAL_PREFIX_@_H.@_FIRST_NAME_@;
       begin
 @@IF@@ @_IS_ENUM_@
-         if @_COMP_TYP_@'Pos (HB) > @_COMP_TYP_@'Pos (LB)
-           and then Biggest_Int (@_COMP_TYP_@'Pos (HB) - @_COMP_TYP_@'Pos (LB))
+         if TGen.TGen_Std.@_COMP_TYP_@'Pos (HB) > TGen.TGen_Std.@_COMP_TYP_@'Pos (LB)
+           and then Biggest_Int (TGen.TGen_Std.@_COMP_TYP_@'Pos (HB) - TGen.TGen_Std.@_COMP_TYP_@'Pos (LB))
                   > @_ARR_LIMIT_@
 @@ELSE@@
          if HB > LB and then Biggest_Int (HB - LB) > @_ARR_LIMIT_@
@@ -93,7 +93,7 @@
 @@END_TABLE@@
 @@END_IF@@
       pragma Warnings (Off, "variable ""@_GLOBAL_PREFIX_@_V"" is read but never assigned");
-      return @_GLOBAL_PREFIX_@_V : @_TY_NAME_@
+      return @_GLOBAL_PREFIX_@_V : TGen.TGen_Std.@_TY_NAME_@
 @@IF@@ @_FIRST_NAME_@ /= ""
 @@TABLE'ALIGN_ON("..")@@
             @_LPAR()_@@_GLOBAL_PREFIX_@_H.@_FIRST_NAME_@ .. @_GLOBAL_PREFIX_@_H.@_LAST_NAME_@@_RVPAR()_@
@@ -125,7 +125,7 @@
 
    procedure @_TY_PREFIX_@_Output_Header
      (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class;
-      @_GLOBAL_PREFIX_@_V      : @_TY_NAME_@)
+      @_GLOBAL_PREFIX_@_V      : TGen.TGen_Std.@_TY_NAME_@)
    is
       @_GLOBAL_PREFIX_@_Buffer : Unsigned_8 := 0;
       @_GLOBAL_PREFIX_@_Offset : Offset_Type := 0;

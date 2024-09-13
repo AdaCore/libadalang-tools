@@ -527,10 +527,10 @@ package body TGen.Libgen is
       Create (F_Spec, Out_File, File_Name & ".ads");
       Create (F_Body, Out_File, File_Name & ".adb");
 
+      Put_Line (F_Spec, "with TGen;");
+      New_Line (F_Spec);
       Put_Line (F_Spec, "package " & Ada_Pack_Name & " is");
 
-      Put_Line (F_Body, "with TGen;");
-      New_Line (F_Body);
       Put_Line (F_Body, "package body " & Ada_Pack_Name & " is");
       New_Line (F_Body);
 
@@ -1078,6 +1078,7 @@ package body TGen.Libgen is
          Put_Line (F_Body, "with Ada.Strings.Fixed;");
       end if;
 
+      Put_Line (F_Body, "with TGen;");
       Put_Line (F_Body, "with TGen.JSON;");
       Put_Line (F_Body, "with TGen.Types;");
       Put_Line (F_Body, "with TGen.Strategies;");
@@ -1164,7 +1165,7 @@ package body TGen.Libgen is
                else
                   Concrete_Typ := Element (Param_Cur);
                end if;
-               Param_Types.Append (Concrete_Typ.Get.FQN);
+               Param_Types.Append (Concrete_Typ.Get.FQN (No_Std => True));
                Input_FNs.Append (Input_Fname_For_Typ (Concrete_Typ.Get.Name));
                Output_FNs.Append
                  (Output_Fname_For_Typ (Concrete_Typ.Get.Name));

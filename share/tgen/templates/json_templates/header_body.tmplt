@@ -60,7 +60,7 @@
 
    procedure @_TY_PREFIX_@_Write_Header
      (@_GLOBAL_PREFIX_@_JSON : in out TGen.JSON.JSON_Value;
-      @_GLOBAL_PREFIX_@_V    : @_TY_NAME_@)
+      @_GLOBAL_PREFIX_@_V    : TGen.TGen_Std.@_TY_NAME_@)
    is
    begin
 @@IF@@ @_FIRST_NAME_@ /= ""
@@ -131,7 +131,7 @@
 
    procedure @_TY_PREFIX_@_Output_Header
      (@_GLOBAL_PREFIX_@_JSON : in out TGen.JSON.JSON_Value;
-      @_GLOBAL_PREFIX_@_V    : @_TY_NAME_@) is
+      @_GLOBAL_PREFIX_@_V    : TGen.TGen_Std.@_TY_NAME_@) is
    begin
       @_TY_PREFIX_@_Write_Header
          (@_GLOBAL_PREFIX_@_JSON, @_GLOBAL_PREFIX_@_V);

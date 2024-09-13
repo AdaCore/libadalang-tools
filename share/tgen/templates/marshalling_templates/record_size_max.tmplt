@@ -13,8 +13,8 @@
 @@INCLUDE@@ util.tmplt
    function @_TY_PREFIX_@_Size_Max
 @@TABLE'ALIGN_ON(":", ":=")@@
-     @_LPAR()_@@_GLOBAL_PREFIX_@_@_DISCR_NAME_@_D_Min : @_DISCR_TYP_@ := @_DISCR_TYP_@'First;
-      @_GLOBAL_PREFIX_@_@_DISCR_NAME_@_D_Max : @_DISCR_TYP_@ := @_DISCR_TYP_@'Last@_RPAR()_@
+     @_LPAR()_@@_GLOBAL_PREFIX_@_@_DISCR_NAME_@_D_Min : TGen.TGen_Std.@_DISCR_TYP_@ := TGen.TGen_Std.@_DISCR_TYP_@'First;
+      @_GLOBAL_PREFIX_@_@_DISCR_NAME_@_D_Max : TGen.TGen_Std.@_DISCR_TYP_@ := TGen.TGen_Std.@_DISCR_TYP_@'Last@_RPAR()_@
 @@END_TABLE@@
      return Natural
    is

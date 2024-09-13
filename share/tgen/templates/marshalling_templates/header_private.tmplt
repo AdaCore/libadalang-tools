@@ -14,12 +14,12 @@
    type @_TY_PREFIX_@_Header_Type is record
 @@IF@@ @_FIRST_NAME_@ /= ""
 @@TABLE'ALIGN_ON(":")@@
-      @_FIRST_NAME_@ : @_COMP_TYP_@'Base;
-      @_LAST_NAME_@ : @_COMP_TYP_@'Base;
+      @_FIRST_NAME_@ : TGen.TGen_Std.@_COMP_TYP_@'Base;
+      @_LAST_NAME_@ : TGen.TGen_Std.@_COMP_TYP_@'Base;
 @@END_TABLE@@
 @@ELSE@@
 @@TABLE'ALIGN_ON(":")@@
-      @_DISCR_NAME_@ : @_COMP_TYP_@;
+      @_DISCR_NAME_@ : TGen.TGen_Std.@_COMP_TYP_@;
 @@END_TABLE@@
 @@END_IF@@
    end record;

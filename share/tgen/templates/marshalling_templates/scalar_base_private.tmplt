@@ -8,5 +8,9 @@
 @@INCLUDE@@ util.tmplt
   --  Private extensions of the functions encoding 'First and 'Last
 
-   function @_TY_PREFIX_@_First@_BASE_SUFFIX()_@ return @_TY_NAME_@ is (@_TY_NAME_@'First);
-   function @_TY_PREFIX_@_Last@_BASE_SUFFIX()_@ return @_TY_NAME_@ is (@_TY_NAME_@'Last);
+   function @_TY_PREFIX_@_First@_BASE_SUFFIX()_@
+     return TGen.TGen_Std.@_TY_NAME_@ is
+     (TGen.TGen_Std.@_TY_NAME_@'First);
+   function @_TY_PREFIX_@_Last@_BASE_SUFFIX()_@
+     return TGen.TGen_Std.@_TY_NAME_@ is
+     (TGen.TGen_Std.@_TY_NAME_@'Last);

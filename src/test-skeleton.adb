@@ -6977,8 +6977,10 @@ package body Test.Skeleton is
             is
                Pad_Str : constant String (1 .. Initial_Pad) := [others => ' '];
             begin
-               Put (F, Pad_Str & Subp_Content.Get ("fully_qualified_name")
-                    & (if Length (Param_Values) /= 0 then " (" else ""));
+               Put
+                 (F,
+                  Pad_Str & "Std." & Subp_Content.Get ("fully_qualified_name")
+                  & (if Length (Param_Values) /= 0 then " (" else ""));
                for Param_Id in Param_Values loop
                   Put
                     (F,
@@ -7096,6 +7098,15 @@ package body Test.Skeleton is
             Put_Line (Body_Kind, "package body " & Test_Unit_Name & " is");
             New_Line (Body_Kind);
 
+            --  Insert a standard package renaming to be able to avoid
+            --  shadowing of any type or subprogram by a local type or
+            --  subprogram declarations.
+
+            Put_Line
+              (Body_Kind,
+               "   package Std renames Gnattest_Generated.GNATtest_Standard;");
+            New_Line (Body_Kind);
+
             for Test_Vec of Subp_Vectors loop
 
                Test_Routine_Name := +"Gen_" & Subp.Subp_Mangle_Name.all
@@ -7202,8 +7213,10 @@ package body Test.Skeleton is
 
                         Put_Line
                           (Body_Kind,
-                           Com & "   Param_" & Param.Get ("name") & " : "
-                           & Param.Get ("type_name") & " "
+                           Com & "   Param_" & Param.Get ("name") & " : Std."
+                           & Utils.String_Utilities.Strip_Prefix
+                               (Param.Get ("type_name"), "standard.")
+                           & " "
                            & (+Constraints)
                            &  " := " & (+Value) & ";");
                      end;
@@ -7213,16 +7226,24 @@ package body Test.Skeleton is
                      --  value, which needs to be escaped.
 
                      declare
+                        use Utils.String_Utilities;
+                        LAL_Type : constant String := Param.Get ("type_name");
+                        --  Fully qualified name LAL would return (i.e.
+                        --  including standard. for type of that unit)
+
+                        Ada_Type : constant String :=
+                          "Std." & Strip_Prefix (LAL_Type, "standard.");
+                        --  Fully qualified name to be used when generating
+                        --  sources, prefixed by "Std." to avoid shadowing.
+
                         Value : constant Unbounded_String :=
-                          +Input_Fname_For_Typ
-                          (To_Qualified_Name (Param.Get ("type_name")))
+                          +Input_Fname_For_Typ (To_Qualified_Name (LAL_Type))
                           & " (TGen.JSON.Read (";
                      begin
                         Put_Line
                           (Body_Kind,
                            Com & "   Param_" & Param.Get ("name") & " : "
-                           & Param.Get ("type_name")
-                           & ":= " & (+Value));
+                           & Ada_Type & ":= " & (+Value));
                         Pp_JSON_Object_Lit (Body_Kind, Param.Get ("value"), 5);
                         Put_Line (Body_Kind, "));");
                      end;
@@ -7259,7 +7280,7 @@ package body Test.Skeleton is
                      declare
                         Value : constant Unbounded_String :=
                           +Input_Fname_For_Typ
-                          (To_Qualified_Name (Global.Get ("type_name")))
+                             (To_Qualified_Name (Global.Get ("type_name")))
                           & " (TGen.JSON.Read (";
                      begin
                         Put_Line
@@ -7282,8 +7303,12 @@ package body Test.Skeleton is
                end if;
                if Is_Function then
                   Put_Line (Body_Kind, Com & "   declare");
-                  Put_Line (Body_Kind, Com & "      Ret_Val : "
-                            & Subp_Content.Get ("return_type") & ":=");
+                  Put_Line
+                    (Body_Kind,
+                     Com & "      Ret_Val : Std."
+                     & Utils.String_Utilities.Strip_Prefix
+                       (Subp_Content.Get ("return_type"), "standard.")
+                     & ":=");
                   Put (Files (Body_Kind), Com);
                   Pp_Subp_Call (Files (Body_Kind), 8);
                   New_Line (Body_Kind);

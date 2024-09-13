@@ -125,6 +125,12 @@ package TGen.Types is
    function Compilation_Unit_Name (Self : Typ) return Ada_Qualified_Name;
    --  Return the name of the compilation unit this type belongs to
 
+   function FQN (Self : Typ; No_Std : Boolean := False) return String;
+   --  Return the fully qualified name for the type.
+   --
+   --  If No_Std is True, remove the Standard prefix for entities from the
+   --  standard packaged.
+
    function Is_Constrained (Self : Typ) return Boolean is (False);
    --  An array type with indefinite bounds must be constrained, a discriminant
    --  record type must be constrained.
@@ -179,9 +185,6 @@ package TGen.Types is
 
    procedure Free_Content (Self : in out Typ) is null;
    --  Helper for shared pointers
-
-   function FQN (Self : Typ) return String is (To_Ada (Self.Name));
-   --  Return the fully qualified name for the type
 
    function Simple_Name (Self : Typ) return String is
      (+Unbounded_String (Self.Name.Last_Element));

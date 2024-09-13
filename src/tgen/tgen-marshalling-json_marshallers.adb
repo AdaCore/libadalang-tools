@@ -51,7 +51,7 @@ package body TGen.Marshalling.JSON_Marshallers is
       package Templates is new TGen.Templates (TRD);
       use Templates.JSON_Marshalling;
 
-      Ty_Name       : constant String := Typ.FQN;
+      Ty_Name       : constant String := Typ.FQN (No_Std => True);
       Ty_Prefix     : constant String := Prefix_For_Typ (Typ.Slug);
       Generic_Name  : constant String :=
         (if Needs_Header (Typ) then "In_Out_Unconstrained" else "In_Out");
@@ -296,14 +296,16 @@ package body TGen.Marshalling.JSON_Marshallers is
 
       Assocs : Translate_Set;
 
-      Param_Names : Vector_Tag;
-      Param_Types : Vector_Tag;
-      Param_Slugs : Vector_Tag;
+      Param_Names      : Vector_Tag;
+      Param_Types      : Vector_Tag;
+      Param_Full_Types : Vector_Tag;
+      Param_FNs        : Vector_Tag;
 
-      Global_Names       : Vector_Tag;
-      Global_Types       : Vector_Tag;
-      Global_Slugs       : Vector_Tag;
-      Global_Types_Slugs : Vector_Tag;
+      Global_Names      : Vector_Tag;
+      Global_Types      : Vector_Tag;
+      Global_Full_Types : Vector_Tag;
+      Global_Slugs      : Vector_Tag;
+      Global_Types_FNs  : Vector_Tag;
    begin
       if FN_Typ.Component_Types.Is_Empty and then FN_Typ.Globals.Is_Empty then
          return;
@@ -316,12 +318,13 @@ package body TGen.Marshalling.JSON_Marshallers is
          else (FN_Typ.Simple_Name))));
       Assocs.Insert (Assoc
         ("PROC_FQN",
-         Utils.String_Utilities.Escape_String_Literal (FN_Typ.FQN)));
+         Utils.String_Utilities.Escape_String_Literal
+           (FN_Typ.FQN (No_Std => True))));
       Assocs.Insert (Assoc ("PROC_UID", FN_Typ.Subp_UID));
       if FN_Typ.Ret_Typ /= SP.Null_Ref then
          Assocs.Insert (Assoc
            ("PROC_RETURN_TY",
-            FN_Typ.Ret_Typ.Get.FQN));
+            FN_Typ.Ret_Typ.Get.FQN (No_Std => True)));
       else
          Assocs.Insert (Assoc ("PROC_RETURN_TY", ""));
       end if;
@@ -331,25 +334,33 @@ package body TGen.Marshalling.JSON_Marshallers is
       for Param_Cur in FN_Typ.Component_Types.Iterate loop
          Param_Names.Append (Unbounded_String (Key (Param_Cur)));
          Param_Types.Append
-           (To_Ada (FN_Typ.Component_Types
-                    .Constant_Reference (Param_Cur).Get.Name));
-         Param_Slugs.Append
-           (To_Symbol (FN_Typ.Component_Types
-                       .Constant_Reference (Param_Cur).Get.Name, '_'));
+           (FN_Typ.Component_Types
+            .Constant_Reference (Param_Cur).Get.FQN (No_Std => True));
+         Param_Full_Types.Append
+           (FN_Typ.Component_Types
+            .Constant_Reference (Param_Cur).Get.FQN (No_Std => False));
+         Param_FNs.Append
+           (Output_Fname_For_Typ (FN_Typ.Component_Types
+            .Constant_Reference (Param_Cur).Get.Name));
       end loop;
       Assocs.Insert (Assoc ("PARAM_NAME", Param_Names));
       Assocs.Insert (Assoc ("PARAM_TY", Param_Types));
-      Assocs.Insert (Assoc ("PARAM_TY_SLUG", Param_Slugs));
+      Assocs.Insert (Assoc ("LAL_PARAM_TY", Param_Full_Types));
+      Assocs.Insert (Assoc ("PARAM_TY_OUTPUT_FN", Param_FNs));
 
       --  Deal with the global inputs of the subprogram
 
       for Global_Cur in FN_Typ.Globals.Iterate loop
          Global_Names.Append (Key (Global_Cur));
          Global_Types.Append
-           (To_Ada (FN_Typ.Globals.Constant_Reference (Global_Cur).Get.Name));
-         Global_Types_Slugs.Append
-           (To_Symbol (FN_Typ.Globals
-            .Constant_Reference (Global_Cur).Get.Name, '_'));
+           (FN_Typ.Globals.Constant_Reference (Global_Cur).Get.FQN
+              (No_Std => True));
+         Global_Full_Types.Append
+           (FN_Typ.Globals.Constant_Reference (Global_Cur).Get.FQN
+              (No_Std => False));
+         Global_Types_FNs.Append
+           (Output_Fname_For_Typ
+              (FN_Typ.Globals.Constant_Reference (Global_Cur).Get.Name));
          Global_Slugs.Append
            (To_Symbol
               (To_Qualified_Name (+Key (Global_Cur)),
@@ -357,7 +368,8 @@ package body TGen.Marshalling.JSON_Marshallers is
       end loop;
       Assocs.Insert (Assoc ("GLOBAL_NAME", Global_Names));
       Assocs.Insert (Assoc ("GLOBAL_TY", Global_Types));
-      Assocs.Insert (Assoc ("GLOBAL_TY_SLUG", Global_Types_Slugs));
+      Assocs.Insert (Assoc ("LAL_GLOBAL_TY", Global_Full_Types));
+      Assocs.Insert (Assoc ("GLOBAL_TY_OUTPUT_FN", Global_Types_FNs));
       Assocs.Insert (Assoc ("GLOBAL_SLUG", Global_Slugs));
 
       --  First generate the spec, in the correct part of the spec

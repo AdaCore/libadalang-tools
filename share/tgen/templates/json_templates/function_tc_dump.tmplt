@@ -8,11 +8,15 @@
 @@--  @_PROC_RETURN_TY_@ name of the return type of the subprogram
 @@--  @_PARAM_NAME_@ Simple names of the parameters of the subprogram.
 @@--  @_PARAM_TY_@ Ada names of the types of the parameters of the subprogram
-@@--  @_PARAM_TY_SLUG_@ Slug names of the parameter types.
+@@--  @_LAL_PARAM_TY_@ Same as above, but with the optional "Standard" prefix
+@@--                    for predefined types.
+@@--  @_PARAM_TY_OUTPUT_FN_@ Slug names of the parameter types.
 @@--  @_GLOBAL_NAME_@ Simple names of the global inputs of the subprogram.
 @@--  @_GLOBAL_SLUG_@ Slug names of the global inputs.
 @@--  @_GLOBAL_TY_@ Ada names of the types of the global inputs.
-@@--  @_GLOBAL_TY_SLUG_@ Slug names of the global inputs type.
+@@--  @_LAL_GLOBAL_TY_@ Same as above, but with the optional "Standard" prefix
+@@--                     for predefined types.
+@@--  @_GLOBAL_TY_OUTPUT_FN_@ Slug names of the global inputs type.
 @@--  @_PROC_UID_@ Subprogram_UID
 @@--
 @@INCLUDE@@ util.tmplt
@@ -21,10 +25,10 @@
 
    procedure @_PROC_NAME_@_Dump_TC (
 @@TABLE'ALIGN_ON(":")@@
-     @_GLOBAL_PREFIX_@_@_PARAM_NAME_@ : @_PARAM_TY_@;
+     @_GLOBAL_PREFIX_@_@_PARAM_NAME_@ : TGen.TGen_Std.@_PARAM_TY_@;
 @@END_TABLE@@
 @@TABLE'ALIGN_ON(":")@@
-      @_GLOBAL_PREFIX_@_@_GLOBAL_SLUG_@ : @_GLOBAL_TY_@ := @_GLOBAL_NAME_@;
+      @_GLOBAL_PREFIX_@_@_GLOBAL_SLUG_@ : TGen.TGen_Std.@_GLOBAL_TY_@ := @_GLOBAL_NAME_@;
 @@END_TABLE@@
       @_GLOBAL_PREFIX_@_Unit_JSON : in out TGen.JSON.JSON_Value;
 @@IF@@ @_FOR_SPEC_@
@@ -65,10 +69,10 @@
          Param_Obj : constant JSON_Value := Create_Object;
       begin
          Param_Obj.Set_Field ("name", "@_PARAM_NAME_@");
-         Param_Obj.Set_Field ("type_name", "@_PARAM_TY_@");
+         Param_Obj.Set_Field ("type_name", "@_LAL_PARAM_TY_@");
          Param_Obj.Set_Field
            ("value",
-            @_GLOBAL_PREFIX_@_@_PARAM_TY_SLUG_@_Output (@_GLOBAL_PREFIX_@_@_PARAM_NAME_@));
+            @_PARAM_TY_OUTPUT_FN_@ (@_GLOBAL_PREFIX_@_@_PARAM_NAME_@));
          TGen.JSON.Append (New_Test_Vec_Vals, Param_Obj);
       end;
 @@END_TABLE@@
@@ -78,10 +82,10 @@
          Global_Obj : constant JSON_Value := Create_Object;
       begin
          Global_Obj.Set_Field ("name", "@_GLOBAL_NAME_@");
-         Global_Obj.Set_Field ("type_name", "@_GLOBAL_TY_@");
+         Global_Obj.Set_Field ("type_name", "@_LAL_GLOBAL_TY_@");
          Global_Obj.Set_Field
            ("value",
-            @_GLOBAL_PREFIX_@_@_GLOBAL_TY_SLUG_@_Output (@_GLOBAL_PREFIX_@_@_GLOBAL_SLUG_@));
+            @_GLOBAL_TY_OUTPUT_FN_@ (@_GLOBAL_PREFIX_@_@_GLOBAL_SLUG_@));
          TGen.JSON.Append (New_Test_Vec_Global_Vals, Global_Obj);
       end;
 @@END_TABLE@@

@@ -27,7 +27,7 @@
 @_SPACING_@   null;
 @@ELSE@@
 @_SPACING_@   declare
-@_SPACING_@      use type @_DISCR_TYP_@;
+@_SPACING_@      use type TGen.TGen_Std.@_DISCR_TYP_@;
 @_SPACING_@   begin
 @_SPACING_@      if @_GLOBAL_PREFIX_@_@_DISCR_NAME_@_D_Max /= @_GLOBAL_PREFIX_@_@_DISCR_NAME_@_D_Min
 @_SPACING_@        or else @_GLOBAL_PREFIX_@_@_DISCR_NAME_@_D_Min in @_CHOICES_@
