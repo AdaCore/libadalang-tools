@@ -49,7 +49,7 @@ package body TGen.Marshalling.JSON_Marshallers is
       package Templates is new TGen.Templates (TRD);
       use Templates.JSON_Marshalling;
 
-      Ty_Name       : constant String := Typ.Fully_Qualified_Name;
+      Ty_Name       : constant String := Typ.FQN;
       Ty_Prefix     : constant String := Prefix_For_Typ (Typ.Slug);
       Generic_Name  : constant String :=
         (if Needs_Header (Typ) then "In_Out_Unconstrained" else "In_Out");
@@ -316,7 +316,7 @@ package body TGen.Marshalling.JSON_Marshallers is
       if FN_Typ.Ret_Typ /= SP.Null_Ref then
          Assocs.Insert (Assoc
            ("PROC_RETURN_TY",
-            FN_Typ.Ret_Typ.Get.Fully_Qualified_Name));
+            FN_Typ.Ret_Typ.Get.FQN));
       else
          Assocs.Insert (Assoc ("PROC_RETURN_TY", ""));
       end if;

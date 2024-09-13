@@ -103,10 +103,6 @@ package TGen.Types is
    function Is_Anonymous (Self : Typ) return Boolean;
    --  Whether Self represents an anonymous type
 
-   function Fully_Qualified_Name (Self : Typ) return String is
-     (To_Ada (Self.Name));
-   --  Return the FQN of Self
-
    function Type_Name (Self : Typ) return String is
      (if Ada_Identifier_Vectors.Is_Empty (Self.Name)
       then "anonymous"

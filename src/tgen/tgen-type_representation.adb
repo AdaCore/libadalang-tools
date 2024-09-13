@@ -349,7 +349,7 @@ package body TGen.Type_Representation is
       T_Decl, T_Init : out Unbounded_String)
    is
       Ty_Prefix : constant String := T.Slug;
-      Ty_Name   : constant String := T.Fully_Qualified_Name;
+      Ty_Name   : constant String := T.FQN;
       Assocs    : Translate_Set;
    begin
       Insert (Assocs, Assoc ("TY_NAME", Ty_Name));
@@ -394,7 +394,7 @@ package body TGen.Type_Representation is
       T_Decl, T_Init : out Unbounded_String)
    is
       Ty_Prefix : constant String := T.Slug;
-      Ty_Name   : constant String := T.Fully_Qualified_Name;
+      Ty_Name   : constant String := T.FQN;
       Assocs    : Translate_Set;
    begin
       Insert (Assocs, Assoc ("TY_NAME", Ty_Name));
@@ -425,7 +425,7 @@ package body TGen.Type_Representation is
       Scalar_Typ_Init : out Unbounded_String)
    is
       Ty_Prefix : constant String := T.Slug;
-      Ty_Name   : constant String := T.Fully_Qualified_Name;
+      Ty_Name   : constant String := T.FQN;
       Assocs : Translate_Set;
    begin
       Insert (Assocs, Assoc ("TY_NAME", Ty_Name));
@@ -475,7 +475,7 @@ package body TGen.Type_Representation is
       use Templates.Type_Representation;
 
       Ty_Prefix : constant String := Typ.Slug;
-      Ty_Name   : constant String := Typ.Fully_Qualified_Name;
+      Ty_Name   : constant String := Typ.FQN;
       Anonymous_Ty_Index : Positive := 1;
       Variant_Index : Positive := 1;
 

@@ -1164,7 +1164,7 @@ package body TGen.Libgen is
                else
                   Concrete_Typ := Element (Param_Cur);
                end if;
-               Param_Types.Append (Concrete_Typ.Get.Fully_Qualified_Name);
+               Param_Types.Append (Concrete_Typ.Get.FQN);
                Input_FNs.Append (Input_Fname_For_Typ (Concrete_Typ.Get.Name));
                Output_FNs.Append
                  (Output_Fname_For_Typ (Concrete_Typ.Get.Name));

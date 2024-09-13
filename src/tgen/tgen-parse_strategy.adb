@@ -165,7 +165,7 @@ package body TGen.Parse_Strategy is
                      Result.Name := Prefix;
                      Result.Last_Comp_Unit_Idx := Last_Comp_Unit_Index;
                      Strat.Generate_Name := +(+Strategy.As_Base_Id.Text);
-                     Strategies.Insert (+Result.Fully_Qualified_Name, Strat);
+                     Strategies.Insert (+Result.FQN, Strat);
                      return Result;
                   end if;
                end loop;
