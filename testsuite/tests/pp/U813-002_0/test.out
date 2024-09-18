@@ -1,5 +1,5 @@
 
-WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
 -------
 
 with Ada.Text_IO; use Ada.Text_IO;
@@ -13,7 +13,7 @@ begin
 end Main;
 
 
-WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
 -------
 
 with Ada.Text_IO; use Ada.Text_IO;
@@ -27,7 +27,7 @@ begin
 end Main;
 
 
-WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
 -------
 
 with Ada.Text_IO; use Ada.Text_IO;
@@ -41,7 +41,7 @@ begin
 end Main;
 
 
-WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
 -------
 
 with Ada.Text_IO; use Ada.Text_IO;
@@ -55,7 +55,7 @@ begin
 end Main;
 
 
-WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
 -------
 
 with Ada.Text_IO; use Ada.Text_IO;
@@ -69,7 +69,7 @@ begin
 end Main;
 
 
-WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
 -------
 
 with Ada.Text_IO; use Ada.Text_IO;

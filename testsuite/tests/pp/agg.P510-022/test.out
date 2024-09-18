@@ -1,6 +1,6 @@
 test number 1
 
-WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
 -------
 
 PACKAGE a1 IS
@@ -8,7 +8,7 @@ PACKAGE a1 IS
 END a1;
 test number 2
 
-WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
 -------
 
 PACKAGE a IS
@@ -21,15 +21,15 @@ PACKAGE a IS
 END a;
 test number 3
 
-WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
 -------
 
 
-WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
 -------
 
 
-WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
+Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
 -------
 
 ----------------
