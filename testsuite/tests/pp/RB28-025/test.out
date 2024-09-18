@@ -1,14 +1,14 @@
 gnatpp --pipe abc.ads
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 package Abc is
 end Abc;
 gnatpp --replace_backup abc.ads
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 package Abc is end;
 package Abc is
@@ -16,14 +16,14 @@ end Abc;
 gnatpp --replace_backup abc.ads
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 gnatpp: file abc.ads.npp exists
  use '--replace-force-backup' option to override
 gnatpp --replace_force_backup abc.ads
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 package Abc is end;
 package Abc is
@@ -31,7 +31,7 @@ end Abc;
 gnatpp --replace_backup --output-dir=out abc.ads
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 package Abc is end;
 package Abc is
@@ -39,14 +39,14 @@ end Abc;
 gnatpp --replace_backup --output-dir=out abc.ads
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 gnatpp: file out/abc.ads.npp exists
  use '--replace-force-backup' option to override
 gnatpp --replace_force_backup --output-dir=out abc.ads
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 package Abc is end;
 package Abc is

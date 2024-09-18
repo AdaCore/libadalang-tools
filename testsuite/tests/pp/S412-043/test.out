@@ -1,6 +1,6 @@
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 function Cvt is new Unchecked_Conversion
   (Source => Integer, Target => Tds_Unsigned_T);

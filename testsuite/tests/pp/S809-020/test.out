@@ -1,6 +1,6 @@
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 pragma Ada_95;
 pragma Warnings (Off);
@@ -322,7 +322,7 @@ package body ada_main is
 end ada_main;
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 pragma Ada_95;
 pragma Warnings (Off);
@@ -757,7 +757,7 @@ package ada_main is
 end ada_main;
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 pragma Ada_95;
 pragma Warnings (Off);
@@ -1027,7 +1027,7 @@ package body ada_main is
 end ada_main;
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 pragma Ada_95;
 pragma Warnings (Off);
@@ -1399,7 +1399,7 @@ package ada_main is
 end ada_main;
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 package Csc_Channel.Version_Handling is
    type T_Version_Handling is limited interface;
@@ -1414,7 +1414,7 @@ package Csc_Channel.Version_Handling is
 end Csc_Channel.Version_Handling;
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 procedure Gnatpp_Array_Formatting is
@@ -1441,7 +1441,7 @@ begin
 end Gnatpp_Array_Formatting;
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 with Ada.Text_IO;
 procedure Gnatpp_Exdentation is
@@ -1468,7 +1468,7 @@ begin
 end Gnatpp_Exdentation;
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 procedure Loop_Then is
    X_012345,
@@ -1612,7 +1612,7 @@ begin
 end Loop_Then;
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 procedure Ors is
 begin
@@ -1626,7 +1626,7 @@ begin
 end Ors;
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 procedure Pretty is
 
@@ -1717,7 +1717,7 @@ begin
 end Pretty;
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 procedure Separate_Thens is
    X_0123456789,
@@ -1791,12 +1791,12 @@ begin
 end Separate_Thens;
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 procedure Test070;
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 with Ada.Text_IO;
 with test_gnatpp;
@@ -1813,7 +1813,7 @@ begin
 end test070;
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 procedure Junk is
 begin
@@ -1824,7 +1824,7 @@ begin
 end Junk;
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 package test_gnatpp is
 

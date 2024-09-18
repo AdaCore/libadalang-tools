@@ -1,7 +1,7 @@
 Default layout
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 procedure Main is
    type My_Enum is
@@ -15,7 +15,7 @@ end Main;
 Minimal layout
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 procedure Main is
    type My_Enum is (One, Two, Three,
@@ -26,7 +26,7 @@ end Main;
 Compact layout
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 procedure Main is
    type My_Enum is (One, Two, Three, Four);
@@ -36,7 +36,7 @@ end Main;
 Tall layout
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 procedure Main is
 
@@ -52,7 +52,7 @@ end Main;
 Shorthand Tall layout with space syntax
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 procedure Main is
 

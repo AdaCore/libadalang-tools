@@ -1,7 +1,7 @@
 Testing --split-line-before-op switch
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 procedure Main is
    type My_Range is range 1 .. 100;

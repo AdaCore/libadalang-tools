@@ -1,6 +1,6 @@
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 package Example_With_Comments is
 
@@ -23,7 +23,7 @@ package Example_With_Comments is
 end Example_With_Comments;
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 package Example_With_Comments is -- end of line
 

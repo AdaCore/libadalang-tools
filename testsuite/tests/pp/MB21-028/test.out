@@ -1,6 +1,6 @@
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 procedure P is
    pragma Warnings (Off);
@@ -10,7 +10,7 @@ begin
 end P;
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 procedure P is
    pragma Warnings (Off);
@@ -22,7 +22,7 @@ begin
 end P;
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 package body Q is
 

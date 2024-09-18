@@ -1,6 +1,6 @@
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 package Test is
 
@@ -20,7 +20,7 @@ package Test is
 end Test;
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 package Test is
 

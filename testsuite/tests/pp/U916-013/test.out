@@ -1,7 +1,7 @@
 test_OK
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 procedure test_OK is
 
@@ -16,7 +16,7 @@ end test_OK;
 test_NOK
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 Syntax errors in test_NOK.adb
 8:4: Skipped token val

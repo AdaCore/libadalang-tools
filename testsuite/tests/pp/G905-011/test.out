@@ -1,6 +1,6 @@
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 procedure Gnatpp_Array_Formatting is
@@ -27,7 +27,7 @@ begin
 end Gnatpp_Array_Formatting;
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 with Ada.Text_IO;
 procedure Gnatpp_Exdentation is
@@ -54,7 +54,7 @@ begin
 end Gnatpp_Exdentation;
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 procedure Junk is
 begin

@@ -47,7 +47,7 @@ begin
      ("\n\1\n",
       "Info: AdaCore provides a new formatter GNATformat, currently in beta. "
       & "This will supersede GNATpp when leaving the beta program.");
-   Utils.Err_Out.Put ("-------\n\n");
+   Utils.Err_Out.Put ("-----\n\n");
 
    --  Override trace settings by parsing the config file
    GNATCOLL.Traces.Parse_Config_File;

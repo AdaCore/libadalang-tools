@@ -1,6 +1,6 @@
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 with Ada.Text_IO; use Ada.Text_IO;
 procedure Main is
@@ -12,7 +12,7 @@ end Main;
 
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 with Ada.Text_IO; use Ada.Text_IO;
 procedure Main is
@@ -24,7 +24,7 @@ end Main;
 
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 with Ada.Text_IO; use Ada.Text_IO;
 procedure Main is
@@ -36,7 +36,7 @@ end Main;
 
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 with Ada.Text_IO; use Ada.Text_IO;
 procedure Main is
@@ -48,7 +48,7 @@ end Main;
 
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 with Ada.Text_IO; use Ada.Text_IO;
 procedure Main is
@@ -60,7 +60,7 @@ end Main;
 
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 with Ada.Text_IO; use Ada.Text_IO;
 procedure Main is

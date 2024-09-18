@@ -2,7 +2,7 @@ Testing --layout switch
 1 --layout=default
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 procedure Main is
    type My_Range is range 1 .. 100;
@@ -40,7 +40,7 @@ end Main;
 2 --layout=minimal
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 procedure Main is
    type My_Range is range 1 .. 100;
@@ -59,7 +59,7 @@ end Main;
 3 --layout=tall
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 procedure Main is
 
@@ -98,7 +98,7 @@ end Main;
 4 --layout=compact
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 procedure Main is
    type My_Range is range 1 .. 100;

@@ -1,6 +1,6 @@
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 package Csc_Channel.Version_Handling is
    type T_Version_Handling is limited interface;
@@ -14,7 +14,7 @@ package Csc_Channel.Version_Handling is
 end Csc_Channel.Version_Handling;
 
 Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
--------
+-----
 
 package Csc_Channel.Version_Handling is
    type T_Version_Handling is limited interface;
