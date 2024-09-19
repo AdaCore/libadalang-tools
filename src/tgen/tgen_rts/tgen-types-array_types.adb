@@ -113,6 +113,43 @@ package body TGen.Types.Array_Types is
       return To_String (Res);
    end Image;
 
+   ----------
+   -- Size --
+   ----------
+
+   function Size (Self : Constrained_Array_Typ) return Big_Integer is
+      Total_Size  : Big_Integer := To_Big_Integer (1);
+   begin
+      for I in 1 .. Self.Num_Dims loop
+         if not Self.Index_Constraints (I).Present then
+            if As_Discrete_Typ (Self.Index_Types (I)).Is_Static then
+               Total_Size := Total_Size *
+                 (As_Discrete_Typ (Self.Index_Types (I)).High_Bound
+                  - As_Discrete_Typ (Self.Index_Types (I)).Low_Bound
+                  + To_Big_Integer (1));
+            else
+               Total_Size := To_Big_Integer (-1);
+            end if;
+         elsif Self.Index_Constraints (I).Discrete_Range.High_Bound.Kind
+               = Static
+              and then Self.Index_Constraints (I).Discrete_Range.Low_Bound.Kind
+                       = Static
+         then
+            Total_Size := Total_Size *
+              (Self.Index_Constraints (I).Discrete_Range.High_Bound.Int_Val
+               - Self.Index_Constraints (I).Discrete_Range.Low_Bound.Int_Val
+               + To_Big_Integer (1));
+         else
+            Total_Size := To_Big_Integer (-1);
+         end if;
+      end loop;
+      return Total_Size;
+   end Size;
+
+   ----------------------------
+   -- Callback_On_Constraint --
+   ----------------------------
+
    procedure Callback_On_Constraint
      (Self     : Constrained_Array_Typ;
       Var_Name : Unbounded_String;

@@ -1,0 +1,10 @@
+description:
+  Check that TGen properly rejects constrained array types which are over the
+  configured array size limit.
+  We do this by attempting to generate tests with gnattest for a big array type,
+  and checking the emitted warnings.
+
+driver: shell_script
+
+control:
+    - [XFAIL, 'x86', 'Marshalling not working for 32bits (UB03-008)']

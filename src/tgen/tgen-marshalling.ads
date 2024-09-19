@@ -47,6 +47,21 @@ package TGen.Marshalling is
    function Input_Fname_For_Typ (Typ_FQN : Ada_Qualified_Name) return String;
    --  Name of the input marshalling function for the given type
 
+   function Get_Array_Size_Limit return Positive;
+   --  Return the size beyond which the marshallers will give up trying to load
+   --  arrays, to avoid allocating overly-large arrays on the stack.
+   --
+   --  The default value is 1000, but this can be overridden either through the
+   --  TGEN_ARRAY_LIMIT environment variable, or the Set_Array_Size_Limit
+   --  procedure. The latter takes precedence over the former.
+
+   procedure Set_Array_Size_Limit (Limit : Positive);
+   --  Set the array size limit beyond which marshallers will give up reading
+   --  array values, to avoid allocating overly large arrays on the stack.
+   --
+   --  If used, this will override any value set through the TGEN_ARRAY_LIMIT
+   --  environment variable.
+
    Global_Prefix   : constant String := "TGen_Marshalling";
 
    type Spec_Part is (Pub, Priv);

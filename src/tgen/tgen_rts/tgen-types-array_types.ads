@@ -104,6 +104,10 @@ package TGen.Types.Array_Types is
      (Self : Constrained_Array_Typ) return Strategy_Type'Class;
    --  Generate a strategy for the generation for a Constrained_Array_Typ
 
+   function Size (Self : Constrained_Array_Typ) return Big_Integer;
+   --  Return the size, in number of elements, of self, if all indices are
+   --  static. Return an unspecified negative value otherwise.
+
    type Constr_Array_Enum_Strat is new Enum_Strategy_Type with record
       Arr_T : SP.Ref;
       --  Type of the array for which we are generating values

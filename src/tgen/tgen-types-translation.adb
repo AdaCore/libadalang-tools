@@ -42,6 +42,7 @@ with TGen.Types.Enum_Types;      use TGen.Types.Enum_Types;
 with TGen.Types.Int_Types;       use TGen.Types.Int_Types;
 with TGen.Types.Real_Types;      use TGen.Types.Real_Types;
 with TGen.Types.Record_Types;    use TGen.Types.Record_Types;
+with TGen.Marshalling;
 with TGen.Numerics;
 
 package body TGen.Types.Translation is
@@ -1220,6 +1221,7 @@ package body TGen.Types.Translation is
             Decl.P_Root_Type.P_Full_View.As_Type_Decl.F_Type_Def
             .As_Array_Type_Def.F_Component_Type;
          Num_Indices : Natural := 0;
+         Total_Size  : Big_Integer;
       begin
          --  Compute the number of indices
 
@@ -1355,9 +1357,6 @@ package body TGen.Types.Translation is
                end if;
 
                if not Has_Constraints then
-                  Res_Typ.Index_Constraints (Current_Index) :=
-                    (Present => False);
-
                   --  Check if the index type is a subtype with constraints. If
                   --  this is the case, update the constraints accordingly.
 
@@ -1368,6 +1367,9 @@ package body TGen.Types.Translation is
                             (Constraint.As_Identifier.P_Referenced_Decl
                              .As_Base_Type_Decl);
                      begin
+
+                        --  Create non-static constraints by default...
+
                         if Id_Type_Res.Success then
                            declare
                               FQN : constant String :=
@@ -1386,19 +1388,30 @@ package body TGen.Types.Translation is
                                  Max_Text := +(FQN & "'Last");
                               end if;
                            end;
-                           Res_Typ.Index_Constraints (Current_Index) :=
-                             (Present    => True,
-                              Discrete_Range =>
-                                (Low_Bound  =>
-                                   (Kind => Non_Static,
-                                    Text => +Min_Text),
-                                 High_Bound =>
-                                   (Kind => Non_Static,
-                                    Text => +Max_Text)));
-                        end if;
+                           Has_Constraints := True;
+                           Min_Static := False;
+                           Max_Static := False;
 
+                           --  ...But attempt to evaluate the subtype bounds,
+                           --  this is still useful in practice to detect
+                           --  arrays that could be too large.
+
+                           if As_Discrete_Typ (Id_Type_Res.Res).Is_Static then
+                              Min_Static := True;
+                              Max_Static := True;
+                              Constraint_Min :=
+                                As_Discrete_Typ (Id_Type_Res.Res).Low_Bound;
+                              Constraint_Max :=
+                                As_Discrete_Typ (Id_Type_Res.Res).High_Bound;
+                           end if;
+                        end if;
                      end;
                   end if;
+               end if;
+
+               if not Has_Constraints then
+                  Res_Typ.Index_Constraints (Current_Index) :=
+                    (Present => False);
                elsif Max_Static and then not Min_Static then
                   Res_Typ.Index_Constraints (Current_Index) :=
                   (Present        => True,
@@ -1439,6 +1452,28 @@ package body TGen.Types.Translation is
               Res_Typ.Component_Type.Get.Supports_Static_Gen
               and then (for all Idx in 1 .. Res_Typ.Num_Dims
                           => Static (Res_Typ.Index_Constraints (Idx)));
+
+            --  Check if the translated array type has less elements than what
+            --  is allowed.
+
+            Total_Size := Res_Typ.Size;
+            if Total_Size >
+              To_Big_Integer (TGen.Marshalling.Get_Array_Size_Limit)
+            then
+               return Res : Translation_Result (Success => True) do
+                  Res.Res.Set
+                    (Unsupported_Typ'
+                       (Reason =>
+                        +("array type " & To_Ada (Res_Typ.Name)
+                          & "has more elements ("
+                          & Trim (To_String (Total_Size))
+                          & ") than the configured limit ("
+                          & Trim (Positive'Image
+                              (TGen.Marshalling.Get_Array_Size_Limit))
+                          & ")"),
+                        others => <>));
+               end return;
+            end if;
 
             return Res : Translation_Result (Success => True) do
                Res.Res.Set (Res_Typ);
@@ -2832,9 +2867,15 @@ package body TGen.Types.Translation is
                       (N.As_Subtype_Indication.F_Constraint))));
             end return;
          when Array_Typ_Range =>
-            return Res : Translation_Result (Success => True) do
-               Res.Res.Set (Anonymous_Typ'
-                 (Name                => Ada_Identifier_Vectors.Empty_Vector,
+
+               --  We need to check wether this anonymous array type isn't
+               --  going to be larger than what is supported by the
+               --  marshallers.
+
+            declare
+               Anon_Typ : constant Anonymous_Typ :=
+                 (Name                =>
+                    Ada_Identifier_Vectors.Empty_Vector,
                   Last_Comp_Unit_Idx  => 1,
                   Named_Ancestor      => Intermediate_Result.Res,
                   Fully_Private       =>
@@ -2843,10 +2884,31 @@ package body TGen.Types.Translation is
                     Intermediate_Result.Res.Get.Private_Extension,
                   Subtype_Constraints => new Index_Constraints'
                     (Translate_Index_Constraints
-                      (N.As_Subtype_Indication.F_Constraint,
-                       As_Unconstrained_Array_Typ
-                         (Intermediate_Result.Res).Num_Dims))));
-            end return;
+                       (N.As_Subtype_Indication.F_Constraint,
+                        As_Unconstrained_Array_Typ
+                          (Intermediate_Result.Res).Num_Dims)));
+
+               Total_Size : constant Big_Integer :=
+                 As_Constrained_Array_Typ (Anon_Typ.As_Named_Typ).Size;
+            begin
+               if Total_Size >
+                 To_Big_Integer (TGen.Marshalling.Get_Array_Size_Limit)
+               then
+                  return Res : Translation_Result (Success => False) do
+                     Res.Diagnostics :=
+                       +("array type has more elements ("
+                         & Trim (To_String (Total_Size))
+                         & ") than the configured limit ("
+                         & Trim (Positive'Image
+                             (TGen.Marshalling.Get_Array_Size_Limit))
+                         & ")");
+                  end return;
+               else
+                  return Res : Translation_Result (Success => True) do
+                     Res.Res.Set (Anon_Typ);
+                  end return;
+               end if;
+            end;
          when Record_Typ_Range =>
             return Res : Translation_Result (Success => True) do
                pragma Assert (Kind (N.As_Subtype_Indication.F_Constraint)
@@ -2963,7 +3025,7 @@ package body TGen.Types.Translation is
       --  First part of the declaration. Used to determine whether the type we
       --  are translating is private or not.
 
-      Specialized_Res : Translation_Result (Success => True);
+      Specialized_Res : Translation_Result;
 
    begin
       Verbose_Diag := Verbose;
@@ -2980,6 +3042,8 @@ package body TGen.Types.Translation is
          --  declarations or anonymous access types, both of which we don't
          --  intend to support.
 
+         Specialized_Res := (Success => True, others => <>);
+
          Specialized_Res.Res.Set
            (Unsupported_Typ'
              (Reason => To_Unbounded_String
@@ -2993,6 +3057,7 @@ package body TGen.Types.Translation is
          --  modular integer but for which we do not want to generate any
          --  values.
 
+         Specialized_Res := (Success => True, others => <>);
          Specialized_Res.Res.Set (Unsupported_Typ'
            (Reason => To_Unbounded_String ("System.Address unsupported"),
             others => <>));
@@ -3002,6 +3067,7 @@ package body TGen.Types.Translation is
          --  We are dealing with a private type declared in a nested package,
          --  consider this as unsupported.
 
+         Specialized_Res := (Success => True, others => <>);
          Specialized_Res.Res.Set (Unsupported_Typ'
            (Reason =>
               To_Unbounded_String
@@ -3009,6 +3075,7 @@ package body TGen.Types.Translation is
                  & " supported"),
             others => <>));
       elsif Root_Type.P_Is_Formal then
+         Specialized_Res := (Success => True, others => <>);
          Specialized_Res.Res.Set (Formal_Typ'
            (Reason =>
               To_Unbounded_String ("Generic formal types are unsupported"),
@@ -3020,10 +3087,12 @@ package body TGen.Types.Translation is
           (Node       => N,
            Other_Type => N.P_Bool_Type.As_Base_Type_Decl)
       then
+         Specialized_Res := (Success => True, others => <>);
          Specialized_Res.Res.Set (Bool_Typ'(Is_Static => True, others => <>));
       elsif Root_Type.P_Is_Enum_Type then
 
          if not Is_Static then
+            Specialized_Res := (Success => True, others => <>);
             Specialized_Res.Res.Set (Other_Enum_Typ'
               (Is_Static => False, others => <>));
          end if;
@@ -3045,6 +3114,7 @@ package body TGen.Types.Translation is
          if Is_Static then
             Specialized_Res := Translate_Float_Decl (N);
          else
+            Specialized_Res := (Success => True, others => <>);
             Specialized_Res.Res.Set
               (Float_Typ'
                (Is_Static => False,
@@ -3059,6 +3129,7 @@ package body TGen.Types.Translation is
             if Is_Static then
                Specialized_Res := Translate_Ordinary_Fixed_Decl (N);
             else
+               Specialized_Res := (Success => True, others => <>);
                Specialized_Res.Res.Set
                  (Ordinary_Fixed_Typ'
                     (Is_Static => False,
@@ -3068,6 +3139,7 @@ package body TGen.Types.Translation is
             if Is_Static then
                Specialized_Res := Translate_Decimal_Fixed_Decl (N);
             else
+               Specialized_Res := (Success => True, others => <>);
                Specialized_Res.Res.Set
                  (Decimal_Fixed_Typ'
                     (Is_Static => False,
@@ -3081,6 +3153,7 @@ package body TGen.Types.Translation is
 
       elsif Root_Type.P_Is_Record_Type then
          if Root_Type.P_Is_Tagged_Type then
+            Specialized_Res := (Success => True, others => <>);
             Specialized_Res.Res.Set
               (Unsupported_Typ'
                 (Reason => To_Unbounded_String ("tagged types not supported"),
@@ -3090,12 +3163,14 @@ package body TGen.Types.Translation is
          end if;
 
       elsif Root_Type.P_Is_Access_Type then
+         Specialized_Res := (Success => True, others => <>);
          Specialized_Res.Res.Set
            (Access_Typ'
               (Reason =>
                  To_Unbounded_String ("Access types are not supported"),
                others => <>));
       else
+         Specialized_Res := (Success => True, others => <>);
          Specialized_Res.Res.Set
            (Unsupported_Typ'
               (Reason => To_Unbounded_String ("Unknown type kind"),
