@@ -1,6 +1,6 @@
 
-WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
--------
+Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
+-----
 
 procedure P is
    pragma Warnings (Off);
@@ -9,8 +9,8 @@ begin
    null;
 end P;
 
-WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
--------
+Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
+-----
 
 procedure P is
    pragma Warnings (Off);
@@ -21,8 +21,8 @@ begin
    null;
 end P;
 
-WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
--------
+Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
+-----
 
 package body Q is
 

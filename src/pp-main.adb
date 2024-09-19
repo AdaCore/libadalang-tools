@@ -45,9 +45,9 @@ begin
    --  Deprecation message to advertise about GNATformat
    Utils.Err_Out.Put
      ("\n\1\n",
-      "WARNING: GNATpp will be baselined soon. Please switch "
-      & "to GNATformat, the new Ada code formatter, for future use.");
-   Utils.Err_Out.Put ("-------\n\n");
+      "Info: AdaCore provides a new formatter GNATformat, currently in beta. "
+      & "This will supersede GNATpp when leaving the beta program.");
+   Utils.Err_Out.Put ("-----\n\n");
 
    --  Override trace settings by parsing the config file
    GNATCOLL.Traces.Parse_Config_File;

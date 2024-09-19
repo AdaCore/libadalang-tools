@@ -1,6 +1,6 @@
 
-WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
--------
+Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
+-----
 
 package Csc_Channel.Version_Handling is
    type T_Version_Handling is limited interface;
@@ -13,8 +13,8 @@ package Csc_Channel.Version_Handling is
       P2   : out Lang.Primitifs.T_Uint) is abstract;
 end Csc_Channel.Version_Handling;
 
-WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
--------
+Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
+-----
 
 package Csc_Channel.Version_Handling is
    type T_Version_Handling is limited interface;

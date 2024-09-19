@@ -1,8 +1,8 @@
 Testing --layout switch
 1 --layout=default
 
-WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
--------
+Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
+-----
 
 procedure Main is
    type My_Range is range 1 .. 100;
@@ -39,8 +39,8 @@ end Main;
 ---------------------------------------------------
 2 --layout=minimal
 
-WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
--------
+Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
+-----
 
 procedure Main is
    type My_Range is range 1 .. 100;
@@ -58,8 +58,8 @@ end Main;
 ---------------------------------------------------
 3 --layout=tall
 
-WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
--------
+Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
+-----
 
 procedure Main is
 
@@ -97,8 +97,8 @@ end Main;
 ---------------------------------------------------
 4 --layout=compact
 
-WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
--------
+Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
+-----
 
 procedure Main is
    type My_Range is range 1 .. 100;

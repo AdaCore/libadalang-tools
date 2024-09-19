@@ -1,6 +1,6 @@
 
-WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
--------
+Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
+-----
 
 WITH System.Multiprocessors.Dispatching_Domains;
 PACKAGE p IS
@@ -9,8 +9,8 @@ PACKAGE p IS
    END t;
 END p;
 
-WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
--------
+Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
+-----
 
 WITH System.Multiprocessors.Dispatching_Domains;
 PACKAGE p IS

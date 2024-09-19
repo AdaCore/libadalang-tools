@@ -1,6 +1,6 @@
 
-WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
--------
+Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
+-----
 
 procedure Loop_Then is
    X_012345, X_0123456, X_01234567,
@@ -186,8 +186,8 @@ begin
 end Loop_Then;
 separate-loop
 
-WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
--------
+Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
+-----
 
 procedure Loop_Then is
    X_012345, X_0123456, X_01234567,
@@ -376,8 +376,8 @@ begin
 end Loop_Then;
 separate-then
 
-WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
--------
+Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
+-----
 
 procedure Loop_Then is
    X_012345, X_0123456, X_01234567,
@@ -574,8 +574,8 @@ begin
 end Loop_Then;
 separate-loop-then
 
-WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
--------
+Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
+-----
 
 procedure Loop_Then is
    X_012345, X_0123456, X_01234567,
@@ -775,8 +775,8 @@ begin
 end Loop_Then;
 separate-loop separate-then
 
-WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
--------
+Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
+-----
 
 procedure Loop_Then is
    X_012345, X_0123456, X_01234567,
@@ -976,8 +976,8 @@ begin
 end Loop_Then;
 no-separate-loop
 
-WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
--------
+Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
+-----
 
 procedure Loop_Then is
    X_012345, X_0123456, X_01234567,
@@ -1156,8 +1156,8 @@ begin
 end Loop_Then;
 no-separate-then
 
-WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
--------
+Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
+-----
 
 procedure Loop_Then is
    X_012345, X_0123456, X_01234567,
@@ -1334,8 +1334,8 @@ begin
 end Loop_Then;
 no-separate-loop-then
 
-WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
--------
+Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
+-----
 
 procedure Loop_Then is
    X_012345, X_0123456, X_01234567,
@@ -1505,8 +1505,8 @@ begin
 end Loop_Then;
 no-separate-loop no-separate-then
 
-WARNING: GNATpp will be baselined soon. Please switch to GNATformat, the new Ada code formatter, for future use.
--------
+Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
+-----
 
 procedure Loop_Then is
    X_012345, X_0123456, X_01234567,
