@@ -1,3 +1,6 @@
+gnattest: Error while processing <ExprFunction ["Ident"] my_file.ads:78:4-78:43>:
+my_file.ident.X: my_file.ident.t is not supported (Generic formal types are unsupported)
+
 Units remaining: 2     Units remaining: 1     
 my_file.ads:14:4: info: corresponding test PASSED
 my_file.ads:14:4: info: corresponding test PASSED
