@@ -147,7 +147,18 @@ package body TGen.Wrappers is
             end;
 
          when Ada_Paren_Expr =>
-            return Dnf (E.As_Paren_Expr.F_Expr, Polarity);
+
+            --  Do not unwrap the Paren_Expr if is is legally required by the
+            --  parenthesized expression, such as if-expressions or quantified
+            --  expressions.
+
+            if E.As_Paren_Expr.F_Expr.Kind not in
+              Ada_Cond_Expr
+              | Ada_Quantified_Expr
+              | Ada_Decl_Expr
+            then
+               return Dnf (E.As_Paren_Expr.F_Expr, Polarity);
+            end if;
 
          when others =>
             null;
