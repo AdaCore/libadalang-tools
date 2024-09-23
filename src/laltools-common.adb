@@ -1180,7 +1180,7 @@ package body Laltools.Common is
       return Defining_Name
    is
       Qualified_Name : constant Langkit_Support.Text.Text_Type :=
-        Definition.P_Basic_Decl.P_Fully_Qualified_Name;
+        Definition.P_Fully_Qualified_Name;
       --  The name that we'll try to match
 
       Found : Defining_Name := No_Defining_Name;
@@ -1210,7 +1210,7 @@ package body Laltools.Common is
                Decl     : constant Basic_Decl := Node.As_Basic_Decl;
                Def      : constant Defining_Name := Decl.P_Defining_Name;
                Def_Name : constant Langkit_Support.Text.Text_Type :=
-                 Decl.P_Fully_Qualified_Name;
+                 Def.P_Fully_Qualified_Name;
             begin
                --  Search a declaration with the same qualified_name which is
                --  not Definition itself.
