@@ -823,11 +823,6 @@ package body Test.Stub is
 
       New_Line_Count;
 
-      if Add_Pragma_05 then
-         New_Line_Count;
-         S_Put (0, "pragma Ada_2005;");
-      end if;
-
       if Markered_Data.Contains (ID) then
          --  Extract importing MD
          MD := Markered_Data.Element (ID);
@@ -837,6 +832,10 @@ package body Test.Stub is
          New_Line_Count;
          if Add_Import and then Tasks_Present then
             S_Put (3, "with Ada.Real_Time;");
+            New_Line_Count;
+         end if;
+         if Add_Pragma_05 then
+            S_Put (0, "pragma Ada_2005;");
             New_Line_Count;
          end if;
       end if;
