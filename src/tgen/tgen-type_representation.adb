@@ -23,6 +23,8 @@
 
 with GNAT.OS_Lib;
 
+with Utils.String_Utilities;
+
 pragma Warnings (Off);
 with TGen.Big_Int;
 with TGen.Big_Reals;
@@ -39,6 +41,9 @@ with TGen.Types.Record_Types;      use TGen.Types.Record_Types;
 pragma Warnings (On);
 
 package body TGen.Type_Representation is
+
+   function Esc (Str : String) return String renames
+     Utils.String_Utilities.Escape_String_Literal;
 
    procedure Collect_Info_For_Constraint
      (Ty_Prefix : String;
@@ -349,7 +354,7 @@ package body TGen.Type_Representation is
       T_Decl, T_Init : out Unbounded_String)
    is
       Ty_Prefix : constant String := T.Slug;
-      Ty_Name   : constant String := T.Fully_Qualified_Name;
+      Ty_Name   : constant String := Esc (T.FQN (No_Std => True));
       Assocs    : Translate_Set;
    begin
       Insert (Assocs, Assoc ("TY_NAME", Ty_Name));
@@ -394,7 +399,7 @@ package body TGen.Type_Representation is
       T_Decl, T_Init : out Unbounded_String)
    is
       Ty_Prefix : constant String := T.Slug;
-      Ty_Name   : constant String := T.Fully_Qualified_Name;
+      Ty_Name   : constant String := Esc (T.FQN (No_Std => True));
       Assocs    : Translate_Set;
    begin
       Insert (Assocs, Assoc ("TY_NAME", Ty_Name));
@@ -425,7 +430,7 @@ package body TGen.Type_Representation is
       Scalar_Typ_Init : out Unbounded_String)
    is
       Ty_Prefix : constant String := T.Slug;
-      Ty_Name   : constant String := T.Fully_Qualified_Name;
+      Ty_Name   : constant String := Esc (T.FQN (No_Std => True));
       Assocs : Translate_Set;
    begin
       Insert (Assocs, Assoc ("TY_NAME", Ty_Name));
@@ -475,7 +480,7 @@ package body TGen.Type_Representation is
       use Templates.Type_Representation;
 
       Ty_Prefix : constant String := Typ.Slug;
-      Ty_Name   : constant String := Typ.Fully_Qualified_Name;
+      Ty_Name   : constant String := Esc (Typ.FQN (No_Std => True));
       Anonymous_Ty_Index : Positive := 1;
       Variant_Index : Positive := 1;
 

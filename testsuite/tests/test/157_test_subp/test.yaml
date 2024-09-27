@@ -1,0 +1,8 @@
+description: Check that the support library and gnattest harness are legal when
+  either the subprogram under test is called "test" or the unit in which it is
+  defined is called test.
+
+driver: shell_script
+
+control:
+    - [XFAIL, 'x86', 'Marshalling not working for 32bits (UB03-008)']

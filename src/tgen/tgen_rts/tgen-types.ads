@@ -103,10 +103,6 @@ package TGen.Types is
    function Is_Anonymous (Self : Typ) return Boolean;
    --  Whether Self represents an anonymous type
 
-   function Fully_Qualified_Name (Self : Typ) return String is
-     (To_Ada (Self.Name));
-   --  Return the FQN of Self
-
    function Type_Name (Self : Typ) return String is
      (if Ada_Identifier_Vectors.Is_Empty (Self.Name)
       then "anonymous"
@@ -128,6 +124,12 @@ package TGen.Types is
    function Compilation_Unit_Name (Self : Typ) return String;
    function Compilation_Unit_Name (Self : Typ) return Ada_Qualified_Name;
    --  Return the name of the compilation unit this type belongs to
+
+   function FQN (Self : Typ; No_Std : Boolean := False) return String;
+   --  Return the fully qualified name for the type.
+   --
+   --  If No_Std is True, remove the Standard prefix for entities from the
+   --  standard packaged.
 
    function Is_Constrained (Self : Typ) return Boolean is (False);
    --  An array type with indefinite bounds must be constrained, a discriminant
@@ -183,9 +185,6 @@ package TGen.Types is
 
    procedure Free_Content (Self : in out Typ) is null;
    --  Helper for shared pointers
-
-   function FQN (Self : Typ) return String is (To_Ada (Self.Name));
-   --  Return the fully qualified name for the type
 
    function Simple_Name (Self : Typ) return String is
      (+Unbounded_String (Self.Name.Last_Element));

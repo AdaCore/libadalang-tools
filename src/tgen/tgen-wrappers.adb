@@ -239,7 +239,10 @@ package body TGen.Wrappers is
                   Append (Result, " : ");
                   Append
                     (Result, Image (F.Param_Modes.Element (Param_Name)) & " ");
-                  Append (Result, Param_Type.Get.FQN & " ");
+                  Append
+                    (Result,
+                    "TGen.TGen_Std." & Param_Type.Get.FQN (No_Std => True)
+                    & " ");
                   if Param_Name /= F.Param_Order.Last_Element then
                      Append (Result, " ; ");
                   end if;
@@ -252,7 +255,10 @@ package body TGen.Wrappers is
 
          if Kind = Ada_Subp_Kind_Function then
             Append (Result, " return ");
-            Append (Result, To_Ada (F.Ret_Typ.Get.Name));
+            Append
+              (Result,
+               "TGen.TGen_Std."
+               & F.Ret_Typ.Get.FQN (No_Std => True));
          end if;
 
          return To_String (Result);

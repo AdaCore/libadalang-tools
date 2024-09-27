@@ -348,7 +348,7 @@ package body TGen.Marshalling is
       for I in U_Typ.Index_Types'Range loop
          declare
             Index_Type : constant String :=
-              U_Typ.Index_Types (I).Get.Fully_Qualified_Name;
+              U_Typ.Index_Types (I).Get.FQN (No_Std => True);
             Index_Pref : constant String := Prefix_For_Typ
               (U_Typ.Index_Types (I).Get.Slug);
             Assocs     : constant Translate_Table :=
@@ -408,7 +408,7 @@ package body TGen.Marshalling is
          declare
             Discr_Name : constant String := (+Component_Maps.Key (Cu));
             Discr_Typ  : constant String :=
-              (Component_Maps.Element (Cu).Get.Fully_Qualified_Name);
+              (Component_Maps.Element (Cu).Get.FQN (No_Std => True));
             Discr_Pref : constant String :=
               Prefix_For_Typ (Component_Maps.Element (Cu).Get.Slug);
          begin
@@ -427,7 +427,7 @@ package body TGen.Marshalling is
      (Typ      : TGen.Types.Typ'Class;
       For_Base : Boolean := False)
    is
-      B_Name         : constant String := Typ.Fully_Qualified_Name;
+      B_Name         : constant String := Typ.FQN (No_Std => True);
       Ty_Prefix      : constant String := Prefix_For_Typ (Typ.Slug);
       Ty_Name        : constant String :=
         (if For_Base then B_Name & "'Base" else B_Name);
@@ -611,9 +611,9 @@ package body TGen.Marshalling is
          Object_Name   : String)
       is
          Discr_Name    : constant String := +V.Discr_Name;
-         Discr_Typ     : constant TGen.Types.Typ'Class :=
-           Discriminants (V.Discr_Name).Get;
-         Discr_Typ_FQN : constant String := Discr_Typ.Fully_Qualified_Name;
+         Discr_Typ     : constant TGen.Types.SP.Ref :=
+           Discriminants (V.Discr_Name);
+         Discr_Typ_FQN : constant String := Discr_Typ.Get.FQN (No_Std => True);
 
          Choices_Tag          : Matrix_Tag;
          Comp_Read_Tag        : Matrix_Tag;
@@ -632,7 +632,7 @@ package body TGen.Marshalling is
 
             Choices_Tag :=
               Choices_Tag & Create_Tag_For_Intervals
-                (V_Choice.Alt_Set, Discr_Typ);
+                (V_Choice.Alt_Set, Discr_Typ.Get);
 
             --  Hanlde the components
 
@@ -858,7 +858,7 @@ package body TGen.Marshalling is
                     3  => Assoc ("COMPONENT_SIZE", Component_Size),
                     4  => Assoc ("COMPONENT_SIZE_MAX", Component_Size_Max),
                     5  => Assoc
-                      ("COMP_TYP", Named_Comp_Ty.Fully_Qualified_Name),
+                      ("COMP_TYP", Named_Comp_Ty.FQN (No_Std => True)),
                     6  => Assoc ("ADA_DIM", Ada_Dim_Tag),
                     7  => Assoc ("FIRST_NAME", First_Name_Tag),
                     8  => Assoc ("LAST_NAME", Last_Name_Tag),

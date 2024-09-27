@@ -7,8 +7,8 @@
    --  Input and Output functions for @_TY_NAME_@
 
    function @_TY_PREFIX_@_Output
-     (@_GLOBAL_PREFIX_@_V : @_TY_NAME_@) return TGen.JSON.JSON_Value;
+     (@_GLOBAL_PREFIX_@_V : TGen.TGen_Std.@_TY_NAME_@) return TGen.JSON.JSON_Value;
 
    function @_TY_PREFIX_@_Input
      (@_GLOBAL_PREFIX_@_JSON : TGen.JSON.JSON_Value)
-     return @_TY_NAME_@;
+     return TGen.TGen_Std.@_TY_NAME_@;

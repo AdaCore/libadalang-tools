@@ -26,6 +26,8 @@
 package TGen is
    pragma Preelaborate;
 
+   package TGen_Std renames Standard;
+
    Version : constant String := "0.0";
 
    Precondition_Error : exception;

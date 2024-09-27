@@ -9,7 +9,7 @@
 @@--       @_GLOBAL_PREFIX_@_E.
 @@--
    function @_TY_PREFIX_@_Size
-     (@_GLOBAL_PREFIX_@_V : @_TY_NAME_@)
+     (@_GLOBAL_PREFIX_@_V : TGen.TGen_Std.@_TY_NAME_@)
      return Natural
    is
      @_GLOBAL_PREFIX_@_Length : constant Natural :=
@@ -23,7 +23,7 @@
          return 0;
       end if;
       declare
-         @_GLOBAL_PREFIX_@_E : @_COMP_TYP_@ renames
+         @_GLOBAL_PREFIX_@_E : TGen.TGen_Std.@_COMP_TYP_@ renames
            @_GLOBAL_PREFIX_@_V
 @@INLINE(             \()(, )(\);)@@
 @@TABLE@@

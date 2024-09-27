@@ -8,7 +8,7 @@
 @@--       from the variant part of @_GLOBAL_PREFIX_@_V.
 @@--
    function @_TY_PREFIX_@_Size
-     (@_GLOBAL_PREFIX_@_V : @_TY_NAME_@)
+     (@_GLOBAL_PREFIX_@_V : TGen.TGen_Std.@_TY_NAME_@)
      return Natural
    is
    begin

@@ -1,0 +1,14 @@
+Units remaining: 2     Units remaining: 1     
+foo.ads:9:4: info: corresponding test PASSED
+foo.ads:9:4: info: corresponding test PASSED
+foo.ads:9:4: info: corresponding test PASSED
+foo.ads:9:4: info: corresponding test PASSED
+foo.ads:9:4: info: corresponding test PASSED
+test.ads:5:4: info: corresponding test PASSED
+test.ads:5:4: info: corresponding test PASSED
+test.ads:5:4: info: corresponding test PASSED
+test.ads:5:4: info: corresponding test PASSED
+test.ads:5:4: info: corresponding test PASSED
+foo.ads:9:4: error: corresponding test FAILED: Test not implemented. (foo-test_data-tests.adb:45)
+test.ads:5:4: error: corresponding test FAILED: Test not implemented. (test-test_data-tests.adb:45)
+12 tests run: 10 passed; 2 failed; 0 crashed.

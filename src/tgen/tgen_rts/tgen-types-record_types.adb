@@ -23,6 +23,7 @@
 
 with Ada.Containers;        use Ada.Containers;
 with Ada.Strings;           use Ada.Strings;
+with Ada.Strings.Equal_Case_Insensitive;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Unchecked_Deallocation;
 
@@ -1593,10 +1594,18 @@ package body TGen.Types.Record_Types is
    -- FQN --
    ---------
 
-   function FQN (Self : Function_Typ) return String is
+   function FQN (Self : Function_Typ; No_Std : Boolean := False) return String
+   is
       Result : Ada_Qualified_Name := Self.Name.Copy;
    begin
       Result.Delete_Last;
+      if No_Std
+        and then Ada.Strings.Equal_Case_Insensitive
+                  (+Unbounded_String (Self.Name.First_Element),
+                   "standard")
+      then
+         Result.Delete_First;
+      end if;
       return To_Ada (Result);
    end FQN;
 
@@ -1861,5 +1870,29 @@ package body TGen.Types.Record_Types is
       Res.Append_Vector (Get_Diagnostics (Self.Globals, Global_Prefix));
       return Res;
    end Get_Diagnostics;
+
+   ----------
+   -- Slug --
+   ----------
+
+   function Slug (Self : Function_Typ) return String is
+      Temp : Ada_Qualified_Name;
+   begin
+      --  Build a new qualified name, replacing operator names by an
+      --  ada-compliant identifier.
+
+      for Id of Self.Name loop
+         if Is_Operator (+Unbounded_String (Id)) then
+            Temp.Append
+              (New_Item =>
+                 Ada_Identifier (+Map_Operator_Name (+Unbounded_String (Id))),
+               Count    => 1);
+         else
+            Temp.Append (New_Item => Id, Count => 1);
+         end if;
+      end loop;
+
+      return To_Symbol (Temp, '_');
+   end Slug;
 
 end TGen.Types.Record_Types;

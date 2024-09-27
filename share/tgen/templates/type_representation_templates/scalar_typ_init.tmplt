@@ -4,10 +4,11 @@
 @@--  @_DISCRETE_TYP_@ Kind of the discrete typ
 @@--
 @@IF@@ @_SCALAR_TYP_@ = "Other_Enum_Typ"
-   for Elem in @_TY_NAME_@ loop
+   for Elem in TGen.TGen_Std.@_TY_NAME_@ loop
       @_TY_PREFIX_@_Typ.Literals.Insert
-         (TGen.Big_Int.From_Universal_Image (@_TY_NAME_@'Pos (Elem)'Image),
-          TGen.Strings."+" (@_TY_NAME_@'Image (Elem)));
+         (TGen.Big_Int.From_Universal_Image
+            (TGen.TGen_Std.@_TY_NAME_@'Pos (Elem)'Image),
+          TGen.Strings."+" (TGen.TGen_Std.@_TY_NAME_@'Image (Elem)));
    end loop;
 @@ELSIF@@ @_SCALAR_TYP_@ = "Char_Typ"
 @@--  TODO deal with character types

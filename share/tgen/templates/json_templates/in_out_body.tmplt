@@ -14,7 +14,7 @@
 @@IF@@ @_IS_SCALAR_@
    procedure @_TY_PREFIX_@_Read_No_Param
      (@_GLOBAL_PREFIX_@_JSON : TGen.JSON.JSON_Value;
-      @_GLOBAL_PREFIX_@_V    : out @_TY_NAME_@)
+      @_GLOBAL_PREFIX_@_V    : out TGen.TGen_Std.@_TY_NAME_@)
    is
    begin
      @_TY_PREFIX_@_Read
@@ -23,7 +23,7 @@
 
    procedure @_TY_PREFIX_@_Write_No_Param
      (@_GLOBAL_PREFIX_@_JSON : in out TGen.JSON.JSON_Value;
-      @_GLOBAL_PREFIX_@_V    : @_TY_NAME_@)
+      @_GLOBAL_PREFIX_@_V    : TGen.TGen_Std.@_TY_NAME_@)
    is
    begin
      @_TY_PREFIX_@_Write
@@ -32,13 +32,13 @@
 
    package @_TY_PREFIX_@_In_Out_JSON is
      new @_MARSHALLING_LIB_@.@_GENERIC_NAME_@_JSON
-       (T     => @_TY_NAME_@,
+       (T     => TGen.TGen_Std.@_TY_NAME_@,
         Read  => @_TY_PREFIX_@_Read_No_Param,
         Write => @_TY_PREFIX_@_Write_No_Param);
 @@ELSE@@
    package @_TY_PREFIX_@_In_Out_JSON is
      new @_MARSHALLING_LIB_@.@_GENERIC_NAME_@_JSON
-       (T      => @_TY_NAME_@,
+       (T      => TGen.TGen_Std.@_TY_NAME_@,
 @@IF@@ @_NEEDS_HEADER_@
         Header        => @_TY_PREFIX_@_Header_Type,
         Init          => @_TY_PREFIX_@_Init_From_Header,
@@ -50,9 +50,9 @@
 @@END_IF@@
 
    function @_TY_PREFIX_@_Output
-     (@_GLOBAL_PREFIX_@_V : @_TY_NAME_@) return TGen.JSON.JSON_Value
+     (@_GLOBAL_PREFIX_@_V : TGen.TGen_Std.@_TY_NAME_@) return TGen.JSON.JSON_Value
      renames @_TY_PREFIX_@_In_Out_JSON.Output;
 
    function @_TY_PREFIX_@_Input
-     (@_GLOBAL_PREFIX_@_JSON : TGen.JSON.JSON_Value) return @_TY_NAME_@
+     (@_GLOBAL_PREFIX_@_JSON : TGen.JSON.JSON_Value) return TGen.TGen_Std.@_TY_NAME_@
      renames @_TY_PREFIX_@_In_Out_JSON.Input;

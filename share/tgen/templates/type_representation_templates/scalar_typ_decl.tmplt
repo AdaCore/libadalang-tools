@@ -10,7 +10,7 @@
 
 @@IF@@ @_SCALAR_TYP_@ = "Signed_Int_Typ"
    package @_TY_PREFIX_@_Typ_Conversions is
-      new TGen.Big_Int.Signed_Conversions (@_TY_NAME_@);
+      new TGen.Big_Int.Signed_Conversions (TGen.TGen_Std.@_TY_NAME_@);
 
    @_TY_PREFIX_@_Typ : constant TGen.Types.Int_Types.Signed_Int_Typ :=
       (Name => TGen.Strings.To_Qualified_Name ("@_TY_NAME_@"),
@@ -19,10 +19,10 @@
           TGen.Types.Discrete_Types.Int_Range'
              (Min =>
                  @_TY_PREFIX_@_Typ_Conversions.To_Big_Integer
-                    (@_TY_NAME_@'First),
+                    (TGen.TGen_Std.@_TY_NAME_@'First),
               Max =>
                  @_TY_PREFIX_@_Typ_Conversions.To_Big_Integer
-                    (@_TY_NAME_@'Last)),
+                    (TGen.TGen_Std.@_TY_NAME_@'Last)),
        others => <>);
 
 @@ELSIF@@ @_SCALAR_TYP_@ = "Mod_Int_Typ"
@@ -30,7 +30,8 @@
       (Name => TGen.Strings.To_Qualified_Name ("@_TY_NAME_@"),
        Is_Static => True,
        Mod_Value =>
-          TGen.Big_Int.From_Universal_Image (@_TY_NAME_@'Modulus'Image),
+          TGen.Big_Int.From_Universal_Image
+            (TGen.TGen_Std.@_TY_NAME_@'Modulus'Image),
        others => <>);
 
 @@ELSIF@@ @_SCALAR_TYP_@ = "Char_Typ"
@@ -60,20 +61,20 @@
 
 @@ELSIF@@ @_SCALAR_TYP_@ = "Float_Typ"
    package @_TY_PREFIX_@_Typ_Conversions is
-      new TGen.Big_Reals.Float_Conversions (@_TY_NAME_@);
+      new TGen.Big_Reals.Float_Conversions (TGen.TGen_Std.@_TY_NAME_@);
    @_TY_PREFIX_@_Typ : constant TGen.Types.Real_Types.Float_Typ :=
       (Name         => TGen.Strings.To_Qualified_Name ("@_TY_NAME_@"),
        Is_Static    => True,
        Has_Range    => True,
-       Digits_Value => @_TY_NAME_@'Digits,
+       Digits_Value => TGen.TGen_Std.@_TY_NAME_@'Digits,
        Range_Value  =>
           TGen.Types.Real_Types.Float_Range'
              (Min =>
                  @_TY_PREFIX_@_Typ_Conversions.To_Big_Real
-                    (@_TY_NAME_@'First),
+                    (TGen.TGen_Std.@_TY_NAME_@'First),
               Max =>
                  @_TY_PREFIX_@_Typ_Conversions.To_Big_Real
-                    (@_TY_NAME_@'Last)),
+                    (TGen.TGen_Std.@_TY_NAME_@'Last)),
        others => <>);
 
 @@ELSIF@@ @_SCALAR_TYP_@ = "Ordinary_Fixed_Typ"
@@ -81,13 +82,16 @@
       (Name         => TGen.Strings.To_Qualified_Name ("@_TY_NAME_@"),
        Is_Static    => True,
        Delta_Value  =>
-          TGen.Big_Reals.From_Universal_Image (@_TY_NAME_@'Delta'Image),
+          TGen.Big_Reals.From_Universal_Image
+            (TGen.TGen_Std.@_TY_NAME_@'Delta'Image),
        Range_Value  =>
           TGen.Types.Real_Types.Float_Range'
              (Min =>
-                 TGen.Big_Reals.From_Universal_Image (@_TY_NAME_@'First'Image),
+                 TGen.Big_Reals.From_Universal_Image
+                   (TGen.TGen_Std.@_TY_NAME_@'First'Image),
               Max =>
-                 TGen.Big_Reals.From_Universal_Image (@_TY_NAME_@'Last'Image)),
+                 TGen.Big_Reals.From_Universal_Image
+                   (TGen.TGen_Std.@_TY_NAME_@'Last'Image)),
        others => <>);
 
 @@ELSIF@@ @_SCALAR_TYP_@ = "Decimal_Fixed_Typ"
@@ -96,14 +100,17 @@
        Is_Static    => True,
        Has_Range    => True,
        Delta_Value  =>
-          TGen.Big_Reals.From_Universal_Image (@_TY_NAME_@'Delta'Image),
-       Digits_Value => @_TY_NAME_@'Digits,
+          TGen.Big_Reals.From_Universal_Image
+            (TGen.TGen_Std.@_TY_NAME_@'Delta'Image),
+       Digits_Value => TGen.TGen_Std.@_TY_NAME_@'Digits,
        Range_Value  =>
           TGen.Types.Real_Types.Float_Range'
              (Min =>
-                 TGen.Big_Reals.From_Universal_Image (@_TY_NAME_@'First'Image),
+                 TGen.Big_Reals.From_Universal_Image
+                   (TGen.TGen_Std.@_TY_NAME_@'First'Image),
               Max =>
-                 TGen.Big_Reals.From_Universal_Image (@_TY_NAME_@'Last'Image)),
+                 TGen.Big_Reals.From_Universal_Image
+                   (TGen.TGen_Std.@_TY_NAME_@'Last'Image)),
        others => <>);
 
 @@END_IF@@

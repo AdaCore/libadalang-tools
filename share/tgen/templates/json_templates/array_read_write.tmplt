@@ -11,7 +11,7 @@
 @@--
    procedure @_TY_PREFIX_@_Write
      (@_GLOBAL_PREFIX_@_JSON : in out TGen.JSON.JSON_Value;
-      @_GLOBAL_PREFIX_@_V    : @_TY_NAME_@)
+      @_GLOBAL_PREFIX_@_V    : TGen.TGen_Std.@_TY_NAME_@)
    is
       @_GLOBAL_PREFIX_@_JSON_Array_Sizes : TGen.JSON.JSON_Array;
       @_GLOBAL_PREFIX_@_JSON_Array : TGen.JSON.JSON_Array;
@@ -34,7 +34,7 @@
 
    procedure @_TY_PREFIX_@_Read
      (@_GLOBAL_PREFIX_@_JSON : TGen.JSON.JSON_Value;
-      @_GLOBAL_PREFIX_@_V    : out @_TY_NAME_@)
+      @_GLOBAL_PREFIX_@_V    : out TGen.TGen_Std.@_TY_NAME_@)
    is
       @_GLOBAL_PREFIX_@_JSON_Array : constant TGen.JSON.JSON_Array :=
          TGen.JSON.Get (@_GLOBAL_PREFIX_@_JSON, "array");
@@ -49,7 +49,7 @@
             (@_GLOBAL_PREFIX_@_JSON_Array, Current_Index);
       end loop;
 
-      if @_GLOBAL_PREFIX_@_V not in @_TY_NAME_@ then
+      if @_GLOBAL_PREFIX_@_V not in TGen.TGen_Std.@_TY_NAME_@ then
         raise Invalid_Value;
       end if;
    end @_TY_PREFIX_@_Read;

@@ -12,7 +12,7 @@
      (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class;
       @_GLOBAL_PREFIX_@_Buffer : in out Unsigned_8;
       @_GLOBAL_PREFIX_@_Offset : in out Offset_Type;
-      @_GLOBAL_PREFIX_@_V      : @_TY_NAME_@)
+      @_GLOBAL_PREFIX_@_V      : TGen.TGen_Std.@_TY_NAME_@)
    is
    begin
       @_TY_PREFIX_@_Write_Header
@@ -32,7 +32,7 @@
      (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class;
       @_GLOBAL_PREFIX_@_Buffer : in out Unsigned_8;
       @_GLOBAL_PREFIX_@_Offset : in out Offset_Type;
-      @_GLOBAL_PREFIX_@_V      : out @_TY_NAME_@)
+      @_GLOBAL_PREFIX_@_V      : out TGen.TGen_Std.@_TY_NAME_@)
    is
       @_GLOBAL_PREFIX_@_H : @_TY_PREFIX_@_Header_Type;
    begin
@@ -50,7 +50,7 @@
          Size => @_TY_PREFIX_@_Size_Max_All_Const -
             @_TY_PREFIX_@_Size (@_GLOBAL_PREFIX_@_V));
 
-      if @_GLOBAL_PREFIX_@_V not in @_TY_NAME_@ then
+      if @_GLOBAL_PREFIX_@_V not in TGen.TGen_Std.@_TY_NAME_@ then
         raise Invalid_Value;
       end if;
    end @_TY_PREFIX_@_Read_All;
