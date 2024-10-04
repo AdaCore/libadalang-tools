@@ -6,6 +6,7 @@ LIBRARY_TYPE ?= static
 LALTOOLS_SET ?= all
 PROCESSORS ?= 0
 BUILD_ROOT ?=
+GPRBUILD_EXTRA ?=
 
 ALL_LIBRARY_TYPES = static static-pic relocatable
 ALL_BUILD_MODES = dev prod AddressSanitizer
@@ -34,7 +35,7 @@ RELOCATE_BUILD=--relocate-build-tree="$(BUILD_ROOT)" --root-dir=.
 BIN=$(BUILD_ROOT)/bin
 endif
 
-GPRBUILD = gprbuild -v -k -p -j$(PROCESSORS) $(RELOCATE_BUILD)
+GPRBUILD = gprbuild -v -k -p -j$(PROCESSORS) $(RELOCATE_BUILD) $(GPRBUILD_EXTRA)
 
 .PHONY: all
 all:
