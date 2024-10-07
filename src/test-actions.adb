@@ -207,6 +207,14 @@ package body Test.Actions is
       Test.Common.Verbose := Arg (Cmd, Verbose);
       Test.Common.Quiet   := Arg (Cmd, Quiet);
 
+      --  If the tool project is an aggregate one, exit early and do nothing.
+      --  The aggregated projects will be processed in sequence in subprocess
+      --  calls made by the driver.
+
+      if Tool.Project_Tree.Root_Project.Is_Aggregate_Project then
+         return;
+      end if;
+
       Test.Common.Instrument := Arg (Cmd, Dump_Test_Inputs);
 
       Test.Common.Lang_Version :=
@@ -1013,6 +1021,14 @@ package body Test.Actions is
       Src_Prj : constant String :=
         Tool.Project_Tree.Root_Project.Project_Path.Display_Full_Name;
    begin
+
+      --  If the tool project is an aggregate one, exit early and do nothing.
+      --  The aggregated projects will be processed in sequence in subprocess
+      --  calls made by the driver.
+
+      if Tool.Project_Tree.Root_Project.Is_Aggregate_Project then
+         return;
+      end if;
 
       --  In any case, generate the support library if needed
 

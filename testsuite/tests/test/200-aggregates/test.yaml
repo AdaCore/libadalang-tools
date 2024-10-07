@@ -1,0 +1,5 @@
+description:
+  Test that gnattest does not crash when processing an aggregate project,
+  and that they are processed in sequence, producing two valid harnesses.
+
+driver: shell_script

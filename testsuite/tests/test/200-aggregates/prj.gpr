@@ -1,0 +1,3 @@
+aggregate project Prj is
+   for Project_Files use ("prj1.gpr", "prj2.gpr");
+end Prj;
