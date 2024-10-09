@@ -1,0 +1,5 @@
+Units remaining: 4     Units remaining: 3      warning: (gnattest) Dep.Test_Data.Tests has dangling test(s)
+Units remaining: 2     Units remaining: 1      warning: (gnattest) Dep has dangling element(s)
+ warning: (gnattest) Dep.Stub_Data has dangling setter spec(s)
+ warning: (gnattest) Dep.Stub_Data has dangling setter body(ies)
+
