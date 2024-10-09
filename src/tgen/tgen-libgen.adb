@@ -921,11 +921,13 @@ package body TGen.Libgen is
          Put_Line (Prj_File, "   package Compiler is");
          Put_Line (Prj_File, "      case Build_Mode is");
          Put_Line (Prj_File, "         when ""dev"" =>");
-         Put_Line (Prj_File, "            for Default_Switches (""Ada"") use"
-                   & " (""-g"", ""-gnatg"", ""-gnatyN"", ""-gnatws"");");
+         Put (Prj_File, "            for Default_Switches (""Ada"") use"
+                   & " (""-g"", ""-gnatg"", ""-gnatyN"", ""-gnatws""");
+         Write_Preprocessor_Config (Ctx, Prj_File);
          Put_Line (Prj_File, "         when ""prod"" =>");
          Put_Line (Prj_File, "            for Default_Switches (""Ada"") use"
-                   & " (""-gnatg"", ""-gnatyN"", ""-gnatws"");");
+                   & " (""-gnatg"", ""-gnatyN"", ""-gnatws""");
+         Write_Preprocessor_Config (Ctx, Prj_File);
          Put_Line (Prj_File, "      end case;");
          Put_Line (Prj_File, "   end Compiler;");
          New_Line (Prj_File);
@@ -1265,6 +1267,39 @@ package body TGen.Libgen is
             raise;
    end Generate_Harness_Unit;
 
+   -------------------------------
+   -- Write_Preprocessor_Config --
+   -------------------------------
+
+   procedure Write_Preprocessor_Config
+      (Ctx : Libgen_Context;
+       Prj_File : Ada.Text_IO.File_Type;
+       Append_Flags : Boolean := True)
+   is
+      Preprocessor_File : constant String := To_String (Ctx.Output_Dir)
+         & GNAT.OS_Lib.Directory_Separator
+         & "preprocessor.def";
+   begin
+      if not Ctx.Preprocessor_Definitions.Default_Config.Enabled
+         and Ctx.Preprocessor_Definitions.File_Configs.Is_Empty
+      then
+         Put_Line (Prj_File, ");");
+         return;
+      end if;
+
+      Libadalang.Preprocessing.Write_Preprocessor_Data_File
+         (Ctx.Preprocessor_Definitions,
+          Preprocessor_File,
+          To_String (Ctx.Output_Dir));
+
+      if Append_Flags then
+         Put (Prj_File, ", ");
+      end if;
+      Put (Prj_File, """-gnatep=");
+      Put (Prj_File, Preprocessor_File);
+      Put_Line (Prj_File, """);");
+   end Write_Preprocessor_Config;
+
    ----------------------
    -- Generate_Harness --
    ----------------------
@@ -1320,6 +1355,13 @@ package body TGen.Libgen is
       Put_Line (Prj_File, "project TGen_Generation_Harness is");
       Put_Line (Prj_File, "   for Main use (""generation_main.adb"");");
       Put_Line (Prj_File, "   for Object_Dir use ""obj"";");
+      Ada.Text_IO.Put_Line (Prj_File, "package Compiler is");
+      Ada.Text_IO.Put
+         (Prj_File,
+          "   for Default_Switches (""Ada"") use (");
+      Write_Preprocessor_Config (Ctx, Prj_File, Append_Flags => False);
+      Ada.Text_IO.Put_Line (Prj_File, "end Compiler;");
+
       Put_Line (Prj_File, "end TGen_Generation_Harness;");
       Close (Prj_File);
 
@@ -1371,4 +1413,14 @@ package body TGen.Libgen is
       TGen.Marshalling.Set_Array_Size_Limit (Limit);
    end Set_Array_Size_Limit;
 
+   -----------------------------------
+   -- Set_Preprocessing_Definitions --
+   -----------------------------------
+
+   procedure Set_Preprocessing_Definitions
+      (Ctx : out Libgen_Context;
+       Data : Libadalang.Preprocessing.Preprocessor_Data) is
+   begin
+      Ctx.Preprocessor_Definitions := Data;
+   end Set_Preprocessing_Definitions;
 end TGen.Libgen;
