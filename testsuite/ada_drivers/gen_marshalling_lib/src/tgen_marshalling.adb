@@ -29,6 +29,7 @@ with GNATCOLL.Opt_Parse; use GNATCOLL.Opt_Parse;
 with Libadalang.Analysis;
 with Libadalang.Common;   use Libadalang.Common;
 with Libadalang.Helpers;
+with Libadalang.Preprocessing;
 
 with TGen.LAL_Utils; use TGen.LAL_Utils;
 with TGen.Libgen;    use TGen.Libgen;
@@ -101,10 +102,15 @@ procedure TGen_Marshalling is
       Jobs    : Libadalang.Helpers.App_Job_Context_Array)
    is
       pragma Unreferenced (Context, Jobs);
+      package LAL_Prep renames Libadalang.Preprocessing;
       User_Project_Path : constant Unbounded_String :=
         App.Args.Project_File.Get;
       Templates_Dir     : Unbounded_String := Templates_Dirs.Get;
       Output_Dir        : Unbounded_String := Output_Dirs.Get;
+      File_Config : LAL_Prep.File_Config;
+      File_Configs : LAL_Prep.File_Config_Maps.Map;
+      Preprocessor_Data : constant LAL_Prep.Preprocessor_Data :=
+         LAL_Prep.Create_Preprocessor_Data (File_Config, File_Configs);
    begin
       if User_Project_Path = Null_Unbounded_String then
          Libadalang.Helpers.Abort_App ("Project file required");
@@ -118,6 +124,8 @@ procedure TGen_Marshalling is
         (Output_Dir         => To_String (Output_Dir),
          User_Project_Path  => To_String (User_Project_Path),
          Root_Templates_Dir => To_String (Templates_Dir));
+         TGen.Libgen.Set_Preprocessing_Definitions
+            (Gen_Ctx, Preprocessor_Data);
    end App_Setup;
 
    ------------------

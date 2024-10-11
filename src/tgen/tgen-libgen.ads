@@ -27,10 +27,12 @@
 with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with Ada.Text_IO;
 
 with GNATCOLL.VFS;
 
 with Libadalang.Analysis;
+with Libadalang.Preprocessing;
 
 with TGen.Context;
 with TGen.Marshalling;
@@ -128,6 +130,13 @@ package TGen.Libgen is
    --  This returns False when every included subprogram is not supported by
    --  TGen, or when no subprogram was included.
 
+   procedure Write_Preprocessor_Config
+      (Ctx : Libgen_Context;
+       Prj_File : Ada.Text_IO.File_Type;
+       Append_Flags : Boolean := True);
+   --  Generate a preprocessor file from the context and enable pre-processing
+   --  in the given Project_File by adding `-gnatep=<file>`.
+
    procedure Generate_Harness
      (Ctx              : in out Libgen_Context;
       Harness_Dir      : String;
@@ -160,6 +169,10 @@ package TGen.Libgen is
    --  Supported_Subprogram to ensure consistency of the array limit used in
    --  all the marshallers, otherwise Constraint_Error is raised.
 
+   procedure Set_Preprocessing_Definitions
+      (Ctx : out Libgen_Context;
+       Data : Libadalang.Preprocessing.Preprocessor_Data);
+   --  Set preprocessor definitions to the context.
 private
    use TGen.Strings;
    use TGen.Context;
@@ -225,6 +238,9 @@ private
 
       Array_Index_Types : Typ_Set;
       --  Set of types used to instantiate array index constraints
+
+      Preprocessor_Definitions : Libadalang.Preprocessing.Preprocessor_Data;
+      --  Preprocessor defintions to add in projects files
 
    end record;
 
