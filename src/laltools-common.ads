@@ -56,12 +56,6 @@ package Laltools.Common is
    --  If Left.Text = Right.Text then Full_Sloc_Image will sort first by
    --  file and then by Sloc (first by line and then by column).
 
-   function "<"
-     (Left, Right : Source_Location_Range)
-      return Boolean;
-   --  Checks if L is < than R, first based on the line number and then on
-   --  the column number
-
    function "<" (Left, Right : Base_Id) return Boolean is
      (Left.Text < Right.Text
       or else Left.Sloc_Range < Right.Sloc_Range);
