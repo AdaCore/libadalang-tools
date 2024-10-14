@@ -626,6 +626,7 @@ package body TGen.Libgen is
               User_Project_Path     =>
                 To_Unbounded_String (User_Project_Path),
               Lib_Support_Generated => False,
+              Has_Preprocessor_Config => False,
               others                => <>);
    end Create;
 
@@ -1280,9 +1281,7 @@ package body TGen.Libgen is
          & GNAT.OS_Lib.Directory_Separator
          & "preprocessor.def";
    begin
-      if not Ctx.Preprocessor_Definitions.Default_Config.Enabled
-         and Ctx.Preprocessor_Definitions.File_Configs.Is_Empty
-      then
+      if not Ctx.Has_Preprocessor_Config then
          Put_Line (Prj_File, ");");
          return;
       end if;
@@ -1421,6 +1420,7 @@ package body TGen.Libgen is
       (Ctx : out Libgen_Context;
        Data : Libadalang.Preprocessing.Preprocessor_Data) is
    begin
+      Ctx.Has_Preprocessor_Config := True;
       Ctx.Preprocessor_Definitions := Data;
    end Set_Preprocessing_Definitions;
 end TGen.Libgen;
