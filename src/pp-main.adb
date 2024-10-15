@@ -53,10 +53,12 @@ begin
    GNATCOLL.Traces.Parse_Config_File;
 
    Utils.Drivers.Driver
-     (Cmd               => Cmd,
-      Tool              => Tool,
-      Tool_Package_Name => "pretty_printer",
-      Callback          => null);
+     (Cmd                   => Cmd,
+      Tool                  => Tool,
+      Tool_Package_Name     => "pretty_printer",
+      Callback              => null,
+      --  GNATpp handles preprocessing directives in its own way
+      Preprocessing_Allowed => False);
 
    --  If syntax errors are detected during the processing then return a
    --  non zero exit code.

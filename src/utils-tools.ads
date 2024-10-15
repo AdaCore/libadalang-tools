@@ -88,13 +88,14 @@ package Utils.Tools is
    --  Called in between First_Per_File_Action and Second_Per_File_Action
 
    procedure Process_File
-     (Tool         : in out Tool_State'Class;
-      Cmd          : in out Command_Line;
-      File_Name    : String;
-      Counter      : Natural;
-      Syntax_Error : out Boolean;
-      Reparse      : Boolean := False;
-      Pass         : Pass_Kind := Second_Pass);
+     (Tool                  : in out Tool_State'Class;
+      Cmd                   : in out Command_Line;
+      File_Name             : String;
+      Counter               : Natural;
+      Syntax_Error          : out Boolean;
+      Reparse               : Boolean := False;
+      Pass                  : Pass_Kind := Second_Pass;
+      Preprocessing_Allowed : Boolean := False);
    --  This class-wide procedure takes care of some bookkeeping, and then
    --  dispatches to First_Per_File_Action or Second_Per_File_Action depending
    --  on the .
