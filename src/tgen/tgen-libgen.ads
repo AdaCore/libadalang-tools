@@ -242,6 +242,8 @@ private
       Preprocessor_Definitions : Libadalang.Preprocessing.Preprocessor_Data;
       --  Preprocessor defintions to add in projects files
 
+      Has_Preprocessor_Config : Boolean;
+      --  Whether the context has preprocessing definitions
    end record;
 
 end TGen.Libgen;
