@@ -1420,7 +1420,8 @@ package body TGen.Libgen is
       (Ctx : out Libgen_Context;
        Data : Libadalang.Preprocessing.Preprocessor_Data) is
    begin
-      Ctx.Has_Preprocessor_Config := True;
+      Ctx.Has_Preprocessor_Config := Data.Default_Config.Enabled
+                                  or not Data.File_Configs.Is_Empty;
       Ctx.Preprocessor_Definitions := Data;
    end Set_Preprocessing_Definitions;
 end TGen.Libgen;
