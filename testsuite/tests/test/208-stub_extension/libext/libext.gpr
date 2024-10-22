@@ -1,0 +1,4 @@
+with "libinc/libinc.gpr";
+
+project LibExt is
+end LibExt;
