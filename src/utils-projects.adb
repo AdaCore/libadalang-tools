@@ -118,6 +118,8 @@ package body Utils.Projects is
         and then Index (S, "not found") /= 0
       then
          return;
+      elsif Index (S, "warning:") /= 0 then
+         Err_Out.Put_Str (S);
       else
          Cmd_Error_No_Tool_Name (S);
       end if;
