@@ -1680,7 +1680,9 @@ package body Laltools.Common is
          return Get_Declarative_Part_From_Owner (Node);
 
       else
-         raise Assertion_Error;
+         --  Cases as a Begin_Block
+
+         return No_Declarative_Part;
       end if;
    end Get_Declarative_Part;
 
