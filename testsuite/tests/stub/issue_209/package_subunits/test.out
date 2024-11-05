@@ -1,0 +1,43 @@
+--  my_package_1.adb
+pragma Ada_2012;
+package body My_Package_1 with
+  SPARK_Mode => Off
+is
+
+   ------------------
+   -- My_Procedure --
+   ------------------
+
+   procedure My_Procedure is separate;
+
+end My_Package_1;
+
+--  my_package_2.adb
+pragma Ada_2012;
+package body My_Package_2 is
+
+   ------------------
+   -- My_Procedure --
+   ------------------
+
+   procedure My_Procedure is separate;
+
+end My_Package_2;
+
+--  my_package_1-my_procedure.adb
+pragma Ada_2012;
+separate (My_Package_1)
+procedure My_Procedure is
+begin
+   pragma Compile_Time_Warning (Standard.True, "My_Procedure unimplemented");
+   raise Program_Error with "Unimplemented procedure My_Procedure";
+end My_Procedure;
+
+--  my_package_2-my_procedure.adb
+pragma Ada_2012;
+separate (My_Package_2)
+procedure My_Procedure is
+begin
+   pragma Compile_Time_Warning (Standard.True, "My_Procedure unimplemented");
+   raise Program_Error with "Unimplemented procedure My_Procedure";
+end My_Procedure;

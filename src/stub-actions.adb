@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                    Copyright (C) 2021-2022, AdaCore                      --
+--                    Copyright (C) 2021-2025, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -619,7 +619,7 @@ package body Stub.Actions is
       --  If we are processing a subunit, generate "separate (parent)".
 
       procedure Generate_Subp_Body
-        (Decl : Ada_Node; Name : W_Str; Ada_Stub : Boolean);
+        (Decl : Ada_Node; Name : W_Str; Ada_Stub : Boolean; Level : Natural);
       --  Generate a subprogram body stub. If Ada_Stub is True, we generate
       --  "is separate"; otherwise the so-called "stub" is a proper body.
 
@@ -627,7 +627,7 @@ package body Stub.Actions is
       --  Generate an entry body stub
 
       procedure Generate_Subp_Or_Entry_Body
-        (Decl : Ada_Node; Name : W_Str; Ada_Stub : Boolean);
+        (Decl : Ada_Node; Name : W_Str; Ada_Stub : Boolean; Level : Natural);
 
       procedure Generate_Stub_Begin_End (Name, Stub_Kind : W_Str);
       --  Generate the text from "begin" to "end" of the generated code for a
@@ -743,7 +743,7 @@ package body Stub.Actions is
       end Generate_Subunit_Start;
 
       procedure Generate_Subp_Body
-        (Decl : Ada_Node; Name : W_Str; Ada_Stub : Boolean)
+        (Decl : Ada_Node; Name : W_Str; Ada_Stub : Boolean; Level : Natural)
       is
          Empty_Vec, Pp_Out_Vec : Char_Vector;
          Spec                  : constant Subp_Spec := Get_Subp_Spec (Decl);
@@ -761,10 +761,20 @@ package body Stub.Actions is
             Output   => Pp_Out_Vec,
             Messages => Tool.Ignored_Messages);
          pragma Assert (Is_Empty (Tool.Ignored_Messages));
-         Put
-           (" \1\2 is",
-            Overriding_String (Overrides),
-            From_UTF8 (Elems (Pp_Out_Vec) (1 .. Last_Index (Pp_Out_Vec))));
+         if Arg (Cmd, Spark_Mode_Off)
+           and then Level = 0
+           and then Decl.P_Has_Spark_Mode_On
+         then
+            Put
+              (" \1\2 with SPARK_Mode => Off is",
+               Overriding_String (Overrides),
+               From_UTF8 (Elems (Pp_Out_Vec) (1 .. Last_Index (Pp_Out_Vec))));
+         else
+            Put
+              (" \1\2 is",
+               Overriding_String (Overrides),
+               From_UTF8 (Elems (Pp_Out_Vec) (1 .. Last_Index (Pp_Out_Vec))));
+         end if;
          if Ada_Stub then
             Put (" separate;\n");
          else
@@ -805,11 +815,11 @@ package body Stub.Actions is
       end Generate_Entry_Body;
 
       procedure Generate_Subp_Or_Entry_Body
-        (Decl : Ada_Node; Name : W_Str; Ada_Stub : Boolean) is
+        (Decl : Ada_Node; Name : W_Str; Ada_Stub : Boolean; Level : Natural) is
       begin
          case Decl.Kind is
             when Ada_Subp_Decl | Ada_Generic_Subp_Decl =>
-               Generate_Subp_Body (Decl, Name, Ada_Stub);
+               Generate_Subp_Body (Decl, Name, Ada_Stub, Level);
 
             when Ada_Entry_Decl =>
                Generate_Entry_Body (Decl, Name);
@@ -921,7 +931,14 @@ package body Stub.Actions is
             =>
                Generate_Local_Header (Name, Level);
                Generate_Subunit_Start (Level);
-               Put ("package body \1 is\n", Name);
+               if Arg (Cmd, Spark_Mode_Off)
+                 and then Level = 0
+                 and then Decl.P_Has_Spark_Mode_On
+               then
+                  Put ("package body \1 with Spark_Mode => Off is\n", Name);
+               else
+                  Put ("package body \1 is\n", Name);
+               end if;
 
             when Ada_Single_Protected_Decl
                | Ada_Protected_Type_Decl
@@ -929,20 +946,37 @@ package body Stub.Actions is
             =>
                Generate_Local_Header (Name, Level);
                Generate_Subunit_Start (Level);
-               Put ("protected body \1 is\n", Name);
+               if Arg (Cmd, Spark_Mode_Off)
+                 and then Level = 0
+                 and then Decl.P_Has_Spark_Mode_On
+               then
+                  Put ("protected body \1 with SPARK_Mode => Off is\n", Name);
+               else
+                  Put ("protected body \1 is\n", Name);
+               end if;
 
             when Ada_Single_Task_Decl | Ada_Task_Type_Decl | Ada_Task_Body_Stub
             =>
                Generate_Local_Header (Name, Level);
                Generate_Subunit_Start (Level);
-               Put ("task body \1 is\n", Name);
+               if Arg (Cmd, Spark_Mode_Off)
+                 and then Level = 0
+                 and then Decl.P_Has_Spark_Mode_On
+               then
+                  Put ("task body \1 with SPARK_Mode => Off is\n", Name);
+               else
+                  Put ("task body \1 is\n", Name);
+               end if;
                Generate_Stub_Begin_End (Name, "task");
 
             when Ada_Subp_Decl | Ada_Generic_Subp_Decl | Ada_Subp_Body_Stub =>
                Generate_Local_Header (Name, Level);
                Generate_Subunit_Start (Level);
                Generate_Subp_Body
-                 (Decl, Name, Ada_Stub => Generating_Ada_Stubs);
+                 (Decl,
+                  Name,
+                  Ada_Stub => Generating_Ada_Stubs,
+                  Level    => Level);
 
             when Ada_Entry_Decl =>
                Generate_Local_Header (Name, Level);
@@ -1187,19 +1221,25 @@ package body Stub.Actions is
               (if Root_Node.Kind in Ada_Body_Stub then Unit_Separate
                else Unit_Body);
          begin
-            pragma
-              Assert
-                (Extending_Project (Project (Arg_File_Info)) = No_Project);
-            --  We don't want to modify extended projects
+            if Project (Arg_File_Info) /= No_Project then
+               pragma
+                 Assert
+                   (Extending_Project (Project (Arg_File_Info)) = No_Project);
+               --  We don't want to modify extended projects
+
+            end if;
 
             return
                Result : constant String :=
-                 +GNATCOLL.Projects.File_From_Unit
-                    (Project         => Project (Arg_File_Info),
-                     Unit_Name       => Unit_Name,
-                     Part            => Part,
-                     Language        => "Ada",
-                     File_Must_Exist => False)
+                 (if Project (Arg_File_Info) /= No_Project
+                  then
+                    +GNATCOLL.Projects.File_From_Unit
+                       (Project         => Project (Arg_File_Info),
+                        Unit_Name       => Unit_Name,
+                        Part            => Part,
+                        Language        => "Ada",
+                        File_Must_Exist => False)
+                  else Simple_Name (Default_Name))
             do
                null;
             end return;
@@ -1531,7 +1571,10 @@ package body Stub.Actions is
             Generate_Local_Header (Name, Level);
             Generate_Subunit_Start (Level);
             Generate_Subp_Or_Entry_Body
-              (Subp_Decl, Name, Ada_Stub => Arg (Cmd, Subunits));
+              (Decl     => Subp_Decl,
+               Name     => Name,
+               Ada_Stub => Arg (Cmd, Subunits),
+               Level    => Level);
             Set_Arg (Pp_Cmd, Initial_Indentation, 0);
 
             declare
