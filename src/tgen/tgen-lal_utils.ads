@@ -73,7 +73,7 @@ package TGen.LAL_Utils is
    --  same subprogram.
 
    function Ultimate_Enclosing_Compilation_Unit
-     (Subp : LAL.Basic_Decl'Class) return LAL.Unbounded_Text_Type_Array;
+     (Subp : LAL.Basic_Decl'Class) return LAL.Basic_Decl;
    --  Return the ultimate enclosing compilation unit, going up the
    --  instantiation chains if the given Subp is a generic instantiation.
    --

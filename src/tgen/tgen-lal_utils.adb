@@ -129,15 +129,15 @@ package body TGen.LAL_Utils is
    -----------------------------------------
 
    function Ultimate_Enclosing_Compilation_Unit
-     (Subp : LAL.Basic_Decl'Class) return LAL.Unbounded_Text_Type_Array
+     (Subp : LAL.Basic_Decl'Class) return LAL.Basic_Decl
    is
       Instantiation_Chain : constant LAL.Generic_Instantiation_Array :=
         Subp.P_Generic_Instantiations;
-      Res                 : constant LAL.Unbounded_Text_Type_Array :=
+      Res                 : constant LAL.Basic_Decl :=
         LAL.P_Enclosing_Compilation_Unit
           (if Instantiation_Chain'Length > 0
            then Instantiation_Chain (Instantiation_Chain'Last)
-           else Subp).P_Decl.P_Fully_Qualified_Name_Array;
+           else Subp).P_Decl;
    begin
       return Res;
    end Ultimate_Enclosing_Compilation_Unit;
