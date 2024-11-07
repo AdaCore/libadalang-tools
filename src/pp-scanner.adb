@@ -546,7 +546,7 @@ package body Pp.Scanner is
                   Org => "NLs/Ind combined space");
             end;
          else
-            Append_Tokn (V, Spaces, Intern (String'(1 .. Count => ' ')), Org);
+            Append_Tokn (V, Spaces, Intern (String'[1 .. Count => ' ']), Org);
             --  ???For smallish Counts, we could look up the symbol in a table
             --  indexed by Count.
          end if;
