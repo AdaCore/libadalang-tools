@@ -26,6 +26,10 @@ package body Utils.Command_Lines.Common is
 
    Saved_WCEM : Character := ASCII.NUL;
 
+   --------------
+   -- Set_WCEM --
+   --------------
+
    procedure Set_WCEM (Cmd : in out Command_Line; Encoding : String) is
    begin
       if not Present (Arg (Cmd, Wide_Character_Encoding)) then
@@ -37,6 +41,10 @@ package body Utils.Command_Lines.Common is
       Saved_WCEM := WCEM (Cmd);
    end Set_WCEM;
 
+   ------------------
+   -- Restore_WCEM --
+   ------------------
+
    procedure Restore_WCEM (Cmd : in out Command_Line) is
    begin
       if Saved_WCEM = ASCII.NUL then
@@ -46,6 +54,10 @@ package body Utils.Command_Lines.Common is
       Set_Arg (Cmd, Wide_Character_Encoding, [1 => Saved_WCEM]);
       Saved_WCEM := ASCII.NUL;
    end Restore_WCEM;
+
+   ----------
+   -- WCEM --
+   ----------
 
    function WCEM (Cmd : Command_Line) return Character is
       WCEM : constant String :=
@@ -62,6 +74,10 @@ package body Utils.Command_Lines.Common is
 
       return C;
    end WCEM;
+
+   -----------------------------
+   -- Wide_Character_Encoding --
+   -----------------------------
 
    function Wide_Character_Encoding (Cmd : Command_Line) return String is
    begin
