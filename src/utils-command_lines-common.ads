@@ -240,9 +240,20 @@ package Utils.Command_Lines.Common is
    --  Libadalang wants the encoding as a String, whereas Pp.Buffers uses
    --  WC_Encoding_Method.
 
+   function WCEM (Cmd : Command_Line) return Character;
+   --  Return the single-character encoding letter
+
    procedure Set_WCEM (Cmd : in out Command_Line; Encoding : String);
    --  Set the wide character encoding method as if the switch had appeared on
    --  the command line. This is used when a BOM selects UTF-8.
+   --
+   --  The encoding specified on the command line is saved internally and can
+   --  be restored with Restore_WCEM.
+
+   procedure Restore_WCEM (Cmd : in out Command_Line);
+   --  Restore the wide character encoding method saved in the internal state
+   --  of this package. This must not be called if Set_WCEM has not previously
+   --  been called, otherwise Program_Error is raised.
 
    ----------------
 

@@ -65,20 +65,6 @@ package body Utils.Tools is
       BOM_Len : Natural;
       BOM_Seen : Boolean := False;
    begin
-      --  Check for BOM at start of file. The only supported BOM is
-      --  UTF8_All. If present, when we're called from gnatpp, the
-      --  Wide_Character_Encoding should already be set to
-      --  WCEM_UTF8, but when we're called from xml2gnat, we need to
-      --  set it.
-
-      Read_BOM (Input.all, BOM_Len, BOM);
-      if BOM = UTF8_All then
-         First := BOM_Len + 1; -- skip it
-         BOM_Seen := True;
-         Set_WCEM (Cmd, "8");
-      else
-         pragma Assert (BOM = Unknown); -- no BOM found
-      end if;
 
       --  Call Create_Context if we don't have one, or after an arbitrary
       --  number of files.
@@ -136,7 +122,6 @@ package body Utils.Tools is
       end if;
 
       declare
-         Inp : String renames Input (First .. Input'Last);
          Unit : constant Analysis_Unit :=
            Get_From_File (Tool.Context, File_Name, Reparse => Reparse);
       begin
@@ -157,13 +142,44 @@ package body Utils.Tools is
             end if;
 
          else
-            pragma Assert (not Root (Unit).Is_Null);
-            if Pass = First_Pass then
-               First_Per_File_Action
-                 (Tool, Cmd, File_Name, Inp, BOM_Seen, Unit);
+            --  Check for BOM at start of file. The only supported BOM is
+            --  UTF8_All. If present, when we're called from gnatpp, the
+            --  Wide_Character_Encoding should already be set to
+            --  WCEM_UTF8, but when we're called from xml2gnat, we need to
+            --  set it.
+            --
+            --  This needs to be done after the input file has been parsed by
+            --  LAL as we need to be able to set the context wide encoding from
+            --  the -W switch, but we do not want to set the context wide
+            --  encoding from the encoding found within a source's BOM.
+
+            Read_BOM (Input.all, BOM_Len, BOM);
+            if BOM = UTF8_All then
+               First := BOM_Len + 1; -- skip it
+               BOM_Seen := True;
+               Set_WCEM (Cmd, "8");
             else
-               Second_Per_File_Action
-                 (Tool, Cmd, File_Name, Inp, BOM_Seen, Unit);
+               pragma Assert (BOM = Unknown); -- no BOM found
+            end if;
+
+            declare
+               Inp : String renames Input (First .. Input'Last);
+            begin
+               pragma Assert (not Root (Unit).Is_Null);
+               if Pass = First_Pass then
+                  First_Per_File_Action
+                    (Tool, Cmd, File_Name, Inp, BOM_Seen, Unit);
+               else
+                  Second_Per_File_Action
+                    (Tool, Cmd, File_Name, Inp, BOM_Seen, Unit);
+               end if;
+            end;
+
+            --  Restore encoding to not mess with potential LAL context
+            --  re-creations.
+
+            if BOM_Seen then
+               Restore_WCEM (Cmd);
             end if;
          end if;
          Free (Input);
