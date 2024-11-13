@@ -1,0 +1,23 @@
+Units remaining: 4     Units remaining: 3     Units remaining: 2     Units remaining: 1     
+Compile
+   [Ada]          test_runner.adb
+   [Ada]          gnattest_generated.ads
+   [Ada]          gnattest_generated-mapping.adb
+   [Ada]          gnattest_generated-persistent.adb
+   [Ada]          gnattest_main_suite.adb
+   [Ada]          pkg.adb
+   [Ada]          pkg-test_data.adb
+   [Ada]          pkg-test_data-tests.adb
+   [Ada]          pkg-test_data-tests-suite.adb
+   [Ada]          zdep.adb
+   [Ada]          zdep-test_data.adb
+   [Ada]          zdep-test_data-tests.adb
+   [Ada]          zdep-test_data-tests-suite.adb
+Bind
+   [gprbind]      test_runner.bexch
+   [Ada]          test_runner.ali
+Link
+   [link]         test_runner.adb
+pkg.ads:5:4: error: corresponding test FAILED: Test not implemented. (pkg-test_data-tests.adb:44)
+zdep.ads:7:4: error: corresponding test FAILED: Test not implemented. (zdep-test_data-tests.adb:44)
+2 tests run: 0 passed; 2 failed; 0 crashed.

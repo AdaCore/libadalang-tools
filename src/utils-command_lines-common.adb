@@ -24,6 +24,8 @@
 with GNATCOLL.Iconv;
 package body Utils.Command_Lines.Common is
 
+   Saved_WCEM : Character := ASCII.NUL;
+
    procedure Set_WCEM (Cmd : in out Command_Line; Encoding : String) is
    begin
       if not Present (Arg (Cmd, Wide_Character_Encoding)) then
@@ -32,10 +34,18 @@ package body Utils.Command_Lines.Common is
          Cmd_Error_No_Help
            ("input and output wide character encodings conflict");
       end if;
+      Saved_WCEM := WCEM (Cmd);
    end Set_WCEM;
 
-   function WCEM (Cmd : Command_Line) return Character;
-   --  Return the single-character encoding letter
+   procedure Restore_WCEM (Cmd : in out Command_Line) is
+   begin
+      if Saved_WCEM = ASCII.NUL then
+         raise Program_Error with
+           "attempting to restore unset wide character encoding method";
+      end if;
+      Set_Arg (Cmd, Wide_Character_Encoding, [1 => Saved_WCEM]);
+      Saved_WCEM := ASCII.NUL;
+   end Restore_WCEM;
 
    function WCEM (Cmd : Command_Line) return Character is
       WCEM : constant String :=
