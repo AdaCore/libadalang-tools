@@ -710,9 +710,6 @@ package body Pp.Actions is
    function L (T1, T2, T3, T4 : Str_Template) return Str_Template_Ptr;
    function L (T1, T2, T3, T4, T5 : Str_Template) return Str_Template_Ptr;
    function L (T1, T2, T3, T4, T5, T6 : Str_Template) return Str_Template_Ptr;
-   function L
-     (T1, T2, T3, T4, T5, T6, T7 : Str_Template)
-      return                       Str_Template_Ptr;
    --  All the L functions form a template by concatenating together a bunch of
    --  lines.
 
@@ -753,14 +750,6 @@ package body Pp.Actions is
    is
    begin
       return new Str_Template'(T1 & T2 & T3 & T4 & T5 & T6);
-   end L;
-
-   function L
-     (T1, T2, T3, T4, T5, T6, T7 : Str_Template)
-      return                       Str_Template_Ptr
-   is
-   begin
-      return new Str_Template'(T1 & T2 & T3 & T4 & T5 & T6 & T7);
    end L;
 
    function Template_For_Kind (Kind : Ada_Tree_Kind) return Str_Template_Ptr is
@@ -1109,10 +1098,12 @@ package body Pp.Actions is
            when Ada_Select_Stmt =>
              L ("select",
                 "!",
-                "?else$", "{~$~$}~",
-                "?then abort$", "{~$~$}~",
+                "!",
+                "!",
                 "end select;"),
            when Ada_Select_When_Part => null,
+           when Ada_Then_Abort_Part =>
+             L ("$then abort$", "?{~$~}$~"),
            when Ada_Accept_Stmt =>
              L ("accept !? #(~~)~?~~~;"),
            when Ada_Accept_Stmt_With_Stmts =>
@@ -1145,11 +1136,12 @@ package body Pp.Actions is
              L ("if[ !]# then$",
                 "{?~$~$~}",
                 "?~~~",
-                "?else$",
-                "{~$~$}~",
+                "!",
                 "end if;"),
            when Ada_Elsif_Stmt_Part =>
              L ("elsif[ !]# then$", "{?~$~$~}"),
+           when Ada_Else_Part =>
+             L ("$else$", "{?~$~$}~"),
            when Ada_Named_Stmt =>
              L ("! :$!"),
            when Ada_Named_Stmt_Decl =>
@@ -2512,7 +2504,8 @@ package body Pp.Actions is
 
                              Ada_Case_Stmt_Alternative |
                              Ada_Case_Expr_Alternative |
-                             Ada_Variant
+                             Ada_Variant |
+                             Ada_Then_Abort_Part
                            then
                               null;
                            else

@@ -1,0 +1,1 @@
+gnatpp --pipe a.adb

@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                    Copyright (C) 2021-2022, AdaCore                      --
+--                    Copyright (C) 2021-2024, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -2999,9 +2999,13 @@ package body METRICS.Actions is
                   Num_Alts : constant Metric_Nat :=
                      Children_Count (F_Guards (S));
                   Num_Else : constant Metric_Nat :=
-                    (if Children_Count (F_Else_Stmts (S)) = 0 then 0 else 1);
+                    (if Children_Count (F_Stmts (F_Else_Part (S))) = 0
+                     then 0
+                     else 1);
                   Num_Abort : constant Metric_Nat :=
-                    (if Children_Count (F_Abort_Stmts (S)) = 0 then 0 else 1);
+                    (if Children_Count (F_Stmts (F_Then_Abort_Part (S))) = 0
+                     then 0
+                     else 1);
                begin
                   Inc_Cyc (Complexity_Statement,
                            By => Num_Alts + Num_Else + Num_Abort - 1);
