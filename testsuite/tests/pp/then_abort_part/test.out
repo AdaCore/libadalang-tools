@@ -1,0 +1,16 @@
+
+Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
+-----
+
+procedure A is
+begin
+   select when T =>
+      null;
+   then abort
+      null;
+   end select;
+   select when T =>
+      null;
+   then abort
+   end select;
+end A;
