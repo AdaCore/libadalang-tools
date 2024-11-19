@@ -5,7 +5,7 @@
 --
 --  end read only
 
-pragma Ada_2005;
+pragma Ada_2012;
 --  begin read only
 --  end read only
 
@@ -33,7 +33,7 @@ end Input.Stub_Data;
 --
 --  end read only
 
-pragma Ada_2005;
+pragma Ada_2012;
 --  begin read only
 --  end read only
 

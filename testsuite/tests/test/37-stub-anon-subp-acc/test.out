@@ -1,0 +1,1 @@
+dep.adb:63:10: warning: Stub for Get_CB is unimplemented, this might affect some tests [enabled by default]

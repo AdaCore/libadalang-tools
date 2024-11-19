@@ -213,6 +213,9 @@ package body Test.Actions is
 
       Test.Common.Instrument := Arg (Cmd, Dump_Test_Inputs);
 
+      Test.Common.Lang_Version :=
+        Utils.Command_Lines.Common.Ada_Version_Switches.Arg (Cmd);
+
       if Arg (Cmd, Passed_Tests) /= null then
          if Arg (Cmd, Passed_Tests).all = "hide" then
             Test.Common.Show_Passed_Tests := False;
