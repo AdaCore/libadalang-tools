@@ -143,6 +143,10 @@ package body Test.Stub is
    --  Analyzes type definition and detects if only the limited view is
    --  available. If so, Is_Limited and Is_Abstract are not to be applied.
 
+   function Is_Anon_Access_To_Subp (Param_Type : Type_Expr) return Boolean;
+   --  Returns whether Param_Type represents an anonymous access to subprogram
+   --  type.
+
    function Filter_Private_Parameters
      (Param_List : Stubbed_Parameter_Lists.List)
       return Stubbed_Parameter_Lists.List;
@@ -1988,6 +1992,7 @@ package body Test.Stub is
               or else Is_Abstract (SP.Type_Elem.As_Type_Expr)
               or else Is_Limited (SP.Type_Elem.As_Type_Expr)
               or else Is_Fully_Private (SP.Type_Elem.As_Type_Expr)
+              or else Is_Anon_Access_To_Subp (SP.Type_Elem.As_Type_Expr)
             then
                S_Put
                  ((Level + 1) * Indent_Level,
@@ -2781,6 +2786,15 @@ package body Test.Stub is
       return True;
    end Is_Only_Limited_Withed;
 
+   ----------------------------
+   -- Is_Anon_Access_To_Subp --
+   ----------------------------
+
+   function Is_Anon_Access_To_Subp (Param_Type : Type_Expr) return Boolean is
+     (Param_Type.Kind in Ada_Anonymous_Type
+      and then Param_Type.As_Anonymous_Type.F_Type_Decl.F_Type_Def.Kind
+              in Ada_Access_To_Subp_Def);
+
    -------------------------
    -- Generate_Entry_Body --
    -------------------------
@@ -3268,19 +3282,24 @@ package body Test.Stub is
       Cur        : Stubbed_Parameter_Lists.Cursor;
 
       Empty_Case           :          Boolean := Param_List.Is_Empty;
-      Abstract_Res_Profile : constant Boolean :=
+      Skip_Res : constant Boolean :=
         not Empty_Case
         and then not Param_List.Last_Element.Type_Elem.Is_Null
         and then not Is_Only_Limited_Withed
           (Param_List.Last_Element.Type_Elem.As_Type_Expr)
-        and then Is_Abstract (Param_List.Last_Element.Type_Elem.As_Type_Expr);
+        and then
+          (Is_Abstract (Param_List.Last_Element.Type_Elem.As_Type_Expr)
+           or else Is_Anon_Access_To_Subp
+             (Param_List.Last_Element.Type_Elem.As_Type_Expr));
+      --  Do not generate a setter for abstract types, or anonymous access-to-
+      --  subprogram types.
 
       SP : Stubbed_Parameter;
 
       Count : Natural;
    begin
       Trace (Me, "Generating default setter spec for " & Node.Spec_Name.all);
-      if Abstract_Res_Profile and then not Empty_Case then
+      if Skip_Res and then not Empty_Case then
          --  No need to keep it in the parameters list
          Param_List.Delete_Last;
       end if;
@@ -3404,12 +3423,17 @@ package body Test.Stub is
       Cur        : Stubbed_Parameter_Lists.Cursor;
 
       Empty_Case           :          Boolean := Param_List.Is_Empty;
-      Abstract_Res_Profile : constant Boolean :=
+      Skip_Res : constant Boolean :=
         not Empty_Case
         and then not Param_List.Last_Element.Type_Elem.Is_Null
         and then not Is_Only_Limited_Withed
           (Param_List.Last_Element.Type_Elem.As_Type_Expr)
-        and then Is_Abstract (Param_List.Last_Element.Type_Elem.As_Type_Expr);
+        and then
+          (Is_Abstract (Param_List.Last_Element.Type_Elem.As_Type_Expr)
+           or else Is_Anon_Access_To_Subp
+             (Param_List.Last_Element.Type_Elem.As_Type_Expr));
+      --  Do not generate a setter for abstract types, or anonymous access-to-
+      --  subprogram types.
 
       SP : Stubbed_Parameter;
 
@@ -3418,7 +3442,7 @@ package body Test.Stub is
       Non_Limited_Parameters : Boolean := False;
    begin
       Trace (Me, "Generating default setter body for " & Node.Spec_Name.all);
-      if Abstract_Res_Profile and then not Empty_Case then
+      if Skip_Res and then not Empty_Case then
          --  No need to keep it in the parameters list
          Param_List.Delete_Last;
       end if;
@@ -3598,7 +3622,7 @@ package body Test.Stub is
       Create (Tmp_File_Name);
       Reset_Line_Counter;
 
-      Put_Import_Section (Markered_Subp_Data, Add_Pragma_05 => True);
+      Put_Import_Section (Markered_Subp_Data, Add_Language_Version => True);
 
       S_Put
         (0,
