@@ -43,6 +43,8 @@ with Langkit_Support.Slocs; use Langkit_Support.Slocs;
 
 with TGen.Libgen;
 
+with Utils.Command_Lines.Common; use Utils.Command_Lines.Common;
+
 package Test.Common is
 
    package String_Set is new
@@ -449,6 +451,10 @@ package Test.Common is
 
    Instr_Suffix : constant String := "-gnattest-instr";
    --  Suffix for object subdirs containing instrumented sources
+
+   Lang_Version : Ada_Version_Type := Ada_2012;
+   --  Language version to be inserted in the pragma in stub helper units.
+
 private
 
    Need_Lib_Support : Lib_Support_Status := Not_Needed;

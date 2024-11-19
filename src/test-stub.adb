@@ -51,7 +51,8 @@ with Ada.Strings; use Ada.Strings;
 with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 with Ada.Characters.Handling; use Ada.Characters.Handling;
 
-with Utils.Command_Lines; use Utils.Command_Lines;
+with Utils.Command_Lines;        use Utils.Command_Lines;
+with Utils.Command_Lines.Common;
 with Utils.Environment;
 
 package body Test.Stub is
@@ -282,10 +283,13 @@ package body Test.Stub is
    --  Puts header of generated stub explaining where user code should be put
 
    procedure Put_Import_Section
-     (Markered_Data : in out Markered_Data_Maps.Map;
-      Add_Import    :        Boolean := False;
-      Add_Pragma_05 :        Boolean := False);
+     (Markered_Data        : in out Markered_Data_Maps.Map;
+      Add_Import           :        Boolean := False;
+      Add_Language_Version :        Boolean := False);
    --  Puts or regenerates markered section for with clauses
+   --
+   --  The included version is the one defined through the Ada_Version_Switch
+   --  argument, if defined, or Ada_2012 otherwise.
 
    procedure Put_Lines (MD : Markered_Data_Type; Comment_Out : Boolean);
 
@@ -786,10 +790,11 @@ package body Test.Stub is
    ------------------------
 
    procedure Put_Import_Section
-     (Markered_Data : in out Markered_Data_Maps.Map;
-      Add_Import    :        Boolean := False;
-      Add_Pragma_05 :        Boolean := False)
+     (Markered_Data        : in out Markered_Data_Maps.Map;
+      Add_Import           :        Boolean := False;
+      Add_Language_Version :        Boolean := False)
    is
+      use Utils.Command_Lines.Common;
       ID : constant Markered_Data_Id :=
         (Import_MD,
          new String'(""),
@@ -834,8 +839,16 @@ package body Test.Stub is
             S_Put (3, "with Ada.Real_Time;");
             New_Line_Count;
          end if;
-         if Add_Pragma_05 then
-            S_Put (0, "pragma Ada_2005;");
+         if Add_Language_Version then
+            S_Put
+              (0,
+               "pragma "
+               & (case Test.Common.Lang_Version is
+                    when Ada_83   => "Ada_83",
+                    when Ada_95   => "Ada_95",
+                    when Ada_2005 => "Ada_2005",
+                    when Ada_2012 => "Ada_2012")
+               & ";");
             New_Line_Count;
          end if;
       end if;
@@ -3585,7 +3598,7 @@ package body Test.Stub is
       Create (Tmp_File_Name);
       Reset_Line_Counter;
 
-      Put_Import_Section (Markered_Subp_Data, Add_Pragma_05 => True);
+      Put_Import_Section (Markered_Subp_Data, Add_Language_Version => True);
 
       S_Put
         (0,
