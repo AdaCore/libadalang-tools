@@ -1424,6 +1424,10 @@ package body Test.Skeleton.Source_Table is
 
          Resolved_Dep_List : List_Of_Strings.List;
          --  List of relative paths to the stub project dependencies of Proj
+
+         Sources_Names : String_Set.Set := String_Set.Empty_Set;
+      --  Used to store the names of all sources of this project to be able to
+      --  add those needed in the interface if the project is a library.
       begin
          if Processed_Projects.Contains (Proj) then
             return;
@@ -1587,43 +1591,39 @@ package body Test.Skeleton.Source_Table is
                   S_Put (3, "for Source_Files use ();");
                   Put_New_Line;
                end if;
+
                while E_Cur /= String_Set.No_Element loop
-                  if not Excluded_Test_Data_Files.Contains
-                    (Get_Source_Stub_Data_Spec (String_Set.Element (E_Cur)))
-                  then
+                  declare
+                     Source : constant String := String_Set.Element (E_Cur);
+                     Stub_Data_Spec : constant String :=
+                       Get_Source_Stub_Data_Spec (Source);
+                     Stub_Data_Body : constant String :=
+                       Get_Source_Stub_Data_Body (Source);
+                  begin
+                     if not Excluded_Test_Data_Files.Contains (Stub_Data_Spec)
+                     then
+                        S_Put (6, """" & Base_Name (Stub_Data_Spec) & """,");
+                        Sources_Names.Include (Base_Name (Stub_Data_Spec));
+                        Put_New_Line;
+                     end if;
+
+                     if not Excluded_Test_Data_Files.Contains (Stub_Data_Body)
+                     then
+                        S_Put (6, """" & Base_Name (Stub_Data_Body) & """,");
+                        Sources_Names.Include (Base_Name (Stub_Data_Body));
+                        Put_New_Line;
+                     end if;
+
                      S_Put
-                       (6,
-                        """"
-                        & Base_Name
-                            (Get_Source_Stub_Data_Spec
-                               (String_Set.Element (E_Cur)))
-                        & """,");
-                     Put_New_Line;
-                  end if;
-                  if not Excluded_Test_Data_Files.Contains
-                    (Get_Source_Stub_Data_Body (String_Set.Element (E_Cur)))
-                  then
+                       (6, """" & Base_Name (Get_Source_Body (Source)) & """");
+                     Sources_Names.Include (Base_Name (Source));
+                     Next (E_Cur);
+
                      S_Put
-                       (6,
-                        """"
-                        & Base_Name
-                            (Get_Source_Stub_Data_Body
-                               (String_Set.Element (E_Cur)))
-                        & """,");
+                       (0,
+                        (if E_Cur = String_Set.No_Element then ");" else ","));
                      Put_New_Line;
-                  end if;
-                  S_Put
-                    (6,
-                     """"
-                     & Base_Name (Get_Source_Body (String_Set.Element (E_Cur)))
-                     & """");
-                  Next (E_Cur);
-                  if E_Cur = String_Set.No_Element then
-                     S_Put (0, ");");
-                  else
-                     S_Put (0, ",");
-                  end if;
-                  Put_New_Line;
+                  end;
                end loop;
             end if;
 
@@ -1670,6 +1670,47 @@ package body Test.Skeleton.Source_Table is
                     (Stub_Project_Prefix & Current_Infix & Proj)
                   & """;");
                Put_New_Line;
+
+               declare
+                  Interfaces_Attribute : constant Attribute_Pkg_List :=
+                    Build ("", "interfaces");
+
+                  Project : constant Project_Type :=
+                    GNATCOLL.Projects.Project_From_Name
+                      (Source_Project_Tree, Proj);
+               begin
+                  S_Put (3, "for Interfaces use (");
+
+                  --  Go through all units exposed in the interface and
+                  --  add them to the driver's interface.
+                  declare
+                     Exposed_List : constant String_List :=
+                       Project.Attribute_Value
+                         (Interfaces_Attribute).all;
+                  begin
+                     for Source of Exposed_List loop
+                        S_Put (0, """" & Source.all & """,");
+                     end loop;
+                  end;
+
+                  --  Include all sources in the interface
+                  if not Sources_Names.Is_Empty then
+                     declare
+                        Cur : String_Set.Cursor := Sources_Names.First;
+                     begin
+                        while Cur /= String_Set.No_Element loop
+                           S_Put (0, """" & String_Set.Element (Cur) & """");
+
+                           Next (Cur);
+
+                           if Cur /= String_Set.No_Element then
+                              S_Put (0, ",");
+                           end if;
+                        end loop;
+                     end;
+                  end if;
+                  S_Put (3, ");");
+               end;
             end if;
             Put_New_Line;
 

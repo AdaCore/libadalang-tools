@@ -3037,6 +3037,9 @@ package body Test.Harness is
          end loop;
       end Add_Nesting_Hierarchy_Dummies;
 
+      Sources_Names : String_Set.Set := String_Set.Empty_Set;
+      --  Used to store the names of all sources of this project to be able to
+      --  add those needed in the interface if the project is a library.
    begin
       Trace (Me, "Generate_Stub_Test_Driver_Projects");
       Increase_Indent (Me);
@@ -3208,37 +3211,89 @@ package body Test.Harness is
 
          S_Cur := P.Sources_List.First;
          if S_Cur /= List_Of_Strings.No_Element then
-            S_Put (3, "for Source_Files use");
+            S_Put (3, "for Source_Files use (");
             Put_New_Line;
 
             while S_Cur /= List_Of_Strings.No_Element loop
 
-               if S_Cur = P.Sources_List.First then
-                  S_Put
-                    (5,
-                     "("""
-                     & Base_Name (List_Of_Strings.Element (S_Cur))
-                     & """");
-               else
-                  S_Put
-                    (6,
-                     """"
-                     & Base_Name (List_Of_Strings.Element (S_Cur))
-                     & """");
-               end if;
+               declare
+                  Source_Name : constant String :=
+                    Base_Name (List_Of_Strings.Element (S_Cur));
+               begin
+                  S_Put (6, """" & Source_Name & """");
+                  Sources_Names.Include (Source_Name);
+               end;
 
                Next (S_Cur);
 
-               if S_Cur = List_Of_Strings.No_Element then
-                  S_Put (0, ");");
-               else
-                  S_Put (0, ",");
-               end if;
-
+               S_Put
+                 (0,
+                  (if S_Cur = List_Of_Strings.No_Element then ");" else ","));
                Put_New_Line;
-
             end loop;
          end if;
+         Put_New_Line;
+         Put_New_Line;
+
+         --  If the project is a library, declare an interface exposing all the
+         --  originally exposed units and all other relevant units.
+
+         if Test.Skeleton.Source_Table.Project_Is_Library
+           (P.Name_Of_Extended.all)
+         then
+            declare
+               Interfaces_Attribute : constant Attribute_Pkg_List :=
+                 Build ("", "interfaces");
+
+               Project : constant Project_Type :=
+                 GNATCOLL.Projects.Project_From_Name
+                   (Source_Project_Tree, P.Name_Of_Extended.all);
+
+               Driver_Sources_Present : constant Boolean :=
+                 P.Sources_List.First = List_Of_Strings.No_Element;
+            begin
+               S_Put (3, "for Interfaces use (");
+
+               --  Go through all units exposed in the interface and add them
+               --  to the driver's interface.
+               declare
+                  Exposed_List : constant String_List :=
+                    Project.Attribute_Value (Interfaces_Attribute).all;
+               begin
+                  for Source of Exposed_List loop
+                     S_Put (0, """" & Source.all & """,");
+                  end loop;
+               end;
+
+               --  If there are source for this test driver, add all of them to
+               --  the interface. If not, only add the relevant unit.
+
+               if Driver_Sources_Present then
+                  S_Put (0, """" & Base_Name (P.UUT_File_Name.all) & """");
+               else
+                  declare
+                     Cur : String_Set.Cursor := Sources_Names.First;
+                  begin
+                     while Cur /= String_Set.No_Element loop
+                        S_Put (0, """" & String_Set.Element (Cur) & """");
+
+                        Next (Cur);
+
+                        if Cur /= String_Set.No_Element then
+                           S_Put (0, ",");
+                        end if;
+                     end loop;
+                  end;
+               end if;
+
+               S_Put (0, ");");
+
+               --  Reset the sources list to be added to the interface
+               Sources_Names := String_Set.Empty_Set;
+            end;
+         end if;
+         Put_New_Line;
+         Put_New_Line;
 
          S_Put (3, "package Compiler renames Gnattest_Common.Compiler;");
 
