@@ -1268,6 +1268,50 @@ package body Test.Common is
    --  The harness can only have generated tests if the support library has
    --  been generated, and the JSON_Test dir exists.
 
+   ---------------------------------
+   -- Extract_Preprocessor_Config --
+   ---------------------------------
+
+   procedure Extract_Preprocessor_Config
+      (Tree : GNATCOLL.Projects.Project_Tree'Class)
+   is
+      use Libadalang.Preprocessing;
+      Data : constant Preprocessor_Data :=
+         Extract_Preprocessor_Data_From_Project (Tree);
+   begin
+      Preprocessor_Config := Data;
+      Has_Preprocessor :=
+         Data.Default_Config.Enabled or not Data.File_Configs.Is_Empty;
+   end Extract_Preprocessor_Config;
+
+   -----------------------------------------
+   -- Write_Preprocessor_Compiler_Package --
+   -----------------------------------------
+
+   procedure Write_Preprocessor_Compiler_Package
+      (Preprocessor_Config_Dir : String) is
+   begin
+      Preprocessor_Config.Write_Preprocessor_Data_File
+         (Preprocessor_Config_Dir
+            & GNAT.OS_Lib.Directory_Separator
+            & Preprocessor_File_Name,
+          Preprocessor_Config_Dir);
+
+      S_Put (3, "package Compiler extends Gnattest_Common.Compiler is");
+      Put_New_Line;
+      S_Put (6, "for Default_Switches (""Ada"") use ");
+      Put_New_Line;
+      S_Put (9, "Gnattest_Common.Compiler'Default_Switches (""Ada"")");
+      Put_New_Line;
+      S_Put (12, "& (""-gnatep="
+         & Preprocessor_Config_Dir
+         & GNAT.OS_Lib.Directory_Separator
+         & Test.Common.Preprocessor_File_Name
+         & """);");
+      Put_New_Line;
+      S_Put (3, "end Compiler;");
+   end Write_Preprocessor_Compiler_Package;
+
    ----------------------------
    -- Common_Subp_Node_Filter --
    ----------------------------

@@ -1,0 +1,6 @@
+description:
+    Test that preprocessing works within both gnattest and TGen.
+    This test generates test cases and builds everything. The build is
+    expected to succeed.
+
+driver: shell_script
