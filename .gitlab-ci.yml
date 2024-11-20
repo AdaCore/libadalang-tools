@@ -1,64 +1,37 @@
 stages:
-  - build_and_test
-  - downstream_ci
+  - build
+  - test
+  - optional
+  - check
 
-#########
-# BUILD #
-#########
+include:
+  # Issue check
+  - component: $CI_SERVER_FQDN/eng/gitlab-templates/check-issue@~latest
 
-.basic-setup:
-  # Use generic_anod_ci here.
-  - generic_anod_ci
-  - cat /tmp/ci_env.sh
-  - . /tmp/ci_env.sh
+  # Build
+  - component: $CI_SERVER_FQDN/eng/gitlab-templates/build@~latest
+    inputs:
+      anod-args: run build_$ACI_TRACK
+      cpus: 16
+      image: pe-base
+      save-component: true
 
-build_and_test:
-  services:
-    - image:e3
-    - cpu:8
-    - mem:16
-  stage: build_and_test
-  interruptible: true
-  rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-    - if: $CI_PIPELINE_SOURCE == 'pipeline'
-  script:
-    - !reference [.basic-setup]
+  # Testing
+  - component: $CI_SERVER_FQDN/eng/gitlab-templates/test@~latest
+    inputs:
+      job-name: libadalang-tools
+      anod-args: run test_$ACI_TRACK
+      image: pe-base
+      cpus: 16
 
-    # Build and test
-    - anod build libadalang-tools $ACI_TRACK_QUALIFIER
-    - anod test libadalang-tools  $ACI_TRACK_QUALIFIER
-
-    # Programmatically find the build space name
-    - BUILD_SPACE=`anod eval libadalang-tools --primitive test build_space_name $ACI_TRACK_QUALIFIER | tr -d "'"`
-    - SB_BASE=$ANOD_DEFAULT_SANDBOX_DIR/x86_64-linux/$BUILD_SPACE
-
-    - e3-testsuite-report
-      --failure-exit-code 1
-      --xunit-output $CI_PROJECT_DIR/xunit_output.xml
-      $SB_BASE/results/new/
-
-  artifacts:
-    when: always
-    paths:
-      - xunit_output.xml
-    reports:
-      junit: xunit_output.xml
-
-downstream_ci:
-  stage: downstream_ci
-  rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-      when: manual
-      allow_failure: true
-  inherit:
-    variables: false
-  variables:
-    ACI_UPSTREAM_PROJECT_ID: $CI_PROJECT_ID
-    ACI_UPSTREAM_MERGE_REQUEST_IID: $CI_MERGE_REQUEST_IID
-  parallel:
-    matrix:
-      - PROJECT: ["eng/ide/lal-refactor", "eng/ide/ada_language_server"]
-  trigger:
-    strategy: depend
-    project: $PROJECT
+  # Optional testing of ALS
+  - component: $CI_SERVER_FQDN/eng/gitlab-templates/test@~latest
+    inputs:
+      job-name: als-test
+      anod-args: run test_als_$ACI_TRACK
+      image: pe-base
+      cpus: 16
+      rules:
+        - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+          when: manual
+          allow_failure: true

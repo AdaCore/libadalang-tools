@@ -1,0 +1,33 @@
+def build_(qualifier={}):
+    with defaults(qualifier=qualifier):
+        anod_build("libadalang-tools")
+
+def test_(qualifier={}):
+    with defaults(qualifier=qualifier):
+        # Install the component built in the preceding CI build job
+        anod_install("libadalang-tools")
+        anod_test("libadalang-tools")
+
+# Edge
+
+edge_qualifier = {"edge": True}
+
+def build_edge():
+    build_(edge_qualifier)
+
+def test_edge():
+    test_(edge_qualifier)
+
+# Optional ALS testing
+
+def test_als_(qualifier={}):
+    with defaults(qualifier=qualifier):
+        # This component below has been built by the build job of the CI
+        anod_install("libadalang-tools")
+
+        # Build and test the ALS
+        anod_build("als")
+        anod_test("als")
+
+def test_als_edge():
+    test_als_(edge_qualifier)
