@@ -3703,7 +3703,7 @@ package body Test.Stub is
             S_Put (0, GT_Marker_End);
             New_Line_Count;
 
-            Put_Lines (MD, Comment_Out => False);
+            Put_Lines (MD, Comment_Out => True);
 
             S_Put (0, GT_Marker_Begin);
             New_Line_Count;
@@ -3833,7 +3833,7 @@ package body Test.Stub is
             S_Put (0, GT_Marker_End);
             New_Line_Count;
 
-            Put_Lines (MD, Comment_Out => False);
+            Put_Lines (MD, Comment_Out => True);
 
             S_Put (0, GT_Marker_Begin);
             New_Line_Count;
