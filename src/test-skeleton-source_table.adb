@@ -118,18 +118,50 @@ package body Test.Skeleton.Source_Table is
    procedure Reset_Source_Process_Iterator;
    --  Sets SF_Iterator to the begining of SF_Table.
 
-   type Project_Record is record
-      Path                : String_Access;
-      Obj_Dir             : String_Access;
-      Stub_Dir            : String_Access;
-      Importing_List      : List_Of_Strings.List;
-      Imported_List       : List_Of_Strings.List;
-      Limited_Withed      : String_Set.Set;
-      Is_Externally_Built : Boolean;
-      Is_Library          : Boolean := False;
+   procedure Generate_Stub_Extension_Project
+     (Proj             : String;
+      Current_Infix    : String;
+      Subroot_Stub_Prj : String;
+      Get_Sources      : access procedure
+        (Proj : String; Current_Proj_Present_Sources : out String_Set.Set));
+   --  Create a extending project tree rooted at Proj, overriding the default
+   --  sources in the tree with the required stubs and helper units.
+   --  Get_Sources is a callback to get the list of sources that should be part
+   --  of the extending project for Proj ???
+   --
+   --  This is a helper for Enforce_Custom_Project_Extension and
+   --  Enforce_Project_Extension.
 
+   type Project_Record is record
+      Path    : String_Access;
+      Obj_Dir : String_Access;
+
+      Stub_Dir : String_Access;
+      --  Directory in which the stubbed sources must be generated
+
+      Importing_List : List_Of_Strings.List;
+      --  List of projects that depend on this project. This may be directly,
+      --  or through project extensions.
+
+      Imported_List : List_Of_Strings.List;
+      --  List of projects that this project imports, either directly, or
+      --  through dependencies of the extended projects.
+
+      Limited_Withed : String_Set.Set;
+      --  Set of projects that are limited with'ed by this projects
+
+      Is_Externally_Built  : Boolean := False;
+      Is_Library           : Boolean := False;
       Needed_For_Extention : Boolean := False;
+
+      Aggregate_Lib : Boolean := False;
+      --  Whether this project is an aggregate library project. As an aggregate
+      --  library project does not have sources itself and thus cannot "with"
+      --  other projects, we'll use the Imported_List to represent the
+      --  aggregated projects.
+
    end record;
+   --  Representation of the important attributes of a project
 
    use List_Of_Strings;
 
@@ -771,7 +803,9 @@ package body Test.Skeleton.Source_Table is
    begin
       Trace (Me, "Initialize_Project_Table");
       Increase_Indent (Me);
-      Iter := Start (Source_Project_Tree.Root_Project);
+      Iter := Start
+        (Source_Project_Tree.Root_Project,
+         Include_Aggregate_Libraries => True);
       while Current (Iter) /= No_Project loop
          P := Current (Iter);
          Trace (Me, "processing " & P.Name);
@@ -793,6 +827,7 @@ package body Test.Skeleton.Source_Table is
                end if;
             end if;
             PR.Is_Externally_Built := False;
+            PR.Aggregate_Lib := P.Is_Aggregate_Library;
 
             if P = Source_Project_Tree.Root_Project then
                PR.Needed_For_Extention := True;
@@ -827,14 +862,23 @@ package body Test.Skeleton.Source_Table is
 
             while P2 /= No_Project loop
                Imported :=
-                 P2.Start (Direct_Only => True, Include_Extended => False);
+                 P2.Start
+                   (Direct_Only                 => True,
+                    Include_Extended            => False,
+                    Include_Aggregate_Libraries => True);
 
                while Current (Imported) /= No_Project loop
-                  PR.Imported_List.Append (Current (Imported).Name);
-                  if Is_Limited_With (Imported) then
-                     PR.Limited_Withed.Include (Current (Imported).Name);
-                  end if;
+
+                  --  ??? It seems that aggregate library projects include
+                  --  themselves according to GNATOLL.Projects..
+
+                  if Current (Imported).Name /= P.Name then
+                     PR.Imported_List.Append (Current (Imported).Name);
+                     if Is_Limited_With (Imported) then
+                        PR.Limited_Withed.Include (Current (Imported).Name);
+                     end if;
                      Trace (Me, Current (Imported).Name);
+                  end if;
                   Next (Imported);
                end loop;
 
@@ -1349,35 +1393,37 @@ package body Test.Skeleton.Source_Table is
         (SF_Table, SN).Stub_Created;
    end Source_Stubbed;
 
-   --------------------------------------
-   -- Enforce_Custom_Project_Extention --
-   --------------------------------------
+   -------------------------------------
+   -- Generate_Stub_Extension_Project --
+   -------------------------------------
 
-   procedure Enforce_Custom_Project_Extention
-     (File_Name            : String;
-      Subroot_Stub_Prj     : String;
-      Current_Source_Infix : String)
+   procedure Generate_Stub_Extension_Project
+     (Proj             : String;
+      Current_Infix    : String;
+      Subroot_Stub_Prj : String;
+      Get_Sources      : access procedure
+        (Proj : String; Current_Proj_Present_Sources : out String_Set.Set))
    is
-      Short_Name : constant String := Base_Name (File_Name);
+      Processed_Projects : String_Set.Set := String_Set.Empty_Set;
 
-      Excluded_Sources             : String_Set.Set := String_Set.Empty_Set;
       Current_Proj_Present_Sources : String_Set.Set := String_Set.Empty_Set;
-      Processed_Projects           : String_Set.Set := String_Set.Empty_Set;
 
-      SS_Cur  : String_Set.Cursor;
-      Subroot_Prj_Name : constant String :=
-        Get_Source_Project_Name (File_Name);
+      procedure Generate_Stub_Extension_Project_Aux (Proj : String);
+      --  Recursive helper
 
-      procedure Process_Project (Proj : String);
+      -----------------------------------------
+      -- Generate_Stub_Extension_Project_Aux --
+      -----------------------------------------
 
-      procedure Set_Present_Subset_For_Project (Proj : String);
-
-      procedure Process_Project (Proj : String) is
+      procedure Generate_Stub_Extension_Project_Aux (Proj : String) is
          Cur, I_Cur : List_Of_Strings.Cursor;
          E_Cur : String_Set.Cursor;
          Arg_Proj : Project_Record;
 
          Relative_P_Path, Relative_I_Path : String_Access;
+
+         Resolved_Dep_List : List_Of_Strings.List;
+         --  List of relative paths to the stub project dependencies of Proj
       begin
          if Processed_Projects.Contains (Proj) then
             return;
@@ -1385,7 +1431,7 @@ package body Test.Skeleton.Source_Table is
          Processed_Projects.Include (Proj);
          Arg_Proj := PF_Table.Element (Proj);
 
-         if Proj = Subroot_Prj_Name then
+         if Proj = Generate_Stub_Extension_Project.Proj then
             --  The root of the subtree is extended by the test driver project.
             goto Process_Imported;
          end if;
@@ -1405,7 +1451,7 @@ package body Test.Skeleton.Source_Table is
                     (+(Arg_Proj.Stub_Dir.all
                      & Directory_Separator
                      & Unit_To_File_Name
-                       (Stub_Project_Prefix & Current_Source_Infix & Proj))));
+                       (Stub_Project_Prefix & Current_Infix & Proj))));
 
                if Arg_Proj.Is_Library then
                   Append
@@ -1415,7 +1461,7 @@ package body Test.Skeleton.Source_Table is
                         & Directory_Separator
                         & Unit_To_File_Name
                           (Stub_Project_Prefix
-                           & Current_Source_Infix
+                           & Current_Infix
                            & Proj
                            & "_lib"))));
                end if;
@@ -1433,14 +1479,21 @@ package body Test.Skeleton.Source_Table is
                & Arg_Proj.Stub_Dir.all
                & Directory_Separator
                & Unit_To_File_Name
-                 (Stub_Project_Prefix & Current_Source_Infix & Proj)
+                 (Stub_Project_Prefix & Current_Infix & Proj)
                & ".gpr");
             Create
               (Arg_Proj.Stub_Dir.all
                & Directory_Separator
                & Unit_To_File_Name
-                 (Stub_Project_Prefix & Current_Source_Infix & Proj)
+                 (Stub_Project_Prefix & Current_Infix & Proj)
                & ".gpr");
+
+            --  Generate the list of stubbed projects on which Proj depends.
+            --  If Proj is not an aggregate library project, the list will
+            --  consist of
+            --    [limited] with "rel/path/to/dep.gpr";
+            --  otherwise the list will be the plain list of relative paths,
+            --  with surrounding quotes.
 
             I_Cur := Arg_Proj.Imported_List.First;
             while I_Cur /= List_Of_Strings.No_Element loop
@@ -1454,11 +1507,13 @@ package body Test.Skeleton.Source_Table is
                          (List_Of_Strings.Element (I_Cur)).Stub_Dir.all
                          & Directory_Separator
                        & To_Lower (Stub_Project_Prefix
-                                   & Current_Source_Infix
+                                   & Current_Infix
                                    & List_Of_Strings.Element (I_Cur))
                        & ".gpr";
                   begin
-                     if List_Of_Strings.Element (I_Cur) = Subroot_Prj_Name then
+                     if List_Of_Strings.Element (I_Cur)
+                       = Generate_Stub_Extension_Project.Proj
+                     then
                         Relative_I_Path := new String'
                           (+Relative_Path (Create (+Subroot_Stub_Prj),
                            Create (+Arg_Proj.Stub_Dir.all)));
@@ -1468,128 +1523,99 @@ package body Test.Skeleton.Source_Table is
                            Create (+Arg_Proj.Stub_Dir.all)));
                      end if;
                   end;
-                  if Arg_Proj.Limited_Withed.Contains
+                  if Arg_Proj.Aggregate_Lib then
+                     Resolved_Dep_List.Append
+                       ("""" & Relative_I_Path.all & """");
+
+                  elsif Arg_Proj.Limited_Withed.Contains
                     (List_Of_Strings.Element (I_Cur))
                   then
-                     S_Put
-                       (0,
-                        "limited with """
+                     Resolved_Dep_List.Append
+                       ("limited with """
                         & Relative_I_Path.all
                         & """;");
                   else
-                     S_Put
-                       (0,
-                        "with """
+                     Resolved_Dep_List.Append
+                       ("with """
                         & Relative_I_Path.all
                         & """;");
                   end if;
-                  Put_New_Line;
                end if;
                Next (I_Cur);
             end loop;
+
+            --  Output the resolved dependency list in the non-aggregate
+            --  library project case.
+
+            if not Arg_Proj.Aggregate_Lib then
+               for Str of Resolved_Dep_List loop
+                  S_Put (0, Str);
+                  Put_New_Line;
+               end loop;
+            end if;
 
             S_Put (0, "with ""aunit"";");
             Put_New_Line;
             Put_New_Line;
 
+            if Arg_Proj.Aggregate_Lib then
+               S_Put (0, "aggregate library ");
+            end if;
+
             S_Put
               (0,
                "project "
                & Stub_Project_Prefix
-               & Current_Source_Infix
+               & Current_Infix
                & Proj
                & " extends """
                & Relative_P_Path.all
                & """ is");
             Put_New_Line;
-            S_Put (3, "for Source_Dirs use (""."");");
-            Put_New_Line;
 
-            Set_Present_Subset_For_Project (Proj);
-            E_Cur := Current_Proj_Present_Sources.First;
-            if E_Cur /= String_Set.No_Element then
-               S_Put (3, "for Source_Files use (");
+            if not Arg_Proj.Aggregate_Lib then
+               S_Put (3, "for Source_Dirs use (""."");");
                Put_New_Line;
-            else
-               S_Put (3, "for Source_Files use ();");
-               Put_New_Line;
-            end if;
-            while E_Cur /= String_Set.No_Element loop
-               if not Excluded_Test_Data_Files.Contains
-                 (Get_Source_Stub_Data_Spec (String_Set.Element (E_Cur)))
-               then
-                  S_Put
-                    (6,
-                     """"
-                     & Base_Name
-                       (Get_Source_Stub_Data_Spec (String_Set.Element (E_Cur)))
-                     & """,");
+
+               Get_Sources (Proj, Current_Proj_Present_Sources);
+
+               E_Cur := Current_Proj_Present_Sources.First;
+               if E_Cur /= String_Set.No_Element then
+                  S_Put (3, "for Source_Files use (");
                   Put_New_Line;
-               end if;
-               if not Excluded_Test_Data_Files.Contains
-                 (Get_Source_Stub_Data_Body (String_Set.Element (E_Cur)))
-               then
-                  S_Put
-                    (6,
-                     """"
-                     & Base_Name
-                       (Get_Source_Stub_Data_Body (String_Set.Element (E_Cur)))
-                     & """,");
-                  Put_New_Line;
-               end if;
-               S_Put
-                 (6,
-                  """"
-                  & Base_Name (Get_Source_Body (String_Set.Element (E_Cur)))
-                  & """");
-               Next (E_Cur);
-               if E_Cur = String_Set.No_Element then
-                  S_Put (0, ");");
                else
-                  S_Put (0, ",");
+                  S_Put (3, "for Source_Files use ();");
+                  Put_New_Line;
                end if;
-               Put_New_Line;
-            end loop;
-
-            S_Put
-              (3,
-               "for Object_Dir use """
-               & Unit_To_File_Name
-                 (Stub_Project_Prefix & Current_Source_Infix & Proj)
-               & """;");
-            Put_New_Line;
-            if Arg_Proj.Is_Library then
-               S_Put
-                 (3,
-                  "for Library_Dir use """
-                  & Unit_To_File_Name
-                    (Stub_Project_Prefix
-                     & Current_Source_Infix & Proj & "_lib")
-                  & """;");
-               Put_New_Line;
-               S_Put
-                 (3,
-                  "for Library_Name use """
-                  & Unit_To_File_Name
-                    (Stub_Project_Prefix & Current_Source_Infix & Proj)
-                  & """;");
-               Put_New_Line;
-            end if;
-            Put_New_Line;
-
-            E_Cur := Current_Proj_Present_Sources.First;
-            if E_Cur /= String_Set.No_Element then
-               S_Put (3, "package Coverage is");
-               Put_New_Line;
-               S_Put (6, "for Excluded_Units use (");
-               Put_New_Line;
-
                while E_Cur /= String_Set.No_Element loop
+                  if not Excluded_Test_Data_Files.Contains
+                    (Get_Source_Stub_Data_Spec (String_Set.Element (E_Cur)))
+                  then
+                     S_Put
+                       (6,
+                        """"
+                        & Base_Name
+                            (Get_Source_Stub_Data_Spec
+                               (String_Set.Element (E_Cur)))
+                        & """,");
+                     Put_New_Line;
+                  end if;
+                  if not Excluded_Test_Data_Files.Contains
+                    (Get_Source_Stub_Data_Body (String_Set.Element (E_Cur)))
+                  then
+                     S_Put
+                       (6,
+                        """"
+                        & Base_Name
+                            (Get_Source_Stub_Data_Body
+                               (String_Set.Element (E_Cur)))
+                        & """,");
+                     Put_New_Line;
+                  end if;
                   S_Put
-                    (9,
+                    (6,
                      """"
-                     & Get_Source_Unit_Name
-                       (Get_Source_Body (String_Set.Element (E_Cur)))
+                     & Base_Name (Get_Source_Body (String_Set.Element (E_Cur)))
                      & """");
                   Next (E_Cur);
                   if E_Cur = String_Set.No_Element then
@@ -1599,15 +1625,87 @@ package body Test.Skeleton.Source_Table is
                   end if;
                   Put_New_Line;
                end loop;
-               S_Put (3, "end Coverage;");
+            end if;
+
+            --  Add stubbed aggregated projects if this is an aggregate library
+            --  project.
+
+            if Arg_Proj.Aggregate_Lib then
+               S_Put (3, "for Project_Files use (");
                Put_New_Line;
+               I_Cur := Resolved_Dep_List.First;
+               while Has_Element (I_Cur) loop
+                  S_Put (6, Element (I_Cur));
+                  Next (I_Cur);
+                  if Has_Element (I_Cur) then
+                     S_Put (0, ",");
+                  else
+                     S_Put (0, ");");
+                  end if;
+                  Put_New_Line;
+               end loop;
+               Put_New_Line;
+            end if;
+
+            S_Put
+              (3,
+               "for Object_Dir use """
+               & Unit_To_File_Name
+                 (Stub_Project_Prefix & Current_Infix & Proj)
+               & """;");
+            Put_New_Line;
+            if Arg_Proj.Is_Library then
+               S_Put
+                 (3,
+                  "for Library_Dir use """
+                  & Unit_To_File_Name
+                    (Stub_Project_Prefix
+                     & Current_Infix & Proj & "_lib")
+                  & """;");
+               Put_New_Line;
+               S_Put
+                 (3,
+                  "for Library_Name use """
+                  & Unit_To_File_Name
+                    (Stub_Project_Prefix & Current_Infix & Proj)
+                  & """;");
+               Put_New_Line;
+            end if;
+            Put_New_Line;
+
+            if not Arg_Proj.Aggregate_Lib then
+               E_Cur := Current_Proj_Present_Sources.First;
+               if E_Cur /= String_Set.No_Element then
+                  S_Put (3, "package Coverage is");
+                  Put_New_Line;
+                  S_Put (6, "for Excluded_Units use (");
+                  Put_New_Line;
+
+                  while E_Cur /= String_Set.No_Element loop
+                     S_Put
+                       (9,
+                        """"
+                        & Get_Source_Unit_Name
+                          (Get_Source_Body (String_Set.Element (E_Cur)))
+                        & """");
+                     Next (E_Cur);
+                     if E_Cur = String_Set.No_Element then
+                        S_Put (0, ");");
+                     else
+                        S_Put (0, ",");
+                     end if;
+                     Put_New_Line;
+                  end loop;
+                  S_Put (3, "end Coverage;");
+                  Put_New_Line;
+               end if;
             end if;
 
             S_Put
               (0,
                "end "
                & Stub_Project_Prefix
-               & Current_Source_Infix
+               & Current_Infix
                & Proj
                & ";");
 
@@ -1618,12 +1716,46 @@ package body Test.Skeleton.Source_Table is
 
          Cur := Arg_Proj.Imported_List.First;
          while Cur /= List_Of_Strings.No_Element loop
-            Process_Project (List_Of_Strings.Element (Cur));
+            Generate_Stub_Extension_Project_Aux
+              (List_Of_Strings.Element (Cur));
             Next (Cur);
          end loop;
-      end Process_Project;
+      end Generate_Stub_Extension_Project_Aux;
 
-      procedure Set_Present_Subset_For_Project (Proj : String) is
+   --  Start of processing for Generate_Stub_Extension_Project
+   begin
+      Generate_Stub_Extension_Project_Aux (Proj);
+   end Generate_Stub_Extension_Project;
+
+   --------------------------------------
+   -- Enforce_Custom_Project_Extension --
+   --------------------------------------
+
+   procedure Enforce_Custom_Project_Extension
+     (File_Name            : String;
+      Subroot_Stub_Prj     : String;
+      Current_Source_Infix : String)
+   is
+      Short_Name : constant String := Base_Name (File_Name);
+
+      Excluded_Sources             : String_Set.Set := String_Set.Empty_Set;
+
+      SS_Cur  : String_Set.Cursor;
+      Subroot_Prj_Name : constant String :=
+        Get_Source_Project_Name (File_Name);
+
+      procedure Set_Present_Subset_For_Project
+        (Proj                         : String;
+         Current_Proj_Present_Sources : out String_Set.Set);
+
+      ------------------------------------
+      -- Set_Present_Subset_For_Project --
+      ------------------------------------
+
+      procedure Set_Present_Subset_For_Project
+        (Proj                         : String;
+         Current_Proj_Present_Sources : out String_Set.Set)
+      is
          Cur : Source_File_Table.Cursor := SF_Table.First;
       begin
          Current_Proj_Present_Sources.Clear;
@@ -1635,7 +1767,8 @@ package body Test.Skeleton.Source_Table is
                if Source_File_Table.Element (Cur).Project_Name.all = Proj
                  and then not Is_Body (Key)
                  and then Source_Stubbed (Key)
-                 and then not Excluded_Sources.Contains (Base_Name (Key))
+                 and then not Excluded_Sources.Contains
+                                (Base_Name (Key))
                then
                   Current_Proj_Present_Sources.Include
                     (Source_File_Table.Key (Cur));
@@ -1644,6 +1777,8 @@ package body Test.Skeleton.Source_Table is
             Next (Cur);
          end loop;
       end Set_Present_Subset_For_Project;
+
+   --  Start of processing for Enforce_Custom_Project_Extension
    begin
       Union (Excluded_Sources, Default_Stub_Exclusion_List);
       if Stub_Exclusion_Lists.Contains (Short_Name) then
@@ -1673,28 +1808,33 @@ package body Test.Skeleton.Source_Table is
          Decrease_Indent (Me_Verbose);
       end if;
 
-      Process_Project (Subroot_Prj_Name);
+      Generate_Stub_Extension_Project
+        (Subroot_Prj_Name,
+         Current_Source_Infix,
+         Subroot_Stub_Prj,
+         Set_Present_Subset_For_Project'Access);
 
-   end Enforce_Custom_Project_Extention;
+   end Enforce_Custom_Project_Extension;
 
    -------------------------------
-   -- Enforce_Project_Extention --
+   -- Enforce_Project_Extension --
    -------------------------------
 
-   procedure Enforce_Project_Extention
+   procedure Enforce_Project_Extension
      (Prj_Name              : String;
       Subroot_Stub_Prj      : String;
       Current_Project_Infix : String)
    is
+      procedure Set_Present_Subset_For_Project
+        (Proj : String; Current_Proj_Present_Sources : out String_Set.Set);
 
-      Processed_Projects : String_Set.Set := String_Set.Empty_Set;
+      ------------------------------------
+      -- Set_Present_Subset_For_Project --
+      ------------------------------------
 
-      Current_Proj_Present_Sources : String_Set.Set := String_Set.Empty_Set;
-
-      procedure Process_Project (Proj : String);
-      procedure Set_Present_Subset_For_Project (Proj : String);
-
-      procedure Set_Present_Subset_For_Project (Proj : String) is
+      procedure Set_Present_Subset_For_Project
+        (Proj : String; Current_Proj_Present_Sources : out String_Set.Set)
+      is
          Cur : Source_File_Table.Cursor := SF_Table.First;
       begin
          Current_Proj_Present_Sources.Clear;
@@ -1717,261 +1857,13 @@ package body Test.Skeleton.Source_Table is
          end loop;
       end Set_Present_Subset_For_Project;
 
-      procedure Process_Project (Proj : String) is
-         Relative_P_Path, Relative_I_Path : String_Access;
-         Arg_Proj : Project_Record;
-         Cur, I_Cur : List_Of_Strings.Cursor;
-         E_Cur : String_Set.Cursor;
-      begin
-         if Processed_Projects.Contains (Proj) then
-            return;
-         end if;
-         Processed_Projects.Include (Proj);
-
-         Arg_Proj := PF_Table.Element (Proj);
-
-         if Proj = Prj_Name then
-            --  The root of the subtree is extended by the test driver project.
-            goto Process_Imported;
-         end if;
-
-         --  generating stuff
-         if Arg_Proj.Needed_For_Extention then
-
-            declare
-               F : File_Array_Access;
-            begin
-               Append
-                 (F,
-                  GNATCOLL.VFS.Create
-                    (+(Arg_Proj.Stub_Dir.all)));
-               Append
-                 (F,
-                  GNATCOLL.VFS.Create
-                    (+(Arg_Proj.Stub_Dir.all
-                     & Directory_Separator
-                     & Unit_To_File_Name
-                       (Stub_Project_Prefix & Current_Project_Infix & Proj))));
-               if Arg_Proj.Is_Library then
-                  Append
-                    (F,
-                     GNATCOLL.VFS.Create
-                       (+(Arg_Proj.Stub_Dir.all
-                        & Directory_Separator
-                        & Unit_To_File_Name
-                          (Stub_Project_Prefix
-                           & Current_Project_Infix
-                           & Proj
-                           & "_lib"))));
-               end if;
-               Create_Dirs (F);
-            end;
-
-            Relative_P_Path := new String'
-              (+Relative_Path
-                 (Create (+Arg_Proj.Path.all),
-                  Create (+Arg_Proj.Stub_Dir.all)));
-
-            Trace
-              (Me,
-               "Creating "
-               & Arg_Proj.Stub_Dir.all
-               & Directory_Separator
-               & Unit_To_File_Name
-                 (Stub_Project_Prefix & Current_Project_Infix & Proj)
-               & ".gpr");
-            Create
-              (Arg_Proj.Stub_Dir.all
-               & Directory_Separator
-               & Unit_To_File_Name
-                 (Stub_Project_Prefix & Current_Project_Infix & Proj)
-               & ".gpr");
-
-            I_Cur := Arg_Proj.Imported_List.First;
-            while I_Cur /= List_Of_Strings.No_Element loop
-               if
-                 PF_Table.Element
-                 (List_Of_Strings.Element (I_Cur)).Needed_For_Extention
-               then
-                  declare
-                     Imported_Sub_Project : constant String :=
-                       PF_Table.Element
-                         (List_Of_Strings.Element (I_Cur)).Stub_Dir.all
-                         & Directory_Separator
-                       & To_Lower (Stub_Project_Prefix
-                                   & Current_Project_Infix
-                                   & List_Of_Strings.Element (I_Cur))
-                       & ".gpr";
-                  begin
-                     if List_Of_Strings.Element (I_Cur) = Prj_Name then
-                        Relative_I_Path := new String'
-                          (+Relative_Path (Create (+Subroot_Stub_Prj),
-                           Create (+Arg_Proj.Stub_Dir.all)));
-                     else
-                        Relative_I_Path := new String'
-                          (+Relative_Path (Create (+Imported_Sub_Project),
-                           Create (+Arg_Proj.Stub_Dir.all)));
-                     end if;
-                  end;
-                  if Arg_Proj.Limited_Withed.Contains
-                    (List_Of_Strings.Element (I_Cur))
-                  then
-                     S_Put
-                       (0,
-                        "limited with """
-                        & Relative_I_Path.all
-                        & """;");
-                  else
-                     S_Put
-                       (0,
-                        "with """
-                        & Relative_I_Path.all
-                        & """;");
-                  end if;
-                  Put_New_Line;
-               end if;
-               Next (I_Cur);
-            end loop;
-
-            S_Put (0, "with ""aunit"";");
-            Put_New_Line;
-            Put_New_Line;
-
-            S_Put
-              (0,
-               "project "
-               & Stub_Project_Prefix
-               & Current_Project_Infix
-               & Proj
-               & " extends """
-               & Relative_P_Path.all
-               & """ is");
-            Put_New_Line;
-            S_Put (3, "for Source_Dirs use (""."");");
-            Put_New_Line;
-
-            Set_Present_Subset_For_Project (Proj);
-            E_Cur := Current_Proj_Present_Sources.First;
-            if E_Cur /= String_Set.No_Element then
-               S_Put (3, "for Source_Files use (");
-               Put_New_Line;
-            else
-               S_Put (3, "for Source_Files use ();");
-               Put_New_Line;
-            end if;
-            while E_Cur /= String_Set.No_Element loop
-               if not Excluded_Test_Data_Files.Contains
-                 (Get_Source_Stub_Data_Spec (String_Set.Element (E_Cur)))
-               then
-                  S_Put
-                    (6,
-                     """"
-                     & Base_Name
-                       (Get_Source_Stub_Data_Spec (String_Set.Element (E_Cur)))
-                     & """,");
-                  Put_New_Line;
-               end if;
-               if not Excluded_Test_Data_Files.Contains
-                 (Get_Source_Stub_Data_Body (String_Set.Element (E_Cur)))
-               then
-                  S_Put
-                    (6,
-                     """"
-                     & Base_Name
-                       (Get_Source_Stub_Data_Body (String_Set.Element (E_Cur)))
-                     & """,");
-                  Put_New_Line;
-               end if;
-               S_Put
-                 (6,
-                  """"
-                  & Base_Name (Get_Source_Body (String_Set.Element (E_Cur)))
-                  & """");
-               Next (E_Cur);
-               if E_Cur = String_Set.No_Element then
-                  S_Put (0, ");");
-               else
-                  S_Put (0, ",");
-               end if;
-               Put_New_Line;
-            end loop;
-
-            S_Put
-              (3,
-               "for Object_Dir use """
-               & Unit_To_File_Name
-                 (Stub_Project_Prefix & Current_Project_Infix & Proj)
-               & """;");
-            Put_New_Line;
-            if Arg_Proj.Is_Library then
-               S_Put
-                 (3,
-                  "for Library_Dir use """
-                  & Unit_To_File_Name
-                    (Stub_Project_Prefix
-                     & Current_Project_Infix & Proj & "_lib")
-                  & """;");
-               Put_New_Line;
-               S_Put
-                 (3,
-                  "for Library_Name use """
-                  & Unit_To_File_Name
-                    (Stub_Project_Prefix & Current_Project_Infix & Proj)
-                  & """;");
-               Put_New_Line;
-            end if;
-            Put_New_Line;
-
-            E_Cur := Current_Proj_Present_Sources.First;
-            if E_Cur /= String_Set.No_Element then
-               S_Put (3, "package Coverage is");
-               Put_New_Line;
-               S_Put (6, "for Excluded_Units use (");
-               Put_New_Line;
-
-               while E_Cur /= String_Set.No_Element loop
-                  S_Put
-                    (9,
-                     """"
-                     & Get_Source_Unit_Name
-                       (Get_Source_Body (String_Set.Element (E_Cur)))
-                     & """");
-                  Next (E_Cur);
-                  if E_Cur = String_Set.No_Element then
-                     S_Put (0, ");");
-                  else
-                     S_Put (0, ",");
-                  end if;
-                  Put_New_Line;
-               end loop;
-               S_Put (3, "end Coverage;");
-               Put_New_Line;
-            end if;
-
-            S_Put
-              (0,
-               "end "
-               & Stub_Project_Prefix
-               & Current_Project_Infix
-               & Proj
-               & ";");
-
-            Close_File;
-         end if;
-
-         <<Process_Imported>>
-
-         Cur := Arg_Proj.Imported_List.First;
-         while Cur /= List_Of_Strings.No_Element loop
-            Process_Project (List_Of_Strings.Element (Cur));
-            Next (Cur);
-         end loop;
-      end Process_Project;
-
+   --  Start of processing for Enforce_Project_Extension
    begin
-
-      Process_Project (Prj_Name);
-
-   end Enforce_Project_Extention;
+      Generate_Stub_Extension_Project
+        (Prj_Name,
+         Current_Project_Infix,
+         Subroot_Stub_Prj,
+         Set_Present_Subset_For_Project'Access);
+   end Enforce_Project_Extension;
 
 end Test.Skeleton.Source_Table;

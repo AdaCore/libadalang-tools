@@ -1,0 +1,8 @@
+library project Dep2 is
+
+   for Object_Dir use "obj2";
+   for Library_Dir use "lib2";
+   for Library_Name use "dep2";
+   for Source_Dirs use ("src2");
+
+end Dep2;
