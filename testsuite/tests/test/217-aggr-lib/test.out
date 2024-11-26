@@ -1,0 +1,4 @@
+pkg_root.ads:3:4: info: corresponding test PASSED
+pkg1.ads:3:4: error: corresponding test FAILED: Test not implemented. (pkg1-test_data-tests.adb:44)
+pkg2.ads:3:4: error: corresponding test FAILED: Test not implemented. (pkg2-test_data-tests.adb:44)
+3 tests run: 1 passed; 2 failed; 0 crashed.

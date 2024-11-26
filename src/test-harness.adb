@@ -3089,10 +3089,10 @@ package body Test.Harness is
          Current_Infix := new String'(Get_Next_Infix);
          if Stub_Exclusion_Lists.Contains (Base_Name (P.UUT_File_Name.all))
          then
-            Test.Skeleton.Source_Table.Enforce_Custom_Project_Extention
+            Test.Skeleton.Source_Table.Enforce_Custom_Project_Extension
               (P.UUT_File_Name.all, P.Path_Extending.all, Current_Infix.all);
          else
-            Test.Skeleton.Source_Table.Enforce_Project_Extention
+            Test.Skeleton.Source_Table.Enforce_Project_Extension
               (P.Name_Of_Extended.all,
                P.Path_Extending.all,
                Current_Infix.all);

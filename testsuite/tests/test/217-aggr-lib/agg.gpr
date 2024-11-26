@@ -1,0 +1,8 @@
+aggregate library project Agg is
+
+   for Project_Files use ("dep1.gpr", "dep2.gpr");
+   for Library_Dir use "lib_agg";
+   for Library_Name use "agg";
+   for Object_Dir use "obj_agg";
+
+end Agg;
