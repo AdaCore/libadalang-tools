@@ -38,7 +38,6 @@ with GNATCOLL.Traces;
 
 with Libadalang;     use Libadalang;
 with Libadalang.Project_Provider;
-with Libadalang.Preprocessing;
 
 with Utils.Command_Lines.Common; use Utils; use Utils.Command_Lines.Common;
 pragma Unreferenced (Utils.Command_Lines.Common); -- ????
@@ -133,13 +132,10 @@ package body Test.Actions is
    procedure Init
      (Tool : in out Test_Tool; Cmd : in out Command_Line)
    is
-      package LAL_Prep renames Libadalang.Preprocessing;
       Tmp   : GNAT.OS_Lib.String_Access;
       Files : File_Array_Access;
 
       Root_Prj : Project_Type;
-      File_Config : LAL_Prep.File_Config;
-      File_Configs : LAL_Prep.File_Config_Maps.Map;
 
       type Output_Mode_Type is (Root_Mode, Subdir_Mode, Direct_Mode);
       Output_Mode : Output_Mode_Type := Direct_Mode;
@@ -873,17 +869,9 @@ package body Test.Actions is
             & GNAT.OS_Lib.Directory_Separator & "tgen"
             & GNAT.OS_Lib.Directory_Separator & "templates"));
 
-      LAL_Prep.Extract_Preprocessor_Data_From_Project
-         (Tree => Tool.Project_Tree.all,
-          Default_Config => File_Config,
-          File_Configs => File_Configs);
-      declare
-         Preprocessor_Data : constant LAL_Prep.Preprocessor_Data :=
-            LAL_Prep.Create_Preprocessor_Data (File_Config, File_Configs);
-      begin
-         TGen.Libgen.Set_Preprocessing_Definitions
-            (Test.Common.TGen_Libgen_Ctx, Preprocessor_Data);
-      end;
+      Test.Common.Extract_Preprocessor_Config (Tool.Project_Tree.all);
+      TGen.Libgen.Set_Preprocessing_Definitions
+         (Test.Common.TGen_Libgen_Ctx, Test.Common.Preprocessor_Config);
 
       if Arg (Cmd, Gen_Test_Vectors) then
          Test.Common.Generate_Test_Vectors := True;

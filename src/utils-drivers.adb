@@ -124,7 +124,8 @@ package body Utils.Drivers is
                      F_Name.all,
                      Counter,
                      Has_Syntax_Err,
-                     Pass => First_Pass);
+                     Pass => First_Pass,
+                     Preprocessing_Allowed => Preprocessing_Allowed);
                   if Has_Syntax_Err and then not Utils.Syntax_Errors then
                      Utils.Syntax_Errors := True;
                   end if;

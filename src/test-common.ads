@@ -25,6 +25,7 @@
 --  GNATtest components
 
 with Libadalang.Analysis; use Libadalang.Analysis;
+with Libadalang.Preprocessing;
 with Langkit_Support.Text; use Langkit_Support.Text;
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
@@ -423,6 +424,29 @@ package Test.Common is
 
    function Harness_Has_Gen_Tests return Boolean;
    --  Return whether the harness contains any generated tests
+
+   procedure Extract_Preprocessor_Config
+      (Tree : GNATCOLL.Projects.Project_Tree'Class);
+   --  Extract the preprocessor configuration from a project tree.
+   --  It is possible to check if preprocessing is being used with
+   --  `Has_Preprocessor` and retrieve the configuration using
+   --  `Preprocessor_Config` field if possible.
+
+   procedure Write_Preprocessor_Compiler_Package
+      (Preprocessor_Config_Dir : String) with Pre => Has_Preprocessor;
+   --  Write GPR Compiler package which appends preprocessor flags to the
+   --  common gnattest compiler flags
+
+   Preprocessor_Config : Libadalang.Preprocessing.Preprocessor_Data;
+   --  Preprocessor config for the loaded user project.
+   --  Might be null if the project isn't using preprocessing. The
+   --  `Has_Preprocessor` switch can be used to check if preprocessing is used.
+
+   Has_Preprocessor    : Boolean := False;
+   --  True if the loaded project uses preprocessing, false otherwise.
+
+   Preprocessor_File_Name : constant String := "preprocessor.def";
+   --  Name of preprocessor configuration file
 
    TGen_Num_Tests : Natural := 5;
    --  Number of tests to be generated for each procedure (or upper limit if

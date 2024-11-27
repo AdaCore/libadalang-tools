@@ -1129,24 +1129,36 @@ package body Test.Instrument is
       else
          --  First need to close some declarations, then open others
 
-         --  Getting common root package
-         for J in 0 .. Integer'Min (N1'Length, N2'Length) - 1 loop
-            if N1 (N1'First + J) /= N2 (N2'First + J) then
-               exit;
-            elsif N1 (N1'First + J) = '.' then
-               Idx := J - 1;
-            end if;
-         end loop;
-
          declare
-            N_Common : constant Wide_Wide_String :=
-              N1 (N1'First .. N1'First + Idx);
+            Has_Dot : Boolean := False;
          begin
-            Close_Decls (N1, N_Common);
-            Put_New_Line;
-            Open_Decls (N_Common, N2);
-         end;
+            --  Getting common root package
+            for J in 0 .. Integer'Min (N1'Length, N2'Length) - 1 loop
+               if N1 (N1'First + J) /= N2 (N2'First + J) then
+                  exit;
+               elsif N1 (N1'First + J) = '.' then
+                  Idx := J - 1;
+                  Has_Dot := True;
+               end if;
+            end loop;
 
+            declare
+               N_Common : constant Wide_Wide_String :=
+                  (if Has_Dot
+                   then N1 (N1'First .. N1'First + Idx)
+                   --  N1 and N2 are the same at this point. We reached the
+                   --  end of the string without encountering a dot.
+                   else N1);
+            begin
+               if not Has_Dot then
+                  pragma Assert (N1 = N2);
+               end if;
+
+               Close_Decls (N1, N_Common);
+               Put_New_Line;
+               Open_Decls (N_Common, N2);
+            end;
+         end;
       end if;
    end Process_Nesting_Difference;
 
