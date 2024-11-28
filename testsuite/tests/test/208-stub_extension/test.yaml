@@ -3,4 +3,4 @@ description:
   for a project tree in which an extending project is present. This used to
   crash due to a mis-management of the project table.
 
-driver: shell_script
+driver: gnattest_driver

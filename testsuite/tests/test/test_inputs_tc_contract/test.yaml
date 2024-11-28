@@ -2,5 +2,5 @@ description:
     Test that test routines for different Test_Case
     of the same subprogram do not overwrite each other.
 
-driver: shell_script
+driver: gnattest_driver
 

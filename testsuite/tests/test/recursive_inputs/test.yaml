@@ -1,5 +1,5 @@
 description:
     Test checking that intermediate recursive inputs are not dumped
 
-driver: shell_script
+driver: gnattest_driver
 

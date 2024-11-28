@@ -3,6 +3,6 @@ description:
     with no visible part (i.e. only declared in the private part of the
     package).
 
-driver: shell_script
+driver: gnattest_driver
 control:
     - [XFAIL, 'x86', 'Marshalling not working for 32bits (UB03-008)']
