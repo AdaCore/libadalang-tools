@@ -44,19 +44,6 @@ package body Laltools.Common is
       Message : String := "");
    --  Log an exception in the given traces, with an optional message.
 
-   ---------
-   -- "<" --
-   ---------
-
-   function "<" (Left, Right : Source_Location_Range) return Boolean is
-   begin
-      if Left.Start_Line = Right.Start_Line then
-         return Left.Start_Column < Right.Start_Column;
-      end if;
-
-      return Left.Start_Line < Right.Start_Line;
-   end "<";
-
    ------------------------
    -- Append_If_Not_Null --
    ------------------------
