@@ -81,7 +81,7 @@ Units remaining: 6     Units remaining: 5     CompilationUnit[1:1-8:9]
 |  |  |  |  |  |  |  StmtList[5:7-5:12]
 |  |  |  |  |  |  |  |  NullStmt[5:7-5:12]
 |  |  |  |  |  |  |f_exceptions:
-|  |  |  |  |  |  |  AdaNodeList[5:11-5:11]: <empty list>
+|  |  |  |  |  |  |  AdaNodeList[5:12-5:12]: <empty list>
 |  |  |  |  |  |f_end_name:
 |  |  |  |  |  |  EndName[6:8-6:11]
 |  |  |  |  |  |  |f_name:
@@ -147,6 +147,7 @@ CompilationUnit
 |  |  |  |  |  |  HandledStmts
 |  |  |  |  |  |  |  StmtList
 |  |  |  |  |  |  |  |  NullStmt
+|  |  |  |  |  |  |  \x0a   
 |  |  |  |  |  |  |  AdaNodeList
 |  |  |  |  |  |  \x0a   
 |  |  |  |  |  |   
@@ -242,7 +243,7 @@ CompilationUnit[1:1-8:9]
 |  |  |  |  |  |  |  StmtList[5:7-5:12]
 |  |  |  |  |  |  |  |  NullStmt[5:7-5:12]
 |  |  |  |  |  |  |f_exceptions:
-|  |  |  |  |  |  |  AdaNodeList[5:11-5:11]: <empty list>
+|  |  |  |  |  |  |  AdaNodeList[5:12-5:12]: <empty list>
 |  |  |  |  |  |f_end_name:
 |  |  |  |  |  |  EndName[6:8-6:11]
 |  |  |  |  |  |  |f_name:
@@ -308,6 +309,7 @@ CompilationUnit
 |  |  |  |  |  |  HandledStmts
 |  |  |  |  |  |  |  StmtList
 |  |  |  |  |  |  |  |  NullStmt
+|  |  |  |  |  |  |  \x0a   
 |  |  |  |  |  |  |  AdaNodeList
 |  |  |  |  |  |  \x0a   
 |  |  |  |  |  |   
@@ -393,8 +395,8 @@ CompilationUnit
                         -->Walk: <NullStmt foo.adb:5:7-5:12>
                         <--Walk: <NullStmt foo.adb:5:7-5:12>
                      <--Walk: <StmtList foo.adb:5:7-5:12>
-                     -->Walk: <AdaNodeList foo.adb:5:11-5:11>
-                     <--Walk: <AdaNodeList foo.adb:5:11-5:11>
+                     -->Walk: <AdaNodeList foo.adb:5:12-5:12>
+                     <--Walk: <AdaNodeList foo.adb:5:12-5:12>
                   <--Walk: <HandledStmts foo.adb:4:9-6:4>
                   -->Walk: <EndName foo.adb:6:8-6:11>
                      -->Walk: <Id "Bar" foo.adb:6:8-6:11>
@@ -816,7 +818,7 @@ Units remaining: 3     CompilationUnit[1:1-6:10]
 |  |  |  |  |  |  |  |  |f_r_expr:
 |  |  |  |  |  |  |  |  |  Str[5:14-5:28]: "Hello World!"
 |  |  |  |f_exceptions:
-|  |  |  |  AdaNodeList[5:29-5:29]: <empty list>
+|  |  |  |  AdaNodeList[5:30-5:30]: <empty list>
 |  |  |f_end_name:
 |  |  |  EndName[6:5-6:9]
 |  |  |  |f_name:
@@ -863,6 +865,7 @@ CompilationUnit
 |  |  |  |  |  |  |  AssocList
 |  |  |  |  |  |  |  |  ParamAssoc
 |  |  |  |  |  |  |  |  |  Str
+|  |  |  |  \x0a
 |  |  |  |  AdaNodeList
 |  |  |  \x0a
 |  |  |   
@@ -933,7 +936,7 @@ CompilationUnit[1:1-6:10]
 |  |  |  |  |  |  |  |  |f_r_expr:
 |  |  |  |  |  |  |  |  |  Str[5:14-5:28]: "Hello World!"
 |  |  |  |f_exceptions:
-|  |  |  |  AdaNodeList[5:29-5:29]: <empty list>
+|  |  |  |  AdaNodeList[5:30-5:30]: <empty list>
 |  |  |f_end_name:
 |  |  |  EndName[6:5-6:9]
 |  |  |  |f_name:
@@ -980,6 +983,7 @@ CompilationUnit
 |  |  |  |  |  |  |  AssocList
 |  |  |  |  |  |  |  |  ParamAssoc
 |  |  |  |  |  |  |  |  |  Str
+|  |  |  |  \x0a
 |  |  |  |  AdaNodeList
 |  |  |  \x0a
 |  |  |   
@@ -1048,8 +1052,8 @@ CompilationUnit
                   <--Walk: <CallExpr main.adb:5:4-5:29>
                <--Walk: <CallStmt main.adb:5:4-5:30>
             <--Walk: <StmtList main.adb:5:4-5:30>
-            -->Walk: <AdaNodeList main.adb:5:29-5:29>
-            <--Walk: <AdaNodeList main.adb:5:29-5:29>
+            -->Walk: <AdaNodeList main.adb:5:30-5:30>
+            <--Walk: <AdaNodeList main.adb:5:30-5:30>
          <--Walk: <HandledStmts main.adb:4:6-6:1>
          -->Walk: <EndName main.adb:6:5-6:9>
             -->Walk: <Id "Main" main.adb:6:5-6:9>
@@ -1133,7 +1137,7 @@ Units remaining: 2     CompilationUnit[1:1-7:18]
 |  |  |  |  |  |  |  |  |f_r_expr:
 |  |  |  |  |  |  |  |  |  Real[6:12-6:15]: 1.0
 |  |  |  |f_exceptions:
-|  |  |  |  AdaNodeList[6:16-6:16]: <empty list>
+|  |  |  |  AdaNodeList[6:17-6:17]: <empty list>
 |  |  |f_end_name:
 |  |  |  EndName[7:5-7:17]
 |  |  |  |f_name:
@@ -1190,6 +1194,7 @@ CompilationUnit
 |  |  |  |  |  |  |  |   
 |  |  |  |  |  |  |  |  ParamAssoc
 |  |  |  |  |  |  |  |  |  Real
+|  |  |  |  \x0a
 |  |  |  |  AdaNodeList
 |  |  |  \x0a
 |  |  |   
@@ -1271,7 +1276,7 @@ CompilationUnit[1:1-7:18]
 |  |  |  |  |  |  |  |  |f_r_expr:
 |  |  |  |  |  |  |  |  |  Real[6:12-6:15]: 1.0
 |  |  |  |f_exceptions:
-|  |  |  |  AdaNodeList[6:16-6:16]: <empty list>
+|  |  |  |  AdaNodeList[6:17-6:17]: <empty list>
 |  |  |f_end_name:
 |  |  |  EndName[7:5-7:17]
 |  |  |  |f_name:
@@ -1328,6 +1333,7 @@ CompilationUnit
 |  |  |  |  |  |  |  |   
 |  |  |  |  |  |  |  |  ParamAssoc
 |  |  |  |  |  |  |  |  |  Real
+|  |  |  |  \x0a
 |  |  |  |  AdaNodeList
 |  |  |  \x0a
 |  |  |   
@@ -1408,8 +1414,8 @@ CompilationUnit
                   <--Walk: <CallExpr playground_0.adb:6:4-6:16>
                <--Walk: <CallStmt playground_0.adb:6:4-6:17>
             <--Walk: <StmtList playground_0.adb:5:4-6:17>
-            -->Walk: <AdaNodeList playground_0.adb:6:16-6:16>
-            <--Walk: <AdaNodeList playground_0.adb:6:16-6:16>
+            -->Walk: <AdaNodeList playground_0.adb:6:17-6:17>
+            <--Walk: <AdaNodeList playground_0.adb:6:17-6:17>
          <--Walk: <HandledStmts playground_0.adb:4:6-7:1>
          -->Walk: <EndName playground_0.adb:7:5-7:17>
             -->Walk: <Id "Playground_0" playground_0.adb:7:5-7:17>
@@ -1574,7 +1580,7 @@ Units remaining: 1     CompilationUnitList[1:1-43:20]
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_right:
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[14:38-14:39]: 4
 |  |  |  |  |f_exceptions:
-|  |  |  |  |  AdaNodeList[14:41-14:41]: <empty list>
+|  |  |  |  |  AdaNodeList[14:42-14:42]: <empty list>
 |  |  |  |f_end_name:
 |  |  |  |  EndName[15:5-15:17]
 |  |  |  |  |f_name:
@@ -1714,7 +1720,7 @@ Units remaining: 1     CompilationUnitList[1:1-43:20]
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_right:
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[28:38-28:39]: 4
 |  |  |  |  |f_exceptions:
-|  |  |  |  |  AdaNodeList[28:41-28:41]: <empty list>
+|  |  |  |  |  AdaNodeList[28:42-28:42]: <empty list>
 |  |  |  |f_end_name:
 |  |  |  |  EndName[29:5-29:19]
 |  |  |  |  |f_name:
@@ -1854,7 +1860,7 @@ Units remaining: 1     CompilationUnitList[1:1-43:20]
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_right:
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[42:38-42:39]: 4
 |  |  |  |  |f_exceptions:
-|  |  |  |  |  AdaNodeList[42:41-42:41]: <empty list>
+|  |  |  |  |  AdaNodeList[42:42-42:42]: <empty list>
 |  |  |  |f_end_name:
 |  |  |  |  EndName[43:5-43:19]
 |  |  |  |  |f_name:
@@ -1978,6 +1984,9 @@ CompilationUnitList
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |   
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |   
+|  |  |  |  |  --  Prints "Hi John"
+|  |  |  |  |  \x0a
 |  |  |  |  |  AdaNodeList
 |  |  |  |   
 |  |  |  |  --  Prints "Hi John"
@@ -2088,6 +2097,9 @@ CompilationUnitList
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |   
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |   
+|  |  |  |  |  --  Prints "Hi John"
+|  |  |  |  |  \x0a
 |  |  |  |  |  AdaNodeList
 |  |  |  |   
 |  |  |  |  --  Prints "Hi John"
@@ -2198,6 +2210,9 @@ CompilationUnitList
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |   
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |   
+|  |  |  |  |  --  Prints "Hi John"
+|  |  |  |  |  \x0a
 |  |  |  |  |  AdaNodeList
 |  |  |  |   
 |  |  |  |  --  Prints "Hi John"
@@ -2362,7 +2377,7 @@ CompilationUnitList[1:1-43:20]
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_right:
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[14:38-14:39]: 4
 |  |  |  |  |f_exceptions:
-|  |  |  |  |  AdaNodeList[14:41-14:41]: <empty list>
+|  |  |  |  |  AdaNodeList[14:42-14:42]: <empty list>
 |  |  |  |f_end_name:
 |  |  |  |  EndName[15:5-15:17]
 |  |  |  |  |f_name:
@@ -2502,7 +2517,7 @@ CompilationUnitList[1:1-43:20]
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_right:
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[28:38-28:39]: 4
 |  |  |  |  |f_exceptions:
-|  |  |  |  |  AdaNodeList[28:41-28:41]: <empty list>
+|  |  |  |  |  AdaNodeList[28:42-28:42]: <empty list>
 |  |  |  |f_end_name:
 |  |  |  |  EndName[29:5-29:19]
 |  |  |  |  |f_name:
@@ -2642,7 +2657,7 @@ CompilationUnitList[1:1-43:20]
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_right:
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[42:38-42:39]: 4
 |  |  |  |  |f_exceptions:
-|  |  |  |  |  AdaNodeList[42:41-42:41]: <empty list>
+|  |  |  |  |  AdaNodeList[42:42-42:42]: <empty list>
 |  |  |  |f_end_name:
 |  |  |  |  EndName[43:5-43:19]
 |  |  |  |  |f_name:
@@ -2766,6 +2781,9 @@ CompilationUnitList
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |   
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |   
+|  |  |  |  |  --  Prints "Hi John"
+|  |  |  |  |  \x0a
 |  |  |  |  |  AdaNodeList
 |  |  |  |   
 |  |  |  |  --  Prints "Hi John"
@@ -2876,6 +2894,9 @@ CompilationUnitList
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |   
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |   
+|  |  |  |  |  --  Prints "Hi John"
+|  |  |  |  |  \x0a
 |  |  |  |  |  AdaNodeList
 |  |  |  |   
 |  |  |  |  --  Prints "Hi John"
@@ -2986,6 +3007,9 @@ CompilationUnitList
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |   
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |   
+|  |  |  |  |  --  Prints "Hi John"
+|  |  |  |  |  \x0a
 |  |  |  |  |  AdaNodeList
 |  |  |  |   
 |  |  |  |  --  Prints "Hi John"
@@ -3148,8 +3172,8 @@ CompilationUnitList
                   <--Walk: <CallExpr playground_1.adb:14:4-14:41>
                <--Walk: <CallStmt playground_1.adb:14:4-14:42>
             <--Walk: <StmtList playground_1.adb:8:4-14:42>
-            -->Walk: <AdaNodeList playground_1.adb:14:41-14:41>
-            <--Walk: <AdaNodeList playground_1.adb:14:41-14:41>
+            -->Walk: <AdaNodeList playground_1.adb:14:42-14:42>
+            <--Walk: <AdaNodeList playground_1.adb:14:42-14:42>
          <--Walk: <HandledStmts playground_1.adb:7:6-15:1>
          -->Walk: <EndName playground_1.adb:15:5-15:17>
             -->Walk: <Id "Playground_1" playground_1.adb:15:5-15:17>
@@ -3314,7 +3338,7 @@ CompilationUnitList[1:1-43:20]
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_right:
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[14:38-14:39]: 4
 |  |  |  |  |f_exceptions:
-|  |  |  |  |  AdaNodeList[14:41-14:41]: <empty list>
+|  |  |  |  |  AdaNodeList[14:42-14:42]: <empty list>
 |  |  |  |f_end_name:
 |  |  |  |  EndName[15:5-15:17]
 |  |  |  |  |f_name:
@@ -3454,7 +3478,7 @@ CompilationUnitList[1:1-43:20]
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_right:
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[28:38-28:39]: 4
 |  |  |  |  |f_exceptions:
-|  |  |  |  |  AdaNodeList[28:41-28:41]: <empty list>
+|  |  |  |  |  AdaNodeList[28:42-28:42]: <empty list>
 |  |  |  |f_end_name:
 |  |  |  |  EndName[29:5-29:19]
 |  |  |  |  |f_name:
@@ -3594,7 +3618,7 @@ CompilationUnitList[1:1-43:20]
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_right:
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[42:38-42:39]: 4
 |  |  |  |  |f_exceptions:
-|  |  |  |  |  AdaNodeList[42:41-42:41]: <empty list>
+|  |  |  |  |  AdaNodeList[42:42-42:42]: <empty list>
 |  |  |  |f_end_name:
 |  |  |  |  EndName[43:5-43:19]
 |  |  |  |  |f_name:
@@ -3718,6 +3742,9 @@ CompilationUnitList
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |   
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |   
+|  |  |  |  |  --  Prints "Hi John"
+|  |  |  |  |  \x0a
 |  |  |  |  |  AdaNodeList
 |  |  |  |   
 |  |  |  |  --  Prints "Hi John"
@@ -3828,6 +3855,9 @@ CompilationUnitList
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |   
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |   
+|  |  |  |  |  --  Prints "Hi John"
+|  |  |  |  |  \x0a
 |  |  |  |  |  AdaNodeList
 |  |  |  |   
 |  |  |  |  --  Prints "Hi John"
@@ -3938,6 +3968,9 @@ CompilationUnitList
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |   
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |   
+|  |  |  |  |  --  Prints "Hi John"
+|  |  |  |  |  \x0a
 |  |  |  |  |  AdaNodeList
 |  |  |  |   
 |  |  |  |  --  Prints "Hi John"
@@ -4076,8 +4109,8 @@ CompilationUnitList
                   <--Walk: <CallExpr playground_1.adb:28:4-28:41>
                <--Walk: <CallStmt playground_1.adb:28:4-28:42>
             <--Walk: <StmtList playground_1.adb:22:4-28:42>
-            -->Walk: <AdaNodeList playground_1.adb:28:41-28:41>
-            <--Walk: <AdaNodeList playground_1.adb:28:41-28:41>
+            -->Walk: <AdaNodeList playground_1.adb:28:42-28:42>
+            <--Walk: <AdaNodeList playground_1.adb:28:42-28:42>
          <--Walk: <HandledStmts playground_1.adb:21:6-29:1>
          -->Walk: <EndName playground_1.adb:29:5-29:19>
             -->Walk: <Id "Playground_1_X" playground_1.adb:29:5-29:19>
@@ -4242,7 +4275,7 @@ CompilationUnitList[1:1-43:20]
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_right:
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[14:38-14:39]: 4
 |  |  |  |  |f_exceptions:
-|  |  |  |  |  AdaNodeList[14:41-14:41]: <empty list>
+|  |  |  |  |  AdaNodeList[14:42-14:42]: <empty list>
 |  |  |  |f_end_name:
 |  |  |  |  EndName[15:5-15:17]
 |  |  |  |  |f_name:
@@ -4382,7 +4415,7 @@ CompilationUnitList[1:1-43:20]
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_right:
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[28:38-28:39]: 4
 |  |  |  |  |f_exceptions:
-|  |  |  |  |  AdaNodeList[28:41-28:41]: <empty list>
+|  |  |  |  |  AdaNodeList[28:42-28:42]: <empty list>
 |  |  |  |f_end_name:
 |  |  |  |  EndName[29:5-29:19]
 |  |  |  |  |f_name:
@@ -4522,7 +4555,7 @@ CompilationUnitList[1:1-43:20]
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |f_right:
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[42:38-42:39]: 4
 |  |  |  |  |f_exceptions:
-|  |  |  |  |  AdaNodeList[42:41-42:41]: <empty list>
+|  |  |  |  |  AdaNodeList[42:42-42:42]: <empty list>
 |  |  |  |f_end_name:
 |  |  |  |  EndName[43:5-43:19]
 |  |  |  |  |f_name:
@@ -4646,6 +4679,9 @@ CompilationUnitList
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |   
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |   
+|  |  |  |  |  --  Prints "Hi John"
+|  |  |  |  |  \x0a
 |  |  |  |  |  AdaNodeList
 |  |  |  |   
 |  |  |  |  --  Prints "Hi John"
@@ -4756,6 +4792,9 @@ CompilationUnitList
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |   
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |   
+|  |  |  |  |  --  Prints "Hi John"
+|  |  |  |  |  \x0a
 |  |  |  |  |  AdaNodeList
 |  |  |  |   
 |  |  |  |  --  Prints "Hi John"
@@ -4866,6 +4905,9 @@ CompilationUnitList
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  OpDoubleDot
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |   
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int
+|  |  |  |  |   
+|  |  |  |  |  --  Prints "Hi John"
+|  |  |  |  |  \x0a
 |  |  |  |  |  AdaNodeList
 |  |  |  |   
 |  |  |  |  --  Prints "Hi John"
@@ -5004,8 +5046,8 @@ CompilationUnitList
                   <--Walk: <CallExpr playground_1.adb:42:4-42:41>
                <--Walk: <CallStmt playground_1.adb:42:4-42:42>
             <--Walk: <StmtList playground_1.adb:36:4-42:42>
-            -->Walk: <AdaNodeList playground_1.adb:42:41-42:41>
-            <--Walk: <AdaNodeList playground_1.adb:42:41-42:41>
+            -->Walk: <AdaNodeList playground_1.adb:42:42-42:42>
+            <--Walk: <AdaNodeList playground_1.adb:42:42-42:42>
          <--Walk: <HandledStmts playground_1.adb:35:6-43:1>
          -->Walk: <EndName playground_1.adb:43:5-43:19>
             -->Walk: <Id "Playground_1_Y" playground_1.adb:43:5-43:19>
