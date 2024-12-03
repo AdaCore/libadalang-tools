@@ -1,6 +1,6 @@
 description:
     test support for subtypes of incomplete types for the marshalling lib
 
-driver: shell_script
+driver: gnattest_driver
 control:
     - [XFAIL, 'x86', 'Marshalling not working for 32bits (UB03-008)']

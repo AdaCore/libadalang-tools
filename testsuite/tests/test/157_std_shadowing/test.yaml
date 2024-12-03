@@ -1,7 +1,7 @@
 description: Check that the support library and gnattest harness are legal when
   a user project package is named "standard".
 
-driver: shell_script
+driver: gnattest_driver
 
 control:
     - [XFAIL, 'True', 'LAL and nameres on a custom standard package, see eng/libadalang/libadalang#1453']

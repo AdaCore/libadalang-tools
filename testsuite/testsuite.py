@@ -17,6 +17,7 @@ from e3.os.process import Run
 
 from drivers.python_script import PythonScriptDriver
 from drivers.shell_script import ShellScriptDriver
+from drivers.gnattest import GNATtestDriver
 
 
 class Testsuite(e3.testsuite.Testsuite):
@@ -24,6 +25,7 @@ class Testsuite(e3.testsuite.Testsuite):
     test_driver_map = {
         "python_script": PythonScriptDriver,
         "shell_script": ShellScriptDriver,
+        "gnattest_driver": GNATtestDriver,
     }
 
     def add_options(self, parser):

@@ -2,6 +2,6 @@ description:
     Test basic enumerated generation for scalar types as well as non
     discriminated record types.
 
-driver: shell_script
+driver: gnattest_driver
 control:
     - [XFAIL, 'x86', 'Marshalling not working for 32bits (UB03-008)']

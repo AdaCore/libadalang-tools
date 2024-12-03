@@ -3,4 +3,4 @@ description:
     This test generates test cases and builds everything. The build is
     expected to succeed.
 
-driver: shell_script
+driver: gnattest_driver

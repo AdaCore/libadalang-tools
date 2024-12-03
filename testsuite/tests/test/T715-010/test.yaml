@@ -1,4 +1,4 @@
 description:
     gnattest test
 
-driver: shell_script
+driver: gnattest_driver

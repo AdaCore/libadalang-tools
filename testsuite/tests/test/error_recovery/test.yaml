@@ -1,5 +1,5 @@
 description:
     Test error recovery
 
-driver: shell_script
+driver: gnattest_driver
 
