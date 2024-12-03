@@ -1194,19 +1194,26 @@ package body Laltools.Common is
          --  finding the best through a distance/scoring heuristics.
          if Node.Kind in Libadalang.Common.Ada_Basic_Decl then
             declare
-               Decl     : constant Basic_Decl := Node.As_Basic_Decl;
-               Def      : constant Defining_Name := Decl.P_Defining_Name;
-               Def_Name : constant Langkit_Support.Text.Text_Type :=
-                 Def.P_Fully_Qualified_Name;
+               Decl : constant Basic_Decl := Node.As_Basic_Decl;
+               Def  : constant Defining_Name := Decl.P_Defining_Name;
             begin
-               --  Search a declaration with the same qualified_name which is
-               --  not Definition itself.
-               if Def /= Definition
-                 and then Def_Name = Qualified_Name
-               then
-                  Found := Def;
-                  return Libadalang.Common.Stop;
+               if Def.Is_Null then
+                  return Libadalang.Common.Into;
                end if;
+
+               declare
+                  Def_Name : constant Langkit_Support.Text.Text_Type :=
+                    Def.P_Fully_Qualified_Name;
+               begin
+                  --  Search a declaration with the same qualified_name
+                  --  which is not Definition itself.
+                  if Def /= Definition
+                    and then Def_Name = Qualified_Name
+                  then
+                     Found := Def;
+                     return Libadalang.Common.Stop;
+                  end if;
+               end;
             end;
          end if;
 
