@@ -370,6 +370,27 @@ package body Test.Harness is
 
       Filter_Package_Name : constant String :=
         Common_Package_Name & ".Mapping";
+
+      function Calculate_Tested_Subp_Count return Natural;
+      --  Computes the total number of tested subprograms taking into account
+      --  different instantiations of the same generic packages using gathered
+      --  test cases list.
+
+      function Calculate_Tested_Subp_Count return Natural is
+         Result : Natural := 0;
+      begin
+         for M of Test.Mapping.Mapping loop
+            Result := @ + Natural (M.Test_Info.Length);
+         end loop;
+
+         return Result;
+      end Calculate_Tested_Subp_Count;
+
+      Subp_Count : constant Natural := Calculate_Tested_Subp_Count;
+      Total_Subp_Count : constant Natural :=
+         (if Subp_UT_Counter > Subp_Count
+          then Subp_UT_Counter
+          else Subp_Count);
    begin
       if not Is_Directory (Common_File_Subdir) then
          Make_Dir (Common_File_Subdir);
@@ -423,8 +444,8 @@ package body Test.Harness is
 
       S_Put
         (3,
-         "Test_Routines_Total : constant Positive :="
-         & Natural'Image (Subp_UT_Counter) & ";");
+         "Test_Routines_Total : constant Positive := "
+         & Total_Subp_Count'Image & ";");
       Put_New_Line;
       Put_New_Line;
 
@@ -4643,6 +4664,9 @@ package body Test.Harness is
       Unit := Bod.F_Item.As_Ada_Node;
 
       case Unit.Kind is
+         when Ada_Generic_Package_Instantiation =>
+            Data.Generic_Kind := True;
+            Data.Top_Level_Generic_Instantiation := True;
          when Ada_Package_Decl =>
             Data.Generic_Kind := False;
 

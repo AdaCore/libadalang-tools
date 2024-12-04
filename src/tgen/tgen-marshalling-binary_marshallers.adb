@@ -255,12 +255,14 @@ package body TGen.Marshalling.Binary_Marshallers is
          --  part: This is not the case as soon as one of the discriminants
          --  is fully private.
 
+         pragma Style_Checks (Off);
          Size_Max_Pub : constant Boolean :=
            not (Typ in Discriminated_Record_Typ'Class)
            or else
              not (for some Disc_Typ of
                     Discriminated_Record_Typ'Class (Typ).Discriminant_Types
                   => Disc_Typ.Get.Fully_Private);
+         pragma Style_Checks (On);
       begin
          Put_Line (Spec_Part, Parse (Composite_Base_Spec_Template, Assocs));
          New_Line (Spec_Part);

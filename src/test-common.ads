@@ -96,6 +96,9 @@ package Test.Common is
      (Nesting_1, Nesting_2 : String) return String;
    --  Returns the common prefix of two nestings
 
+   function Skip_Prefix (Identifier : String; Prefix : String)
+      return String with Pre => Identifier'Last >= Prefix'Last;
+
    function Nesting_Difference
      (Nesting_1, Nesting_2 : String) return String;
    --  Returns difference in ending of two nestings without the first dot

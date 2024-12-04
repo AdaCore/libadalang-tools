@@ -2,7 +2,7 @@
 --                                                                          --
 --                                  TGen                                    --
 --                                                                          --
---                       Copyright (C) 2022, AdaCore                        --
+--                       Copyright (C) 2024, AdaCore                        --
 --                                                                          --
 -- TGen  is  free software; you can redistribute it and/or modify it  under --
 -- under  terms of  the  GNU General  Public License  as  published by  the --
@@ -1097,7 +1097,8 @@ package body TGen.Types.Record_Types is
             Component_Types     => Components,
             Static_Gen          => Disc_Record.Static_Gen,
             Fully_Private       => Disc_Record.Fully_Private,
-            Private_Extension   => Disc_Record.Private_Extension);
+            Private_Extension   => Disc_Record.Private_Extension,
+            others => <>);
          R_Ref      : SP.Ref;
       begin
          R_Ref.Set (R);
@@ -1594,7 +1595,10 @@ package body TGen.Types.Record_Types is
    -- FQN --
    ---------
 
-   function FQN (Self : Function_Typ; No_Std : Boolean := False) return String
+   function FQN
+      (Self : Function_Typ;
+       No_Std : Boolean := False;
+       Top_Level_Generic : Boolean := False) return String
    is
       Result : Ada_Qualified_Name := Self.Name.Copy;
    begin
@@ -1605,6 +1609,10 @@ package body TGen.Types.Record_Types is
                    "standard")
       then
          Result.Delete_First;
+      end if;
+
+      if Top_Level_Generic then
+         Result := TGen.Types.Generic_Package_Instance_Name (@);
       end if;
       return To_Ada (Result);
    end FQN;
@@ -1875,7 +1883,11 @@ package body TGen.Types.Record_Types is
    -- Slug --
    ----------
 
-   function Slug (Self : Function_Typ) return String is
+   function Slug
+      (Self : Function_Typ;
+       Is_Top_Level_Generic_Instantiation : Boolean := False)
+      return String
+   is
       Temp : Ada_Qualified_Name;
    begin
       --  Build a new qualified name, replacing operator names by an
@@ -1891,6 +1903,10 @@ package body TGen.Types.Record_Types is
             Temp.Append (New_Item => Id, Count => 1);
          end if;
       end loop;
+
+      if Is_Top_Level_Generic_Instantiation then
+         Temp := Generic_Package_Instance_Name (@);
+      end if;
 
       return To_Symbol (Temp, '_');
    end Slug;

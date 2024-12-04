@@ -1,0 +1,5 @@
+description: |
+  Generate test cases when a package is a simply a generic package
+  instantiation.
+
+driver: shell_script

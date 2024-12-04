@@ -28,6 +28,34 @@ with TGen.Strategies; use TGen.Strategies;
 
 package body TGen.Types is
 
+   --------------------------
+   -- Generic_Package_Name --
+   --------------------------
+
+   function Generic_Package_Instance_Name
+      (Pack_Name : Ada_Qualified_Name)
+      return Ada_Qualified_Name
+   is
+      Prefix : constant Ada_Identifier := Ada_Identifier
+         (+"TGen_Generic_Instantiation_");
+      First_Element_Name : constant Ada_Identifier :=
+         Prefix & Pack_Name.First_Element;
+      Result : Ada_Qualified_Name;
+
+      use Ada_Identifier_Vectors;
+   begin
+      Result.Append (First_Element_Name);
+      Result.Append (Ada_Identifier (+"Instance"));
+      for I in
+         Extended_Index'Succ (Pack_Name.First_Index)
+         .. Pack_Name.Last_Index
+      loop
+         Result.Append (Pack_Name.Element (I));
+      end loop;
+
+      return Result;
+   end Generic_Package_Instance_Name;
+
    -----------
    -- Image --
    -----------
@@ -65,17 +93,23 @@ package body TGen.Types is
    -- FQN --
    ---------
 
-   function FQN (Self : Typ; No_Std : Boolean := False) return String is
+   function FQN (Self : Typ;
+      No_Std : Boolean := False;
+      Top_Level_Generic : Boolean := False) return String is
+      Name : constant Ada_Qualified_Name :=
+         (if Top_Level_Generic
+          then Generic_Package_Instance_Name (Self.Name)
+          else Self.Name);
    begin
       if not No_Std
         or else not Ada.Strings.Equal_Case_Insensitive
-                  (+Unbounded_String (Self.Name.First_Element),
+                  (+Unbounded_String (Name.First_Element),
                    "standard")
       then
-         return To_Ada (Self.Name);
+         return To_Ada (Name);
       end if;
       declare
-         Stripped : Ada_Qualified_Name := Self.Name;
+         Stripped : Ada_Qualified_Name := Name;
       begin
          Stripped.Delete_First;
          return To_Ada (Stripped);
@@ -159,9 +193,15 @@ package body TGen.Types is
    -- Slug --
    ----------
 
-   function Slug (Self : Typ) return String is
+   function Slug (Self : Typ; Top_Level_Generic : Boolean := False)
+      return String
+   is
+      Name : constant Ada_Qualified_Name :=
+         (if Top_Level_Generic
+          then Generic_Package_Instance_Name (Self.Name)
+          else Self.Name);
    begin
-      return To_Symbol (Self.Name, '_');
+      return To_Symbol (Name, '_');
    end Slug;
 
    ------------------

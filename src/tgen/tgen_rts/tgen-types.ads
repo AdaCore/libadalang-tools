@@ -60,7 +60,19 @@ package TGen.Types is
       --  Whether this type has a private extension. Note that if Fully_Private
       --  is True, this field will be False.
 
-   end record;
+      Top_Level_Generic : Boolean := False;
+      --  If the type comes from a top level generic instantiation.
+
+      Is_Generic : Boolean := False;
+      --  If the type is the result of a generic package instantiation
+
+   end record
+   with Dynamic_Predicate =>
+      --  A top level generic instantion is a generic itself (Top_Level_Generic
+      --  implies Is_Generic).
+      (if Top_Level_Generic
+       then Top_Level_Generic and Is_Generic
+       else True);
 
    type Typ_Kind is (Invalid_Kind,
                      Signed_Int_Kind,
@@ -97,7 +109,8 @@ package TGen.Types is
 
    function Image (Self : Typ) return String;
 
-   function Slug (Self : Typ) return String;
+   function Slug (Self : Typ; Top_Level_Generic : Boolean := False)
+      return String;
    --  Return a unique identifier for the type
 
    function Is_Anonymous (Self : Typ) return Boolean;
@@ -125,11 +138,16 @@ package TGen.Types is
    function Compilation_Unit_Name (Self : Typ) return Ada_Qualified_Name;
    --  Return the name of the compilation unit this type belongs to
 
-   function FQN (Self : Typ; No_Std : Boolean := False) return String;
+   function FQN
+      (Self : Typ;
+       No_Std : Boolean := False;
+       Top_Level_Generic : Boolean := False) return String;
    --  Return the fully qualified name for the type.
    --
    --  If No_Std is True, remove the Standard prefix for entities from the
    --  standard packaged.
+   --  The Top_Level_Generic flag can be used to return the generic wrapper
+   --  package name instead of the package instantiation one.
 
    function Is_Constrained (Self : Typ) return Boolean is (False);
    --  An array type with indefinite bounds must be constrained, a discriminant
@@ -267,5 +285,11 @@ package TGen.Types is
    is (Self.Diags);
 
    function Kind (Self : Unsupported_Types) return Typ_Kind is (Unsupported);
+
+private
+
+   function Generic_Package_Instance_Name (Pack_Name : Ada_Qualified_Name)
+      return Ada_Qualified_Name;
+   --  Return the fully qualified name of a generic instance.
 
 end TGen.Types;

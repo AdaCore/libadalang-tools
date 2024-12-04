@@ -76,6 +76,9 @@ package body Test.Skeleton is
    Me_Direct_Callees : constant Trace_Handle :=
      Create ("Skeletons.Direct_Callees", Default => Off);
 
+   Generic_Instantiation_Name : constant String := "Generic_Instantiation_";
+   --  Prefix for packages that are top level generic instantiation
+
    -------------------
    --  Minded Data  --
    -------------------
@@ -86,6 +89,8 @@ package body Test.Skeleton is
    package Tests_Per_Unit is new
      Ada.Containers.Indefinite_Ordered_Maps (String, Natural);
    use Tests_Per_Unit;
+   package String_Vectors is new
+     Ada.Containers.Indefinite_Vectors (Natural, String);
 
    Test_Info : Tests_Per_Unit.Map;
 
@@ -209,8 +214,20 @@ package body Test.Skeleton is
 
          when Declaration_Data =>
 
-            Is_Generic       : Boolean;
+            Is_Generic                         : Boolean := False;
             --  Indicates if given argument package declaration is generic.
+
+            Is_Top_Level_Generic_Instantiation : Boolean := False;
+            --  True if the declaration is a library level generic
+            --  instantiation. This information is necessary because it's not
+            --  possible to create child packages of an instantiation.
+            --
+            --  As a workaround top level generic packages are, wrapped in a
+            --  package containing the original instantiation. This wrapper
+            --  package should look like this:
+            --  package Generic_Instantiation_<package_name> is
+            --     package Instance is new Bar;
+            --  end Generic_Instantiation_<package_name>;
 
             Has_Simple_Case  : Boolean := False;
             --  Indicates if we have routines that are not primitives of any
@@ -384,9 +401,6 @@ package body Test.Skeleton is
    -----------------------
    -- Marker Processing --
    -----------------------
-
-   package String_Vectors is new
-     Ada.Containers.Indefinite_Vectors (Natural, String);
 
    type Markered_Data is record
       Commented_Out   : Boolean := False;
@@ -782,7 +796,9 @@ package body Test.Skeleton is
                --  in dumping the traces for user-written test.
                --  This is recorded in the Data holder.
 
-               if Ada.Directories.Exists (Test.Common.JSON_Test_Dir.all) then
+               if Ada.Directories.Exists (Test.Common.JSON_Test_Dir.all)
+                  and not Data.Subp_List.Is_Empty
+               then
                   Data.Has_Gen_Tests :=
                     Output_Generated_Tests (Data, Suite_Data_List, TP_List);
                end if;
@@ -897,6 +913,8 @@ package body Test.Skeleton is
       --  instantiation to populate Data for suite creation. In that mode
       --  the nestings gathered by Get_Records and Get_Subprograms must be
       --  replaced with the real nesting of instantiation.
+
+      Inside_Top_Level_Inst : Boolean := False;
 
       Instance_Nesting : String_Access;
       --  Stores the nesting of instantiation and its name
@@ -1376,7 +1394,6 @@ package body Test.Skeleton is
 
          end Update_Name_Frequency;
       begin
-
          if not Common_Subp_Node_Filter (Node) then
             return Over;
          end if;
@@ -1389,7 +1406,43 @@ package body Test.Skeleton is
             return Over;
          end if;
 
-         if Node.Kind = Ada_Package_Decl and then Inside_Inst then
+         if (Node.Kind = Ada_Generic_Package_Instantiation
+            and Node.Parent.Kind = Ada_Library_Item)
+            or
+               (Node.Kind = Ada_Generic_Package_Instantiation
+                  and Inside_Top_Level_Inst)
+         then
+            Inside_Inst := True;
+            Inside_Top_Level_Inst := True;
+            Instance_Nesting := new String'
+              (Encode
+                 (Node
+                     .As_Generic_Package_Instantiation
+                     .P_Designated_Generic_Decl
+                     .P_Generic_Instantiations (1)
+                     .P_Fully_Qualified_Name,
+                  Node.Unit.Get_Charset));
+            Instance_Sloc := new String'
+              (Base_Name (Data.Unit_File_Name.all)
+               & ":"
+               & Trim (First_Line_Number (Node)'Img, Both)
+               & ":"
+               & Trim (First_Column_Number (Node)'Img, Both)
+               & ":");
+            Traverse
+               (Node.As_Generic_Instantiation.P_Designated_Generic_Decl,
+                Get_Subprograms'Access);
+            Inside_Top_Level_Inst := False;
+            Inside_Inst := False;
+            Free (Instance_Nesting);
+            Free (Instance_Sloc);
+            return Over;
+         end if;
+
+         if Node.Kind = Ada_Package_Decl
+            and then Inside_Inst
+            and then not Inside_Top_Level_Inst
+         then
             --  No processing for packages nested inside generic ones
             return Over;
          end if;
@@ -1401,7 +1454,6 @@ package body Test.Skeleton is
          if Node.Kind = Ada_Generic_Package_Instantiation
            and then not Inside_Inst and then not Data.Is_Generic
          then
-
             if Stub_Mode_ON then
                return Over;
             end if;
@@ -1476,7 +1528,7 @@ package body Test.Skeleton is
             return Over;
          end if;
 
-         if not Inside_Inst then
+         if not Inside_Inst or Inside_Top_Level_Inst then
             Subp_UT_Counter := Subp_UT_Counter + 1;
          end if;
          Subp.Subp_Declaration := Node.As_Ada_Node;
@@ -1664,14 +1716,21 @@ package body Test.Skeleton is
                     Test_Unit_Name);
 
             else
-               Test_Routine.Nesting := new String'
-                 (Nesting_Common_Prefix
-                    (Data.Unit_Full_Name.all, Subp.Nesting.all) &
-                    "." & Test_Data_Unit_Name &
-                    "." & Test_Unit_Name & "." &
-                    Nesting_Difference
-                    (Data.Unit_Full_Name.all, Subp.Nesting.all) &
-                    "." & Test_Data_Unit_Name & "." & Test_Unit_Name);
+               if Data.Is_Top_Level_Generic_Instantiation then
+                  Test_Routine.Nesting := new String'
+                    (Data.Unit_Full_Name.all &
+                       "." & Test_Data_Unit_Name &
+                       "." & Test_Unit_Name);
+               else
+                  Test_Routine.Nesting := new String'
+                    (Nesting_Common_Prefix
+                       (Data.Unit_Full_Name.all, Subp.Nesting.all) &
+                       "." & Test_Data_Unit_Name &
+                       "." & Test_Unit_Name & "." &
+                       Nesting_Difference
+                       (Data.Unit_Full_Name.all, Subp.Nesting.all) &
+                       "." & Test_Data_Unit_Name & "." & Test_Unit_Name);
+               end if;
             end if;
 
             Test_Package_Name := new String'
@@ -2395,13 +2454,8 @@ package body Test.Skeleton is
             Data.Is_Generic := True;
 
          when Ada_Generic_Package_Instantiation =>
-            Report_Std
-              ("gnattest: "
-               & Base_Name (The_Unit.Unit.Get_Filename)
-               & " is a library level instantiation");
-            Apropriate_Source := False;
-            Set_Source_Status (The_Unit.Unit.Get_Filename, Bad_Content);
-            return;
+            Data.Is_Top_Level_Generic_Instantiation := True;
+            Apropriate_Source := True;
 
          when others =>
             Report_Std
@@ -2471,7 +2525,10 @@ package body Test.Skeleton is
 
       Data.Unit := The_Unit;
       Data.Unit_Full_Name := new String'
-        (Node_Image (Unit.As_Basic_Decl.P_Defining_Name));
+        (if Data.Is_Top_Level_Generic_Instantiation
+         then Generic_Instantiation_Name
+            & Node_Image (Unit.As_Basic_Decl.P_Defining_Name)
+         else Node_Image (Unit.As_Basic_Decl.P_Defining_Name));
       Data.Unit_File_Name := new String'(The_Unit.Unit.Get_Filename);
 
       Trace (Me, "Gathering nested packages");
@@ -3547,7 +3604,9 @@ package body Test.Skeleton is
       use GNAT.OS_Lib;
       Cur : Package_Info_List.Cursor := Data.Package_Data_List.First;
       Output_Dir  : constant String :=
-        Get_Source_Output_Dir (Data.Unit_File_Name.all);
+         Get_Source_Output_Dir
+            (Skip_Prefix
+               (Data.Unit_File_Name.all, Generic_Instantiation_Name));
    begin
       loop
          exit when Cur = Package_Info_List.No_Element;
@@ -3558,8 +3617,9 @@ package body Test.Skeleton is
             S_Pack : constant String :=
               Data.Unit_Full_Name.all & "." &
               Test_Data_Unit_Name & "." &
-              Test_Unit_Name & "." &
-              Nesting_Difference (Data.Unit_Full_Name.all, S);
+              Test_Unit_Name & (if Data.Is_Top_Level_Generic_Instantiation
+               then ""
+               else ("." & Nesting_Difference (Data.Unit_Full_Name.all, S)));
          begin
             if
               Data.Unit_Full_Name.all /= S
@@ -3579,6 +3639,15 @@ package body Test.Skeleton is
 
          Package_Info_List.Next (Cur);
       end loop;
+
+      --  Create generic instantiation package if it does not already exists
+      if Data.Is_Top_Level_Generic_Instantiation then
+         TGen.Libgen.Create_Generic_Wrapper_Package_If_Not_Exists
+            (Unit_To_File_Name (Data.Unit_Full_Name.all),
+             Skip_Prefix
+                (Data.Unit_Full_Name.all, Generic_Instantiation_Name),
+             Output_Dir);
+      end if;
 
       if not Data.Has_Simple_Case then
          Create
@@ -3647,7 +3716,8 @@ package body Test.Skeleton is
       TP_List : in out TP_Mapping_List.List) is
 
       Output_Dir             : constant String :=
-        Get_Source_Output_Dir (Data.Unit_File_Name.all);
+        Get_Source_Output_Dir
+           (Skip_Prefix (Data.Unit_File_Name.all, Generic_Instantiation_Name));
 
       Tmp_File_Name      : constant String :=
         Ada.Directories.Compose
@@ -4000,6 +4070,12 @@ package body Test.Skeleton is
 
       if Data.Is_Generic then
          Gen_Tests.Gen_Unit_Full_Name := new String'(Data.Unit_Full_Name.all);
+      end if;
+
+      if Data.Is_Top_Level_Generic_Instantiation then
+         pragma Assert (not Data.Package_Data_List.Is_Empty);
+         Current_Pack := Data.Package_Data_List.First_Element;
+         Update_Generic_Packages (Current_Pack.Generic_Containing_Package.all);
       end if;
 
       for I in
@@ -5590,14 +5666,20 @@ package body Test.Skeleton is
                Data_Unit_Name := new String'
                  (Current_Pack.Name.all & "." &  Test_Data_Unit_Name);
             else
-               Data_Unit_Name := new String'
-                 (Data.Unit_Full_Name.all & "." &
-                  Test_Data_Unit_Name & "." &
-                  Test_Unit_Name & "." &
-                  Nesting_Difference
-                    (Current_Pack.Name.all,
-                     Data.Unit_Full_Name.all) &
-                  "." &  Test_Data_Unit_Name);
+               if Data.Is_Top_Level_Generic_Instantiation then
+                  Data_Unit_Name := new String'
+                     (Data.Unit_Full_Name.all & "." &
+                      Test_Data_Unit_Name);
+               else
+                  Data_Unit_Name := new String'
+                    (Data.Unit_Full_Name.all & "." &
+                     Test_Data_Unit_Name & "." &
+                     Test_Unit_Name & "." &
+                     Nesting_Difference
+                       (Current_Pack.Name.all,
+                        Data.Unit_Full_Name.all) &
+                     "." & Test_Data_Unit_Name);
+               end if;
             end if;
 
             Test_File_Name := new String'
@@ -5616,7 +5698,9 @@ package body Test.Skeleton is
 
                Put_Test_Data_Header;
 
-               if Current_Pack.Data_Kind = Instantiation then
+               if Current_Pack.Data_Kind = Instantiation
+                  and not Data.Is_Top_Level_Generic_Instantiation
+               then
                   S_Put
                     (0,
                      "with "
@@ -5670,7 +5754,9 @@ package body Test.Skeleton is
                Put_New_Line;
                Put_New_Line;
 
-               if Current_Pack.Data_Kind = Instantiation then
+               if Current_Pack.Data_Kind = Instantiation
+                  and not Data.Is_Top_Level_Generic_Instantiation
+               then
                   S_Put (0, GT_Marker_Begin);
                   Put_New_Line;
                   S_Put
@@ -5739,7 +5825,9 @@ package body Test.Skeleton is
                S_Put (0, "package body " & Data_Unit_Name.all & " is");
                Put_New_Line;
                Put_New_Line;
-               if Current_Pack.Data_Kind = Declaration_Data then
+               if Current_Pack.Data_Kind = Declaration_Data
+                  or Data.Is_Top_Level_Generic_Instantiation
+               then
                   S_Put (3, "procedure Set_Up (Gnattest_T : in out Test) is");
                   Put_New_Line;
                   if Current_Pack.Is_Generic then
@@ -5889,14 +5977,23 @@ package body Test.Skeleton is
                   Test_Data_Unit_Name & "." &
                   Test_Unit_Name);
             else
-               Unit_Name := new String'
-                 (Data.Unit_Full_Name.all & "." &
-                  Test_Data_Unit_Name & "." &
-                  Test_Unit_Name & "." &
-                  Nesting_Difference
-                    (Current_Pack.Name.all,
-                     Data.Unit_Full_Name.all) &
-                  "." & Test_Data_Unit_Name & "." & Test_Unit_Name);
+               if Data.Is_Top_Level_Generic_Instantiation
+                  or Data.Is_Generic
+               then
+                  Unit_Name := new String'
+                     (Data.Unit_Full_Name.all & "." &
+                     Test_Data_Unit_Name & "." &
+                     Test_Unit_Name);
+               else
+                  Unit_Name := new String'
+                     (Data.Unit_Full_Name.all & "." &
+                     Test_Data_Unit_Name & "." &
+                     Test_Unit_Name & "." &
+                     Nesting_Difference
+                        (Current_Pack.Name.all,
+                        Data.Unit_Full_Name.all) &
+                        "." & Test_Data_Unit_Name & "." & Test_Unit_Name);
+               end if;
             end if;
 
             Test_File_Name := new String'(Unit_To_File_Name (Unit_Name.all));
@@ -5945,7 +6042,9 @@ package body Test.Skeleton is
             Put_New_Line;
 
             --  Declaring simple test type.
-            if Current_Pack.Data_Kind = Declaration_Data then
+            if Current_Pack.Data_Kind = Declaration_Data
+               or Data.Is_Top_Level_Generic_Instantiation
+            then
                S_Put
                  (3,
                   "type Test is new GNATtest_Generated.GNATtest_Standard." &
@@ -6797,8 +6896,14 @@ package body Test.Skeleton is
 
       JSON_Unit_File : constant Virtual_File := GNATCOLL.VFS.Create
          (+Test.Common.JSON_Test_Dir.all)
-         / (+TGen.LAL_Utils.JSON_Test_Filename
-               (Data.Subp_List.First_Element.Subp_Declaration.As_Basic_Decl));
+         / (+(if Data.Is_Top_Level_Generic_Instantiation
+             then
+                TGen.LAL_Utils.Top_Level_Instantiation_Test_File_Name
+                   (Data.Unit_Full_Name.all)
+             else
+               TGen.LAL_Utils.JSON_Test_Filename
+                  (Data.Subp_List.First_Element
+                    .Subp_Declaration.As_Basic_Decl)));
 
       Unit_Raw_Content : GNAT.Strings.String_Access;
 
@@ -6811,7 +6916,7 @@ package body Test.Skeleton is
       --  Diagnostics for TGen.Libgen.Include_Subp
 
       Output_Dir : constant String :=
-        Get_Source_Output_Dir (Data.Unit_File_Name.all);
+         Get_Source_Output_Dir (Data.Unit_File_Name.all);
 
       function Escape (Input_String : String) return String;
       --  Escape every double quote inside Input_String
@@ -6846,7 +6951,7 @@ package body Test.Skeleton is
       end if;
 
       Unit_Raw_Content := GNATCOLL.VFS.Read_File (JSON_Unit_File);
-      if Unit_Raw_Content in null then
+      if Unit_Raw_Content in null or else Unit_Raw_Content.all = "" then
          return False;
       end if;
 
@@ -7086,8 +7191,13 @@ package body Test.Skeleton is
             if not Test.Common.Unparse_Test_Vectors then
                for Pack of TGen.Libgen.Required_Support_Packages
                              (Ctx       => Test.Common.TGen_Libgen_Ctx,
-                              Unit_Name => To_Qualified_Name
-                                             (Data.Unit_Full_Name.all))
+                              Unit_Name
+                                 => To_Qualified_Name
+                                       (if Data
+                                          .Is_Top_Level_Generic_Instantiation
+                                        then "TGen_"
+                                           & Data.Unit_Full_Name.all
+                                              else Data.Unit_Full_Name.all))
                loop
                   Put_Line (Body_Kind, "with " & To_Ada (Pack) & "; use "
                                     & To_Ada (Pack) & ";");

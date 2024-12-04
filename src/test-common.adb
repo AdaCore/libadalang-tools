@@ -534,6 +534,11 @@ package body Test.Common is
    begin
       L1 := Nesting_1'First;
       L2 := Nesting_2'First;
+
+      if Nesting_1 (L1) /= Nesting_2 (L2) then
+         return "";
+      end if;
+
       loop
 
          if Nesting_1 (L1) = Nesting_2 (L2) then
@@ -559,6 +564,22 @@ package body Test.Common is
       end loop;
 
    end Nesting_Common_Prefix;
+
+   function Skip_Prefix (Identifier : String; Prefix : String)
+      return String is
+      L1 : Integer := Identifier'First;
+      L2 : Integer := Prefix'First;
+   begin
+      while L1 <= Identifier'Last
+         and then L2 <= Prefix'Last
+         and then Identifier (L1) = Prefix (L2)
+      loop
+         L1 := @ + 1;
+         L2 := @ + 1;
+      end loop;
+
+      return Identifier (L1 .. Identifier'Last);
+   end Skip_Prefix;
 
    ------------------------
    -- Nesting_Difference --
@@ -1355,5 +1376,4 @@ package body Test.Common is
                  => Name.P_Is_Ghost_Code);
       end if;
    end Is_Ghost_Code;
-
 end Test.Common;

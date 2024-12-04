@@ -340,7 +340,8 @@ package body TGen.Type_Representation is
      (T : Anonymous_Typ'Class;
       Anonymous_Typ_Decl_Template, Anonymous_Typ_Init_Template : String;
       Constraint_Decl_Template, Constraint_Init_Template : String;
-      T_Decl, T_Init : out Unbounded_String);
+      T_Decl, T_Init : out Unbounded_String;
+      Is_Top_Level_Generic : Boolean := False);
    --  Return the declarations and initialization for an anonymous type
 
    ------------------------------------
@@ -351,10 +352,13 @@ package body TGen.Type_Representation is
      (T : Anonymous_Typ'Class;
       Anonymous_Typ_Decl_Template, Anonymous_Typ_Init_Template : String;
       Constraint_Decl_Template, Constraint_Init_Template : String;
-      T_Decl, T_Init : out Unbounded_String)
+      T_Decl, T_Init : out Unbounded_String;
+      Is_Top_Level_Generic : Boolean := False)
    is
-      Ty_Prefix : constant String := T.Slug;
-      Ty_Name   : constant String := Esc (T.FQN (No_Std => True));
+      Ty_Prefix : constant String := T.Slug (Is_Top_Level_Generic);
+      Ty_Name   : constant String :=
+         Esc (T.FQN
+               (No_Std => True, Top_Level_Generic => Is_Top_Level_Generic));
       Assocs    : Translate_Set;
    begin
       Insert (Assocs, Assoc ("TY_NAME", Ty_Name));
@@ -391,15 +395,19 @@ package body TGen.Type_Representation is
    procedure Collect_Info_For_Instance_Typ
      (T : Instance_Typ'Class;
       Instance_Typ_Decl_Template, Instance_Typ_Init_Template : String;
-      T_Decl, T_Init : out Unbounded_String);
+      T_Decl, T_Init : out Unbounded_String;
+      Is_Top_Level_Generic : Boolean := False);
 
    procedure Collect_Info_For_Instance_Typ
      (T : Instance_Typ'Class;
       Instance_Typ_Decl_Template, Instance_Typ_Init_Template : String;
-      T_Decl, T_Init : out Unbounded_String)
+      T_Decl, T_Init : out Unbounded_String;
+      Is_Top_Level_Generic : Boolean := False)
    is
-      Ty_Prefix : constant String := T.Slug;
-      Ty_Name   : constant String := Esc (T.FQN (No_Std => True));
+      Ty_Prefix : constant String := T.Slug (Is_Top_Level_Generic);
+      Ty_Name   : constant String :=
+         Esc (T.FQN
+               (No_Std => True, Top_Level_Generic => Is_Top_Level_Generic));
       Assocs    : Translate_Set;
    begin
       Insert (Assocs, Assoc ("TY_NAME", Ty_Name));
@@ -417,7 +425,8 @@ package body TGen.Type_Representation is
      (T : Scalar_Typ'Class;
       Scalar_Typ_Decl_Template, Scalar_Typ_Init_Template : String;
       Scalar_Typ_Decl : out Unbounded_String;
-      Scalar_Typ_Init : out Unbounded_String);
+      Scalar_Typ_Init : out Unbounded_String;
+      Is_Top_Level_Generic : Boolean := False);
 
    ---------------------------------
    -- Collect_Info_For_Scalar_Typ --
@@ -427,10 +436,13 @@ package body TGen.Type_Representation is
      (T : Scalar_Typ'Class;
       Scalar_Typ_Decl_Template, Scalar_Typ_Init_Template : String;
       Scalar_Typ_Decl : out Unbounded_String;
-      Scalar_Typ_Init : out Unbounded_String)
+      Scalar_Typ_Init : out Unbounded_String;
+      Is_Top_Level_Generic : Boolean := False)
    is
-      Ty_Prefix : constant String := T.Slug;
-      Ty_Name   : constant String := Esc (T.FQN (No_Std => True));
+      Ty_Prefix : constant String := T.Slug (Is_Top_Level_Generic);
+      Ty_Name   : constant String :=
+         Esc (T.FQN
+            (No_Std => True, Top_Level_Generic => Is_Top_Level_Generic));
       Assocs : Translate_Set;
    begin
       Insert (Assocs, Assoc ("TY_NAME", Ty_Name));
@@ -465,10 +477,12 @@ package body TGen.Type_Representation is
 
    procedure Generate_Type_Representation_For_Typ
      (F_Spec, F_Body     : File_Type with Unreferenced;
+      Ctx                : TGen.Libgen.Libgen_Context;
       Typ                : TGen.Types.Typ'Class;
       Templates_Root_Dir : String;
       Strategies         : FQN_To_Parsed_Strat_Maps.Map;
-      Init_Package_Code  : in out Tag)
+      Init_Package_Code  : in out Tag;
+      Is_Top_Level_Gen   : Boolean := False)
    is
       TRD : constant String :=
         Templates_Root_Dir
@@ -479,8 +493,9 @@ package body TGen.Type_Representation is
       package Templates is new TGen.Templates (TRD);
       use Templates.Type_Representation;
 
-      Ty_Prefix : constant String := Typ.Slug;
-      Ty_Name   : constant String := Esc (Typ.FQN (No_Std => True));
+      Ty_Prefix : constant String := Typ.Slug (Is_Top_Level_Gen);
+      Ty_Name   : constant String :=
+         Esc (Typ.FQN (No_Std => True, Top_Level_Generic => Is_Top_Level_Gen));
       Anonymous_Ty_Index : Positive := 1;
       Variant_Index : Positive := 1;
 
@@ -510,8 +525,8 @@ package body TGen.Type_Representation is
 
       procedure Collect_Info_For_Array
         (T : Array_Typ'Class;
-         Array_Typ_Decl : out Unbounded_String;
-         Array_Typ_Init : out Unbounded_String);
+         Array_Typ_Decl      : out Unbounded_String;
+         Array_Typ_Init      : out Unbounded_String);
       --  Return the specification and initialization for an array type
 
       --------------------------------
@@ -523,6 +538,9 @@ package body TGen.Type_Representation is
          Anonymous_Decl      : out Unbounded_String;
          Anonymous_Init      : out Unbounded_String;
          Component_Ty_Prefix : out Unbounded_String) is
+         Is_Top_Level_Gen : constant Boolean :=
+            not T.Package_Name.Is_Empty
+            and then Ctx.Pack_Is_Top_Level_Instantiation (T.Package_Name);
       begin
          --  We have to collect anonymous types there and instantiate a new
          --  prefix for them. It will be the type name + the anonymous type
@@ -546,8 +564,9 @@ package body TGen.Type_Representation is
                   Constraint_Decl_Template,
                   Constraint_Init_Template,
                   Anonymous_Decl,
-                  Anonymous_Init);
-               Component_Ty_Prefix := +Ano_Typ.Slug;
+                  Anonymous_Init,
+                  Is_Top_Level_Gen);
+               Component_Ty_Prefix := +Ano_Typ.Slug (Is_Top_Level_Gen);
                Anonymous_Ty_Index := Anonymous_Ty_Index + 1;
 
                --  Add the type reference declaration in the body declarative
@@ -556,10 +575,11 @@ package body TGen.Type_Representation is
 
                Anonymous_Decl :=
                  Anonymous_Decl
-                 & (+(Ano_Typ.Slug & "_Typ_Ref : TGen.Types.SP.Ref;"));
+                 & (+Ano_Typ.Slug (Is_Top_Level_Gen))
+                 & "_Typ_Ref : TGen.Types.SP.Ref;";
             end;
          else
-            Component_Ty_Prefix := +T.Slug;
+            Component_Ty_Prefix := +T.Slug (Is_Top_Level_Gen);
          end if;
       end Collect_Info_For_Component;
 
@@ -1017,7 +1037,8 @@ package body TGen.Type_Representation is
                Constraint_Decl_Template,
                Constraint_Init_Template,
                Anonymous_Typ_Decl,
-               Anonymous_Typ_Init);
+               Anonymous_Typ_Init,
+               Is_Top_Level_Gen);
             Put_Line (F_Spec, "   " & Anonymous_Typ'Class (Typ).Slug
                               & "_Typ_Ref : SP.Ref;");
             Put_Line (F_Body, +Anonymous_Typ_Decl);
@@ -1033,7 +1054,8 @@ package body TGen.Type_Representation is
                Instance_Decl_Template,
                Instance_Init_Template,
                Instance_Typ_Decl,
-               Instance_Typ_Init);
+               Instance_Typ_Init,
+               Is_Top_Level_Gen);
             Put_Line
               (F_Spec, "   " & Ty_Prefix & "_Typ_Ref : TGen.Types.SP.Ref;");
             Put_Line (F_Body, +Instance_Typ_Decl);
@@ -1079,7 +1101,8 @@ package body TGen.Type_Representation is
                Scalar_Typ_Decl_Template,
                Scalar_Typ_Init_Template,
                Scalar_Typ_Decl,
-               Scalar_Typ_Init);
+               Scalar_Typ_Init,
+               Is_Top_Level_Gen);
             Put_Line
               (F_Spec, "   " & Ty_Prefix & "_Typ_Ref : TGen.Types.SP.Ref;");
             Put_Line (F_Body, +Scalar_Typ_Decl);

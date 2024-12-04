@@ -1,0 +1,4 @@
+description: |
+  Run TGen test case generator with a complex generic packages architecture.
+
+driver: gnattest_driver

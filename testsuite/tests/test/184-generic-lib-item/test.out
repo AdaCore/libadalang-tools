@@ -2,5 +2,4 @@ gnattest: Error while processing <ExprFunction ["Identity"] pkg.ads:5:4-5:62>:
 pkg.identity.X: inst.pair is not supported (types declared a generic package instantiation that is a library item are unsupported)
 
 No subprogram supported for test case generation.
-Units remaining: 3     Units remaining: 2     gnattest: inst.ads is a library level instantiation
-Units remaining: 1     
+Units remaining: 3     Units remaining: 2     Units remaining: 1     
