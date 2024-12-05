@@ -2,7 +2,7 @@ description:
     Test test-case dumping in JSON format for a subset of types, without
     test generation after the test-case dump.
 
-driver: gnattest_driver
+driver: shell_script
 
 resources:
     tc_dump: .

@@ -3,6 +3,6 @@ description:
     point values in the range of a floating point type with a range
     constraint.
 
-driver: gnattest_driver
+driver: shell_script
 control:
     - [XFAIL, 'x86', 'Marshalling not working for 32bits (UB03-008)']

@@ -1,5 +1,5 @@
 description:
     Test checking test input dumping
 
-driver: gnattest_driver
+driver: shell_script
 

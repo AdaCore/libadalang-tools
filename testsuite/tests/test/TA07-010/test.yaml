@@ -1,6 +1,6 @@
 description:
     gnattest test
 
-driver: gnattest_driver
+driver: shell_script
 control:
     - [SKIP, 'windows', 'No symbolic links on Windows']

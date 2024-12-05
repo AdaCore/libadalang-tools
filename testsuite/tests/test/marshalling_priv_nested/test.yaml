@@ -2,4 +2,4 @@ description:
     test that private types declared in nested packages are correctly
     rejected by TGen.
 
-driver: gnattest_driver
+driver: shell_script

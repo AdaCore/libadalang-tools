@@ -1,7 +1,7 @@
 description: Test that gnattest does not attempt to generate test inputs for
   subprograms with generic formal parameters or return types.
 
-driver: gnattest_driver
+driver: shell_script
 
 canonicalize_backslashes: True
 
