@@ -37,6 +37,14 @@ package TGen.Wrappers is
 
       Pre : Unbounded_String;
       --  Precondition string of the subprogram
+
+      Is_Generic_Instantiation : Boolean;
+      --  Whether the package is a simply a generic instantiation or not.
+      --  foo.ads:
+      --
+      --  package Foo is new Bar (Integer);
+      --
+      --  where bar is a generic.
    end record;
 
    procedure Generate_Wrapper_For_Subprogram

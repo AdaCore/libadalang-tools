@@ -26,6 +26,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Templates_Parser; use Templates_Parser;
 
+with TGen.Libgen;
 with TGen.Types;             use TGen.Types;
 with TGen.Parse_Strategy; use TGen.Parse_Strategy;
 
@@ -33,10 +34,12 @@ package TGen.Type_Representation is
 
    procedure Generate_Type_Representation_For_Typ
      (F_Spec, F_Body     : File_Type;
+      Ctx                : TGen.Libgen.Libgen_Context;
       Typ                : TGen.Types.Typ'Class;
       Templates_Root_Dir : String;
       Strategies         : FQN_To_Parsed_Strat_Maps.Map;
-      Init_Package_Code  : in out Tag);
+      Init_Package_Code  : in out Tag;
+      Is_Top_Level_Gen   : Boolean := False);
    --  Generate the TGen type representation for the given type. Note that
    --  this function is not recursive, and must thus be called for all of
    --  the component types of this type that are not anonymous types.

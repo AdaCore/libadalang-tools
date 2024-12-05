@@ -392,11 +392,20 @@ package TGen.Types.Record_Types is
      (Function_Kind);
 
    overriding function FQN
-     (Self : Function_Typ; No_Std : Boolean := False) return String;
-  --  Return the fully qualified name associated with this subprogram,
-  --  removing the trailing hash.
+      (Self : Function_Typ;
+       No_Std : Boolean := False;
+       Top_Level_Generic : Boolean := False) return String;
+   --  Return the fully qualified name associated with this subprogram,
+   --  removing the trailing hash.
+   --  If No_Std is True, remove the Standard prefix for entities from the
+   --  standard packaged.
+   --  The Top_Level_Generic flag can be used to return the generic wrapper
+   --  package name instead of the package instantiation one.
 
-   function Slug (Self : Function_Typ) return String;
+   function Slug
+      (Self : Function_Typ;
+       Is_Top_Level_Generic_Instantiation : Boolean := False)
+      return String;
    --  Return a unique identifier for Typ. This transforms the names of
    --  operators.
 

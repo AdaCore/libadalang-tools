@@ -137,8 +137,16 @@ package Test.Harness is
             --  List of test_case types in current package
 
             --  Flags:
-            Generic_Kind         : Boolean := False;
+            Generic_Kind                    : Boolean := False;
             --  On, when the given package is generic
+
+            Top_Level_Generic_Instantiation : Boolean := False;
+            --  Whether this declaration concern a top level generic
+            --  instantation.
+            --  Example (bar.ads):
+            --  package Bar is new Foo (Integer);
+            --
+            --  where `Foo` is a generic package
 
             Good_For_Suite       : Boolean := False;
             --  The suite should be generated

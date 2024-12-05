@@ -1,0 +1,5 @@
+description: |
+  Check that types that are part of a generic package instantiation and
+  declared as library items are rejected.
+
+driver: shell_script

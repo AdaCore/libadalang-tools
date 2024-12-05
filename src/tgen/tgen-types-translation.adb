@@ -2849,7 +2849,8 @@ package body TGen.Types.Translation is
                   Subtype_Constraints => new Discrete_Range_Constraint'
                     (Translate_Discrete_Range_Constraint
                       (N.As_Subtype_Indication.F_Constraint
-                       .As_Range_Constraint))));
+                       .As_Range_Constraint)),
+                  others => <>));
             end return;
          when Real_Typ_Range =>
             return Res : Translation_Result (Success => True) do
@@ -2864,7 +2865,8 @@ package body TGen.Types.Translation is
                   Subtype_Constraints =>
                     new TGen.Types.Constraints.Constraint'Class'
                     (Translate_Real_Constraints
-                      (N.As_Subtype_Indication.F_Constraint))));
+                      (N.As_Subtype_Indication.F_Constraint)),
+                    others => <>));
             end return;
          when Array_Typ_Range =>
 
@@ -2886,7 +2888,8 @@ package body TGen.Types.Translation is
                     (Translate_Index_Constraints
                        (N.As_Subtype_Indication.F_Constraint,
                         As_Unconstrained_Array_Typ
-                          (Intermediate_Result.Res).Num_Dims)));
+                          (Intermediate_Result.Res).Num_Dims)),
+                  others => <>);
 
                Total_Size : constant Big_Integer :=
                  As_Constrained_Array_Typ (Anon_Typ.As_Named_Typ).Size;
@@ -2927,7 +2930,8 @@ package body TGen.Types.Translation is
                   Subtype_Constraints => new Discriminant_Constraints'
                     (Translate_Discriminant_Constraints
                       (N.As_Subtype_Indication.F_Constraint
-                       .As_Composite_Constraint))));
+                       .As_Composite_Constraint)),
+                  others => <>));
             end return;
          when others =>
             return Intermediate_Result;

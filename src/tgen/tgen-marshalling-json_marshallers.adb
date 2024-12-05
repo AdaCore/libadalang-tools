@@ -306,6 +306,10 @@ package body TGen.Marshalling.JSON_Marshallers is
       Global_Full_Types : Vector_Tag;
       Global_Slugs      : Vector_Tag;
       Global_Types_FNs  : Vector_Tag;
+      Proc_Name         : constant String :=
+         (if FN_Typ.Is_Generic and then not Is_Operator (FN_Typ.Simple_Name)
+          then To_Symbol (FN_Typ.Name, Sep => '_')
+          else FN_Typ.Simple_Name);
    begin
       if FN_Typ.Component_Types.Is_Empty and then FN_Typ.Globals.Is_Empty then
          return;
@@ -313,9 +317,9 @@ package body TGen.Marshalling.JSON_Marshallers is
       Assocs.Insert (Assoc ("GLOBAL_PREFIX", Global_Prefix));
       Assocs.Insert
         (Assoc ("PROC_NAME",
-         (if Is_Operator (FN_Typ.Simple_Name)
-         then Map_Operator_Name (FN_Typ.Simple_Name)
-         else (FN_Typ.Simple_Name))));
+         (if Is_Operator (Proc_Name)
+         then Map_Operator_Name (Proc_Name)
+         else Proc_Name)));
       Assocs.Insert (Assoc
         ("PROC_FQN",
          Utils.String_Utilities.Escape_String_Literal

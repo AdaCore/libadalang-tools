@@ -2,7 +2,7 @@
 --                                                                          --
 --                                  TGen                                    --
 --                                                                          --
---                       Copyright (C) 2022, AdaCore                        --
+--                       Copyright (C) 2024, AdaCore                        --
 --                                                                          --
 -- TGen  is  free software; you can redistribute it and/or modify it  under --
 -- under  terms of  the  GNU General  Public License  as  published by  the --
@@ -258,5 +258,17 @@ package body TGen.Strings is
          Res.Delete_Last;
       end return;
    end Copy_Delete_Last;
+
+   -----------------------
+   -- Copy_Delete_First --
+   -----------------------
+
+   function Copy_Delete_First
+     (FQN : Ada_Qualified_Name) return Ada_Qualified_Name is
+   begin
+      return Res : Ada_Qualified_Name := FQN.Copy do
+         Res.Delete_First;
+      end return;
+   end Copy_Delete_First;
 
 end TGen.Strings;

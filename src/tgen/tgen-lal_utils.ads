@@ -83,4 +83,9 @@ package TGen.LAL_Utils is
    --  provide best effort support: generate support for the generic inst. in
    --  the child package of the package containing the generic instantiation.
 
+   function Top_Level_Instantiation_Test_File_Name
+      (Unit_Full_Name : String) return String
+      with Pre => Unit_Full_Name /= "";
+   --  Get JSON file name when the unit is a library level generic
+   --  instantiation.
 end TGen.LAL_Utils;

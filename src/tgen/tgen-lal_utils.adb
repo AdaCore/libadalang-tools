@@ -21,6 +21,8 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Characters.Handling;
+
 with Libadalang.Common; use Libadalang.Common;
 
 with Test.Common;
@@ -142,4 +144,18 @@ package body TGen.LAL_Utils is
       return Res;
    end Ultimate_Enclosing_Compilation_Unit;
 
+   -------------------------------------------
+   -- Get_Top_Level_Instantiation_File_Name --
+   -------------------------------------------
+
+   function Top_Level_Instantiation_Test_File_Name (Unit_Full_Name : String)
+      return String
+   is
+      Tmp : Ada_Qualified_Name;
+   begin
+      Tmp.Append
+         (TGen.Strings.Ada_Identifier'(To_Unbounded_String (Unit_Full_Name)));
+      return Ada.Characters.Handling.To_Lower
+         ("tgen_" & To_Symbol (Tmp, Sep => '_') & ".json");
+   end Top_Level_Instantiation_Test_File_Name;
 end TGen.LAL_Utils;

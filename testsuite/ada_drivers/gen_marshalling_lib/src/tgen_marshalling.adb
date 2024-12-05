@@ -137,6 +137,8 @@ procedure TGen_Marshalling is
    is
       pragma Unreferenced (Job_Ctx);
 
+      Top_Level_Generic_Inst : Boolean := False;
+
       function Traverse_Helper
         (Node : LAL.Ada_Node'Class) return LALCO.Visit_Status;
 
@@ -158,7 +160,13 @@ procedure TGen_Marshalling is
                return LALCO.Over;
             end if;
 
-            if not Include_Subp (Gen_Ctx, Node.As_Basic_Decl, Diags) then
+            if not Include_Subp
+                  (Gen_Ctx,
+                   Node.As_Basic_Decl,
+                   Diags,
+                   Is_Top_Level_Generic_Instantiation
+                     => Top_Level_Generic_Inst)
+            then
                Put_Line
                  ("Error during parameter translation of subprogram "
                   & (+Node.As_Basic_Decl.P_Fully_Qualified_Name) & ":");
@@ -191,10 +199,14 @@ procedure TGen_Marshalling is
 
       elsif Unit.Root.Kind /= LALCO.Ada_Compilation_Unit then
          Put_Line ("Unit is not a compilation unit");
-      elsif Unit.Root.As_Compilation_Unit.P_Decl.Kind /= LALCO.Ada_Package_Decl
+      elsif Unit.Root.As_Compilation_Unit.P_Decl.Kind not in
+         LALCO.Ada_Package_Decl | LALCO.Ada_Generic_Package_Instantiation
       then
          Put_Line ("Unit does not contain a package declaration");
       else
+         Top_Level_Generic_Inst :=
+            Unit.Root.As_Compilation_Unit.P_Decl.Kind
+               = LALCO.Ada_Generic_Package_Instantiation;
          LAL.Traverse (Unit.Root, Traverse_Helper'Access);
       end if;
    end Process_Unit;

@@ -2,7 +2,7 @@
 --                                                                          --
 --                                  TGen                                    --
 --                                                                          --
---                       Copyright (C) 2022, AdaCore                        --
+--                       Copyright (C) 2024, AdaCore                        --
 --                                                                          --
 -- TGen  is  free software; you can redistribute it and/or modify it  under --
 -- under  terms of  the  GNU General  Public License  as  published by  the --
@@ -172,6 +172,11 @@ package TGen.Strings is
      (FQN : Ada_Qualified_Name) return Ada_Qualified_Name with
      Pre => Ada.Containers.">=" (FQN.Length, 1);
    --  Return a copy of FQN, deleting the last name in the process.
+
+   function Copy_Delete_First
+     (FQN : Ada_Qualified_Name) return Ada_Qualified_Name with
+     Pre => Ada.Containers.">=" (FQN.Length, 1);
+   --  Return a copy of FQN, deleting the first name in the process.
 
    package Ada_Qualified_Name_Sets is new Ada.Containers.Ordered_Sets
      (Element_Type => Ada_Qualified_Name,

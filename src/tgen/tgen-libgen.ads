@@ -81,9 +81,11 @@ package TGen.Libgen is
    --  supported inlined in the Unsupported_Typ.Reason field.
 
    function Include_Subp
-     (Ctx   : in out Libgen_Context;
-      Subp  : LAL.Basic_Decl'Class;
-      Diags : out TGen.Strings.String_Vectors.Vector) return Boolean;
+     (Ctx                                : in out Libgen_Context;
+      Subp                               : LAL.Basic_Decl'Class;
+      Diags                              : out
+                                           TGen.Strings.String_Vectors.Vector;
+      Is_Top_Level_Generic_Instantiation : Boolean := False) return Boolean;
    --  Register all the types in the parameters of Subp in the set of types for
    --  which the marshalling library will be generated. This procedures does
    --  not actually generate any sources, call Generate to create the support
@@ -93,6 +95,10 @@ package TGen.Libgen is
    --  types, or if some of the types are unsupported for marshalling,
    --  and report diagnostics in Diags. In that case, the context is not
    --  modified. Otherwise, Diags should be ignored.
+   --
+   --  The `Is_Generic_Instantiation_Only` switch is used when a subp comes
+   --  from a top level generic instantiation. This flag is required because
+   --  it triggers the generation of a wrapper package to allow child packages.
 
    procedure Generate
      (Ctx : in out Libgen_Context; Part : Any_Library_Part := All_Parts);
@@ -118,7 +124,7 @@ package TGen.Libgen is
    function Required_Support_Packages
      (Ctx       : Libgen_Context;
       Unit_Name : TGen.Strings.Ada_Qualified_Name)
-      return TGen.Strings.Ada_Qualified_Name_Sets_Maps.Constant_Reference_Type;
+     return TGen.Strings.Ada_Qualified_Name_Set;
    --  Return a reference to the set of support packages that need to be
    --  "withed" to be used with the types used in Unit_Name.
 
@@ -173,6 +179,37 @@ package TGen.Libgen is
       (Ctx : out Libgen_Context;
        Data : Libadalang.Preprocessing.Preprocessor_Data);
    --  Set preprocessor definitions to the context.
+
+   function Get_Output_Dir (Ctx : Libgen_Context) return String;
+   --  Get TGgen's support library output directory
+
+   function Generic_Package_Name
+      (Pack_Name : TGen.Strings.Ada_Qualified_Name;
+       Replace_First : Boolean := False)
+      return TGen.Strings.Ada_Qualified_Name
+      with Pre => (not Pack_Name.Is_Empty);
+   --  Add generic instantiation prefix to a qualified name. By default, the
+   --  function will change the last identifier of a fully qualified name, the
+   --  `Replace_First` switch can be used to replace the first one instead.
+
+   function Pack_Is_Top_Level_Instantiation
+      (Ctx : Libgen_Context; Pack_Name : TGen.Strings.Ada_Qualified_Name)
+      return Boolean;
+   --  Return if the package is a top level generic instantiation
+
+   procedure Create_Generic_Wrapper_Package_If_Not_Exists
+      (Unit_Name  : String;
+       Base_Name  : String;
+       Output_Dir : String);
+   --  Create a wrapper package for top level generic instantiations. In
+   --  case a of top level generic instantiation, this wrapper allows
+   --  creation of child packages. The only limitation of this approach
+   --  is that private generic subprograms can't be accessed which is why
+   --  they're not supported.
+   --
+   --  `Pack_Name` being the wrapper fully qualified name and `Base_Name`
+   --  the library level instantiation fully qualified name.
+
 private
    use TGen.Strings;
    use TGen.Context;
