@@ -3,4 +3,4 @@ description:
   This used not to be the case because gnattest added a pragma Ada_2005 in
   some of the stub data units.
 
-driver: gnattest_driver
+driver: shell_script

@@ -3,4 +3,4 @@ description:
   issues. They used to not be commented out, which could result in lingering
   references to types or objects no longer present in the codebase.
 
-driver: gnattest_driver
+driver: shell_script

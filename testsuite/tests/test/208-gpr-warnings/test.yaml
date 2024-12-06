@@ -3,4 +3,4 @@ description:
   loading the project file. Instead, only output those warnings and still
   proceed with the rest of the tool.
 
-driver: gnattest_driver
+driver: shell_script

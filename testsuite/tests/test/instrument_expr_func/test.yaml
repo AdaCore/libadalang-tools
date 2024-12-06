@@ -3,5 +3,5 @@ description:
     of artificial package bodies for containing instrumented
     bodies if necessary, including library level package body.
 
-driver: gnattest_driver
+driver: shell_script
 

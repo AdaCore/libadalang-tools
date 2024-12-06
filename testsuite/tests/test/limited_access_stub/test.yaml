@@ -1,4 +1,4 @@
 description: Check that gnattest does not consider in-mode access types
   as parameters for which stub setters must be generated.
 
-driver: gnattest_driver
+driver: shell_script
