@@ -3274,6 +3274,15 @@ package body Test.Skeleton is
       end Get_Condition_Image;
 
    begin
+      if Subp.Subp_Declaration.P_Generic_Instantiations'Length > 0 then
+         Update_Generic_Packages
+            (Langkit_Support.Text.Encode
+               (Subp.Subp_Declaration
+                  .P_Parent_Basic_Decl
+                  .P_Defining_Name.Text,
+                "utf-8"));
+      end if;
+
       Increase_Indent
         (Me_TC, "Looking for test cases of " & Subp.Subp_Text_Name.all);
 
