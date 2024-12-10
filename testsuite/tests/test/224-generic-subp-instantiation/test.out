@@ -1,0 +1,11 @@
+main_package.ads:4:4: info: corresponding test PASSED
+main_package.ads:4:4: info: corresponding test PASSED
+main_package.ads:4:4: info: corresponding test PASSED
+main_package.ads:4:4: info: corresponding test PASSED
+main_package.ads:4:4: info: corresponding test PASSED
+main_package.ads:6:4: info: corresponding test PASSED
+main_package.ads:6:4: info: corresponding test PASSED
+main_package.ads:6:4: info: corresponding test PASSED
+main_package.ads:6:4: info: corresponding test PASSED
+main_package.ads:6:4: info: corresponding test PASSED
+10 tests run: 10 passed; 0 failed; 0 crashed.
