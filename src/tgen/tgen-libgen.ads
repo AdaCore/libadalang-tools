@@ -210,6 +210,25 @@ package TGen.Libgen is
    --  `Pack_Name` being the wrapper fully qualified name and `Base_Name`
    --  the library level instantiation fully qualified name.
 
+   function Get_Test_Case_Dump_Procedure_Name
+      (Ctx              : Libgen_Context;
+       Parent_Pack_Name : TGen.Strings.Ada_Qualified_Name;
+       Subp_FQN         : Unbounded_String)
+   return Unbounded_String
+   with Pre => not Parent_Pack_Name.Is_Empty;
+   --  Returns an Unbounded_String corresponding to the procedure name used
+   --  to dump parameters for a given subprogram's fully qualified name. If no
+   --  test cases correspond to the given subprogram, this function returns
+   --  `Null_Unbounded_String`.
+   --
+   --  `Pack_Name` represents the subprogram's parent package name, and
+   --  `Subp_FQN` refers to the fully qualified name of the tested subprogram.
+   --
+   --  This function may raise a `Program_Error` if the requested subprogram is
+   --  not present in the TGen context. This typically occurs if the analysis
+   --  has not been performed yet, the requested subprogram does not exist, or
+   --  it is not supported for test case generation.
+
 private
    use TGen.Strings;
    use TGen.Context;
