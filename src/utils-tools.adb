@@ -25,8 +25,10 @@ with GNAT.Byte_Order_Mark;
 with GNAT.OS_Lib;
 
 with Langkit_Support.Diagnostics;
+with Langkit_Support.File_Readers;
 
 with Libadalang.Iterators;        use Libadalang.Iterators;
+with Libadalang.Preprocessing;    use Libadalang.Preprocessing;
 with Libadalang.Project_Provider; use Libadalang.Project_Provider;
 
 with Utils.Command_Lines.Common;   use Utils.Command_Lines.Common;
@@ -36,13 +38,14 @@ with Utils.String_Utilities; use Utils.String_Utilities;
 package body Utils.Tools is
 
    procedure Process_File
-     (Tool         : in out Tool_State'Class;
-      Cmd          : in out Command_Line;
-      File_Name    : String;
-      Counter      : Natural;
-      Syntax_Error : out Boolean;
-      Reparse      : Boolean := False;
-      Pass         : Pass_Kind := Second_Pass)
+     (Tool                  : in out Tool_State'Class;
+      Cmd                   : in out Command_Line;
+      File_Name             : String;
+      Counter               : Natural;
+      Syntax_Error          : out Boolean;
+      Reparse               : Boolean := False;
+      Pass                  : Pass_Kind := Second_Pass;
+      Preprocessing_Allowed : Boolean := False)
    is
       use GNAT.OS_Lib, GNAT.Byte_Order_Mark;
       --  We read the file into a String, and convert to wide
@@ -84,6 +87,12 @@ package body Utils.Tools is
          declare
             use GNATCOLL.Projects;
 
+            Default_Config : Libadalang.Preprocessing.File_Config;
+            File_Configs   : Libadalang.Preprocessing.File_Config_Maps.Map;
+            File_Reader    :
+              Langkit_Support.File_Readers.File_Reader_Reference :=
+                Langkit_Support.File_Readers.No_File_Reader_Reference;
+
             Provider : constant Unit_Provider_Reference :=
               (if Status (Tool.Project_Tree.all) = Empty
                then No_Unit_Provider_Reference
@@ -91,10 +100,38 @@ package body Utils.Tools is
                       (Tree             => Tool.Project_Tree,
                        Env              => Tool.Project_Env,
                        Is_Project_Owner => False));
+
          begin
+            --  Check if there are preprocessing directives and if so, update
+            --  the File_Reader.
+
+            if Preprocessing_Allowed then
+               Libadalang
+                 .Preprocessing
+                 .Extract_Preprocessor_Data_From_Project
+                    (Tree           => Tool.Project_Tree.all,
+                     Project        => No_Project,
+                     Default_Config => Default_Config,
+                     File_Configs   => File_Configs);
+
+               if Default_Config.Enabled or not File_Configs.Is_Empty then
+                  File_Reader :=
+                    Libadalang.Preprocessing.Create_Preprocessor
+                      (Default_Config,
+                       File_Configs);
+               end if;
+            end if;
+
             Tool.Context := Create_Context
               (Charset       => Wide_Character_Encoding (Cmd),
+               File_Reader   => File_Reader,
                Unit_Provider => Provider);
+
+            --  If preprocessing is not allowed, ignore related diagnostics
+
+            if not Preprocessing_Allowed then
+               Disable_Preprocessor_Directives_Errors (Tool.Context);
+            end if;
          end;
       end if;
 
