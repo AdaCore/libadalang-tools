@@ -25,6 +25,7 @@ with Ada.Characters.Handling;
 with Ada.Command_Line;
 with Ada.Containers;
 with Ada.Directories;
+with Ada.Strings.Unbounded.Equal_Case_Insensitive;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with GNAT.OS_Lib;
@@ -1796,4 +1797,42 @@ package body TGen.Libgen is
       Put_Line (F_Type, "end " & Unit_Name & ";");
       Close (F_Type);
    end Create_Generic_Wrapper_Package_If_Not_Exists;
+
+   ---------------------------------------
+   -- Get_Test_Case_Dump_Procedure_Name --
+   ---------------------------------------
+
+   function Get_Test_Case_Dump_Procedure_Name
+      (Ctx              : Libgen_Context;
+       Parent_Pack_Name : TGen.Strings.Ada_Qualified_Name;
+       Subp_FQN         : Unbounded_String)
+   return Unbounded_String
+   is
+      Typ_Set_Cursor : constant Types_Per_Package_Maps.Cursor :=
+         Ctx.Generation_Map.Find
+            (Generation_Harness_Package (Parent_Pack_Name));
+      Is_Top_Level_Generic : constant Boolean :=
+         Ctx.Depends_On_Top_Level_Inst (Parent_Pack_Name);
+   begin
+      if not Typ_Set_Cursor.Has_Element then
+         raise Program_Error with "Sub program isn't present";
+      end if;
+
+      for Ty of Typ_Set_Cursor.Element loop
+         declare
+            Ty_FQN : constant Unbounded_String :=
+               To_Unbounded_String (Ty.Get.FQN
+                  (No_Std => True, Top_Level_Generic => Is_Top_Level_Generic));
+         begin
+            if Ada.Strings.Unbounded.Equal_Case_Insensitive (Ty_FQN, Subp_FQN)
+            then
+               return To_Unbounded_String
+                  (To_Symbol (Ty.Get.Name, Sep => '_') & "_Dump_TC");
+            end if;
+         end;
+      end loop;
+
+      return Ada.Strings.Unbounded.Null_Unbounded_String;
+   end Get_Test_Case_Dump_Procedure_Name;
+
 end TGen.Libgen;
