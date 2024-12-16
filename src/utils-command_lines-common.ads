@@ -78,11 +78,11 @@ package Utils.Command_Lines.Common is
      Common_Boolean_Switches.Set_Shorthands
        ([Syntax_Only => +"-so"]);
 
-   type Ada_Version_Type is (Ada_83, Ada_95, Ada_2005, Ada_2012);
+   type Ada_Version_Type is (Ada_83, Ada_95, Ada_2005, Ada_2012, Ada_2022);
 
    package Ada_Version_Switches is new Enum_Switches
      (Common_Descriptor, Ada_Version_Type,
-      Default => Ada_Version_Type'Last);
+      Default => Ada_2012);
    --  These switches are ignored. The tools are tolerant of using newer
    --  reserved words, such as "interface", as identifiers, so we don't need to
    --  know the version.
@@ -91,7 +91,8 @@ package Utils.Command_Lines.Common is
      ([Ada_83 => +"-gnat83",
        Ada_95 => +"-gnat95",
        Ada_2005 => +"-gnat2005",
-       Ada_2012 => +"-gnat2012"]);
+       Ada_2012 => +"-gnat2012",
+       Ada_2022 => +"-gnat2022"]);
 
    package Ada_Version_Shorthands_2 is new Ada_Version_Switches.Set_Shorthands
      ([Ada_2005 => +"-gnat05",

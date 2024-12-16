@@ -113,6 +113,12 @@ package body TGen.Libgen is
    --  Include all the types in Source in the correct package key in Dest. All
    --  anonymous types are ignored.
 
+   function Lang_Version_To_Attr
+     (Version : Ada_Language_Version) return String;
+   --  Return the corresponding string to be added to the
+   --  Compiler.Default_Switches attribute. This will return the empty string
+   --  if Version is Unspecified.
+
    ----------------------
    -- Replace_Standard --
    ----------------------
@@ -922,11 +928,19 @@ package body TGen.Libgen is
          Put_Line (Prj_File, "   package Compiler is");
          Put_Line (Prj_File, "      case Build_Mode is");
          Put_Line (Prj_File, "         when ""dev"" =>");
-         Put_Line (Prj_File, "            for Default_Switches (""Ada"") use"
-                   & " (""-g"", ""-gnatg"", ""-gnatyN"", ""-gnatws"");");
+         Put (Prj_File, "            for Default_Switches (""Ada"") use"
+                   & " (""-g"", ""-gnatg"", ""-gnatyN"", ""-gnatws""");
+         if Ctx.Lang_Version /= Unspecified then
+            Put (Prj_File, ", " & Lang_Version_To_Attr (Ctx.Lang_Version));
+         end if;
+         Put_Line (Prj_File, ");");
          Put_Line (Prj_File, "         when ""prod"" =>");
          Put_Line (Prj_File, "            for Default_Switches (""Ada"") use"
-                   & " (""-gnatg"", ""-gnatyN"", ""-gnatws"");");
+                   & " (""-gnatg"", ""-gnatyN"", ""-gnatws""");
+         if Ctx.Lang_Version /= Unspecified then
+            Put (Prj_File, ", " & Lang_Version_To_Attr (Ctx.Lang_Version));
+         end if;
+         Put_Line (Prj_File, ");");
          Put_Line (Prj_File, "      end case;");
          Put_Line (Prj_File, "   end Compiler;");
          New_Line (Prj_File);
@@ -1320,6 +1334,11 @@ package body TGen.Libgen is
       Put_Line (Prj_File, "project TGen_Generation_Harness is");
       Put_Line (Prj_File, "   for Main use (""generation_main.adb"");");
       Put_Line (Prj_File, "   for Object_Dir use ""obj"";");
+      Put_Line (Prj_File, "package Compiler is");
+      Put (Prj_File, "   for Default_Switches (""Ada"") use (");
+      Put (Prj_File, Lang_Version_To_Attr (Ctx.Lang_Version) & ");");
+      Ada.Text_IO.Put_Line (Prj_File, "end Compiler;");
+
       Put_Line (Prj_File, "end TGen_Generation_Harness;");
       Close (Prj_File);
 
@@ -1370,5 +1389,26 @@ package body TGen.Libgen is
       end if;
       TGen.Marshalling.Set_Array_Size_Limit (Limit);
    end Set_Array_Size_Limit;
+
+   ------------------------------
+   -- Set_Minimum_Lang_Version --
+   ------------------------------
+
+   procedure Set_Minimum_Lang_Version
+     (Ctx : in out Libgen_Context; Version : Ada_Language_Version) is
+   begin
+      Ctx.Lang_Version := Version;
+   end Set_Minimum_Lang_Version;
+
+   --------------------------
+   -- Lang_Version_To_Attr --
+   --------------------------
+
+   function Lang_Version_To_Attr
+     (Version : Ada_Language_Version) return String is
+     (case Version is
+         when Unspecified => "",
+         when Ada_12      => """-gnat2012""",
+         when Ada_22      => """-gnat2022""");
 
 end TGen.Libgen;
