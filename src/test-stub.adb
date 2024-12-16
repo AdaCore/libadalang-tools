@@ -851,7 +851,8 @@ package body Test.Stub is
                     when Ada_83   => "Ada_83",
                     when Ada_95   => "Ada_95",
                     when Ada_2005 => "Ada_2005",
-                    when Ada_2012 => "Ada_2012")
+                    when Ada_2012 => "Ada_2012",
+                    when Ada_2022 => "Ada_2022")
                & ";");
             New_Line_Count;
          end if;

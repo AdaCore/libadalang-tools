@@ -231,6 +231,8 @@ package body Test.Generation is
       if Debug_Flag_1 then
          Build_Args.Append ("-g");
          Build_Args.Append ("-O0");
+         Build_Args.Append ("-bargs");
+         Build_Args.Append ("-Es");
       end if;
       Run (Build_Args, "Build of the test generation harness");
 
