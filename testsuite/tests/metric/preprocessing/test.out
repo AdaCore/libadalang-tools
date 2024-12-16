@@ -1,0 +1,28 @@
+Line metrics summed over 1 units
+  all lines            : 14
+  code lines           : 10
+  comment lines        : 0
+  end-of-line comments : 0
+  comment percentage   : 0.00
+  blank lines          : 4
+
+Average lines in body: 10.00
+
+Element metrics summed over 1 units
+  all statements      : 4
+  all declarations    : 2
+  logical SLOC        : 6
+
+ 1 public subprograms in 1 units
+
+ 1 subprogram bodies in 1 units
+
+Average cyclomatic complexity: 3.00
+
+Coupling metrics:
+=================
+   Unit Foo (foo.adb)
+      control fan-out coupling  : 0
+      control fan-in coupling   : 0
+      unit fan-out coupling     : 0
+      unit fan-in coupling      : 0
