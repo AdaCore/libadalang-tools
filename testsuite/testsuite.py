@@ -16,6 +16,7 @@ from e3.os.process import Run
 
 from drivers.python_script import PythonScriptDriver
 from drivers.shell_script import ShellScriptDriver
+from drivers.gnattest_tgen import GNATTestTgenDriver
 
 
 class Testsuite(e3.testsuite.Testsuite):
@@ -23,6 +24,7 @@ class Testsuite(e3.testsuite.Testsuite):
     test_driver_map = {
         "python_script": PythonScriptDriver,
         "shell_script": ShellScriptDriver,
+        "gnattest_tgen": GNATTestTgenDriver,
     }
 
     def add_options(self, parser):
@@ -51,6 +53,17 @@ class Testsuite(e3.testsuite.Testsuite):
             help="Build and install TGen_RTS to prevent tests from re-building"
                  " the library. This is not needed if the environment already"
                  " provides the installed project."
+        )
+        parser.add_argument(
+            "--gnatfuzz-tests",
+            action="store_true",
+            help="enable the special 'gnatfuzz testsuite' mode, where all"
+                 " tests are run with the gnattest_tgen driver. It is meant"
+                 " to be used when running the testsuite on tests from the"
+                 " gnatfuzz testsuite, to ensure TGen doesn't crash. It is"
+                 " possible to instruct gnattest to emit debug logs and"
+                 " preserve generation artifacts by setting the GNATTEST_DEBUG"
+                 " env variable to aid debugging."
         )
 
     def set_up(self):
@@ -120,12 +133,25 @@ class Testsuite(e3.testsuite.Testsuite):
             )
             os.environ["PATH"] = valgrind_dir + os.pathsep + os.environ["PATH"]
 
+        # Signal to the tests that we are in GNATFUZZ execution mode (for test
+        # control purposes).
+        if self.main.args.gnatfuzz_tests:
+            os.environ["GNATTEST_GNATFUZZ"] = "TRUE"
+
         # Turn on strict mode for gnattest to catch real errors
         os.environ["GNATTEST_STRICT"] = "TRUE"
 
         # Set a fixed seed for TGen random generation, in order to keep the
         # testsuite deterministic.
         os.environ["TGEN_RANDOM_SEED"] = "1234"
+
+    @property
+    def default_driver(self):
+        """
+        By default, all tests should specify the required driver, except when in
+        gnatffuzz_test mode, where we only want ot use the gnattest_tgen driver.
+        """
+        return "gnattest_tgen" if self.main.args.gnatfuzz_tests else None
 
 
 if __name__ == "__main__":
