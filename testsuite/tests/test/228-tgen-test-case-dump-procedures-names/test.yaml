@@ -1,0 +1,5 @@
+description: |
+  Check that `Get_Test_Case_Dump_Procedure_Name` returns the expected results
+  with generic and non generic subprograms.
+
+driver: shell_script
