@@ -1827,7 +1827,10 @@ package body TGen.Libgen is
             if Ada.Strings.Unbounded.Equal_Case_Insensitive (Ty_FQN, Subp_FQN)
             then
                return To_Unbounded_String
-                  (To_Symbol (Ty.Get.Name, Sep => '_') & "_Dump_TC");
+                  ((if Ty.Get.Top_Level_Generic or else Ty.Get.Is_Generic
+                    then To_Symbol (Ty.Get.Name, Sep => '_')
+                    else Ty.Get.Simple_Name)
+                     & "_Dump_TC");
             end if;
          end;
       end loop;
