@@ -1,0 +1,4 @@
+description: Check that the stubbing mode of gnattest correctly supports
+  aggregate library projects.
+
+driver: shell_script

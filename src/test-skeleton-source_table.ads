@@ -175,11 +175,11 @@ package Test.Skeleton.Source_Table is
 
    function Project_Is_Library (Project_Name : String) return Boolean;
 
-   procedure Enforce_Project_Extention
+   procedure Enforce_Project_Extension
      (Prj_Name              : String;
       Subroot_Stub_Prj      : String;
       Current_Project_Infix : String);
-   procedure Enforce_Custom_Project_Extention
+   procedure Enforce_Custom_Project_Extension
      (File_Name            : String;
       Subroot_Stub_Prj     : String;
       Current_Source_Infix : String);
