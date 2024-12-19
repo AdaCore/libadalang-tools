@@ -26,9 +26,19 @@
        others => <>);
 
 @@ELSIF@@ @_SCALAR_TYP_@ = "Mod_Int_Typ"
+      package @_TY_PREFIX_@_Typ_Conversions is
+         new TGen.Big_Int.Unsigned_Conversions (TGen.TGen_Std.@_TY_NAME_@);
+
       @_TY_PREFIX_@_Typ : constant TGen.Types.Int_Types.Mod_Int_Typ :=
       (Name => TGen.Strings.To_Qualified_Name ("@_TY_NAME_@"),
        Is_Static => True,
+       Range_Value => TGen.Types.Discrete_Types.Int_Range'
+          (Min =>
+              @_TY_PREFIX_@_Typ_Conversions.To_Big_Integer
+                 (TGen.TGen_Std.@_TY_NAME_@'First),
+           Max =>
+              @_TY_PREFIX_@_Typ_Conversions.To_Big_Integer
+                 (TGen.TGen_Std.@_TY_NAME_@'Last)),
        Mod_Value =>
           TGen.Big_Int.From_Universal_Image
             (TGen.TGen_Std.@_TY_NAME_@'Modulus'Image),

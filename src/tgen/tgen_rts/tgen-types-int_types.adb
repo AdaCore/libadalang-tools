@@ -56,9 +56,14 @@ package body TGen.Types.Int_Types is
             else "(non static)"));
    end Image;
 
+   function Low_Bound (Self : Mod_Int_Typ) return Big_Integer is
+   begin
+      return Self.Range_Value.Min;
+   end Low_Bound;
+
    function High_Bound (Self : Mod_Int_Typ) return Big_Integer is
    begin
-      return Self.Mod_Value - To_Big_Integer (1);
+      return Self.Range_Value.Max;
    end High_Bound;
 
    function Gen return T is

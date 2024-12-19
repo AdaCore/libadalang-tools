@@ -169,6 +169,13 @@ package body TGen.Types.Constraints is
             if Cst.Static then
                Res.Set (Mod_Int_Typ'
                  (Is_Static => True,
+                  Range_Value =>
+                        (Discrete_Range_Constraint (Cst)
+                           .High_Bound
+                           .Int_Val,
+                         Discrete_Range_Constraint (Cst)
+                           .Low_Bound
+                           .Int_Val),
                   Mod_Value =>
                     Discrete_Range_Constraint
                       (Cst).High_Bound.Int_Val,

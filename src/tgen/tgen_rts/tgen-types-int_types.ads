@@ -68,6 +68,7 @@ package TGen.Types.Int_Types is
      Int_Typ (Is_Static => Is_Static) with record
       case Is_Static is
          when True =>
+            Range_Value : Int_Range := (0, 0);
             Mod_Value : Big_Integer;
          when others =>
             null;
@@ -79,6 +80,9 @@ package TGen.Types.Int_Types is
    --  Whether values for this Typ can be statically generated
 
    function Image (Self : Mod_Int_Typ) return String;
+
+   function Low_Bound (Self : Mod_Int_Typ) return Big_Integer with
+     Pre => Self.Is_Static;
 
    function High_Bound (Self : Mod_Int_Typ) return Big_Integer with
      Pre => Self.Is_Static;
