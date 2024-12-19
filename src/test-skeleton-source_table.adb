@@ -845,7 +845,13 @@ package body Test.Skeleton.Source_Table is
             Importing := P.Find_All_Projects_Importing (Direct_Only => True);
             Increase_Indent (Me, "importing projects:");
             while Current (Importing) /= No_Project loop
-               PR.Importing_List.Append (Current (Importing).Name);
+
+               --  Ensure to only reference the extending-most project, as
+               --  extended projects are skipped.
+
+               PR.Importing_List.Append
+                 (Current (Importing)
+                  .Extending_Project (Recurse => True).Name);
                Trace (Me, Current (Importing).Name);
                Next (Importing);
             end loop;

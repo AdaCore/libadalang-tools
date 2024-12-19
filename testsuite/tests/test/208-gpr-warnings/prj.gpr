@@ -1,0 +1,11 @@
+library project Prj is
+    for Object_Dir use "obj";
+    for Library_Dir use "lib";
+    for Library_Name use "prj";
+
+    --  Add linker switches to trigger a gpr warning
+    package Linker is
+        for Default_Switches ("Ada") use ("-static-libstdc++");
+    end Linker;
+
+end Prj;
