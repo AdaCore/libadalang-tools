@@ -687,7 +687,8 @@ package body TGen.Libgen is
 
       Unit_Name : constant Ada_Qualified_Name :=
         TGen.LAL_Utils.Convert_Qualified_Name
-          (TGen.LAL_Utils.Ultimate_Enclosing_Compilation_Unit (Subp));
+          (TGen.LAL_Utils.Ultimate_Enclosing_Compilation_Unit (Subp)
+           .P_Fully_Qualified_Name_Array);
       --  Name of the compilation unit this subprogram belongs to.
 
       Support_Packs : Cursor := Ctx.Support_Packs_Per_Unit.Find (Unit_Name);
