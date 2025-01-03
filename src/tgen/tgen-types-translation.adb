@@ -368,7 +368,7 @@ package body TGen.Types.Translation is
       --  non static. To do so we have no choice but to try to evaluate the
       --  bounds, and see if we get an exception.
 
-      Is_Mode_Typ : constant Boolean :=
+      Is_Mod_Typ : constant Boolean :=
         Decl.P_Root_Type.P_Full_View.As_Concrete_Type_Decl.F_Type_Def.Kind
           in Ada_Mod_Int_Type_Def;
    begin
@@ -386,7 +386,7 @@ package body TGen.Types.Translation is
          end;
       end if;
 
-      if Is_Mode_Typ then
+      if Is_Mod_Typ then
          --  ???modular subtypes can actually have a lower bound different than
          --  zero. We need to change the type representation to account for
          --  this.
@@ -395,7 +395,16 @@ package body TGen.Types.Translation is
             return Res : Translation_Result (Success => True) do
                Res.Res.Set
                  (Mod_Int_Typ'(Is_Static => True,
-                               Mod_Value => Max,
+                               Mod_Value => Big_Int.From_String
+                                  (New_Eval_As_Int
+                                     (Decl
+                                        .P_Root_Type
+                                        .P_Full_View
+                                        .As_Concrete_Type_Decl
+                                        .F_Type_Def
+                                        .As_Mod_Int_Type_Def
+                                        .F_Expr).Image),
+                               Range_Value => (0, Max),
                                others    => <>));
             end return;
          else
@@ -1360,14 +1369,25 @@ package body TGen.Types.Translation is
                   --  Check if the index type is a subtype with constraints. If
                   --  this is the case, update the constraints accordingly.
 
-                  if LAL.Kind (Constraint) = LALCO.Ada_Identifier then
+                  if LAL.Kind (Constraint)
+                     in LALCO.Ada_Subtype_Indication_Range
+                        | LALCO.Ada_Identifier
+                  then
                      declare
                         Id_Type_Res : constant Translation_Result :=
-                          Translate
-                            (Constraint.As_Identifier.P_Referenced_Decl
-                             .As_Base_Type_Decl);
+                          --  Retrieve the constraint declaration type in case
+                          --  it is an identifier
+                          (if Constraint.Kind = LALCO.Ada_Identifier then
+                              Translate
+                                 (Constraint
+                                    .As_Identifier
+                                    .P_Name_Designated_Type)
+                           else
+                              Translate
+                                 (Constraint
+                                    .As_Subtype_Indication
+                                    .P_Designated_Type_Decl));
                      begin
-
                         --  Create non-static constraints by default...
 
                         if Id_Type_Res.Success then
@@ -2876,8 +2896,7 @@ package body TGen.Types.Translation is
 
             declare
                Anon_Typ : constant Anonymous_Typ :=
-                 (Name                =>
-                    Ada_Identifier_Vectors.Empty_Vector,
+                 (Name                => Ada_Identifier_Vectors.Empty_Vector,
                   Last_Comp_Unit_Idx  => 1,
                   Named_Ancestor      => Intermediate_Result.Res,
                   Fully_Private       =>
