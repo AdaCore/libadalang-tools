@@ -46,17 +46,17 @@ package TGen.Types is
       Name : Ada_Qualified_Name;
       --  Fully qualified name of the type
 
-      Last_Comp_Unit_Idx : Positive;
+      Last_Comp_Unit_Idx : Positive := 1;
       --  Index, in Name, of the last identifier of the compilation unit in
       --  which this type is declared.
 
-      Fully_Private : Boolean;
+      Fully_Private : Boolean := False;
       --  Wether this type has no public declaration whatsoever, i.e. it cannot
       --  be referenced outside of the private part of its declaration package,
       --  or outside of the private part of child packages of its declaration
       --  package.
 
-      Private_Extension : Boolean;
+      Private_Extension : Boolean := False;
       --  Whether this type has a private extension. Note that if Fully_Private
       --  is True, this field will be False.
 
