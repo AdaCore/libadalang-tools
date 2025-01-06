@@ -92,6 +92,7 @@ package Test.Command_Lines is
       Copy_Environment,
       Reporter,
       Gen_Test_Num,
+      Gen_Test_Subprograms,
       Serialized_Test_Dir,
       Cov_Level,
       Minimization_Filter);
@@ -113,6 +114,7 @@ package Test.Command_Lines is
        Copy_Environment         => '=',
        Reporter                 => '=',
        Gen_Test_Num             => '=',
+       Gen_Test_Subprograms     => '=',
        Serialized_Test_Dir      => '=',
        Cov_Level                => '=',
        Minimization_Filter      => '=']);

@@ -31,9 +31,11 @@ with Langkit_Support.Text; use Langkit_Support.Text;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Exceptions;
 
+with Ada.Strings.Fixed;
 with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Containers.Indefinite_Ordered_Sets;
 with Ada.Containers.Indefinite_Doubly_Linked_Lists;
+with Ada.Containers.Vectors;
 
 with GNAT.OS_Lib;
 with GNATCOLL.VFS;                use GNATCOLL.VFS;
@@ -60,6 +62,12 @@ package Test.Common is
 
    package Ada_Nodes_List is new
      Ada.Containers.Indefinite_Doubly_Linked_Lists (Ada_Node);
+
+   package Unbounded_String_Vectors is new
+      Ada.Containers.Vectors (Index_Type => Positive,
+                              Element_Type => Unbounded_String);
+
+   subtype Unbounded_String_Vector is Unbounded_String_Vectors.Vector;
 
    function Mangle_Hash_Full
      (Subp           : Ada_Node'Class;
@@ -441,6 +449,18 @@ package Test.Common is
    --  and language version. This function only appends flags to the existing
    --  one in `gnattest_common.gpr`.
 
+   procedure Add_Allowed_Subprograms (Subp_Decl : String)
+   with Pre => Ada.Strings.Fixed.Index (Subp_Decl, ":") > 0;
+   --  Add allowed subprograms to the test case generation. All subprograms
+   --  not explicitly allowed will be ignored during test case generation.
+   --  The `Subp_Decl` parameter should have the following format
+   --  `<subp_decl_filename>:<line_number>`.
+
+   function Is_Subprogram_Allowed (Subp : Basic_Decl'Class) return Boolean;
+   --  Return if `Subp_Name` test case generation is allowed. If no subprograms
+   --  have been allowed before (the list of allowed subprograms is empty) all
+   --  subprograms are considered to be allowed.
+
    Preprocessor_Config : Libadalang.Preprocessing.Preprocessor_Data;
    --  Preprocessor config for the loaded user project.
    --  Might be null if the project isn't using preprocessing. The
@@ -482,6 +502,9 @@ package Test.Common is
 
    Lang_Version : Ada_Version_Type := Ada_2012;
    --  Language version to be inserted in the pragma in stub helper units.
+
+   Allowed_Subprograms : String_Set.Set;
+   --  Set of allowed subprograms with the format <filename>:<line number>
 
 private
 

@@ -202,6 +202,44 @@ package body Test.Actions is
          end if;
       end Report_Multiple_Output;
 
+      function Process_Comma_Separated_String (String_List : String)
+         return Test.Common.Unbounded_String_Vector;
+      --  Process a string of comma separated values and returns a vectors of
+      --  the values. An empty String produces and empty vector.
+      --  It is up to the caller to free the allocated strings.
+
+      function Process_Comma_Separated_String (String_List : String)
+         return Test.Common.Unbounded_String_Vector
+      is
+         Result : Test.Common.Unbounded_String_Vector;
+         Value_Begin : Positive := 1;
+         Value_End : Positive := 1;
+
+      begin
+         if String_List = "" then
+            return Result;
+         end if;
+
+         while Value_End < String_List'Length loop
+            if String_List (Value_End) = ',' then
+               Result.Append
+                  (Ada.Strings.Unbounded.To_Unbounded_String
+                     (String_List (Value_Begin .. Value_End - 1)));
+               Value_Begin := Value_End + 1;
+            end if;
+
+            Value_End := @ + 1;
+         end loop;
+
+         if Value_End - Value_Begin >= 1 then
+            Result.Append
+               (Ada.Strings.Unbounded.To_Unbounded_String
+                  (String_List (Value_Begin .. Value_End)));
+         end if;
+
+         return Result;
+      end Process_Comma_Separated_String;
+
    begin
       GNATCOLL.Traces.Parse_Config_File;
       Test.Common.Verbose := Arg (Cmd, Verbose);
@@ -894,6 +932,18 @@ package body Test.Actions is
          Test.Common.Generate_Test_Vectors := True;
          Test.Common.Request_Lib_Support;
 
+         if Arg (Cmd, Gen_Test_Subprograms) /= null then
+            declare
+               Subp_List : constant Test.Common.Unbounded_String_Vector :=
+                  Process_Comma_Separated_String
+                     (Arg (Cmd, Gen_Test_Subprograms).all);
+            begin
+               for E of Subp_List loop
+                  Test.Common.Add_Allowed_Subprograms (E.To_String);
+               end loop;
+            end;
+         end if;
+
          if Arg (Cmd, Enum_Strat) then
             Test.Common.TGen_Strat_Kind := TGen.Libgen.Stateful;
          end if;
@@ -1216,25 +1266,26 @@ package body Test.Actions is
       Put (" --stubs-dir=dirname    - Stub files are put in subdirs of dirname\n");
       Put ("\n");
 
-      Put (" --validate-type-extensions      - Run all tests from all parents to check LSP\n");
-      Put (" --inheritance-check             - Run inherited tests for descendants\n");
-      Put (" --no-inheritance-check          - Do not run inherited tests for descendants\n");
-      Put (" --test-case-only                - Create tests only when Test_Case is specified\n");
-      Put (" --skeleton-default=(pass|fail)  - Default behavior of unimplemented tests\n");
-      Put (" --passed-tests=(show|hide)      - Default output of passed tests\n");
-      Put (" --exit-status=(on|off)          - Default usage of the exit status\n");
-      Put (" --omit-sloc                     - Don't record subprogram sloc in test package\n");
-      Put (" --no-command-line               - Don't add command line support to test driver\n");
-      Put (" --test-duration                 - Show timing for each test\n");
-      Put (" --test-filtering                - Add test filtering option to generated driver\n");
-      Put (" --no-test-filtering             - Suppress test filtering in generated driver\n");
-      Put (" --gen-test-vectors              - Generate test inputs for supported subprograms (experimental)\n");
-      Put (" --gen-test-num=n                - Specify the number of test inputs to be generated (experimental, defaults to 5)\n");
-      Put (" --serialized-test-dir=dir       - Specify in which directory test inputs should be generated (experimental)\n");
-      Put (" --dump-test-inputs              - Dump input values of the subprogram under test as blobs during harness execution (experimental)\n");
-      Put (" --minimize                      - Minimize the generated testsuite based on structural coverage analysis (experimental)\n");
-      Put (" --minimization-filter=file:line - Only minimize tests for the subprogram declared at file:line (file must be a simple name)\n");
-      Put (" --cov-level=level               - Use level as the coverage level to guide test minimization (see gnatcov help for available choices)\n");
+      Put (" --validate-type-extensions         - Run all tests from all parents to check LSP\n");
+      Put (" --inheritance-check                - Run inherited tests for descendants\n");
+      Put (" --no-inheritance-check             - Do not run inherited tests for descendants\n");
+      Put (" --test-case-only                   - Create tests only when Test_Case is specified\n");
+      Put (" --skeleton-default=(pass|fail)     - Default behavior of unimplemented tests\n");
+      Put (" --passed-tests=(show|hide)         - Default output of passed tests\n");
+      Put (" --exit-status=(on|off)             - Default usage of the exit status\n");
+      Put (" --omit-sloc                        - Don't record subprogram sloc in test package\n");
+      Put (" --no-command-line                  - Don't add command line support to test driver\n");
+      Put (" --test-duration                    - Show timing for each test\n");
+      Put (" --test-filtering                   - Add test filtering option to generated driver\n");
+      Put (" --no-test-filtering                - Suppress test filtering in generated driver\n");
+      Put (" --gen-test-vectors                 - Generate test inputs for supported subprograms (experimental)\n");
+      Put (" --gen-test-num=n                   - Specify the number of test inputs to be generated (experimental, defaults to 5)\n");
+      Put (" --gen-test-subprograms=file:line   - Specify a comma separated list of subprograms declared at file:line to generate test cases for\n");
+      Put (" --serialized-test-dir=dir          - Specify in which directory test inputs should be generated (experimental)\n");
+      Put (" --dump-test-inputs                 - Dump input values of the subprogram under test as blobs during harness execution (experimental)\n");
+      Put (" --minimize                         - Minimize the generated testsuite based on structural coverage analysis (experimental)\n");
+      Put (" --minimization-filter=file:line    - Only minimize tests for the subprogram declared at file:line (file must be a simple name)\n");
+      Put (" --cov-level=level                  - Use level as the coverage level to guide test minimization (see gnatcov help for available choices)\n");
       Put ("\n");
 
       Put ("Tests execution mode options:\n");

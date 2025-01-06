@@ -41,6 +41,7 @@ with GNAT.Directory_Operations; use GNAT.Directory_Operations;
 with GNAT.Traceback.Symbolic;
 
 with Utils.Tool_Names;
+with Utils.String_Utilities;
 
 package body Test.Common is
 
@@ -1392,4 +1393,31 @@ package body Test.Common is
                  => Name.P_Is_Ghost_Code);
       end if;
    end Is_Ghost_Code;
+
+   -----------------------------
+   -- Add_Allowed_Subprograms --
+   -----------------------------
+
+   procedure Add_Allowed_Subprograms (Subp_Decl : String) is
+   begin
+      Allowed_Subprograms.Include (Subp_Decl);
+   end Add_Allowed_Subprograms;
+
+   ---------------------------
+   -- Is_Subprogram_Allowed --
+   ---------------------------
+
+   function Is_Subprogram_Allowed (Subp : Basic_Decl'Class) return Boolean
+   is
+      use Utils.String_Utilities;
+
+      Decl_String : constant String :=
+         Ada.Directories.Simple_Name (Subp.Unit.Get_Filename)
+         & ":"
+         & Image (Modular (Subp.Sloc_Range.Start_Line));
+   begin
+      return Allowed_Subprograms.Is_Empty
+         or else Allowed_Subprograms.Contains (Decl_String);
+   end Is_Subprogram_Allowed;
+
 end Test.Common;
