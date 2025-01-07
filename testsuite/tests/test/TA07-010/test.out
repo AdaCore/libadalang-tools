@@ -9,7 +9,11 @@ project test_simple is
 
    for Object_Dir use "test_obj";
    for Languages use Gnattest_Common'Languages & ("Ada");
-   package Compiler renames Gnattest_Common.Compiler;
+   package Compiler extends Gnattest_Common.Compiler is
+      for Default_Switches ("Ada") use 
+         Gnattest_Common.Compiler'Default_Switches ("Ada")
+            & ("-gnat2012");
+   end Compiler;
 
    package Coverage is
       for Units use ();
@@ -34,7 +38,11 @@ project Test_Driver is
    package Builder renames Gnattest_Common.Builder;
    package Linker renames Gnattest_Common.Linker;
    package Binder renames Gnattest_Common.Binder;
-   package Compiler renames Gnattest_Common.Compiler;
+   package Compiler extends Gnattest_Common.Compiler is
+      for Default_Switches ("Ada") use 
+         Gnattest_Common.Compiler'Default_Switches ("Ada")
+            & ("-gnat2012");
+   end Compiler;
 
    package Coverage is
       for Units use ();
