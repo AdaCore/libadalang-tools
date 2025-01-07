@@ -9009,11 +9009,7 @@ package body Test.Skeleton is
       S_Put (3, "for Languages use Gnattest_Common'Languages & (""Ada"");");
       Put_New_Line;
 
-      if Test.Common.Has_Preprocessor then
-         Test.Common.Write_Preprocessor_Compiler_Package (Harness_Dir_Str.all);
-      else
-         S_Put (3, "package Compiler renames Gnattest_Common.Compiler;");
-      end if;
+      Test.Common.Write_Additional_Compiler_Flags (Harness_Dir_Str.all);
       Put_New_Line;
       Put_New_Line;
 
