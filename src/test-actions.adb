@@ -881,6 +881,15 @@ package body Test.Actions is
       TGen.Libgen.Set_Preprocessing_Definitions
          (Test.Common.TGen_Libgen_Ctx, Test.Common.Preprocessor_Config);
 
+      TGen.Libgen.Set_Minimum_Lang_Version
+        (Test.Common.TGen_Libgen_Ctx,
+         (case Test.Common.Lang_Version is
+             when Ada_83 |
+                  Ada_95 |
+                  Ada_2005 |
+                  Ada_2012 => TGen.Libgen.Ada_12,
+             when Ada_2022 => TGen.Libgen.Ada_22));
+
       if Arg (Cmd, Gen_Test_Vectors) then
          Test.Common.Generate_Test_Vectors := True;
          Test.Common.Request_Lib_Support;

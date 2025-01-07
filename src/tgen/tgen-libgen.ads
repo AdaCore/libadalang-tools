@@ -52,6 +52,9 @@ package TGen.Libgen is
       Test_Generation_Part => True,
       Wrappers_Part        => True];
 
+   type Ada_Language_Version is (Unspecified, Ada_12, Ada_22);
+   --  Ada language versions
+
    type Libgen_Context is private;
 
    function Create
@@ -180,6 +183,16 @@ package TGen.Libgen is
        Data : Libadalang.Preprocessing.Preprocessor_Data);
    --  Set preprocessor definitions to the context.
 
+   procedure Set_Minimum_Lang_Version
+     (Ctx : in out Libgen_Context; Version : Ada_Language_Version);
+   --  Set the desired language version to be used in project compilation
+   --  switches. Note that if not set, no languages version switches will be
+   --  added to the generated project files.
+   --
+   --  TGen also requires at least an Ada_2012 compiler to be available, so
+   --  setting a version lower than that will result in -gnat12 being used in
+   --  the compiler switches, instead of the specified language version.
+
    function Get_Output_Dir (Ctx : Libgen_Context) return String;
    --  Get TGgen's support library output directory
 
@@ -300,6 +313,11 @@ private
 
       Has_Preprocessor_Config : Boolean;
       --  Whether the context has preprocessing definitions
+
+      Lang_Version : Ada_Language_Version := Unspecified;
+      --  Language version to be used in the compilation switches of the
+      --  generated projects. If Unspecified, no language version switch will
+      --  be added to the projects.
    end record;
 
 end TGen.Libgen;
