@@ -1778,11 +1778,21 @@ package body Test.Skeleton is
 
                   ISub := ISub_Iter;
 
+                  --  Do not process a subprogram which:
+                  --  - Is abstract or null
+                  --  - Is overriden
+                  --  - Is synthetic, such as the inequality operator
+
                   if
                     Source_Present (ISub.Unit.Get_Filename)
                     and then Is_Callable_Subprogram (ISub)
                     and then not Is_Private (ISub)
                     and then not Is_Overridden (ISub, ISubs2)
+                    and then not (ISub.Kind in Ada_Synthetic_Subp_Decl)
+                    and then not (ISub.P_Subp_Spec_Or_Null.Is_Null)
+                    and then not
+                      (ISub.P_Subp_Spec_Or_Null.Kind
+                       in Ada_Synthetic_Binary_Spec)
                   then
 
                      --  We need to go to original declaration of the inherited
@@ -7678,6 +7688,12 @@ package body Test.Skeleton is
 
          if not Source_Present (Decl.Unit.Get_Filename) then
             --
+            return Over;
+         end if;
+
+         --  Do not process synthetic decls, no stub are generated for them
+
+         if Decl.Kind in Ada_Synthetic_Subp_Decl then
             return Over;
          end if;
 
