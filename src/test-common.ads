@@ -435,10 +435,11 @@ package Test.Common is
    --  `Has_Preprocessor` and retrieve the configuration using
    --  `Preprocessor_Config` field if possible.
 
-   procedure Write_Preprocessor_Compiler_Package
-      (Preprocessor_Config_Dir : String) with Pre => Has_Preprocessor;
-   --  Write GPR Compiler package which appends preprocessor flags to the
-   --  common gnattest compiler flags
+   procedure Write_Additional_Compiler_Flags
+      (Preprocessor_Config_Dir : String);
+   --  Write additional compiler flags if needed such as preprocessing flags
+   --  and language version. This function only appends flags to the existing
+   --  one in `gnattest_common.gpr`.
 
    Preprocessor_Config : Libadalang.Preprocessing.Preprocessor_Data;
    --  Preprocessor config for the loaded user project.

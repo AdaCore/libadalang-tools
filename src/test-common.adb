@@ -1305,11 +1305,11 @@ package body Test.Common is
          Data.Default_Config.Enabled or not Data.File_Configs.Is_Empty;
    end Extract_Preprocessor_Config;
 
-   -----------------------------------------
-   -- Write_Preprocessor_Compiler_Package --
-   -----------------------------------------
+   ------------------------------------
+   -- Write_Additional_Compiler_Flags --
+   ------------------------------------
 
-   procedure Write_Preprocessor_Compiler_Package
+   procedure Write_Additional_Compiler_Flags
       (Preprocessor_Config_Dir : String) is
    begin
       Preprocessor_Config.Write_Preprocessor_Data_File
@@ -1324,14 +1324,30 @@ package body Test.Common is
       Put_New_Line;
       S_Put (9, "Gnattest_Common.Compiler'Default_Switches (""Ada"")");
       Put_New_Line;
-      S_Put (12, "& (""-gnatep="
-         & Preprocessor_Config_Dir
-         & GNAT.OS_Lib.Directory_Separator
-         & Test.Common.Preprocessor_File_Name
-         & """);");
+
+      if Test.Common.Has_Preprocessor then
+         S_Put (12, "& (""-gnatep="
+            & Preprocessor_Config_Dir
+            & GNAT.OS_Lib.Directory_Separator
+            & Test.Common.Preprocessor_File_Name
+            & """)");
+      end if;
+
+      S_Put
+         (12,
+          "& ("""
+          & (case Lang_Version is
+             when Ada_83   => "-gnat83",
+             when Ada_95   => "-gnat95",
+             when Ada_2005 => "-gnat2005",
+             when Ada_2012 => "-gnat2012",
+             when Ada_2022 => "-gnat2022")
+           & """)");
+
+      S_Put (0, ";");
       Put_New_Line;
       S_Put (3, "end Compiler;");
-   end Write_Preprocessor_Compiler_Package;
+   end Write_Additional_Compiler_Flags;
 
    ----------------------------
    -- Common_Subp_Node_Filter --
