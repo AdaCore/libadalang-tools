@@ -1,4 +1,6 @@
 description: |
   Run TGen test case generator with a complex generic packages architecture.
 
-driver: shell_script
+driver: gnattest_tgen
+
+suppress_test_dump: True

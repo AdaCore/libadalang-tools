@@ -1,4 +1,6 @@
 description: |4
      tgen test
 
-driver: shell_script
+driver: gnattest_tgen
+
+suppress_test_dump: True
