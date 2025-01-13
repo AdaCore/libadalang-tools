@@ -1849,7 +1849,7 @@ package body Test.Skeleton is
                     and then not Is_Private (ISub)
                     and then not Is_Overridden (ISub, ISubs2)
                     and then not (ISub.Kind in Ada_Synthetic_Subp_Decl)
-                    and then not (ISub.P_Subp_Spec_Or_Null.Is_Null)
+                    and then not ISub.P_Subp_Spec_Or_Null.Is_Null
                     and then not
                       (ISub.P_Subp_Spec_Or_Null.Kind
                        in Ada_Synthetic_Binary_Spec)
