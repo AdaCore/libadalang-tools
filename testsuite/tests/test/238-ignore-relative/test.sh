@@ -1,0 +1,1 @@
+gnattest -P prj.gpr

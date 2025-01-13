@@ -362,7 +362,7 @@ package body Test.Actions is
 
          procedure Include_One (File_Name : String) is
          begin
-            Ignored.Include (File_Name);
+            Ignored.Include (Ada.Directories.Simple_Name (File_Name));
          end Include_One;
       begin
          for Ignored_Arg of Arg (Cmd, Ignore) loop
