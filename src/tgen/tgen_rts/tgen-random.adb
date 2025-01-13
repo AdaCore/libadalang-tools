@@ -352,7 +352,7 @@ package body TGen.Random is
                   Result_Sign :=
                     (if Intermediate_Exp < 0 then -1 else 1);
                   Result_Exp :=
-                    Unsigned_Type (abs (Intermediate_Exp));
+                    Unsigned_Type (abs Intermediate_Exp);
                   Result_Mantissa :=
                     Unsigned_Type
                       (Int_Type (MS_Part) + Result_Sign

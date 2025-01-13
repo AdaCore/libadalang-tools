@@ -798,7 +798,7 @@ package body Pp.Scanner is
 
    procedure Next (Cur : in out Tokn_Cursor) is
    begin
-      pragma Assert (not (After_Last (Cur)));
+      pragma Assert (not After_Last (Cur));
 
       --  Skip over the extra information stored in Octets; this must match
       --  Append_Tokn.
