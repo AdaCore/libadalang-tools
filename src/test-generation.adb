@@ -34,6 +34,7 @@ with Utils.Drivers;      use Utils.Drivers;
 with Utils.Environment;  use Utils.Environment;
 
 with GNATCOLL.OS.Process;
+with GNATCOLL.Traces; use GNATCOLL.Traces;
 
 with Libadalang.Common; use Libadalang.Common;
 
@@ -43,6 +44,8 @@ with TGen.Libgen; use TGen.Libgen;
 with TGen.Strings;
 
 package body Test.Generation is
+
+   Me : constant Trace_Handle := Create ("Generation", Default => Off);
 
    Global_Aspect_Name : constant Langkit_Support.Text.Unbounded_Text_Type :=
      Langkit_Support.Text.To_Unbounded_Text ("Global");
@@ -113,7 +116,7 @@ package body Test.Generation is
          --  user is filtering test generation).
 
          if not Test.Common.Is_Subprogram_Allowed (Node.As_Basic_Decl) then
-            Report_Std (Node.Image & ": subprogram skipped");
+            Me.Trace (Node.Image & ": subprogram skipped");
             return Over;
          end if;
 
