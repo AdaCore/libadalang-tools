@@ -58,6 +58,20 @@ package body Test.Generation is
    function Traverse_Helper (Node : Ada_Node'Class) return Visit_Status is
       use TGen.Strings;
       Diags : String_Vector;
+
+      procedure Report_Failures;
+      --  Reports processing failures and skipped subprograms to the user.
+
+      ---------------------
+      -- Report_Failures --
+      ---------------------
+
+      procedure Report_Failures is
+      begin
+         Report_Err
+           ("Error while processing " & Node.Image & ":" & ASCII.LF
+            & Join (Diags) & ASCII.LF);
+      end Report_Failures;
    begin
       --  Do not traverse package bodies
 
@@ -95,6 +109,14 @@ package body Test.Generation is
         | Ada_Subp_Renaming_Decl
       then
 
+         --  Don't do anything if the subprogram isn't allowed (in case the
+         --  user is filtering test generation).
+
+         if not Test.Common.Is_Subprogram_Allowed (Node.As_Basic_Decl) then
+            Report_Std (Node.Image & ": subprogram skipped");
+            return Over;
+         end if;
+
          --  Check, if the subprogram has zero parameters. If so, only add it
          --  to the generation context if it has a global annotation.
 
@@ -121,9 +143,7 @@ package body Test.Generation is
                  (Test.Common.TGen_Libgen_Ctx, Node.As_Basic_Decl, Diags,
                   Is_Top_Level_Generic_Instantiation => True)
                then
-                  Report_Err
-                    ("Error while processing " & Node.Image & ":" & ASCII.LF
-                     & Join (Diags) & ASCII.LF);
+                  Report_Failures;
                end if;
                return Over;
             end if;
@@ -132,10 +152,7 @@ package body Test.Generation is
          if not Include_Subp
            (Test.Common.TGen_Libgen_Ctx, Node.As_Basic_Decl, Diags)
          then
-
-            Report_Err
-              ("Error while processing " & Node.Image & ":" & ASCII.LF
-               & Join (Diags) & ASCII.LF);
+            Report_Failures;
          end if;
          return Over;
       end if;
