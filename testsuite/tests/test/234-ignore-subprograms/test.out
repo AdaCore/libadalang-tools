@@ -1,5 +1,3 @@
-<ExprFunction ["Mul"] pkg.ads:4:4-4:70>: subprogram skipped
-<ExprFunction ["Div"] pkg.ads:5:4-5:70>: subprogram skipped
 pkg.ads:3:4: info: corresponding test PASSED
 pkg.ads:3:4: info: corresponding test PASSED
 pkg.ads:3:4: info: corresponding test PASSED
