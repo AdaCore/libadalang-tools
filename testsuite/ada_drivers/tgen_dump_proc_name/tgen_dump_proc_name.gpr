@@ -1,0 +1,11 @@
+with "../../../src/lal_tools.gpr";
+with "libadalang.gpr";
+
+project TGen_Dump_Proc_Name is
+   for Source_Dirs use (".");
+   for Object_Dir use "obj";
+   for Exec_Dir use "../bin/";
+   for Main use ("tgen_dump_proc_name.adb");
+
+   package Compiler renames LAL_Tools.Compiler;
+end TGen_Dump_Proc_Name;

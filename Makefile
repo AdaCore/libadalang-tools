@@ -20,7 +20,8 @@ TESTSUITE_PROJECTS ?= \
 	testsuite/ada_drivers/gen_marshalling_lib/tgen_marshalling.gpr \
 	testsuite/ada_drivers/indent/indent.gpr \
 	testsuite/ada_drivers/outgoing_calls/outgoing_calls.gpr \
-	testsuite/ada_drivers/partial_gnatpp/partial_gnatpp.gpr
+	testsuite/ada_drivers/partial_gnatpp/partial_gnatpp.gpr \
+	testsuite/ada_drivers/tgen_dump_proc_name/tgen_dump_proc_name.gpr
 
 ALL_PROJECTS = \
 	$(BIN_PROJECTS) $(LIB_PROJECTS) $(TESTSUITE_PROJECTS)

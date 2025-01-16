@@ -14,8 +14,10 @@ with Test.Common;
 with TGen.Libgen;
 with TGen.Strings;
 
-procedure Main is
+procedure TGen_Dump_Proc_Name is
    package LAL renames Libadalang.Analysis;
+
+   function Load_Project return LAL.Unit_Provider_Reference;
 
    function Load_Project return LAL.Unit_Provider_Reference is
       package GPR renames GNATCOLL.Projects;
@@ -65,4 +67,4 @@ begin
               ("TGen_Generic_Instantiation_user_instantiation"),
             Ada.Strings.Unbounded.To_Unbounded_String
               ("user_instantiation.Plus_Two"))));
-end Main;
+end TGen_Dump_Proc_Name;
