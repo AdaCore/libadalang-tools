@@ -2,8 +2,5 @@
 
 LALTOOLS_ROOT=$(dirname $(which gnattest))/..
 TEMPLATES_PATH=$LALTOOLS_ROOT/share/tgen/templates
-export GPR_PROJECT_PATH="$LALTOOLS_ROOT/src:$GPR_PROJECT_PATH"
 
-mkdir -p obj/tgen
-gprbuild -q -P build.gpr
-./main user.gpr $TEMPLATES_PATH src/*.ads
+tgen_dump_proc_name user.gpr $TEMPLATES_PATH src/*.ads
