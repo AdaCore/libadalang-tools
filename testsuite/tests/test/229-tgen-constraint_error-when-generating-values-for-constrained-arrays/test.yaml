@@ -2,4 +2,6 @@ description: |
   This test generates test cases using TGen with an Array whose Index type
   is a subtype of `Interface.Unsigned_32` with range constraints.
 
-driver: shell_script
+driver: gnattest_tgen
+
+suppress_test_dump: True

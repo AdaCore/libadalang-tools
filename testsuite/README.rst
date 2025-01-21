@@ -17,12 +17,15 @@ Then, in the ``testsuite/`` directory, run:
 
 .. code-block:: text
 
-    ./testsuite.py
+    ./testsuite.py [--setup-tgen-rts]
 
 This will run all the testcases (showing progression on standard output) and
 put a report in the ``out/`` directory. Note that you can actually run the
 testsuite from whatever directory that suits you: in any case, it will create
 the ``out/`` report in the current directory.
+
+The --setup-tgen-rts flag is only required if you have not already built &
+installed the TGen_RTS runtime project already.
 
 To run only specific testcases pass these testcases as arguments to the
 ``testsuite.py`` script.  For instance:
@@ -39,6 +42,27 @@ instance: ``--show-error-output`` will display the difference between expected
 output and actual one on standard output. You can discover these options with
 ``testsuite.py``'s ``--help`` flag.
 
+Running the testsuite in gnatfuzz-testsuite mode
+------------------------------------------------
+
+It is possible to use the testsuite to sanity check the functionality of
+gnattest + TGen on the benchmarks stored in the internal-fuzz-testsuite
+repository. Do to so, you'll need to clone the internal-fuzz-testsuite, then
+run:
+
+.. code-block:: text
+
+    ./testsuite.py [--setup-tgen-rts] --gnatfuzz-tests <path to internal-fuzz-testsuite>
+
+If the path to the internal-fuzz-testsuite repository is not specified, the
+testsuite will attempt to run all the regular laltools tests using the
+gnattest_tgen test driver, which will fail, if only for lack of an appropriate
+baseline.
+
+In this mode, the baseline file in each of the tests should be named
+gnattest_baseline.out, so that the baseline is not mixed-up with regular
+gnatfuzz baselines. the --rewrite switch can be used to update the contents of
+this file.
 
 How to write new testcases
 ==========================

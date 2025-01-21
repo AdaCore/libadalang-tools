@@ -24,6 +24,21 @@ include:
       image: pe-base
       cpus: 16
 
+  - component: $CI_SERVER_FQDN/eng/gitlab-templates/test@~latest
+    inputs:
+      job-name: laltools-gnatfuzz
+      anod-args: run test_gnatfuzz_tests
+      image: pe-base
+      cpus: 8
+      rules:
+        - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+          changes:
+            paths:
+              - src/tgen/**/*
+              - src/test-*
+              - share/tgen/templates/**/*
+            compare_to: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+
   # Optional testing of ALS
   - component: $CI_SERVER_FQDN/eng/gitlab-templates/test@~latest
     inputs:

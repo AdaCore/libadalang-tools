@@ -3,6 +3,9 @@ description:
     generates values for array types that have a constrained subtype as
     an index type. It used to crash when trying to generate values.
 
-driver: shell_script
+driver: gnattest_tgen
+
+suppress_test_dump: True
+
 control:
     - [XFAIL, 'x86', 'Marshalling not working for 32bits (UB03-008)']

@@ -2,4 +2,6 @@ description:
   Check that a warning is emitted when a top level generic package contains
   private subprograms.
 
-driver: shell_script
+driver: gnattest_tgen
+
+suppress_test_dump: True
