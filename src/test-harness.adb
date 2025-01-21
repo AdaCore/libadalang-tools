@@ -3808,6 +3808,10 @@ package body Test.Harness is
 
       Switches : GNAT.Strings.String_List_Access;
 
+      Common_Switches : GNAT.Strings.String_List_Access;
+      --  Will be used to store the values of the "for Switches("*") use ..."
+      --  and propagate them everywhere.
+
       Switches_From_Prj     : Boolean := False;
       Switches_From_Default : Boolean := False;
       --  Used to keep track of the origin of the gnatcov switches (from
@@ -3837,14 +3841,27 @@ package body Test.Harness is
          S_Put (0, "# Switches for the various gnatcov commands");
          Put_New_Line;
 
+         if Root_Prj.Has_Attribute (Switches_Attribute, Index => "*") then
+            Common_Switches :=
+              Root_Prj.Attribute_Value (Switches_Attribute, Index => "*");
+         else
+            Common_Switches := new GNAT.Strings.String_List'([]);
+         end if;
+
          --  Instrument switches
 
          if Root_Prj.Has_Attribute (Switches_Attribute, Index => "instrument")
+           or else Common_Switches.all'Length /= 0
          then
             Switches := Root_Prj.Attribute_Value
               (Switches_Attribute, Index => "instrument");
+            if Switches = null then
+               Switches := new GNAT.Strings.String_List'([]);
+            end if;
             S_Put (0, "SWITCHES_INSTRUMENT=");
-            for Switch of Switches.all loop
+            for Switch of GNAT.Strings.String_List'
+              (Common_Switches.all & Switches.all)
+            loop
                S_Put (0, Switch.all & ' ');
             end loop;
             GNAT.Strings.Free (Switches);
@@ -3869,11 +3886,17 @@ package body Test.Harness is
          --  Run switches
 
          if Root_Prj.Has_Attribute (Switches_Attribute, Index => "run")
+           or else Common_Switches.all'Length /= 0
          then
             Switches := Root_Prj.Attribute_Value
               (Switches_Attribute, Index => "run");
+            if Switches = null then
+               Switches := new GNAT.Strings.String_List'([]);
+            end if;
             S_Put (0, "SWITCHES_RUN=");
-            for Switch of Switches.all loop
+            for Switch of GNAT.Strings.String_List'
+              (Common_Switches.all & Switches.all)
+            loop
                S_Put (0, Switch.all & ' ');
             end loop;
             GNAT.Strings.Free (Switches);
@@ -3891,11 +3914,17 @@ package body Test.Harness is
          --  Coverage switches
 
          if Root_Prj.Has_Attribute (Switches_Attribute, Index => "coverage")
+           or else Common_Switches.all'Length /= 0
          then
             Switches := Root_Prj.Attribute_Value
               (Switches_Attribute, Index => "coverage");
+            if Switches = null then
+               Switches := new GNAT.Strings.String_List'([]);
+            end if;
             S_Put (0, "SWITCHES_COVERAGE=");
-            for Switch of Switches.all loop
+            for Switch of GNAT.Strings.String_List'
+              (Common_Switches.all & Switches.all)
+            loop
                S_Put (0, Switch.all & ' ');
             end loop;
             GNAT.Strings.Free (Switches);
@@ -3911,6 +3940,8 @@ package body Test.Harness is
          end if;
          Put_New_Line;
          Put_New_Line;
+
+         GNAT.Strings.Free (Common_Switches);
 
          --  If there are both switches from the project file and "default"
          --  switches in the makefile, warn the user that there may be

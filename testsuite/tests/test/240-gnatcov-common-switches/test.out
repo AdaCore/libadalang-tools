@@ -1,0 +1,16 @@
+# Settings in this file were extracted from the source project
+# or are gnattest default values if they weren't specified in the source project.
+# They may need adjustments to fit your particular coverage needs.
+# This file won't be overwritten when regenerating the harness.
+
+# Switches for the various gnatcov commands
+SWITCHES_INSTRUMENT=-q --level=stmt+mcdc 
+
+SWITCHES_RUN=-q --level=stmt+mcdc 
+
+SWITCHES_COVERAGE=-q --level=stmt+mcdc --annotate=report --save-checkpoint=ckpt 
+
+# Path to the installed gnatcov rts project file.
+# No need to specify it if the project file path was added to the GPR_PROJECT_PATH environment variable.
+GNATCOV_RTS=
+
