@@ -9,9 +9,9 @@
       @_TY_PREFIX_@_Size_Max;
 
    procedure @_TY_PREFIX_@_Write_All
-     (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class;
-      @_GLOBAL_PREFIX_@_Buffer : in out Unsigned_8;
-      @_GLOBAL_PREFIX_@_Offset : in out Offset_Type;
+     (@_GLOBAL_PREFIX_@_Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+      @_GLOBAL_PREFIX_@_Buffer : in out Interfaces.Unsigned_8;
+      @_GLOBAL_PREFIX_@_Offset : in out TGen.Marshalling_Lib.Offset_Type;
       @_GLOBAL_PREFIX_@_V      : TGen.TGen_Std.@_TY_NAME_@)
    is
    begin
@@ -29,9 +29,9 @@
    end @_TY_PREFIX_@_Write_All;
 
    procedure @_TY_PREFIX_@_Read_All
-     (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class;
-      @_GLOBAL_PREFIX_@_Buffer : in out Unsigned_8;
-      @_GLOBAL_PREFIX_@_Offset : in out Offset_Type;
+     (@_GLOBAL_PREFIX_@_Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+      @_GLOBAL_PREFIX_@_Buffer : in out Interfaces.Unsigned_8;
+      @_GLOBAL_PREFIX_@_Offset : in out TGen.Marshalling_Lib.Offset_Type;
       @_GLOBAL_PREFIX_@_V      : out TGen.TGen_Std.@_TY_NAME_@)
    is
       @_GLOBAL_PREFIX_@_H : @_TY_PREFIX_@_Header_Type;
@@ -51,7 +51,7 @@
             @_TY_PREFIX_@_Size (@_GLOBAL_PREFIX_@_V));
 
       if @_GLOBAL_PREFIX_@_V not in TGen.TGen_Std.@_TY_NAME_@ then
-        raise Invalid_Value;
+        raise TGen.Marshalling_Lib.Invalid_Value;
       end if;
    end @_TY_PREFIX_@_Read_All;
 

@@ -237,12 +237,10 @@ package body TGen.Libgen is
 
    begin
       Create (F_Spec, Out_File, File_Name & ".ads");
-      Put (F_Spec, "with TGen.Marshalling_Lib; ");
-      Put_Line (F_Spec, "use TGen.Marshalling_Lib;");
+      Put_Line (F_Spec, "with TGen.Marshalling_Lib;");
       Put_Line (F_Spec, "with TGen.JSON;");
-      Put (F_Spec, "with Interfaces; ");
-      Put_Line (F_Spec, "use Interfaces;");
-      Put_Line (F_Spec, "with Ada.Streams; use Ada.Streams;");
+      Put_Line (F_Spec, "with Interfaces;");
+      Put_Line (F_Spec, "with Ada.Streams;");
       Put_Line (F_Spec, "with TGen.Strings;");
       Put_Line (F_Spec, "with TGen.Big_Int;");
       Put_Line (F_Spec, "with TGen.Types;");
@@ -336,6 +334,15 @@ package body TGen.Libgen is
 
       Put_Line
         (F_Body, "package body " & Ada_Pack_Name & " is");
+      New_Line (F_Body);
+
+      --  Put the `use` clauses under the package body to prevent compiler
+      --  errors when the base package is predefined (use clauses are forbidden
+      --  in predefined specs).
+
+      Put_Line (F_Body, "use Ada.Streams;");
+      Put_Line (F_Body, "use Interfaces;");
+      Put_Line (F_Body, "use TGen.Marshalling_Lib;");
       New_Line (F_Body);
 
       --  Complete the dummy null procedure
@@ -505,9 +512,8 @@ package body TGen.Libgen is
    begin
       Create (F_Spec, Out_File, File_Name & ".ads");
       Create (F_Body, Out_File, File_Name & ".adb");
-      Put (F_Spec, "with Interfaces; ");
-      Put_Line (F_Spec, "use Interfaces;");
-      Put_Line (F_Spec, "with Ada.Streams; use Ada.Streams;");
+      Put_Line (F_Spec, "with Interfaces;");
+      Put_Line (F_Spec, "with Ada.Streams;");
       Put_Line (F_Spec, "with TGen.JSON;");
       Put_Line (F_Spec, "with TGen.Strategies;");
       Put_Line (F_Spec, "with TGen.Strings;");
@@ -596,6 +602,13 @@ package body TGen.Libgen is
       New_Line (F_Spec);
 
       Put_Line (F_Body, "package body " & Ada_Pack_Name & " is");
+      New_Line (F_Body);
+
+      --  Put the `use` clauses under the package to prevent compiler errors
+      --  when the base package is predefined.
+
+      Put_Line (F_Body, "use Ada.Streams;");
+      Put_Line (F_Body, "use Interfaces;");
       New_Line (F_Body);
 
       --  We have to make sure to generate the initialization code in the
