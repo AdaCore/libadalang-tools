@@ -64,7 +64,7 @@ procedure Example_Gen is
 
 begin
 
-   Test_Proc_Dump_TC
+   My_File_Test_Proc_0e31b625e8e24f10_Dump_TC
      (TGen_Marshalling_A         => String_Inst,
       TGen_Marshalling_D         => Shape_Inst,
       TGen_Marshalling_M         => Matrix_Inst,
@@ -75,7 +75,7 @@ begin
       TGen_Marshalling_Unit_JSON => Unit_JSON,
       TGen_Marshalling_Origin    => "First write");
 
-   Test_Proc_Dump_TC
+   My_File_Test_Proc_0e31b625e8e24f10_Dump_TC
      (TGen_Marshalling_A         => String_Inst,
       TGen_Marshalling_D         => Shape_Inst,
       TGen_Marshalling_M         => Matrix_Inst,
@@ -86,10 +86,10 @@ begin
       TGen_Marshalling_Unit_JSON => Unit_JSON,
       TGen_Marshalling_Origin    => "Second write");
 
-   Actual_Ident_Dump_TC (T_Gen_Inst, Unit_JSON, "First write");
-   Actual_Ident_Dump_TC (T_Gen_Inst, Unit_JSON, "Second write");
-   Use_Null_Rec_Dump_TC (T_Null_Inst, Unit_JSON, "First Write");
-   Use_Null_Rec_Dump_TC (T_Null_Inst, Unit_JSON, "Second Write");
+   my_file_actual_ident_5e1d01120f468a24_Dump_TC (T_Gen_Inst, Unit_JSON, "First write");
+   my_file_actual_ident_5e1d01120f468a24_Dump_TC (T_Gen_Inst, Unit_JSON, "Second write");
+   my_file_use_null_rec_d9e626ae7e5c9f3e_Dump_TC (T_Null_Inst, Unit_JSON, "First Write");
+   my_file_use_null_rec_d9e626ae7e5c9f3e_Dump_TC (T_Null_Inst, Unit_JSON, "Second Write");
 
    Put_Line (Unit_JSON.Write (Compact => False));
 

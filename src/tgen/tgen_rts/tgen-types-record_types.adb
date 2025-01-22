@@ -22,6 +22,7 @@
 ------------------------------------------------------------------------------
 
 with Ada.Containers;        use Ada.Containers;
+with Ada.Environment_Variables;
 with Ada.Strings;           use Ada.Strings;
 with Ada.Strings.Equal_Case_Insensitive;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
@@ -1890,6 +1891,12 @@ package body TGen.Types.Record_Types is
    is
       Temp : Ada_Qualified_Name;
    begin
+      if Ada.Environment_Variables.Exists ("TGEN_DEBUG_NAMES") then
+         return (if Is_Operator (Self.Simple_Name)
+                 then Map_Operator_Name (Self.Simple_Name)
+                 else Self.Simple_Name);
+      end if;
+
       --  Build a new qualified name, replacing operator names by an
       --  ada-compliant identifier.
 

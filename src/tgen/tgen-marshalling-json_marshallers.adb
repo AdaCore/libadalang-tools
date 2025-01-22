@@ -306,10 +306,7 @@ package body TGen.Marshalling.JSON_Marshallers is
       Global_Full_Types : Vector_Tag;
       Global_Slugs      : Vector_Tag;
       Global_Types_FNs  : Vector_Tag;
-      Proc_Name         : constant String :=
-         (if FN_Typ.Is_Generic and then not Is_Operator (FN_Typ.Simple_Name)
-          then To_Symbol (FN_Typ.Name, Sep => '_')
-          else FN_Typ.Simple_Name);
+      Proc_Name         : constant String := FN_Typ.Slug;
    begin
       if FN_Typ.Component_Types.Is_Empty and then FN_Typ.Globals.Is_Empty then
          return;

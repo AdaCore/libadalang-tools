@@ -408,6 +408,10 @@ package TGen.Types.Record_Types is
       return String;
    --  Return a unique identifier for Typ. This transforms the names of
    --  operators.
+   --  If the environment variable `TGEN_DEBUG_NAMES` is set, the function
+   --  returns only the function name in a readable manner. Be aware that
+   --  returned names may not be unique if this variable is set. Only use
+   --  this for debugging purposes.
 
    function Simple_Name (Self : Function_Typ) return String is
       (+Unbounded_String (Self.Name.Element (Self.Name.Last_Index - 1)));

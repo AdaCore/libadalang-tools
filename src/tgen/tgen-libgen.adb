@@ -237,12 +237,10 @@ package body TGen.Libgen is
 
    begin
       Create (F_Spec, Out_File, File_Name & ".ads");
-      Put (F_Spec, "with TGen.Marshalling_Lib; ");
-      Put_Line (F_Spec, "use TGen.Marshalling_Lib;");
+      Put_Line (F_Spec, "with TGen.Marshalling_Lib;");
       Put_Line (F_Spec, "with TGen.JSON;");
-      Put (F_Spec, "with Interfaces; ");
-      Put_Line (F_Spec, "use Interfaces;");
-      Put_Line (F_Spec, "with Ada.Streams; use Ada.Streams;");
+      Put_Line (F_Spec, "with Interfaces;");
+      Put_Line (F_Spec, "with Ada.Streams;");
       Put_Line (F_Spec, "with TGen.Strings;");
       Put_Line (F_Spec, "with TGen.Big_Int;");
       Put_Line (F_Spec, "with TGen.Types;");
@@ -336,6 +334,15 @@ package body TGen.Libgen is
 
       Put_Line
         (F_Body, "package body " & Ada_Pack_Name & " is");
+      New_Line (F_Body);
+
+      --  Put the `use` clauses under the package body to prevent compiler
+      --  errors when the base package is predefined (use clauses are forbidden
+      --  in predefined specs).
+
+      Put_Line (F_Body, "use Ada.Streams;");
+      Put_Line (F_Body, "use Interfaces;");
+      Put_Line (F_Body, "use TGen.Marshalling_Lib;");
       New_Line (F_Body);
 
       --  Complete the dummy null procedure
@@ -505,9 +512,8 @@ package body TGen.Libgen is
    begin
       Create (F_Spec, Out_File, File_Name & ".ads");
       Create (F_Body, Out_File, File_Name & ".adb");
-      Put (F_Spec, "with Interfaces; ");
-      Put_Line (F_Spec, "use Interfaces;");
-      Put_Line (F_Spec, "with Ada.Streams; use Ada.Streams;");
+      Put_Line (F_Spec, "with Interfaces;");
+      Put_Line (F_Spec, "with Ada.Streams;");
       Put_Line (F_Spec, "with TGen.JSON;");
       Put_Line (F_Spec, "with TGen.Strategies;");
       Put_Line (F_Spec, "with TGen.Strings;");
@@ -596,6 +602,13 @@ package body TGen.Libgen is
       New_Line (F_Spec);
 
       Put_Line (F_Body, "package body " & Ada_Pack_Name & " is");
+      New_Line (F_Body);
+
+      --  Put the `use` clauses under the package to prevent compiler errors
+      --  when the base package is predefined.
+
+      Put_Line (F_Body, "use Ada.Streams;");
+      Put_Line (F_Body, "use Interfaces;");
       New_Line (F_Body);
 
       --  We have to make sure to generate the initialization code in the
@@ -1409,15 +1422,7 @@ package body TGen.Libgen is
             Global_Input_FNs  : Vector_Tag;
             Global_Output_FNs : Vector_Tag;
 
-            Real_Name : constant String :=
-               (if Subp.Get.Is_Generic
-                then
-                   To_Symbol (As_Function_Typ (Subp).Name, Sep => '_')
-                else As_Function_Typ (Subp).Simple_Name);
-            Subp_Name : constant String :=
-              (if Is_Operator (Real_Name)
-               then Map_Operator_Name (Real_Name)
-               else Real_Name);
+            Subp_Name : constant String := As_Function_Typ (Subp).Slug;
 
             Concrete_Typ : SP.Ref;
             --  Shortcut to hold the concrete type of a parameter
@@ -1433,7 +1438,7 @@ package body TGen.Libgen is
             Assocs.Insert (Assoc ("GLOBAL_PREFIX", Global_Prefix));
             Assocs.Insert (Assoc ("NUM_TESTS", Default_Test_Num));
             Assocs.Insert (Assoc ("ENUM_STRAT", Default_Strat = Stateful));
-            Assocs.Insert (Assoc ("SUBP_NAME", (Subp_Name)));
+            Assocs.Insert (Assoc ("SUBP_NAME", Subp_Name));
             Assocs.Insert
               (Assoc ("SUBP_UID", As_Function_Typ (Subp).Subp_UID));
             Assocs.Insert
@@ -1539,14 +1544,7 @@ package body TGen.Libgen is
       Put_Line (F_Body, "   begin");
       for Subp of Subps loop
          declare
-            Real_Name   : constant String :=
-               (if Subp.Get.Is_Generic
-                then To_Symbol (As_Function_Typ (Subp).Name, Sep => '_')
-                else As_Function_Typ (Subp).Simple_Name);
-            Subp_Name   : constant String :=
-              (if Is_Operator (Real_Name)
-               then Map_Operator_Name (Real_Name)
-               else Real_Name);
+            Subp_Name   : constant String := As_Function_Typ (Subp).Slug;
          begin
             Put_Line
               (F_Body,
@@ -1843,10 +1841,8 @@ package body TGen.Libgen is
             if Ada.Strings.Unbounded.Equal_Case_Insensitive (Ty_FQN, Subp_FQN)
             then
                return To_Unbounded_String
-                  ((if Ty.Get.Top_Level_Generic or else Ty.Get.Is_Generic
-                    then To_Symbol (Ty.Get.Name, Sep => '_')
-                    else Ty.Get.Simple_Name)
-                     & "_Dump_TC");
+                  (Ty.Get.Slug (Top_Level_Generic => Is_Top_Level_Generic)
+                   & "_Dump_TC");
             end if;
          end;
       end loop;

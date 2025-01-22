@@ -18,9 +18,9 @@
    --  Input and Output subprograms for headers of type @_TY_NAME_@
 
    procedure @_TY_PREFIX_@_Read_Header
-     (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class;
-      @_GLOBAL_PREFIX_@_Buffer : in out Unsigned_8;
-      @_GLOBAL_PREFIX_@_Offset : in out Offset_Type;
+     (@_GLOBAL_PREFIX_@_Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+      @_GLOBAL_PREFIX_@_Buffer : in out Interfaces.Unsigned_8;
+      @_GLOBAL_PREFIX_@_Offset : in out TGen.Marshalling_Lib.Offset_Type;
       @_GLOBAL_PREFIX_@_V      : out @_TY_PREFIX_@_Header_Type)
    is
    begin
@@ -43,9 +43,9 @@
    end @_TY_PREFIX_@_Read_Header;
 
    procedure @_TY_PREFIX_@_Write_Header
-     (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class;
-      @_GLOBAL_PREFIX_@_Buffer : in out Unsigned_8;
-      @_GLOBAL_PREFIX_@_Offset : in out Offset_Type;
+     (@_GLOBAL_PREFIX_@_Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+      @_GLOBAL_PREFIX_@_Buffer : in out Interfaces.Unsigned_8;
+      @_GLOBAL_PREFIX_@_Offset : in out TGen.Marshalling_Lib.Offset_Type;
       @_GLOBAL_PREFIX_@_V      : TGen.TGen_Std.@_TY_NAME_@)
    is
    begin
@@ -110,11 +110,11 @@
    end @_TY_PREFIX_@_Init_From_Header;
 
    function @_TY_PREFIX_@_Input_Header
-     (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class)
+     (@_GLOBAL_PREFIX_@_Stream : not null access Ada.Streams.Root_Stream_Type'Class)
      return @_TY_PREFIX_@_Header_Type
    is
-      @_GLOBAL_PREFIX_@_Buffer : Unsigned_8 := 0;
-      @_GLOBAL_PREFIX_@_Offset : Offset_Type := 0;
+      @_GLOBAL_PREFIX_@_Buffer : Interfaces.Unsigned_8 := 0;
+      @_GLOBAL_PREFIX_@_Offset : TGen.Marshalling_Lib.Offset_Type := 0;
    begin
       return @_GLOBAL_PREFIX_@_V : @_TY_PREFIX_@_Header_Type do
         @_TY_PREFIX_@_Read_Header
@@ -124,17 +124,17 @@
    end @_TY_PREFIX_@_Input_Header;
 
    procedure @_TY_PREFIX_@_Output_Header
-     (@_GLOBAL_PREFIX_@_Stream : not null access Root_Stream_Type'Class;
+     (@_GLOBAL_PREFIX_@_Stream : not null access Ada.Streams.Root_Stream_Type'Class;
       @_GLOBAL_PREFIX_@_V      : TGen.TGen_Std.@_TY_NAME_@)
    is
-      @_GLOBAL_PREFIX_@_Buffer : Unsigned_8 := 0;
-      @_GLOBAL_PREFIX_@_Offset : Offset_Type := 0;
+      @_GLOBAL_PREFIX_@_Buffer : Interfaces.Unsigned_8 := 0;
+      @_GLOBAL_PREFIX_@_Offset : TGen.Marshalling_Lib.Offset_Type := 0;
    begin
       @_TY_PREFIX_@_Write_Header
          (@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer,
           @_GLOBAL_PREFIX_@_Offset, @_GLOBAL_PREFIX_@_V);
       if @_GLOBAL_PREFIX_@_Offset /= 0 then
-         Unsigned_8'Write (@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer);
+         Interfaces.Unsigned_8'Write (@_GLOBAL_PREFIX_@_Stream, @_GLOBAL_PREFIX_@_Buffer);
       end if;
    end @_TY_PREFIX_@_Output_Header;
 
