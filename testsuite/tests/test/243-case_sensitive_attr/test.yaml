@@ -1,0 +1,7 @@
+description:
+  For switches --skeleton_default, --passed_tests, --separate-drivers and
+  --exit-status, check that passing one of their two possible options is
+  accepted in any casing.
+
+driver: shell_script
+

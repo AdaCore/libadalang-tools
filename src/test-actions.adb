@@ -220,16 +220,26 @@ package body Test.Actions is
       Test.Common.Lang_Version :=
         Utils.Command_Lines.Common.Ada_Version_Switches.Arg (Cmd);
 
-      if Arg (Cmd, Passed_Tests) /= null then
-         if Arg (Cmd, Passed_Tests).all = "hide" then
-            Test.Common.Show_Passed_Tests := False;
-         elsif Arg (Cmd, Passed_Tests).all = "show" then
-            Test.Common.Show_Passed_Tests := True;
-         else
-            Cmd_Error_No_Help
-              ("--passed-tests should be either show or hide");
+      --  Passed_Tests
+      declare
+         Passed_Test_Arg     : constant String_Ref := Arg (Cmd, Passed_Tests);
+         Present             : constant Boolean := Passed_Test_Arg /= null;
+         Passed_Test_Arg_Val : constant String :=
+           (if Present then To_Lower (Passed_Test_Arg.all) else "");
+      begin
+         if Present then
+            if Passed_Test_Arg_Val = "hide" then
+               Test.Common.Show_Passed_Tests := False;
+
+            elsif Passed_Test_Arg_Val = "show" then
+               Test.Common.Show_Passed_Tests := True;
+
+            else
+               Cmd_Error_No_Help
+                ("--passed-tests should be either show or hide");
+            end if;
          end if;
-      end if;
+      end;
 
       if Status (Tool.Project_Tree.all) = Empty then
 
@@ -571,57 +581,93 @@ package body Test.Actions is
 
       --  Default behaviour of tests
       declare
+         Skeleton_Default_Switch : constant String_Ref :=
+           Arg (Cmd, Skeleton_Default);
+
          Skeleton_Default_Att : constant Attribute_Pkg_String :=
            Build_Att_String ("skeletons_default");
+
+         Present : constant Boolean :=
+           Skeleton_Default_Switch /= null
+           or else Root_Prj.Has_Attribute (Skeleton_Default_Att);
+
          Skeleton_Default_Val : constant String :=
-           (if Arg (Cmd, Skeleton_Default) = null then
-               (if Root_Prj.Has_Attribute (Skeleton_Default_Att) then
-                   Root_Prj.Attribute_Value (Skeleton_Default_Att)
-                else
-                    "")
-            else Arg (Cmd, Skeleton_Default).all);
+           To_Lower
+             ((if Skeleton_Default_Switch = null then
+                (if Root_Prj.Has_Attribute (Skeleton_Default_Att)
+                 then Root_Prj.Attribute_Value (Skeleton_Default_Att)
+                 else "")
+              else Arg (Cmd, Skeleton_Default).all));
+         --  If Skeleton_Default was specified through a switch, use this
+         --  value. Otherwise, if it was specified through a project file
+         --  attribute, use this value. If it was not specified, set it to the
+         --  empty string.
       begin
-         if Skeleton_Default_Val = "pass" then
-            Test.Common.Skeletons_Fail := False;
-         elsif Skeleton_Default_Val = "fail" then
-            Test.Common.Skeletons_Fail := True;
-         elsif Skeleton_Default_Val /= "" then
-            if Arg (Cmd, Skeleton_Default) = null then
+         if Present then
+            if Skeleton_Default_Val = "pass" then
+               Test.Common.Skeletons_Fail := False;
+
+            elsif Skeleton_Default_Val = "fail" then
+               Test.Common.Skeletons_Fail := True;
+
+            elsif Skeleton_Default_Val /= "" then
                Cmd_Error_No_Help
-                 ("--skeleton-default should be either fail or pass");
-            else
-               Cmd_Error_No_Help
-                 ("Gnattest.Skeletons_Default should be either fail or pass");
+                 ((if Skeleton_Default_Switch /= null
+                  then "--skeleton-default"
+                  else "Gnattest.Skeletons_Default")
+                  & " should be either fail or pass");
             end if;
          end if;
       end;
 
       --  Exit status
-      if Arg (Cmd, Exit_Status) /= null then
-         if Arg (Cmd, Exit_Status).all = "off" then
-            Test.Common.Show_Passed_Tests := False;
-         elsif Arg (Cmd, Exit_Status).all = "on" then
-            Test.Common.Add_Exit_Status := True;
-         else
-            Cmd_Error_No_Help
-              ("--exit-status should be either on or off");
+      declare
+         Exit_Status_Switch : constant String_Ref := Arg (Cmd, Exit_Status);
+         Present            : constant Boolean := Exit_Status_Switch /= null;
+         Exit_Status_Val    : constant String :=
+           (if Present then To_Lower (Exit_Status_Switch.all) else "");
+      begin
+         if Present then
+            if Exit_Status_Val = "off" then
+               Test.Common.Add_Exit_Status := False;
+
+            elsif Exit_Status_Val = "on" then
+               Test.Common.Add_Exit_Status := True;
+
+            else
+               Cmd_Error_No_Help
+                 ("--exit-status should be either on or off");
+            end if;
          end if;
-      end if;
+      end;
 
       --  Separate drivers
-      if Arg (Cmd, Separate_Drivers) /= null then
-         if Arg (Cmd, Separate_Drivers).all in "unit" | "" then
+      declare
+         Separate_Drivers_Switch : constant String_Ref :=
+           Arg (Cmd, Separate_Drivers);
+         Present                 : constant Boolean :=
+           Separate_Drivers_Switch /= null;
+         Separate_Drivers_Val    : constant String :=
+           (if Present then To_Lower (Separate_Drivers_Switch.all) else "");
+      begin
+         if Present then
             Test.Common.Separate_Drivers := True;
-            Test.Common.Driver_Per_Unit := True;
-         elsif Arg (Cmd, Separate_Drivers).all = "test" then
-            Test.Common.Separate_Drivers := True;
-            Test.Common.Driver_Per_Unit := False;
-         else
-            Cmd_Error_No_Help
-              ("--separate-drivers should be either unit or test"
-               & " >" & Arg (Cmd, Separate_Drivers).all & "<");
+
+            if Separate_Drivers_Val = "unit"
+              or else Separate_Drivers_Val = ""
+            then
+               Test.Common.Driver_Per_Unit := True;
+
+            elsif Separate_Drivers_Val = "test" then
+               Test.Common.Driver_Per_Unit := False;
+
+            else
+               Cmd_Error_No_Help
+                 ("--separate-drivers should be either unit or test"
+                  & " >" & Separate_Drivers_Switch.all & "<");
+            end if;
          end if;
-      end if;
+      end;
 
       --  Reporter
       if Arg (Cmd, Reporter) /= null then
