@@ -60,6 +60,9 @@ package TGen.Types is
       --  Whether this type has a private extension. Note that if Fully_Private
       --  is True, this field will be False.
 
+      Is_Class_Wide : Boolean := False;
+      --  Whether the type is class wide (has `'Class` attribute)
+
    end record;
 
    type Typ_Kind is (Invalid_Kind,
@@ -184,7 +187,7 @@ package TGen.Types is
    procedure Free_Content (Self : in out Typ) is null;
    --  Helper for shared pointers
 
-   function FQN (Self : Typ) return String is (To_Ada (Self.Name));
+   function FQN (Self : Typ; No_Std : Boolean := False) return String;
    --  Return the fully qualified name for the type
 
    function Simple_Name (Self : Typ) return String is

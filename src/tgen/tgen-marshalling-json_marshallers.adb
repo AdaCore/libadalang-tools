@@ -314,9 +314,7 @@ package body TGen.Marshalling.JSON_Marshallers is
          else (FN_Typ.Simple_Name))));
       Assocs.Insert (Assoc ("PROC_UID", FN_Typ.Subp_UID));
       if FN_Typ.Ret_Typ /= SP.Null_Ref then
-         Assocs.Insert (Assoc
-           ("PROC_RETURN_TY",
-            FN_Typ.Ret_Typ.Get.Fully_Qualified_Name));
+         Assocs.Insert (Assoc ("PROC_RETURN_TY", FN_Typ.Ret_Typ.Get.FQN));
       else
          Assocs.Insert (Assoc ("PROC_RETURN_TY", ""));
       end if;

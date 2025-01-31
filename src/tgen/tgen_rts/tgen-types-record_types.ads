@@ -391,9 +391,10 @@ package TGen.Types.Record_Types is
    function Kind (Self : Function_Typ) return Typ_Kind is
      (Function_Kind);
 
-   function FQN (Self : Function_Typ) return String;
-  --  Return the fully qualified name associated with this subprogram,
-  --  removing the trailing hash.
+   overriding
+   function FQN (Self : Function_Typ; No_Std : Boolean := False) return String;
+   --  Return the fully qualified name associated with this subprogram,
+   --  removing the trailing hash.
 
    function Simple_Name (Self : Function_Typ) return String is
       (+Unbounded_String (Self.Name.Element (Self.Name.Last_Index - 1)));
