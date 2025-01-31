@@ -1,0 +1,4 @@
+description: Check that using the --include-subp-name leads to the test
+  runner displaying the name of the tested subprogram.
+
+driver: shell_script

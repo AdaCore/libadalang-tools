@@ -1,0 +1,9 @@
+pkg.ads:8:4 (Pkg.Inherited_Prim): info: corresponding test PASSED
+pkg.ads:9:4 (Pkg.Overridden_Prim): info: corresponding test PASSED
+pkg.ads:3:4 (Pkg.Simple): info: corresponding test PASSED
+pkg.ads:4:4 (Pkg.With_TC): info: corresponding test PASSED
+gen.ads:4:4 (Gen.Gen) instance at user.ads:11:4: info: corresponding test PASSED
+user.ads:7:4 (User.Overridden_Prim): info: corresponding test PASSED
+pkg.ads:8:4 (Pkg.Inherited_Prim): inherited at user.ads:6:4: info: corresponding test PASSED
+pkg.ads:9:4 (Pkg.Overridden_Prim): overridden at user.ads:7:4: info: corresponding test PASSED
+8 tests run: 8 passed; 0 failed; 0 crashed.

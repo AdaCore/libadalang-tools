@@ -577,6 +577,7 @@ package body Test.Actions is
       Test.Common.Show_Test_Duration := Arg (Cmd, Test_Duration);
       Test.Common.Relocatable_Harness := Arg (Cmd, Relocatable_Harness);
       Test.Common.Test_Filtering := Arg (Cmd, Test_Filtering);
+      Test.Common.Include_Subp_Name := Arg (Cmd, Include_Subp_Name);
 
       Test.Common.Strict_Execution := Arg (Cmd, Strict)
         or else (Ada.Environment_Variables.Exists ("GNATTEST_STRICT")
@@ -1321,6 +1322,7 @@ package body Test.Actions is
       Put (" --exit-status=(on|off)             - Default usage of the exit status\n");
       Put (" --omit-sloc                        - Don't record subprogram sloc in test package\n");
       Put (" --no-command-line                  - Don't add command line support to test driver\n");
+      Put (" --include-subp-name                - Include the tested subprogram's name in the output\n");
       Put (" --test-duration                    - Show timing for each test\n");
       Put (" --test-filtering                   - Add test filtering option to generated driver\n");
       Put (" --no-test-filtering                - Suppress test filtering in generated driver\n");
