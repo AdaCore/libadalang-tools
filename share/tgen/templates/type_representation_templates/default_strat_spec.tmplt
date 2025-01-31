@@ -4,9 +4,9 @@
 
    function Generate
       (S           : in out @_TY_PREFIX_@_Strategy;
-       Disc_Context : Disc_Value_Map) return JSON_Value
+       Disc_Context : Disc_Value_Map) return TGen.JSON.JSON_Value
     is
-       Res : constant JSON_Value :=
+       Res : constant TGen.JSON.JSON_Value :=
           @_ORIG_TY_PREFIX_@_To_JSON (@_FUNCTION_NAME_@);
     begin
        @@IF@@ @_DISCR_NAME_@ /= ""

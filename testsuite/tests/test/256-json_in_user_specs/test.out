@@ -1,0 +1,8 @@
+pkg.ads:6:4: info: corresponding test PASSED
+pkg.ads:6:4: info: corresponding test PASSED
+pkg.ads:6:4: info: corresponding test PASSED
+pkg.ads:6:4: info: corresponding test PASSED
+pkg.ads:6:4: info: corresponding test PASSED
+pkg.ads:6:4: error: corresponding test FAILED: Test not implemented. (pkg-test_data-tests.adb:61)
+6 tests run: 5 passed; 1 failed; 0 crashed.
+Test runner dumped 5 tests

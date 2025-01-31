@@ -39,12 +39,12 @@
 @@ELSE@@
       @_GLOBAL_PREFIX_@_Origin : String := "")
    is
-      use TGen.JSON;
-      Subp_JSON                : JSON_Value;
-      Subp_Vectors             : JSON_Array;
-      New_Test_Vec             : constant JSON_Value := Create_Object;
-      New_Test_Vec_Vals        : JSON_Array;
-      New_Test_Vec_Global_Vals : JSON_Array;
+      Subp_JSON                : TGen.JSON.JSON_Value;
+      Subp_Vectors             : TGen.JSON.JSON_Array;
+      New_Test_Vec             : constant TGen.JSON.JSON_Value :=
+         TGen.JSON.Create_Object;
+      New_Test_Vec_Vals        : TGen.JSON.JSON_Array;
+      New_Test_Vec_Global_Vals : TGen.JSON.JSON_Array;
    begin
       if @_GLOBAL_PREFIX_@_Unit_JSON.Has_Field ("@_PROC_UID_@") then
          Subp_JSON := @_GLOBAL_PREFIX_@_Unit_JSON.Get ("@_PROC_UID_@");
@@ -60,7 +60,7 @@
       New_Test_Vec.Set_Field ("origin", @_GLOBAL_PREFIX_@_Origin);
 @@TABLE@@
       declare
-         Param_Obj : constant JSON_Value := Create_Object;
+         Param_Obj : constant TGen.JSON.JSON_Value := TGen.JSON.Create_Object;
       begin
          Param_Obj.Set_Field ("name", "@_PARAM_NAME_@");
          Param_Obj.Set_Field ("type_name", "@_PARAM_TY_@");
@@ -73,7 +73,7 @@
       New_Test_Vec.Set_Field ("param_values", New_Test_Vec_Vals);
 @@TABLE@@
       declare
-         Global_Obj : constant JSON_Value := Create_Object;
+         Global_Obj : constant TGen.JSON.JSON_Value := TGen.JSON.Create_Object;
       begin
          Global_Obj.Set_Field ("name", "@_GLOBAL_NAME_@");
          Global_Obj.Set_Field ("type_name", "@_GLOBAL_TY_@");

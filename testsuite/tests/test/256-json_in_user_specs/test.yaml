@@ -1,0 +1,5 @@
+description: |
+  This test check that TGen test case generation still works when a user uses
+  GNATCOLL.JSON in its specs.
+
+driver: gnattest_tgen
