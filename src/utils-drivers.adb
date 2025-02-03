@@ -89,7 +89,7 @@ package body Utils.Drivers is
 
       procedure Include_One (File_Name : String) is
       begin
-         Include (Ignored, File_Name);
+         Include (Ignored, Ada.Directories.Simple_Name (File_Name));
       end Include_One;
 
       procedure Process_Files is
