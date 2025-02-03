@@ -53,7 +53,8 @@ package Test.Command_Lines is
       Dump_Test_Inputs,
       Unparse,
       Enum_Strat,
-      Minimize);
+      Minimize,
+      Include_Subp_Name);
 
    package Test_Boolean_Switches is new Boolean_Switches
      (Descriptor,

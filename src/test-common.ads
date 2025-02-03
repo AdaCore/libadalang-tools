@@ -120,6 +120,10 @@ package Test.Common is
    --  if Subp is a subprigram declaration it will return subprogram's name;
    --  if Subp is an overloaded operator - it's text name
 
+   function Get_Subp_FQN (Node : Basic_Decl'Class) return String is
+    (Image (Node.As_Basic_Decl.P_Fully_Qualified_Name));
+   --  Return the fully qualified name of Node
+
    function Enclosing_Unit_Name (Node : Ada_Node'Class) return String is
       (Node_Image (P_Top_Level_Decl (Node, Node.Unit).P_Defining_Name));
    --  Returns name of the compilation unit enclosing given node
@@ -324,6 +328,10 @@ package Test.Common is
    Tmp_Test_Prj : GNAT.OS_Lib.String_Access := null;
 
    Reporter_Name : GNAT.OS_Lib.String_Access := new String'("gnattest");
+
+   Include_Subp_Name : Boolean := False;
+   --  Whether the AUnit testcases' names should include the name of the
+   --  subprogram. Default is False for backwards compatibility reasons.
 
    No_Command_Line : Boolean := False;
 

@@ -536,6 +536,12 @@ package body Test.Skeleton is
    --  Returns the list of possible setters for all subprograms called from
    --  the body of given subprogram.
 
+   function Get_TR_Name_Suffix (Subp : Basic_Decl'Class) return String is
+     (if Include_Subp_Name then " (" & Get_Subp_FQN (Subp) & ")" else "");
+   --  Return the string that either contains the name of the tested subprogram
+   --  in Subp in parenthesis, or the empty string, based on whether
+   --  --include-subp-name was passed on the command line.
+
    ---------
    -- "<" --
    ---------
@@ -1553,6 +1559,7 @@ package body Test.Skeleton is
                   & Trim (Subp_Span.Start_Line'Img, Both)
                   & ":"
                   & Trim (Subp_Span.Start_Column'Img, Both)
+                  & Get_TR_Name_Suffix (Subp.Subp_Declaration.As_Basic_Decl)
                   & " instance at "
                   & Instance_Sloc.all);
             else
@@ -1562,6 +1569,7 @@ package body Test.Skeleton is
                   & Trim (Subp_Span.Start_Line'Img, Both)
                   & ":"
                   & Trim (Subp_Span.Start_Column'Img, Both)
+                  & Get_TR_Name_Suffix (Subp.Subp_Declaration.As_Basic_Decl)
                   & ":");
             end if;
          end;
@@ -2049,6 +2057,7 @@ package body Test.Skeleton is
                               & ":"
                               & Trim
                                 (First_Column_Number (ISub)'Img, Both)
+                              & Get_TR_Name_Suffix (ISub)
                               & ": inherited at "
                               & Base_Name (Type_Dec.Unit.Get_Filename)
                               & ":"
@@ -2200,6 +2209,7 @@ package body Test.Skeleton is
                      & Trim
                        (First_Column_Number (OSub)'Img,
                         Both)
+                     & Get_TR_Name_Suffix (OSub)
                      & ": overridden at "
                      & Base_Name
                        (TR_W.Original_Type.Unit.Get_Filename)
@@ -3595,6 +3605,7 @@ package body Test.Skeleton is
                & Trim (First_Line_Number (TC.Elem)'Img, Both)
                & ":"
                & Trim (First_Column_Number (TC.Elem)'Img, Both)
+               & (if Include_Subp_Name then " (" & TC.Name.all & ")" else "")
                & ":");
          else
             TR_Info_Add.TR_Info.Tested_Sloc := new String'
@@ -3603,6 +3614,7 @@ package body Test.Skeleton is
                & Trim (First_Line_Number (TC.Elem)'Img, Both)
                & ":"
                & Trim (First_Column_Number (TC.Elem)'Img, Both)
+               & (if Include_Subp_Name then " (" & TC.Name.all & ")" else "")
                & " instance at "
                & Instance_Sloc);
          end if;
