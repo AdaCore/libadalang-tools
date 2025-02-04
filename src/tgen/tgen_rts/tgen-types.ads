@@ -66,6 +66,9 @@ package TGen.Types is
       Is_Generic : Boolean := False;
       --  If the type is the result of a generic package instantiation
 
+      Is_Class_Wide : Boolean := False;
+      --  Whether the type is class wide (has `'Class` attribute)
+
    end record
    with Dynamic_Predicate =>
       --  A top level generic instantion is a generic itself (Top_Level_Generic

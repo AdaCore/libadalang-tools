@@ -2950,6 +2950,8 @@ package body TGen.Types.Translation is
                     (Translate_Discriminant_Constraints
                       (N.As_Subtype_Indication.F_Constraint
                        .As_Composite_Constraint)),
+                    Is_Class_Wide =>
+                        not Type_Decl_Node.P_Classwide_Type.Is_Null,
                   others => <>));
             end return;
          when others =>
@@ -3042,7 +3044,7 @@ package body TGen.Types.Translation is
       Comp_Unit_Idx : constant Positive :=
         Comp_Unit_Decl.P_Fully_Qualified_Name_Array'Last;
 
-      FQN : constant Ada_Qualified_Name :=
+      FQN : Ada_Qualified_Name :=
         (if not Type_Name.Is_Null
          then Convert_Qualified_Name (Type_Name.P_Fully_Qualified_Name_Array)
          else Ada_Identifier_Vectors.Empty);
@@ -3229,6 +3231,8 @@ package body TGen.Types.Translation is
          Specialized_Res.Res.Get.Fully_Private := Decl_Is_Fully_Private (N);
          Specialized_Res.Res.Get.Private_Extension :=
            Basic_Decl'(N.P_All_Parts (1)).As_Base_Type_Decl.P_Is_Private;
+         Specialized_Res.Res.Get.Is_Class_Wide :=
+            not N.P_Classwide_Type.Is_Null;
       end if;
 
       return Specialized_Res;
@@ -3508,6 +3512,7 @@ package body TGen.Types.Translation is
                if not Ret.Success then
                   return (False, Ret.Diagnostics);
                end if;
+
                F_Typ.Ret_Typ := Ret.Res;
             end;
          else
