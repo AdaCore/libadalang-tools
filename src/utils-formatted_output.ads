@@ -24,9 +24,11 @@
 with Utils.Generic_Formatted_Output;
 with Utils.String_Utilities; use Utils.String_Utilities;
 
-package Utils.Formatted_Output is new Utils.Generic_Formatted_Output
-  (Char_Type      => Character,
-   Str_Type       => String,
-   Basic_Put_Char => Text_IO_Put_Char);
+package Utils.Formatted_Output is new
+  Utils.Generic_Formatted_Output
+    (Char_Type      => Character,
+     Str_Type       => String,
+     Basic_Put_Char => Text_IO_Put_Char);
+
 --  All data is sent to Text_IO.Current_Output, so Text_IO.Set_Output
 --  maybe used to send it to a particular file.

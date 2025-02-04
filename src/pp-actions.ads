@@ -25,9 +25,9 @@ with Libadalang.Analysis; use Libadalang.Analysis;
 
 with Pp.Scanner;
 
-with Utils.Char_Vectors; use Utils.Char_Vectors;
+with Utils.Char_Vectors;  use Utils.Char_Vectors;
 with Utils.Command_Lines; use Utils.Command_Lines;
-with Utils.Tools; use Utils.Tools;
+with Utils.Tools;         use Utils.Tools;
 
 use Utils.Char_Vectors.Char_Vectors;
 
@@ -46,7 +46,7 @@ package Pp.Actions is
       Partial_GNATPP      : Boolean := False;
       Start_Child_Index   : Natural := 0;
       End_Child_Index     : Natural := 0)
-     with Pre => Pp.Scanner.Source_Message_Vectors.Is_Empty (Messages);
+   with Pre => Pp.Scanner.Source_Message_Vectors.Is_Empty (Messages);
    --  This pretty prints the given source. Parameters:
    --
    --     Cmd -- processed command line, or "command line" concocted by a tool
@@ -108,9 +108,7 @@ package Pp.Actions is
 private
 
    overriding
-   procedure Init
-     (Tool : in out Pp_Tool;
-      Cmd  : in out Command_Line);
+   procedure Init (Tool : in out Pp_Tool; Cmd : in out Command_Line);
 
    overriding
    procedure Second_Per_File_Action
@@ -122,22 +120,17 @@ private
       Unit      : Analysis_Unit);
 
    overriding
-   procedure Final
-     (Tool : in out Pp_Tool;
-      Cmd  : Command_Line);
+   procedure Final (Tool : in out Pp_Tool; Cmd : Command_Line);
 
    overriding
    procedure Tool_Help (Tool : Pp_Tool);
 
-   type Pp_Tool is new Tool_State with
-     record
-       Failed : Boolean := False;
-     end record;
+   type Pp_Tool is new Tool_State with record
+      Failed : Boolean := False;
+   end record;
 
    --  For Debugging:
 
-   procedure Dump
-     (Tool    : in out Pp_Tool;
-      Message : String := "");
+   procedure Dump (Tool : in out Pp_Tool; Message : String := "");
 
 end Pp.Actions;

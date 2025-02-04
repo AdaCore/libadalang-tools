@@ -88,15 +88,15 @@ package TGen.JSON is
       --  JSON value. Depending on the context, this sequence can be processed
       --  as a mapping, because each field name is unique, but iterating on
       --  fields is deterministic because it is a sequence underneath.
-   );
+     );
    --  Each JSON value (JSON_Value below) has a specific kind...
 
-   subtype JSON_Elementary_Value_Type is JSON_Value_Type range
-     JSON_Null_Type .. JSON_String_Type;
+   subtype JSON_Elementary_Value_Type is
+     JSON_Value_Type range JSON_Null_Type .. JSON_String_Type;
    --  Some are atoms...
 
-   subtype JSON_Container_Value_Type is JSON_Value_Type range
-     JSON_Array_Type .. JSON_Object_Type;
+   subtype JSON_Container_Value_Type is
+     JSON_Value_Type range JSON_Array_Type .. JSON_Object_Type;
    --  While others are containers for other values
 
    Invalid_JSON_Stream : exception;
@@ -122,11 +122,13 @@ package TGen.JSON is
    --
    --  If you want to create a separate copy, you must use the Clone function.
 
-   type JSON_Array is private with
-      Iterable => (First       => Array_First,
-                   Next        => Array_Next,
-                   Has_Element => Array_Has_Element,
-                   Element     => Array_Element);
+   type JSON_Array is private
+   with
+     Iterable =>
+       (First       => Array_First,
+        Next        => Array_Next,
+        Has_Element => Array_Has_Element,
+        Element     => Array_Element);
    --  JSON array type. If an object of type JSON_Array is not otherwise
    --  initialized, it is initialized to Empty_Array.
    --
@@ -137,7 +139,7 @@ package TGen.JSON is
    --  type (JSON_Array because of the Arr argument, and JSON_Value because of
    --  the return type).
 
-   JSON_Null : constant JSON_Value;
+   JSON_Null   : constant JSON_Value;
    Empty_Array : constant JSON_Array;
 
    --------------------
@@ -218,6 +220,7 @@ package TGen.JSON is
       case Success is
          when True =>
             Value : JSON_Value;
+
          when False =>
             Error : Parsing_Error;
       end case;
@@ -227,8 +230,7 @@ package TGen.JSON is
      (Strm     : Ada.Strings.Unbounded.Unbounded_String;
       Filename : String := "<data>") return JSON_Value;
    function Read
-     (Strm     : String;
-      Filename : String := "<data>") return JSON_Value;
+     (Strm : String; Filename : String := "<data>") return JSON_Value;
    --  Parse the JSON document in Strm and return it. On parsing error, print
    --  an error message referencing Filename on the standard output and raise
    --  an Invalid_JSON_Stream exception.
@@ -240,8 +242,9 @@ package TGen.JSON is
    --  error, return the corresponding error information.
 
    function Write (Item : JSON_Value; Compact : Boolean := True) return String;
-   function Write (Item : JSON_Value; Compact : Boolean := True)
-                   return Ada.Strings.Unbounded.Unbounded_String;
+   function Write
+     (Item : JSON_Value; Compact : Boolean := True)
+      return Ada.Strings.Unbounded.Unbounded_String;
    --  Return a string that encodes Item in JSON. Unless Compact is True, this
    --  creates an indented multi-line representation.
 
@@ -250,38 +253,38 @@ package TGen.JSON is
    -----------------------------
 
    function Create return JSON_Value
-      with Post => Create'Result.Kind = JSON_Null_Type;
+   with Post => Create'Result.Kind = JSON_Null_Type;
    --  Create a 'null' JSON value
 
    function Create (Val : Boolean) return JSON_Value
-      with Post => Create'Result.Kind = JSON_Boolean_Type;
+   with Post => Create'Result.Kind = JSON_Boolean_Type;
    --  Create a boolean-typed JSON value
 
    function Create (Val : Big_Integer) return JSON_Value
-      with Post => Create'Result.Kind = JSON_Int_Type;
+   with Post => Create'Result.Kind = JSON_Int_Type;
 
    function Create (Val : Big_Real) return JSON_Value
-      with Post => Create'Result.Kind = JSON_Float_Type;
+   with Post => Create'Result.Kind = JSON_Float_Type;
    --  Create a float-typed JSON value
 
    function Create (Val : UTF8_String) return JSON_Value
-      with Post => Create'Result.Kind = JSON_String_Type;
+   with Post => Create'Result.Kind = JSON_String_Type;
    --  Create a string-typed JSON value
 
    function Create (Val : UTF8_Unbounded_String) return JSON_Value
-      with Post => Create'Result.Kind = JSON_String_Type;
+   with Post => Create'Result.Kind = JSON_String_Type;
    --  Create a string-typed JSON value
 
    function Create (Val : UTF8_XString) return JSON_Value
-      with Post => Create'Result.Kind = JSON_String_Type;
+   with Post => Create'Result.Kind = JSON_String_Type;
    --  Create a string-typed JSON value
 
    function Create (Val : JSON_Array) return JSON_Value
-      with Post => Create'Result.Kind = JSON_Array_Type;
+   with Post => Create'Result.Kind = JSON_Array_Type;
    --  Create a JSON value from the JSON array
 
    function Create_Object return JSON_Value
-      with Post => Create_Object'Result.Kind = JSON_Object_Type;
+   with Post => Create_Object'Result.Kind = JSON_Object_Type;
    --  Create an empty object. Values need to be added using the below
    --  Set_Field methods.
 
@@ -294,7 +297,7 @@ package TGen.JSON is
    --  values are compared, not field names.
 
    procedure Append (Arr : JSON_Value; Item : JSON_Value)
-      with Pre => Arr.Kind = JSON_Array_Type;
+   with Pre => Arr.Kind = JSON_Array_Type;
    --  Assuming Arr is a JSON array, append Item to it
 
    function Clone (Val : JSON_Value) return JSON_Value;
@@ -310,18 +313,14 @@ package TGen.JSON is
    --  for arrays however.
 
    procedure Set_Field
-     (Val        : JSON_Value;
-      Field_Name : UTF8_String;
-      Field      : JSON_Value)
-      with Pre => Val.Kind = JSON_Object_Type;
+     (Val : JSON_Value; Field_Name : UTF8_String; Field : JSON_Value)
+   with Pre => Val.Kind = JSON_Object_Type;
    --  Assuming Val is a JSON object, add a new field or modify the existing
    --  one for the given Field_Name. The field value is Field afterwards.
 
    procedure Set_Field
-     (Val        : JSON_Value;
-      Field_Name : UTF8_XString;
-      Field      : JSON_Value)
-      with Pre => Val.Kind = JSON_Object_Type;
+     (Val : JSON_Value; Field_Name : UTF8_XString; Field : JSON_Value)
+   with Pre => Val.Kind = JSON_Object_Type;
    --  Assuming Val is a JSON object, add a new field or modify the existing
    --  one for the given Field_Name. The field value is Field afterwards.
 
@@ -330,40 +329,30 @@ package TGen.JSON is
    --  Set_Field procedures with the result.
 
    procedure Set_Field
-     (Val        : JSON_Value;
-      Field_Name : UTF8_String;
-      Field      : Boolean)
-      with Pre => Val.Kind = JSON_Object_Type;
+     (Val : JSON_Value; Field_Name : UTF8_String; Field : Boolean)
+   with Pre => Val.Kind = JSON_Object_Type;
 
    procedure Set_Field
-     (Val        : JSON_Value;
-      Field_Name : UTF8_String;
-      Field      : Big_Integer)
-      with Pre => Val.Kind = JSON_Object_Type;
+     (Val : JSON_Value; Field_Name : UTF8_String; Field : Big_Integer)
+   with Pre => Val.Kind = JSON_Object_Type;
 
    procedure Set_Field
-     (Val        : JSON_Value;
-      Field_Name : UTF8_String;
-      Field      : Big_Real)
-      with Pre => Val.Kind = JSON_Object_Type;
+     (Val : JSON_Value; Field_Name : UTF8_String; Field : Big_Real)
+   with Pre => Val.Kind = JSON_Object_Type;
 
    procedure Set_Field
-     (Val        : JSON_Value;
-      Field_Name : UTF8_String;
-      Field      : UTF8_String)
-      with Pre => Val.Kind = JSON_Object_Type;
+     (Val : JSON_Value; Field_Name : UTF8_String; Field : UTF8_String)
+   with Pre => Val.Kind = JSON_Object_Type;
 
    procedure Set_Field
      (Val        : JSON_Value;
       Field_Name : UTF8_String;
       Field      : UTF8_Unbounded_String)
-      with Pre => Val.Kind = JSON_Object_Type;
+   with Pre => Val.Kind = JSON_Object_Type;
 
    procedure Set_Field
-     (Val        : JSON_Value;
-      Field_Name : UTF8_String;
-      Field      : JSON_Array)
-      with Pre => Val.Kind = JSON_Object_Type;
+     (Val : JSON_Value; Field_Name : UTF8_String; Field : JSON_Array)
+   with Pre => Val.Kind = JSON_Object_Type;
    --  This performs a a shallow copy of Field, so any change you do to the
    --  passed array for Field afterwards will not impact Val.
 
@@ -371,29 +360,23 @@ package TGen.JSON is
      (Val        : JSON_Value;
       Field_Name : UTF8_String;
       Field      : UTF8_Unbounded_String)
-      with Pre => Val.Kind = JSON_Object_Type;
+   with Pre => Val.Kind = JSON_Object_Type;
    --  Set Field only if it is not empty string
 
    procedure Set_Field_If_Not_Empty
-     (Val        : JSON_Value;
-      Field_Name : UTF8_String;
-      Field      : UTF8_String)
-      with Pre => Val.Kind = JSON_Object_Type;
+     (Val : JSON_Value; Field_Name : UTF8_String; Field : UTF8_String)
+   with Pre => Val.Kind = JSON_Object_Type;
    --  Set Field only if it is not empty string
 
    procedure Set_Field_If_Not_Empty
-     (Val        : JSON_Value;
-      Field_Name : UTF8_String;
-      Field      : JSON_Array)
-      with Pre => Val.Kind = JSON_Object_Type;
+     (Val : JSON_Value; Field_Name : UTF8_String; Field : JSON_Array)
+   with Pre => Val.Kind = JSON_Object_Type;
    --  Set Field only if it is not empty array.
    --  This performs a a shallow copy of Field, so any change you do to the
    --  passed array for Field afterwards will not impact Val.
 
-   procedure Unset_Field
-     (Val        : JSON_Value;
-      Field_Name : UTF8_String)
-      with Pre => Val.Kind = JSON_Object_Type;
+   procedure Unset_Field (Val : JSON_Value; Field_Name : UTF8_String)
+   with Pre => Val.Kind = JSON_Object_Type;
    --  Assuming Val is a JSON object, remove its field whose name matches
    --  Field_Name. Do nothing if there is no such a field.
 
@@ -405,59 +388,70 @@ package TGen.JSON is
    --  Return the kind corresponding to the Val JSON value
 
    function Get (Val : JSON_Value) return Boolean
-      with Pre => Val.Kind = JSON_Boolean_Type;
+   with Pre => Val.Kind = JSON_Boolean_Type;
 
    function Get (Val : JSON_Value) return Big_Integer
-     with Pre => Val.Kind = JSON_Int_Type;
+   with Pre => Val.Kind = JSON_Int_Type;
 
    function Get (Val : JSON_Value) return Big_Real
-      with Pre => Val.Kind = JSON_Float_Type;
+   with Pre => Val.Kind = JSON_Float_Type;
 
    function Get (Val : JSON_Value) return UTF8_String
-      with Pre => Val.Kind = JSON_String_Type;
+   with Pre => Val.Kind = JSON_String_Type;
 
    function Get (Val : JSON_Value) return UTF8_Unbounded_String
-      with Pre => Val.Kind = JSON_String_Type;
+   with Pre => Val.Kind = JSON_String_Type;
 
    function Get (Val : JSON_Value) return UTF8_XString
-      with Pre => Val.Kind = JSON_String_Type;
+   with Pre => Val.Kind = JSON_String_Type;
 
    function Get (Val : JSON_Value) return JSON_Array
-      with Pre => Val.Kind = JSON_Array_Type;
+   with Pre => Val.Kind = JSON_Array_Type;
 
    function Has_Field (Val : JSON_Value; Field : UTF8_String) return Boolean
-      with Pre => Val.Kind = JSON_Object_Type;
+   with Pre => Val.Kind = JSON_Object_Type;
    --  Assuming Val is a JSON object, return whether it contains a field whose
    --  name is Field.
 
    function Get (Val : JSON_Value; Field : UTF8_String) return JSON_Value
-      with Pre => Val.Kind = JSON_Object_Type;
+   with Pre => Val.Kind = JSON_Object_Type;
 
    function Get (Val : JSON_Value; Field : UTF8_String) return Boolean
-      with Pre => Val.Kind = JSON_Object_Type
-                  and then Get (Val, Field).Kind = JSON_Boolean_Type;
+   with
+     Pre =>
+       Val.Kind = JSON_Object_Type
+       and then Get (Val, Field).Kind = JSON_Boolean_Type;
 
    function Get (Val : JSON_Value; Field : UTF8_String) return Big_Integer
-      with Pre => Val.Kind = JSON_Object_Type
-                  and then Get (Val, Field).Kind = JSON_Int_Type;
+   with
+     Pre =>
+       Val.Kind = JSON_Object_Type
+       and then Get (Val, Field).Kind = JSON_Int_Type;
 
-   function Get
-      (Val : JSON_Value; Field : UTF8_String) return Big_Real
-      with Pre => Val.Kind = JSON_Object_Type
-                  and then Get (Val, Field).Kind = JSON_Float_Type;
+   function Get (Val : JSON_Value; Field : UTF8_String) return Big_Real
+   with
+     Pre =>
+       Val.Kind = JSON_Object_Type
+       and then Get (Val, Field).Kind = JSON_Float_Type;
 
    function Get (Val : JSON_Value; Field : UTF8_String) return UTF8_String
-      with Pre => Val.Kind = JSON_Object_Type
-                  and then Get (Val, Field).Kind = JSON_String_Type;
+   with
+     Pre =>
+       Val.Kind = JSON_Object_Type
+       and then Get (Val, Field).Kind = JSON_String_Type;
 
    function Get
      (Val : JSON_Value; Field : UTF8_String) return UTF8_Unbounded_String
-      with Pre => Val.Kind = JSON_Object_Type
-                  and then Get (Val, Field).Kind = JSON_String_Type;
+   with
+     Pre =>
+       Val.Kind = JSON_Object_Type
+       and then Get (Val, Field).Kind = JSON_String_Type;
 
    function Get (Val : JSON_Value; Field : UTF8_String) return JSON_Array
-      with Pre => Val.Kind = JSON_Object_Type
-                  and then Get (Val, Field).Kind = JSON_Array_Type;
+   with
+     Pre =>
+       Val.Kind = JSON_Object_Type
+       and then Get (Val, Field).Kind = JSON_Array_Type;
 
    ---------------
    -- Iteration --
@@ -466,19 +460,20 @@ package TGen.JSON is
    procedure Map_JSON_Object
      (Val : JSON_Value;
       CB  : access procedure (Name : UTF8_String; Value : JSON_Value))
-      with Pre => Val.Kind = JSON_Object_Type;
+   with Pre => Val.Kind = JSON_Object_Type;
    --  Assuming Val is a JSON object, call CB on all its fields
 
    generic
       type Mapped (<>) is private;
    procedure Gen_Map_JSON_Object
      (Val         : JSON_Value;
-      CB          : access procedure
-        (User_Object : in out Mapped;
-         Name        : UTF8_String;
-         Value       : JSON_Value);
+      CB          :
+        access procedure
+          (User_Object : in out Mapped;
+           Name        : UTF8_String;
+           Value       : JSON_Value);
       User_Object : in out Mapped)
-      with Pre => Val.Kind = JSON_Object_Type;
+   with Pre => Val.Kind = JSON_Object_Type;
    --  Assuming Val is a JSON object, call CB on all its field, passing the
    --  given User_Object from call to call.
 
@@ -486,8 +481,8 @@ package TGen.JSON is
    --  Custom TGen interface --
    ----------------------------
    package Utils is
-      type JSON_Auto_IO is new Ada.Finalization.Limited_Controlled with
-      private;
+      type JSON_Auto_IO is
+        new Ada.Finalization.Limited_Controlled with private;
       --  Type to handle automatic reading and writing JSON values from a
       --  specific file. When created, if the specified filename exists, the
       --  internal ref will hold the contents of that file loaded as a
@@ -507,13 +502,13 @@ package TGen.JSON is
       --  Get a reference to the JSON_Value held by Self
 
    private
-         type JSON_Auto_IO is new Ada.Finalization.Limited_Controlled with
-         record
-            Filename     : GNAT.Strings.String_Access;
-            JSON_Content : JSON_Value := Create_Object;
-         end record;
+      type JSON_Auto_IO is new Ada.Finalization.Limited_Controlled with record
+         Filename     : GNAT.Strings.String_Access;
+         JSON_Content : JSON_Value := Create_Object;
+      end record;
 
-         overriding procedure Finalize (Self : in out JSON_Auto_IO);
+      overriding
+      procedure Finalize (Self : in out JSON_Auto_IO);
    end Utils;
 
 private
@@ -525,13 +520,26 @@ private
 
    type Data_Type (Kind : JSON_Value_Type := JSON_Null_Type) is record
       case Kind is
-         when JSON_Null_Type    => null;
-         when JSON_Boolean_Type => Bool_Value : Boolean;
-         when JSON_Int_Type     => Int_Value  : Big_Integer;
-         when JSON_Float_Type   => Flt_Value  : Big_Real;
-         when JSON_String_Type  => Str_Value  : UTF8_XString;
-         when JSON_Array_Type   => Arr_Value  : JSON_Array_Access;
-         when JSON_Object_Type  => Obj_Value  : JSON_Object_Access;
+         when JSON_Null_Type =>
+            null;
+
+         when JSON_Boolean_Type =>
+            Bool_Value : Boolean;
+
+         when JSON_Int_Type =>
+            Int_Value : Big_Integer;
+
+         when JSON_Float_Type =>
+            Flt_Value : Big_Real;
+
+         when JSON_String_Type =>
+            Str_Value : UTF8_XString;
+
+         when JSON_Array_Type =>
+            Arr_Value : JSON_Array_Access;
+
+         when JSON_Object_Type =>
+            Obj_Value : JSON_Object_Access;
       end case;
    end record;
 
@@ -541,22 +549,25 @@ private
    --  We cannot merge Data_Type and JSON_Value, because JSON_Value cannot
    --  have a discriminant with a default value.
 
-   overriding procedure Adjust (Obj : in out JSON_Value);
-   overriding procedure Finalize (Obj : in out JSON_Value);
+   overriding
+   procedure Adjust (Obj : in out JSON_Value);
+   overriding
+   procedure Finalize (Obj : in out JSON_Value);
 
    --  JSON Array definition:
 
-   package Vect_Pkg is new Ada.Containers.Vectors
-     (Index_Type   => Positive,
-      Element_Type => JSON_Value);
+   package Vect_Pkg is new
+     Ada.Containers.Vectors
+       (Index_Type   => Positive,
+        Element_Type => JSON_Value);
 
    type JSON_Array is record
       Vals : Vect_Pkg.Vector;
    end record;
 
    type JSON_Array_Internal is record
-      Cnt  : aliased GNATCOLL.Atomic.Atomic_Counter := 1;
-      Arr  : JSON_Array;
+      Cnt : aliased GNATCOLL.Atomic.Atomic_Counter := 1;
+      Arr : JSON_Array;
    end record;
 
    Empty_Array : constant JSON_Array := (Vals => Vect_Pkg.Empty_Vector);
@@ -568,8 +579,8 @@ private
       Val : JSON_Value;
    end record;
 
-   package Object_Items_Pkg is new Ada.Containers.Vectors
-     (Positive, Object_Item);
+   package Object_Items_Pkg is new
+     Ada.Containers.Vectors (Positive, Object_Item);
 
    type JSON_Object_Internal is record
       Cnt  : aliased GNATCOLL.Atomic.Atomic_Counter := 1;
@@ -577,25 +588,22 @@ private
    end record;
 
    JSON_Null : constant JSON_Value :=
-      (Ada.Finalization.Controlled with others => <>);
+     (Ada.Finalization.Controlled with others => <>);
    --  Can't call Create, because we would need to see the body of
    --  Initialize and Adjust.
 
    --  Copy of gnatcoll-json-utility.ads
 
-   JsonMimeType           : constant String := "application/json";
+   JsonMimeType : constant String := "application/json";
 
    function Escape_Non_Print_Character (C : Wide_Wide_Character) return String;
 
-   function Escape_String (Text : UTF8_XString)
-      return Ada.Strings.Unbounded.Unbounded_String;
+   function Escape_String
+     (Text : UTF8_XString) return Ada.Strings.Unbounded.Unbounded_String;
    --  Translates an UTF-8 encoded unbounded string into a JSON-escaped string
 
    function Un_Escape_String
-     (Text : String;
-      Low  : Natural;
-      High : Natural)
-      return UTF8_XString;
+     (Text : String; Low : Natural; High : Natural) return UTF8_XString;
    --  Translates a JSON-escaped string into an UTF-8 encoded unbounded string
    --  Low represents the lower bound of the JSON string in Text
    --  High represents the higher bound of the JSON string in Text

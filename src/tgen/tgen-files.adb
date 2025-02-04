@@ -31,11 +31,9 @@ package body TGen.Files is
    -------------------------
 
    procedure Prepare_Output_Dirs (Context : Generation_Context) is
-      Output_Dir : constant String :=
-        +(Context.Output_Dir);
+      Output_Dir : constant String := +(Context.Output_Dir);
    begin
-      if not Ada.Directories.Exists (Output_Dir)
-      then
+      if not Ada.Directories.Exists (Output_Dir) then
          Ada.Text_IO.Put_Line ("Creating " & Output_Dir);
          Ada.Directories.Create_Path (Output_Dir);
       end if;
@@ -53,7 +51,7 @@ package body TGen.Files is
       else
          declare
             Prj_Name : constant String :=
-               Ada.Characters.Handling.To_Lower (Project.Name);
+              Ada.Characters.Handling.To_Lower (Project.Name);
          begin
             return Obj_Dir / Prj_Name & "-tgen";
          end;

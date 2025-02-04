@@ -35,11 +35,11 @@ procedure Stub.Main is
 
    procedure Callback (Phase : Parse_Phase; Swit : Dynamically_Typed_Switch);
 
-   procedure Callback (Phase : Parse_Phase; Swit : Dynamically_Typed_Switch) is
-     null;
+   procedure Callback (Phase : Parse_Phase; Swit : Dynamically_Typed_Switch)
+   is null;
 
    Tool : Actions.Stub_Tool;
-   Cmd : Command_Line (Stub.Command_Lines.Descriptor'Access);
+   Cmd  : Command_Line (Stub.Command_Lines.Descriptor'Access);
 
 begin
    --  By default, send errors to stdout
@@ -48,8 +48,8 @@ begin
    Utils.Drivers.Driver
      (Cmd,
       Tool,
-      Tool_Package_Name     => "gnatstub",
-      Callback              => Callback'Unrestricted_Access);
+      Tool_Package_Name => "gnatstub",
+      Callback          => Callback'Unrestricted_Access);
 
    --  If syntax errors are detected during the processing then return a
    --  non zero exit code

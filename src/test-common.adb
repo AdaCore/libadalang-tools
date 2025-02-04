@@ -21,21 +21,21 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Libadalang.Common;         use Libadalang.Common;
+with Libadalang.Common; use Libadalang.Common;
 
 with Ada.Directories;
-with Ada.Text_IO;               use Ada.Text_IO;
+with Ada.Text_IO;             use Ada.Text_IO;
 with Ada.IO_Exceptions;
-with Ada.Exceptions;            use Ada.Exceptions;
-with Ada.Characters.Handling;   use Ada.Characters.Handling;
-with Ada.Strings;               use Ada.Strings;
-with Ada.Strings.Fixed;         use Ada.Strings.Fixed;
+with Ada.Exceptions;          use Ada.Exceptions;
+with Ada.Characters.Handling; use Ada.Characters.Handling;
+with Ada.Strings;             use Ada.Strings;
+with Ada.Strings.Fixed;       use Ada.Strings.Fixed;
 
-with GNATCOLL.Traces;           use GNATCOLL.Traces;
+with GNATCOLL.Traces; use GNATCOLL.Traces;
 
 with GNAT.SHA1;
 
-with Utils.Command_Lines;       use Utils.Command_Lines;
+with Utils.Command_Lines; use Utils.Command_Lines;
 
 with GNAT.Directory_Operations; use GNAT.Directory_Operations;
 with GNAT.Traceback.Symbolic;
@@ -45,8 +45,8 @@ with Utils.String_Utilities;
 
 package body Test.Common is
 
-   Me_Hash    : constant Trace_Handle := Create ("Hash", Default => Off);
-   Me_Stub    : constant Trace_Handle := Create ("Stubs", Default => Off);
+   Me_Hash : constant Trace_Handle := Create ("Hash", Default => Off);
+   Me_Stub : constant Trace_Handle := Create ("Stubs", Default => Off);
 
    function Operator_Image (Node : Ada_Node'Class) return String;
    --  According to operator symbols returns their literal names to make the
@@ -63,7 +63,7 @@ package body Test.Common is
       for J in Target_Dirs'Range loop
          declare
             Target_Dir : constant String :=
-                           Target_Dirs.all (J).Display_Full_Name;
+              Target_Dirs.all (J).Display_Full_Name;
          begin
             First := Target_Dir'First;
 
@@ -96,17 +96,15 @@ package body Test.Common is
    -----------------
 
    function Mangle_Hash
-     (Subp               : Ada_Node'Class;
-      Unwind_Controlling : Boolean := True) return String
+     (Subp : Ada_Node'Class; Unwind_Controlling : Boolean := True)
+      return String
    is
       Full_Hash : Unbounded_String;
    begin
 
       Full_Hash :=
         To_Unbounded_String
-          (Mangle_Hash_16
-             (Subp,
-              N_Controlling => not Unwind_Controlling));
+          (Mangle_Hash_16 (Subp, N_Controlling => not Unwind_Controlling));
 
       return
         Test_Routine_Prefix
@@ -126,8 +124,7 @@ package body Test.Common is
       For_Stubs      : Boolean := False) return String
    is
       Subp_Name : constant String :=
-        Common.Node_Image
-          (P_Defining_Name (As_Basic_Decl (Subp)));
+        Common.Node_Image (P_Defining_Name (As_Basic_Decl (Subp)));
 
       L_Subp      : Base_Subp_Spec;
       L_Subp_Span : Source_Location_Range;
@@ -160,8 +157,7 @@ package body Test.Common is
       --  of Subp, if no such pragma is specified returns empty string.
 
       function Handle_Parameters
-        (Params         : Param_Spec_Array;
-         Result_Profile : Type_Expr) return String;
+        (Params : Param_Spec_Array; Result_Profile : Type_Expr) return String;
       --  Returns an image of the types from parameters list and the result
       --  type in case of a function for a given list of parameter
       --  specifications.
@@ -183,8 +179,8 @@ package body Test.Common is
       begin
          for Pr of Prelude loop
             if Pr.Kind = Ada_Pragma_Node
-              and then To_Lower (Node_Image (Pr.As_Pragma_Node.F_Id)) =
-                "extend_system"
+              and then To_Lower (Node_Image (Pr.As_Pragma_Node.F_Id))
+                       = "extend_system"
             then
                declare
                   Assocs : constant Base_Assoc_List :=
@@ -192,13 +188,15 @@ package body Test.Common is
                begin
                   Print
                     (Assocs.Base_Assoc_List_Element
-                       (Assocs.Base_Assoc_List_First).
-                         As_Pragma_Argument_Assoc.F_Expr);
+                       (Assocs.Base_Assoc_List_First)
+                       .As_Pragma_Argument_Assoc
+                       .F_Expr);
                   return
                     Node_Image
                       (Assocs.Base_Assoc_List_Element
-                         (Assocs.Base_Assoc_List_First).
-                             As_Pragma_Argument_Assoc.F_Expr);
+                         (Assocs.Base_Assoc_List_First)
+                         .As_Pragma_Argument_Assoc
+                         .F_Expr);
                end;
             end if;
          end loop;
@@ -212,8 +210,7 @@ package body Test.Common is
       System_Extension : constant String := Get_System_Extension;
 
       function Handle_Parameters
-        (Params         : Param_Spec_Array;
-         Result_Profile : Type_Expr) return String
+        (Params : Param_Spec_Array; Result_Profile : Type_Expr) return String
       is
          Result : Unbounded_String := To_Unbounded_String ("");
          Param  : Param_Spec;
@@ -246,7 +243,7 @@ package body Test.Common is
       end Handle_Parameters;
 
       function Parameter_Image (Param : Param_Spec) return String is
-         Param_Names : constant Defining_Name_List := F_Ids (Param);
+         Param_Names      : constant Defining_Name_List := F_Ids (Param);
          Param_Names_Size : Natural := 0;
       begin
          for N of Param_Names loop
@@ -269,8 +266,7 @@ package body Test.Common is
       begin
          case Kind (Param) is
             when Ada_Subtype_Indication =>
-               Param_Type_Name :=
-                 F_Name (As_Subtype_Indication (Param));
+               Param_Type_Name := F_Name (As_Subtype_Indication (Param));
 
                if Kind (Param_Type_Name) = Ada_Attribute_Ref then
                   Attr_Flag := True;
@@ -280,8 +276,7 @@ package body Test.Common is
                if Param_Type_Name.P_Referenced_Decl.Is_Null then
                   if System_Extension = "" then
                      Report_Err
-                       ("name resolution error for "
-                        & Param_Type_Name.Image);
+                       ("name resolution error for " & Param_Type_Name.Image);
                      return
                        Node_Image (Param_Type_Name)
                        & (if Attr_Flag then "'Attr" else "");
@@ -297,15 +292,14 @@ package body Test.Common is
 
                Type_Decl :=
                  P_Canonical_Type
-                   (As_Base_Type_Decl (P_Referenced_Decl (Param_Type_Name))).
-                      As_Basic_Decl;
+                   (As_Base_Type_Decl (P_Referenced_Decl (Param_Type_Name)))
+                   .As_Basic_Decl;
                while not Type_Decl.P_Next_Part_For_Decl.Is_Null loop
-                  Type_Decl :=
-                    Type_Decl.P_Next_Part_For_Decl;
+                  Type_Decl := Type_Decl.P_Next_Part_For_Decl;
                end loop;
 
-               if
-                 Subp_Depth < 2 and then not Attr_Flag
+               if Subp_Depth < 2
+                 and then not Attr_Flag
                  and then Type_Decl = Tagged_Rec
                  and then not For_Stubs
                  and then not N_Controlling
@@ -317,21 +311,21 @@ package body Test.Common is
 
                return
                  Encode
-                    (Type_Decl.As_Basic_Decl.P_Fully_Qualified_Name,
-                     Type_Decl.Unit.Get_Charset)
+                   (Type_Decl.As_Basic_Decl.P_Fully_Qualified_Name,
+                    Type_Decl.Unit.Get_Charset)
                  & (if Attr_Flag then "'Attr" else "");
 
             when Ada_Anonymous_Type =>
                Param_Type_Def :=
                  F_Type_Def
-                   (As_Type_Decl
-                      (F_Type_Decl (As_Anonymous_Type (Param))));
+                   (As_Type_Decl (F_Type_Decl (As_Anonymous_Type (Param))));
 
                case Kind (Param_Type_Def) is
                   when Ada_Type_Access_Def =>
                      Param_Type_Name :=
-                       F_Name (F_Subtype_Indication
-                               (As_Type_Access_Def (Param_Type_Def)));
+                       F_Name
+                         (F_Subtype_Indication
+                            (As_Type_Access_Def (Param_Type_Def)));
 
                      if Kind (Param_Type_Name) = Ada_Attribute_Ref then
                         Attr_Flag := True;
@@ -361,15 +355,14 @@ package body Test.Common is
                      Type_Decl :=
                        P_Canonical_Type
                          (As_Base_Type_Decl
-                            (P_Referenced_Decl (Param_Type_Name))).
-                               As_Basic_Decl;
+                            (P_Referenced_Decl (Param_Type_Name)))
+                         .As_Basic_Decl;
                      while not Type_Decl.P_Next_Part_For_Decl.Is_Null loop
-                        Type_Decl :=
-                          Type_Decl.P_Next_Part_For_Decl;
+                        Type_Decl := Type_Decl.P_Next_Part_For_Decl;
                      end loop;
 
-                     if
-                       Subp_Depth < 2 and then not Attr_Flag
+                     if Subp_Depth < 2
+                       and then not Attr_Flag
                        and then Type_Decl = Tagged_Rec
                        and then not For_Stubs
                        and then not N_Controlling
@@ -382,8 +375,8 @@ package body Test.Common is
                      return
                        "@"
                        & Encode
-                          (Type_Decl.As_Basic_Decl.P_Fully_Qualified_Name,
-                           Type_Decl.Unit.Get_Charset)
+                           (Type_Decl.As_Basic_Decl.P_Fully_Qualified_Name,
+                            Type_Decl.Unit.Get_Charset)
                        & (if Attr_Flag then "'Attr" else "");
 
                   when Ada_Access_To_Subp_Def =>
@@ -392,9 +385,10 @@ package body Test.Common is
                      return
                        (if F_Has_Protected (Anon_Subp_Def) then "#" else "")
                        & Handle_Parameters
-                       (P_Params (F_Subp_Spec (Anon_Subp_Def)),
-                        F_Subp_Returns
-                          (As_Subp_Spec (F_Subp_Spec (Anon_Subp_Def))));
+                           (P_Params (F_Subp_Spec (Anon_Subp_Def)),
+                            F_Subp_Returns
+                              (As_Subp_Spec (F_Subp_Spec (Anon_Subp_Def))));
+
                   when others =>
                      Report_Err ("UNKNOWN type def:");
                      Print (Param_Type_Def);
@@ -416,17 +410,18 @@ package body Test.Common is
       else
          --  This allows us to compute the Hash of generic instantiations.
 
-         L_Subp := Subp.As_Basic_Decl.P_Subp_Spec_Or_Null
-                     (Follow_Generic => True);
+         L_Subp :=
+           Subp.As_Basic_Decl.P_Subp_Spec_Or_Null (Follow_Generic => True);
       end if;
 
       L_Subp_Span := Sloc_Range (L_Subp);
 
       Trace
         (Me_Hash,
-         "Mangle_Hash_Full for " & Subp_Name
+         "Mangle_Hash_Full for "
+         & Subp_Name
          & (if L_Subp_Span = No_Source_Location_Range then ""
-           else " at line" & L_Subp_Span.Start_Line'Img));
+            else " at line" & L_Subp_Span.Start_Line'Img));
       Increase_Indent (Me_Hash);
 
       Tagged_Rec := P_Primitive_Subp_Tagged_Type (L_Subp).As_Basic_Decl;
@@ -443,16 +438,19 @@ package body Test.Common is
          when Ada_Subp_Kind_Function =>
             Sign_Image :=
               To_Unbounded_String
-              ("function"
-               & Subp_Name & Handle_Parameters
-                 (P_Params (L_Subp),
-                  F_Subp_Returns (As_Subp_Spec (L_Subp))));
+                ("function"
+                 & Subp_Name
+                 & Handle_Parameters
+                     (P_Params (L_Subp),
+                      F_Subp_Returns (As_Subp_Spec (L_Subp))));
+
          when Ada_Subp_Kind_Procedure =>
             Sign_Image :=
               To_Unbounded_String
-              ("procedure"
-               & Subp_Name & Handle_Parameters
-                 (P_Params (L_Subp), No_Type_Expr));
+                ("procedure"
+                 & Subp_Name
+                 & Handle_Parameters (P_Params (L_Subp), No_Type_Expr));
+
          when others =>
             Trace (Me_Hash, "Unexpected element, returning empty hash");
             Trace (Me_Hash, Node_Image (L_Subp));
@@ -472,9 +470,7 @@ package body Test.Common is
       end if;
 
       Decrease_Indent (Me_Hash);
-      Trace
-        (Me_Hash,
-         "Hash : " & To_String (Head (Hash_Result, 16)));
+      Trace (Me_Hash, "Hash : " & To_String (Head (Hash_Result, 16)));
       return To_String (Hash_Result);
    end Mangle_Hash_Full;
 
@@ -486,12 +482,12 @@ package body Test.Common is
      (Subp           : Ada_Node'Class;
       Case_Sensitive : Boolean := False;
       N_Controlling  : Boolean := False;
-      For_Stubs      : Boolean := False) return String
-   is
+      For_Stubs      : Boolean := False) return String is
    begin
-      return Head
-        (Mangle_Hash_Full (Subp, Case_Sensitive, N_Controlling, For_Stubs),
-         16);
+      return
+        Head
+          (Mangle_Hash_Full (Subp, Case_Sensitive, N_Controlling, For_Stubs),
+           16);
    end Mangle_Hash_16;
 
    -----------------
@@ -503,14 +499,19 @@ package body Test.Common is
       Result  : Unbounded_String := To_Unbounded_String ("");
    begin
       for I in Nesting'First + 1 .. Nesting'Last loop
-         if Kind (Nesting (I)) in
-           Ada_Package_Decl | Ada_Generic_Package_Decl | Ada_Task_Type_Decl
-             | Ada_Protected_Type_Decl | Ada_Single_Protected_Decl
-               | Ada_Single_Task_Decl
+         if Kind (Nesting (I))
+            in Ada_Package_Decl
+             | Ada_Generic_Package_Decl
+             | Ada_Task_Type_Decl
+             | Ada_Protected_Type_Decl
+             | Ada_Single_Protected_Decl
+             | Ada_Single_Task_Decl
          then
             if Result = "" then
-               Result := To_Unbounded_String
-                 (Node_Image (P_Defining_Name (As_Basic_Decl (Nesting (I)))));
+               Result :=
+                 To_Unbounded_String
+                   (Node_Image
+                      (P_Defining_Name (As_Basic_Decl (Nesting (I)))));
             else
                Result :=
                  Node_Image (Nesting (I).As_Basic_Decl.P_Defining_Name)
@@ -527,8 +528,7 @@ package body Test.Common is
    -- Nesting_Common_Prefix --
    ---------------------------
 
-   function Nesting_Common_Prefix
-     (Nesting_1, Nesting_2 : String) return String
+   function Nesting_Common_Prefix (Nesting_1, Nesting_2 : String) return String
    is
       L1, L2   : Integer;
       Last_Dot : Integer;
@@ -566,14 +566,13 @@ package body Test.Common is
 
    end Nesting_Common_Prefix;
 
-   function Skip_Prefix (Identifier : String; Prefix : String)
-      return String is
+   function Skip_Prefix (Identifier : String; Prefix : String) return String is
       L1 : Integer := Identifier'First;
       L2 : Integer := Prefix'First;
    begin
       while L1 <= Identifier'Last
-         and then L2 <= Prefix'Last
-         and then Identifier (L1) = Prefix (L2)
+        and then L2 <= Prefix'Last
+        and then Identifier (L1) = Prefix (L2)
       loop
          L1 := @ + 1;
          L2 := @ + 1;
@@ -586,9 +585,7 @@ package body Test.Common is
    -- Nesting_Difference --
    ------------------------
 
-   function Nesting_Difference
-     (Nesting_1, Nesting_2 : String) return String
-   is
+   function Nesting_Difference (Nesting_1, Nesting_2 : String) return String is
       L : constant Integer := Integer'Min (Nesting_1'Length, Nesting_2'Length);
    begin
 
@@ -622,9 +619,9 @@ package body Test.Common is
    ----------------------
 
    function Operator_Image (Node : Ada_Node'Class) return String is
-      Name : constant String :=
+      Name              : constant String :=
         To_Lower (Common.Node_Image (P_Defining_Name (As_Basic_Decl (Node))));
-      Params : constant Param_Spec_Array :=
+      Params            : constant Param_Spec_Array :=
         P_Params (P_Subp_Spec_Or_Null (As_Basic_Decl (Node)));
       First_Param_Names : constant Defining_Name_List :=
         F_Ids (Params (Params'First));
@@ -636,51 +633,70 @@ package body Test.Common is
          First_Param_Names_Size := First_Param_Names_Size + 1;
       end loop;
 
-      if Name = """and""" then               -- and
+      if Name = """and""" then
+         --  and
          return "And";
-      elsif Name = """or""" then             -- or
+      elsif Name = """or""" then
+         --  or
          return "Or";
-      elsif Name = """xor""" then            -- xor
+      elsif Name = """xor""" then
+         --  xor
          return "Xor";
-      elsif Name = """=""" then              -- =
+      elsif Name = """=""" then
+         --  =
          return "Equal";
-      elsif Name = """/=""" then             -- /=
+      elsif Name = """/=""" then
+         --  /=
          return "Not_Equal";
-      elsif Name = """<""" then              -- <
+      elsif Name = """<""" then
+         --  <
          return "Less_Than";
-      elsif Name = """<=""" then             -- <=
+      elsif Name = """<=""" then
+         --  <=
          return "Less_Than_Or_Equal";
-      elsif Name = """>""" then              -- >
+      elsif Name = """>""" then
+         --  >
          return "Greater_Than";
-      elsif Name = """>=""" then             -- >=
+      elsif Name = """>=""" then
+         --  >=
          return "Greater_Than_Or_Equal";
-      elsif Name = """+""" then              -- +
+      elsif Name = """+""" then
+         --  +
          if Params'Length = 2 or else First_Param_Names_Size = 2 then
             return "Plus";
          else
             return "Unary_Plus";
          end if;
-      elsif Name = """-""" then              -- -
+      elsif Name = """-""" then
+         --  -
          if Params'Length = 2 or else First_Param_Names_Size = 2 then
             return "Minus";
          else
             return "Unary_Minus";
          end if;
-      elsif Name = """&""" then              -- &
+      elsif Name = """&""" then
+         --  &
          return "Concatenate";
-      elsif Name = """*""" then              -- *
+      elsif Name = """*""" then
+         --  *
          return "Multiply";
-      elsif Name = """/""" then              -- /
+      elsif Name = """/""" then
+         --  /
          return "Divide";
-      elsif Name = """mod""" then            -- mod
+      elsif Name = """mod""" then
+         --  mod
          return "Mod";
-      elsif Name = """rem""" then            -- rem
+      elsif Name = """rem""" then
+         --  rem
          return "Rem";
-      elsif Name = """**""" then             -- **
+      elsif Name = """**""" then
+         --  **
          return "Exponentiate";
-      elsif Name = """abs""" then            -- abs
+      elsif Name = """abs""" then
+         --  abs
          return "Abs";
-      elsif Name = """not""" then            -- not
+      elsif Name = """not""" then
+         --  not
          return "Not";
       end if;
 
@@ -827,8 +843,9 @@ package body Test.Common is
       T := new String'(Old);
       for J in T.all'First .. T.all'Last loop
          if T.all (J) = '.' then
-            if J = T.all'First + 1 and then
-              T.all (J - 1) in 'a' | 's' | 'i' | 'g' | 'A' | 'S' | 'I' | 'G'
+            if J = T.all'First + 1
+              and then T.all (J - 1)
+                       in 'a' | 's' | 'i' | 'g' | 'A' | 'S' | 'I' | 'G'
             then
                T.all (J) := '~';
             else
@@ -859,7 +876,7 @@ package body Test.Common is
    ------------
 
    procedure Create (Name : String) is
-      B_Name :          String := Base_Name (Name);
+      B_Name : String := Base_Name (Name);
       P_Name : constant String := Dir_Name (Name);
    begin
       if B_Name (B_Name'First + 1) = '-'
@@ -904,8 +921,7 @@ package body Test.Common is
    procedure Put_Harness_Header is
    begin
       S_Put
-        (0,
-         "--  This package has been generated automatically by GNATtest.");
+        (0, "--  This package has been generated automatically by GNATtest.");
       Put_New_Line;
       S_Put
         (0,
@@ -924,7 +940,7 @@ package body Test.Common is
 
       Persistent_Package_Name : constant String :=
         Common_Package_Name & ".Persistent";
-      Common_File_Subdir  : constant String :=
+      Common_File_Subdir      : constant String :=
         Harness_Dir.all & GNAT.OS_Lib.Directory_Separator & "common";
 
       use GNAT.OS_Lib;
@@ -933,9 +949,11 @@ package body Test.Common is
          Make_Dir (Common_File_Subdir);
       end if;
 
-      Create (Common_File_Subdir &
-              Directory_Separator &
-              Unit_To_File_Name (Common_Package_Name) & ".ads");
+      Create
+        (Common_File_Subdir
+         & Directory_Separator
+         & Unit_To_File_Name (Common_Package_Name)
+         & ".ads");
 
       S_Put (0, "package Gnattest_Generated is");
       Put_New_Line;
@@ -954,13 +972,15 @@ package body Test.Common is
 
       declare
          Persistent_File_Name_Spec : constant String :=
-           Common_File_Subdir &
-           Directory_Separator &
-           Unit_To_File_Name (Persistent_Package_Name) & ".ads";
+           Common_File_Subdir
+           & Directory_Separator
+           & Unit_To_File_Name (Persistent_Package_Name)
+           & ".ads";
          Persistent_File_Name_Body : constant String :=
-           Common_File_Subdir &
-           Directory_Separator &
-           Unit_To_File_Name (Persistent_Package_Name) & ".adb";
+           Common_File_Subdir
+           & Directory_Separator
+           & Unit_To_File_Name (Persistent_Package_Name)
+           & ".adb";
       begin
          if not Is_Regular_File (Persistent_File_Name_Spec) then
             Create (Persistent_File_Name_Spec);
@@ -1008,8 +1028,7 @@ package body Test.Common is
    -- Is_Private --
    ----------------
 
-   function Is_Private (Node : Ada_Node'Class) return Boolean
-   is
+   function Is_Private (Node : Ada_Node'Class) return Boolean is
       P_List : constant Ada_Node_Array := Parents (Node);
    begin
       for P of P_List loop
@@ -1053,31 +1072,27 @@ package body Test.Common is
    -------------------
 
    function Abstract_Type (Decl : Base_Type_Decl) return Boolean is
-      Type_Decl       : constant Base_Type_Decl := Decl;
-      Param_Type_Def  :          Type_Def;
+      Type_Decl      : constant Base_Type_Decl := Decl;
+      Param_Type_Def : Type_Def;
    begin
-      if
-        Type_Decl.Kind = Ada_Incomplete_Tagged_Type_Decl and then
-        Type_Decl.As_Incomplete_Tagged_Type_Decl.F_Has_Abstract
+      if Type_Decl.Kind = Ada_Incomplete_Tagged_Type_Decl
+        and then Type_Decl.As_Incomplete_Tagged_Type_Decl.F_Has_Abstract
       then
          return True;
       end if;
 
       if Type_Decl.Kind in Ada_Type_Decl then
          Param_Type_Def := Type_Decl.As_Type_Decl.F_Type_Def;
-         if
-           Param_Type_Def.Kind = Ada_Derived_Type_Def and then
-           Param_Type_Def.As_Derived_Type_Def.F_Has_Abstract
+         if Param_Type_Def.Kind = Ada_Derived_Type_Def
+           and then Param_Type_Def.As_Derived_Type_Def.F_Has_Abstract
          then
             return True;
-         elsif
-           Param_Type_Def.Kind = Ada_Private_Type_Def and then
-           Param_Type_Def.As_Private_Type_Def.F_Has_Abstract
+         elsif Param_Type_Def.Kind = Ada_Private_Type_Def
+           and then Param_Type_Def.As_Private_Type_Def.F_Has_Abstract
          then
             return True;
-         elsif
-           Param_Type_Def.Kind = Ada_Record_Type_Def and then
-           Param_Type_Def.As_Record_Type_Def.F_Has_Abstract
+         elsif Param_Type_Def.Kind = Ada_Record_Type_Def
+           and then Param_Type_Def.As_Record_Type_Def.F_Has_Abstract
          then
             return True;
          end if;
@@ -1091,10 +1106,9 @@ package body Test.Common is
 
    function Inheritance_Depth
      (Inheritance_Root_Type  : Base_Type_Decl;
-      Inheritance_Final_Type : Base_Type_Decl)
-      return Natural
+      Inheritance_Final_Type : Base_Type_Decl) return Natural
    is
-      Count    : Natural        := 0;
+      Count    : Natural := 0;
       Type_Dec : Base_Type_Decl := Inheritance_Final_Type;
    begin
 
@@ -1118,11 +1132,18 @@ package body Test.Common is
    function Is_Function (Decl : Basic_Decl) return Boolean is
    begin
       if Decl.Kind = Ada_Expr_Function then
-         return Decl.As_Expr_Function.F_Subp_Spec.F_Subp_Kind.Kind =
-           Ada_Subp_Kind_Function;
+         return
+           Decl.As_Expr_Function.F_Subp_Spec.F_Subp_Kind.Kind
+           = Ada_Subp_Kind_Function;
       else
-         return Decl.As_Basic_Subp_Decl.P_Subp_Decl_Spec.As_Subp_Spec.
-           F_Subp_Kind.Kind = Ada_Subp_Kind_Function;
+         return
+           Decl
+             .As_Basic_Subp_Decl
+             .P_Subp_Decl_Spec
+             .As_Subp_Spec
+             .F_Subp_Kind
+             .Kind
+           = Ada_Subp_Kind_Function;
       end if;
    exception
       when others =>
@@ -1143,13 +1164,14 @@ package body Test.Common is
       procedure Report_Elab (N : Ada_Node'Class);
       --  Outputs warning about possible problems with elaboration
 
-      function Check_Name (S : String) return Boolean is
-        (To_Lower (S) in "preelaborate"   |
-                         "pure"           |
-                         "elaborate"      |
-                         "elaborate_body" |
-                         "elaborate_all"  |
-                         "preelaborable_initialization");
+      function Check_Name (S : String) return Boolean
+      is (To_Lower (S)
+          in "preelaborate"
+           | "pure"
+           | "elaborate"
+           | "elaborate_body"
+           | "elaborate_all"
+           | "preelaborable_initialization");
       --  Checks that given name is among the list of elaboration pragmas
 
       -----------------
@@ -1167,8 +1189,7 @@ package body Test.Common is
             & Trim (First_Column_Number (N)'Img, Both)
             & ": elaboration control "
             & (if N.Kind = Ada_Pragma_Node then "pragma" else "aspect"));
-         Report_Std
-           ("this can cause circularity in the test harness", 1);
+         Report_Std ("this can cause circularity in the test harness", 1);
          Elab_Found := True;
       end Report_Elab;
 
@@ -1208,8 +1229,8 @@ package body Test.Common is
             return;
          end if;
 
-         Sibl := Decls.Ada_Node_List_Element
-           (Decls.Ada_Node_List_First).As_Ada_Node;
+         Sibl :=
+           Decls.Ada_Node_List_Element (Decls.Ada_Node_List_First).As_Ada_Node;
 
          while not Sibl.Is_Null and then Sibl.Kind = Ada_Pragma_Node loop
             if Check_Name (Node_Image (Sibl.As_Pragma_Node.F_Id)) then
@@ -1220,8 +1241,7 @@ package body Test.Common is
          end loop;
 
          for Pr of CU.F_Pragmas loop
-            if Check_Name (Node_Image (Pr.As_Pragma_Node.F_Id))
-            then
+            if Check_Name (Node_Image (Pr.As_Pragma_Node.F_Id)) then
                Report_Elab (Pr);
                return;
             end if;
@@ -1243,8 +1263,8 @@ package body Test.Common is
 
       if Body_N /= No_Body_Node
         and then Body_N.Unit.Root.Kind = Ada_Compilation_Unit
-        and then Body_N.Unit.Root.As_Compilation_Unit.F_Body.Kind /=
-          Ada_Subunit
+        and then Body_N.Unit.Root.As_Compilation_Unit.F_Body.Kind
+                 /= Ada_Subunit
       then
          Process_CU (Body_N.Unit.Root.As_Compilation_Unit);
       end if;
@@ -1266,8 +1286,8 @@ package body Test.Common is
    -- Get_Lib_Support_Status --
    ----------------------------
 
-   function Get_Lib_Support_Status return Lib_Support_Status is
-     (Need_Lib_Support);
+   function Get_Lib_Support_Status return Lib_Support_Status
+   is (Need_Lib_Support);
 
    --------------------------------
    -- Mark_Lib_Support_Generated --
@@ -1282,10 +1302,10 @@ package body Test.Common is
    -- Harness_Has_Gen_Tests --
    ---------------------------
 
-   function Harness_Has_Gen_Tests return Boolean is
-     (Need_Lib_Support = Generated
-      and then JSON_Test_Dir /= null
-      and then Ada.Directories.Exists (JSON_Test_Dir.all));
+   function Harness_Has_Gen_Tests return Boolean
+   is (Need_Lib_Support = Generated
+       and then JSON_Test_Dir /= null
+       and then Ada.Directories.Exists (JSON_Test_Dir.all));
 
    --  The harness can only have generated tests if the support library has
    --  been generated, and the JSON_Test dir exists.
@@ -1295,29 +1315,29 @@ package body Test.Common is
    ---------------------------------
 
    procedure Extract_Preprocessor_Config
-      (Tree : GNATCOLL.Projects.Project_Tree'Class)
+     (Tree : GNATCOLL.Projects.Project_Tree'Class)
    is
       use Libadalang.Preprocessing;
       Data : constant Preprocessor_Data :=
-         Extract_Preprocessor_Data_From_Project (Tree);
+        Extract_Preprocessor_Data_From_Project (Tree);
    begin
       Preprocessor_Config := Data;
       Has_Preprocessor :=
-         Data.Default_Config.Enabled or not Data.File_Configs.Is_Empty;
+        Data.Default_Config.Enabled or not Data.File_Configs.Is_Empty;
    end Extract_Preprocessor_Config;
 
    ------------------------------------
    -- Write_Additional_Compiler_Flags --
    ------------------------------------
 
-   procedure Write_Additional_Compiler_Flags
-      (Preprocessor_Config_Dir : String) is
+   procedure Write_Additional_Compiler_Flags (Preprocessor_Config_Dir : String)
+   is
    begin
       Preprocessor_Config.Write_Preprocessor_Data_File
-         (Preprocessor_Config_Dir
-            & GNAT.OS_Lib.Directory_Separator
-            & Preprocessor_File_Name,
-          Preprocessor_Config_Dir);
+        (Preprocessor_Config_Dir
+         & GNAT.OS_Lib.Directory_Separator
+         & Preprocessor_File_Name,
+         Preprocessor_Config_Dir);
 
       S_Put (3, "package Compiler extends Gnattest_Common.Compiler is");
       Put_New_Line;
@@ -1327,7 +1347,9 @@ package body Test.Common is
       Put_New_Line;
 
       if Test.Common.Has_Preprocessor then
-         S_Put (12, "& (""-gnatep="
+         S_Put
+           (12,
+            "& (""-gnatep="
             & Preprocessor_Config_Dir
             & GNAT.OS_Lib.Directory_Separator
             & Test.Common.Preprocessor_File_Name
@@ -1335,15 +1357,15 @@ package body Test.Common is
       end if;
 
       S_Put
-         (12,
-          "& ("""
-          & (case Lang_Version is
-             when Ada_83   => "-gnat83",
-             when Ada_95   => "-gnat95",
-             when Ada_2005 => "-gnat2005",
-             when Ada_2012 => "-gnat2012",
-             when Ada_2022 => "-gnat2022")
-           & """)");
+        (12,
+         "& ("""
+         & (case Lang_Version is
+              when Ada_83 => "-gnat83",
+              when Ada_95 => "-gnat95",
+              when Ada_2005 => "-gnat2005",
+              when Ada_2012 => "-gnat2012",
+              when Ada_2022 => "-gnat2022")
+         & """)");
 
       S_Put (0, ";");
       Put_New_Line;
@@ -1366,8 +1388,11 @@ package body Test.Common is
 
       --  No support for protected entities
 
-      if Node.Kind in Ada_Single_Protected_Decl | Ada_Protected_Type_Decl
-                     | Ada_Protected_Body | Ada_Protected_Body_Stub
+      if Node.Kind
+         in Ada_Single_Protected_Decl
+          | Ada_Protected_Type_Decl
+          | Ada_Protected_Body
+          | Ada_Protected_Body_Stub
       then
          return False;
       end if;
@@ -1385,12 +1410,12 @@ package body Test.Common is
       if Is_Null (Decl.P_Defining_Name) then
          return Decl.P_Is_Ghost_Code;
       else
-      --  We consider that as soon as one of the defining names in
-      --  Decl is not ghost, then the whole declaration is not ghost
-      --  as well.
+         --  We consider that as soon as one of the defining names in
+         --  Decl is not ghost, then the whole declaration is not ghost
+         --  as well.
 
-         return (for all Name of Decl.P_Defining_Names
-                 => Name.P_Is_Ghost_Code);
+         return
+           (for all Name of Decl.P_Defining_Names => Name.P_Is_Ghost_Code);
       end if;
    end Is_Ghost_Code;
 
@@ -1407,17 +1432,17 @@ package body Test.Common is
    -- Is_Subprogram_Allowed --
    ---------------------------
 
-   function Is_Subprogram_Allowed (Subp : Basic_Decl'Class) return Boolean
-   is
+   function Is_Subprogram_Allowed (Subp : Basic_Decl'Class) return Boolean is
       use Utils.String_Utilities;
 
       Decl_String : constant String :=
-         Ada.Directories.Simple_Name (Subp.Unit.Get_Filename)
-         & ":"
-         & Image (Modular (Subp.Sloc_Range.Start_Line));
+        Ada.Directories.Simple_Name (Subp.Unit.Get_Filename)
+        & ":"
+        & Image (Modular (Subp.Sloc_Range.Start_Line));
    begin
-      return Allowed_Subprograms.Is_Empty
-         or else Allowed_Subprograms.Contains (Decl_String);
+      return
+        Allowed_Subprograms.Is_Empty
+        or else Allowed_Subprograms.Contains (Decl_String);
    end Is_Subprogram_Allowed;
 
 end Test.Common;

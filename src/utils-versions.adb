@@ -45,25 +45,25 @@ package body Utils.Versions is
       case Build_Type is
          when GPL =>
             return
-              "This is free software; see the source for copying conditions." &
-              ASCII.LF &
-              "There is NO warranty; not even for MERCHANTABILITY or FITNESS" &
-              " FOR A PARTICULAR PURPOSE.";
+              "This is free software; see the source for copying conditions."
+              & ASCII.LF
+              & "There is NO warranty; not even for MERCHANTABILITY or FITNESS"
+              & " FOR A PARTICULAR PURPOSE.";
 
          when Gnatpro =>
             return
-              "This is free software; see the source for copying conditions." &
-               ASCII.LF &
-               "See your AdaCore support agreement for details of warranty" &
-               " and support." &
-               ASCII.LF &
-               "If you do not have a current support agreement, then there" &
-               " is absolutely" &
-               ASCII.LF &
-               "no warranty; not even for MERCHANTABILITY or FITNESS FOR" &
-               " A PARTICULAR" &
-               ASCII.LF &
-               "PURPOSE.";
+              "This is free software; see the source for copying conditions."
+              & ASCII.LF
+              & "See your AdaCore support agreement for details of warranty"
+              & " and support."
+              & ASCII.LF
+              & "If you do not have a current support agreement, then there"
+              & " is absolutely"
+              & ASCII.LF
+              & "no warranty; not even for MERCHANTABILITY or FITNESS FOR"
+              & " A PARTICULAR"
+              & ASCII.LF
+              & "PURPOSE.";
       end case;
    end Gnat_Free_Software;
 
@@ -75,18 +75,20 @@ package body Utils.Versions is
    --  This is the first year in which any of the sources used by these tools
    --  was written.
 
-   function Edition return String is
-      (case Build_Type is
+   function Edition return String
+   is (case Build_Type is
          when Gnatpro => "Pro",
          when GPL => "Community");
 
    procedure Print_Tool_Version is
       use Utils.Formatted_Output;
    begin
-      Put ("\1 \2 \3\n",
-           To_Upper (Tool_Names.Tool_Name), Edition, Version);
-      Put ("Copyright (C) \1-\2, \3\n",
-           Initial_Year, Current_Year, Copyright_Holder);
+      Put ("\1 \2 \3\n", To_Upper (Tool_Names.Tool_Name), Edition, Version);
+      Put
+        ("Copyright (C) \1-\2, \3\n",
+         Initial_Year,
+         Current_Year,
+         Copyright_Holder);
       Put ("\1", Gnat_Free_Software);
       Put ("\n");
    end Print_Tool_Version;
@@ -99,8 +101,11 @@ package body Utils.Versions is
       use Utils.Formatted_Stderr;
    begin
       Put ("\1 \2 \3\n", Tool_Names.Tool_Name, Edition, Version);
-      Put ("Copyright (C) \1-\2, \3\n",
-           Initial_Year, Current_Year, Copyright_Holder);
+      Put
+        ("Copyright (C) \1-\2, \3\n",
+         Initial_Year,
+         Current_Year,
+         Copyright_Holder);
    end Print_Version_Info;
 
 end Utils.Versions;

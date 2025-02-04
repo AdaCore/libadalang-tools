@@ -33,7 +33,7 @@ with Ada.Strings.Wide_Wide_Unbounded.Wide_Wide_Hash;
 
 with Langkit_Support.Text; use Langkit_Support.Text;
 
-with TGen.JSON; use TGen.JSON;
+with TGen.JSON;        use TGen.JSON;
 with TGen.Strategies;  use TGen.Strategies;
 with TGen.Strings;     use TGen.Strings;
 with TGen.Subprograms; use TGen.Subprograms;
@@ -41,40 +41,42 @@ with TGen.Types;       use TGen.Types;
 
 package TGen.Context is
 
-   package Fully_Qualified_Name_To_Type_Maps is new Ada.Containers.Ordered_Maps
-     (Key_Type     => Unbounded_Text_Type,
-      Element_Type => SP.Ref,
-      "<"          => Ada.Strings.Wide_Wide_Unbounded."<",
-      "="          => SP."=");
+   package Fully_Qualified_Name_To_Type_Maps is new
+     Ada.Containers.Ordered_Maps
+       (Key_Type     => Unbounded_Text_Type,
+        Element_Type => SP.Ref,
+        "<"          => Ada.Strings.Wide_Wide_Unbounded."<",
+        "="          => SP."=");
    subtype Fully_Qualified_Name_To_Type_Map is
      Fully_Qualified_Name_To_Type_Maps.Map;
 
-   package Unit_To_JSON_Maps is new Ada.Containers.Ordered_Maps
-     (Key_Type     => Unbounded_Text_Type,
-      Element_Type => JSON_Value,
-      "<"          => Ada.Strings.Wide_Wide_Unbounded."<");
+   package Unit_To_JSON_Maps is new
+     Ada.Containers.Ordered_Maps
+       (Key_Type     => Unbounded_Text_Type,
+        Element_Type => JSON_Value,
+        "<"          => Ada.Strings.Wide_Wide_Unbounded."<");
    subtype Unit_To_JSON_Map is Unit_To_JSON_Maps.Map;
 
-   package Typ_Sets is new Ada.Containers.Ordered_Sets
-     (Element_Type => SP.Ref,
-      "="          => SP."=");
+   package Typ_Sets is new
+     Ada.Containers.Ordered_Sets (Element_Type => SP.Ref, "=" => SP."=");
    subtype Typ_Set is Typ_Sets.Set;
 
-   package Typ_Lists is new Ada.Containers.Doubly_Linked_Lists
-     (Element_Type => SP.Ref);
+   package Typ_Lists is new
+     Ada.Containers.Doubly_Linked_Lists (Element_Type => SP.Ref);
    subtype Typ_List is Typ_Lists.List;
 
-   package Type_Vectors_Maps is new Ada.Containers.Ordered_Maps
-     (Key_Type     => Unbounded_Text_Type,
-      Element_Type => Typ_Set,
-      "<"          => Ada.Strings.Wide_Wide_Unbounded."<",
-      "="          => Typ_Sets."=");
+   package Type_Vectors_Maps is new
+     Ada.Containers.Ordered_Maps
+       (Key_Type     => Unbounded_Text_Type,
+        Element_Type => Typ_Set,
+        "<"          => Ada.Strings.Wide_Wide_Unbounded."<",
+        "="          => Typ_Sets."=");
    subtype Type_Vectors_Map is Type_Vectors_Maps.Map;
 
    type Unsupported_Behavior_Kind is (No_Test, Commented_Out);
 
-   package Fully_Qualified_Name_To_Strat_Maps is
-     new Ada.Containers.Indefinite_Hashed_Maps
+   package Fully_Qualified_Name_To_Strat_Maps is new
+     Ada.Containers.Indefinite_Hashed_Maps
        (Key_Type        => Unbounded_Text_Type,
         Element_Type    => Strategy_Type'Class,
         Hash            => Ada.Strings.Wide_Wide_Unbounded.Wide_Wide_Hash,

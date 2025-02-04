@@ -26,8 +26,8 @@ with GNATCOLL.Terminal;
 
 package body Pp is
 
-   Info_Message_Style : GNATCOLL.Traces.Message_Style renames
-     GNATCOLL.Traces.Use_Default_Style;
+   Info_Message_Style : GNATCOLL.Traces.Message_Style
+     renames GNATCOLL.Traces.Use_Default_Style;
 
    Debug_Message_Style : constant GNATCOLL.Traces.Message_Style :=
      GNATCOLL.Traces.Message_Style'
@@ -45,26 +45,23 @@ package body Pp is
    -- Trace --
    -----------
 
-   procedure Trace
-     (Message  : String;
-      Level    : Log_Level := Info) is
+   procedure Trace (Message : String; Level : Log_Level := Info) is
    begin
       case Level is
          when Info =>
             Info_Logger.Trace
-              (Message => Message,
-               Style   => Info_Message_Style);
+              (Message => Message, Style => Info_Message_Style);
+
          when Debug =>
             Debug_Logger.Trace
-              (Message => Message,
-               Style   => Debug_Message_Style);
+              (Message => Message, Style => Debug_Message_Style);
+
          when Error =>
             if Utils.Err_Out.Output_Enabled then
                Utils.Err_Out.Put ("\1\n", Message);
             end if;
             Error_Logger.Trace
-              (Message => Message,
-               Style   => Error_Message_Style);
+              (Message => Message, Style => Error_Message_Style);
       end case;
    end Trace;
 
@@ -73,29 +70,25 @@ package body Pp is
    -----------
 
    procedure Trace
-     (E        : Ada.Exceptions.Exception_Occurrence;
-      Message  : String := "Unexpected exception: ";
-      Level    : Log_Level := Error) is
+     (E       : Ada.Exceptions.Exception_Occurrence;
+      Message : String := "Unexpected exception: ";
+      Level   : Log_Level := Error) is
    begin
       case Level is
          when Info =>
             Info_Logger.Trace
-              (E       => E,
-               Msg     => Message,
-               Style   => Info_Message_Style);
+              (E => E, Msg => Message, Style => Info_Message_Style);
+
          when Debug =>
             Debug_Logger.Trace
-              (E       => E,
-               Msg     => Message,
-               Style   => Debug_Message_Style);
+              (E => E, Msg => Message, Style => Debug_Message_Style);
+
          when Error =>
             if Utils.Err_Out.Output_Enabled then
                Utils.Err_Out.Put ("\1\n", Message);
             end if;
             Error_Logger.Trace
-              (E       => E,
-               Msg     => Message,
-               Style   => Error_Message_Style);
+              (E => E, Msg => Message, Style => Error_Message_Style);
       end case;
    end Trace;
 

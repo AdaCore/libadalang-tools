@@ -63,9 +63,11 @@ package body TGen.Dependency_Graph is
          when Anonymous_Kind =>
             Res.Include (As_Anonymous_Typ (T).Named_Ancestor);
             if Transitive then
-               Res.Union (Type_Dependencies
-                            (As_Anonymous_Typ (T).Named_Ancestor, Transitive));
+               Res.Union
+                 (Type_Dependencies
+                    (As_Anonymous_Typ (T).Named_Ancestor, Transitive));
             end if;
+
          when Array_Typ_Range =>
             declare
                Comp_Ty : constant SP.Ref := As_Array_Typ (T).Component_Type;
@@ -80,11 +82,12 @@ package body TGen.Dependency_Graph is
             --  any type.
 
             for Idx_Typ of As_Array_Typ (T).Index_Types loop
-                  Res.Include (Idx_Typ);
+               Res.Include (Idx_Typ);
                if Idx_Typ.Get.Kind = Anonymous_Kind then
                   Res.Union (Type_Dependencies (Idx_Typ, Transitive));
                end if;
             end loop;
+
          when Non_Disc_Record_Kind =>
             for Comp_Typ of As_Nondiscriminated_Record_Typ (T).Component_Types
             loop
@@ -93,21 +96,21 @@ package body TGen.Dependency_Graph is
                   Res.Union (Type_Dependencies (Comp_Typ, Transitive));
                end if;
             end loop;
+
          when Function_Kind =>
-            for Param_Typ of As_Function_Typ (T).Component_Types
-            loop
+            for Param_Typ of As_Function_Typ (T).Component_Types loop
                Res.Include (Param_Typ);
                if Transitive then
                   Res.Union (Type_Dependencies (Param_Typ, Transitive));
                end if;
             end loop;
-            for Global_Typ of As_Function_Typ (T).Globals
-            loop
+            for Global_Typ of As_Function_Typ (T).Globals loop
                Res.Include (Global_Typ);
                if Transitive then
                   Res.Union (Type_Dependencies (Global_Typ, Transitive));
                end if;
             end loop;
+
          when Disc_Record_Kind =>
             for Comp_Typ of As_Discriminated_Record_Typ (T).Component_Types
             loop
@@ -128,6 +131,7 @@ package body TGen.Dependency_Graph is
                end if;
             end loop;
             Inspect_Variant (As_Discriminated_Record_Typ (T).Variant);
+
          when others =>
             null;
       end case;
@@ -160,11 +164,10 @@ package body TGen.Dependency_Graph is
    --------------
 
    procedure Traverse
-     (G        : Graph_Type;
-      Callback : access procedure (N : SP.Ref))
+     (G : Graph_Type; Callback : access procedure (N : SP.Ref))
    is
       G_Copy : Graph_Type := G;
-      Roots : Typ_List;
+      Roots  : Typ_List;
    begin
       --  Start by getting the roots of the DAG
 
@@ -217,9 +220,8 @@ package body TGen.Dependency_Graph is
    -- Sort --
    ----------
 
-   function Sort (Types : Typ_Sets.Set) return Typ_List
-   is
-      G : Graph_Type;
+   function Sort (Types : Typ_Sets.Set) return Typ_List is
+      G            : Graph_Type;
       Sorted_Types : Typ_List;
 
       procedure Append (T : SP.Ref);
@@ -254,7 +256,7 @@ package body TGen.Dependency_Graph is
          end loop;
       end loop;
 
-         --  Sort the types
+      --  Sort the types
 
       Traverse (G, Append'Access);
       return Sorted_Types;

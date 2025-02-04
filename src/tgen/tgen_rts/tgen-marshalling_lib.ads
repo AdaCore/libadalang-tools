@@ -53,9 +53,7 @@ package TGen.Marshalling_Lib is
       type T is (<>);
    package Read_Write_Enum is
 
-      function Size
-        (First : T := T'First;
-         Last  : T := T'Last) return Natural;
+      function Size (First : T := T'First; Last : T := T'Last) return Natural;
       --  Return the number of bits used for values of the type
 
       procedure Write
@@ -80,9 +78,7 @@ package TGen.Marshalling_Lib is
       type T is range <>;
    package Read_Write_Signed is
 
-      function Size
-        (First : T := T'First;
-         Last  : T := T'Last) return Natural;
+      function Size (First : T := T'First; Last : T := T'Last) return Natural;
       --  Return the number of bits used for values of the type
 
       procedure Write
@@ -107,9 +103,7 @@ package TGen.Marshalling_Lib is
       type T is mod <>;
    package Read_Write_Unsigned is
 
-      function Size
-        (First : T := T'First;
-         Last  : T := T'Last) return Natural;
+      function Size (First : T := T'First; Last : T := T'Last) return Natural;
       --  Return the number of bits used for values of the type
 
       procedure Write
@@ -144,9 +138,7 @@ package TGen.Marshalling_Lib is
       type T is delta <> digits <>;
    package Read_Write_Decimal_Fixed is
 
-      function Size
-        (First : T := T'First;
-         Last  : T := T'Last) return Natural;
+      function Size (First : T := T'First; Last : T := T'Last) return Natural;
       --  Return the number of bits used for values of the type
 
       procedure Write
@@ -173,18 +165,17 @@ package TGen.Marshalling_Lib is
 
       procedure Write (JSON : in out TGen.JSON.JSON_Value; V : T);
 
-      procedure Read
-        (JSON : TGen.JSON.JSON_Value; V : out T);
+      procedure Read (JSON : TGen.JSON.JSON_Value; V : out T);
 
    end Read_Write_Decimal_Fixed_JSON;
 
+   --!format off
    generic
       type T is delta <>;
    package Read_Write_Ordinary_Fixed is
+      --!format on
 
-      function Size
-        (First : T := T'First;
-         Last  : T := T'Last) return Natural;
+      function Size (First : T := T'First; Last : T := T'Last) return Natural;
       --  Return the number of bits used for values of the type
 
       procedure Write
@@ -205,9 +196,11 @@ package TGen.Marshalling_Lib is
 
    end Read_Write_Ordinary_Fixed;
 
+   --!format off
    generic
       type T is delta <>;
    package Read_Write_Ordinary_Fixed_JSON is
+      --!format on
 
       procedure Write (JSON : in out TGen.JSON.JSON_Value; V : T);
 
@@ -219,19 +212,18 @@ package TGen.Marshalling_Lib is
       type T is digits <>;
    package Read_Write_Float is
 
-      pragma Compile_Time_Error
-        ((case T'Machine_Mantissa is
-            when 24     => Float'Machine_Mantissa /= 24,
-            when 53     => Long_Float'Machine_Mantissa /= 53,
-            when 64     => Long_Long_Float'Machine_Mantissa /= 64,
-            when others => True),
-         "Unsupported floating-point type");
+      pragma
+        Compile_Time_Error
+          ((case T'Machine_Mantissa is
+              when 24 => Float'Machine_Mantissa /= 24,
+              when 53 => Long_Float'Machine_Mantissa /= 53,
+              when 64 => Long_Long_Float'Machine_Mantissa /= 64,
+              when others => True),
+           "Unsupported floating-point type");
       --  We only support standard floating point formats in targets that
       --  support them.
 
-      function Size
-        (First : T := T'First;
-         Last  : T := T'Last) return Natural;
+      function Size (First : T := T'First; Last : T := T'Last) return Natural;
       --  Return the number of bits used for values of the type
 
       procedure Write
@@ -265,32 +257,32 @@ package TGen.Marshalling_Lib is
    generic
       type T is private;
 
-      with procedure Write
-        (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-         Buffer : in out Unsigned_8;
-         Offset : in out Offset_Type;
-         V      : T);
+      with
+        procedure Write
+          (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+           Buffer : in out Unsigned_8;
+           Offset : in out Offset_Type;
+           V      : T);
 
-      with procedure Read
-        (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-         Buffer : in out Unsigned_8;
-         Offset : in out Offset_Type;
-         V      : out T);
+      with
+        procedure Read
+          (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+           Buffer : in out Unsigned_8;
+           Offset : in out Offset_Type;
+           V      : out T);
 
-   package In_Out is
+   package In_Out
+   is
 
       function Input
-        (Stream : not null access Ada.Streams.Root_Stream_Type'Class)
-        return T;
+        (Stream : not null access Ada.Streams.Root_Stream_Type'Class) return T;
 
       procedure Output
-        (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-         V      : T);
+        (Stream : not null access Ada.Streams.Root_Stream_Type'Class; V : T);
 
       function Input
         (Header : not null access Ada.Streams.Root_Stream_Type'Class;
-         Stream : not null access Ada.Streams.Root_Stream_Type'Class)
-        return T;
+         Stream : not null access Ada.Streams.Root_Stream_Type'Class) return T;
 
       procedure Output
         (Header : not null access Ada.Streams.Root_Stream_Type'Class;
@@ -302,13 +294,12 @@ package TGen.Marshalling_Lib is
    generic
       type T is private;
 
-      with procedure Write
-        (JSON : in out TGen.JSON.JSON_Value; V : T);
+      with procedure Write (JSON : in out TGen.JSON.JSON_Value; V : T);
 
-      with procedure Read
-        (JSON  : TGen.JSON.JSON_Value; V : out T);
+      with procedure Read (JSON : TGen.JSON.JSON_Value; V : out T);
 
-   package In_Out_JSON is
+   package In_Out_JSON
+   is
 
       function Input (JSON : TGen.JSON.JSON_Value) return T;
 
@@ -322,40 +313,41 @@ package TGen.Marshalling_Lib is
 
       with function Init (H : Header_Type) return T;
 
-      with function Input_Header
-        (Stream : not null access Ada.Streams.Root_Stream_Type'Class)
-        return Header_Type;
+      with
+        function Input_Header
+          (Stream : not null access Ada.Streams.Root_Stream_Type'Class)
+           return Header_Type;
 
-      with procedure Output_Header
-        (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-         V      : T);
+      with
+        procedure Output_Header
+          (Stream : not null access Ada.Streams.Root_Stream_Type'Class; V : T);
 
-      with procedure Write
-        (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-         Buffer : in out Unsigned_8;
-         Offset : in out Offset_Type;
-         V      : T);
+      with
+        procedure Write
+          (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+           Buffer : in out Unsigned_8;
+           Offset : in out Offset_Type;
+           V      : T);
 
-      with procedure Read
-        (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-         Buffer : in out Unsigned_8;
-         Offset : in out Offset_Type;
-         V      : out T);
+      with
+        procedure Read
+          (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+           Buffer : in out Unsigned_8;
+           Offset : in out Offset_Type;
+           V      : out T);
 
-   package In_Out_Unconstrained is
+   package In_Out_Unconstrained
+   is
 
       function Input
-        (Stream : not null access Ada.Streams.Root_Stream_Type'Class)
-        return T;
+        (Stream : not null access Ada.Streams.Root_Stream_Type'Class) return T;
 
       procedure Output
-        (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-         V      : T);
+        (Stream : not null access Ada.Streams.Root_Stream_Type'Class; V : T);
 
       function Input
         (Header : not null access Ada.Streams.Root_Stream_Type'Class;
-         Stream : not null access Ada.Streams.Root_Stream_Type'Class)
-        return T;
+         Stream : not null access Ada.Streams.Root_Stream_Type'Class) return T;
 
       procedure Output
         (Header : not null access Ada.Streams.Root_Stream_Type'Class;
@@ -370,17 +362,16 @@ package TGen.Marshalling_Lib is
 
       with function Init (H : Header) return T;
 
-      with procedure Output_Header
-        (JSON : in out TGen.JSON.JSON_Value; V : T);
+      with procedure Output_Header (JSON : in out TGen.JSON.JSON_Value; V : T);
 
-      with function Input_Header
-        (JSON : TGen.JSON.JSON_Value) return Header;
+      with function Input_Header (JSON : TGen.JSON.JSON_Value) return Header;
 
       with procedure Write (JSON : in out TGen.JSON.JSON_Value; V : T);
 
-      with procedure Read (JSON  : TGen.JSON.JSON_Value; V : out T);
+      with procedure Read (JSON : TGen.JSON.JSON_Value; V : out T);
 
-   package In_Out_Unconstrained_JSON is
+   package In_Out_Unconstrained_JSON
+   is
 
       function Input (JSON : TGen.JSON.JSON_Value) return T;
 

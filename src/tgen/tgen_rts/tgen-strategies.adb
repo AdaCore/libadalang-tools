@@ -31,8 +31,7 @@ package body TGen.Strategies is
    -- "=" --
    ---------
 
-   function "=" (L, R : Strategy_Type'Class) return Boolean
-   is
+   function "=" (L, R : Strategy_Type'Class) return Boolean is
       pragma Unreferenced (L);
       pragma Unreferenced (R);
    begin
@@ -44,8 +43,8 @@ package body TGen.Strategies is
    --------------
 
    function Generate
-     (S            : in out Commented_Out_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return JSON_Value is
+     (S : in out Commented_Out_Strategy_Type; Disc_Context : Disc_Value_Map)
+      return JSON_Value is
    begin
       return Create ("--  Replace this comment by a valid value");
    end Generate;
@@ -55,8 +54,8 @@ package body TGen.Strategies is
    --------------
 
    function Generate
-     (S            : in out Dispatching_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return JSON_Value
+     (S : in out Dispatching_Strategy_Type; Disc_Context : Disc_Value_Map)
+      return JSON_Value
    is
       Rnd : constant Float := Rand_Float;
    begin
@@ -73,8 +72,8 @@ package body TGen.Strategies is
    ----------------------------
 
    function Make_Dispatching_Strat
-     (S1, S2 : Strategy_Type'Class;
-      Bias   : Float := 0.5) return Dispatching_Strategy_Type
+     (S1, S2 : Strategy_Type'Class; Bias : Float := 0.5)
+      return Dispatching_Strategy_Type
    is
       Strat : Dispatching_Strategy_Type;
    begin

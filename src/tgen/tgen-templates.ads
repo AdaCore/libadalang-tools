@@ -24,7 +24,7 @@
 --  Template files for marshalling generation purposes
 
 generic
-   Template_Folder :  String;
+   Template_Folder : String;
 package TGen.Templates is
 
    package Binary_Marshalling is
@@ -45,7 +45,7 @@ package TGen.Templates is
       Header_Private_Template       : constant String :=
         Template_Folder & "header_private.tmplt";
       Default_Header_Spec_Template  : constant String :=
-     Template_Folder & "default_header_spec.tmplt";
+        Template_Folder & "default_header_spec.tmplt";
       Header_Spec_Template          : constant String :=
         Template_Folder & "header_spec.tmplt";
       Header_Wrappers_Body_Template : constant String :=
@@ -114,43 +114,43 @@ package TGen.Templates is
    end JSON_Marshalling;
 
    package Type_Representation is
-      Scalar_Typ_Decl_Template : constant String :=
+      Scalar_Typ_Decl_Template     : constant String :=
         Template_Folder & "scalar_typ_decl.tmplt";
-      Scalar_Typ_Init_Template : constant String :=
+      Scalar_Typ_Init_Template     : constant String :=
         Template_Folder & "scalar_typ_init.tmplt";
-      Record_Typ_Decl_Template : constant String :=
+      Record_Typ_Decl_Template     : constant String :=
         Template_Folder & "record_typ_decl.tmplt";
-      Record_Typ_Init_Template : constant String :=
+      Record_Typ_Init_Template     : constant String :=
         Template_Folder & "record_typ_init.tmplt";
-      Anonymous_Typ_Decl_Template : constant String :=
+      Anonymous_Typ_Decl_Template  : constant String :=
         Template_Folder & "anonymous_typ_decl.tmplt";
-      Anonymous_Typ_Init_Template : constant String :=
+      Anonymous_Typ_Init_Template  : constant String :=
         Template_Folder & "anonymous_typ_init.tmplt";
-      Custom_Strat_Spec_Template : constant String :=
+      Custom_Strat_Spec_Template   : constant String :=
         Template_Folder & "custom_strat_spec.tmplt";
-      Custom_Strat_Body_Template : constant String :=
+      Custom_Strat_Body_Template   : constant String :=
         Template_Folder & "custom_strat_body.tmplt";
       Variant_Choice_Decl_Template : constant String :=
         Template_Folder & "variant_choice_decl.tmplt";
       Variant_Choice_Init_Template : constant String :=
         Template_Folder & "variant_choice_init.tmplt";
-      Variant_Decl_Template : constant String :=
+      Variant_Decl_Template        : constant String :=
         Template_Folder & "variant_decl.tmplt";
-      Variant_Init_Template : constant String :=
+      Variant_Init_Template        : constant String :=
         Template_Folder & "variant_init.tmplt";
-      Constraint_Decl_Template : constant String :=
+      Constraint_Decl_Template     : constant String :=
         Template_Folder & "constraint_decl.tmplt";
-      Constraint_Init_Template : constant String :=
+      Constraint_Init_Template     : constant String :=
         Template_Folder & "constraint_init.tmplt";
-      Instance_Decl_Template : constant String :=
+      Instance_Decl_Template       : constant String :=
         Template_Folder & "instance_typ_decl.tmplt";
-      Instance_Init_Template : constant String :=
+      Instance_Init_Template       : constant String :=
         Template_Folder & "instance_typ_init.tmplt";
-      Array_Typ_Decl_Template : constant String :=
+      Array_Typ_Decl_Template      : constant String :=
         Template_Folder & "array_typ_decl.tmplt";
-      Array_Typ_Init_Template : constant String :=
+      Array_Typ_Init_Template      : constant String :=
         Template_Folder & "array_typ_init.tmplt";
-      Function_Typ_Init_Template : constant String :=
+      Function_Typ_Init_Template   : constant String :=
         Template_Folder & "function_typ_init.tmplt";
    end Type_Representation;
 

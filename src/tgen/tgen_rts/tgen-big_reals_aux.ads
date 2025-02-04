@@ -36,14 +36,16 @@ package TGen.Big_Reals_Aux is
    package Decimal_Fixed_Conversions is
 
       function To_Big_Real (Arg : Num) return Valid_Big_Real
-        with Global => null;
+      with Global => null;
 
       function From_Big_Real (Arg : Big_Real) return Num
       with
-        Pre    => In_Range (Arg,
-                            Low  => To_Big_Real (Num'First),
-                            High => To_Big_Real (Num'Last))
-                   or else (raise Constraint_Error),
+        Pre    =>
+          In_Range
+            (Arg,
+             Low  => To_Big_Real (Num'First),
+             High => To_Big_Real (Num'Last))
+          or else (raise Constraint_Error),
         Global => null;
 
    end Decimal_Fixed_Conversions;

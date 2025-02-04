@@ -22,7 +22,8 @@
 ------------------------------------------------------------------------------
 
 with Ada.Finalization;
-with Ada.Containers.Hashed_Sets; use Ada.Containers;
+with Ada.Containers.Hashed_Sets;
+use Ada.Containers;
 
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 with GNAT.String_Hash;
@@ -100,8 +101,9 @@ package Utils.Command_Lines is
    generic
       Descriptor : in out Command_Line_Descriptor;
    package Freeze_Descriptor is
-   --  Freezes the Descriptor; no more switches may be added. Freeze_Descriptor
-   --  must be called before calling Parse or Copy_Descriptor.
+      --  Freezes the Descriptor; no more switches may be added.
+      --  Freeze_Descriptor must be called before calling Parse or
+      --  Copy_Descriptor.
    end Freeze_Descriptor;
 
    function Copy_Descriptor
@@ -154,37 +156,37 @@ package Utils.Command_Lines is
    type Validator_Type is not null access procedure (Text : String);
    --  For internal use only
 
-   subtype String_Ref is GNAT.OS_Lib.String_Access with
-     Predicate => (if String_Ref /= null then String_Ref'First = 1);
+   subtype String_Ref is GNAT.OS_Lib.String_Access
+   with Predicate => (if String_Ref /= null then String_Ref'First = 1);
    type String_Ref_Array is array (Positive range <>) of String_Ref;
 
-   function Present (X : String_Ref) return Boolean is
-     (GNAT.OS_Lib."/=" (X, null));
+   function Present (X : String_Ref) return Boolean
+   is (GNAT.OS_Lib."/=" (X, null));
 
-   package String_Ref_Vectors is new Utils.Vectors
-     (Positive,
-      String_Ref,
-      String_Ref_Array);
+   package String_Ref_Vectors is new
+     Utils.Vectors (Positive, String_Ref, String_Ref_Array);
    use String_Ref_Vectors;
    subtype String_Ref_Vector is String_Ref_Vectors.Vector;
 
-   function Copy
-     (String_Refs : String_Ref_Vector)
-      return String_Ref_Vector;
+   function Copy (String_Refs : String_Ref_Vector) return String_Ref_Vector;
    --  Returns a deep copy of String_Refs
 
    procedure Destroy (Vector : in out String_Ref_Vector);
    --  Free contained strings and the Vector
 
-   function Hash_String  is new GNAT.String_Hash.Hash
-     (Character, String, Hash_Type);
-   function Hash_String_Ref (X : String_Ref) return Hash_Type is
-     (Hash_String (X.all));
-   function String_Eq (X, Y : String_Ref) return Boolean is
-     (X.all = Y.all);
+   function Hash_String is new
+     GNAT.String_Hash.Hash (Character, String, Hash_Type);
+   function Hash_String_Ref (X : String_Ref) return Hash_Type
+   is (Hash_String (X.all));
+   function String_Eq (X, Y : String_Ref) return Boolean
+   is (X.all = Y.all);
 
-   package String_Ref_Sets is new Ada.Containers.Hashed_Sets
-     (String_Ref, Hash_String_Ref, String_Eq, String_Eq);
+   package String_Ref_Sets is new
+     Ada.Containers.Hashed_Sets
+       (String_Ref,
+        Hash_String_Ref,
+        String_Eq,
+        String_Eq);
    subtype String_Ref_Set is String_Ref_Sets.Set;
 
    --  ???For each _Switches generic, specify:
@@ -223,20 +225,20 @@ package Utils.Command_Lines is
          Shorthands : Switch_To_String_Mapping;
       package Set_Shorthands is
 
-      --  This is really a procedure, but we make it a generic so we can
-      --  "call" it (by instantiating it) in a package spec. All the work is
-      --  done by the elaboration code in the body. The same is true of
-      --  other empty generics below.
+         --  This is really a procedure, but we make it a generic so we can
+         --  "call" it (by instantiating it) in a package spec. All the work is
+         --  done by the elaboration code in the body. The same is true of
+         --  other empty generics below.
 
-      --  Instantiate this with an aggregate that maps Switches to strings
-      --  that should be used as shorthands, for example Verbose => +"-v"
-      --  will allow either "--verbose" or "-v" on the command line.
-      --  (The "+" function is declared below; it just converts String to
-      --  String_Ref.)
+         --  Instantiate this with an aggregate that maps Switches to strings
+         --  that should be used as shorthands, for example Verbose => +"-v"
+         --  will allow either "--verbose" or "-v" on the command line.
+         --  (The "+" function is declared below; it just converts String to
+         --  String_Ref.)
 
-      --  You can instantiate this multiple times to get multiple
-      --  shorthands. Use null for Switches that you don't want a
-      --  shorthand for.
+         --  You can instantiate this multiple times to get multiple
+         --  shorthands. Use null for Switches that you don't want a
+         --  shorthand for.
 
       end Set_Shorthands;
 
@@ -318,7 +320,7 @@ package Utils.Command_Lines is
       generic
          Shorthands : Switch_To_String_Mapping;
       package Set_Shorthands is
-      --  As above
+         --  As above
       end Set_Shorthands;
 
    end Enum_Switches;
@@ -360,16 +362,16 @@ package Utils.Command_Lines is
       generic
          Syntax : Switch_To_Syntax_Mapping;
       package Set_Syntax is
-      --  The syntax of a switch is '=' by default. Instantiate this to set
-      --  the Syntax of each switch.
+         --  The syntax of a switch is '=' by default. Instantiate this to set
+         --  the Syntax of each switch.
       end Set_Syntax;
 
       generic
          Defaults : Switch_To_String_Mapping;
       package Set_Defaults is
-      --  Instantiate this to set the default value for a switch
-      --  parameter. If this is not instantiated, then if the switch is not
-      --  given, Arg returns null.
+         --  Instantiate this to set the default value for a switch
+         --  parameter. If this is not instantiated, then if the switch is not
+         --  given, Arg returns null.
       end Set_Defaults;
 
       --  Set_Syntax and Set_Defaults should be instantiated before
@@ -378,7 +380,7 @@ package Utils.Command_Lines is
       generic
          Shorthands : Switch_To_String_Mapping;
       package Set_Shorthands is
-      --  As above
+         --  As above
       end Set_Shorthands;
 
    end String_Switches;
@@ -397,12 +399,10 @@ package Utils.Command_Lines is
       function Valid (Switch : All_Switches) return Boolean;
 
       function Arg
-        (Cmd    : Command_Line;
-         Switch : Switches) return String_Ref_Array;
+        (Cmd : Command_Line; Switch : Switches) return String_Ref_Array;
       function Arg_Length
-        (Cmd    : Command_Line;
-         Switch : Switches) return Natural with
-         Post => Arg_Length'Result = Arg (Cmd, Switch)'Length;
+        (Cmd : Command_Line; Switch : Switches) return Natural
+      with Post => Arg_Length'Result = Arg (Cmd, Switch)'Length;
 
       procedure Set_Arg
         (Cmd : in out Command_Line; Switch : Switches; Val : String_Ref_Array);
@@ -414,13 +414,13 @@ package Utils.Command_Lines is
       generic
          Syntax : Switch_To_Syntax_Mapping;
       package Set_Syntax is
-      --  As above
+         --  As above
       end Set_Syntax;
 
       generic
          Shorthands : Switch_To_String_Mapping;
       package Set_Shorthands is
-      --  As above
+         --  As above
       end Set_Shorthands;
 
    end String_Seq_Switches;
@@ -466,15 +466,15 @@ package Utils.Command_Lines is
       generic
          Syntax : Switch_To_Syntax_Mapping;
       package Set_Syntax is
-      --  As above
+         --  As above
       end Set_Syntax;
 
       generic
          Defaults : Switch_To_Arg_Type_Mapping;
       package Set_Defaults is
 
-      --  As for String_Switches, except that this MUST be instantiated to
-      --  set Default, because otherwise Arg will blow up.
+         --  As for String_Switches, except that this MUST be instantiated to
+         --  set Default, because otherwise Arg will blow up.
 
       end Set_Defaults;
 
@@ -483,7 +483,7 @@ package Utils.Command_Lines is
       generic
          Shorthands : Switch_To_String_Mapping;
       package Set_Shorthands is
-      --  As above
+         --  As above
       end Set_Shorthands;
 
    private
@@ -497,21 +497,22 @@ package Utils.Command_Lines is
 
    generic
       Descriptor : in out Command_Line_Descriptor;
-      Disable    :        Switch_Array;
+      Disable : Switch_Array;
    package Disable_Switches is
 
-   --  Instantiate this to disable some switches; Parse behaves as if the
-   --  disabled switches did not exist. This allows us to have switches that
-   --  are common to SOME tools, but not allowed for others.
+      --  Instantiate this to disable some switches; Parse behaves as if the
+      --  disabled switches did not exist. This allows us to have switches that
+      --  are common to SOME tools, but not allowed for others.
 
    end Disable_Switches;
 
    ----------------------------------------------------------------
 
-   package String_Access_Vectors is new Utils.Vectors
-     (Positive,
-      GNAT.OS_Lib.String_Access,
-      GNAT.OS_Lib.String_List);
+   package String_Access_Vectors is new
+     Utils.Vectors
+       (Positive,
+        GNAT.OS_Lib.String_Access,
+        GNAT.OS_Lib.String_List);
    use String_Access_Vectors;
    subtype String_Access_Vector is String_Access_Vectors.Vector;
 
@@ -548,44 +549,47 @@ package Utils.Command_Lines is
       case Kind is
          when No_Such | False_Switch =>
             null; -- Can't happen
+
          when True_Switch =>
             Boolean_Val : Boolean;
             --  For Flag_Switches, True if the switch was given. For
             --  Boolean_Switches, True if the switch was given, False if
             --  its negation was given (last one wins).
+
          when Enum_Switch =>
-            Position    : Logical_Position;
+            Position : Logical_Position;
             --  If the switch was given, this is its index in the sequence of
             --  switches processed. If Parse is called multiple times, the
             --  current position keeps increasing. Within a given Enum switch,
             --  the one with the last position wins.
+
          when String_Switch =>
-            String_Val  : String_Ref;
+            String_Val : String_Ref;
+
          when String_Seq_Switch =>
-            Seq_Val     : String_Ref_Vector;
+            Seq_Val : String_Ref_Vector;
       end case;
    end record; -- Dynamically_Typed_Switch
 
    function Copy
-     (Switch : Dynamically_Typed_Switch)
-      return Dynamically_Typed_Switch;
+     (Switch : Dynamically_Typed_Switch) return Dynamically_Typed_Switch;
 
    procedure Destroy (Object : in out Dynamically_Typed_Switch);
 
-   type Parse_Callback is access procedure
-     (Phase : Parse_Phase;
-      Swit  : Dynamically_Typed_Switch);
+   type Parse_Callback is
+     access procedure (Phase : Parse_Phase; Swit : Dynamically_Typed_Switch);
 
    procedure Null_Callback
-     (Phase : Parse_Phase; Swit : Dynamically_Typed_Switch) is null;
+     (Phase : Parse_Phase; Swit : Dynamically_Typed_Switch)
+   is null;
 
    procedure Parse
-     (Text_Args          :        Argument_List_Access;
+     (Text_Args          : Argument_List_Access;
       Cmd                : in out Command_Line;
-      Phase              :        Parse_Phase;
-      Callback           :        Parse_Callback;
-      Collect_File_Names :        Boolean;
-      Ignore_Errors      :        Boolean := False);
+      Phase              : Parse_Phase;
+      Callback           : Parse_Callback;
+      Collect_File_Names : Boolean;
+      Ignore_Errors      : Boolean := False);
    --  Given Text_Args (from the command line, project file, or elsewhere),
    --  parse that information into Cmd. This may be called multiple
    --  times, with later information overriding earlier.
@@ -620,7 +624,7 @@ package Utils.Command_Lines is
 
    procedure Iter_File_Names
      (Cmd    : in out Command_Line;
-      Action :    not null access procedure (File_Name : in out String_Ref));
+      Action : not null access procedure (File_Name : in out String_Ref));
    --  Calls Action for each non-switch argument. Note that File_Name is
    --  'in out'; the caller can modify the file name. This is necessary for
    --  Process_Project. The names are sorted to provide a predictable order.
@@ -629,15 +633,15 @@ package Utils.Command_Lines is
    --  Debugging printout. Without Verbose, skips defaulted args.
 
    function Switch_Text
-     (Descriptor : Command_Line_Descriptor;
-      Switch     : All_Switches) return String_Ref;
+     (Descriptor : Command_Line_Descriptor; Switch : All_Switches)
+      return String_Ref;
    --  Switch_Text (To_All (Some_Switch)) --> "--some-switch"
 
    procedure Dump_Descriptor (Descriptor : Command_Line_Descriptor);
 
    function To_Argument_List_Access
-     (Args : String_Access_Vector) return Argument_List_Access is
-      (new Argument_List'(To_Array (Args)));
+     (Args : String_Access_Vector) return Argument_List_Access
+   is (new Argument_List'(To_Array (Args)));
 
    procedure Append_Text_Args_From_Command_Line
      (Tool_Package_Name : String; Args : in out String_Access_Vector);
@@ -645,33 +649,38 @@ package Utils.Command_Lines is
      (Tool_Package_Name : String) return Argument_List_Access;
    --  Returns the sequence of command-line arguments
 
-   function "+" (S : String) return String_Ref is (new String'(S));
+   function "+" (S : String) return String_Ref
+   is (new String'(S));
    --  Hack to get around the fact that Ada doesn't allow arrays of String
 
    Command_Line_Error,
-   Command_Line_Error_No_Help,
-   Command_Line_Error_No_Tool_Name : exception;
+     Command_Line_Error_No_Help,
+     Command_Line_Error_No_Tool_Name : exception;
    --  Raised by Parse if there are errors. The tool should handle these,
    --  print out the Exception_Message, and exit the process.
 
    function Error_Detected (Cmd : Command_Line) return Boolean;
    --  True if Parse detected an error
 
-   procedure Cmd_Error (Message : String) with No_Return;
+   procedure Cmd_Error (Message : String)
+   with No_Return;
    --  Prints an error message, and raises Command_Line_Error. This is
    --  called by Parse to report errors, and may also be used by clients
    --  of Parse.
 
-   procedure Cmd_Error_No_Help (Message : String) with No_Return;
+   procedure Cmd_Error_No_Help (Message : String)
+   with No_Return;
    --  Same as Cmd_Error, but doesn't print the "try help" message
 
-   procedure Cmd_Error_No_Tool_Name (Message : String) with No_Return;
+   procedure Cmd_Error_No_Tool_Name (Message : String)
+   with No_Return;
    --  Same as Cmd_Error, but doesn't print the tool name, and raises
    --  Command_Line_Error_No_Tool_Name instead of Command_Line_Error.  It's not
    --  clear why we want to suppress the tool name, but we're mimicking the way
    --  ASIS tools work.
 
-   procedure Raise_Cmd_Error (Message : String) with No_Return;
+   procedure Raise_Cmd_Error (Message : String)
+   with No_Return;
    --  Raises Command_Line_Error with the given message.
 
 private
@@ -697,12 +706,16 @@ private
       case Kind is
          when No_Such =>
             null;
+
          when True_Switch =>
             Default_Bool : Boolean := False;
+
          when False_Switch =>
             null;
+
          when Enum_Switch =>
             null;
+
          when String_Switch | String_Seq_Switch =>
             Syntax : Switch_Syntax := '=';
             case Kind is
@@ -710,10 +723,12 @@ private
                   Default : String_Ref := null;
 
                   Validator : Validator_Type := Null_Validator'Access;
-               --  Called during Parse to validate the form of a string switch.
-               --  Currently used only for Other_Switches. This is necessary
-               --  so we can give an error for malformed switches during Parse,
-               --  rather than allowing some Arg query to blow up later.
+                  --  Called during Parse to validate the form of a string
+                  --  switch. Currently used only for Other_Switches. This is
+                  --  necessary so we can give an error for malformed switches
+                  --  during Parse, rather than allowing some Arg query to blow
+                  --  up later.
+
                when others =>
                   null;
             end case;
@@ -724,10 +739,8 @@ private
      array (All_Switches range <>) of Switch_Descriptor;
    type Switch_Descriptor_Array_Ptr is access all Switch_Descriptor_Array;
 
-   package Switch_Descriptor_Vectors is new Utils.Vectors
-     (All_Switches,
-      Switch_Descriptor,
-      Switch_Descriptor_Array);
+   package Switch_Descriptor_Vectors is new
+     Utils.Vectors (All_Switches, Switch_Descriptor, Switch_Descriptor_Array);
    use Switch_Descriptor_Vectors;
 
    type Command_Line_Descriptor is limited record
@@ -739,42 +752,40 @@ private
    end record;
 
    function Enabled
-     (Descriptor : Command_Line_Descriptor;
-      Switch     : All_Switches) return Boolean is
-     (Descriptor.Allowed_Switches (Descriptor.Allowed_Switches (Switch).Alias)
-        .Enabled);
+     (Descriptor : Command_Line_Descriptor; Switch : All_Switches)
+      return Boolean
+   is (Descriptor.Allowed_Switches (Descriptor.Allowed_Switches (Switch).Alias)
+         .Enabled);
 
    function Syntax
-     (Descriptor : Command_Line_Descriptor;
-      Switch     : All_Switches) return Switch_Syntax is
-     (Descriptor.Allowed_Switches (Descriptor.Allowed_Switches (Switch).Alias)
-        .Syntax);
+     (Descriptor : Command_Line_Descriptor; Switch : All_Switches)
+      return Switch_Syntax
+   is (Descriptor.Allowed_Switches (Descriptor.Allowed_Switches (Switch).Alias)
+         .Syntax);
 
    type Dynamically_Typed_Switches is
      array (All_Switches range <>) of Dynamically_Typed_Switch;
    type Dynamically_Typed_Switches_Access is access Dynamically_Typed_Switches;
 
    function Copy
-     (Switches : Dynamically_Typed_Switches)
-      return Dynamically_Typed_Switches;
+     (Switches : Dynamically_Typed_Switches) return Dynamically_Typed_Switches;
    --  Returns a copy of a Dynamically_Typed_Switches
 
-   procedure Destroy
-     (Switches : in out Dynamically_Typed_Switches);
+   procedure Destroy (Switches : in out Dynamically_Typed_Switches);
 
    type Command_Line (Descriptor : Descriptor_Access) is
-     new Ada.Finalization.Controlled with
-      record
-         File_Names       : String_Ref_Vector;
-         Current_Position : Logical_Position                  := 0;
-         Sw               : Dynamically_Typed_Switches_Access := null;
-         Error_Detected   : Boolean                           := False;
+     new Ada.Finalization.Controlled
+   with record
+      File_Names       : String_Ref_Vector;
+      Current_Position : Logical_Position := 0;
+      Sw               : Dynamically_Typed_Switches_Access := null;
+      Error_Detected   : Boolean := False;
 
       --  File_Names is the sequence of non-switch arguments.
       --  Current_Position counts the number of switches encountered.
       --  Sw is the switches.
       --  Error_Detected is True if Parse detected an error, whether or
       --  not Ignore_Errors is set.
-      end record;
+   end record;
 
 end Utils.Command_Lines;

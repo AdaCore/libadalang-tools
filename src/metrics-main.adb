@@ -61,7 +61,7 @@ procedure METRICS.Main is
    end Callback;
 
    Tool : Actions.Metrics_Tool;
-   Cmd : Command_Line (METRICS.Command_Lines.Descriptor'Access);
+   Cmd  : Command_Line (METRICS.Command_Lines.Descriptor'Access);
 
 begin
    --  By default, send errors to stdout
@@ -70,8 +70,8 @@ begin
    Utils.Drivers.Driver
      (Cmd,
       Tool,
-      Tool_Package_Name     => "metrics",
-      Callback              => Callback'Unrestricted_Access);
+      Tool_Package_Name => "metrics",
+      Callback          => Callback'Unrestricted_Access);
 
    --  If syntax errors are detected during the processing then return a
    --  non zero exit code

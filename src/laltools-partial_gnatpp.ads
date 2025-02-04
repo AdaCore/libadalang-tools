@@ -73,49 +73,44 @@ package Laltools.Partial_GNATPP is
    --  process. PP_Messages contains the Error messages issued by gnatpp during
    --  the formatting process.
 
-   type Text_Edit is
-      record
-         Location : Source_Location_Range;
-         Text     : Ada.Strings.Unbounded.Unbounded_String;
-      end record;
+   type Text_Edit is record
+      Location : Source_Location_Range;
+      Text     : Ada.Strings.Unbounded.Unbounded_String;
+   end record;
 
    function Previous_Non_Whitespace_Non_Comment_Token
-     (Token : Token_Reference)
-      return Token_Reference;
+     (Token : Token_Reference) return Token_Reference;
    --  Gets the previous Token_Reference relative to Token that is not a
    --  whitespace nor a comment.
 
    function Estimate_Indentation
-     (Unit : Analysis_Unit;
-      Line_Number : Langkit_Support.Slocs.Line_Number)
+     (Unit : Analysis_Unit; Line_Number : Langkit_Support.Slocs.Line_Number)
       return Natural;
    --  Guess the indentation for a line in Unit given by Line_Number
 
    function Estimate_Indentation
      (Node               : Ada_Node;
       Indentation        : Positive := 3;
-      Inline_Indentation : Positive := 2)
-      return Natural;
+      Inline_Indentation : Positive := 2) return Natural;
    --  Estimate the indentation for Node (assuming that it starts in the
    --  begining of its start line.
 
-   type Formatting_Region_Type (List_Slice : Boolean) is
-      record
-         Start_Token    : Libadalang.Common.Token_Reference;
-         End_Token      : Libadalang.Common.Token_Reference;
-         Enclosing_Node : Ada_Node;
-         case List_Slice is
-            when True =>
-               Start_Child_Index : Positive;
-               End_Child_Index : Positive;
-            when False =>
-               null;
-         end case;
-      end record;
+   type Formatting_Region_Type (List_Slice : Boolean) is record
+      Start_Token    : Libadalang.Common.Token_Reference;
+      End_Token      : Libadalang.Common.Token_Reference;
+      Enclosing_Node : Ada_Node;
+      case List_Slice is
+         when True =>
+            Start_Child_Index : Positive;
+            End_Child_Index   : Positive;
+
+         when False =>
+            null;
+      end case;
+   end record;
 
    function Get_Formatting_Region
-     (Unit        : Analysis_Unit;
-      Input_Range : Source_Location_Range)
+     (Unit : Analysis_Unit; Input_Range : Source_Location_Range)
       return Formatting_Region_Type;
    --  Given an Unit and an Input_Range, returns a Formatting_Region_Type
    --  which:
@@ -133,20 +128,19 @@ package Laltools.Partial_GNATPP is
    --  Format_Selection should be called or not, for instance, based on the
    --  current cursor position.
 
-   type Partial_Formatting_Edit is
-      record
-         Edit           : Text_Edit;
-         Formatted_Node : Ada_Node;
-         Indentation    : Natural;
-         Diagnostics    : Pp.Scanner.Source_Message_Vector;
-      end record;
+   type Partial_Formatting_Edit is record
+      Edit           : Text_Edit;
+      Formatted_Node : Ada_Node;
+      Indentation    : Natural;
+      Diagnostics    : Pp.Scanner.Source_Message_Vector;
+   end record;
 
    function Image (Edit : Partial_Formatting_Edit) return String;
 
    function Format_Selection
-     (Unit                     : Analysis_Unit;
-      Input_Selection_Range    : Source_Location_Range;
-      PP_Options               : Pp.Command_Lines.Cmd_Line)
+     (Unit                  : Analysis_Unit;
+      Input_Selection_Range : Source_Location_Range;
+      PP_Options            : Pp.Command_Lines.Cmd_Line)
       return Partial_Formatting_Edit;
    --  This is the procedure to be called for the IDE integration with the
    --  Ada Language Server for the partial formatting of a text selection.

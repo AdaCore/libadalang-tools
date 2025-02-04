@@ -25,9 +25,10 @@ pragma Warnings (Off); -- imported for children
 with Ada.Wide_Characters.Handling; use Ada.Wide_Characters.Handling;
 use Ada;
 with Utils_Debug;
-with Utils.Dbg_Out; use Utils;
-with Utils.String_Utilities; use Utils.String_Utilities;
-with Utils; use Utils;
+with Utils.Dbg_Out;
+use Utils;
+with Utils.String_Utilities;       use Utils.String_Utilities;
+with Utils;                        use Utils;
 pragma Warnings (On);
 
 package Stub is

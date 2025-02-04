@@ -40,19 +40,18 @@ package body TGen.Wrappers is
       Value : Unbounded_String;
    end record;
 
-   function "<" (L, R : Literal) return Boolean is
-     (if L.Neg = R.Neg
-      then L.Value < R.Value
-      else L.Neg < R.Neg);
+   function "<" (L, R : Literal) return Boolean
+   is (if L.Neg = R.Neg then L.Value < R.Value else L.Neg < R.Neg);
 
-   function "=" (L, R : Literal) return Boolean is
-     (L.Neg = R.Neg and then L.Value = R.Value);
+   function "=" (L, R : Literal) return Boolean
+   is (L.Neg = R.Neg and then L.Value = R.Value);
 
    package Literal_Sets is new Ada.Containers.Ordered_Sets (Literal);
-   package Literal_Set_Vectors is new Ada.Containers.Vectors
-     (Index_Type   => Positive,
-      Element_Type => Literal_Sets.Set,
-      "="          => Literal_Sets."=");
+   package Literal_Set_Vectors is new
+     Ada.Containers.Vectors
+       (Index_Type   => Positive,
+        Element_Type => Literal_Sets.Set,
+        "="          => Literal_Sets."=");
    subtype Formula_Type is Literal_Set_Vectors.Vector;
 
    type Polarity_Kind is new Boolean;
@@ -60,8 +59,7 @@ package body TGen.Wrappers is
    Dnf_Neg_Kind : constant Polarity_Kind := False;
 
    function Dnf
-     (E        : Expr;
-      Polarity : Polarity_Kind := Dnf_Kind) return Formula_Type;
+     (E : Expr; Polarity : Polarity_Kind := Dnf_Kind) return Formula_Type;
    --  Return the DNF for a precondition expression. The Polarity parameter
    --  is there to propagate the negation to literals (and puts (not E) in
    --  DNF).
@@ -70,22 +68,18 @@ package body TGen.Wrappers is
    --  Return the code for the wrapper specification
 
    procedure Write_Wrapper
-     (F_Body            : File_Type;
-      Call_To_Orig_Subp : String;
-      Formula           : Formula_Type);
+     (F_Body : File_Type; Call_To_Orig_Subp : String; Formula : Formula_Type);
 
-   function Subp_Kind (F : Function_Typ) return Ada_Subp_Kind is
-     (if F.Ret_Typ.Is_Null
-      then Ada_Subp_Kind_Procedure
-      else Ada_Subp_Kind_Function);
+   function Subp_Kind (F : Function_Typ) return Ada_Subp_Kind
+   is (if F.Ret_Typ.Is_Null then Ada_Subp_Kind_Procedure
+       else Ada_Subp_Kind_Function);
 
    ---------
    -- Dnf --
    ---------
 
    function Dnf
-     (E        : Expr;
-      Polarity : Polarity_Kind := Dnf_Kind) return Formula_Type
+     (E : Expr; Polarity : Polarity_Kind := Dnf_Kind) return Formula_Type
    is
       Result : Formula_Type;
    begin
@@ -111,9 +105,9 @@ package body TGen.Wrappers is
                      | Ada_Op_And
                      | Ada_Op_Or_Else
                      | Ada_Op_Or
-                     =>
+                  =>
                      declare
-                        Dnf_Left : constant Formula_Type :=
+                        Dnf_Left  : constant Formula_Type :=
                           Dnf (As_Bin_Op.F_Left, Polarity);
                         Dnf_Right : constant Formula_Type :=
                           Dnf (As_Bin_Op.F_Right, Polarity);
@@ -124,9 +118,9 @@ package body TGen.Wrappers is
 
                         if (Polarity = Dnf_Kind
                             and then Ada_Op in Ada_Op_And_Then | Ada_Op_And)
-                          or else
-                            (Polarity = Dnf_Neg_Kind
-                             and then Ada_Op in Ada_Op_Or_Else | Ada_Op_Or)
+                          or else (Polarity = Dnf_Neg_Kind
+                                   and then Ada_Op
+                                            in Ada_Op_Or_Else | Ada_Op_Or)
                         then
                            for Clause_Left of Dnf_Left loop
                               for Clause_Right of Dnf_Right loop
@@ -141,6 +135,7 @@ package body TGen.Wrappers is
                         end if;
                         return Result;
                      end;
+
                   when others =>
                      null;
                end case;
@@ -152,10 +147,8 @@ package body TGen.Wrappers is
             --  parenthesized expression, such as if-expressions or quantified
             --  expressions.
 
-            if E.As_Paren_Expr.F_Expr.Kind not in
-              Ada_Cond_Expr
-              | Ada_Quantified_Expr
-              | Ada_Decl_Expr
+            if E.As_Paren_Expr.F_Expr.Kind
+               not in Ada_Cond_Expr | Ada_Quantified_Expr | Ada_Decl_Expr
             then
                return Dnf (E.As_Paren_Expr.F_Expr, Polarity);
             end if;
@@ -167,8 +160,8 @@ package body TGen.Wrappers is
       Result.Append
         (Literal_Sets.To_Set
            (Literal'
-                (Neg   => not Boolean (Polarity),
-                 Value => To_Unbounded_String (+E.Text))));
+              (Neg   => not Boolean (Polarity),
+               Value => To_Unbounded_String (+E.Text))));
       return Result;
    end Dnf;
 
@@ -177,9 +170,7 @@ package body TGen.Wrappers is
    -------------------
 
    procedure Write_Wrapper
-     (F_Body            : File_Type;
-      Call_To_Orig_Subp : String;
-      Formula           : Formula_Type)
+     (F_Body : File_Type; Call_To_Orig_Subp : String; Formula : Formula_Type)
    is
       use type Literal_Sets.Set;
       Indent : constant String := "      ";
@@ -212,7 +203,7 @@ package body TGen.Wrappers is
 
    function Subprogram_Wrapper_Specification (F : Function_Typ) return String
    is
-      Kind : constant Ada_Subp_Kind := Subp_Kind (F);
+      Kind   : constant Ada_Subp_Kind := Subp_Kind (F);
       Result : Unbounded_String;
    begin
       declare
@@ -220,6 +211,7 @@ package body TGen.Wrappers is
          case Kind is
             when Ada_Subp_Kind_Procedure =>
                Append (Result, "procedure ");
+
             when Ada_Subp_Kind_Function =>
                Append (Result, "function ");
          end case;
@@ -241,8 +233,9 @@ package body TGen.Wrappers is
                     (Result, Image (F.Param_Modes.Element (Param_Name)) & " ");
                   Append
                     (Result,
-                    "TGen.TGen_Std." & Param_Type.Get.FQN (No_Std => True)
-                    & " ");
+                     "TGen.TGen_Std."
+                     & Param_Type.Get.FQN (No_Std => True)
+                     & " ");
                   if Param_Name /= F.Param_Order.Last_Element then
                      Append (Result, " ; ");
                   end if;
@@ -256,9 +249,7 @@ package body TGen.Wrappers is
          if Kind = Ada_Subp_Kind_Function then
             Append (Result, " return ");
             Append
-              (Result,
-               "TGen.TGen_Std."
-               & F.Ret_Typ.Get.FQN (No_Std => True));
+              (Result, "TGen.TGen_Std." & F.Ret_Typ.Get.FQN (No_Std => True));
          end if;
 
          return To_String (Result);
@@ -294,8 +285,8 @@ package body TGen.Wrappers is
       --  Compute local name. Do not take into account the last element as this
       --  is its hash.
 
-      for I in
-         Subprogram.Last_Comp_Unit_Idx + 1 .. Subprogram.Name.Last_Index - 1
+      for I
+        in Subprogram.Last_Comp_Unit_Idx + 1 .. Subprogram.Name.Last_Index - 1
       loop
          Local_Package_Name.Append (Subprogram.Name.Element (I));
       end loop;
@@ -305,6 +296,7 @@ package body TGen.Wrappers is
       case Subp_Kind (Subprogram) is
          when Ada_Subp_Kind_Function =>
             Append (Call_To_User_Subp, "return ");
+
          when Ada_Subp_Kind_Procedure =>
             null;
       end case;

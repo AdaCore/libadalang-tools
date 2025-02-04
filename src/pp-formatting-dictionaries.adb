@@ -23,7 +23,8 @@
 
 with Ada.Text_IO;             use Ada.Text_IO;
 with Ada.Characters.Handling; use Ada.Characters.Handling;
-with Ada.Containers.Hashed_Sets; use Ada.Containers;
+with Ada.Containers.Hashed_Sets;
+use Ada.Containers;
 with Utils.Err_Out;
 
 package body Pp.Formatting.Dictionaries is
@@ -32,8 +33,12 @@ package body Pp.Formatting.Dictionaries is
    subtype Symbol is Syms.Symbol;
    subtype Opt_Symbol is Syms.Opt_Symbol;
 
-   package Name_Sets is new Ada.Containers.Hashed_Sets
-     (Symbol, Syms.Hash_Symbol, Syms.Case_Insensitive_Equal, Syms."=");
+   package Name_Sets is new
+     Ada.Containers.Hashed_Sets
+       (Symbol,
+        Syms.Hash_Symbol,
+        Syms.Case_Insensitive_Equal,
+        Syms."=");
 
    use Name_Sets;
    subtype Name_Set is Name_Sets.Set;
@@ -43,8 +48,8 @@ package body Pp.Formatting.Dictionaries is
      (Not_A_Casing_Exception,  -- Wrong syntax of the exception string
       Whole_Word,              -- Name to be replaced as a whole
       Subword);
-   subtype Casing_Exception_Kinds is Opt_Casing_Exception_Kinds
-     range Whole_Word .. Subword;
+   subtype Casing_Exception_Kinds is
+     Opt_Casing_Exception_Kinds range Whole_Word .. Subword;
 
    --  Subword is a part of the name delimited by '_' or by the beginning or
    --  end of the word and which does not contain any '_' inside.
@@ -54,16 +59,14 @@ package body Pp.Formatting.Dictionaries is
    -----------------------
 
    procedure Add_To_Dictionary
-     (Name           : String;
-      Exception_Kind : Casing_Exception_Kinds);
+     (Name : String; Exception_Kind : Casing_Exception_Kinds);
    --  If Name does not exist in the dictionary, adds the corresponding
    --  dictionary entry. Otherwise replace the casing defined by the
    --  existing occurrence of this name by the casing given by Name
 
    function Find_In_Dictionary
-     (Name           : String;
-      Exception_Kind : Casing_Exception_Kinds)
-      return           Opt_Symbol;
+     (Name : String; Exception_Kind : Casing_Exception_Kinds)
+      return Opt_Symbol;
    --  Tries to find in the dictionary the entry which corresponds to Name
    --  without taking into account the character casing. (Exception_Kind
    --  is used to limit the search by the corresponding kind of dictionary
@@ -78,14 +81,14 @@ package body Pp.Formatting.Dictionaries is
    -----------------------
 
    procedure Add_To_Dictionary
-     (Name           : String;
-      Exception_Kind : Casing_Exception_Kinds)
+     (Name : String; Exception_Kind : Casing_Exception_Kinds)
    is
       Id : constant Symbol := Syms.Intern (Name);
    begin
       case Exception_Kind is
          when Whole_Word =>
             Include (Whole_Word_Exceptions, Id);
+
          when Subword =>
             Include (Subword_Exceptions, Id);
       end case;
@@ -96,14 +99,13 @@ package body Pp.Formatting.Dictionaries is
    ---------------------------
 
    procedure Check_With_Dictionary
-     (Ada_Name : in out Wide_String;
-      Casing   : PP_Casing)
+     (Ada_Name : in out Wide_String; Casing : PP_Casing)
    is
       Name : String := To_String (Ada_Name);
 
       Name_Last : constant Natural := Name'Last;
-      SW_Start  : Integer          := Name'First;
-      SW_End    : Integer          := Name_Last;
+      SW_Start  : Integer := Name'First;
+      SW_End    : Integer := Name_Last;
       --  Indexes of a subword in the Name
 
       Dictionary_String : Opt_Symbol;
@@ -118,9 +120,7 @@ package body Pp.Formatting.Dictionaries is
       --  these indexes to.
 
       function Capitalize_Subword
-        (SW     : String;
-         Casing : PP_Casing)
-         return   String;
+        (SW : String; Casing : PP_Casing) return String;
       --  Supposing that SW is a (sub)word having no '_' inside, returns
       --  the capitalized version of this subword according to the casing
       --  represented by Casing.
@@ -135,10 +135,10 @@ package body Pp.Formatting.Dictionaries is
          if SW_End = Name_Last then
             --  There is no more subwords
             SW_Start := 0;
-            SW_End   := 0;
+            SW_End := 0;
          else
             SW_Start := SW_End + 2;
-            SW_End   := Name_Last;
+            SW_End := Name_Last;
 
             for J in SW_Start + 1 .. SW_End loop
                if Name (J) = '_' then
@@ -157,21 +157,21 @@ package body Pp.Formatting.Dictionaries is
       ------------------------
 
       function Capitalize_Subword
-        (SW     : String;
-         Casing : PP_Casing)
-         return   String
+        (SW : String; Casing : PP_Casing) return String
       is
-         Result    : String           := SW;
+         Result    : String := SW;
          First_Idx : constant Natural := Result'First;
 
       begin
          case Casing is
             when Lower_Case =>
                Result := To_Lower (Result);
+
             when Upper_Case =>
                Result := To_Upper (Result);
+
             when Mixed =>
-               Result             := To_Lower (Result);
+               Result := To_Lower (Result);
                Result (First_Idx) := To_Upper (Result (First_Idx));
 
             when As_Declared =>
@@ -182,7 +182,8 @@ package body Pp.Formatting.Dictionaries is
          return Result;
       end Capitalize_Subword;
 
-   begin  --  Check_With_Dictionary
+   begin
+      --  Check_With_Dictionary
       for J in Name'Range loop
          if Name (J) = '_' then
             SW_End := J - 1;
@@ -214,8 +215,7 @@ package body Pp.Formatting.Dictionaries is
                     Exception_Kind => Subword);
 
                if Syms.Present (Dictionary_String) then
-                  Name (SW_Start .. SW_End) :=
-                    Syms.Str (Dictionary_String).S;
+                  Name (SW_Start .. SW_End) := Syms.Str (Dictionary_String).S;
                else
                   Name (SW_Start .. SW_End) :=
                     Capitalize_Subword (Name (SW_Start .. SW_End), Casing);
@@ -240,17 +240,13 @@ package body Pp.Formatting.Dictionaries is
    ------------------------
 
    function Find_In_Dictionary
-     (Name           : String;
-      Exception_Kind : Casing_Exception_Kinds)
-      return           Opt_Symbol
+     (Name : String; Exception_Kind : Casing_Exception_Kinds) return Opt_Symbol
    is
       Id : constant Symbol := Syms.Intern (Name);
-      C : constant Name_Sets.Cursor :=
+      C  : constant Name_Sets.Cursor :=
         (case Exception_Kind is
-            when Whole_Word =>
-                Find (Whole_Word_Exceptions, Id),
-            when Subword =>
-                Find (Subword_Exceptions, Id));
+           when Whole_Word => Find (Whole_Word_Exceptions, Id),
+           when Subword => Find (Subword_Exceptions, Id));
    begin
       return (if Has_Element (C) then Element (C) else Syms.No_Symbol);
    end Find_In_Dictionary;
@@ -264,7 +260,8 @@ package body Pp.Formatting.Dictionaries is
       pragma Assert (Is_Empty (Subword_Exceptions));
    begin
       for D_Name of Dictionary_File_Names loop
-         if D_Name.all /= "-" then -- "--dictionary-" means no predef casing
+         if D_Name.all /= "-" then
+            --  "--dictionary-" means no predef casing
             Dictionaries.Scan_Dictionary (D_Name.all);
          end if;
       end loop;
@@ -350,8 +347,8 @@ package body Pp.Formatting.Dictionaries is
             end loop;
 
             if Result > Len
-              or else
-              (Result = Len and then Is_White_Space (String_Buffer (Result)))
+              or else (Result = Len
+                       and then Is_White_Space (String_Buffer (Result)))
             then
                Result := 0;
             end if;
@@ -367,11 +364,10 @@ package body Pp.Formatting.Dictionaries is
             Result : Natural := Idx;
          begin
             while Result < Len
-              and then not
-              (Is_White_Space (String_Buffer (Result))
-               or else
-               (String_Buffer (Result) = '-'
-                and then String_Buffer (Result + 1) = '-'))
+              and then not (Is_White_Space (String_Buffer (Result))
+                            or else (String_Buffer (Result) = '-'
+                                     and then String_Buffer (Result + 1)
+                                              = '-'))
             loop
                Result := Result + 1;
             end loop;
@@ -398,9 +394,9 @@ package body Pp.Formatting.Dictionaries is
             if String_Buffer (Start_Word) = '*'
               and then String_Buffer (End_Word) = '*'
             then
-               Result     := Subword;
+               Result := Subword;
                Start_Word := Start_Word + 1;
-               End_Word   := End_Word - 1;
+               End_Word := End_Word - 1;
             else
                Result := Whole_Word;
             end if;
@@ -445,7 +441,8 @@ package body Pp.Formatting.Dictionaries is
             return Result;
          end Get_Exception_Kind;
 
-      begin  --  Process_Dictionary_File_Line
+      begin
+         --  Process_Dictionary_File_Line
          Get_Line (Dictionary_File, String_Buffer, Len);
 
          if Len = 0 then
@@ -456,10 +453,9 @@ package body Pp.Formatting.Dictionaries is
          Start_Word := Skip_White_Spaces (1);
 
          if Start_Word = 0
-           or else
-           (Start_Word < Len
-            and then String_Buffer (Start_Word) = '-'
-            and then String_Buffer (Start_Word + 1) = '-')
+           or else (Start_Word < Len
+                    and then String_Buffer (Start_Word) = '-'
+                    and then String_Buffer (Start_Word + 1) = '-')
          then
             --  blank or comment line
             return;
@@ -472,11 +468,12 @@ package body Pp.Formatting.Dictionaries is
          if Exc_Kind = Not_A_Casing_Exception then
             Err_Out.Put
               ("\1:\2:\3: wrong syntax of a casing exception, line ignored\n",
-               Dictionary_Name, Image (Line_Num), Image (Start_Word));
+               Dictionary_Name,
+               Image (Line_Num),
+               Image (Start_Word));
          else
             Add_To_Dictionary
-              (String_Buffer (Start_Word .. End_Word),
-               Exc_Kind);
+              (String_Buffer (Start_Word .. End_Word), Exc_Kind);
 
             --  We have to check if we have something else in the dictionary
             --  file line. The only possible things are blank characters and
@@ -492,34 +489,35 @@ package body Pp.Formatting.Dictionaries is
 
                Start_Word := Skip_White_Spaces (End_Word + 1);
 
-               if not
-                 (Start_Word = 0
-                  or else
-                  (Start_Word < Len
-                   and then String_Buffer (Start_Word) = '-'
-                   and then String_Buffer (Start_Word + 1) = '-'))
+               if not (Start_Word = 0
+                       or else (Start_Word < Len
+                                and then String_Buffer (Start_Word) = '-'
+                                and then String_Buffer (Start_Word + 1) = '-'))
                then
                   Err_Out.Put
                     ("\1:\2:\3: only one casing exception per line\n",
-                     Dictionary_Name, Image (Line_Num), Image (Start_Word));
+                     Dictionary_Name,
+                     Image (Line_Num),
+                     Image (Start_Word));
                   Err_Out.Put
                     ("\1:\2:\3: end of line ignored\n",
-                     Dictionary_Name, Image (Line_Num), Image (Start_Word));
+                     Dictionary_Name,
+                     Image (Line_Num),
+                     Image (Start_Word));
                end if;
             end if;
          end if;
       end Process_Dictionary_File_Line;
 
-   begin  --  Scan_Dictionary
+   begin
+      --  Scan_Dictionary
 
       --  First trying to open the dictionary file: ???It would be cleaner to
       --  keep the file opening and error message handling in gnatpp.
 
       begin
          Open
-           (File => Dictionary_File,
-            Mode => In_File,
-            Name => Dictionary_Name);
+           (File => Dictionary_File, Mode => In_File, Name => Dictionary_Name);
       exception
          when Name_Error =>
             Err_Out.Put

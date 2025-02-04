@@ -44,71 +44,71 @@ package Utils.Command_Lines.Common is
       Process_RTL_Units,
       Cargs);
 
-   package Common_Flag_Switches is new Flag_Switches
-     (Common_Descriptor,
-      Common_Flags);
+   package Common_Flag_Switches is new
+     Flag_Switches (Common_Descriptor, Common_Flags);
 
-   package Common_Flag_Shorthands is new Common_Flag_Switches.Set_Shorthands
-     ([Version | Help => null,
-       Verbose                   => +"-v",
-       Quiet                     => +"-q",
-       Compile_Switch            => +"-c", -- ignored
-       Avoid_Processing_Gnat_Adc => +"-gnatA",
-       No_Code_Generation        => +"-gnatc", -- ignored
-       Incremental               => null,
-       Outer_Parallel            => null,
-       Rep_Clauses               => null,
-       Follow_Symbolic_Links     => +"-eL",
-       No_Objects_Dir            => null,
-       Compute_Timing            => +"-t",
-       Process_RTL_Units         => +"-a",
-       Cargs                     => +"-cargs"]);
+   package Common_Flag_Shorthands is new
+     Common_Flag_Switches.Set_Shorthands
+       ([Version | Help            => null,
+         Verbose                   => +"-v",
+         Quiet                     => +"-q",
+         Compile_Switch            => +"-c",
+         --  ignored
+         Avoid_Processing_Gnat_Adc => +"-gnatA",
+         No_Code_Generation        => +"-gnatc",
+         --  ignored
+         Incremental               => null,
+         Outer_Parallel            => null,
+         Rep_Clauses               => null,
+         Follow_Symbolic_Links     => +"-eL",
+         No_Objects_Dir            => null,
+         Compute_Timing            => +"-t",
+         Process_RTL_Units         => +"-a",
+         Cargs                     => +"-cargs"]);
 
    type Common_Booleans is (Syntax_Only);
 
-   package Common_Boolean_Switches is new Boolean_Switches
-     (Common_Descriptor,
-      Common_Booleans);
+   package Common_Boolean_Switches is new
+     Boolean_Switches (Common_Descriptor, Common_Booleans);
 
    package Common_Boolean_Defaults is new
-     Common_Boolean_Switches.Set_Defaults
-       ([Syntax_Only => False]);
+     Common_Boolean_Switches.Set_Defaults ([Syntax_Only => False]);
 
    package Common_Boolean_Shorthands is new
-     Common_Boolean_Switches.Set_Shorthands
-       ([Syntax_Only => +"-so"]);
+     Common_Boolean_Switches.Set_Shorthands ([Syntax_Only => +"-so"]);
 
    type Ada_Version_Type is (Ada_83, Ada_95, Ada_2005, Ada_2012, Ada_2022);
 
-   package Ada_Version_Switches is new Enum_Switches
-     (Common_Descriptor, Ada_Version_Type,
-      Default => Ada_2012);
+   package Ada_Version_Switches is new
+     Enum_Switches (Common_Descriptor, Ada_Version_Type, Default => Ada_2012);
    --  These switches are ignored. The tools are tolerant of using newer
    --  reserved words, such as "interface", as identifiers, so we don't need to
    --  know the version.
 
-   package Ada_Version_Shorthands is new Ada_Version_Switches.Set_Shorthands
-     ([Ada_83 => +"-gnat83",
-       Ada_95 => +"-gnat95",
-       Ada_2005 => +"-gnat2005",
-       Ada_2012 => +"-gnat2012",
-       Ada_2022 => +"-gnat2022"]);
+   package Ada_Version_Shorthands is new
+     Ada_Version_Switches.Set_Shorthands
+       ([Ada_83   => +"-gnat83",
+         Ada_95   => +"-gnat95",
+         Ada_2005 => +"-gnat2005",
+         Ada_2012 => +"-gnat2012",
+         Ada_2022 => +"-gnat2022"]);
 
-   package Ada_Version_Shorthands_2 is new Ada_Version_Switches.Set_Shorthands
-     ([Ada_2005 => +"-gnat05",
-       others => null]);
+   package Ada_Version_Shorthands_2 is new
+     Ada_Version_Switches.Set_Shorthands
+       ([Ada_2005 => +"-gnat05", others => null]);
 
    type Source_Selection_Type is
      (Update_All, No_Subprojects, No_Source_Selection);
 
-   package Source_Selection_Switches is new Enum_Switches
-     (Common_Descriptor, Source_Selection_Type,
-      Default => Source_Selection_Type'Last);
+   package Source_Selection_Switches is new
+     Enum_Switches
+       (Common_Descriptor,
+        Source_Selection_Type,
+        Default => Source_Selection_Type'Last);
 
    package Source_Selection_Shorthands is new
      Source_Selection_Switches.Set_Shorthands
-       ([Update_All => +"-U",
-         others => null]);
+       ([Update_All => +"-U", others => null]);
 
    type Common_Strings is
      (Project_File,
@@ -118,9 +118,9 @@ package Utils.Command_Lines.Common is
       Mapping_File,
       Object_Path_File_Name,
       Include_Path,
-   --  ????????????????Need to deal with "-x ada". See "when 'x' =>" in
-   --  Utils.Environment.Scan_Common_Arg for details. Perhaps we could put
-   --  a kludge in Text_Args_From_Command_Line.
+      --  ????????????????Need to deal with "-x ada". See "when 'x' =>" in
+      --  Utils.Environment.Scan_Common_Arg for details. Perhaps we could put
+      --  a kludge in Text_Args_From_Command_Line.
       Outer_Dir,
       Output_Directory,
       Target,
@@ -134,57 +134,58 @@ package Utils.Command_Lines.Common is
    --  spawns 3 subprocesses passing --aggregated-project-file=a,
    --  --aggregated-project-file=b, and  --aggregated-project-file=c.
 
-   package Common_String_Switches is new String_Switches
-     (Common_Descriptor,
-      Common_Strings);
+   package Common_String_Switches is new
+     String_Switches (Common_Descriptor, Common_Strings);
 
-   package Common_String_Syntax is new Common_String_Switches.Set_Syntax
-     ([Project_File               => ':',
-       Aggregated_Project_File    => '=',
-       Run_Time_System            => '=',
-       Configuration_Pragmas_File => '!',
-       Mapping_File               => '!',
-       Object_Path_File_Name      => '!',
-       Include_Path               => ':',
-       Outer_Dir                  => '=',
-       Output_Directory           => '=',
-       Target                     => '=',
-       Subdirs                    => '=',
-       Wide_Character_Encoding    => '!']);
+   package Common_String_Syntax is new
+     Common_String_Switches.Set_Syntax
+       ([Project_File               => ':',
+         Aggregated_Project_File    => '=',
+         Run_Time_System            => '=',
+         Configuration_Pragmas_File => '!',
+         Mapping_File               => '!',
+         Object_Path_File_Name      => '!',
+         Include_Path               => ':',
+         Outer_Dir                  => '=',
+         Output_Directory           => '=',
+         Target                     => '=',
+         Subdirs                    => '=',
+         Wide_Character_Encoding    => '!']);
 
-   package Common_String_Defaults is new Common_String_Switches.Set_Defaults
-     ([Project_File               => null,
-       Aggregated_Project_File    => null,
-       Run_Time_System            => +"", -- ????Needed?
-       Configuration_Pragmas_File => null,
-       Mapping_File               => null,
-       Object_Path_File_Name      => null,
-       Include_Path               => null,
-       Outer_Dir                  => null,
-       Output_Directory           => null,
-       Target                     => null,
-       Subdirs                    => null,
-       Wide_Character_Encoding    => null]);
+   package Common_String_Defaults is new
+     Common_String_Switches.Set_Defaults
+       ([Project_File               => null,
+         Aggregated_Project_File    => null,
+         Run_Time_System            => +"",
+         --  ????Needed?
+         Configuration_Pragmas_File => null,
+         Mapping_File               => null,
+         Object_Path_File_Name      => null,
+         Include_Path               => null,
+         Outer_Dir                  => null,
+         Output_Directory           => null,
+         Target                     => null,
+         Subdirs                    => null,
+         Wide_Character_Encoding    => null]);
 
-   package Common_String_Shorthands is new Common_String_Switches
-     .Set_Shorthands
-     ([Project_File               => +"-P",
-       Aggregated_Project_File    => null,
-       Run_Time_System            => +"--RTS",
-       Configuration_Pragmas_File => +"-gnatec",
-       Mapping_File               => +"-gnatem",
-       Object_Path_File_Name      => +"-gnateO",
-       Include_Path               => +"-I",
-       Outer_Dir                  => null,
-       Output_Directory           => +"--output-dir",
-       Target                     => null,
-       Subdirs                    => null,
-       Wide_Character_Encoding    => +"-W"]);
+   package Common_String_Shorthands is new
+     Common_String_Switches.Set_Shorthands
+       ([Project_File               => +"-P",
+         Aggregated_Project_File    => null,
+         Run_Time_System            => +"--RTS",
+         Configuration_Pragmas_File => +"-gnatec",
+         Mapping_File               => +"-gnatem",
+         Object_Path_File_Name      => +"-gnateO",
+         Include_Path               => +"-I",
+         Outer_Dir                  => null,
+         Output_Directory           => +"--output-dir",
+         Target                     => null,
+         Subdirs                    => null,
+         Wide_Character_Encoding    => +"-W"]);
 
-   package Common_String_Shorthands_2 is new Common_String_Switches
-     .Set_Shorthands
-     ([Output_Directory => +"--dir",
-       others => null]);
+   package Common_String_Shorthands_2 is new
+     Common_String_Switches.Set_Shorthands
+       ([Output_Directory => +"--dir", others => null]);
 
    --  Note: Most tools allow "--debugx" with a shorthand of "-dx".
    --  Gnatmetric, however, uses "--gnatmetric-debugx" with a shorthand
@@ -192,33 +193,35 @@ package Utils.Command_Lines.Common is
 
    type Common_String_Seqs is (Debug, Files, Ignore, External_Variable);
 
-   package Common_String_Seq_Switches is new String_Seq_Switches
-     (Common_Descriptor,
-      Common_String_Seqs);
+   package Common_String_Seq_Switches is new
+     String_Seq_Switches (Common_Descriptor, Common_String_Seqs);
 
-   package Common_String_Seq_Syntax is new Common_String_Seq_Switches
-     .Set_Syntax
-     ([Debug => '!', Files => '=', Ignore => '=', External_Variable => '!']);
+   package Common_String_Seq_Syntax is new
+     Common_String_Seq_Switches.Set_Syntax
+       ([Debug => '!', Files => '=', Ignore => '=', External_Variable => '!']);
 
-   package Common_String_Seq_Shorthands is new Common_String_Seq_Switches
-     .Set_Shorthands
-     ([Debug => +"-d", Files => +"-files", Ignore => null,
-       External_Variable => +"-X"]);
+   package Common_String_Seq_Shorthands is new
+     Common_String_Seq_Switches.Set_Shorthands
+       ([Debug             => +"-d",
+         Files             => +"-files",
+         Ignore            => null,
+         External_Variable => +"-X"]);
 
    --  ??? -j is ignored.
    type Common_Nats is (Jobs);
-   package Common_Nat_Switches is new Other_Switches
-     (Common_Descriptor,
-      Common_Nats,
-      Natural,
-      Natural'Image,
-      Natural'Value);
-   package Common_Nat_Syntax is new Common_Nat_Switches.Set_Syntax
-     ([Jobs => '!']);
-   package Common_Nat_Defaults is new Common_Nat_Switches.Set_Defaults
-     ([Jobs => 1]);
-   package Common_Nat_Shorthands is new Common_Nat_Switches.Set_Shorthands
-     ([Jobs => +"-j"]);
+   package Common_Nat_Switches is new
+     Other_Switches
+       (Common_Descriptor,
+        Common_Nats,
+        Natural,
+        Natural'Image,
+        Natural'Value);
+   package Common_Nat_Syntax is new
+     Common_Nat_Switches.Set_Syntax ([Jobs => '!']);
+   package Common_Nat_Defaults is new
+     Common_Nat_Switches.Set_Defaults ([Jobs => 1]);
+   package Common_Nat_Shorthands is new
+     Common_Nat_Switches.Set_Shorthands ([Jobs => +"-j"]);
 
    use Common_Flag_Switches, Common_String_Switches;
 
@@ -258,8 +261,8 @@ package Utils.Command_Lines.Common is
 
    ----------------
 
-   function Mimic_gcc (Cmd : Command_Line) return Boolean is
-     (Arg (Cmd, Outer_Dir) /= null);
+   function Mimic_gcc (Cmd : Command_Line) return Boolean
+   is (Arg (Cmd, Outer_Dir) /= null);
    --  True if this is an inner invocation of the tool for incremental mode, so
    --  that the ASIS tool should mimic the gcc compiler in certain ways.
    --
@@ -281,21 +284,21 @@ package Utils.Command_Lines.Common is
    --     - When doing cleanup, we set Keep_ALI_Files to True so the .ali files
    --       are kept around for subsequent runs of the builder.
 
-   function Incremental_Mode_Specified (Cmd : Command_Line) return Boolean is
-     (Arg (Cmd, Incremental) and then not Mimic_gcc (Cmd));
+   function Incremental_Mode_Specified (Cmd : Command_Line) return Boolean
+   is (Arg (Cmd, Incremental) and then not Mimic_gcc (Cmd));
    --  We need to ignore --incremental in the inner invocation, because
    --  --incremental could be specified in package Pretty_Printer of the
    --  project file, which will cause the builder to pass it to the inner
    --  invocation.
 
-   function Incremental_Mode_By_Default (Cmd : Command_Line) return Boolean is
-     (False and then Arg (Cmd, Project_File) /= null);
+   function Incremental_Mode_By_Default (Cmd : Command_Line) return Boolean
+   is (False and then Arg (Cmd, Project_File) /= null);
    --  Change False to True to force --incremental mode ON in cases where it is
    --  legal (i.e. a project file was specified). This is for testing.
 
-   function Incremental_Mode (Cmd : Command_Line) return Boolean is
-     (Incremental_Mode_Specified (Cmd)
-        or else Incremental_Mode_By_Default (Cmd));
+   function Incremental_Mode (Cmd : Command_Line) return Boolean
+   is (Incremental_Mode_Specified (Cmd)
+       or else Incremental_Mode_By_Default (Cmd));
    --  True if --incremental was given on the command line. In this mode, the
    --  ASIS tool is incremental on a file-by-file basis (e.g. don't run
    --  gnat2xml if the xml file is already up to date).

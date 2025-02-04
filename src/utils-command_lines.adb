@@ -45,8 +45,7 @@ package body Utils.Command_Lines is
    -- Copy --
    ----------
 
-   function Copy (String_Refs : String_Ref_Vector)
-                  return String_Ref_Vector is
+   function Copy (String_Refs : String_Ref_Vector) return String_Ref_Vector is
    begin
       return Result : String_Ref_Vector do
          Result.Set_Length (String_Refs.Length);
@@ -80,8 +79,7 @@ package body Utils.Command_Lines is
    ----------
 
    function Copy
-     (Switch : Dynamically_Typed_Switch)
-      return Dynamically_Typed_Switch is
+     (Switch : Dynamically_Typed_Switch) return Dynamically_Typed_Switch is
    begin
       return Result : Dynamically_Typed_Switch := Switch do
          if Result.Text /= null then
@@ -92,8 +90,10 @@ package body Utils.Command_Lines is
                if Result.String_Val /= null then
                   Result.String_Val := new String'(Result.String_Val.all);
                end if;
+
             when String_Seq_Switch =>
                Result.Seq_Val := Copy (Result.Seq_Val);
+
             when others =>
                null;
          end case;
@@ -114,8 +114,10 @@ package body Utils.Command_Lines is
             if Object.String_Val /= null then
                Free (Object.String_Val);
             end if;
+
          when String_Seq_Switch =>
             Destroy (Object.Seq_Val);
+
          when others =>
             null;
       end case;
@@ -126,8 +128,8 @@ package body Utils.Command_Lines is
    ----------
 
    function Copy
-     (Switches : Dynamically_Typed_Switches)
-      return Dynamically_Typed_Switches is
+     (Switches : Dynamically_Typed_Switches) return Dynamically_Typed_Switches
+   is
    begin
       return Result : Dynamically_Typed_Switches (Switches'Range) do
          for J in Result'First .. Result'Last loop
@@ -140,8 +142,7 @@ package body Utils.Command_Lines is
    -- Copy --
    ----------
 
-   procedure Destroy
-     (Switches : in out Dynamically_Typed_Switches) is
+   procedure Destroy (Switches : in out Dynamically_Typed_Switches) is
    begin
       for J in Switches'First .. Switches'Last loop
          Destroy (Switches (J));
@@ -150,8 +151,10 @@ package body Utils.Command_Lines is
 
    procedure Free is new Ada.Unchecked_Deallocation (String, String_Ref);
 
-   procedure Free is new Ada.Unchecked_Deallocation
-     (Dynamically_Typed_Switches, Dynamically_Typed_Switches_Access);
+   procedure Free is new
+     Ada.Unchecked_Deallocation
+       (Dynamically_Typed_Switches,
+        Dynamically_Typed_Switches_Access);
 
    procedure Raise_Cmd_Error (Message : String) is
    begin
@@ -243,16 +246,14 @@ package body Utils.Command_Lines is
       return +("--" & Dashes (To_Lower (Switches'Image (Switch))));
    end Generic_Switch_Text;
 
-   function Generic_Negated_Switch_Text
-     (Switch : Switches) return String_Ref
+   function Generic_Negated_Switch_Text (Switch : Switches) return String_Ref
    is
    begin
       return +("--no-" & Dashes (To_Lower (Switches'Image (Switch))));
    end Generic_Negated_Switch_Text;
 
-   function Error_Detected
-     (Cmd : Command_Line) return Boolean is
-     (Cmd.Error_Detected);
+   function Error_Detected (Cmd : Command_Line) return Boolean
+   is (Cmd.Error_Detected);
 
    --  Efficiency: Command_Line_Rec contains entries for all the short-hand
    --  switches, but those are never used.
@@ -274,8 +275,7 @@ package body Utils.Command_Lines is
       end Set_Arg;
 
       function Explicit (Cmd : Command_Line; Switch : Switches) return Boolean
-      is
-        (Cmd.Sw (To_All (Switch)).Explicit);
+      is (Cmd.Sw (To_All (Switch)).Explicit);
 
       package body Set_Shorthands is
          pragma Assert (Descriptor.Allowed_Switches = null);
@@ -297,17 +297,14 @@ package body Utils.Command_Lines is
       Base_Switch : constant All_Switches :=
         Last_Index (Descriptor.Allowed_Switches_Vector) + 1;
 
-      function To_All
-        (Switch : Switches) return All_Switches is
-        (Base_Switch + Switches'Pos (Switch));
+      function To_All (Switch : Switches) return All_Switches
+      is (Base_Switch + Switches'Pos (Switch));
 
-      function From_All
-        (Switch : All_Switches) return Switches is
-        (Switches'Val (Switch - Base_Switch));
+      function From_All (Switch : All_Switches) return Switches
+      is (Switches'Val (Switch - Base_Switch));
 
-      function Valid
-        (Switch : All_Switches) return Boolean is
-        (Switch in To_All (Switches'First) .. To_All (Switches'Last));
+      function Valid (Switch : All_Switches) return Boolean
+      is (Switch in To_All (Switches'First) .. To_All (Switches'Last));
 
       function Switch_Text is new Generic_Switch_Text (Switches);
 
@@ -343,9 +340,7 @@ package body Utils.Command_Lines is
       -----------------------------
 
       procedure Set_Arg_If_Not_Explicit
-        (Cmd    : in out Command_Line;
-         Switch : Switches;
-         Value  : Boolean := True)
+        (Cmd : in out Command_Line; Switch : Switches; Value : Boolean := True)
       is
       begin
          if not Explicit (Cmd, Switch) then
@@ -353,8 +348,8 @@ package body Utils.Command_Lines is
          end if;
       end Set_Arg_If_Not_Explicit;
 
-      function Explicit
-        (Cmd : Command_Line; Switch : Switches) return Boolean is
+      function Explicit (Cmd : Command_Line; Switch : Switches) return Boolean
+      is
       begin
          return Cmd.Sw (To_All (Switch)).Explicit;
       end Explicit;
@@ -394,11 +389,13 @@ package body Utils.Command_Lines is
                  (Descriptor.Allowed_Switches_Vector,
                   Switch_Descriptor'
                     (Kind   => False_Switch,
-                     Text   => new String'
-                       ("--no-" &
-                        Shorthands (J) (After_Dashes .. Shorthands (J)'Last)),
-                       --  So if the shorthand is "--foo-bar" or "-foo-bar",
-                       --  this is "--no-foo-bar".
+                     Text   =>
+                       new String'
+                         ("--no-"
+                          & Shorthands (J)
+                              (After_Dashes .. Shorthands (J)'Last)),
+                     --  So if the shorthand is "--foo-bar" or "-foo-bar",
+                     --  this is "--no-foo-bar".
                      Alias  => To_All (J),
                      others => <>));
             end if;
@@ -408,21 +405,18 @@ package body Utils.Command_Lines is
       Base_Switch : constant All_Switches :=
         Last_Index (Descriptor.Allowed_Switches_Vector) + 1;
 
-      function To_All
-        (Switch : Switches) return All_Switches is
-        (Base_Switch + Switches'Pos (Switch));
+      function To_All (Switch : Switches) return All_Switches
+      is (Base_Switch + Switches'Pos (Switch));
 
-      function From_All
-        (Switch : All_Switches) return Switches is
-        (Switches'Val (Switch - Base_Switch));
+      function From_All (Switch : All_Switches) return Switches
+      is (Switches'Val (Switch - Base_Switch));
 
-      function Valid
-        (Switch : All_Switches) return Boolean is
-        (Switch in To_All (Switches'First) .. To_All (Switches'Last));
+      function Valid (Switch : All_Switches) return Boolean
+      is (Switch in To_All (Switches'First) .. To_All (Switches'Last));
 
       function Switch_Text is new Generic_Switch_Text (Switches);
-      function Negated_Switch_Text is new Generic_Negated_Switch_Text
-        (Switches);
+      function Negated_Switch_Text is new
+        Generic_Negated_Switch_Text (Switches);
 
    begin
       for Switch in Switches loop
@@ -456,8 +450,8 @@ package body Utils.Command_Lines is
             --  any of the switches were explicitly specified.
 
             for Switch in Switches loop
-               if Cmd.Sw (To_All (Switch)).Position >
-                 Cmd.Sw (To_All (Result)).Position
+               if Cmd.Sw (To_All (Switch)).Position
+                 > Cmd.Sw (To_All (Result)).Position
                then
                   Result := Switch;
                end if;
@@ -495,17 +489,14 @@ package body Utils.Command_Lines is
       Base_Switch : constant All_Switches :=
         Last_Index (Descriptor.Allowed_Switches_Vector) + 1;
 
-      function To_All
-        (Switch : Switches) return All_Switches is
-        (Base_Switch + Switches'Pos (Switch));
+      function To_All (Switch : Switches) return All_Switches
+      is (Base_Switch + Switches'Pos (Switch));
 
-      function From_All
-        (Switch : All_Switches) return Switches is
-        (Switches'Val (Switch - Base_Switch));
+      function From_All (Switch : All_Switches) return Switches
+      is (Switches'Val (Switch - Base_Switch));
 
-      function Valid
-        (Switch : All_Switches) return Boolean is
-        (Switch in To_All (Switches'First) .. To_All (Switches'Last));
+      function Valid (Switch : All_Switches) return Boolean
+      is (Switch in To_All (Switches'First) .. To_All (Switches'Last));
 
       function Switch_Text is new Generic_Switch_Text (Switches);
 
@@ -578,17 +569,14 @@ package body Utils.Command_Lines is
       Base_Switch : constant All_Switches :=
         Last_Index (Descriptor.Allowed_Switches_Vector) + 1;
 
-      function To_All
-        (Switch : Switches) return All_Switches is
-        (Base_Switch + Switches'Pos (Switch));
+      function To_All (Switch : Switches) return All_Switches
+      is (Base_Switch + Switches'Pos (Switch));
 
-      function From_All
-        (Switch : All_Switches) return Switches is
-        (Switches'Val (Switch - Base_Switch));
+      function From_All (Switch : All_Switches) return Switches
+      is (Switches'Val (Switch - Base_Switch));
 
-      function Valid
-        (Switch : All_Switches) return Boolean is
-        (Switch in To_All (Switches'First) .. To_All (Switches'Last));
+      function Valid (Switch : All_Switches) return Boolean
+      is (Switch in To_All (Switches'First) .. To_All (Switches'Last));
 
       function Switch_Text is new Generic_Switch_Text (Switches);
 
@@ -608,9 +596,7 @@ package body Utils.Command_Lines is
       pragma Assert (Descriptor.Allowed_Switches = null);
 
       function Arg
-        (Cmd    : Command_Line;
-         Switch : Switches) return String_Ref_Array
-      is
+        (Cmd : Command_Line; Switch : Switches) return String_Ref_Array is
       begin
          return To_Array (Cmd.Sw (To_All (Switch)).Seq_Val);
       end Arg;
@@ -624,9 +610,7 @@ package body Utils.Command_Lines is
       end Set_Arg;
 
       function Arg_Length
-        (Cmd    : Command_Line;
-         Switch : Switches) return Natural
-      is
+        (Cmd : Command_Line; Switch : Switches) return Natural is
       begin
          return Last_Index (Cmd.Sw (To_All (Switch)).Seq_Val);
       end Arg_Length;
@@ -665,17 +649,14 @@ package body Utils.Command_Lines is
       Base_Switch : constant All_Switches :=
         Last_Index (Descriptor.Allowed_Switches_Vector) + 1;
 
-      function To_All
-        (Switch : Switches) return All_Switches is
-        (Base_Switch + Switches'Pos (Switch));
+      function To_All (Switch : Switches) return All_Switches
+      is (Base_Switch + Switches'Pos (Switch));
 
-      function From_All
-        (Switch : All_Switches) return Switches is
-        (Switches'Val (Switch - Base_Switch));
+      function From_All (Switch : All_Switches) return Switches
+      is (Switches'Val (Switch - Base_Switch));
 
-      function Valid
-        (Switch : All_Switches) return Boolean is
-        (Switch in To_All (Switches'First) .. To_All (Switches'Last));
+      function Valid (Switch : All_Switches) return Boolean
+      is (Switch in To_All (Switches'First) .. To_All (Switches'Last));
 
       function Switch_Text is new Generic_Switch_Text (Switches);
 
@@ -702,7 +683,8 @@ package body Utils.Command_Lines is
       end Arg;
 
       procedure Set_Arg
-        (Cmd : in out Command_Line; Switch : Switches; Val : Arg_Type) is
+        (Cmd : in out Command_Line; Switch : Switches; Val : Arg_Type)
+      is
          S : constant String := Image (Val);
       begin
          if Cmd.Sw (To_All (Switch)).String_Val = null
@@ -714,8 +696,7 @@ package body Utils.Command_Lines is
       end Set_Arg;
 
       function Explicit (Cmd : Command_Line; Switch : Switches) return Boolean
-      is
-        (Cmd.Sw (To_All (Switch)).Explicit);
+      is (Cmd.Sw (To_All (Switch)).Explicit);
 
       Set_Shorthands_Instantiated : Boolean := False;
 
@@ -760,17 +741,14 @@ package body Utils.Command_Lines is
       Base_Switch : constant All_Switches :=
         Last_Index (Descriptor.Allowed_Switches_Vector) + 1;
 
-      function To_All
-        (Switch : Switches) return All_Switches is
-        (Base_Switch + Switches'Pos (Switch));
+      function To_All (Switch : Switches) return All_Switches
+      is (Base_Switch + Switches'Pos (Switch));
 
-      function From_All
-        (Switch : All_Switches) return Switches is
-        (Switches'Val (Switch - Base_Switch));
+      function From_All (Switch : All_Switches) return Switches
+      is (Switches'Val (Switch - Base_Switch));
 
-      function Valid
-        (Switch : All_Switches) return Boolean is
-        (Switch in To_All (Switches'First) .. To_All (Switches'Last));
+      function Valid (Switch : All_Switches) return Boolean
+      is (Switch in To_All (Switches'First) .. To_All (Switches'Last));
 
       function Switch_Text is new Generic_Switch_Text (Switches);
 
@@ -816,7 +794,7 @@ package body Utils.Command_Lines is
    end Disable_Switches;
 
    package body Freeze_Descriptor is
---      pragma Assert (Descriptor.Allowed_Switches = null);
+      --      pragma Assert (Descriptor.Allowed_Switches = null);
       --  Don't call this twice. Commented out because of kludgery
       --  in Metrics.Command_Lines. We should move the freezing
       --  of common switches into Common. ????
@@ -843,8 +821,8 @@ package body Utils.Command_Lines is
          --  argument of 123).
 
          for Switch1 in Descriptor.Allowed_Switches'Range loop
-            pragma Assert
-              (Descriptor.Allowed_Switches (Switch1).Kind /= No_Such);
+            pragma
+              Assert (Descriptor.Allowed_Switches (Switch1).Kind /= No_Such);
 
             for Switch2 in Descriptor.Allowed_Switches'Range loop
                if Switch1 /= Switch2
@@ -852,12 +830,10 @@ package body Utils.Command_Lines is
                  and then Enabled (Descriptor, Switch2)
                then
                   declare
-                     Desc1 :
-                       Switch_Descriptor renames
-                         Descriptor.Allowed_Switches (Switch1);
-                     Desc2 :
-                       Switch_Descriptor renames
-                         Descriptor.Allowed_Switches (Switch2);
+                     Desc1 : Switch_Descriptor
+                       renames Descriptor.Allowed_Switches (Switch1);
+                     Desc2 : Switch_Descriptor
+                       renames Descriptor.Allowed_Switches (Switch2);
                   begin
                      if Desc1.Kind = Desc2.Kind
                        and then Desc1.Text.all = Desc2.Text.all
@@ -873,8 +849,9 @@ package body Utils.Command_Lines is
                        and then Desc1.Text.all /= "-gnaty"
                      then
                         OK := False;
-                        Put_Line (Standard_Error, Desc1.Text.all &
-                                    " is prefix of " & Desc2.Text.all);
+                        Put_Line
+                          (Standard_Error,
+                           Desc1.Text.all & " is prefix of " & Desc2.Text.all);
                      end if;
                   end;
                end if;
@@ -885,12 +862,13 @@ package body Utils.Command_Lines is
       end Do_It;
 
    begin
-      if Descriptor.Allowed_Switches = null then -- ???Replaces above assertion
+      if Descriptor.Allowed_Switches = null then
+         --  ???Replaces above assertion
          --  Switch over to using Allowed_Switches from Allowed_Switches_Vector
 
          Descriptor.Allowed_Switches :=
            new Switch_Descriptor_Array'
-           (To_Array (Descriptor.Allowed_Switches_Vector));
+             (To_Array (Descriptor.Allowed_Switches_Vector));
          Free (Descriptor.Allowed_Switches_Vector);
          Do_It (Descriptor);
       end if;
@@ -905,8 +883,7 @@ package body Utils.Command_Lines is
 
       return Result : Command_Line_Descriptor do
          Append
-           (Result.Allowed_Switches_Vector,
-            Descriptor.Allowed_Switches.all);
+           (Result.Allowed_Switches_Vector, Descriptor.Allowed_Switches.all);
       end return;
    end Copy_Descriptor;
 
@@ -937,13 +914,11 @@ package body Utils.Command_Lines is
    end Finalize;
 
    function Text_To_Switch
-     (Descriptor : Command_Line_Descriptor;
-      Text       : String) return All_Switches;
+     (Descriptor : Command_Line_Descriptor; Text : String) return All_Switches;
    function Text_To_Switch
-     (Descriptor : Command_Line_Descriptor;
-      Text       : String) return All_Switches
+     (Descriptor : Command_Line_Descriptor; Text : String) return All_Switches
    is
-      DT : constant String := Dashes (Text);
+      DT     : constant String := Dashes (Text);
       Result : All_Switches := All_Switches'Last;
       --  This is used in case of a String_Switch or String_Seq_Switch that
       --  does not have '=' syntax. We want to choose the longest one.
@@ -952,14 +927,12 @@ package body Utils.Command_Lines is
       for Switch in Descriptor.Allowed_Switches'Range loop
          if Enabled (Descriptor, Switch) then
             declare
-               Desc :
-                 Switch_Descriptor renames
-                 Descriptor.Allowed_Switches (Switch);
+               Desc : Switch_Descriptor
+                 renames Descriptor.Allowed_Switches (Switch);
             begin
                if DT = Desc.Text.all then
-                  if not
-                    (Desc.Kind in String_Switch | String_Seq_Switch
-                     and then Syntax (Descriptor, Switch) = '!')
+                  if not (Desc.Kind in String_Switch | String_Seq_Switch
+                          and then Syntax (Descriptor, Switch) = '!')
                   then
                      return Switch;
                   end if;
@@ -978,8 +951,9 @@ package body Utils.Command_Lines is
 
                      when ':' | '!' | '?' =>
                         if Result = All_Switches'Last
-                          or else Desc.Text'Length >
-                            Descriptor.Allowed_Switches (Result).Text'Length
+                          or else Desc.Text'Length
+                                  > Descriptor.Allowed_Switches (Result)
+                                      .Text'Length
                         then
                            Result := Switch;
                         end if;
@@ -997,21 +971,21 @@ package body Utils.Command_Lines is
    end Text_To_Switch;
 
    procedure Parse_Helper
-     (Text_Args          :        Argument_List_Access;
+     (Text_Args          : Argument_List_Access;
       Cmd                : in out Command_Line;
-      Phase              :        Parse_Phase;
-      Callback           :        Parse_Callback;
-      Collect_File_Names :        Boolean;
-      Ignore_Errors      :        Boolean);
+      Phase              : Parse_Phase;
+      Callback           : Parse_Callback;
+      Collect_File_Names : Boolean;
+      Ignore_Errors      : Boolean);
    --  This does the actual parsing work, after Parse has initialized things.
 
    procedure Parse_Helper
-     (Text_Args          :        Argument_List_Access;
+     (Text_Args          : Argument_List_Access;
       Cmd                : in out Command_Line;
-      Phase              :        Parse_Phase;
-      Callback           :        Parse_Callback;
-      Collect_File_Names :        Boolean;
-      Ignore_Errors      :        Boolean)
+      Phase              : Parse_Phase;
+      Callback           : Parse_Callback;
+      Collect_File_Names : Boolean;
+      Ignore_Errors      : Boolean)
    is
       Cur : Positive := 1;
       --  Points to current element of Text_Args
@@ -1021,7 +995,7 @@ package body Utils.Command_Lines is
 
       procedure Bump is
       begin
-         Cur                  := Cur + 1;
+         Cur := Cur + 1;
          Cmd.Current_Position := Cmd.Current_Position + 1;
       end Bump;
 
@@ -1030,18 +1004,18 @@ package body Utils.Command_Lines is
       --  the current switch (as in "--switch arg").
 
       procedure Parse_One_Switch is
-         Text : String renames Text_Args (Cur).all;
+         Text       : String renames Text_Args (Cur).all;
          pragma Assert (Text'First = 1);
          Descriptor : Command_Line_Descriptor renames Cmd.Descriptor.all;
-         Switch : constant All_Switches := Text_To_Switch (Descriptor, Text);
-         Allowed :
-           String renames
-           Descriptor.Allowed_Switches (Switch).Text.all;
+         Switch     : constant All_Switches :=
+           Text_To_Switch (Descriptor, Text);
+         Allowed    : String
+           renames Descriptor.Allowed_Switches (Switch).Text.all;
          pragma Assert (Allowed'First = 1);
-         Alias : constant All_Switches :=
+         Alias      : constant All_Switches :=
            Descriptor.Allowed_Switches (Switch).Alias;
          pragma Assert (Descriptor.Allowed_Switches (Alias).Enabled);
-         Dyn : Dynamically_Typed_Switch renames Cmd.Sw (Alias);
+         Dyn        : Dynamically_Typed_Switch renames Cmd.Sw (Alias);
       begin
          Dyn.Text :=
            new String'(Descriptor.Allowed_Switches (Switch).Text.all);
@@ -1088,21 +1062,22 @@ package body Utils.Command_Lines is
                           ("missing switch parameter for: " & Text);
                      end if;
 
-                  --  The case of:
-                  --
-                  --     command --switch=arg
-                  --
-                  --  or:
-                  --
-                  --     command --switcharg
-                  --
-                  --  Split out the "arg" part.
+                     --  The case of:
+                     --
+                     --     command --switch=arg
+                     --
+                     --  or:
+                     --
+                     --     command --switcharg
+                     --
+                     --  Split out the "arg" part.
 
                   else
-                     pragma Assert
-                       (Has_Prefix
-                          (Replace_String (Text, "_", "-"),
-                           Prefix => Replace_String (Allowed, "_", "-")));
+                     pragma
+                       Assert
+                         (Has_Prefix
+                            (Replace_String (Text, "_", "-"),
+                             Prefix => Replace_String (Allowed, "_", "-")));
 
                      if Text (Allowed'Length + 1) = '=' then
                         First := Allowed'Length + 2;
@@ -1112,17 +1087,16 @@ package body Utils.Command_Lines is
                   end if;
 
                   declare
-                     Arg :
-                       String renames
-                       Text_Args (Cur) (First .. Text_Args (Cur)'Last);
-                     S : constant String (1 .. Arg'Length) := Arg;
-                  --  Slide it to start at 1
+                     Arg : String
+                       renames Text_Args (Cur) (First .. Text_Args (Cur)'Last);
+                     S   : constant String (1 .. Arg'Length) := Arg;
+                     --  Slide it to start at 1
                   begin
                      case Descriptor.Allowed_Switches (Switch).Kind is
                         when String_Switch =>
                            Descriptor.Allowed_Switches
                              (Descriptor.Allowed_Switches (Switch).Alias)
-                               .Validator (S);
+                             .Validator (S);
                            --  Call the Validator. This will call
                            --  Raise_Cmd_Error if the switch parameter
                            --  is malformed; Raise_Cmd_Error raises.
@@ -1133,6 +1107,7 @@ package body Utils.Command_Lines is
                               Free (Dyn.String_Val);
                               Dyn.String_Val := new String'(S);
                            end if;
+
                         when String_Seq_Switch =>
                            --  If the switch appears on the command line, we
                            --  don't want to duplicate it, so we skip the
@@ -1149,9 +1124,11 @@ package body Utils.Command_Lines is
                            case Phase is
                               when Cmd_Line_1 | Project_File =>
                                  Append (Dyn.Seq_Val, new String'(S));
+
                               when Cmd_Line_2 =>
                                  null;
                            end case;
+
                         when others =>
                            raise Program_Error;
                      end case;
@@ -1168,7 +1145,8 @@ package body Utils.Command_Lines is
 
    begin
       while Cur <= Text_Args'Last loop
-         if Text_Args (Cur) (1) = '-' then -- Is it a switch?
+         if Text_Args (Cur) (1) = '-' then
+            --  Is it a switch?
             begin
                Parse_One_Switch;
             exception
@@ -1178,8 +1156,11 @@ package body Utils.Command_Lines is
                   --  Cmd is a pointer.
 
                   if not Ignore_Errors then
-                     Put_Line (Standard_Error, Utils.Tool_Names.Tool_Name &
-                                  ": " & Exceptions.Exception_Message (X));
+                     Put_Line
+                       (Standard_Error,
+                        Utils.Tool_Names.Tool_Name
+                        & ": "
+                        & Exceptions.Exception_Message (X));
                      raise;
                   end if;
             end;
@@ -1211,7 +1192,7 @@ package body Utils.Command_Lines is
                      end;
                   end loop;
 
-               --  No wildcards:
+                  --  No wildcards:
 
                else
                   Append (Cmd.File_Names, String_Ref (Text_Args (Cur)));
@@ -1224,12 +1205,12 @@ package body Utils.Command_Lines is
    end Parse_Helper;
 
    procedure Parse
-     (Text_Args          :        Argument_List_Access;
+     (Text_Args          : Argument_List_Access;
       Cmd                : in out Command_Line;
-      Phase              :        Parse_Phase;
-      Callback           :        Parse_Callback;
-      Collect_File_Names :        Boolean;
-      Ignore_Errors      :        Boolean := False)
+      Phase              : Parse_Phase;
+      Callback           : Parse_Callback;
+      Collect_File_Names : Boolean;
+      Ignore_Errors      : Boolean := False)
    is
       Descriptor : Command_Line_Descriptor renames Cmd.Descriptor.all;
    begin
@@ -1256,14 +1237,15 @@ package body Utils.Command_Lines is
                        (True_Switch,
                         Switch,
                         Text        => null,
-                        Explicit => False,
+                        Explicit    => False,
                         Boolean_Val =>
                           Descriptor.Allowed_Switches (Switch).Default_Bool);
 
                   when Enum_Switch =>
                      Cmd.Sw (Switch) :=
-                       (Enum_Switch, Switch,
-                        Text => null,
+                       (Enum_Switch,
+                        Switch,
+                        Text     => null,
                         Explicit => False,
                         Position => 0);
 
@@ -1272,21 +1254,23 @@ package body Utils.Command_Lines is
                        (String_Switch,
                         Switch,
                         Text       => null,
-                        Explicit => False,
+                        Explicit   => False,
                         String_Val =>
-                          (if Descriptor.Allowed_Switches
-                               (Switch).Default = null
+                          (if Descriptor.Allowed_Switches (Switch).Default
+                             = null
                            then null
-                           else new String'(Descriptor.Allowed_Switches
-                              (Switch).Default.all)));
+                           else
+                             new String'
+                               (Descriptor.Allowed_Switches (Switch)
+                                  .Default.all)));
 
                   when String_Seq_Switch =>
                      Cmd.Sw (Switch) :=
                        (String_Seq_Switch,
                         Switch,
-                        Text    => null,
+                        Text     => null,
                         Explicit => False,
-                        Seq_Val => String_Ref_Vectors.Empty_Vector);
+                        Seq_Val  => String_Ref_Vectors.Empty_Vector);
                end case;
             end if;
          end loop;
@@ -1295,12 +1279,7 @@ package body Utils.Command_Lines is
       --  Finally, parse the Text_Args into Cmd
 
       Parse_Helper
-        (Text_Args,
-         Cmd,
-         Phase,
-         Callback,
-         Collect_File_Names,
-         Ignore_Errors);
+        (Text_Args, Cmd, Phase, Callback, Collect_File_Names, Ignore_Errors);
    end Parse;
 
    function File_Name_Is_Less_Than (Left, Right : String_Ref) return Boolean;
@@ -1314,8 +1293,8 @@ package body Utils.Command_Lines is
    --
    --  Comparisons are case-sensitive.
 
-   package Sorting is new String_Ref_Vectors.Generic_Sorting
-     (File_Name_Is_Less_Than);
+   package Sorting is new
+     String_Ref_Vectors.Generic_Sorting (File_Name_Is_Less_Than);
 
    ----------------------------
    -- File_Name_Is_Less_Than --
@@ -1382,8 +1361,7 @@ package body Utils.Command_Lines is
 
    procedure Iter_File_Names
      (Cmd    : in out Command_Line;
-      Action :    not null access procedure (File_Name : in out String_Ref))
-   is
+      Action : not null access procedure (File_Name : in out String_Ref)) is
    begin
       for File_Name of Cmd.File_Names loop
          Action (File_Name);
@@ -1391,16 +1369,15 @@ package body Utils.Command_Lines is
    end Iter_File_Names;
 
    function Switch_Text
-     (Descriptor : Command_Line_Descriptor;
-      Switch     : All_Switches) return String_Ref
-   is
+     (Descriptor : Command_Line_Descriptor; Switch : All_Switches)
+      return String_Ref is
    begin
       return Descriptor.Allowed_Switches (Switch).Text;
    end Switch_Text;
 
    procedure Dump_Cmd (Cmd : Command_Line; Verbose : Boolean := False) is
       Descriptor : Command_Line_Descriptor renames Cmd.Descriptor.all;
-      Sw : Dynamically_Typed_Switches renames Cmd.Sw.all;
+      Sw         : Dynamically_Typed_Switches renames Cmd.Sw.all;
    begin
       if Is_Empty (Cmd.File_Names) then
          Put_Line ("No file names");
@@ -1424,14 +1401,17 @@ package body Utils.Command_Lines is
                case Sw (Switch).Kind is
                   when No_Such | False_Switch =>
                      raise Program_Error;
+
                   when True_Switch =>
-                     if Sw (Switch).Boolean_Val =
-                       Descriptor.Allowed_Switches (Switch).Default_Bool
+                     if Sw (Switch).Boolean_Val
+                       = Descriptor.Allowed_Switches (Switch).Default_Bool
                      then
                         goto Continue;
                      end if;
+
                   when Enum_Switch =>
                      null; -- Too much trouble to determine default here
+
                   when String_Switch =>
                      if Sw (Switch).String_Val = null then
                         --  This means that
@@ -1440,12 +1420,13 @@ package body Utils.Command_Lines is
                         goto Continue;
                      end if;
                      if Descriptor.Allowed_Switches (Switch).Default /= null
-                       and then
-                         Sw (Switch).String_Val.all =
-                         Descriptor.Allowed_Switches (Switch).Default.all
+                       and then Sw (Switch).String_Val.all
+                                = Descriptor.Allowed_Switches (Switch)
+                                    .Default.all
                      then
                         goto Continue;
                      end if;
+
                   when String_Seq_Switch =>
                      if Last_Index (Sw (Switch).Seq_Val) = 0 then
                         goto Continue;
@@ -1454,24 +1435,28 @@ package body Utils.Command_Lines is
             end if;
 
             Put
-              (Descriptor.Allowed_Switches (Switch).Text.all &
-               ": " &
-               Sw (Switch).Kind'Img &
-               " := ");
+              (Descriptor.Allowed_Switches (Switch).Text.all
+               & ": "
+               & Sw (Switch).Kind'Img
+               & " := ");
 
             case Sw (Switch).Kind is
                when No_Such | False_Switch =>
                   raise Program_Error;
+
                when True_Switch =>
                   Put (if Sw (Switch).Boolean_Val then "True" else "False");
+
                when Enum_Switch =>
                   Put ("at" & Sw (Switch).Position'Img);
+
                when String_Switch =>
                   if Sw (Switch).String_Val = null then
                      Put ("null");
                   else
                      Put ("""" & Sw (Switch).String_Val.all & """");
                   end if;
+
                when String_Seq_Switch =>
                   Put ("(");
                   declare
@@ -1504,18 +1489,20 @@ package body Utils.Command_Lines is
          declare
             X : Switch_Descriptor renames Descriptor.Allowed_Switches (J);
             S : constant String :=
-              (if X.Kind in String_Switch | String_Seq_Switch then
-                 Syntax (Descriptor, J)'Img
-               else
-                  "");
+              (if X.Kind in String_Switch | String_Seq_Switch
+               then Syntax (Descriptor, J)'Img
+               else "");
          begin
             Put_Line
-              (J'Img &
-                 " " & X.Kind'Img &
-                 S &
-                 " " & X.Text.all &
-                 (if X.Alias = J then "" else X.Alias'Img) &
-                 " " & (if X.Enabled then "" else " DISABLED"));
+              (J'Img
+               & " "
+               & X.Kind'Img
+               & S
+               & " "
+               & X.Text.all
+               & (if X.Alias = J then "" else X.Alias'Img)
+               & " "
+               & (if X.Enabled then "" else " DISABLED"));
          end;
       end loop;
    end Dump_Descriptor;

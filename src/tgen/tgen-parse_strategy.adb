@@ -36,9 +36,9 @@ package body TGen.Parse_Strategy is
 
    --  TODO: also parse the strategies for the base type decl
 
-   function Is_Standard_Strategy (Str : String) return Boolean is
-     (Str'Length > 5
-      and then To_Lower (Str (Str'First .. Str'First + 4)) = "tgen_");
+   function Is_Standard_Strategy (Str : String) return Boolean
+   is (Str'Length > 5
+       and then To_Lower (Str (Str'First .. Str'First + 4)) = "tgen_");
 
    function Check_Strategy
      (Prefix               : Ada_Qualified_Name;
@@ -77,8 +77,7 @@ package body TGen.Parse_Strategy is
    function Clone (T : Typ'Class) return Typ'Class;
    --  Clone a given type recursively
 
-   function Clone (T : Typ'Class) return Typ'Class
-   is
+   function Clone (T : Typ'Class) return Typ'Class is
       use Component_Maps;
    begin
       if T in Scalar_Typ'Class then
@@ -86,7 +85,7 @@ package body TGen.Parse_Strategy is
       elsif T in Record_Typ'Class then
          declare
             Rec_Type : constant Record_Typ'Class := Record_Typ'Class (T);
-            Result : Record_Typ'Class := Rec_Type;
+            Result   : Record_Typ'Class := Rec_Type;
          begin
             Result.Component_Types.Clear;
             for Comp in Rec_Type.Component_Types.Iterate loop
@@ -150,11 +149,14 @@ package body TGen.Parse_Strategy is
                --  type.
 
                for Entity of All_Overloads loop
-                  if Kind (Entity) in Ada_Expr_Function
-                    | Ada_Subp_Kind_Function
+                  if Kind (Entity)
+                     in Ada_Expr_Function | Ada_Subp_Kind_Function
                   then
                      Fct_Return_Type :=
-                       Entity.As_Basic_Decl.P_Subp_Spec_Or_Null.P_Returns
+                       Entity
+                         .As_Basic_Decl
+                         .P_Subp_Spec_Or_Null
+                         .P_Returns
                          .P_Designated_Type_Decl;
                   end if;
                   if Fct_Return_Type.P_Matching_Type (Expected_Type) then
@@ -208,17 +210,18 @@ package body TGen.Parse_Strategy is
                declare
                   Error_Msg : constant String :=
                     (if Rec_Typ in Function_Typ'Class
-                     then +Assoc_Identifier
-                     & " is not a parameter of the function."
-                     else +Assoc_Identifier
-                     & " is not a member of the record.");
+                     then
+                       +Assoc_Identifier
+                       & " is not a parameter of the function."
+                     else
+                       +Assoc_Identifier & " is not a member of the record.");
                begin
                   Put_Line (Error_Msg & ". Ignoring it.");
                end;
 
             else
                declare
-                  New_Typ : constant Typ'Class :=
+                  New_Typ     : constant Typ'Class :=
                     Check_Strategy
                       (Prefix & TGen.Strings.Ada_Identifier (Assoc_Identifier),
                        Last_Comp_Unit_Index,
@@ -250,19 +253,21 @@ package body TGen.Parse_Strategy is
    begin
       pragma Warnings (Off);
       if T in Record_Typ'Class then
-         return Check_Strategy_For_Record
-           (Prefix,
-            Last_Comp_Unit_Index,
-            Record_Typ'Class (T),
-            Strategy,
-            Strategies);
+         return
+           Check_Strategy_For_Record
+             (Prefix,
+              Last_Comp_Unit_Index,
+              Record_Typ'Class (T),
+              Strategy,
+              Strategies);
       elsif T in Scalar_Typ'Class then
-         return Check_Strategy_For_Scalar
-           (Prefix,
-            Last_Comp_Unit_Index,
-            Scalar_Typ'Class (T),
-            Strategy,
-            Strategies);
+         return
+           Check_Strategy_For_Scalar
+             (Prefix,
+              Last_Comp_Unit_Index,
+              Scalar_Typ'Class (T),
+              Strategy,
+              Strategies);
       end if;
       pragma Warnings (On);
    end Check_Strategy;
@@ -274,8 +279,7 @@ package body TGen.Parse_Strategy is
    procedure Parse_Strategy
      (Fct_Typ    : in out Function_Typ'Class;
       Aspect     : Libadalang.Analysis.Aspect_Assoc;
-      Strategies : out FQN_To_Parsed_Strat_Maps.Map)
-   is
+      Strategies : out FQN_To_Parsed_Strat_Maps.Map) is
    begin
       pragma Assert (To_Lower (+Aspect.F_Id.Text) = "generation");
 
@@ -299,13 +303,14 @@ package body TGen.Parse_Strategy is
 
                --  Start by checking them
 
-               Fct_Typ := Function_Typ'Class
-                 (Check_Strategy
-                    (Fct_Typ.Name,
-                     Fct_Typ.Last_Comp_Unit_Idx,
-                     Fct_Typ,
-                     Assoc.As_Aggregate_Assoc.F_R_Expr,
-                     Strategies));
+               Fct_Typ :=
+                 Function_Typ'Class
+                   (Check_Strategy
+                      (Fct_Typ.Name,
+                       Fct_Typ.Last_Comp_Unit_Idx,
+                       Fct_Typ,
+                       Assoc.As_Aggregate_Assoc.F_R_Expr,
+                       Strategies));
 
             else
                Put_Line ("Wrong parameter for the generation aspect");

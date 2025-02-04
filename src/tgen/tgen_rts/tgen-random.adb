@@ -40,17 +40,17 @@ package body TGen.Random is
    function Draw_Bits (N : Positive) return Unsigned_128 is
       function Rand is new GNAT.Random_Numbers.Random_Discrete (Unsigned_128);
    begin
-      return Rand (Generator_Instance, Min => 0, Max => 2 ** N);
+      return Rand (Generator_Instance, Min => 0, Max => 2**N);
    end Draw_Bits;
 
    function Draw_Bits (N : Positive) return Unsigned_64 is
       function Rand is new GNAT.Random_Numbers.Random_Discrete (Unsigned_64);
    begin
-      return Rand (Generator_Instance, Min => 0, Max => 2 ** N);
+      return Rand (Generator_Instance, Min => 0, Max => 2**N);
    end Draw_Bits;
 
-   package Value_Functions is new Ada.Numerics.Generic_Elementary_Functions
-     (Float);
+   package Value_Functions is new
+     Ada.Numerics.Generic_Elementary_Functions (Float);
    use Value_Functions;
 
    -----------------
@@ -70,8 +70,8 @@ package body TGen.Random is
          --  Meaningful draw
 
          Bits :=
-           Positive (Float'Ceiling
-                     (-Log (X => Float'Min (P, 1.0 - P), Base => 2.0)));
+           Positive
+             (Float'Ceiling (-Log (X => Float'Min (P, 1.0 - P), Base => 2.0)));
 
          if Bits >= 64 then
             --  Let's avoid large draws and treat that as effectively zero.
@@ -81,7 +81,7 @@ package body TGen.Random is
             return False;
          end if;
 
-         Size := 2 ** Bits;
+         Size := 2**Bits;
 
          while True loop
             declare
@@ -127,22 +127,22 @@ package body TGen.Random is
    -- Many --
    ----------
 
-   function Many
-     (Min_Size, Max_Size, Average_Size : Natural) return Many_Type
+   function Many (Min_Size, Max_Size, Average_Size : Natural) return Many_Type
    is
    begin
-      return Many_Type'
-        (Min_Size, Max_Size,
-         Count          => 0,
-         Stopping_Value => 1.0 - 1.0 / Float (1 + Average_Size));
+      return
+        Many_Type'
+          (Min_Size,
+           Max_Size,
+           Count          => 0,
+           Stopping_Value => 1.0 - 1.0 / Float (1 + Average_Size));
    end Many;
 
    ----------
    -- More --
    ----------
 
-   function More (Self : in out Many_Type) return Boolean
-   is
+   function More (Self : in out Many_Type) return Boolean is
       Should_Continue : Boolean;
    begin
       if Self.Min_Size = Self.Max_Size then
@@ -181,9 +181,10 @@ package body TGen.Random is
    end Rand_Int;
 
    function Rand_LLLI
-     (Min, Max : Long_Long_Long_Integer) return Long_Long_Long_Integer is
-      function Rand is
-        new GNAT.Random_Numbers.Random_Discrete (Long_Long_Long_Integer);
+     (Min, Max : Long_Long_Long_Integer) return Long_Long_Long_Integer
+   is
+      function Rand is new
+        GNAT.Random_Numbers.Random_Discrete (Long_Long_Long_Integer);
    begin
       return Rand (Generator_Instance, Min, Max);
    end Rand_LLLI;
@@ -210,23 +211,21 @@ package body TGen.Random is
       --  Conversions functions, to convert a value of the Float_Type to the
       --  Unsigned_Type and reciprocally.
 
-      with function Float_To_Unsigned
-        (F : Float_Type) return Unsigned_Type;
-      with function Unsigned_To_Float
-        (U : Unsigned_Type) return Float_Type;
+      with function Float_To_Unsigned (F : Float_Type) return Unsigned_Type;
+      with function Unsigned_To_Float (U : Unsigned_Type) return Float_Type;
 
-      with function Random
-        (Gen : GNAT.Random_Numbers.Generator;
-         Min, Max : Unsigned_Type) return Unsigned_Type;
+      with
+        function Random
+          (Gen : GNAT.Random_Numbers.Generator; Min, Max : Unsigned_Type)
+           return Unsigned_Type;
 
-   function Random_Float (LB, HB : Float_Type) return Float_Type;
+     function Random_Float (LB, HB : Float_Type) return Float_Type;
 
    ------------------
    -- Random_Float --
    ------------------
 
-   function Random_Float (LB, HB : Float_Type) return Float_Type
-   is
+   function Random_Float (LB, HB : Float_Type) return Float_Type is
       MS_Part : constant Unsigned_Type := 2**Mantissa_Size;
       XP_Part : constant Unsigned_Type := 2**Exponent_Size;
 
@@ -241,17 +240,14 @@ package body TGen.Random is
 
       LB_Exp      : constant Unsigned_Type :=
         (LB_Unsigned / MS_Part) mod XP_Part;
-      LB_Mantissa : constant Unsigned_Type :=
-        LB_Unsigned mod MS_Part;
-      LB_Sign     : constant Int_Type :=
-        (if LB < 0.0 then -1 else 1);
+      LB_Mantissa : constant Unsigned_Type := LB_Unsigned mod MS_Part;
+      LB_Sign     : constant Int_Type := (if LB < 0.0 then -1 else 1);
 
       --  Get the higher bound characteristics
 
       HB_Exp      : constant Unsigned_Type :=
         (HB_Unsigned / MS_Part) mod XP_Part;
-      HB_Mantissa : constant Unsigned_Type :=
-        HB_Unsigned mod MS_Part;
+      HB_Mantissa : constant Unsigned_Type := HB_Unsigned mod MS_Part;
       HB_Sign     : constant Int_Type := (if HB < 0.0 then -1 else 1);
 
       Nb_Values_In_First_Binade : Unsigned_Type := 0;
@@ -272,8 +268,10 @@ package body TGen.Random is
 
       if LB_Sign = HB_Sign and then LB_Exp = HB_Exp then
          Nb_Values :=
-           Unsigned_Type (HB_Sign * Int_Type (HB_Mantissa)
-                          - LB_Sign * (Int_Type (LB_Mantissa)))
+           Unsigned_Type
+             (HB_Sign
+              * Int_Type (HB_Mantissa)
+              - LB_Sign * (Int_Type (LB_Mantissa)))
            + 1;
       else
          --  Otherwise, enumerate the number of values in 'First's binade, the
@@ -282,13 +280,14 @@ package body TGen.Random is
 
          Nb_Values_In_First_Binade :=
 
-         --  Everything between the mantissa and a higher / lower
-         --  exponent depending on the sign
+           --  Everything between the mantissa and a higher / lower
+           --  exponent depending on the sign
 
-           Unsigned_Type (Int_Type (MS_Part) - LB_Sign
-                          * Int_Type (LB_Mantissa)) mod MS_Part
+             Unsigned_Type
+                (Int_Type (MS_Part) - LB_Sign * Int_Type (LB_Mantissa))
+           mod MS_Part
 
-         --  Don't forget the LB_Mantissa value itself
+           --  Don't forget the LB_Mantissa value itself
 
            + 1;
 
@@ -296,27 +295,29 @@ package body TGen.Random is
          --  for LB, but symetrically.
 
          Nb_Values_In_Last_Binade :=
-           Unsigned_Type (Int_Type (MS_Part) + HB_Sign
-                          * Int_Type (HB_Mantissa)) mod MS_Part + 1;
+           Unsigned_Type
+             (Int_Type (MS_Part) + HB_Sign * Int_Type (HB_Mantissa))
+           mod MS_Part
+           + 1;
 
          --  Grab the values in between
 
          Nb_Values_Between :=
            Unsigned_Type
              (HB_Sign * Int_Type (HB_Exp) - LB_Sign * Int_Type (LB_Exp) - 1)
-               * MS_Part;
+           * MS_Part;
 
          Nb_Values :=
-           Nb_Values_In_First_Binade + Nb_Values_In_Last_Binade
-             + Nb_Values_Between;
+           Nb_Values_In_First_Binade
+           + Nb_Values_In_Last_Binade
+           + Nb_Values_Between;
       end if;
 
       --  Now that we have the number of values that can be
       --  represented, pick an integer in [0, Nb_Values[.
 
       declare
-         Rand : Unsigned_Type :=
-           Random (Generator_Instance, 0, Nb_Values - 1);
+         Rand : Unsigned_Type := Random (Generator_Instance, 0, Nb_Values - 1);
 
          --  Save the result characteristics: the sign, the exponent and the
          --  mantissa.
@@ -347,17 +348,16 @@ package body TGen.Random is
                declare
                   Intermediate_Exp : constant Int_Type :=
                     Int_Type (Rand / MS_Part)
-                    + (LB_Sign * Int_Type (LB_Exp)) + 1;
+                    + (LB_Sign * Int_Type (LB_Exp))
+                    + 1;
                begin
-                  Result_Sign :=
-                    (if Intermediate_Exp < 0 then -1 else 1);
-                  Result_Exp :=
-                    Unsigned_Type (abs Intermediate_Exp);
+                  Result_Sign := (if Intermediate_Exp < 0 then -1 else 1);
+                  Result_Exp := Unsigned_Type (abs Intermediate_Exp);
                   Result_Mantissa :=
                     Unsigned_Type
-                      (Int_Type (MS_Part) + Result_Sign
-                       * Int_Type (Rand mod MS_Part))
-                  mod MS_Part;
+                      (Int_Type (MS_Part)
+                       + Result_Sign * Int_Type (Rand mod MS_Part))
+                    mod MS_Part;
                end;
 
                --  Case where it lies in 'Last's binade
@@ -369,8 +369,7 @@ package body TGen.Random is
                Result_Exp := HB_Exp;
                Result_Mantissa :=
                  Unsigned_Type
-                   (Int_Type (HB_Mantissa)
-                    - HB_Sign * Int_Type (Rand));
+                   (Int_Type (HB_Mantissa) - HB_Sign * Int_Type (Rand));
             end if;
          end if;
 
@@ -392,60 +391,63 @@ package body TGen.Random is
       end;
    end Random_Float;
 
-   function Float_To_Unsigned_32 is
-     new Ada.Unchecked_Conversion (Source => Float, Target => Unsigned_32);
-   function Unsigned_32_To_Float is
-     new Ada.Unchecked_Conversion (Source => Unsigned_32, Target => Float);
-   function Random_Unsigned_32 is
-     new GNAT.Random_Numbers.Random_Discrete (Unsigned_32);
+   function Float_To_Unsigned_32 is new
+     Ada.Unchecked_Conversion (Source => Float, Target => Unsigned_32);
+   function Unsigned_32_To_Float is new
+     Ada.Unchecked_Conversion (Source => Unsigned_32, Target => Float);
+   function Random_Unsigned_32 is new
+     GNAT.Random_Numbers.Random_Discrete (Unsigned_32);
 
-   function Random_F is new Random_Float
-     (Float_Type        => Float,
-      Unsigned_Type     => Unsigned_32,
-      Int_Type          => Integer,
-      Exponent_Size     => 8,
-      Mantissa_Size     => 23,
-      Float_To_Unsigned => Float_To_Unsigned_32,
-      Unsigned_To_Float => Unsigned_32_To_Float,
-      Random            => Random_Unsigned_32);
+   function Random_F is new
+     Random_Float
+       (Float_Type        => Float,
+        Unsigned_Type     => Unsigned_32,
+        Int_Type          => Integer,
+        Exponent_Size     => 8,
+        Mantissa_Size     => 23,
+        Float_To_Unsigned => Float_To_Unsigned_32,
+        Unsigned_To_Float => Unsigned_32_To_Float,
+        Random            => Random_Unsigned_32);
 
-   function Long_Float_To_Unsigned_64 is
-     new Ada.Unchecked_Conversion
-       (Source => Long_Float, Target => Unsigned_64);
-   function Unsigned_64_To_Long_Float is
-     new Ada.Unchecked_Conversion
-       (Source => Unsigned_64, Target => Long_Float);
-   function Random_Unsigned_64 is
-     new GNAT.Random_Numbers.Random_Discrete (Unsigned_64);
+   function Long_Float_To_Unsigned_64 is new
+     Ada.Unchecked_Conversion (Source => Long_Float, Target => Unsigned_64);
+   function Unsigned_64_To_Long_Float is new
+     Ada.Unchecked_Conversion (Source => Unsigned_64, Target => Long_Float);
+   function Random_Unsigned_64 is new
+     GNAT.Random_Numbers.Random_Discrete (Unsigned_64);
 
-   function Random_LF is new Random_Float
-     (Float_Type => Long_Float,
-      Unsigned_Type     => Unsigned_64,
-      Int_Type          => Long_Long_Integer,
-      Exponent_Size     => 11,
-      Mantissa_Size     => 52,
-      Float_To_Unsigned => Long_Float_To_Unsigned_64,
-      Unsigned_To_Float => Unsigned_64_To_Long_Float,
-      Random            => Random_Unsigned_64);
+   function Random_LF is new
+     Random_Float
+       (Float_Type        => Long_Float,
+        Unsigned_Type     => Unsigned_64,
+        Int_Type          => Long_Long_Integer,
+        Exponent_Size     => 11,
+        Mantissa_Size     => 52,
+        Float_To_Unsigned => Long_Float_To_Unsigned_64,
+        Unsigned_To_Float => Unsigned_64_To_Long_Float,
+        Random            => Random_Unsigned_64);
 
-   function Long_Long_Float_To_Unsigned_128 is
-     new Ada.Unchecked_Conversion
-       (Source => Long_Long_Float, Target => Unsigned_128);
-   function Unsigned_128_To_Long_Long_Float is
-     new Ada.Unchecked_Conversion
-       (Source => Unsigned_128, Target => Long_Long_Float);
-   function Random_Unsigned_128 is
-     new GNAT.Random_Numbers.Random_Discrete (Unsigned_128);
+   function Long_Long_Float_To_Unsigned_128 is new
+     Ada.Unchecked_Conversion
+       (Source => Long_Long_Float,
+        Target => Unsigned_128);
+   function Unsigned_128_To_Long_Long_Float is new
+     Ada.Unchecked_Conversion
+       (Source => Unsigned_128,
+        Target => Long_Long_Float);
+   function Random_Unsigned_128 is new
+     GNAT.Random_Numbers.Random_Discrete (Unsigned_128);
 
-   function Random_LLF is new Random_Float
-     (Float_Type        => Long_Long_Float,
-      Unsigned_Type     => Unsigned_128,
-      Int_Type          => Long_Long_Long_Integer,
-      Exponent_Size     => 15,
-      Mantissa_Size     => 63,
-      Float_To_Unsigned => Long_Long_Float_To_Unsigned_128,
-      Unsigned_To_Float => Unsigned_128_To_Long_Long_Float,
-      Random            => Random_Unsigned_128);
+   function Random_LLF is new
+     Random_Float
+       (Float_Type        => Long_Long_Float,
+        Unsigned_Type     => Unsigned_128,
+        Int_Type          => Long_Long_Long_Integer,
+        Exponent_Size     => 15,
+        Mantissa_Size     => 63,
+        Float_To_Unsigned => Long_Long_Float_To_Unsigned_128,
+        Unsigned_To_Float => Unsigned_128_To_Long_Long_Float,
+        Random            => Random_Unsigned_128);
 
    ------------
    -- Random --
@@ -456,8 +458,10 @@ package body TGen.Random is
       case Min.Precision is
          when Single =>
             return Create (Random_F (Value (Min), Value (Max)));
+
          when Double =>
             return Create (Random_LF (Value (Min), Value (Max)));
+
          when Extended =>
             return Create (Random_LLF (Value (Min), Value (Max)));
       end case;
@@ -469,8 +473,8 @@ package body TGen.Random is
      Time_Of (Year => 2000, Month => 1, Day => 1, Seconds => 0.0);
    --  First day of Year 2000, to get a duration
 
-   function To_U64 is
-     new Ada.Unchecked_Conversion (Duration, Interfaces.Unsigned_64);
+   function To_U64 is new
+     Ada.Unchecked_Conversion (Duration, Interfaces.Unsigned_64);
 
 begin
    if Ada.Environment_Variables.Exists (Seed_Env_Var) then

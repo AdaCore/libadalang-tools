@@ -24,8 +24,9 @@
 --  This package contains routines for dealing with the casing exception
 --  dictionaries
 
-with Pp.Command_Lines; use Pp.Command_Lines;
+with Pp.Command_Lines;    use Pp.Command_Lines;
 with Utils.Command_Lines; use Utils.Command_Lines;
+
 package Pp.Formatting.Dictionaries is
 
    procedure Scan_Dictionaries (Dictionary_File_Names : String_Ref_Array);
@@ -33,8 +34,7 @@ package Pp.Formatting.Dictionaries is
    --  the casing exceptions in the exception tables.
 
    procedure Check_With_Dictionary
-     (Ada_Name : in out Wide_String;
-      Casing   : PP_Casing);
+     (Ada_Name : in out Wide_String; Casing : PP_Casing);
    --  Checks if Ada_Name as a whole or some its subname (that is, a part of
    --  the Ada_Name surrounded by '_' is in the exception dictionary, and if it
    --  is, changes the casing of Ada_Name or of its part to what is defined in

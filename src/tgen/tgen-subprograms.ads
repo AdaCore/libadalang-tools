@@ -26,9 +26,9 @@
 
 with Ada.Containers.Ordered_Sets;
 with Ada.Containers.Vectors;
-with Ada.Strings.Unbounded;           use Ada.Strings.Unbounded;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-with Libadalang.Analysis; use Libadalang.Analysis;
+with Libadalang.Analysis;  use Libadalang.Analysis;
 with Libadalang.Common;
 with Langkit_Support.Text; use Langkit_Support.Text;
 
@@ -40,82 +40,82 @@ package TGen.Subprograms is
 
    type Parameter_Mode is (In_Mode, In_Out_Mode, Out_Mode);
 
-   type Parameter_Data is
-      record
-         Name                      : Unbounded_Text_Type;
-         --  Name of the parameter
+   type Parameter_Data is record
+      Name : Unbounded_Text_Type;
+      --  Name of the parameter
 
-         Index                     : Positive;
-         --  Positionnal index of the parameter
+      Index : Positive;
+      --  Positionnal index of the parameter
 
-         Mode                      : Parameter_Mode;
-         --  Mode of the parameter
+      Mode : Parameter_Mode;
+      --  Mode of the parameter
 
-         Type_Name                 : Unbounded_Text_Type;
-         --  Name of the type of the parameter
+      Type_Name : Unbounded_Text_Type;
+      --  Name of the type of the parameter
 
-         Type_Fully_Qualified_Name : Unbounded_Text_Type;
-         --  FQN of the type of the parameter
+      Type_Fully_Qualified_Name : Unbounded_Text_Type;
+      --  FQN of the type of the parameter
 
-         Type_Parent_Package       : Unbounded_Text_Type;
-         --  Package in which the type of the parameter has been declared
-      end record;
-      --  Various information about a single parameter of a subrogram
+      Type_Parent_Package : Unbounded_Text_Type;
+      --  Package in which the type of the parameter has been declared
+   end record;
+   --  Various information about a single parameter of a subrogram
 
-   package Parameters_Data_Vectors is new Ada.Containers.Vectors
-     (Index_Type   => Positive,
-      Element_Type => Parameter_Data,
-      "="          => "=");
+   package Parameters_Data_Vectors is new
+     Ada.Containers.Vectors
+       (Index_Type   => Positive,
+        Element_Type => Parameter_Data,
+        "="          => "=");
    subtype Parameters_Data_Vector is Parameters_Data_Vectors.Vector;
 
    type Subprogram_Data (Kind : Ada_Subp_Kind := Ada_Subp_Kind_Procedure) is
-      record
-         Name                 : Unbounded_Text_Type;
-         --  Name of the subprogram
+   record
+      Name : Unbounded_Text_Type;
+      --  Name of the subprogram
 
-         Fully_Qualified_Name : Unbounded_Text_Type;
-         --  FQN of the subprogram
+      Fully_Qualified_Name : Unbounded_Text_Type;
+      --  FQN of the subprogram
 
-         Parent_Package       : Unbounded_Text_Type;
-         --  Package in which the subprogram is defined
+      Parent_Package : Unbounded_Text_Type;
+      --  Package in which the subprogram is defined
 
-         Parameters_Data      : Parameters_Data_Vector;
-         --  Information about the subprogram's parameters
+      Parameters_Data : Parameters_Data_Vector;
+      --  Information about the subprogram's parameters
 
-         Precondition         : Unbounded_Text_Type;
-         --  Precondition text
+      Precondition : Unbounded_Text_Type;
+      --  Precondition text
 
-         Some_Param_Static    : Boolean := False;
-         --  Whether at least one of the subprograms parameters supports static
-         --  (single pass) generation.
+      Some_Param_Static : Boolean := False;
+      --  Whether at least one of the subprograms parameters supports static
+      --  (single pass) generation.
 
-         All_Params_Static    : Boolean := False;
-         --  Whether all of the subprograms'parameters supports static
-         --  (single pass) generation.
+      All_Params_Static : Boolean := False;
+      --  Whether all of the subprograms'parameters supports static
+      --  (single pass) generation.
 
-         case Kind is
-            when Ada_Subp_Kind_Function =>
-               Return_Type_Fully_Qualified_Name : Unbounded_Text_Type;
-               --  FQN of the function's return type
+      case Kind is
+         when Ada_Subp_Kind_Function =>
+            Return_Type_Fully_Qualified_Name : Unbounded_Text_Type;
+            --  FQN of the function's return type
 
-               Return_Type_Parent_Package       : Unbounded_Text_Type;
-               --  Package in which the function return type is declared
+            Return_Type_Parent_Package : Unbounded_Text_Type;
+            --  Package in which the function return type is declared
 
-            when Ada_Subp_Kind_Procedure =>
-               null;
-         end case;
-      end record;
-      --  Inforamtion about a subprogram
+         when Ada_Subp_Kind_Procedure =>
+            null;
+      end case;
+   end record;
+   --  Inforamtion about a subprogram
 
-   function To_String
-     (Subp : Subprogram_Data) return String
-     with Pre => Subp.Kind = Ada_Subp_Kind_Function;
+   function To_String (Subp : Subprogram_Data) return String
+   with Pre => Subp.Kind = Ada_Subp_Kind_Function;
    --  Return a string representation of the spec of the subprogram, e.g.
    --  "function Foo (Bar : Integer) return Natural".
 
-   package Subprograms_Data_Vectors is new Ada.Containers.Vectors
-     (Index_Type => Positive,
-      Element_Type => Subprogram_Data);
+   package Subprograms_Data_Vectors is new
+     Ada.Containers.Vectors
+       (Index_Type   => Positive,
+        Element_Type => Subprogram_Data);
    subtype Subprograms_Data_Vector is Subprograms_Data_Vectors.Vector;
 
    type Package_Data;
@@ -123,29 +123,29 @@ package TGen.Subprograms is
 
    type Package_Data_Acc is access all Package_Data;
 
-   package Package_Data_Vectors is new Ada.Containers.Vectors
-     (Index_Type => Positive,
-      Element_Type => Package_Data_Acc);
+   package Package_Data_Vectors is new
+     Ada.Containers.Vectors
+       (Index_Type   => Positive,
+        Element_Type => Package_Data_Acc);
 
-   type Package_Data is
-      record
-         Subpackages : Package_Data_Vectors.Vector;
-         --  Nested packages information
+   type Package_Data is record
+      Subpackages : Package_Data_Vectors.Vector;
+      --  Nested packages information
 
-         Subprograms : Subprograms_Data_Vectors.Vector;
-         --  Information about subprograms declared immediately within this
-         --  unit.
+      Subprograms : Subprograms_Data_Vectors.Vector;
+      --  Information about subprograms declared immediately within this
+      --  unit.
 
-         Pkg_Name    : Package_Decl;
-         --  Name of the unit
+      Pkg_Name : Package_Decl;
+      --  Name of the unit
 
-      end record;
+   end record;
 
-   function "<" (L, R : Package_Data) return Boolean is
-     (L.Pkg_Name.P_Fully_Qualified_Name < R.Pkg_Name.P_Fully_Qualified_Name);
+   function "<" (L, R : Package_Data) return Boolean
+   is (L.Pkg_Name.P_Fully_Qualified_Name < R.Pkg_Name.P_Fully_Qualified_Name);
 
-   package Package_Data_Sets is new Ada.Containers.Ordered_Sets
-     (Element_Type => Package_Data);
+   package Package_Data_Sets is new
+     Ada.Containers.Ordered_Sets (Element_Type => Package_Data);
    subtype Package_Data_Set is Package_Data_Sets.Set;
 
 end TGen.Subprograms;

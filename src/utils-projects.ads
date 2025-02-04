@@ -30,15 +30,15 @@ with Utils.Command_Lines; use Utils.Command_Lines;
 package Utils.Projects is
 
    procedure Process_Command_Line
-     (Cmd                             : in out Command_Line;
-      Global_Report_Dir               :    out String_Ref;
-      The_Project_Tree                :    out not null Project_Tree_Access;
-      The_Project_Env                : out not null Project_Environment_Access;
-      Preprocessing_Allowed           :        Boolean;
-      Tool_Package_Name               :        String;
-      Compute_Project_Closure         :        Boolean        := True;
-      Callback                        :        Parse_Callback := null;
-      Print_Help                      : not null access procedure);
+     (Cmd                     : in out Command_Line;
+      Global_Report_Dir       : out String_Ref;
+      The_Project_Tree        : out not null Project_Tree_Access;
+      The_Project_Env         : out not null Project_Environment_Access;
+      Preprocessing_Allowed   : Boolean;
+      Tool_Package_Name       : String;
+      Compute_Project_Closure : Boolean := True;
+      Callback                : Parse_Callback := null;
+      Print_Help              : not null access procedure);
    --  Processes the command line and (if specified on the command line) the
    --  project file.
    --

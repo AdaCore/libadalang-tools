@@ -26,12 +26,12 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with GNAT.OS_Lib;
 
 with Test.Actions;
-with Test.Common;        use Test.Common;
+with Test.Common;       use Test.Common;
 with Test.Command_Lines;
-with Test.Subprocess;    use Test.Subprocess;
-with Utils_Debug;        use Utils_Debug;
-with Utils.Drivers;      use Utils.Drivers;
-with Utils.Environment;  use Utils.Environment;
+with Test.Subprocess;   use Test.Subprocess;
+with Utils_Debug;       use Utils_Debug;
+with Utils.Drivers;     use Utils.Drivers;
+with Utils.Environment; use Utils.Environment;
 
 with GNATCOLL.OS.Process;
 with GNATCOLL.Traces; use GNATCOLL.Traces;
@@ -72,8 +72,12 @@ package body Test.Generation is
       procedure Report_Failures is
       begin
          Report_Err
-           ("Error while processing " & Node.Image & ":" & ASCII.LF
-            & Join (Diags) & ASCII.LF);
+           ("Error while processing "
+            & Node.Image
+            & ":"
+            & ASCII.LF
+            & Join (Diags)
+            & ASCII.LF);
       end Report_Failures;
    begin
       --  Do not traverse package bodies
@@ -106,10 +110,11 @@ package body Test.Generation is
       --  procedures and subprogram renamings which are considered as
       --  subprogram bodies in LAL.
 
-      if Node.Kind in Ada_Subp_Decl
-        | Ada_Expr_Function
-        | Ada_Null_Subp_Decl
-        | Ada_Subp_Renaming_Decl
+      if Node.Kind
+         in Ada_Subp_Decl
+          | Ada_Expr_Function
+          | Ada_Null_Subp_Decl
+          | Ada_Subp_Renaming_Decl
       then
 
          --  Don't do anything if the subprogram isn't allowed (in case the
@@ -133,18 +138,21 @@ package body Test.Generation is
             --  If it is top level generic package instantiation, we call
             --  `Include_Subp` but with the associated switch set.
             if Inst.Unit.Root.As_Compilation_Unit.F_Body.Kind
-               = Libadalang.Common.Ada_Library_Item
+              = Libadalang.Common.Ada_Library_Item
               and then Inst
-               .Unit
-               .Root
-               .As_Compilation_Unit
-               .F_Body
-               .As_Library_Item
-               .F_Item = Inst.As_Basic_Decl
+                         .Unit
+                         .Root
+                         .As_Compilation_Unit
+                         .F_Body
+                         .As_Library_Item
+                         .F_Item
+                       = Inst.As_Basic_Decl
             then
                if not Include_Subp
-                 (Test.Common.TGen_Libgen_Ctx, Node.As_Basic_Decl, Diags,
-                  Is_Top_Level_Generic_Instantiation => True)
+                        (Test.Common.TGen_Libgen_Ctx,
+                         Node.As_Basic_Decl,
+                         Diags,
+                         Is_Top_Level_Generic_Instantiation => True)
                then
                   Report_Failures;
                end if;
@@ -153,7 +161,7 @@ package body Test.Generation is
          end loop;
 
          if not Include_Subp
-           (Test.Common.TGen_Libgen_Ctx, Node.As_Basic_Decl, Diags)
+                  (Test.Common.TGen_Libgen_Ctx, Node.As_Basic_Decl, Diags)
          then
             Report_Failures;
          end if;
@@ -162,9 +170,12 @@ package body Test.Generation is
 
       --  Traverse subprogram declarations in generic package instantiations
       if Node.Kind in Ada_Generic_Package_Instantiation then
-         Node.As_Generic_Package_Instantiation.P_Designated_Generic_Decl
-         .As_Generic_Package_Decl.F_Package_Decl
-         .Traverse (Traverse_Helper'Access);
+         Node
+           .As_Generic_Package_Instantiation
+           .P_Designated_Generic_Decl
+           .As_Generic_Package_Decl
+           .F_Package_Decl
+           .Traverse (Traverse_Helper'Access);
          return Over;
       end if;
       return Into;
@@ -177,7 +188,7 @@ package body Test.Generation is
    procedure Run_First_Pass_Tool (Cmd : Command_Line) is
       pragma Unreferenced (Cmd);
       First_Pass_Tool : Test.Actions.Test_Tool;
-      First_Pass_Cmd : Command_Line (Test.Command_Lines.Descriptor'Access);
+      First_Pass_Cmd  : Command_Line (Test.Command_Lines.Descriptor'Access);
    begin
       Driver
         (Cmd               => First_Pass_Cmd,
@@ -202,13 +213,13 @@ package body Test.Generation is
       use GNATCOLL.OS.Process;
       Directory_Separator : Character renames GNAT.OS_Lib.Directory_Separator;
 
-      Build_Args    : Argument_List;
-      Run_Args      : Argument_List;
-      Harness_Dir   : constant String :=
+      Build_Args  : Argument_List;
+      Run_Args    : Argument_List;
+      Harness_Dir : constant String :=
         Tool_Temp_Dir.all & Directory_Separator & "tgen_Harness";
-      Ext_Acc       : GNAT.OS_Lib.String_Access :=
+      Ext_Acc     : GNAT.OS_Lib.String_Access :=
         GNAT.OS_Lib.Get_Executable_Suffix;
-      Ext           : constant String := Ext_Acc.all;
+      Ext         : constant String := Ext_Acc.all;
 
    begin
       GNAT.OS_Lib.Free (Ext_Acc);
@@ -257,8 +268,12 @@ package body Test.Generation is
       Run (Build_Args, "Build of the test generation harness");
 
       Run_Args.Append
-        (Harness_Dir & Directory_Separator & "obj" & Directory_Separator
-         & "generation_main" & Ext);
+        (Harness_Dir
+         & Directory_Separator
+         & "obj"
+         & Directory_Separator
+         & "generation_main"
+         & Ext);
       Run (Run_Args, "Execution of the test generation harness");
    end Generate_Build_And_Run;
 

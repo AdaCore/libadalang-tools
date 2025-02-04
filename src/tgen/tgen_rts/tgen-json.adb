@@ -34,8 +34,8 @@ with Interfaces;                       use Interfaces;
 with GNAT.Encode_UTF8_String;
 with GNAT.Decode_UTF8_String;
 
-with GNATCOLL.Atomic;         use GNATCOLL.Atomic;
-with GNATCOLL.Strings;        use GNATCOLL.Strings;
+with GNATCOLL.Atomic;  use GNATCOLL.Atomic;
+with GNATCOLL.Strings; use GNATCOLL.Strings;
 with GNATCOLL.VFS;
 
 package body TGen.JSON is
@@ -77,10 +77,10 @@ package body TGen.JSON is
    --  Subset of token kinds for JSON values: null, false, true, a string, a
    --  number, an array or an object.
 
-   procedure Free is
-     new Ada.Unchecked_Deallocation (JSON_Array_Internal, JSON_Array_Access);
-   procedure Free is
-     new Ada.Unchecked_Deallocation (JSON_Object_Internal, JSON_Object_Access);
+   procedure Free is new
+     Ada.Unchecked_Deallocation (JSON_Array_Internal, JSON_Array_Access);
+   procedure Free is new
+     Ada.Unchecked_Deallocation (JSON_Object_Internal, JSON_Object_Access);
 
    procedure Write
      (Item    : JSON_Value;
@@ -95,7 +95,7 @@ package body TGen.JSON is
       Pos       : in out Text_Position;
       Kind      : out Token_Kind;
       Check_EOF : Boolean := False)
-      with Pre => Result.Success;
+   with Pre => Result.Success;
    --  Read and decode a JSON value. On success, this returns a Read_Result
    --  with Success => True, otherwise it returns an error with a Success =>
    --  False record.
@@ -120,6 +120,7 @@ package body TGen.JSON is
       case Success is
          when True =>
             Kind : Token_Kind;
+
          when False =>
             Error : Parsing_Error;
       end case;
@@ -129,8 +130,7 @@ package body TGen.JSON is
      (Strm        : String;
       Pos         : in out Text_Position;
       Token_Start : out Text_Position;
-      Token_End   : out Text_Position)
-      return Read_Token_Result;
+      Token_End   : out Text_Position) return Read_Token_Result;
    --  Read a token.
    --
    --  Strm is the content to decode,
@@ -161,10 +161,17 @@ package body TGen.JSON is
    function Is_Empty (Val : JSON_Value) return Boolean is
    begin
       case Val.Kind is
-         when JSON_Null_Type   => return True;
-         when JSON_Array_Type  => return Val.Data.Arr_Value.Arr.Vals.Is_Empty;
-         when JSON_Object_Type => return Val.Data.Obj_Value.Vals.Is_Empty;
-         when others           => return False;
+         when JSON_Null_Type =>
+            return True;
+
+         when JSON_Array_Type =>
+            return Val.Data.Arr_Value.Arr.Vals.Is_Empty;
+
+         when JSON_Object_Type =>
+            return Val.Data.Obj_Value.Vals.Is_Empty;
+
+         when others =>
+            return False;
       end case;
    end Is_Empty;
 
@@ -193,8 +200,7 @@ package body TGen.JSON is
    -----------------------
 
    function Array_Has_Element
-     (Arr : JSON_Array; Index : Positive) return Boolean
-   is
+     (Arr : JSON_Array; Index : Positive) return Boolean is
    begin
       return Index <= Length (Arr);
    end Array_Has_Element;
@@ -204,8 +210,7 @@ package body TGen.JSON is
    -------------------
 
    function Array_Element
-     (Arr : JSON_Array; Index : Positive) return JSON_Value
-   is
+     (Arr : JSON_Array; Index : Positive) return JSON_Value is
    begin
       return Get (Arr, Index);
    end Array_Element;
@@ -219,8 +224,10 @@ package body TGen.JSON is
       C : constant String := Error.Column'Img;
    begin
       return
-        (L (L'First + 1 .. L'Last) & ":"
-         & C (C'First + 1 .. C'Last) & ": "
+        (L (L'First + 1 .. L'Last)
+         & ":"
+         & C (C'First + 1 .. C'Last)
+         & ": "
          & To_String (Error.Message));
    end Format_Parsing_Error;
 
@@ -232,25 +239,27 @@ package body TGen.JSON is
      (Strm        : String;
       Pos         : in out Text_Position;
       Token_Start : out Text_Position;
-      Token_End   : out Text_Position)
-      return Read_Token_Result
+      Token_End   : out Text_Position) return Read_Token_Result
    is
       procedure Next_Char;
       --  Update Pos to point to next character in Strm
 
       function Next_Char (Result : Token_Kind) return Read_Token_Result
-         with Inline;
+      with Inline;
       --  Shortcut to call the Next_Char procedure after returning Result
 
-      function Is_Whitespace return Boolean with Inline;
+      function Is_Whitespace return Boolean
+      with Inline;
       --  Return True of current character is a whitespace: line feed, carriage
       --  return, space or horizontal tabulation.
 
-      function Is_Structural_Token return Boolean with Inline;
+      function Is_Structural_Token return Boolean
+      with Inline;
       --  Return True if current character is one of the structural tokens:
       --  brackets, parens, comma or colon.
 
-      function Is_Token_Sep return Boolean with Inline;
+      function Is_Token_Sep return Boolean
+      with Inline;
       --  Return True if at least of of the following is true:
       --
       --    * we reached the end of input string;
@@ -273,10 +282,12 @@ package body TGen.JSON is
 
       function Error (Msg : String) return Read_Token_Result is
       begin
-         return (Success => False,
-                 Error   => (Line    => Pos.Line,
-                             Column  => Pos.Column,
-                             Message => To_Unbounded_String (Msg)));
+         return
+           (Success => False,
+            Error   =>
+              (Line    => Pos.Line,
+               Column  => Pos.Column,
+               Message => To_Unbounded_String (Msg)));
       end Error;
 
       ---------------
@@ -330,9 +341,10 @@ package body TGen.JSON is
 
       function Is_Token_Sep return Boolean is
       begin
-         return (Pos.Index > Strm'Last
-                 or else Is_Whitespace
-                 or else Is_Structural_Token);
+         return
+           (Pos.Index > Strm'Last
+            or else Is_Whitespace
+            or else Is_Structural_Token);
       end Is_Token_Sep;
 
       ---------------------
@@ -347,8 +359,10 @@ package body TGen.JSON is
             Next_Char;
          end loop;
          if Strm (Token_Start.Index .. Token_End.Index) /= Kw then
-            return Error ("invalid keyword starting with: "
-                          & Strm (Token_Start.Index .. Token_End.Index));
+            return
+              Error
+                ("invalid keyword starting with: "
+                 & Strm (Token_Start.Index .. Token_End.Index));
          else
             return (Success => True, Kind => Kind);
          end if;
@@ -370,7 +384,7 @@ package body TGen.JSON is
       --  Initialize token delimiters
 
       Token_Start := Pos;
-      Token_End   := Pos;
+      Token_End := Pos;
 
       --  If we reached the end of the input string, just return a EOF token
 
@@ -384,211 +398,232 @@ package body TGen.JSON is
       CC := Strm (Pos.Index);
       case CC is
 
-      --  Structual tokens are unambiguously designated by standalone
-      --  characters.
+         --  Structual tokens are unambiguously designated by standalone
+         --  characters.
 
-      when '[' => return Next_Char (J_ARRAY);
-      when ']' => return Next_Char (J_ARRAY_END);
-      when '{' => return Next_Char (J_OBJECT);
-      when '}' => return Next_Char (J_OBJECT_END);
-      when ',' => return Next_Char (J_COMMA);
-      when ':' => return Next_Char (J_COLON);
+         when '[' =>
+            return Next_Char (J_ARRAY);
 
-      --  Only named value tokens can start with a letter
+         when ']' =>
+            return Next_Char (J_ARRAY_END);
 
-      when 'n' => return Delimit_Keyword ("null", J_NULL);
-      when 'f' => return Delimit_Keyword ("false", J_FALSE);
-      when 't' => return Delimit_Keyword ("true", J_TRUE);
+         when '{' =>
+            return Next_Char (J_OBJECT);
 
-      when '"' =>
+         when '}' =>
+            return Next_Char (J_OBJECT_END);
 
-         --  We expect a string.
-         --
-         --  Just scan till the end the of the string but do not attempt to
-         --  decode it. This means that even if we get a string token it might
-         --  not be a valid string from the ECMA 404 point of view.
+         when ',' =>
+            return Next_Char (J_COMMA);
 
-         Next_Char;
-         while Pos.Index <= Strm'Last and then Strm (Pos.Index) /= '"' loop
-            CC := Strm (Pos.Index);
+         when ':' =>
+            return Next_Char (J_COLON);
 
-            if CC in ASCII.NUL .. ASCII.US then
-               return Error ("control character not allowed in string");
-            end if;
+            --  Only named value tokens can start with a letter
 
-            if CC = '\' then
+         when 'n' =>
+            return Delimit_Keyword ("null", J_NULL);
 
-               --  This is an escape sequence. Make sure we have at least one
-               --  more character to read.
+         when 'f' =>
+            return Delimit_Keyword ("false", J_FALSE);
 
-               Next_Char;
+         when 't' =>
+            return Delimit_Keyword ("true", J_TRUE);
 
-               if Pos.Index > Strm'Last then
-                  return Error ("non terminated string");
+         when '"' =>
+
+            --  We expect a string.
+            --
+            --  Just scan till the end the of the string but do not attempt to
+            --  decode it. This means that even if we get a string token it
+            --  might not be a valid string from the ECMA 404 point of view.
+
+            Next_Char;
+            while Pos.Index <= Strm'Last and then Strm (Pos.Index) /= '"' loop
+               CC := Strm (Pos.Index);
+
+               if CC in ASCII.NUL .. ASCII.US then
+                  return Error ("control character not allowed in string");
                end if;
 
-               case Strm (Pos.Index) is
-                  when 'u' =>
-                     --  This is a unicode escape sequence ("\uXXXX")
-                     for Idx in 1 .. 4 loop
-                        Next_Char;
-                        if Pos.Index > Strm'Last then
-                           return Error ("non terminated string");
-                        elsif Strm (Pos.Index) not in
-                           'a' .. 'f' | 'A' .. 'F' | '0' .. '9'
-                        then
-                           return Error ("invalid unicode escape sequence");
-                        end if;
-                     end loop;
+               if CC = '\' then
 
-                  when '\' | '/' | '"' | 'b' | 'f' | 'n' | 'r' | 't' =>
-                     --  This is a single-character escape sequence
-                     null;
+                  --  This is an escape sequence. Make sure we have at least
+                  --  one more character to read.
 
-                  when others =>
-                     return Error ("invalid escape sequence");
-               end case;
-            end if;
-            Next_Char;
-         end loop;
-
-         --  We could not find a closing quote before the end of the input
-         --  string: this is an error.
-
-         if Pos.Index > Strm'Last then
-            return Error ("non terminated string");
-         end if;
-
-         Token_End := Pos;
-
-         --  Go to next char and ensure that this is separator. Indeed,
-         --  construction such as "string1""string2" are not allowed.
-
-         Next_Char;
-         if not Is_Token_Sep then
-            return Error ("invalid syntax");
-         end if;
-         return (Success => True, Kind => J_STRING);
-
-      when '-' | '0' .. '9' =>
-
-         --  We expect a number. If it's a negative one, just discard the
-         --  leading dash.
-
-         if CC = '-' then
-            Next_Char;
-            if Pos.Index > Strm'Last then
-               return Error ("invalid number");
-            end if;
-         end if;
-
-         --  Parse the integer part of a number. Leading zeros (except a mere
-         --  "0" of course) are not allowed.
-
-         case Strm (Pos.Index) is
-         when '0' =>
-            Token_End := Pos;
-            Next_Char;
-
-         when '1' .. '9' =>
-            Token_End := Pos;
-            Next_Char;
-            while Pos.Index <= Strm'Last
-                  and then Strm (Pos.Index) in '0' .. '9'
-            loop
-               Token_End := Pos;
-               Next_Char;
-            end loop;
-
-         when others =>
-            return Error ("invalid number");
-         end case;
-
-         if Is_Token_Sep then
-
-            --  The token stops here, so we have a valid integer number
-
-            return (Success => True, Kind => J_INTEGER);
-
-         elsif Strm (Pos.Index) not in '.' | 'e' | 'E' then
-
-            --  At this point, we allow only an exponent or a decimal number
-
-            return Error ("invalid number");
-         end if;
-
-         --  If present, handle the decimals
-
-         if Strm (Pos.Index) = '.' then
-            Can_Be_Integer := False;
-            Token_End := Pos;
-            Next_Char;
-            if Pos.Index > Strm'Last or else
-              Strm (Pos.Index) not in '0' .. '9'
-            then
-               return Error ("invalid number");
-            end if;
-
-            while Pos.Index <= Strm'Last and then
-              Strm (Pos.Index) in '0' .. '9'
-            loop
-               Token_End := Pos;
-               Next_Char;
-            end loop;
-
-         end if;
-
-         --  If present, handle the exponent
-
-         if Pos.Index <= Strm'Last and then Strm (Pos.Index) in 'e' | 'E' then
-            Token_End := Pos;
-            Next_Char;
-            if Pos.Index > Strm'Last then
-               return Error ("invalid number");
-            end if;
-
-            --  Skip the sign, if present
-
-            case Strm (Pos.Index) is
-               when '-' =>
-
-                  --  The exponent is negative. Even though several corner
-                  --  cases (such as having "1" as the prefix) can lead to an
-                  --  integer, assume that the number is not an integer.
-
-                  Can_Be_Integer := False;
                   Next_Char;
 
-               when '+'   => Next_Char;
-               when others => null;
+                  if Pos.Index > Strm'Last then
+                     return Error ("non terminated string");
+                  end if;
+
+                  case Strm (Pos.Index) is
+                     when 'u' =>
+                        --  This is a unicode escape sequence ("\uXXXX")
+                        for Idx in 1 .. 4 loop
+                           Next_Char;
+                           if Pos.Index > Strm'Last then
+                              return Error ("non terminated string");
+                           elsif Strm (Pos.Index)
+                                 not in 'a' .. 'f' | 'A' .. 'F' | '0' .. '9'
+                           then
+                              return Error ("invalid unicode escape sequence");
+                           end if;
+                        end loop;
+
+                     when '\' | '/' | '"' | 'b' | 'f' | 'n' | 'r' | 't' =>
+                        --  This is a single-character escape sequence
+                        null;
+
+                     when others =>
+                        return Error ("invalid escape sequence");
+                  end case;
+               end if;
+               Next_Char;
+            end loop;
+
+            --  We could not find a closing quote before the end of the input
+            --  string: this is an error.
+
+            if Pos.Index > Strm'Last then
+               return Error ("non terminated string");
+            end if;
+
+            Token_End := Pos;
+
+            --  Go to next char and ensure that this is separator. Indeed,
+            --  construction such as "string1""string2" are not allowed.
+
+            Next_Char;
+            if not Is_Token_Sep then
+               return Error ("invalid syntax");
+            end if;
+            return (Success => True, Kind => J_STRING);
+
+         when '-' | '0' .. '9' =>
+
+            --  We expect a number. If it's a negative one, just discard the
+            --  leading dash.
+
+            if CC = '-' then
+               Next_Char;
+               if Pos.Index > Strm'Last then
+                  return Error ("invalid number");
+               end if;
+            end if;
+
+            --  Parse the integer part of a number. Leading zeros (except a
+            --  mere "0" of course) are not allowed.
+
+            case Strm (Pos.Index) is
+               when '0' =>
+                  Token_End := Pos;
+                  Next_Char;
+
+               when '1' .. '9' =>
+                  Token_End := Pos;
+                  Next_Char;
+                  while Pos.Index <= Strm'Last
+                    and then Strm (Pos.Index) in '0' .. '9'
+                  loop
+                     Token_End := Pos;
+                     Next_Char;
+                  end loop;
+
+               when others =>
+                  return Error ("invalid number");
             end case;
 
-            if Pos.Index > Strm'Last or else Strm (Pos.Index) not in '0' .. '9'
-            then
+            if Is_Token_Sep then
+
+               --  The token stops here, so we have a valid integer number
+
+               return (Success => True, Kind => J_INTEGER);
+
+            elsif Strm (Pos.Index) not in '.' | 'e' | 'E' then
+
+               --  At this point, we allow only an exponent or a decimal number
+
                return Error ("invalid number");
             end if;
 
-            while Pos.Index <= Strm'Last
-                  and then Strm (Pos.Index) in '0' .. '9'
-            loop
+            --  If present, handle the decimals
+
+            if Strm (Pos.Index) = '.' then
+               Can_Be_Integer := False;
                Token_End := Pos;
                Next_Char;
-            end loop;
-         end if;
+               if Pos.Index > Strm'Last
+                 or else Strm (Pos.Index) not in '0' .. '9'
+               then
+                  return Error ("invalid number");
+               end if;
 
-         if Is_Token_Sep then
+               while Pos.Index <= Strm'Last
+                 and then Strm (Pos.Index) in '0' .. '9'
+               loop
+                  Token_End := Pos;
+                  Next_Char;
+               end loop;
 
-            --  The token stops here, so we have a valid integer number
+            end if;
 
-            return
-              (Success => True,
-               Kind    => (if Can_Be_Integer then J_INTEGER else J_NUMBER));
-         else
-            return Error ("invalid number");
-         end if;
+            --  If present, handle the exponent
 
-      when others =>
-         return Error ("Unexpected character '" & CC & ''');
+            if Pos.Index <= Strm'Last and then Strm (Pos.Index) in 'e' | 'E'
+            then
+               Token_End := Pos;
+               Next_Char;
+               if Pos.Index > Strm'Last then
+                  return Error ("invalid number");
+               end if;
+
+               --  Skip the sign, if present
+
+               case Strm (Pos.Index) is
+                  when '-' =>
+
+                     --  The exponent is negative. Even though several corner
+                     --  cases (such as having "1" as the prefix) can lead to
+                     --  an integer, assume that the number is not an integer.
+
+                     Can_Be_Integer := False;
+                     Next_Char;
+
+                  when '+' =>
+                     Next_Char;
+
+                  when others =>
+                     null;
+               end case;
+
+               if Pos.Index > Strm'Last
+                 or else Strm (Pos.Index) not in '0' .. '9'
+               then
+                  return Error ("invalid number");
+               end if;
+
+               while Pos.Index <= Strm'Last
+                 and then Strm (Pos.Index) in '0' .. '9'
+               loop
+                  Token_End := Pos;
+                  Next_Char;
+               end loop;
+            end if;
+
+            if Is_Token_Sep then
+
+               --  The token stops here, so we have a valid integer number
+
+               return
+                 (Success => True,
+                  Kind    => (if Can_Be_Integer then J_INTEGER else J_NUMBER));
+            else
+               return Error ("invalid number");
+            end if;
+
+         when others =>
+            return Error ("Unexpected character '" & CC & ''');
       end case;
    end Read_Token;
 
@@ -609,7 +644,7 @@ package body TGen.JSON is
       --  message.
 
       function Error (Result : Read_Token_Result) return Read_Result
-         with Pre => not Result.Success;
+      with Pre => not Result.Success;
       --  Transform a parsing error from Read_Token into a Read_Result
 
       -----------
@@ -618,10 +653,12 @@ package body TGen.JSON is
 
       function Error (Msg : String) return Read_Result is
       begin
-         return (Success => False,
-                 Error   => (Line    => Pos.Line,
-                             Column  => Pos.Column,
-                             Message => To_Unbounded_String (Msg)));
+         return
+           (Success => False,
+            Error   =>
+              (Line    => Pos.Line,
+               Column  => Pos.Column,
+               Message => To_Unbounded_String (Msg)));
       end Error;
 
       function Error (Result : Read_Token_Result) return Read_Result is
@@ -662,8 +699,9 @@ package body TGen.JSON is
          when J_STRING =>
             begin
                declare
-                  Str_Value : constant UTF8_XString := Un_Escape_String
-                    (Strm, Token_Start.Index, Token_End.Index);
+                  Str_Value : constant UTF8_XString :=
+                    Un_Escape_String
+                      (Strm, Token_Start.Index, Token_End.Index);
                begin
                   Result.Value := Create (Str_Value);
                end;
@@ -703,55 +741,55 @@ package body TGen.JSON is
                   end if;
 
                   case ST is
-                  when J_ARRAY_END =>
-                     exit when Is_First;
-                     Free (Arr);
-                     Result := Error ("syntax error");
-                     return;
-
-                  when Value_Token =>
-                     --  We got a new array element: append it
-
-                     Append (Arr.Arr, Element.Value);
-
-                     --  Now see what is next: the end of the array or a comma
-                     --  (hence another array element after).
-
-                     Read (Element, Strm, Pos, ST);
-                     if not Element.Success then
-                        Free (Arr);
-                        Result := Element;
-                        return;
-                     end if;
-
-                     case ST is
                      when J_ARRAY_END =>
-                        exit;
+                        exit when Is_First;
+                        Free (Arr);
+                        Result := Error ("syntax error");
+                        return;
 
-                     when J_COMMA =>
-                        --  We have a comma, so we expect another element in
-                        --  the array. Continue reading.
+                     when Value_Token =>
+                        --  We got a new array element: append it
 
-                        null;
+                        Append (Arr.Arr, Element.Value);
+
+                        --  Now see what is next: the end of the array or a
+                        --  comma (hence another array element after).
+
+                        Read (Element, Strm, Pos, ST);
+                        if not Element.Success then
+                           Free (Arr);
+                           Result := Element;
+                           return;
+                        end if;
+
+                        case ST is
+                           when J_ARRAY_END =>
+                              exit;
+
+                           when J_COMMA =>
+                              --  We have a comma, so we expect another element
+                              --  in the array. Continue reading.
+
+                              null;
+
+                           when others =>
+                              Free (Arr);
+                              Result := Error ("comma expected");
+                              return;
+                        end case;
 
                      when others =>
                         Free (Arr);
-                        Result := Error ("comma expected");
+                        Result := Error ("syntax error");
                         return;
-                     end case;
-
-                  when others =>
-                     Free (Arr);
-                     Result := Error ("syntax error");
-                     return;
                   end case;
 
                   Is_First := False;
                end loop;
 
                Result.Value :=
-                 (Ada.Finalization.Controlled with
-                  Data => (Kind => JSON_Array_Type, Arr_Value => Arr));
+                 (Ada.Finalization.Controlled
+                  with Data => (Kind => JSON_Array_Type, Arr_Value => Arr));
             end;
 
          when J_OBJECT =>
@@ -770,9 +808,11 @@ package body TGen.JSON is
                --  Allocate internal container for the result
 
                Result.Value :=
-                 (Ada.Finalization.Controlled with
-                  Data => (Kind      => JSON_Object_Type,
-                           Obj_Value => new JSON_Object_Internal));
+                 (Ada.Finalization.Controlled
+                  with
+                    Data =>
+                      (Kind      => JSON_Object_Type,
+                       Obj_Value => new JSON_Object_Internal));
 
                --  Read all members for this object until we reach the closing
                --  token ("}").
@@ -787,70 +827,70 @@ package body TGen.JSON is
                   end if;
 
                   case ST is
-                  when J_OBJECT_END =>
-                     exit when Is_First;
-                     Result := Error ("string value expected");
-                     return;
-
-                  when J_STRING =>
-                     --  Consume the colon token, then get the member value
-
-                     Read (Value, Strm, Pos, ST);
-                     if not Value.Success then
-                        Result := Value;
-                        return;
-                     elsif ST /= J_COLON then
-                        Result := Error ("colon expected");
-                        return;
-                     end if;
-
-                     Read (Value, Strm, Pos, ST);
-                     if not Value.Success then
-                        Result := Value;
-                        return;
-                     elsif ST not in Value_Token then
-                        Result := Error ("non expected token");
-                        return;
-                     end if;
-
-                     --  Register this new member.
-                     --
-                     --  As we checked above that reading Key parsed a string
-                     --  token, we know that coercing Key to a string cannot
-                     --  fail.
-
-                     declare
-                        Key_Str : constant UTF8_XString := Get (Key.Value);
-                     begin
-                        Set_Field (Result.Value, Key_Str, Value.Value);
-                     end;
-
-                     --  Now see what is next: the end of the object or a comma
-                     --  (hence another object member after).
-
-                     Read (Value, Strm, Pos, ST);
-                     if not Value.Success then
-                        Result := Value;
-                        return;
-                     end if;
-                     case ST is
                      when J_OBJECT_END =>
-                        exit;
+                        exit when Is_First;
+                        Result := Error ("string value expected");
+                        return;
 
-                     when J_COMMA =>
-                        --  We have a comma, so we expect another member in the
-                        --  object. Continue reading.
+                     when J_STRING =>
+                        --  Consume the colon token, then get the member value
 
-                        null;
+                        Read (Value, Strm, Pos, ST);
+                        if not Value.Success then
+                           Result := Value;
+                           return;
+                        elsif ST /= J_COLON then
+                           Result := Error ("colon expected");
+                           return;
+                        end if;
+
+                        Read (Value, Strm, Pos, ST);
+                        if not Value.Success then
+                           Result := Value;
+                           return;
+                        elsif ST not in Value_Token then
+                           Result := Error ("non expected token");
+                           return;
+                        end if;
+
+                        --  Register this new member.
+                        --
+                        --  As we checked above that reading Key parsed a
+                        --  string token, we know that coercing Key to a string
+                        --  cannot fail.
+
+                        declare
+                           Key_Str : constant UTF8_XString := Get (Key.Value);
+                        begin
+                           Set_Field (Result.Value, Key_Str, Value.Value);
+                        end;
+
+                        --  Now see what is next: the end of the object or a
+                        --  comma (hence another object member after).
+
+                        Read (Value, Strm, Pos, ST);
+                        if not Value.Success then
+                           Result := Value;
+                           return;
+                        end if;
+                        case ST is
+                           when J_OBJECT_END =>
+                              exit;
+
+                           when J_COMMA =>
+                              --  We have a comma, so we expect another member
+                              --  in the object. Continue reading.
+
+                              null;
+
+                           when others =>
+                              Result := Error ("comma expected");
+                              return;
+                        end case;
 
                      when others =>
-                        Result := Error ("comma expected");
+                        Result := Error ("string value expected");
                         return;
-                     end case;
-
-                  when others =>
-                     Result := Error ("string value expected");
-                     return;
                   end case;
                   Is_First := False;
                end loop;
@@ -859,7 +899,7 @@ package body TGen.JSON is
          when J_NUMBER | J_INTEGER =>
             declare
                Number_Str  : constant String :=
-                  Strm (Token_Start.Index .. Token_End.Index);
+                 Strm (Token_Start.Index .. Token_End.Index);
                Has_Integer : Boolean := False;
             begin
                if Kind = J_INTEGER then
@@ -881,8 +921,8 @@ package body TGen.JSON is
                        Create (Big_Reals.From_String (Number_Str));
                   exception
                      when Constraint_Error =>
-                        Result := Error
-                          ("cannot convert JSON number to Long_Float");
+                        Result :=
+                          Error ("cannot convert JSON number to Long_Float");
                         return;
                   end;
                end if;
@@ -907,16 +947,14 @@ package body TGen.JSON is
    end Read;
 
    function Read
-     (Strm     : Unbounded_String;
-      Filename : String := "<data>") return JSON_Value
+     (Strm : Unbounded_String; Filename : String := "<data>") return JSON_Value
    is
    begin
       return Read (To_String (Strm), Filename);
    end Read;
 
    function Read
-     (Strm     : String;
-      Filename : String := "<data>") return JSON_Value
+     (Strm : String; Filename : String := "<data>") return JSON_Value
    is
       Result : constant Read_Result := Read (Strm);
    begin
@@ -937,8 +975,7 @@ package body TGen.JSON is
    end Read;
 
    function Read
-     (Strm : Ada.Strings.Unbounded.Unbounded_String) return Read_Result
-   is
+     (Strm : Ada.Strings.Unbounded.Unbounded_String) return Read_Result is
    begin
       return Read (To_String (Strm));
    end Read;
@@ -1023,13 +1060,16 @@ package body TGen.JSON is
                Append (Ret, ASCII.LF);
             end if;
 
-            for J in Item.Data.Arr_Value.Arr.Vals.First_Index ..
-              Item.Data.Arr_Value.Arr.Vals.Last_Index
+            for J
+              in Item.Data.Arr_Value.Arr.Vals.First_Index
+                 .. Item.Data.Arr_Value.Arr.Vals.Last_Index
             loop
                Do_Indent (Indent + 1);
                Write
                  (Item.Data.Arr_Value.Arr.Vals.Element (J),
-                  Compact, Indent + 1, Ret);
+                  Compact,
+                  Indent + 1,
+                  Ret);
 
                if J < Item.Data.Arr_Value.Arr.Vals.Last_Index then
                   Append (Ret, ",");
@@ -1057,9 +1097,7 @@ package body TGen.JSON is
 
                while Has_Element (J) loop
                   Do_Indent (Indent + 1);
-                  Append
-                    (Ret,
-                     Escape_String (Element (J).Key));
+                  Append (Ret, Escape_String (Element (J).Key));
 
                   Append (Ret, ':');
                   if not Compact then
@@ -1090,8 +1128,7 @@ package body TGen.JSON is
    -- Write --
    -----------
 
-   function Write
-     (Item : JSON_Value; Compact : Boolean := True) return String
+   function Write (Item : JSON_Value; Compact : Boolean := True) return String
    is
    begin
       return To_String (Write (Item, Compact));
@@ -1152,7 +1189,7 @@ package body TGen.JSON is
    ----------
 
    procedure Sort
-     (Arr : in out JSON_Array;
+     (Arr  : in out JSON_Array;
       Less : access function (Left, Right : JSON_Value) return Boolean)
    is
       package Sorting is new Vect_Pkg.Generic_Sorting ("<" => Less.all);
@@ -1161,7 +1198,7 @@ package body TGen.JSON is
    end Sort;
 
    procedure Sort
-     (Val : in out JSON_Value;
+     (Val  : in out JSON_Value;
       Less : access function (Left, Right : JSON_Value) return Boolean)
    is
       function "<" (Left, Right : Object_Item) return Boolean;
@@ -1175,9 +1212,14 @@ package body TGen.JSON is
 
    begin
       case Val.Kind is
-         when JSON_Array_Type  => Sort (Val.Data.Arr_Value.Arr, Less);
-         when JSON_Object_Type => Sorting.Sort (Val.Data.Obj_Value.Vals);
-         when others => null;
+         when JSON_Array_Type =>
+            Sort (Val.Data.Arr_Value.Arr, Less);
+
+         when JSON_Object_Type =>
+            Sorting.Sort (Val.Data.Obj_Value.Vals);
+
+         when others =>
+            null;
       end case;
    end Sort;
 
@@ -1231,17 +1273,20 @@ package body TGen.JSON is
    -- Adjust --
    ------------
 
-   overriding procedure Adjust (Obj : in out JSON_Value) is
+   overriding
+   procedure Adjust (Obj : in out JSON_Value) is
    begin
       case Obj.Data.Kind is
          when JSON_Array_Type =>
             if Obj.Data.Arr_Value /= null then
                Increment (Obj.Data.Arr_Value.Cnt);
             end if;
+
          when JSON_Object_Type =>
             if Obj.Data.Obj_Value /= null then
                Increment (Obj.Data.Obj_Value.Cnt);
             end if;
+
          when others =>
             null;
       end case;
@@ -1251,7 +1296,8 @@ package body TGen.JSON is
    -- Finalize --
    --------------
 
-   overriding procedure Finalize (Obj : in out JSON_Value) is
+   overriding
+   procedure Finalize (Obj : in out JSON_Value) is
    begin
       case Obj.Data.Kind is
          when JSON_Array_Type =>
@@ -1334,11 +1380,12 @@ package body TGen.JSON is
 
    function Create (Val : JSON_Array) return JSON_Value is
    begin
-      return (Ada.Finalization.Controlled with
-                Data => (Kind      => JSON_Array_Type,
-                         Arr_Value => new JSON_Array_Internal'
-                           (Cnt => 1,
-                            Arr => Val)));
+      return
+        (Ada.Finalization.Controlled
+         with
+           Data =>
+             (Kind      => JSON_Array_Type,
+              Arr_Value => new JSON_Array_Internal'(Cnt => 1, Arr => Val)));
    end Create;
 
    -------------------
@@ -1356,10 +1403,7 @@ package body TGen.JSON is
    -- Unset_Field --
    -----------------
 
-   procedure Unset_Field
-     (Val        : JSON_Value;
-      Field_Name : UTF8_String)
-   is
+   procedure Unset_Field (Val : JSON_Value; Field_Name : UTF8_String) is
       Vals : Object_Items_Pkg.Vector renames Val.Data.Obj_Value.Vals;
    begin
       for J in Vals.First_Index .. Vals.Last_Index loop
@@ -1375,9 +1419,7 @@ package body TGen.JSON is
    ---------------
 
    procedure Set_Field
-     (Val        : JSON_Value;
-      Field_Name : UTF8_String;
-      Field      : JSON_Value)
+     (Val : JSON_Value; Field_Name : UTF8_String; Field : JSON_Value)
    is
       Vals : Object_Items_Pkg.Vector renames Val.Data.Obj_Value.Vals;
    begin
@@ -1388,15 +1430,11 @@ package body TGen.JSON is
          end if;
       end loop;
 
-      Vals.Append
-        (Object_Item'(Key => To_XString (Field_Name),
-          Val => Field));
+      Vals.Append (Object_Item'(Key => To_XString (Field_Name), Val => Field));
    end Set_Field;
 
    procedure Set_Field
-     (Val        : JSON_Value;
-      Field_Name : UTF8_XString;
-      Field      : JSON_Value)
+     (Val : JSON_Value; Field_Name : UTF8_XString; Field : JSON_Value)
    is
       Vals : Object_Items_Pkg.Vector renames Val.Data.Obj_Value.Vals;
    begin
@@ -1407,39 +1445,29 @@ package body TGen.JSON is
          end if;
       end loop;
 
-      Vals.Append
-        (Object_Item'(Key => Field_Name,
-          Val => Field));
+      Vals.Append (Object_Item'(Key => Field_Name, Val => Field));
    end Set_Field;
 
    procedure Set_Field
-     (Val        : JSON_Value;
-      Field_Name : UTF8_String;
-      Field      : Boolean) is
+     (Val : JSON_Value; Field_Name : UTF8_String; Field : Boolean) is
    begin
       Set_Field (Val, Field_Name, Create (Field));
    end Set_Field;
 
    procedure Set_Field
-     (Val        : JSON_Value;
-      Field_Name : UTF8_String;
-      Field      : Big_Integer) is
+     (Val : JSON_Value; Field_Name : UTF8_String; Field : Big_Integer) is
    begin
       Set_Field (Val, Field_Name, Create (Field));
    end Set_Field;
 
    procedure Set_Field
-     (Val        : JSON_Value;
-      Field_Name : UTF8_String;
-      Field      : Big_Real) is
+     (Val : JSON_Value; Field_Name : UTF8_String; Field : Big_Real) is
    begin
       Set_Field (Val, Field_Name, Create (Field));
    end Set_Field;
 
    procedure Set_Field
-     (Val        : JSON_Value;
-      Field_Name : UTF8_String;
-      Field      : UTF8_String) is
+     (Val : JSON_Value; Field_Name : UTF8_String; Field : UTF8_String) is
    begin
       Set_Field (Val, Field_Name, Create (Field));
    end Set_Field;
@@ -1453,9 +1481,7 @@ package body TGen.JSON is
    end Set_Field;
 
    procedure Set_Field
-     (Val        : JSON_Value;
-      Field_Name : UTF8_String;
-      Field      : JSON_Array)
+     (Val : JSON_Value; Field_Name : UTF8_String; Field : JSON_Array)
    is
       F_Val : constant JSON_Value := Create (Field);
    begin
@@ -1477,9 +1503,7 @@ package body TGen.JSON is
    end Set_Field_If_Not_Empty;
 
    procedure Set_Field_If_Not_Empty
-     (Val        : JSON_Value;
-      Field_Name : UTF8_String;
-      Field      : UTF8_String) is
+     (Val : JSON_Value; Field_Name : UTF8_String; Field : UTF8_String) is
    begin
       if Field /= "" then
          Set_Field (Val, Field_Name, Field);
@@ -1487,9 +1511,7 @@ package body TGen.JSON is
    end Set_Field_If_Not_Empty;
 
    procedure Set_Field_If_Not_Empty
-     (Val        : JSON_Value;
-      Field_Name : UTF8_String;
-      Field      : JSON_Array) is
+     (Val : JSON_Value; Field_Name : UTF8_String; Field : JSON_Array) is
    begin
       if Field /= Empty_Array then
          Set_Field (Val, Field_Name, Field);
@@ -1538,10 +1560,7 @@ package body TGen.JSON is
       return To_Unbounded_String (Val.Data.Str_Value.To_String);
    end Get;
 
-   function Get
-     (Val   : JSON_Value;
-      Field : UTF8_String) return JSON_Value
-   is
+   function Get (Val : JSON_Value; Field : UTF8_String) return JSON_Value is
       Vals : Object_Items_Pkg.Vector renames Val.Data.Obj_Value.Vals;
    begin
       for J in Vals.First_Index .. Vals.Last_Index loop
@@ -1599,8 +1618,7 @@ package body TGen.JSON is
    end Get;
 
    function Get
-     (Val : JSON_Value; Field : UTF8_String) return UTF8_Unbounded_String
-   is
+     (Val : JSON_Value; Field : UTF8_String) return UTF8_Unbounded_String is
    begin
       return Get (Get (Val, Field));
    end Get;
@@ -1635,9 +1653,11 @@ package body TGen.JSON is
          when JSON_Array_Type =>
             declare
                Result : constant JSON_Value :=
-                 (Ada.Finalization.Controlled with
-                  Data => (Kind => JSON_Array_Type,
-                           Arr_Value => new JSON_Array_Internal));
+                 (Ada.Finalization.Controlled
+                  with
+                    Data =>
+                      (Kind      => JSON_Array_Type,
+                       Arr_Value => new JSON_Array_Internal));
             begin
                for E of Val.Data.Arr_Value.Arr.Vals loop
                   Append (Result.Data.Arr_Value.Arr, Clone (E));
@@ -1688,16 +1708,22 @@ package body TGen.JSON is
             --  Same pointer ?
             if Left.Data.Arr_Value = Right.Data.Arr_Value then
                return True;
-            elsif Left.Data.Arr_Value.Arr.Vals.Length /=
-              Right.Data.Arr_Value.Arr.Vals.Length
+            elsif Left.Data.Arr_Value.Arr.Vals.Length
+              /= Right.Data.Arr_Value.Arr.Vals.Length
             then
                return False;
             else
-               for J in Left.Data.Arr_Value.Arr.Vals.First_Index ..
-                 Left.Data.Arr_Value.Arr.Vals.Last_Index
+               for J
+                 in Left.Data.Arr_Value.Arr.Vals.First_Index
+                    .. Left.Data.Arr_Value.Arr.Vals.Last_Index
                loop
-                  if not (Left.Data.Arr_Value.Arr.Vals (J) =  --  recursive
-                            Right.Data.Arr_Value.Arr.Vals (J))
+                  if not (Left.Data.Arr_Value.Arr.Vals (J)
+                          =  --  recursive
+                                             Right
+                                             .Data
+                                             .Arr_Value
+                                             .Arr
+                                             .Vals (J))
                   then
                      return False;
                   end if;
@@ -1709,8 +1735,8 @@ package body TGen.JSON is
             --  Same pointer ?
             if Left.Data.Obj_Value = Right.Data.Obj_Value then
                return True;
-            elsif Left.Data.Obj_Value.Vals.Length /=
-              Right.Data.Obj_Value.Vals.Length
+            elsif Left.Data.Obj_Value.Vals.Length
+              /= Right.Data.Obj_Value.Vals.Length
             then
                return False;
             else
@@ -1719,7 +1745,8 @@ package body TGen.JSON is
                   Found := False;
                   for R of Right.Data.Obj_Value.Vals loop
                      if R.Key = L.Key then
-                        if not (R.Val = L.Val) then --  recursive
+                        if not (R.Val = L.Val) then
+                           --  recursive
                            return False;
                         end if;
                         Found := True;
@@ -1757,10 +1784,11 @@ package body TGen.JSON is
 
    procedure Gen_Map_JSON_Object
      (Val         : JSON_Value;
-      CB          : access procedure
-        (User_Object : in out Mapped;
-         Name        : UTF8_String;
-         Value       : JSON_Value);
+      CB          :
+        access procedure
+          (User_Object : in out Mapped;
+           Name        : UTF8_String;
+           Value       : JSON_Value);
       User_Object : in out Mapped)
    is
       procedure Internal (Name : UTF8_String; Value : JSON_Value);
@@ -1787,12 +1815,11 @@ package body TGen.JSON is
    -- Escape_Non_Print_Character --
    --------------------------------
 
-   function Escape_Non_Print_Character
-     (C : Wide_Wide_Character) return String
+   function Escape_Non_Print_Character (C : Wide_Wide_Character) return String
    is
-      Code  : constant Unsigned_32 := Wide_Wide_Character'Pos (C);
-      Buf   : String (1 .. 12);
-      Last  : Natural := Buf'First - 1;
+      Code : constant Unsigned_32 := Wide_Wide_Character'Pos (C);
+      Buf  : String (1 .. 12);
+      Last : Natural := Buf'First - 1;
 
       procedure Append_Escaped (Code : Unsigned_16);
 
@@ -1848,7 +1875,8 @@ package body TGen.JSON is
          begin
             GNAT.Decode_UTF8_String.Decode_Wide_Wide_Character
               (String (Str (Low .. Natural'Min (Text_Length, Low + 3))),
-               Low, W_Chr);
+               Low,
+               W_Chr);
          exception
             when Constraint_Error =>
                --  Skip the character even if it is invalid.
@@ -1859,20 +1887,28 @@ package body TGen.JSON is
          case W_Chr is
             when NUL =>
                Append (Ret, "\u0000");
+
             when '"' =>
                Append (Ret, "\""");
+
             when '\' =>
                Append (Ret, "\\");
+
             when BS =>
                Append (Ret, "\b");
+
             when FF =>
                Append (Ret, "\f");
+
             when LF =>
                Append (Ret, "\n");
+
             when CR =>
                Append (Ret, "\r");
+
             when HT =>
                Append (Ret, "\t");
+
             when others =>
                if Wide_Wide_Character'Pos (W_Chr) < 32 then
                   Append (Ret, Escape_Non_Print_Character (W_Chr));
@@ -1895,9 +1931,7 @@ package body TGen.JSON is
    ----------------------
 
    function Un_Escape_String
-     (Text : String;
-      Low  : Natural;
-      High : Natural) return UTF8_XString
+     (Text : String; Low : Natural; High : Natural) return UTF8_XString
    is
       First : Integer;
       Last  : Integer;
@@ -1906,7 +1940,7 @@ package body TGen.JSON is
 
    begin
       First := Low;
-      Last  := High;
+      Last := High;
 
       --  Trim blanks and double quotes
 
@@ -1930,8 +1964,8 @@ package body TGen.JSON is
             Idx := Idx + 1;
 
             if Idx > High then
-               raise Invalid_JSON_Stream with
-                 "Unexpected escape character at end of line";
+               raise Invalid_JSON_Stream
+                 with "Unexpected escape character at end of line";
             end if;
 
             --  See http://tools.ietf.org/html/rfc4627 for the list of
@@ -1940,7 +1974,7 @@ package body TGen.JSON is
             case Text (Idx) is
                when 'u' | 'U' =>
                   declare
-                     Lead : constant Unsigned_16 :=
+                     Lead  : constant Unsigned_16 :=
                        Unsigned_16'Value
                          ("16#" & Text (Idx + 1 .. Idx + 4) & "#");
                      Trail : Unsigned_16;
@@ -1957,12 +1991,14 @@ package body TGen.JSON is
                        and then Text (Idx + 5) = '\'
                        and then Text (Idx + 6) in 'u' | 'U'
                      then
-                        Trail := Unsigned_16'Value
-                          ("16#" & Text (Idx + 7 .. Idx + 10) & '#');
-                        Char := Wide_Wide_Character'Val
-                          (16#1_0000#
-                           + Unsigned_32 (Lead and 16#03FF#) * 16#0400#
-                           + Unsigned_32 (Trail and 16#03FF#));
+                        Trail :=
+                          Unsigned_16'Value
+                            ("16#" & Text (Idx + 7 .. Idx + 10) & '#');
+                        Char :=
+                          Wide_Wide_Character'Val
+                            (16#1_0000#
+                             + Unsigned_32 (Lead and 16#03FF#) * 16#0400#
+                             + Unsigned_32 (Trail and 16#03FF#));
                         Idx := Idx + 6;
                      end if;
 
@@ -1974,24 +2010,31 @@ package body TGen.JSON is
 
                when '"' =>
                   Unb.Append ('"');
+
                when '/' =>
                   Unb.Append ('/');
+
                when '\' =>
                   Unb.Append ('\');
+
                when 'b' =>
                   Unb.Append (ASCII.BS);
+
                when 'f' =>
                   Unb.Append (ASCII.FF);
+
                when 'n' =>
                   Unb.Append (ASCII.LF);
+
                when 'r' =>
                   Unb.Append (ASCII.CR);
+
                when 't' =>
                   Unb.Append (ASCII.HT);
+
                when others =>
-                  raise Invalid_JSON_Stream with
-                    "Unexpected escape sequence '\" &
-                    Text (Idx) & "'";
+                  raise Invalid_JSON_Stream
+                    with "Unexpected escape sequence '\" & Text (Idx) & "'";
             end case;
 
          else
@@ -2015,7 +2058,7 @@ package body TGen.JSON is
 
       function Create (Filename : String) return JSON_Auto_IO is
          use GNATCOLL.VFS;
-         VF : constant Virtual_File := Create (+Filename);
+         VF      : constant Virtual_File := Create (+Filename);
          Content : constant JSON_Value :=
            (if Ada.Directories.Exists (Filename)
             then Read (VF.Read_File.all, Filename)
@@ -2034,14 +2077,15 @@ package body TGen.JSON is
       -- Get_JSON_Ref --
       ------------------
 
-      function Get_JSON_Ref (Self : JSON_Auto_IO) return JSON_Value is
-      (Self.JSON_Content);
+      function Get_JSON_Ref (Self : JSON_Auto_IO) return JSON_Value
+      is (Self.JSON_Content);
 
       ----------------
       --  Finalize  --
       ----------------
 
-      overriding procedure Finalize (Self : in out JSON_Auto_IO) is
+      overriding
+      procedure Finalize (Self : in out JSON_Auto_IO) is
          use Ada.Directories;
          use GNAT.Strings;
          File : Ada.Text_IO.File_Type;

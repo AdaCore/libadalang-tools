@@ -21,7 +21,8 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Directories; use Ada;
+with Ada.Directories;
+use Ada;
 with Ada.Exceptions;
 with GNAT.Command_Line;
 with GNAT.Directory_Operations; use GNAT.Directory_Operations;
@@ -30,20 +31,21 @@ with GNAT.OS_Lib;
 with GNATCOLL.Projects;
 with GNATCOLL.Projects.Aux;
 
-with Utils.Command_Lines.Common;   use Utils.Command_Lines.Common;
+with Utils.Command_Lines.Common; use Utils.Command_Lines.Common;
 with Utils.Environment;
 with Utils.Err_Out;
-with Utils.Projects; use Utils.Projects;
+with Utils.Projects;             use Utils.Projects;
 with Utils.Projects.Aggregate;
-with Utils.String_Utilities; use Utils.String_Utilities;
+with Utils.String_Utilities;     use Utils.String_Utilities;
 with Utils.Tool_Names;
 
 with Libadalang.Iterators; use Libadalang.Iterators;
 
 package body Utils.Drivers is
 
-   use Common_Flag_Switches, Common_String_Switches,
-     Common_String_Seq_Switches;
+   use Common_Flag_Switches,
+       Common_String_Switches,
+       Common_String_Seq_Switches;
 
    --  See libadalang_env/src/libadalang/ada/testsuite/ada/nameres.adb.
 
@@ -53,15 +55,14 @@ package body Utils.Drivers is
    procedure Driver
      (Cmd                   : in out Command_Line;
       Tool                  : in out Tool_State'Class;
-      Tool_Package_Name     :        String;
-      Preprocessing_Allowed :        Boolean        := True;
-      Callback              :        Parse_Callback := null)
+      Tool_Package_Name     : String;
+      Preprocessing_Allowed : Boolean := True;
+      Callback              : Parse_Callback := null)
    is
       use String_Sets;
 
       procedure Local_Callback
-        (Phase : Parse_Phase;
-         Swit  : Dynamically_Typed_Switch);
+        (Phase : Parse_Phase; Swit : Dynamically_Typed_Switch);
       --  This processes the Common switches, and then calls the tool-specific
       --  Callback passed in.
 
@@ -70,16 +71,14 @@ package body Utils.Drivers is
       procedure Print_Help;
 
       procedure Local_Callback
-        (Phase : Parse_Phase;
-         Swit  : Dynamically_Typed_Switch)
-      is
+        (Phase : Parse_Phase; Swit : Dynamically_Typed_Switch) is
       begin
          if Callback /= null then
             Callback (Phase, Swit);
          end if;
       end Local_Callback;
 
-      Global_Report_Dir   : String_Ref;
+      Global_Report_Dir : String_Ref;
 
       procedure Include_One (File_Name : String);
       --  Include File_Name in the Ignored set below
@@ -124,7 +123,7 @@ package body Utils.Drivers is
                      F_Name.all,
                      Counter,
                      Has_Syntax_Err,
-                     Pass => First_Pass,
+                     Pass                  => First_Pass,
                      Preprocessing_Allowed => Preprocessing_Allowed);
                   if Has_Syntax_Err and then not Utils.Syntax_Errors then
                      Utils.Syntax_Errors := True;
@@ -159,7 +158,7 @@ package body Utils.Drivers is
                   F_Name.all,
                   Counter,
                   Has_Syntax_Err,
-                  Pass => Second_Pass,
+                  Pass                  => Second_Pass,
                   Preprocessing_Allowed => Preprocessing_Allowed);
                if Has_Syntax_Err and then not Utils.Syntax_Errors then
                   Utils.Syntax_Errors := True;
@@ -176,26 +175,26 @@ package body Utils.Drivers is
          Tool_Help (Tool);
       end Print_Help;
 
-   --  Start of processing for Driver
+      --  Start of processing for Driver
 
    begin
 
       Process_Command_Line
         (Cmd,
          Global_Report_Dir,
-         The_Project_Tree          => Tool.Project_Tree,
-         The_Project_Env           => Tool.Project_Env,
-         Preprocessing_Allowed     => Preprocessing_Allowed,
-         Tool_Package_Name         => Tool_Package_Name,
-         Callback                  => Local_Callback'Unrestricted_Access,
-         Print_Help                => Print_Help'Access);
---      Utils.Command_Lines.Common.Post.Postprocess_Common (Cmd);
+         The_Project_Tree      => Tool.Project_Tree,
+         The_Project_Env       => Tool.Project_Env,
+         Preprocessing_Allowed => Preprocessing_Allowed,
+         Tool_Package_Name     => Tool_Package_Name,
+         Callback              => Local_Callback'Unrestricted_Access,
+         Print_Help            => Print_Help'Access);
+      --      Utils.Command_Lines.Common.Post.Postprocess_Common (Cmd);
 
       if Debug_Flag_C then
          Dump_Cmd (Cmd);
       end if;
 
---      Utils.Check_Parameters; -- ????Move into Init?
+      --      Utils.Check_Parameters; -- ????Move into Init?
 
       --  ????????????????Stuff from Environment:
 
@@ -203,36 +202,37 @@ package body Utils.Drivers is
          use GNAT.OS_Lib, Environment;
       begin
          Copy_Gnat_Adc;
-         pragma Assert
-           (Get_Current_Dir = Tool_Current_Dir.all & Directory_Separator);
+         pragma
+           Assert
+             (Get_Current_Dir = Tool_Current_Dir.all & Directory_Separator);
 
---         if not Incremental_Mode then
---            Change_Dir (Tool_Temp_Dir.all);
---            Utils.Compiler_Options.Store_I_Options;
---         end if;
+         --         if not Incremental_Mode then
+         --            Change_Dir (Tool_Temp_Dir.all);
+         --            Utils.Compiler_Options.Store_I_Options;
+         --         end if;
 
          --  Create output directory if necessary
 
---         if Out_Dir /= null then
---            Parallel_Make_Dir (Out_Dir.all, Give_Message => Verbose_Mode);
---         end if;
+         --  if Out_Dir /= null then
+         --     Parallel_Make_Dir (Out_Dir.all, Give_Message => Verbose_Mode);
+         --  end if;
       end;
 
       --  In Incremental_Mode, we invoke the builder instead of doing the
       --  normal tool processing. The inner invocations of this tool invoked by
       --  the builder will do the normal tool processing.
 
---      if Utils.Options.Incremental_Mode then
---         Environment.Call_Builder;
---      else
---         Utils.Source_Table.Processing.Process_Sources;
---      end if;
+      --      if Utils.Options.Incremental_Mode then
+      --         Environment.Call_Builder;
+      --      else
+      --         Utils.Source_Table.Processing.Process_Sources;
+      --      end if;
 
       --  Create output directory if necessary
 
       if Present (Arg (Cmd, Output_Directory)) then
          declare
-            Dir : constant String := Arg (Cmd, Output_Directory).all;
+            Dir           : constant String := Arg (Cmd, Output_Directory).all;
             Cannot_Create : constant String :=
               "cannot create directory '" & Dir & "'";
             use Directories;
@@ -263,7 +263,7 @@ package body Utils.Drivers is
       Final (Tool, Cmd);
 
       if GNATCOLL.Projects."/="
-        (Tool.Project_Tree.Status, GNATCOLL.Projects.Empty)
+           (Tool.Project_Tree.Status, GNATCOLL.Projects.Empty)
       then
          GNATCOLL.Projects.Aux.Delete_All_Temp_Files
            (Tool.Project_Tree.Root_Project);
@@ -272,13 +272,13 @@ package body Utils.Drivers is
       GNATCOLL.Projects.Free (Tool.Project_Env);
       Environment.Clean_Up;
 
---      if not Utils.Options.Incremental_Mode then
---         if not Utils.Source_Table.Processing
---             .All_Files_Successfully_Processed
---         then
---            GNAT.OS_Lib.OS_Exit (1);
---         end if;
---      end if;
+      --      if not Utils.Options.Incremental_Mode then
+      --         if not Utils.Source_Table.Processing
+      --             .All_Files_Successfully_Processed
+      --         then
+      --            GNAT.OS_Lib.OS_Exit (1);
+      --         end if;
+      --      end if;
 
       Utils.Main_Done := True;
 
@@ -296,8 +296,10 @@ package body Utils.Drivers is
          GNAT.Command_Line.Try_Help;
          Environment.Clean_Up;
          GNAT.OS_Lib.OS_Exit (1);
-      when Utils.Command_Lines.Command_Line_Error_No_Help |
-        Utils.Command_Lines.Command_Line_Error_No_Tool_Name =>
+      when
+        Utils.Command_Lines.Command_Line_Error_No_Help
+        | Utils.Command_Lines.Command_Line_Error_No_Tool_Name
+      =>
          --  Error message has already been printed.
          Environment.Clean_Up;
          GNAT.OS_Lib.OS_Exit (1);

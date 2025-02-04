@@ -24,11 +24,13 @@
 with Utils.Generic_Formatted_Output;
 with Utils.String_Utilities;
 
-package Utils.Dbg_Out is new Utils.Generic_Formatted_Output
-  (Char_Type                => Character,
-   Str_Type                 => String,
-   Basic_Put_Char           => Utils.String_Utilities.Std_Err_Put_Char,
-   Output_Enabled_Initially => False);
+package Utils.Dbg_Out is new
+  Utils.Generic_Formatted_Output
+    (Char_Type                => Character,
+     Str_Type                 => String,
+     Basic_Put_Char           => Utils.String_Utilities.Std_Err_Put_Char,
+     Output_Enabled_Initially => False);
+
 --  All data is sent to Text_IO.Standard_Error. In gdb, set:
 --     Utils.Dbg_Out.Output_Enabled := True
 --  to enable debugging output, which is turned off by default.

@@ -24,7 +24,7 @@
 with Langkit_Support.Text; use Langkit_Support.Text;
 
 with Libadalang.Analysis; use Libadalang.Analysis;
-with Libadalang.Common; use Libadalang.Common;
+with Libadalang.Common;   use Libadalang.Common;
 
 with Utils.String_Utilities; use Utils.String_Utilities;
 with Utils.Vectors;
@@ -34,15 +34,14 @@ package LAL_Extensions is
    --  ???Perhaps we should move (some of?) this stuff into package
    --  Libadalang.Analysis.
 
-   package Ada_Node_Vectors is new Utils.Vectors
-     (Index_Type => Positive,
-      Element_Type => Ada_Node,
-      Elements_Array => Ada_Node_Array);
+   package Ada_Node_Vectors is new
+     Utils.Vectors
+       (Index_Type     => Positive,
+        Element_Type   => Ada_Node,
+        Elements_Array => Ada_Node_Array);
    subtype Ada_Node_Vector is Ada_Node_Vectors.Vector;
 
-   function Childx
-     (Node  : Ada_Node'Class;
-      Index : Positive) return Ada_Node;
+   function Childx (Node : Ada_Node'Class; Index : Positive) return Ada_Node;
    --  Should this replace Analysis.Child???
 
    function Contains_Kind
@@ -51,55 +50,54 @@ package LAL_Extensions is
 
    procedure Find_Iter
      (Node      : Ada_Node'Class;
-      Predicate : not null access function
-        (Node : Ada_Node'Class) return Boolean;
-      Visit     : not null access procedure
-        (Node : Ada_Node'Class));
+      Predicate :
+        not null access function (Node : Ada_Node'Class) return Boolean;
+      Visit     : not null access procedure (Node : Ada_Node'Class));
    --  Iterate over the tree in depth-first search order, calling Visit for
    --  each node that satisfies the Predicate.
 
    procedure Find_Iter
      (Node      : Ada_Node'Class;
       Node_Kind : Ada_Node_Kind_Type;
-      Visit     : not null access procedure
-        (Node : Ada_Node'Class));
+      Visit     : not null access procedure (Node : Ada_Node'Class));
    --  Iterate over the tree in depth-first search order, calling Visit for
    --  each node whose kind is Node_Kind.
 
    function Find_All
      (Node      : Ada_Node'Class;
-      Predicate : not null access function
-        (Node : Ada_Node'Class) return Boolean)
+      Predicate :
+        not null access function (Node : Ada_Node'Class) return Boolean)
       return Ada_Node_Array;
    --  Same as above, except return an array of the relevant nodes
 
    function Find_All
-     (Node      : Ada_Node'Class;
-      Node_Kind : Ada_Node_Kind_Type) return Ada_Node_Array;
+     (Node : Ada_Node'Class; Node_Kind : Ada_Node_Kind_Type)
+      return Ada_Node_Array;
    --  Same as above, except return an array of the relevant nodes
 
    function Token_Text (Tok : Token_Reference) return W_Str;
    function L_Token_Text (Tok : Token_Reference) return W_Str;
    --  Text of a token. The L_Token_Text is converted to lower case.
 
-   function Id_Name
-     (Nm : Ada_Node'Class)
-     return W_Str with
-     Pre => Kind (Nm) in Ada_Defining_Name | Ada_Identifier |
-       Ada_Int_Literal | Ada_Real_Literal |
-       Ada_String_Literal | Ada_Char_Literal;
-   function L_Name
-     (Nm : Ada_Node'Class)
-     return W_Str with
-     Pre => Kind (Nm) in Ada_Defining_Name | Ada_Identifier |
-       Ada_String_Literal;
+   function Id_Name (Nm : Ada_Node'Class) return W_Str
+   with
+     Pre =>
+       Kind (Nm)
+       in Ada_Defining_Name
+        | Ada_Identifier
+        | Ada_Int_Literal
+        | Ada_Real_Literal
+        | Ada_String_Literal
+        | Ada_Char_Literal;
+   function L_Name (Nm : Ada_Node'Class) return W_Str
+   with
+     Pre =>
+       Kind (Nm) in Ada_Defining_Name | Ada_Identifier | Ada_String_Literal;
    --  Text name of an identifier. The L_Name is converted to lower
    --  case.
 
-   function Label_Name
-     (L : Ada_Node'Class)
-     return W_Str with
-     Pre => Kind (L) = Ada_Label;
+   function Label_Name (L : Ada_Node'Class) return W_Str
+   with Pre => Kind (L) = Ada_Label;
 
    function Full_Name (Nm : Name) return W_Str;
    function L_Full_Name (Nm : Name) return W_Str;
@@ -112,22 +110,18 @@ package LAL_Extensions is
    function Get_Aspects (Decl : Basic_Decl) return Aspect_Spec;
    --  Wrapper for F_Aspects functions
 
-   function G_Formal_Part
-     (Node : Ada_Node'Class) return Generic_Formal_Part;
+   function G_Formal_Part (Node : Ada_Node'Class) return Generic_Formal_Part;
    --  Return the generic formal part of a generic unit.
 
-   function Vis_Part
-     (Node : Ada_Node'Class) return Public_Part;
+   function Vis_Part (Node : Ada_Node'Class) return Public_Part;
    --  Return the visible part of a package, generic package, task decl, or
    --  protected decl.
 
-   function Priv_Part
-     (Node : Ada_Node'Class) return Private_Part;
+   function Priv_Part (Node : Ada_Node'Class) return Private_Part;
    --  Return the private part of a package, generic package, task decl, or
    --  protected decl.
 
-   function Body_Decls
-     (Node : Ada_Node'Class) return Declarative_Part;
+   function Body_Decls (Node : Ada_Node'Class) return Declarative_Part;
    --  Return the declarative part of a body
 
    function Text_To_W_Str (X : Text_Type) return W_Str;

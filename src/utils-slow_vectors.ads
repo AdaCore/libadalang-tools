@@ -30,7 +30,8 @@ generic
 
    with function "=" (Left, Right : Element_Type) return Boolean is <>;
 
-package Utils.Slow_Vectors is
+package Utils.Slow_Vectors
+is
 
    --  This is a wrapper around Ada.Containers.Vectors that provides a few
    --  extra operations. The intended usage of an instance X_Vectors is:
@@ -38,17 +39,15 @@ package Utils.Slow_Vectors is
    --     use X_Vectors;
    --     use all type X_Vector;
 
-   package Vectors is new Ada.Containers.Vectors
-     (Index_Type,
-      Element_Type,
-      "=");
+   package Vectors is new
+     Ada.Containers.Vectors (Index_Type, Element_Type, "=");
 
    subtype Vector is Vectors.Vector;
 
    --  Renamings of things that "use all type" won't make visible:
 
    subtype Extended_Index is Vectors.Extended_Index;
-   No_Index : Extended_Index renames Vectors.No_Index;
+   No_Index     : Extended_Index renames Vectors.No_Index;
    Empty_Vector : Vector renames Vectors.Empty_Vector;
    generic package Generic_Sorting renames Vectors.Generic_Sorting;
 
@@ -58,14 +57,12 @@ package Utils.Slow_Vectors is
    --  Same as Clear, but also frees storage
 
    function Slice
-     (V     : Vector;
-      First : Index_Type;
-      Last  : Vectors.Extended_Index)
-      return  Elements_Array with
-      Post => Slice'Result'First = Index_Type'First;
+     (V : Vector; First : Index_Type; Last : Vectors.Extended_Index)
+      return Elements_Array
+   with Post => Slice'Result'First = Index_Type'First;
 
-   function To_Array (V : Vector) return Elements_Array with
-      Post => To_Array'Result'First = Index_Type'First;
+   function To_Array (V : Vector) return Elements_Array
+   with Post => To_Array'Result'First = Index_Type'First;
 
    procedure Append (V : in out Vector; A : Elements_Array);
 

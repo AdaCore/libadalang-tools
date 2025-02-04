@@ -24,14 +24,15 @@
 with Ada.Containers.Ordered_Maps;
 
 with TGen.Context; use TGen.Context;
-with TGen.Types; use TGen.Types;
+with TGen.Types;   use TGen.Types;
 
 package TGen.Dependency_Graph is
 
-   package Typ_Maps is new Ada.Containers.Ordered_Maps
-     (Key_Type     => SP.Ref,
-      Element_Type => Typ_Set,
-      "="          => Typ_Sets."=");
+   package Typ_Maps is new
+     Ada.Containers.Ordered_Maps
+       (Key_Type     => SP.Ref,
+        Element_Type => Typ_Set,
+        "="          => Typ_Sets."=");
    subtype Typ_Map is Typ_Maps.Map;
 
    function Type_Dependencies
@@ -41,18 +42,17 @@ package TGen.Dependency_Graph is
    --  the transitive closure of types on which self depends.
 
    type Graph_Type is record
-      Nodes : Typ_Set;
+      Nodes      : Typ_Set;
       Succ, Pred : Typ_Map;
    end record;
 
    procedure Create_Node (G : in out Graph_Type; New_Node : SP.Ref);
 
    procedure Create_Edge (G : in out Graph_Type; From, To : SP.Ref)
-     with Pre => G.Nodes.Contains (From) and then G.Nodes.Contains (To);
+   with Pre => G.Nodes.Contains (From) and then G.Nodes.Contains (To);
 
    procedure Traverse
-     (G        : Graph_Type;
-      Callback : access procedure (N : SP.Ref));
+     (G : Graph_Type; Callback : access procedure (N : SP.Ref));
    --  Traverse the graph in the topological order and call callback on every
    --  node.
 

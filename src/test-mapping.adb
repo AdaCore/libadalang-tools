@@ -23,15 +23,15 @@
 
 pragma Ada_2012;
 
-with Test.Common;            use Test.Common;
+with Test.Common; use Test.Common;
 
-with GNAT.Directory_Operations;  use GNAT.Directory_Operations;
+with GNAT.Directory_Operations; use GNAT.Directory_Operations;
 
-with Ada.Strings;                use Ada.Strings;
-with Ada.Strings.Fixed;          use Ada.Strings.Fixed;
+with Ada.Strings;       use Ada.Strings;
+with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 
-with GNATCOLL.Traces;            use GNATCOLL.Traces;
-with GNATCOLL.VFS;               use GNATCOLL.VFS;
+with GNATCOLL.Traces; use GNATCOLL.Traces;
+with GNATCOLL.VFS;    use GNATCOLL.VFS;
 
 package body Test.Mapping is
 
@@ -72,8 +72,7 @@ package body Test.Mapping is
    -- Add_Stub_List --
    -------------------
 
-   procedure Add_Stub_List (Name : String; Info : Stub_Unit_Mapping)
-   is
+   procedure Add_Stub_List (Name : String; Info : Stub_Unit_Mapping) is
       M : Mapping_Type;
    begin
       Trace (Me, "adding stub list for " & Name);
@@ -106,10 +105,10 @@ package body Test.Mapping is
    ---------------------------
 
    procedure Generate_Mapping_File is
-      TC : TC_Mapping;
-      TR : TR_Mapping;
-      TP : TP_Mapping;
-      DT : DT_Mapping;
+      TC      : TC_Mapping;
+      TR      : TR_Mapping;
+      TP      : TP_Mapping;
+      DT      : DT_Mapping;
       TP_List : TP_Mapping_List.List;
 
       TC_Cur : TC_Mapping_List.Cursor;
@@ -118,21 +117,19 @@ package body Test.Mapping is
       SP_Cur : SP_Mapping.Cursor;
       DT_Cur : DT_Mapping_List.Cursor;
 
-      SI : Stub_Unit_Mapping;
-      ES : Entity_Stub_Mapping;
-      ES_Cur : Entity_Stub_Mapping_List.Cursor;
+      SI       : Stub_Unit_Mapping;
+      ES       : Entity_Stub_Mapping;
+      ES_Cur   : Entity_Stub_Mapping_List.Cursor;
       Sloc_Cur : ES_List.Cursor;
 
-      UTP : User_Test_Package;
+      UTP     : User_Test_Package;
       UTP_Cur : UTP_Mapping_List.Cursor;
 
-      function Get_Path_Relative_To_XML (Path : String) return String is
-         (+Relative_Path (Create (+Path), Create (+Harness_Dir.all)));
+      function Get_Path_Relative_To_XML (Path : String) return String
+      is (+Relative_Path (Create (+Path), Create (+Harness_Dir.all)));
    begin
       Trace (Me, "generating mapping file");
-      Create (Harness_Dir.all &
-              Directory_Separator &
-              "gnattest.xml");
+      Create (Harness_Dir.all & Directory_Separator & "gnattest.xml");
 
       if Generate_Separates then
          S_Put (0, "<tests_mapping mode=""separates"">");
@@ -147,9 +144,9 @@ package body Test.Mapping is
 
          S_Put
            (3,
-            "<unit source_file=""" &
-            Base_Name (SP_Mapping.Key (SP_Cur)) &
-            """>");
+            "<unit source_file="""
+            & Base_Name (SP_Mapping.Key (SP_Cur))
+            & """>");
          Put_New_Line;
 
          TP_List := SP_Mapping.Element (SP_Cur).Test_Info;
@@ -160,33 +157,29 @@ package body Test.Mapping is
 
                TP := TP_Mapping_List.Element (TP_Cur);
 
-               S_Put
-                 (6,
-                  "<test_unit target_file=""" &
-                    TP.TP_Name.all &
-                    """>");
+               S_Put (6, "<test_unit target_file=""" & TP.TP_Name.all & """>");
                Put_New_Line;
 
                if TP.SetUp_Name /= null then
                   S_Put
                     (9,
-                     "<setup file=""" &
-                       TP.SetUp_Name.all &
-                       """ name=""Set_Up"" line=""" &
-                       Trim (Natural'Image (TP.SetUp_Line), Both) &
-                       """  column=""" &
-                       Trim (Natural'Image (TP.SetUp_Column), Both) &
-                       """/>");
+                     "<setup file="""
+                     & TP.SetUp_Name.all
+                     & """ name=""Set_Up"" line="""
+                     & Trim (Natural'Image (TP.SetUp_Line), Both)
+                     & """  column="""
+                     & Trim (Natural'Image (TP.SetUp_Column), Both)
+                     & """/>");
                   Put_New_Line;
                   S_Put
                     (9,
-                     "<teardown file=""" &
-                       TP.TearDown_Name.all &
-                       """ name=""Tear_Down"" line=""" &
-                       Trim (Natural'Image (TP.TearDown_Line), Both) &
-                       """  column=""" &
-                       Trim (Natural'Image (TP.TearDown_Column), Both) &
-                       """/>");
+                     "<teardown file="""
+                     & TP.TearDown_Name.all
+                     & """ name=""Tear_Down"" line="""
+                     & Trim (Natural'Image (TP.TearDown_Line), Both)
+                     & """  column="""
+                     & Trim (Natural'Image (TP.TearDown_Column), Both)
+                     & """/>");
                   Put_New_Line;
                end if;
 
@@ -198,13 +191,13 @@ package body Test.Mapping is
 
                   S_Put
                     (9,
-                     "<tested name=""" &
-                       TR.TR_Name.all &
-                       """ line=""" &
-                       Trim (Natural'Image (TR.Line), Both) &
-                       """ column=""" &
-                       Trim (Natural'Image (TR.Column), Both) &
-                       """>");
+                     "<tested name="""
+                     & TR.TR_Name.all
+                     & """ line="""
+                     & Trim (Natural'Image (TR.Line), Both)
+                     & """ column="""
+                     & Trim (Natural'Image (TR.Column), Both)
+                     & """>");
                   Put_New_Line;
 
                   TC_Cur := TR.TC_List.First;
@@ -215,13 +208,13 @@ package body Test.Mapping is
 
                      S_Put
                        (12,
-                        "<test_case name=""" &
-                          TC.TC_Name.all &
-                          """ line=""" &
-                          Trim (Natural'Image (TC.Line), Both) &
-                          """ column=""" &
-                          Trim (Natural'Image (TC.Column), Both) &
-                          """>");
+                        "<test_case name="""
+                        & TC.TC_Name.all
+                        & """ line="""
+                        & Trim (Natural'Image (TC.Line), Both)
+                        & """ column="""
+                        & Trim (Natural'Image (TC.Column), Both)
+                        & """>");
                      Put_New_Line;
                      S_Put
                        (15,
@@ -230,10 +223,10 @@ package body Test.Mapping is
                         & """ line="""
                         & Trim (Natural'Image (TC.TR_Line), Both)
                         & """ column=""1"""
-                        & " name=""" & TC.T_Name.all & """");
-                     S_Put (0, " timestamp="""
-                            & TC.Test_Time.all
-                            & """/>");
+                        & " name="""
+                        & TC.T_Name.all
+                        & """");
+                     S_Put (0, " timestamp=""" & TC.Test_Time.all & """/>");
                      Put_New_Line;
                      S_Put (12, "</test_case>");
                      Put_New_Line;
@@ -338,10 +331,10 @@ package body Test.Mapping is
                  (12,
                   "<stub line="""
                   & Trim
-                    (Natural'Image (ES_List.Element (Sloc_Cur).Line), Both)
+                      (Natural'Image (ES_List.Element (Sloc_Cur).Line), Both)
                   & """ column="""
                   & Trim
-                    (Natural'Image (ES_List.Element (Sloc_Cur).Column), Both)
+                      (Natural'Image (ES_List.Element (Sloc_Cur).Column), Both)
                   & """/>");
                Put_New_Line;
                Next (Sloc_Cur);
@@ -357,10 +350,10 @@ package body Test.Mapping is
                  (12,
                   "<setter line="""
                   & Trim
-                    (Natural'Image (ES_List.Element (Sloc_Cur).Line), Both)
+                      (Natural'Image (ES_List.Element (Sloc_Cur).Line), Both)
                   & """ column="""
                   & Trim
-                    (Natural'Image (ES_List.Element (Sloc_Cur).Column), Both)
+                      (Natural'Image (ES_List.Element (Sloc_Cur).Column), Both)
                   & """/>");
                Put_New_Line;
                Next (Sloc_Cur);
@@ -517,13 +510,18 @@ package body Test.Mapping is
                for TR of TP.TR_List loop
                   S_Put
                     (6,
-                     (if Index = 1 then "if" else "elsif") & " SLOC = """
-                     & Src & ":" & Trim (TR.Decl_Line'Img, Both) & """ then");
+                     (if Index = 1 then "if" else "elsif")
+                     & " SLOC = """
+                     & Src
+                     & ":"
+                     & Trim (TR.Decl_Line'Img, Both)
+                     & """ then");
                   Put_New_Line;
                   S_Put
                     (9,
                      "Filter.Selection ("
-                     & Trim (Index'Img, Both) & ") := True;");
+                     & Trim (Index'Img, Both)
+                     & ") := True;");
                   Put_New_Line;
                   Index := Index + 1;
                end loop;
@@ -555,7 +553,8 @@ package body Test.Mapping is
       First_TC_Ever : Boolean := True;
       First_Auto_TC : Boolean;
 
-      function Put_If return Boolean is (Index = 1 and First_TC_Ever);
+      function Put_If return Boolean
+      is (Index = 1 and First_TC_Ever);
       --  Tells whether we should put IF instead of ELSIF
    begin
       SP_Cur := Mapping.First;
@@ -580,16 +579,17 @@ package body Test.Mapping is
                      --  different names so generate a different filter for
                      --  each one of them.
 
-                     if TC.Origin = Test_Case_Pragma or else First_Auto_TC
-                     then
+                     if TC.Origin = Test_Case_Pragma or else First_Auto_TC then
                         S_Put
                           (9,
                            (if Put_If then "if" else "elsif")
                            & " Starts_With (SLOC, """
-                           & Src & ":" & Trim (TC.Line'Img, Both)
+                           & Src
+                           & ":"
+                           & Trim (TC.Line'Img, Both)
                            & ":"") then");
-                        if TC.Origin in Gnattest_Generated
-                          | Test_Case_Generated
+                        if TC.Origin
+                           in Gnattest_Generated | Test_Case_Generated
                         then
                            First_Auto_TC := False;
                         end if;
@@ -598,7 +598,8 @@ package body Test.Mapping is
                         S_Put
                           (12,
                            "return Filter.Selection ("
-                           & Trim (Index'Img, Both) & ");");
+                           & Trim (Index'Img, Both)
+                           & ");");
                         Put_New_Line;
                      end if;
                   end loop;

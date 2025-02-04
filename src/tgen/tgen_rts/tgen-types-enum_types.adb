@@ -34,14 +34,14 @@ package body TGen.Types.Enum_Types is
       return Typ (Self).Image & ": Boolean";
    end Image;
 
-   function Lit_Image (Self : Bool_Typ; Lit : Big_Integer) return String is
-      (if Big_Int."=" (Lit, Big_Zero) then "False" else "True");
+   function Lit_Image (Self : Bool_Typ; Lit : Big_Integer) return String
+   is (if Big_Int."=" (Lit, Big_Zero) then "False" else "True");
    --  This isn't strictly correct, but this function should only be called
    --  with values of Lit being 0 or 1, given that these are the values that
    --  LAL will return when evaluating boolean static values.
 
-   function High_Bound (Self : Bool_Typ) return Big_Integer is
-     (Big_Int.To_Big_Integer (1));
+   function High_Bound (Self : Bool_Typ) return Big_Integer
+   is (Big_Int.To_Big_Integer (1));
    --  1 is the value representing True for boolean in the LAL static
    --  expression evaluator so use this value for now.
 
@@ -58,20 +58,24 @@ package body TGen.Types.Enum_Types is
          Res := Res & " range ";
          case Self.Range_Value.Low_Bound.Kind is
             when Static =>
-               Res := Res & Self.Lit_Image
-                 (Self.Range_Value.Low_Bound.Int_Val);
+               Res :=
+                 Res & Self.Lit_Image (Self.Range_Value.Low_Bound.Int_Val);
+
             when Discriminant =>
                Append (Res, +Self.Range_Value.Low_Bound.Disc_Name);
+
             when Non_Static =>
                Append (Res, +Self.Range_Value.Low_Bound.Text);
          end case;
          Res := Res & " .. ";
          case Self.Range_Value.High_Bound.Kind is
             when Static =>
-               Res := Res & Self.Lit_Image
-                 (Self.Range_Value.High_Bound.Int_Val);
+               Res :=
+                 Res & Self.Lit_Image (Self.Range_Value.High_Bound.Int_Val);
+
             when Discriminant =>
                Append (Res, +Self.Range_Value.High_Bound.Disc_Name);
+
             when Non_Static =>
                Append (Res, +Self.Range_Value.High_Bound.Text);
          end case;
@@ -81,55 +85,52 @@ package body TGen.Types.Enum_Types is
 
    function Lit_Image (Self : Char_Typ; Lit : Big_Integer) return String is
       Res : constant String :=
-        [1 => Character'Val (Long_Long_Integer'Value
-                               (Big_Int.To_String (Lit)))];
+        [1 =>
+           Character'Val (Long_Long_Integer'Value (Big_Int.To_String (Lit)))];
       --  Wide_Wide_Character is 32 bits wide so we should be fine with
       --  Long_Long_Integer
    begin
       return "'" & Res & "'";
    end Lit_Image;
 
-   function High_Bound (Self : Char_Typ) return Big_Integer is
-   (if Self.Has_Range
-    then Self.Range_Value.High_Bound.Int_Val
-    else Big_Int.To_Big_Integer (Character'Pos ('~')));
+   function High_Bound (Self : Char_Typ) return Big_Integer
+   is (if Self.Has_Range then Self.Range_Value.High_Bound.Int_Val
+       else Big_Int.To_Big_Integer (Character'Pos ('~')));
    --  Although Char_Typ represents Character, Wide_Character and
    --  Wide_Wide_Character, we'll conservatively use ~ (last printable ASCII
    --  character) as the high bound.
 
-   function Low_Bound (Self : Char_Typ) return Big_Integer is
-     (if Self.Has_Range
-      then Self.Range_Value.Low_Bound.Int_Val
-      else Big_Int.To_Big_Integer (Character'Pos (' ')));
+   function Low_Bound (Self : Char_Typ) return Big_Integer
+   is (if Self.Has_Range then Self.Range_Value.Low_Bound.Int_Val
+       else Big_Int.To_Big_Integer (Character'Pos (' ')));
    --  The space is not the first element of Character but we won't generate
    --  non printable characters as they need to be unparsable in sources.
 
-   function Generate_Value_Char_Typ
-     (Ty : Typ'Class) return JSON_Value;
+   function Generate_Value_Char_Typ (Ty : Typ'Class) return JSON_Value;
 
    -----------------------------
    -- Generate_Value_Char_Typ --
    -----------------------------
 
-   function Generate_Value_Char_Typ (Ty : Typ'Class) return JSON_Value
-   is
+   function Generate_Value_Char_Typ (Ty : Typ'Class) return JSON_Value is
       --  Let's use only the standard characters in the ASCII table. Others
       --  can't be represented as Character literals. Improvements TODO.
 
       LB : constant Natural :=
         (if Char_Typ (Ty).Has_Range
-         then Nat_Conversions.From_Big_Integer
-           (Char_Typ (Ty).Range_Value.Low_Bound.Int_Val)
+         then
+           Nat_Conversions.From_Big_Integer
+             (Char_Typ (Ty).Range_Value.Low_Bound.Int_Val)
          else Character'Pos (' '));
 
       HB : constant Natural :=
         (if Char_Typ (Ty).Has_Range
-         then Nat_Conversions.From_Big_Integer
-           (Char_Typ (Ty).Range_Value.High_Bound.Int_Val)
+         then
+           Nat_Conversions.From_Big_Integer
+             (Char_Typ (Ty).Range_Value.High_Bound.Int_Val)
          else Character'Pos ('~'));
 
-      Lit : constant Integer :=
-        Rand_Int (Min => LB, Max => HB);
+      Lit : constant Integer := Rand_Int (Min => LB, Max => HB);
    begin
       return Create (Big_Int.To_Big_Integer (Lit));
    end Generate_Value_Char_Typ;
@@ -138,8 +139,7 @@ package body TGen.Types.Enum_Types is
    -- Default_Strategy --
    ----------------------
 
-   function Default_Strategy (Self : Char_Typ) return Strategy_Type'Class
-   is
+   function Default_Strategy (Self : Char_Typ) return Strategy_Type'Class is
       Strat : Basic_Strategy_Type;
    begin
       SP.From_Element (Strat.T, Self'Unrestricted_Access);
@@ -150,36 +150,37 @@ package body TGen.Types.Enum_Types is
    function Image (Self : Other_Enum_Typ) return String is
    begin
       return
-        Typ (Self).Image & ": Enum"
+        Typ (Self).Image
+        & ": Enum"
         & (if Self.Is_Static
-           then " range "
-                & (+Self.Literals.First_Element)
-                & " .. " & (+Self.Literals.Last_Element)
+           then
+             " range "
+             & (+Self.Literals.First_Element)
+             & " .. "
+             & (+Self.Literals.Last_Element)
            else " (non static)");
    end Image;
 
-   function Lit_Image
-     (Self : Other_Enum_Typ; Lit : Big_Integer) return String is
-      (+Self.Literals.Element (Lit));
+   function Lit_Image (Self : Other_Enum_Typ; Lit : Big_Integer) return String
+   is (+Self.Literals.Element (Lit));
 
-   function Low_Bound (Self : Other_Enum_Typ) return Big_Integer is
-     (Self.Literals.First_Key);
+   function Low_Bound (Self : Other_Enum_Typ) return Big_Integer
+   is (Self.Literals.First_Key);
 
-   function High_Bound (Self : Other_Enum_Typ) return Big_Integer is
-     (Self.Literals.Last_Key);
+   function High_Bound (Self : Other_Enum_Typ) return Big_Integer
+   is (Self.Literals.Last_Key);
 
    ------------
    -- Encode --
    ------------
 
-   function Encode (Self : Char_Typ; Val : JSON_Value) return JSON_Value is
-     (Create (Self.Lit_Image (Val.Get)));
+   function Encode (Self : Char_Typ; Val : JSON_Value) return JSON_Value
+   is (Create (Self.Lit_Image (Val.Get)));
 
-   function Encode (Self : Bool_Typ; Val : JSON_Value) return JSON_Value is
-     (Create (Self.Lit_Image (Val.Get)));
+   function Encode (Self : Bool_Typ; Val : JSON_Value) return JSON_Value
+   is (Create (Self.Lit_Image (Val.Get)));
 
-   function Encode
-     (Self : Other_Enum_Typ; Val : JSON_Value) return JSON_Value is
-     (Create (Self.Lit_Image (Val.Get)));
+   function Encode (Self : Other_Enum_Typ; Val : JSON_Value) return JSON_Value
+   is (Create (Self.Lit_Image (Val.Get)));
 
 end TGen.Types.Enum_Types;

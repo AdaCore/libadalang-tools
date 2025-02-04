@@ -27,19 +27,19 @@ with Ada.Containers.Indefinite_Vectors;
 with Libadalang.Analysis;
 
 with Utils.Vectors;
-with Utils.Char_Vectors; use Utils.Char_Vectors;
+with Utils.Char_Vectors;       use Utils.Char_Vectors;
 use Utils.Char_Vectors.WChar_Vectors;
 with Utils.Symbols;
 with Utils.Predefined_Symbols; use Utils.Predefined_Symbols;
 with Utils.Command_Lines;
-with Pp.Buffers; use Pp.Buffers;
+with Pp.Buffers;               use Pp.Buffers;
 with Pp.Scanner;
 
 package Pp.Formatting is
 
    package Syms renames Utils.Symbols;
 
-   Token_Mismatch : exception;
+   Token_Mismatch       : exception;
    --  Raised by Tree_To_Ada if it detects a bug in itself that causes the
    --  output tokens to not match the input properly.
    Partial_GNATPP_Error : exception;
@@ -55,7 +55,7 @@ package Pp.Formatting is
      Nesting_Level'Base range 0 .. Nesting_Level'Last;
 
    type Line_Break is record
-      Tok : Scanner.Tokn_Cursor;
+      Tok      : Scanner.Tokn_Cursor;
       --  Cursor in New_Tokns or Saved_New_Tokns of the Line_Break_Token. These
       --  become invalid as soon as New_Tokns is modified.
       Tokn_Val : Scanner.Token;
@@ -64,13 +64,13 @@ package Pp.Formatting is
       --  invalidated because the token stream was modified. This can be
       --  removed for better efficiency.
 
-      Hard : Boolean;
+      Hard                       : Boolean;
       --  True for a hard line break, False for a soft one
-      Affects_Comments : Boolean;
+      Affects_Comments           : Boolean;
       --  True if the indentation of this Line_Break should affect the
       --  indentation of surrounding comments. For example, True for '$' but
       --  False for '$1' (see type Ada_Template).
-      Enabled : Boolean;
+      Enabled                    : Boolean;
       --  True if this line break will appear in the final output
       Source_Line_Breaks_Enabled : Boolean;
       --  True if the Source_Line_Breaks switch is given, and a line break
@@ -80,7 +80,7 @@ package Pp.Formatting is
       --  in the source where Convert_Tree_To_Ada did not generate one, then we
       --  must insert a new one, rather than enabling an existing one.
 
-      Level : Nesting_Level := 1000;
+      Level       : Nesting_Level := 1000;
       --  Nesting level of [...] (continuation-line indentation, mainly for
       --  soft line breaks).
       Indentation : Natural := 1000;
@@ -103,17 +103,15 @@ package Pp.Formatting is
 
       --  For debugging:
 
---  ????      Kind     : Ada_Tree_Kind;
---  This is left over from the ASIS-based version. Not clear
---  whether we should reinstate this debug info.
+      --  ????      Kind     : Ada_Tree_Kind;
+      --  This is left over from the ASIS-based version. Not clear
+      --  whether we should reinstate this debug info.
    end record; -- Line_Break
 
    type Line_Break_Index is new Positive;
    type Line_Break_Array is array (Line_Break_Index range <>) of Line_Break;
-   package Line_Break_Vectors is new Utils.Vectors
-     (Line_Break_Index,
-      Line_Break,
-      Line_Break_Array);
+   package Line_Break_Vectors is new
+     Utils.Vectors (Line_Break_Index, Line_Break, Line_Break_Array);
    subtype Line_Break_Vector is Line_Break_Vectors.Vector;
 
    use Line_Break_Vectors;
@@ -122,10 +120,11 @@ package Pp.Formatting is
    type Line_Break_Index_Index is new Positive;
    type Line_Break_Index_Array is
      array (Line_Break_Index_Index range <>) of Line_Break_Index;
-   package Line_Break_Index_Vectors is new Utils.Vectors
-     (Line_Break_Index_Index,
-      Line_Break_Index,
-      Line_Break_Index_Array);
+   package Line_Break_Index_Vectors is new
+     Utils.Vectors
+       (Line_Break_Index_Index,
+        Line_Break_Index,
+        Line_Break_Index_Array);
    subtype Line_Break_Index_Vector is Line_Break_Index_Vectors.Vector;
    use Line_Break_Index_Vectors;
 
@@ -158,23 +157,23 @@ package Pp.Formatting is
    --  templates, as in "^2".
 
    type Tab_Rec is record
-      Parent, Tree : Libadalang.Analysis.Ada_Node;
+      Parent, Tree       : Libadalang.Analysis.Ada_Node;
       --  Tree is the tree whose template generated this tab, and Parent is its
       --  parent. Tree is used to ensure that the relevant tabs within a single
       --  line all come from the same tree; other tabs in the line are ignored.
       --  Parent is used across lines to ensure that all lines within a
       --  paragraph to be aligned together all come from the same parent tree.
-      Token : Syms.Symbol := Name_Empty;
+      Token              : Syms.Symbol := Name_Empty;
       --  This is some text associated with the Tab. Usually, it is the text of
       --  the token that follows the Tab in the template.
-      Insertion_Point : Scanner.Tokn_Cursor;
+      Insertion_Point    : Scanner.Tokn_Cursor;
       --  Position in Saved_New_Tokns of the tab token
-      Index_In_Line   : Tab_Index_In_Line := Tab_Index_In_Line'Last;
-      Col             : Positive          := Positive'Last;
+      Index_In_Line      : Tab_Index_In_Line := Tab_Index_In_Line'Last;
+      Col                : Positive := Positive'Last;
       --  Column number of the tab
-      Num_Blanks : Natural := 0;
+      Num_Blanks         : Natural := 0;
       --  Number of blanks this tab should expand into
-      Is_Fake : Boolean;
+      Is_Fake            : Boolean;
       --  True if this is a "fake tab", which means that it doesn't actually
       --  insert any blanks (Num_Blanks = 0). See Append_Tab for more
       --  explanation.
@@ -186,7 +185,7 @@ package Pp.Formatting is
       --  right-justification.
       --  See Tree_To_Ada.Insert_Alignment.Calculate_Num_Blanks.Process_Line in
       --  pp-formatting.adb for more information.
-      Deleted : Boolean := False;
+      Deleted            : Boolean := False;
       --  True if this tab has been logically deleted. This happens when a real
       --  tab replaces a fake tab.
    end record;
@@ -199,17 +198,18 @@ package Pp.Formatting is
    use Tab_Vectors;
    --  use all type Tab_Vector;
 
-   package Tab_In_Line_Vectors is new Ada.Containers.Bounded_Vectors
-     (Tab_Index_In_Line, Tab_Index);
+   package Tab_In_Line_Vectors is new
+     Ada.Containers.Bounded_Vectors (Tab_Index_In_Line, Tab_Index);
    use Tab_In_Line_Vectors;
    subtype Tab_In_Line_Vector is
      Tab_In_Line_Vectors.Vector
        (Capacity => Ada.Containers.Count_Type (Tab_Index_In_Line'Last));
 
    type Tab_In_Line_Vector_Index is new Positive;
-   package Tab_In_Line_Vector_Vectors is new Ada.Containers.Indefinite_Vectors
-     (Tab_In_Line_Vector_Index,
-      Tab_In_Line_Vector);
+   package Tab_In_Line_Vector_Vectors is new
+     Ada.Containers.Indefinite_Vectors
+       (Tab_In_Line_Vector_Index,
+        Tab_In_Line_Vector);
    --  We use Indefinite_Vectors rather than Vectors because otherwise we get
    --  "discriminant check failed" at a-cobove.ads:371. I'm not sure whether
    --  that's a compiler bug.
@@ -222,7 +222,7 @@ package Pp.Formatting is
       --  final result. We initially generate New_Tokns, then Tokns_To_Buffer
       --  converts that to Out_Buf for the last few phases.
 
-      First_Line_Offset   : Natural := 0;
+      First_Line_Offset : Natural := 0;
 
       Initial_Indentation : Natural := 0;
       Cur_Indentation     : Natural := 0;
@@ -247,7 +247,7 @@ package Pp.Formatting is
 
       Enabled_LBI : Line_Break_Index_Vector;
       --  All enabled line breaks
-      Syntax_LBI : Line_Break_Index_Vector;
+      Syntax_LBI  : Line_Break_Index_Vector;
       --  All (enabled) nonblank hard line breaks. These are called
       --  "Syntax_..."  because they are determined by the syntax (e.g. we
       --  always put a line break after a statement).
@@ -277,8 +277,8 @@ package Pp.Formatting is
 
    procedure Do_Comments_Only
      (Lines_Data_P : Lines_Data_Ptr;
-      Src_Buf : in out Buffer;
-      Cmd : Utils.Command_Lines.Command_Line);
+      Src_Buf      : in out Buffer;
+      Cmd          : Utils.Command_Lines.Command_Line);
    --  Implement the --comments-only switch. This skips most of the usual
    --  pretty-printing passes, and just formats comments.
 
@@ -304,8 +304,7 @@ package Pp.Formatting is
    --  Dump out all the token sequences
 
    function Line_Text
-     (Lines_Data : Lines_Data_Rec;
-      F, L : Line_Break_Index_Index) return W_Str;
+     (Lines_Data : Lines_Data_Rec; F, L : Line_Break_Index_Index) return W_Str;
    --  F and L are the first and last index forming a line; returns the text of
    --  the line, not including any new-lines. ???This doesn't work since the
    --  conversion to token vectors, because Out_Buf is not set until near the
@@ -324,11 +323,11 @@ package Pp.Formatting is
      (Lines_Data : Lines_Data_Rec; Message : String);
 
    Simulate_Token_Mismatch : Boolean renames Debug_Flag_8;
-   Disable_Final_Check : Boolean renames Debug_Flag_7;
-   function Enable_Token_Mismatch return Boolean is
-      ((Assert_Enabled or Debug_Flag_5)
-         and not Simulate_Token_Mismatch
-         and not Debug_Flag_6);
+   Disable_Final_Check     : Boolean renames Debug_Flag_7;
+   function Enable_Token_Mismatch return Boolean
+   is ((Assert_Enabled or Debug_Flag_5)
+       and not Simulate_Token_Mismatch
+       and not Debug_Flag_6);
 
    procedure Assert_No_LB (Lines_Data : Lines_Data_Rec);
    --  Assert that all the lines-break data is empty

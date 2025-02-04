@@ -22,12 +22,14 @@
 ------------------------------------------------------------------------------
 
 with Ada.Command_Line;
-with Ada.Containers; use type Ada.Containers.Count_Type;
+with Ada.Containers;
+use type Ada.Containers.Count_Type;
 with Ada.Environment_Variables;
 with Ada.IO_Exceptions;
 with Ada.Strings.Unbounded;
 
-with Interfaces; use type Interfaces.Unsigned_16;
+with Interfaces;
+use type Interfaces.Unsigned_16;
 
 with GNAT.OS_Lib; use GNAT.OS_Lib;
 
@@ -36,10 +38,12 @@ with GNATCOLL.VFS;      use GNATCOLL.VFS;
 with GNATCOLL.Projects; use GNATCOLL.Projects;
 with GNATCOLL.Traces;
 
-with Libadalang;     use Libadalang;
+with Libadalang; use Libadalang;
 with Libadalang.Project_Provider;
 
-with Utils.Command_Lines.Common; use Utils; use Utils.Command_Lines.Common;
+with Utils.Command_Lines.Common;
+use Utils;
+use Utils.Command_Lines.Common;
 pragma Unreferenced (Utils.Command_Lines.Common); -- ????
 with Utils.Formatted_Output;
 
@@ -57,8 +61,8 @@ with Test.Harness.Source_Table;
 with Test.Generation;
 with Test.Suite_Min;
 
-with Ada.Directories; use Ada.Directories;
-with Utils.Projects; use Utils.Projects;
+with Ada.Directories;         use Ada.Directories;
+with Utils.Projects;          use Utils.Projects;
 with GNAT.Directory_Operations;
 with Ada.Characters.Handling; use Ada.Characters.Handling;
 with Ada.Text_IO;
@@ -68,15 +72,14 @@ with TGen.Libgen;
 
 package body Test.Actions is
 
-   SPT : GNATCOLL.Projects.Project_Tree renames
-     Test.Common.Source_Project_Tree;
+   SPT : GNATCOLL.Projects.Project_Tree
+     renames Test.Common.Source_Project_Tree;
 
    function Is_Externally_Built (File : Virtual_File) return Boolean;
    --  Checks if the given source file belongs to an externally build library
 
    procedure Process_Exclusion_List
-     (Value        : String;
-      From_Project : Boolean := False);
+     (Value : String; From_Project : Boolean := False);
    --  Processes value of --exclude-from-stubbing switch. If values come from
    --  project attributes they do not override already stored ones.
 
@@ -98,9 +101,7 @@ package body Test.Actions is
    --  between stub and test dirs.
 
    function Non_Null_Intersection
-     (Left  : File_Array_Access;
-      Right : File_Array)
-      return Boolean;
+     (Left : File_Array_Access; Right : File_Array) return Boolean;
    --  Returns True if two file arrays have at least one common file.
 
    procedure Process_Additional_Tests
@@ -129,9 +130,7 @@ package body Test.Actions is
    -- Init --
    ----------
 
-   procedure Init
-     (Tool : in out Test_Tool; Cmd : in out Command_Line)
-   is
+   procedure Init (Tool : in out Test_Tool; Cmd : in out Command_Line) is
       Tmp   : GNAT.OS_Lib.String_Access;
       Files : File_Array_Access;
 
@@ -149,8 +148,7 @@ package body Test.Actions is
 
       function Build_Att_String
         (Attribute_Name : String) return Attribute_Pkg_String
-      is
-        (Build (Test.Common.GT_Package, Attribute_Name));
+      is (Build (Test.Common.GT_Package, Attribute_Name));
 
       --  Flags for default output dirs being set explicitly:
       Stub_Dir_Set    : Boolean := False;
@@ -171,20 +169,19 @@ package body Test.Actions is
         (Second_Output_Mode : Output_Mode_Type;
          From_Project       : Boolean := False)
       is
-         function Mode_Image_Cmd (M : Output_Mode_Type) return String is
-           (case M is
-                when Root_Mode   => "--tests-root",
-                when Subdir_Mode => "--subdirs",
-                when Direct_Mode => "--tests-dir");
+         function Mode_Image_Cmd (M : Output_Mode_Type) return String
+         is (case M is
+               when Root_Mode => "--tests-root",
+               when Subdir_Mode => "--subdirs",
+               when Direct_Mode => "--tests-dir");
 
-         function Mode_Image_Att (M : Output_Mode_Type) return String is
-           (case M is
-                when Root_Mode   => "Tests_Root",
-                when Subdir_Mode => "Subdir",
-                when Direct_Mode => "Tests_Dir");
+         function Mode_Image_Att (M : Output_Mode_Type) return String
+         is (case M is
+               when Root_Mode => "Tests_Root",
+               when Subdir_Mode => "Subdir",
+               when Direct_Mode => "Tests_Dir");
       begin
-         Test.Common.Report_Err
-           ("multiple output modes are not allowed");
+         Test.Common.Report_Err ("multiple output modes are not allowed");
          if From_Project then
             Cmd_Error_No_Help
               ("attributes "
@@ -202,18 +199,18 @@ package body Test.Actions is
          end if;
       end Report_Multiple_Output;
 
-      function Process_Comma_Separated_String (String_List : String)
-         return Test.Common.Unbounded_String_Vector;
+      function Process_Comma_Separated_String
+        (String_List : String) return Test.Common.Unbounded_String_Vector;
       --  Process a string of comma separated values and returns a vectors of
       --  the values. An empty String produces and empty vector.
       --  It is up to the caller to free the allocated strings.
 
-      function Process_Comma_Separated_String (String_List : String)
-         return Test.Common.Unbounded_String_Vector
+      function Process_Comma_Separated_String
+        (String_List : String) return Test.Common.Unbounded_String_Vector
       is
-         Result : Test.Common.Unbounded_String_Vector;
+         Result      : Test.Common.Unbounded_String_Vector;
          Value_Begin : Positive := 1;
-         Value_End : Positive := 1;
+         Value_End   : Positive := 1;
 
       begin
          if String_List = "" then
@@ -223,8 +220,8 @@ package body Test.Actions is
          while Value_End < String_List'Length loop
             if String_List (Value_End) = ',' then
                Result.Append
-                  (Ada.Strings.Unbounded.To_Unbounded_String
-                     (String_List (Value_Begin .. Value_End - 1)));
+                 (Ada.Strings.Unbounded.To_Unbounded_String
+                    (String_List (Value_Begin .. Value_End - 1)));
                Value_Begin := Value_End + 1;
             end if;
 
@@ -233,8 +230,8 @@ package body Test.Actions is
 
          if Value_End - Value_Begin >= 1 then
             Result.Append
-               (Ada.Strings.Unbounded.To_Unbounded_String
-                  (String_List (Value_Begin .. Value_End)));
+              (Ada.Strings.Unbounded.To_Unbounded_String
+                 (String_List (Value_Begin .. Value_End)));
          end if;
 
          return Result;
@@ -243,7 +240,7 @@ package body Test.Actions is
    begin
       GNATCOLL.Traces.Parse_Config_File;
       Test.Common.Verbose := Arg (Cmd, Verbose);
-      Test.Common.Quiet   := Arg (Cmd, Quiet);
+      Test.Common.Quiet := Arg (Cmd, Quiet);
 
       --  If the tool project is an aggregate one, exit early and do nothing.
       --  The aggregated projects will be processed in sequence in subprocess
@@ -274,7 +271,7 @@ package body Test.Actions is
 
             else
                Cmd_Error_No_Help
-                ("--passed-tests should be either show or hide");
+                 ("--passed-tests should be either show or hide");
             end if;
          end if;
       end;
@@ -283,14 +280,14 @@ package body Test.Actions is
 
          if Arg (Cmd, Subdirs) /= null then
             GNAT.OS_Lib.Free (Test.Common.Aggregate_Subdir_Name);
-            Test.Common.Aggregate_Subdir_Name := new String'
-              (Arg (Cmd, Subdirs).all);
+            Test.Common.Aggregate_Subdir_Name :=
+              new String'(Arg (Cmd, Subdirs).all);
          end if;
 
          for File of File_Names (Cmd) loop
 
-            if GNAT.Directory_Operations.File_Extension
-              (File.all) in ".ads" | ".adb"
+            if GNAT.Directory_Operations.File_Extension (File.all)
+               in ".ads" | ".adb"
             then
                --  No project is specified but there are argument sources.
                --  Most probably user forgot to specify the project, and since
@@ -299,11 +296,12 @@ package body Test.Actions is
                Cmd_Error_No_Help ("project file not specified");
             end if;
 
-            Tmp := new String'
-              (GNAT.OS_Lib.Normalize_Pathname
-                 (File.all,
-                  Resolve_Links  => False,
-                  Case_Sensitive => False));
+            Tmp :=
+              new String'
+                (GNAT.OS_Lib.Normalize_Pathname
+                   (File.all,
+                    Resolve_Links  => False,
+                    Case_Sensitive => False));
             if not GNAT.OS_Lib.Is_Regular_File (Tmp.all) then
                Cmd_Error_No_Help ("cannot find " & Tmp.all);
             end if;
@@ -319,15 +317,17 @@ package body Test.Actions is
 
          --  Dealing with environment dir to copy
          if Arg (Cmd, Copy_Environment) /= null then
-            Test.Common.Environment_Dir := new String'
-              (Normalize_Pathname
-                 (Arg (Cmd, Copy_Environment).all,
-                  Resolve_Links  => False,
-                  Case_Sensitive => False));
+            Test.Common.Environment_Dir :=
+              new String'
+                (Normalize_Pathname
+                   (Arg (Cmd, Copy_Environment).all,
+                    Resolve_Links  => False,
+                    Case_Sensitive => False));
             if not Is_Directory (Test.Common.Environment_Dir.all) then
                Cmd_Error_No_Help
                  ("environment dir "
-                  & Test.Common.Environment_Dir.all & " does not exist");
+                  & Test.Common.Environment_Dir.all
+                  & " does not exist");
             end if;
          end if;
 
@@ -423,8 +423,7 @@ package body Test.Actions is
 
          Tests_Dir_Set := True;
          Free (Test.Common.Test_Dir_Name);
-         Test.Common.Test_Dir_Name := new String'
-           (Arg (Cmd, Tests_Dir).all);
+         Test.Common.Test_Dir_Name := new String'(Arg (Cmd, Tests_Dir).all);
 
       elsif Arg (Cmd, Tests_Root) /= null then
 
@@ -435,15 +434,14 @@ package body Test.Actions is
          end if;
 
          Tests_Dir_Set := True;
-         Test.Common.Separate_Root_Dir := new String'
-           (Arg (Cmd, Tests_Root).all);
+         Test.Common.Separate_Root_Dir :=
+           new String'(Arg (Cmd, Tests_Root).all);
 
       elsif Arg (Cmd, Subdirs) /= null then
 
          Output_Mode := Subdir_Mode;
          Tests_Dir_Set := True;
-         Test.Common.Test_Subdir_Name := new String'
-           (Arg (Cmd, Subdirs).all);
+         Test.Common.Test_Subdir_Name := new String'(Arg (Cmd, Subdirs).all);
 
       else
 
@@ -459,8 +457,8 @@ package body Test.Actions is
 
             Tests_Dir_Set := True;
             Free (Test.Common.Test_Dir_Name);
-            Test.Common.Test_Dir_Name := new String'
-              (Root_Prj.Attribute_Value (Direct_Mode_Att));
+            Test.Common.Test_Dir_Name :=
+              new String'(Root_Prj.Attribute_Value (Direct_Mode_Att));
 
          elsif Root_Prj.Has_Attribute (Root_Mode_Att) then
 
@@ -471,15 +469,15 @@ package body Test.Actions is
             end if;
 
             Tests_Dir_Set := True;
-            Test.Common.Separate_Root_Dir := new String'
-              (Root_Prj.Attribute_Value (Root_Mode_Att));
+            Test.Common.Separate_Root_Dir :=
+              new String'(Root_Prj.Attribute_Value (Root_Mode_Att));
 
          elsif Root_Prj.Has_Attribute (Subdir_Mode_Att) then
 
             Output_Mode := Subdir_Mode;
             Tests_Dir_Set := True;
-            Test.Common.Test_Subdir_Name := new String'
-              (Root_Prj.Attribute_Value (Subdir_Mode_Att));
+            Test.Common.Test_Subdir_Name :=
+              new String'(Root_Prj.Attribute_Value (Subdir_Mode_Att));
 
          end if;
 
@@ -494,8 +492,9 @@ package body Test.Actions is
       elsif Root_Prj.Has_Attribute (Build_Att_String ("stubs_dir")) then
 
          Free (Test.Common.Stub_Dir_Name);
-         Test.Common.Stub_Dir_Name := new String'
-           (Root_Prj.Attribute_Value (Build_Att_String ("stubs_dir")));
+         Test.Common.Stub_Dir_Name :=
+           new String'
+             (Root_Prj.Attribute_Value (Build_Att_String ("stubs_dir")));
          Stub_Dir_Set := True;
 
       end if;
@@ -503,15 +502,16 @@ package body Test.Actions is
       if Arg (Cmd, Harness_Dir) /= null then
 
          Free (Test.Common.Harness_Dir_Str);
-         Test.Common.Harness_Dir_Str := new String'
-           (Arg (Cmd, Harness_Dir).all);
+         Test.Common.Harness_Dir_Str :=
+           new String'(Arg (Cmd, Harness_Dir).all);
          Harness_Dir_Set := True;
 
       elsif Root_Prj.Has_Attribute (Build_Att_String ("harness_dir")) then
 
          Free (Test.Common.Harness_Dir_Str);
-         Test.Common.Harness_Dir_Str := new String'
-           (Root_Prj.Attribute_Value (Build_Att_String ("harness_dir")));
+         Test.Common.Harness_Dir_Str :=
+           new String'
+             (Root_Prj.Attribute_Value (Build_Att_String ("harness_dir")));
          Harness_Dir_Set := True;
 
       end if;
@@ -579,10 +579,11 @@ package body Test.Actions is
       Test.Common.Test_Filtering := Arg (Cmd, Test_Filtering);
       Test.Common.Include_Subp_Name := Arg (Cmd, Include_Subp_Name);
 
-      Test.Common.Strict_Execution := Arg (Cmd, Strict)
+      Test.Common.Strict_Execution :=
+        Arg (Cmd, Strict)
         or else (Ada.Environment_Variables.Exists ("GNATTEST_STRICT")
-                  and then Ada.Environment_Variables.Value
-                    ("GNATTEST_STRICT") = "TRUE");
+                 and then Ada.Environment_Variables.Value ("GNATTEST_STRICT")
+                          = "TRUE");
 
       --  Command line support
 
@@ -590,7 +591,7 @@ package body Test.Actions is
          Test.Common.No_Command_Line := True;
       else
          declare
-            Files : constant GNATCOLL.VFS.File_Array :=
+            Files          : constant GNATCOLL.VFS.File_Array :=
               Predefined_Source_Files (Root_Prj.Get_Environment);
             A_Comlin_Found : Boolean := False;
          begin
@@ -605,8 +606,8 @@ package body Test.Actions is
 
             if A_Comlin_Found then
                for I in Files'Range loop
-                  if Arg (Cmd, Test_Filtering_File_IO) and then
-                    Files (I).Display_Base_Name = "s-ficobl.ads"
+                  if Arg (Cmd, Test_Filtering_File_IO)
+                    and then Files (I).Display_Base_Name = "s-ficobl.ads"
                   then
                      Test.Common.Text_IO_Present := True;
                   end if;
@@ -632,11 +633,12 @@ package body Test.Actions is
 
          Skeleton_Default_Val : constant String :=
            To_Lower
-             ((if Skeleton_Default_Switch = null then
-                (if Root_Prj.Has_Attribute (Skeleton_Default_Att)
-                 then Root_Prj.Attribute_Value (Skeleton_Default_Att)
-                 else "")
-              else Arg (Cmd, Skeleton_Default).all));
+             ((if Skeleton_Default_Switch = null
+               then
+                 (if Root_Prj.Has_Attribute (Skeleton_Default_Att)
+                  then Root_Prj.Attribute_Value (Skeleton_Default_Att)
+                  else "")
+               else Arg (Cmd, Skeleton_Default).all));
          --  If Skeleton_Default was specified through a switch, use this
          --  value. Otherwise, if it was specified through a project file
          --  attribute, use this value. If it was not specified, set it to the
@@ -651,9 +653,8 @@ package body Test.Actions is
 
             elsif Skeleton_Default_Val /= "" then
                Cmd_Error_No_Help
-                 ((if Skeleton_Default_Switch /= null
-                  then "--skeleton-default"
-                  else "Gnattest.Skeletons_Default")
+                 ((if Skeleton_Default_Switch /= null then "--skeleton-default"
+                   else "Gnattest.Skeletons_Default")
                   & " should be either fail or pass");
             end if;
          end if;
@@ -674,8 +675,7 @@ package body Test.Actions is
                Test.Common.Add_Exit_Status := True;
 
             else
-               Cmd_Error_No_Help
-                 ("--exit-status should be either on or off");
+               Cmd_Error_No_Help ("--exit-status should be either on or off");
             end if;
          end if;
       end;
@@ -692,8 +692,7 @@ package body Test.Actions is
          if Present then
             Test.Common.Separate_Drivers := True;
 
-            if Separate_Drivers_Val = "unit"
-              or else Separate_Drivers_Val = ""
+            if Separate_Drivers_Val = "unit" or else Separate_Drivers_Val = ""
             then
                Test.Common.Driver_Per_Unit := True;
 
@@ -703,7 +702,9 @@ package body Test.Actions is
             else
                Cmd_Error_No_Help
                  ("--separate-drivers should be either unit or test"
-                  & " >" & Separate_Drivers_Switch.all & "<");
+                  & " >"
+                  & Separate_Drivers_Switch.all
+                  & "<");
             end if;
          end if;
       end;
@@ -737,35 +738,33 @@ package body Test.Actions is
 
          if not Tests_Dir_Set then
             Free (Test.Common.Test_Dir_Name);
-            Test.Common.Test_Dir_Name := new String'
-              ("gnattest_stub" & Directory_Separator & "tests");
+            Test.Common.Test_Dir_Name :=
+              new String'("gnattest_stub" & Directory_Separator & "tests");
          end if;
 
          if not Stub_Dir_Set then
             Free (Test.Common.Stub_Dir_Name);
-            Test.Common.Stub_Dir_Name := new String'
-              ("gnattest_stub" & Directory_Separator & "stubs");
+            Test.Common.Stub_Dir_Name :=
+              new String'("gnattest_stub" & Directory_Separator & "stubs");
          end if;
 
          if not Harness_Dir_Set then
             Free (Test.Common.Harness_Dir_Str);
-            Test.Common.Harness_Dir_Str := new String'
-              ("gnattest_stub" & Directory_Separator & "harness");
+            Test.Common.Harness_Dir_Str :=
+              new String'("gnattest_stub" & Directory_Separator & "harness");
          end if;
 
          Test.Skeleton.Source_Table.Initialize_Project_Table (SPT);
 
          Files := SPT.Root_Project.Source_Files (True);
          for F in Files'Range loop
-            if
-              To_Lower (SPT.Info (Files (F)).Language) = "ada"
+            if To_Lower (SPT.Info (Files (F)).Language) = "ada"
               and then not Is_Externally_Built (Files (F))
             then
                case SPT.Info (Files (F)).Unit_Part is
                   when Unit_Body =>
                      declare
-                        P : Project_Type :=
-                          SPT.Info (Files (F)).Project;
+                        P : Project_Type := SPT.Info (Files (F)).Project;
                      begin
                         --  The name of the project here will be used to create
                         --  stub projects. Those extend original projects, so
@@ -781,9 +780,11 @@ package body Test.Actions is
                            P.Name,
                            SPT.Info (Files (F)).Unit_Name);
                      end;
+
                   when Unit_Spec =>
                      Test.Skeleton.Source_Table.Add_Body_Reference
                        (Files (F).Display_Full_Name);
+
                   when others =>
                      null;
                end case;
@@ -796,34 +797,34 @@ package body Test.Actions is
       --  Processing harness dir specification
 
       if Is_Absolute_Path
-        (GNATCOLL.VFS.Create (+Test.Common.Harness_Dir_Str.all))
+           (GNATCOLL.VFS.Create (+Test.Common.Harness_Dir_Str.all))
       then
          Tmp := Test.Common.Harness_Dir_Str;
-         Test.Common.Harness_Dir_Str := new String'
-           (Normalize_Pathname
-              (Tmp.all,
-               Resolve_Links  => False,
-               Case_Sensitive => False)
-            & Directory_Separator);
+         Test.Common.Harness_Dir_Str :=
+           new String'
+             (Normalize_Pathname
+                (Tmp.all, Resolve_Links => False, Case_Sensitive => False)
+              & Directory_Separator);
          Free (Tmp);
       else
          Tmp := Test.Common.Harness_Dir_Str;
-         Test.Common.Harness_Dir_Str := new String'
-           (Normalize_Pathname
-              (Root_Prj.Object_Dir.Display_Full_Name & Tmp.all,
-               Resolve_Links  => False,
-               Case_Sensitive => False)
-            & Directory_Separator);
+         Test.Common.Harness_Dir_Str :=
+           new String'
+             (Normalize_Pathname
+                (Root_Prj.Object_Dir.Display_Full_Name & Tmp.all,
+                 Resolve_Links  => False,
+                 Case_Sensitive => False)
+              & Directory_Separator);
          Free (Tmp);
       end if;
 
       for Dir of Root_Prj.Source_Dirs (Recursive => True) loop
-         if Test.Common.Harness_Dir_Str.all =
-           Normalize_Pathname
-             (Dir.Display_Full_Name,
-              Resolve_Links  => False,
-              Case_Sensitive => False)
-           & Directory_Separator
+         if Test.Common.Harness_Dir_Str.all
+           = Normalize_Pathname
+               (Dir.Display_Full_Name,
+                Resolve_Links  => False,
+                Case_Sensitive => False)
+            & Directory_Separator
          then
             Cmd_Error_No_Help
               ("invalid harness directory, cannot mix up "
@@ -851,9 +852,11 @@ package body Test.Actions is
       case Output_Mode is
          when Direct_Mode =>
             Check_Direct;
+
          when Subdir_Mode =>
             Check_Subdir;
-         when Root_Mode   =>
+
+         when Root_Mode =>
             Check_Separate_Root;
       end case;
 
@@ -862,8 +865,7 @@ package body Test.Actions is
       if Arg (Cmd, Dump_Test_Inputs) then
          Files := SPT.Root_Project.Source_Files (True);
          for F in Files'Range loop
-            if
-              To_Lower (SPT.Info (Files (F)).Language) = "ada"
+            if To_Lower (SPT.Info (Files (F)).Language) = "ada"
               and then not Is_Externally_Built (Files (F))
             then
                if SPT.Info (Files (F)).Unit_Part = Unit_Body then
@@ -901,32 +903,38 @@ package body Test.Actions is
 
       if Arg (Cmd, Serialized_Test_Dir) /= null then
          if not GNAT.OS_Lib.Is_Absolute_Path
-           (Arg (Cmd, Serialized_Test_Dir).all)
+                  (Arg (Cmd, Serialized_Test_Dir).all)
          then
-            Test.Common.JSON_Test_Dir := new String'
-              (Ada.Directories.Current_Directory
-               & GNAT.OS_Lib.Directory_Separator
-               & Arg (Cmd, Serialized_Test_Dir).all);
+            Test.Common.JSON_Test_Dir :=
+              new String'
+                (Ada.Directories.Current_Directory
+                 & GNAT.OS_Lib.Directory_Separator
+                 & Arg (Cmd, Serialized_Test_Dir).all);
          else
-            Test.Common.JSON_Test_Dir := new String'
-              (Arg (Cmd, Serialized_Test_Dir).all);
+            Test.Common.JSON_Test_Dir :=
+              new String'(Arg (Cmd, Serialized_Test_Dir).all);
          end if;
       else
          if Is_Absolute_Path (Test.Common.Test_Dir_Name.all) then
-            Test.Common.JSON_Test_Dir := new String'
-              (Normalize_Pathname
-                 (Test.Common.Test_Dir_Name.all
-                  & Directory_Separator & "JSON_Tests",
-                  Resolve_Links  => False,
-                  Case_Sensitive => False));
+            Test.Common.JSON_Test_Dir :=
+              new String'
+                (Normalize_Pathname
+                   (Test.Common.Test_Dir_Name.all
+                    & Directory_Separator
+                    & "JSON_Tests",
+                    Resolve_Links  => False,
+                    Case_Sensitive => False));
          else
-            Test.Common.JSON_Test_Dir := new String'
-              (Normalize_Pathname
-                 (Root_Prj.Object_Dir.Display_Full_Name
-                  & Directory_Separator & Test.Common.Test_Dir_Name.all
-                  & Directory_Separator & "JSON_Tests",
-                  Resolve_Links  => False,
-                  Case_Sensitive => False));
+            Test.Common.JSON_Test_Dir :=
+              new String'
+                (Normalize_Pathname
+                   (Root_Prj.Object_Dir.Display_Full_Name
+                    & Directory_Separator
+                    & Test.Common.Test_Dir_Name.all
+                    & Directory_Separator
+                    & "JSON_Tests",
+                    Resolve_Links  => False,
+                    Case_Sensitive => False));
          end if;
       end if;
 
@@ -950,30 +958,31 @@ package body Test.Actions is
       --  Alway initialize the Libgen context; we don't know if there will be
       --  JSON tests to load or not.
 
-      Test.Common.TGen_Libgen_Ctx := TGen.Libgen.Create
-        (Output_Dir         =>
-           Test.Common.Harness_Dir_Str.all & "tgen_support",
-         User_Project_Path  => Arg (Cmd, Project_File).all,
-         Root_Templates_Dir =>
-           (Containing_Directory
-              (Containing_Directory
-                 (GNAT.OS_Lib.Locate_Exec_On_Path ("gnattest").all))
-            & GNAT.OS_Lib.Directory_Separator & "share"
-            & GNAT.OS_Lib.Directory_Separator & "tgen"
-            & GNAT.OS_Lib.Directory_Separator & "templates"));
+      Test.Common.TGen_Libgen_Ctx :=
+        TGen.Libgen.Create
+          (Output_Dir         =>
+             Test.Common.Harness_Dir_Str.all & "tgen_support",
+           User_Project_Path  => Arg (Cmd, Project_File).all,
+           Root_Templates_Dir =>
+             (Containing_Directory
+                (Containing_Directory
+                   (GNAT.OS_Lib.Locate_Exec_On_Path ("gnattest").all))
+              & GNAT.OS_Lib.Directory_Separator
+              & "share"
+              & GNAT.OS_Lib.Directory_Separator
+              & "tgen"
+              & GNAT.OS_Lib.Directory_Separator
+              & "templates"));
 
       Test.Common.Extract_Preprocessor_Config (Tool.Project_Tree.all);
       TGen.Libgen.Set_Preprocessing_Definitions
-         (Test.Common.TGen_Libgen_Ctx, Test.Common.Preprocessor_Config);
+        (Test.Common.TGen_Libgen_Ctx, Test.Common.Preprocessor_Config);
 
       TGen.Libgen.Set_Minimum_Lang_Version
         (Test.Common.TGen_Libgen_Ctx,
          (case Test.Common.Lang_Version is
-             when Ada_83 |
-                  Ada_95 |
-                  Ada_2005 |
-                  Ada_2012 => TGen.Libgen.Ada_12,
-             when Ada_2022 => TGen.Libgen.Ada_22));
+            when Ada_83 | Ada_95 | Ada_2005 | Ada_2012 => TGen.Libgen.Ada_12,
+            when Ada_2022 => TGen.Libgen.Ada_22));
 
       if Arg (Cmd, Gen_Test_Vectors) then
          Test.Common.Generate_Test_Vectors := True;
@@ -982,8 +991,8 @@ package body Test.Actions is
          if Arg (Cmd, Gen_Test_Subprograms) /= null then
             declare
                Subp_List : constant Test.Common.Unbounded_String_Vector :=
-                  Process_Comma_Separated_String
-                     (Arg (Cmd, Gen_Test_Subprograms).all);
+                 Process_Comma_Separated_String
+                   (Arg (Cmd, Gen_Test_Subprograms).all);
             begin
                for E of Subp_List loop
                   Test.Common.Add_Allowed_Subprograms (E.To_String);
@@ -1003,8 +1012,7 @@ package body Test.Actions is
          declare
             Dir : File_Array_Access;
          begin
-            Append
-              (Dir, GNATCOLL.VFS.Create (+Test.Common.JSON_Test_Dir.all));
+            Append (Dir, GNATCOLL.VFS.Create (+Test.Common.JSON_Test_Dir.all));
             Test.Common.Create_Dirs (Dir);
          exception
             when GNAT.Directory_Operations.Directory_Error =>
@@ -1039,7 +1047,7 @@ package body Test.Actions is
               Build (Test.Common.GT_Package, "default_stub_exclusion_list");
             Exclude_Attr         : constant Attribute_Pkg_String :=
               Build (Test.Common.GT_Package, "stub_exclusion_list");
-            Indexes              : constant String_List          :=
+            Indexes              : constant String_List :=
               Attribute_Indexes (Root_Prj, Exclude_Attr);
          begin
             if Has_Attribute (Root_Prj, Default_Exclude_Attr) then
@@ -1049,7 +1057,9 @@ package body Test.Actions is
             end if;
             for Index of Indexes loop
                Process_Exclusion_List
-                 (":" & Index.all & "="
+                 (":"
+                  & Index.all
+                  & "="
                   & Attribute_Value (Root_Prj, Exclude_Attr, Index.all),
                   From_Project => True);
             end loop;
@@ -1058,22 +1068,24 @@ package body Test.Actions is
 
       --  Process additional tests
       if Arg (Cmd, Additional_Tests) /= null then
-         Test.Common.Additional_Tests_Prj := new String'
-           (Normalize_Pathname
-              (Arg (Cmd, Additional_Tests).all,
-               Resolve_Links  => False,
-               Case_Sensitive => False));
+         Test.Common.Additional_Tests_Prj :=
+           new String'
+             (Normalize_Pathname
+                (Arg (Cmd, Additional_Tests).all,
+                 Resolve_Links  => False,
+                 Case_Sensitive => False));
       elsif Root_Prj.Has_Attribute (Build_Att_String ("additional_tests")) then
-         Test.Common.Additional_Tests_Prj := new String'
-           (Normalize_Pathname
-              (Root_Prj.Attribute_Value
+         Test.Common.Additional_Tests_Prj :=
+           new String'
+             (Normalize_Pathname
+                (Root_Prj.Attribute_Value
                    (Build_Att_String ("additional_tests")),
-               Resolve_Links  => False,
-               Case_Sensitive => False));
+                 Resolve_Links  => False,
+                 Case_Sensitive => False));
       end if;
 
-      if Test.Common.Additional_Tests_Prj /= null and then
-        not Is_Regular_File (Test.Common.Additional_Tests_Prj.all)
+      if Test.Common.Additional_Tests_Prj /= null
+        and then not Is_Regular_File (Test.Common.Additional_Tests_Prj.all)
       then
          Cmd_Error_No_Help
            ("cannot find " & Test.Common.Additional_Tests_Prj.all);
@@ -1082,9 +1094,8 @@ package body Test.Actions is
       if Root_Prj.Has_Attribute (Compiler_Default_Switches_Attribute) then
          declare
             Switches : String_List_Access :=
-              Attribute_Value (Root_Prj,
-                               Compiler_Default_Switches_Attribute,
-                               "ada");
+              Attribute_Value
+                (Root_Prj, Compiler_Default_Switches_Attribute, "ada");
          begin
             if Switches = null then
                return;
@@ -1104,9 +1115,9 @@ package body Test.Actions is
 
    end Init;
 
-   overriding procedure First_Pass_Post_Process
-     (Tool : in out Test_Tool; Cmd : in out Command_Line)
-   is
+   overriding
+   procedure First_Pass_Post_Process
+     (Tool : in out Test_Tool; Cmd : in out Command_Line) is
    begin
       --  We always need the lib support when running the generation harness
 
@@ -1141,10 +1152,10 @@ package body Test.Actions is
       if Test.Common.Get_Lib_Support_Status in Test.Common.Needed then
          TGen.Libgen.Generate
            (Test.Common.TGen_Libgen_Ctx,
-           [TGen.Libgen.Marshalling_Part     => True,
-            TGen.Libgen.Test_Generation_Part => True,
-            TGen.Libgen.Wrappers_Part        => False]);
-            Test.Common.Mark_Lib_Support_Generated;
+            [TGen.Libgen.Marshalling_Part     => True,
+             TGen.Libgen.Test_Generation_Part => True,
+             TGen.Libgen.Wrappers_Part        => False]);
+         Test.Common.Mark_Lib_Support_Generated;
       end if;
 
       if Status (Tool.Project_Tree.all) = Empty then
@@ -1166,8 +1177,8 @@ package body Test.Actions is
                   Test.Skeleton.Report_Tests_Total;
                end if;
             end if;
-            Test.Harness.Test_Runner_Generator  (Src_Prj);
-            Test.Harness.Project_Creator        (Src_Prj);
+            Test.Harness.Test_Runner_Generator (Src_Prj);
+            Test.Harness.Project_Creator (Src_Prj);
          end if;
          Test.Harness.Generate_Makefile (Src_Prj);
          Test.Harness.Generate_Config;
@@ -1203,14 +1214,14 @@ package body Test.Actions is
    -- First_Per_File_Action --
    ---------------------------
 
-   overriding procedure First_Per_File_Action
-     (Tool : in out Test_Tool;
-      Cmd : Command_Line;
+   overriding
+   procedure First_Per_File_Action
+     (Tool      : in out Test_Tool;
+      Cmd       : Command_Line;
       File_Name : String;
-      Input : String;
-      BOM_Seen : Boolean;
-      Unit : Analysis_Unit)
-   is
+      Input     : String;
+      BOM_Seen  : Boolean;
+      Unit      : Analysis_Unit) is
    begin
       Test.Generation.Process_Source (Unit);
    end First_Per_File_Action;
@@ -1220,12 +1231,12 @@ package body Test.Actions is
    ----------------------------
 
    procedure Second_Per_File_Action
-     (Tool : in out Test_Tool;
-      Cmd : Command_Line;
+     (Tool      : in out Test_Tool;
+      Cmd       : Command_Line;
       File_Name : String;
-      Input : String;
-      BOM_Seen : Boolean;
-      Unit : Analysis_Unit)
+      Input     : String;
+      BOM_Seen  : Boolean;
+      Unit      : Analysis_Unit)
    is
       pragma Unreferenced (Tool, Input, BOM_Seen); -- ????
    begin
@@ -1246,10 +1257,9 @@ package body Test.Actions is
    -- Second_Per_Invalid_File_Action --
    ------------------------------------
 
-   overriding procedure Second_Per_Invalid_File_Action
-     (Tool      : in out Test_Tool;
-      Cmd       :        Command_Line;
-      File_Name :        String)
+   overriding
+   procedure Second_Per_Invalid_File_Action
+     (Tool : in out Test_Tool; Cmd : Command_Line; File_Name : String)
    is
       pragma Unreferenced (Tool, Cmd, File_Name);
    begin
@@ -1278,71 +1288,114 @@ package body Test.Actions is
 
       Put ("Framework generation mode options:\n");
       Put ("\n");
-      Put (" -Pproject        - Use project file project. Only one such switch can be used\n");
-      Put (" -U               - Process all sources of the argument project\n");
-      Put (" -U main          - Process the closure of units rooted at unit main\n");
+      Put
+        (" -Pproject        - Use project file project. Only one such switch can be used\n");
+      Put
+        (" -U               - Process all sources of the argument project\n");
+      Put
+        (" -U main          - Process the closure of units rooted at unit main\n");
       Put (" --no-subprojects - Process sources of root project only\n");
-      Put (" -Xname=value     - Specify an external reference for argument project file\n");
-      Put (" -eL              - Follow all symbolic links when processing project files\n");
+      Put
+        (" -Xname=value     - Specify an external reference for argument project file\n");
+      Put
+        (" -eL              - Follow all symbolic links when processing project files\n");
       Put (" --target=target  - Specify a target\n");
       Put (" --RTS=runtime    - Specify runtime for Ada\n");
-      Put (" --files=file     - Name of a text file containing a list of Ada\n");
+      Put
+        (" --files=file     - Name of a text file containing a list of Ada\n");
       Put ("                    source files to process\n");
-      Put (" --ignore=file    - Name of a text file containing a list of sources\n");
+      Put
+        (" --ignore=file    - Name of a text file containing a list of sources\n");
       Put ("                    to be excluded from processing\n");
 
-      Put (" --strict                - Return error exit code if there are parsing errors\n");
-      Put (" --additional-tests=prj  - Treat sources from project prj as additional\n");
-      Put ("                           manual tests to add to the test suite\n");
-      Put (" --harness-only          - Treat argument sources as tests to add to the suite\n");
-      Put (" --stub                  - Generate testing framework that uses stubs\n");
+      Put
+        (" --strict                - Return error exit code if there are parsing errors\n");
+      Put
+        (" --additional-tests=prj  - Treat sources from project prj as additional\n");
+      Put
+        ("                           manual tests to add to the test suite\n");
+      Put
+        (" --harness-only          - Treat argument sources as tests to add to the suite\n");
+      Put
+        (" --stub                  - Generate testing framework that uses stubs\n");
       Put ("\n");
 
-      Put (" --exclude-from-stubbing=file       - List of sources whose bodies should not\n");
+      Put
+        (" --exclude-from-stubbing=file       - List of sources whose bodies should not\n");
       Put ("                                      be stubbed\n");
-      Put (" --exclude-from-stubbing:spec=file  - List of sources whose bodies should not\n");
-      Put ("                                      be stubbed when testing unit whose\n");
-      Put ("                                      specification is located in file spec\n");
+      Put
+        (" --exclude-from-stubbing:spec=file  - List of sources whose bodies should not\n");
+      Put
+        ("                                      be stubbed when testing unit whose\n");
+      Put
+        ("                                      specification is located in file spec\n");
       Put ("\n");
 
       Put (" --harness-dir=dirname  - Output dir for test harness\n");
       Put (" --tests-dir=dirname    - Test files are put in dirname\n");
-      Put (" --subdirs=dirname      - Test files are put in subdirs dirname of source dirs\n");
-      Put (" --tests-root=dirname   - Test files are put in the same directory hierarchy\n");
+      Put
+        (" --subdirs=dirname      - Test files are put in subdirs dirname of source dirs\n");
+      Put
+        (" --tests-root=dirname   - Test files are put in the same directory hierarchy\n");
       Put ("                          as sources but rooted at dirname\n");
-      Put (" --stubs-dir=dirname    - Stub files are put in subdirs of dirname\n");
+      Put
+        (" --stubs-dir=dirname    - Stub files are put in subdirs of dirname\n");
       Put ("\n");
 
-      Put (" --validate-type-extensions         - Run all tests from all parents to check LSP\n");
-      Put (" --inheritance-check                - Run inherited tests for descendants\n");
-      Put (" --no-inheritance-check             - Do not run inherited tests for descendants\n");
-      Put (" --test-case-only                   - Create tests only when Test_Case is specified\n");
-      Put (" --skeleton-default=(pass|fail)     - Default behavior of unimplemented tests\n");
-      Put (" --passed-tests=(show|hide)         - Default output of passed tests\n");
-      Put (" --exit-status=(on|off)             - Default usage of the exit status\n");
-      Put (" --omit-sloc                        - Don't record subprogram sloc in test package\n");
-      Put (" --no-command-line                  - Don't add command line support to test driver\n");
-      Put (" --include-subp-name                - Include the tested subprogram's name in the output\n");
-      Put (" --test-duration                    - Show timing for each test\n");
-      Put (" --test-filtering                   - Add test filtering option to generated driver\n");
-      Put (" --no-test-filtering                - Suppress test filtering in generated driver\n");
-      Put (" --gen-test-vectors                 - Generate test inputs for supported subprograms (experimental)\n");
-      Put (" --gen-test-num=n                   - Specify the number of test inputs to be generated (experimental, defaults to 5)\n");
-      Put (" --gen-test-subprograms=file:line   - Specify a comma separated list of subprograms declared at file:line to generate test cases for\n");
-      Put (" --serialized-test-dir=dir          - Specify in which directory test inputs should be generated (experimental)\n");
-      Put (" --dump-test-inputs                 - Dump input values of the subprogram under test as blobs during harness execution (experimental)\n");
-      Put (" --minimize                         - Minimize the generated testsuite based on structural coverage analysis (experimental)\n");
-      Put (" --minimization-filter=file:line    - Only minimize tests for the subprogram declared at file:line (file must be a simple name)\n");
-      Put (" --cov-level=level                  - Use level as the coverage level to guide test minimization (see gnatcov help for available choices)\n");
+      Put
+        (" --validate-type-extensions         - Run all tests from all parents to check LSP\n");
+      Put
+        (" --inheritance-check                - Run inherited tests for descendants\n");
+      Put
+        (" --no-inheritance-check             - Do not run inherited tests for descendants\n");
+      Put
+        (" --test-case-only                   - Create tests only when Test_Case is specified\n");
+      Put
+        (" --skeleton-default=(pass|fail)     - Default behavior of unimplemented tests\n");
+      Put
+        (" --passed-tests=(show|hide)         - Default output of passed tests\n");
+      Put
+        (" --exit-status=(on|off)             - Default usage of the exit status\n");
+      Put
+        (" --omit-sloc                        - Don't record subprogram sloc in test package\n");
+      Put
+        (" --no-command-line                  - Don't add command line support to test driver\n");
+      Put
+        (" --include-subp-name                - Include the tested subprogram's name in the output\n");
+      Put
+        (" --test-duration                    - Show timing for each test\n");
+      Put
+        (" --test-filtering                   - Add test filtering option to generated driver\n");
+      Put
+        (" --no-test-filtering                - Suppress test filtering in generated driver\n");
+      Put
+        (" --gen-test-vectors                 - Generate test inputs for supported subprograms (experimental)\n");
+      Put
+        (" --gen-test-num=n                   - Specify the number of test inputs to be generated (experimental, defaults to 5)\n");
+      Put
+        (" --gen-test-subprograms=file:line   - Specify a comma separated list of subprograms declared at file:line to generate test cases for\n");
+      Put
+        (" --serialized-test-dir=dir          - Specify in which directory test inputs should be generated (experimental)\n");
+      Put
+        (" --dump-test-inputs                 - Dump input values of the subprogram under test as blobs during harness execution (experimental)\n");
+      Put
+        (" --minimize                         - Minimize the generated testsuite based on structural coverage analysis (experimental)\n");
+      Put
+        (" --minimization-filter=file:line    - Only minimize tests for the subprogram declared at file:line (file must be a simple name)\n");
+      Put
+        (" --cov-level=level                  - Use level as the coverage level to guide test minimization (see gnatcov help for available choices)\n");
       Put ("\n");
 
       Put ("Tests execution mode options:\n");
       Put ("\n");
       Put (" --passed-tests=(show|hide)  - Default output of passed tests\n");
-      Put (" --queues=n, -jn             - Run n tests in parallel (default n=1)\n");
-      Put (" --copy-environment=dir      - Copy contents of dir to temp dirs where test\n");
+      Put
+        (" --queues=n, -jn             - Run n tests in parallel (default n=1)\n");
+      Put
+        (" --copy-environment=dir      - Copy contents of dir to temp dirs where test\n");
       Put ("                               drivers are spawned\n");
-      Put (" --subdirs=dirname           - Look for test drivers in subdirs\n");
+      Put
+        (" --subdirs=dirname           - Look for test drivers in subdirs\n");
       pragma Style_Checks ("M79");
    end Tool_Help;
 
@@ -1351,7 +1404,7 @@ package body Test.Actions is
    -------------------------
 
    function Is_Externally_Built (File : Virtual_File) return Boolean is
-      F_Info : constant File_Info    := Info (SPT, File);
+      F_Info : constant File_Info := Info (SPT, File);
       Proj   : constant Project_Type := Project (F_Info);
       Attr   : constant Attribute_Pkg_String := Build ("", "externally_built");
    begin
@@ -1368,8 +1421,7 @@ package body Test.Actions is
    ----------------------------
 
    procedure Process_Exclusion_List
-     (Value        : String;
-      From_Project : Boolean := False)
+     (Value : String; From_Project : Boolean := False)
    is
       use Ada.Text_IO;
       use Ada.Strings.Fixed;
@@ -1379,14 +1431,14 @@ package body Test.Actions is
       F : File_Type;
 
       Exclude_For_One_UUT : constant Boolean :=
-        Value'Length > 3    and then
-        Value (First) = ':' and then
-        Index (Value, "=") > First + 1;
+        Value'Length > 3
+        and then Value (First) = ':'
+        and then Index (Value, "=") > First + 1;
 
       S : String_Access;
 
-      function Is_Comment (S : String) return Boolean is
-        (S'Length >= 2 and then S (S'First .. S'First + 1) = "--");
+      function Is_Comment (S : String) return Boolean
+      is (S'Length >= 2 and then S (S'First .. S'First + 1) = "--");
    begin
       if Exclude_For_One_UUT then
          Idx := Index (Value, "=");
@@ -1402,8 +1454,8 @@ package body Test.Actions is
                Cmd_Error_No_Help ("cannot find " & F_Path);
             end if;
 
-            if From_Project and then
-              Test.Common.Stub_Exclusion_Lists.Contains (Unit)
+            if From_Project
+              and then Test.Common.Stub_Exclusion_Lists.Contains (Unit)
             then
                return;
             end if;
@@ -1421,8 +1473,8 @@ package body Test.Actions is
          return;
       end if;
 
-      if From_Project and then
-        not Test.Common.Default_Stub_Exclusion_List.Is_Empty
+      if From_Project
+        and then not Test.Common.Default_Stub_Exclusion_List.Is_Empty
       then
          return;
       end if;
@@ -1430,9 +1482,7 @@ package body Test.Actions is
       declare
          F_Path : constant String :=
            Normalize_Pathname
-             (Name           => Value,
-              Resolve_Links  => False,
-              Case_Sensitive => False);
+             (Name => Value, Resolve_Links => False, Case_Sensitive => False);
       begin
          if not Is_Regular_File (F_Path) then
             Cmd_Error_No_Help ("cannot find " & F_Path);
@@ -1475,32 +1525,25 @@ package body Test.Actions is
             Indexed => False));
       Report_If_Err
         (GNATCOLL.Projects.Register_New_Attribute
-           (Name => "harness_dir",
-            Pkg  => Test.Common.GT_Package));
+           (Name => "harness_dir", Pkg => Test.Common.GT_Package));
       Report_If_Err
         (GNATCOLL.Projects.Register_New_Attribute
-           (Name => "subdir",
-            Pkg  => Test.Common.GT_Package));
+           (Name => "subdir", Pkg => Test.Common.GT_Package));
       Report_If_Err
         (GNATCOLL.Projects.Register_New_Attribute
-           (Name => "tests_root",
-            Pkg  => Test.Common.GT_Package));
+           (Name => "tests_root", Pkg => Test.Common.GT_Package));
       Report_If_Err
         (GNATCOLL.Projects.Register_New_Attribute
-           (Name => "tests_dir",
-            Pkg  => Test.Common.GT_Package));
+           (Name => "tests_dir", Pkg => Test.Common.GT_Package));
       Report_If_Err
         (GNATCOLL.Projects.Register_New_Attribute
-           (Name => "additional_tests",
-            Pkg  => Test.Common.GT_Package));
+           (Name => "additional_tests", Pkg => Test.Common.GT_Package));
       Report_If_Err
         (GNATCOLL.Projects.Register_New_Attribute
-           (Name    => "stubs_dir",
-            Pkg     => Test.Common.GT_Package));
+           (Name => "stubs_dir", Pkg => Test.Common.GT_Package));
       Report_If_Err
         (GNATCOLL.Projects.Register_New_Attribute
-           (Name => "skeletons_default",
-            Pkg  => Test.Common.GT_Package));
+           (Name => "skeletons_default", Pkg => Test.Common.GT_Package));
       Report_If_Err
         (GNATCOLL.Projects.Register_New_Attribute
            (Name => "default_stub_exclusion_list",
@@ -1515,8 +1558,7 @@ package body Test.Actions is
       --  inherit makefile attribute in test driver.
       Report_If_Err
         (GNATCOLL.Projects.Register_New_Attribute
-           (Name => "makefile",
-            Pkg  => "make"));
+           (Name => "makefile", Pkg => "make"));
 
       --  Needed for gnatcov integration
 
@@ -1542,8 +1584,7 @@ package body Test.Actions is
    ---------------------------
 
    function Non_Null_Intersection
-     (Left  : File_Array_Access;
-      Right : File_Array) return Boolean is
+     (Left : File_Array_Access; Right : File_Array) return Boolean is
    begin
       for J in Left'Range loop
          declare
@@ -1555,15 +1596,16 @@ package body Test.Actions is
          begin
             for K in Right'Range loop
 
-               if Left_Str =
-                 Normalize_Pathname
-                   (Name           => Right (K).Display_Full_Name,
-                    Resolve_Links  => False,
-                    Case_Sensitive => False)
+               if Left_Str
+                 = Normalize_Pathname
+                     (Name           => Right (K).Display_Full_Name,
+                      Resolve_Links  => False,
+                      Case_Sensitive => False)
                then
                   Test.Common.Report_Std
                     ("gnattest: "
-                     & Left_Str & " is used for more than one purpose");
+                     & Left_Str
+                     & " is used for more than one purpose");
                   return True;
                end if;
             end loop;
@@ -1580,10 +1622,10 @@ package body Test.Actions is
    procedure Check_Direct is
       use Test.Common;
 
-      Tmp : String_Access;
-      TD_Name : constant Virtual_File :=
+      Tmp            : String_Access;
+      TD_Name        : constant Virtual_File :=
         GNATCOLL.VFS.Create (+Test_Dir_Name.all);
-      Future_Dirs : File_Array_Access := new File_Array'(Empty_File_Array);
+      Future_Dirs    : File_Array_Access := new File_Array'(Empty_File_Array);
       Harness_Dir_Ar : constant File_Array (1 .. 1) :=
         [1 => Create (+(Harness_Dir_Str.all))];
 
@@ -1593,8 +1635,7 @@ package body Test.Actions is
         Source_Project_Tree.Root_Project.Source_Dirs (Recursive => True);
 
       Project  : Project_Type;
-      Iterator : Project_Iterator :=
-        Start (Source_Project_Tree.Root_Project);
+      Iterator : Project_Iterator := Start (Source_Project_Tree.Root_Project);
    begin
 
       if TD_Name.Is_Absolute_Path then
@@ -1616,8 +1657,7 @@ package body Test.Actions is
 
       if Non_Null_Intersection (Future_Dirs, All_Source_Locations) then
          Cmd_Error_No_Help
-           ("invalid output directory, cannot mix up "
-            & "tests and sources");
+           ("invalid output directory, cannot mix up " & "tests and sources");
       end if;
 
       if Non_Null_Intersection (Future_Dirs, Harness_Dir_Ar) then
@@ -1654,8 +1694,7 @@ package body Test.Actions is
 
       if Non_Null_Intersection (Future_Dirs, All_Source_Locations) then
          Cmd_Error_No_Help
-           ("invalid output directory, cannot mix up "
-            & "tests and sources");
+           ("invalid output directory, cannot mix up " & "tests and sources");
       end if;
 
       if Non_Null_Intersection (Future_Dirs, Harness_Dir_Ar) then
@@ -1691,7 +1730,7 @@ package body Test.Actions is
       All_Source_Locations : constant File_Array :=
         Source_Project_Tree.Root_Project.Source_Dirs (Recursive => True);
 
-      Files : File_Array_Access;
+      Files    : File_Array_Access;
       Project  : Project_Type;
       Iterator : Project_Iterator :=
         Start_Reversed (Source_Project_Tree.Root_Project);
@@ -1748,13 +1787,12 @@ package body Test.Actions is
       if RD_Name.Is_Absolute_Path then
 
          Test.Skeleton.Source_Table.Reset_Location_Iterator;
-         Tmp := new String'
-           (Test.Skeleton.Source_Table.Next_Source_Location);
+         Tmp := new String'(Test.Skeleton.Source_Table.Next_Source_Location);
          Maximin_Root := new String'(Tmp.all);
 
          loop
-            Tmp := new String'
-              (Test.Skeleton.Source_Table.Next_Source_Location);
+            Tmp :=
+              new String'(Test.Skeleton.Source_Table.Next_Source_Location);
             exit when Tmp.all = "";
 
             Buff := new String'(Common_Root (Tmp.all, Maximin_Root.all));
@@ -1773,22 +1811,26 @@ package body Test.Actions is
 
          Root_Length := Maximin_Root.all'Length;
 
-         Separate_Root_Dir := new String'
-           (Normalize_Pathname
-              (Name           => Separate_Root_Dir.all,
-               Resolve_Links  => False,
-               Case_Sensitive => False));
+         Separate_Root_Dir :=
+           new String'
+             (Normalize_Pathname
+                (Name           => Separate_Root_Dir.all,
+                 Resolve_Links  => False,
+                 Case_Sensitive => False));
 
          Test.Skeleton.Source_Table.Reset_Location_Iterator;
 
          loop
-            Tmp := new String'
-              (Test.Skeleton.Source_Table.Next_Source_Location);
+            Tmp :=
+              new String'(Test.Skeleton.Source_Table.Next_Source_Location);
             exit when Tmp.all = "";
 
-            Append (Future_Dirs, GNATCOLL.VFS.Create
-              (+(Separate_Root_Dir.all & Directory_Separator &
-                 Tmp.all (Root_Length + 1 .. Tmp.all'Last))));
+            Append
+              (Future_Dirs,
+               GNATCOLL.VFS.Create
+                 (+(Separate_Root_Dir.all
+                    & Directory_Separator
+                    & Tmp.all (Root_Length + 1 .. Tmp.all'Last))));
 
             Free (Tmp);
          end loop;
@@ -1818,13 +1860,13 @@ package body Test.Actions is
                Common_Root_Dir : String_Access;
             begin
                if Dirs'Length > 0 then
-                  Common_Root_Dir := new String'
-                    (Dirs (Dirs'First).Display_Full_Name);
+                  Common_Root_Dir :=
+                    new String'(Dirs (Dirs'First).Display_Full_Name);
 
                   for J in Dirs'Range loop
                      Tmp := new String'(Dirs (J).Display_Full_Name);
-                     Buff := new String'
-                       (Common_Root (Tmp.all, Common_Root_Dir.all));
+                     Buff :=
+                       new String'(Common_Root (Tmp.all, Common_Root_Dir.all));
 
                      if Buff.all = "" then
                         Cmd_Error_No_Help
@@ -1851,8 +1893,8 @@ package body Test.Actions is
 
             if Files'Length > 0 then
                if Maximin_Root = null then
-                  Maximin_Root := new String'
-                    (Files (Files'First).Display_Dir_Name);
+                  Maximin_Root :=
+                    new String'(Files (Files'First).Display_Dir_Name);
                end if;
 
                for F in Files'Range loop
@@ -1875,28 +1917,32 @@ package body Test.Actions is
 
                Obj_Dir := new String'(Project.Object_Dir.Display_Full_Name);
 
-               Local_Separate_Root_Dir := new String'
-                 (Normalize_Pathname
-                    (Name => Obj_Dir.all & Separate_Root_Dir.all,
-                     Case_Sensitive => False));
+               Local_Separate_Root_Dir :=
+                 new String'
+                   (Normalize_Pathname
+                      (Name           => Obj_Dir.all & Separate_Root_Dir.all,
+                       Case_Sensitive => False));
 
                for F in Files'Range loop
 
-                  if
-                    Source_Project_Tree.Info (Files (F)).Unit_Part = Unit_Spec
+                  if Source_Project_Tree.Info (Files (F)).Unit_Part = Unit_Spec
                     and then Test.Skeleton.Source_Table.Source_Present
-                      (Files (F).Display_Full_Name)
+                               (Files (F).Display_Full_Name)
                   then
                      Tmp := new String'(Files (F).Display_Dir_Name);
 
-                     Append (Future_Dirs, GNATCOLL.VFS.Create
-                       (+(Local_Separate_Root_Dir.all & Directory_Separator &
-                          Tmp.all (Root_Length + 1 .. Tmp.all'Last))));
+                     Append
+                       (Future_Dirs,
+                        GNATCOLL.VFS.Create
+                          (+(Local_Separate_Root_Dir.all
+                             & Directory_Separator
+                             & Tmp.all (Root_Length + 1 .. Tmp.all'Last))));
 
                      Test.Skeleton.Source_Table.Set_Output_Dir
                        (Files (F).Display_Full_Name,
-                        Local_Separate_Root_Dir.all & Directory_Separator &
-                        Tmp.all (Root_Length + 1 .. Tmp.all'Last));
+                        Local_Separate_Root_Dir.all
+                        & Directory_Separator
+                        & Tmp.all (Root_Length + 1 .. Tmp.all'Last));
                   end if;
 
                end loop;
@@ -1907,12 +1953,11 @@ package body Test.Actions is
             loop
                Next (Iterator);
 
-               if
-                 Current (Iterator) = No_Project
+               if Current (Iterator) = No_Project
                  or else not Has_Attribute (Current (Iterator), Ext_Bld)
-                 or else
-                   To_Lower
-                     (Attribute_Value (Current (Iterator), Ext_Bld)) /= "true"
+                 or else To_Lower
+                           (Attribute_Value (Current (Iterator), Ext_Bld))
+                         /= "true"
                then
                   exit;
                end if;
@@ -1942,8 +1987,8 @@ package body Test.Actions is
    procedure Check_Stub is
       use Test.Common;
 
-      Tmp : String_Access;
-      SD_Name : constant Virtual_File :=
+      Tmp         : String_Access;
+      SD_Name     : constant Virtual_File :=
         GNATCOLL.VFS.Create (+Stub_Dir_Name.all);
       Future_Dirs : File_Array_Access := new File_Array'(Empty_File_Array);
 
@@ -1953,8 +1998,7 @@ package body Test.Actions is
       Obj_Dir : String_Access;
 
       Project  : Project_Type;
-      Iterator : Project_Iterator :=
-        Start (Source_Project_Tree.Root_Project);
+      Iterator : Project_Iterator := Start (Source_Project_Tree.Root_Project);
    begin
 
       --  look for collisions with source dirs
@@ -1966,11 +2010,12 @@ package body Test.Actions is
             exit when Project = No_Project;
 
             Obj_Dir := new String'(Project.Object_Dir.Display_Full_Name);
-            Tmp := new String'
-              (Normalize_Pathname
-                 (Obj_Dir.all & Stub_Dir_Name.all,
-                  Resolve_Links  => False,
-                  Case_Sensitive => False));
+            Tmp :=
+              new String'
+                (Normalize_Pathname
+                   (Obj_Dir.all & Stub_Dir_Name.all,
+                    Resolve_Links  => False,
+                    Case_Sensitive => False));
             Append (Future_Dirs, GNATCOLL.VFS.Create (+Tmp.all));
             Free (Tmp);
             Free (Obj_Dir);
@@ -1991,9 +2036,8 @@ package body Test.Actions is
       Skeleton.Source_Table.Reset_Source_Iterator;
       Tmp := new String'(Skeleton.Source_Table.Next_Source_Name);
       while Tmp.all /= "" loop
-         if
-           Skeleton.Source_Table.Get_Source_Output_Dir (Tmp.all) =
-           Skeleton.Source_Table.Get_Source_Stub_Dir (Tmp.all)
+         if Skeleton.Source_Table.Get_Source_Output_Dir (Tmp.all)
+           = Skeleton.Source_Table.Get_Source_Stub_Dir (Tmp.all)
          then
             Test.Common.Report_Std
               ("gnattest: "
@@ -2040,29 +2084,30 @@ package body Test.Actions is
       end loop;
       Unchecked_Free (Sources);
 
-      Provider := Create_Project_Unit_Provider
-        (Tree             => PT,
-         Env              => Env,
-         Is_Project_Owner => False);
+      Provider :=
+        Create_Project_Unit_Provider
+          (Tree => PT, Env => Env, Is_Project_Owner => False);
 
-      Context := Create_Context
-        (Charset       => Wide_Character_Encoding (Cmd),
-         Unit_Provider => Provider);
+      Context :=
+        Create_Context
+          (Charset       => Wide_Character_Encoding (Cmd),
+           Unit_Provider => Provider);
 
-      Current_Source := new String'
-        (Test.Harness.Source_Table.Next_Non_Processed_Source);
+      Current_Source :=
+        new String'(Test.Harness.Source_Table.Next_Non_Processed_Source);
       while Current_Source.all /= "" loop
 
-         Unit := Get_From_File
-           (Context,
-            Test.Harness.Source_Table.Get_Source_Full_Name
-              (Current_Source.all));
+         Unit :=
+           Get_From_File
+             (Context,
+              Test.Harness.Source_Table.Get_Source_Full_Name
+                (Current_Source.all));
 
          Test.Harness.Process_Source (Unit);
 
          Free (Current_Source);
-         Current_Source := new String'
-           (Test.Harness.Source_Table.Next_Non_Processed_Source);
+         Current_Source :=
+           new String'(Test.Harness.Source_Table.Next_Non_Processed_Source);
       end loop;
       Free (Current_Source);
 

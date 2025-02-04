@@ -52,11 +52,11 @@ package body TGen.Marshalling.Binary_Marshallers is
       package Templates is new TGen.Templates (TRD);
       use Templates.Binary_Marshalling;
 
-      Ty_Name       : constant String := Typ.FQN (No_Std => True);
-      Ty_Prefix     : constant String := Prefix_For_Typ (Typ.Slug);
-      Generic_Name  : constant String :=
+      Ty_Name      : constant String := Typ.FQN (No_Std => True);
+      Ty_Prefix    : constant String := Prefix_For_Typ (Typ.Slug);
+      Generic_Name : constant String :=
         (if Needs_Header (Typ) then "In_Out_Unconstrained" else "In_Out");
-      Assocs        : constant Translate_Table :=
+      Assocs       : constant Translate_Table :=
         [1 => Assoc ("TY_NAME", Ty_Name),
          2 => Assoc ("TY_PREFIX", Ty_Prefix),
          3 => Assoc ("MARSHALLING_LIB", Marshalling_Lib),
@@ -75,8 +75,7 @@ package body TGen.Marshalling.Binary_Marshallers is
         (Assocs : Translate_Table) return Unbounded_String;
       function Variant_Read_Write
         (Assocs : Translate_Table) return Unbounded_String;
-      function Variant_Size
-        (Assocs : Translate_Table) return Unbounded_String;
+      function Variant_Size (Assocs : Translate_Table) return Unbounded_String;
       function Variant_Size_Max
         (Assocs : Translate_Table) return Unbounded_String;
       procedure Print_Header (Assocs : Translate_Table);
@@ -91,12 +90,12 @@ package body TGen.Marshalling.Binary_Marshallers is
       --------------------
 
       function Component_Read
-        (Assocs : Translate_Table) return Unbounded_String
-      is
+        (Assocs : Translate_Table) return Unbounded_String is
       begin
-         return Parse
-           (Component_Read_Write_Template,
-            Assocs & Assoc ("ACTION", "Read"));
+         return
+           Parse
+             (Component_Read_Write_Template,
+              Assocs & Assoc ("ACTION", "Read"));
       end Component_Read;
 
       ---------------------
@@ -104,12 +103,12 @@ package body TGen.Marshalling.Binary_Marshallers is
       ---------------------
 
       function Component_Write
-        (Assocs : Translate_Table) return Unbounded_String
-      is
+        (Assocs : Translate_Table) return Unbounded_String is
       begin
-         return Parse
-           (Component_Read_Write_Template,
-            Assocs & Assoc ("ACTION", "Write"));
+         return
+           Parse
+             (Component_Read_Write_Template,
+              Assocs & Assoc ("ACTION", "Write"));
       end Component_Write;
 
       --------------------
@@ -117,8 +116,7 @@ package body TGen.Marshalling.Binary_Marshallers is
       --------------------
 
       function Component_Size
-        (Assocs : Translate_Table) return Unbounded_String
-      is
+        (Assocs : Translate_Table) return Unbounded_String is
       begin
          return Parse (Component_Size_Template, Assocs);
       end Component_Size;
@@ -128,8 +126,7 @@ package body TGen.Marshalling.Binary_Marshallers is
       ------------------------
 
       function Component_Size_Max
-        (Assocs : Translate_Table) return Unbounded_String
-      is
+        (Assocs : Translate_Table) return Unbounded_String is
       begin
          return Parse (Component_Size_Max_Template, Assocs);
       end Component_Size_Max;
@@ -139,8 +136,7 @@ package body TGen.Marshalling.Binary_Marshallers is
       ------------------------
 
       function Variant_Read_Write
-        (Assocs : Translate_Table) return Unbounded_String
-      is
+        (Assocs : Translate_Table) return Unbounded_String is
       begin
          return Parse (Variant_Read_Write_Template, Assocs);
       end Variant_Read_Write;
@@ -149,8 +145,7 @@ package body TGen.Marshalling.Binary_Marshallers is
       -- Variant_Size --
       ------------------
 
-      function Variant_Size
-        (Assocs : Translate_Table) return Unbounded_String
+      function Variant_Size (Assocs : Translate_Table) return Unbounded_String
       is
       begin
          return Parse (Variant_Size_Template, Assocs);
@@ -161,8 +156,7 @@ package body TGen.Marshalling.Binary_Marshallers is
       ----------------------
 
       function Variant_Size_Max
-        (Assocs : Translate_Table) return Unbounded_String
-      is
+        (Assocs : Translate_Table) return Unbounded_String is
       begin
          return Parse (Variant_Size_Max_Template, Assocs);
       end Variant_Size_Max;
@@ -198,8 +192,7 @@ package body TGen.Marshalling.Binary_Marshallers is
       procedure Print_Scalar (Assocs : Translate_Table; For_Base : Boolean) is
       begin
          if For_Base and then Typ.Private_Extension then
-            Put_Line
-              (Private_Part, Parse (Scalar_Base_Spec_Template, Assocs));
+            Put_Line (Private_Part, Parse (Scalar_Base_Spec_Template, Assocs));
             New_Line (Private_Part);
          else
             Put_Line (Spec_Part, Parse (Scalar_Base_Spec_Template, Assocs));
@@ -234,13 +227,11 @@ package body TGen.Marshalling.Binary_Marshallers is
             Put_Line
               (Private_Part, Parse (Composite_Size_Max_Template, Assocs));
          end if;
-         Put_Line
-           (Body_Part, Parse (Array_Read_Write_Template, Assocs));
+         Put_Line (Body_Part, Parse (Array_Read_Write_Template, Assocs));
          New_Line (Body_Part);
          Put_Line (Body_Part, Parse (Array_Size_Template, Assocs));
          New_Line (Body_Part);
-         Put_Line
-           (Body_Part, Parse (Array_Size_Max_Template, Assocs));
+         Put_Line (Body_Part, Parse (Array_Size_Max_Template, Assocs));
          New_Line (Body_Part);
 
       end Print_Array;
@@ -258,10 +249,10 @@ package body TGen.Marshalling.Binary_Marshallers is
          pragma Style_Checks (Off);
          Size_Max_Pub : constant Boolean :=
            not (Typ in Discriminated_Record_Typ'Class)
-           or else
-             not (for some Disc_Typ of
-                    Discriminated_Record_Typ'Class (Typ).Discriminant_Types
-                  => Disc_Typ.Get.Fully_Private);
+           or else not (for some Disc_Typ
+                          of Discriminated_Record_Typ'Class (Typ)
+                               .Discriminant_Types
+                        => Disc_Typ.Get.Fully_Private);
          pragma Style_Checks (On);
       begin
          Put_Line (Spec_Part, Parse (Composite_Base_Spec_Template, Assocs));
@@ -272,14 +263,11 @@ package body TGen.Marshalling.Binary_Marshallers is
             Put_Line
               (Private_Part, Parse (Composite_Size_Max_Template, Assocs));
          end if;
-         Put_Line
-           (Body_Part, Parse (Record_Read_Write_Template, Assocs));
+         Put_Line (Body_Part, Parse (Record_Read_Write_Template, Assocs));
          New_Line (Body_Part);
-         Put_Line
-           (Body_Part, Parse (Record_Size_Template, Assocs));
+         Put_Line (Body_Part, Parse (Record_Size_Template, Assocs));
          New_Line (Body_Part);
-         Put_Line
-           (Body_Part, Parse (Record_Size_Max_Template, Assocs));
+         Put_Line (Body_Part, Parse (Record_Size_Max_Template, Assocs));
          New_Line (Body_Part);
       end Print_Record;
 
@@ -292,11 +280,9 @@ package body TGen.Marshalling.Binary_Marshallers is
            Parse (Header_Wrappers_Spec_Template, Assocs);
          pragma Unreferenced (Header_Wrapper);
       begin
-         Put_Line
-           (Spec_Part, Parse (Header_Wrappers_Spec_Template, Assocs));
+         Put_Line (Spec_Part, Parse (Header_Wrappers_Spec_Template, Assocs));
          New_Line (Spec_Part);
-         Put_Line
-           (Body_Part, Parse (Header_Wrappers_Body_Template, Assocs));
+         Put_Line (Body_Part, Parse (Header_Wrappers_Body_Template, Assocs));
          New_Line (Body_Part);
       end Print_Header_Wrappers;
 
@@ -330,10 +316,7 @@ package body TGen.Marshalling.Binary_Marshallers is
 
       --  Generate the Input and Output subprograms
 
-      Put_Line
-        (Spec_Part,
-         Parse
-           (In_Out_Spec_Template, Assocs));
+      Put_Line (Spec_Part, Parse (In_Out_Spec_Template, Assocs));
       New_Line (Spec_Part);
       Put_Line (Body_Part, Parse (In_Out_Body_Template, Assocs));
       New_Line (Body_Part);

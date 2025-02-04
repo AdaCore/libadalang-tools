@@ -22,6 +22,7 @@
 ------------------------------------------------------------------------------
 
 with Libadalang.Analysis; use Libadalang.Analysis;
+
 package Test.Skeleton is
    procedure Process_Source (The_Unit : Analysis_Unit);
 

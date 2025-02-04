@@ -21,13 +21,13 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Utils.Command_Lines; use Utils.Command_Lines;
+with Utils.Command_Lines;        use Utils.Command_Lines;
 with Utils.Command_Lines.Common; use Utils.Command_Lines.Common;
+
 package Test.Command_Lines is
 
-   package Test_Common_Nat_Shorthands is new Common_Nat_Switches
-     .Set_Shorthands
-       ([Jobs => +"--queues"]);
+   package Test_Common_Nat_Shorthands is new
+     Common_Nat_Switches.Set_Shorthands ([Jobs => +"--queues"]);
 
    package Freeze_Common is new Freeze_Descriptor (Common_Descriptor);
 
@@ -56,15 +56,14 @@ package Test.Command_Lines is
       Minimize,
       Include_Subp_Name);
 
-   package Test_Boolean_Switches is new Boolean_Switches
-     (Descriptor,
-      Test_Booleans);
+   package Test_Boolean_Switches is new
+     Boolean_Switches (Descriptor, Test_Booleans);
 
-   package Test_Boolean_Shorthands is new Test_Boolean_Switches
-     .Set_Shorthands
-     ([Recursive => +"-r",
-       Command_Line_Support => +"--command-line",
-       others => null]);
+   package Test_Boolean_Shorthands is new
+     Test_Boolean_Switches.Set_Shorthands
+       ([Recursive            => +"-r",
+         Command_Line_Support => +"--command-line",
+         others               => null]);
 
    --  Re: the --command-line/--no-command-line switch. We don't want an
    --  enumeration literal Command_Line here, because it causes conflicts
@@ -78,7 +77,7 @@ package Test.Command_Lines is
          Harness_Only           => False,
          Test_Filtering         => True,
          Test_Filtering_File_IO => True,
-         others => False]);
+         others                 => False]);
 
    type Test_Strings is
      (Separate_Drivers,
@@ -98,37 +97,35 @@ package Test.Command_Lines is
       Cov_Level,
       Minimization_Filter);
 
-   package Test_String_Switches is new String_Switches
-     (Descriptor,
-      Test_Strings);
+   package Test_String_Switches is new
+     String_Switches (Descriptor, Test_Strings);
 
-   package Test_String_Syntax is new Test_String_Switches.Set_Syntax
-     ([Separate_Drivers         => '?',
-       Harness_Dir              => '=',
-       Tests_Dir                => '=',
-       Tests_Root               => '=',
-       Stubs_Dir                => '=',
-       Additional_Tests         => '=',
-       Skeleton_Default         => '=',
-       Passed_Tests             => '=',
-       Exit_Status              => '=',
-       Copy_Environment         => '=',
-       Reporter                 => '=',
-       Gen_Test_Num             => '=',
-       Gen_Test_Subprograms     => '=',
-       Serialized_Test_Dir      => '=',
-       Cov_Level                => '=',
-       Minimization_Filter      => '=']);
+   package Test_String_Syntax is new
+     Test_String_Switches.Set_Syntax
+       ([Separate_Drivers     => '?',
+         Harness_Dir          => '=',
+         Tests_Dir            => '=',
+         Tests_Root           => '=',
+         Stubs_Dir            => '=',
+         Additional_Tests     => '=',
+         Skeleton_Default     => '=',
+         Passed_Tests         => '=',
+         Exit_Status          => '=',
+         Copy_Environment     => '=',
+         Reporter             => '=',
+         Gen_Test_Num         => '=',
+         Gen_Test_Subprograms => '=',
+         Serialized_Test_Dir  => '=',
+         Cov_Level            => '=',
+         Minimization_Filter  => '=']);
 
    type Test_String_Seqs is (Exclude_From_Stubbing);
 
-   package Test_String_Seq_Switches is new String_Seq_Switches
-     (Descriptor,
-      Test_String_Seqs);
+   package Test_String_Seq_Switches is new
+     String_Seq_Switches (Descriptor, Test_String_Seqs);
 
-   package Test_String_Seq_Syntax is new Test_String_Seq_Switches
-     .Set_Syntax
-     ([Exclude_From_Stubbing => '!']);
+   package Test_String_Seq_Syntax is new
+     Test_String_Seq_Switches.Set_Syntax ([Exclude_From_Stubbing => '!']);
 
    package Freeze is new Freeze_Descriptor (Descriptor);
 

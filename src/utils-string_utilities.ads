@@ -78,10 +78,8 @@ package Utils.String_Utilities is
    function Slide (X : W_Str) return W_Str;
    --  Return X with X'First = 1
 
-   function Find
-     (Source : Wide_String;
-      Pattern : Wide_String) return Natural is
-      (Ada.Strings.Wide_Fixed.Index (Source, Pattern));
+   function Find (Source : Wide_String; Pattern : Wide_String) return Natural
+   is (Ada.Strings.Wide_Fixed.Index (Source, Pattern));
 
    function Has_Prefix (X, Prefix : String) return Boolean;
    function Has_Prefix (X, Prefix : W_Str) return Boolean;
@@ -106,17 +104,13 @@ package Utils.String_Utilities is
 
    function Replace_All (S, From, To : W_Str) return W_Str;
    function Replace_All
-     (S        : W_Str_Access;
-      From, To : W_Str)
-      return     W_Str_Access;
+     (S : W_Str_Access; From, To : W_Str) return W_Str_Access;
    --  Replaces all occurrences of From in S with To. In the second form, S is
    --  freed.
 
    function Must_Replace (S, From, To : W_Str) return W_Str;
    function Must_Replace
-     (S        : W_Str_Access;
-      From, To : W_Str)
-      return     W_Str_Access;
+     (S : W_Str_Access; From, To : W_Str) return W_Str_Access;
    --  Same as Replace_All, except these require that at least one substring be
    --  replaced.
 
@@ -135,15 +129,13 @@ package Utils.String_Utilities is
      Ada.Strings.UTF_Encoding.BOM_8;
 
    function To_UTF8
-     (Item       : W_Str;
-      Output_BOM : Boolean := False)
-      return       Ada.Strings.UTF_Encoding.UTF_8_String renames
-     Ada.Strings.UTF_Encoding.Wide_Strings.Encode;
+     (Item : W_Str; Output_BOM : Boolean := False)
+      return Ada.Strings.UTF_Encoding.UTF_8_String
+   renames Ada.Strings.UTF_Encoding.Wide_Strings.Encode;
 
    function From_UTF8
-     (Item : Ada.Strings.UTF_Encoding.UTF_8_String)
-      return W_Str renames
-     Ada.Strings.UTF_Encoding.Wide_Strings.Decode;
+     (Item : Ada.Strings.UTF_Encoding.UTF_8_String) return W_Str
+   renames Ada.Strings.UTF_Encoding.Wide_Strings.Decode;
 
    procedure Text_IO_Put_Char (C : Character);
    procedure Wide_Text_IO_Put_Char (C : Character);
@@ -185,48 +177,49 @@ package Utils.String_Utilities is
    --  already exists. On failure, raises Move_Failure with an appropriate
    --  Exception_Message.
 
-   package String_Vectors is
-      new Ada.Containers.Indefinite_Vectors (Positive, String);
+   package String_Vectors is new
+     Ada.Containers.Indefinite_Vectors (Positive, String);
    subtype String_Vector is String_Vectors.Vector;
 
    package String_Sets is new Ada.Containers.Indefinite_Ordered_Sets (String);
    subtype String_Set is String_Sets.Set;
 
-   function String_Less
-     (S1, S2 : String_Access) return Boolean is
-       (S1.all < S2.all);
+   function String_Less (S1, S2 : String_Access) return Boolean
+   is (S1.all < S2.all);
 
-   function String_Equal
-     (S1, S2 : String_Access) return Boolean is
-       (S1.all = S2.all);
+   function String_Equal (S1, S2 : String_Access) return Boolean
+   is (S1.all = S2.all);
 
-   package String_Access_Sets is new Ada.Containers.Ordered_Sets
-     (String_Access, "<" => String_Less, "=" => String_Equal);
+   package String_Access_Sets is new
+     Ada.Containers.Ordered_Sets
+       (String_Access,
+        "<" => String_Less,
+        "=" => String_Equal);
    subtype String_Access_Set is String_Access_Sets.Set;
 
-   function Hash is new GNAT.String_Hash.Hash
-     (Character, String, Ada.Containers.Hash_Type);
+   function Hash is new
+     GNAT.String_Hash.Hash (Character, String, Ada.Containers.Hash_Type);
 
-   function Hash
-     (S : String_Access) return Ada.Containers.Hash_Type is
-       (Hash (S.all));
+   function Hash (S : String_Access) return Ada.Containers.Hash_Type
+   is (Hash (S.all));
 
-   function Equivalent_Strings
-     (S1, S2 : String_Access) return Boolean is
-       (S1.all = S2.all);
+   function Equivalent_Strings (S1, S2 : String_Access) return Boolean
+   is (S1.all = S2.all);
 
-   package String_String_Maps is new Ada.Containers.Hashed_Maps
-     (Key_Type        => String_Access,
-      Element_Type    => String_Access,
-      Hash            => Hash,
-      Equivalent_Keys => Equivalent_Strings);
+   package String_String_Maps is new
+     Ada.Containers.Hashed_Maps
+       (Key_Type        => String_Access,
+        Element_Type    => String_Access,
+        Hash            => Hash,
+        Equivalent_Keys => Equivalent_Strings);
    subtype String_String_Map is String_String_Maps.Map;
 
-   package String_String_List_Maps is new Ada.Containers.Hashed_Maps
-     (Key_Type        => String_Access,
-      Element_Type    => String_List_Access,
-      Hash            => Hash,
-      Equivalent_Keys => Equivalent_Strings);
+   package String_String_List_Maps is new
+     Ada.Containers.Hashed_Maps
+       (Key_Type        => String_Access,
+        Element_Type    => String_List_Access,
+        Hash            => Hash,
+        Equivalent_Keys => Equivalent_Strings);
    subtype String_String_List_Map is String_String_List_Maps.Map;
 
    ---------------------

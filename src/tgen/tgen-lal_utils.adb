@@ -34,8 +34,7 @@ package body TGen.LAL_Utils is
    -----------------------
 
    function To_Qualified_Name
-     (Name : Libadalang.Analysis.Name) return Ada_Qualified_Name
-   is
+     (Name : Libadalang.Analysis.Name) return Ada_Qualified_Name is
    begin
       return Result : Ada_Qualified_Name do
          case Ada_Name (Name.Kind) is
@@ -43,8 +42,8 @@ package body TGen.LAL_Utils is
                declare
                   DN     : constant Libadalang.Analysis.Dotted_Name :=
                     Name.As_Dotted_Name;
-                  Suffix : constant Ada_Qualified_Name := To_Qualified_Name
-                     (DN.F_Suffix.As_Name);
+                  Suffix : constant Ada_Qualified_Name :=
+                    To_Qualified_Name (DN.F_Suffix.As_Name);
                begin
                   Result := To_Qualified_Name (DN.F_Prefix);
                   Result.Append (Suffix);
@@ -59,14 +58,14 @@ package body TGen.LAL_Utils is
                   --  Langkit_Support.Text.Image.
 
                   Identifier : constant TGen.Strings.Ada_Identifier :=
-                     To_Unbounded_String (Image (Name.Text));
+                    To_Unbounded_String (Image (Name.Text));
                begin
                   Result.Append (Identifier);
                end;
 
             when others =>
                raise Constraint_Error
-                  with "no qualified name for " & Name.Kind'Image & " nodes";
+                 with "no qualified name for " & Name.Kind'Image & " nodes";
          end case;
       end return;
    end To_Qualified_Name;
@@ -97,9 +96,10 @@ package body TGen.LAL_Utils is
       Comp_Unit : constant Libadalang.Analysis.Compilation_Unit :=
         Subp.P_Enclosing_Compilation_Unit;
    begin
-      return To_JSON_filename
-        (Convert_Qualified_Name
-           (Comp_Unit.P_Syntactic_Fully_Qualified_Name));
+      return
+        To_JSON_filename
+          (Convert_Qualified_Name
+             (Comp_Unit.P_Syntactic_Fully_Qualified_Name));
    end JSON_Test_Filename;
 
    --------------------------------
@@ -120,7 +120,7 @@ package body TGen.LAL_Utils is
            (FQN.Last_Index,
             To_Unbounded_String
               (Map_Operator_Name
-                (To_String (Unbounded_String (FQN.Last_Element)))));
+                 (To_String (Unbounded_String (FQN.Last_Element)))));
       end if;
       FQN.Append (To_Unbounded_String (Test.Common.Mangle_Hash_Full (Subp)));
       return To_Filename (FQN);
@@ -139,7 +139,8 @@ package body TGen.LAL_Utils is
         LAL.P_Enclosing_Compilation_Unit
           (if Instantiation_Chain'Length > 0
            then Instantiation_Chain (Instantiation_Chain'Last)
-           else Subp).P_Decl;
+           else Subp)
+          .P_Decl;
    begin
       return Res;
    end Ultimate_Enclosing_Compilation_Unit;
@@ -148,14 +149,15 @@ package body TGen.LAL_Utils is
    -- Get_Top_Level_Instantiation_File_Name --
    -------------------------------------------
 
-   function Top_Level_Instantiation_Test_File_Name (Unit_Full_Name : String)
-      return String
+   function Top_Level_Instantiation_Test_File_Name
+     (Unit_Full_Name : String) return String
    is
       Tmp : Ada_Qualified_Name;
    begin
       Tmp.Append
-         (TGen.Strings.Ada_Identifier'(To_Unbounded_String (Unit_Full_Name)));
-      return Ada.Characters.Handling.To_Lower
-         ("tgen_" & To_Symbol (Tmp, Sep => '_') & ".json");
+        (TGen.Strings.Ada_Identifier'(To_Unbounded_String (Unit_Full_Name)));
+      return
+        Ada.Characters.Handling.To_Lower
+          ("tgen_" & To_Symbol (Tmp, Sep => '_') & ".json");
    end Top_Level_Instantiation_Test_File_Name;
 end TGen.LAL_Utils;

@@ -64,20 +64,23 @@ package Pp.Scanner is
       --  A fillable whole-line comment; that is, one that should be
       --  filled if filling is turned on.
       Other_Whole_Line_Comment,
-   --  A comment that appears by itself on a line. Multiple comments that may
-   --  be filled as a "paragraph" are combined into a single Whole_Line_Comment
-   --  token.
+      --  A comment that appears by itself on a line. Multiple comments that
+      --  may be filled as a "paragraph" are combined into a single
+      --  Whole_Line_Comment token.
       End_Of_Line_Comment,
-   --  A comment that appears at the end of a line, after some other
-   --  program text.
+      --  A comment that appears at the end of a line, after some other
+      --  program text.
 
       --  All the rest are in Same_Text_Kind (see body):
 
       Start_Of_Input,
       End_Of_Input,
-      Enabled_LB_Token, Disabled_LB_Token,
+      Enabled_LB_Token,
+      Disabled_LB_Token,
       Tab_Token,
-      False_End_Of_Line, True_End_Of_Line_LF, True_End_Of_Line_CR,
+      False_End_Of_Line,
+      True_End_Of_Line_LF,
+      True_End_Of_Line_CR,
       True_End_Of_Line_CRLF,
       --  False_End_Of_Line and True_End_Of_Line are used only in Src_Tokns;
       --  the scanner produces these when scanning the source.
@@ -92,11 +95,38 @@ package Pp.Scanner is
       --  with an Enabled_LB_Token. Thus, a Disabled_LB_Token can temporarily
       --  correspond to an enabled line break.
 
-      '!', '#', '$', '?', '[', '\', ']', '^', '`', '{', '}', '~', '_',
+      '!',
+      '#',
+      '$',
+      '?',
+      '[',
+      '\',
+      ']',
+      '^',
+      '`',
+      '{',
+      '}',
+      '~',
+      '_',
       --  These are not in Ada
 
-      '-', ''', '&', '(', ')', '+', ',', ':', ';', '|', '@',
-      '<', '>', '.', '*', '=', '/',
+      '-',
+      ''',
+      '&',
+      '(',
+      ')',
+      '+',
+      ',',
+      ':',
+      ';',
+      '|',
+      '@',
+      '<',
+      '>',
+      '.',
+      '*',
+      '=',
+      '/',
       Arrow, --  =>
       Dot_Dot, --  ..
       Exp_Op, --  **
@@ -191,50 +221,54 @@ package Pp.Scanner is
 
       --  Ada 2012 reserved words
 
-      Res_Some
-     );
+      Res_Some);
 
    subtype Token_Kind is Opt_Token_Kind with Predicate => Token_Kind /= Nil;
 
    subtype Other_Lexeme is Token_Kind range '!' .. Colon_Equal;
 
    subtype Reserved_Word is Token_Kind range Res_Abort .. Res_Some;
-   subtype Reserved_Word_Or_Id is Token_Kind with
-     Predicate => Reserved_Word_Or_Id in Ident | Reserved_Word;
+   subtype Reserved_Word_Or_Id is Token_Kind
+   with Predicate => Reserved_Word_Or_Id in Ident | Reserved_Word;
    subtype Reserved_Word_83 is Token_Kind range Res_Abort .. Res_Xor;
    subtype Reserved_Word_95 is Token_Kind range Res_Abort .. Res_Tagged;
    subtype Reserved_Word_2005 is
      Token_Kind range Res_Abort .. Res_Synchronized;
    subtype Reserved_Word_2012 is Token_Kind range Res_Abort .. Res_Some;
 
-   subtype Reserved_Word_New is Reserved_Word_2012 with
-     Predicate => Reserved_Word_New not in Reserved_Word_83;
+   subtype Reserved_Word_New is Reserved_Word_2012
+   with Predicate => Reserved_Word_New not in Reserved_Word_83;
    --  These are the reserved words that were added to Ada after Ada 83. We
    --  don't know what language version we are processing, so we allow these
    --  as identifiers.
 
-   subtype Whole_Line_Comment is Token_Kind with
-     Predicate => Whole_Line_Comment in
-       Pp_Off_Comment | Pp_On_Comment | Special_Comment |
-       Fillable_Comment | Other_Whole_Line_Comment;
+   subtype Whole_Line_Comment is Token_Kind
+   with
+     Predicate =>
+       Whole_Line_Comment
+       in Pp_Off_Comment
+        | Pp_On_Comment
+        | Special_Comment
+        | Fillable_Comment
+        | Other_Whole_Line_Comment;
 
-   subtype Comment_Kind is Token_Kind with
-        Predicate => Comment_Kind in Whole_Line_Comment | End_Of_Line_Comment;
+   subtype Comment_Kind is Token_Kind
+   with Predicate => Comment_Kind in Whole_Line_Comment | End_Of_Line_Comment;
 
-   subtype True_End_Of_Line is Token_Kind with
-     Predicate => True_End_Of_Line in
-                    True_End_Of_Line_LF
-                      | True_End_Of_Line_CR
-                      | True_End_Of_Line_CRLF;
+   subtype True_End_Of_Line is Token_Kind
+   with
+     Predicate =>
+       True_End_Of_Line
+       in True_End_Of_Line_LF | True_End_Of_Line_CR | True_End_Of_Line_CRLF;
 
-   subtype EOL_Token is Token_Kind with
-     Predicate => EOL_Token in False_End_Of_Line | True_End_Of_Line;
+   subtype EOL_Token is Token_Kind
+   with Predicate => EOL_Token in False_End_Of_Line | True_End_Of_Line;
 
-   subtype Line_Break_Token is Token_Kind with
-     Predicate => Line_Break_Token in Enabled_LB_Token | Disabled_LB_Token;
+   subtype Line_Break_Token is Token_Kind
+   with Predicate => Line_Break_Token in Enabled_LB_Token | Disabled_LB_Token;
 
-   subtype Pp_Off_On_Comment is Token_Kind with
-        Predicate => Pp_Off_On_Comment in Pp_Off_Comment | Pp_On_Comment;
+   subtype Pp_Off_On_Comment is Token_Kind
+   with Predicate => Pp_Off_On_Comment in Pp_Off_Comment | Pp_On_Comment;
 
    subtype Same_Text_Kind is Opt_Token_Kind range Start_Of_Input .. Res_Some;
    --  These are the tokens that always have the same text associated with
@@ -242,8 +276,8 @@ package Pp.Scanner is
    --  each token. Instead, the token text is stored in Token_To_Symbol_Map
    --  below. Example: Every Less_Or_Equal token has the text "<=".
 
-   subtype Stored_Text_Kind is Token_Kind with
-     Predicate => Stored_Text_Kind not in Same_Text_Kind;
+   subtype Stored_Text_Kind is Token_Kind
+   with Predicate => Stored_Text_Kind not in Same_Text_Kind;
    --  These are the tokens that have different text.
    --  The token text is stored separately for each token.
    --  Example: Ident -- one might have text = "Foo",
@@ -278,15 +312,18 @@ package Pp.Scanner is
    --  be encoded, decoded, and skipped over. Token_At_Cursor also needs to
    --  be modified. Currently, we only have support for integer types.
 
-   function Image (Sloc : Source_Location) return String is
-     (Image (Sloc.Line) & ":" &
-      Image (Sloc.Col) & "(" &
-      Image (Sloc.First) & ".." &
-      Image (Sloc.Last) & ")");
+   function Image (Sloc : Source_Location) return String
+   is (Image (Sloc.Line)
+       & ":"
+       & Image (Sloc.Col)
+       & "("
+       & Image (Sloc.First)
+       & ".."
+       & Image (Sloc.Last)
+       & ")");
 
-   function Sloc_Image
-     (Sloc : Source_Location) return String is
-       (Image (Sloc.Line) & ":" & Image (Sloc.Col));
+   function Sloc_Image (Sloc : Source_Location) return String
+   is (Image (Sloc.Line) & ":" & Image (Sloc.Col));
 
    type Source_Message is record
       --  Message attached to a particular source location.
@@ -295,23 +332,24 @@ package Pp.Scanner is
    end record;
    type Source_Message_Array is array (Positive range <>) of Source_Message;
 
-   package Source_Message_Vectors is new Utils.Vectors
-     (Index_Type => Positive,
-      Element_Type => Source_Message,
-      Elements_Array => Source_Message_Array);
+   package Source_Message_Vectors is new
+     Utils.Vectors
+       (Index_Type     => Positive,
+        Element_Type   => Source_Message,
+        Elements_Array => Source_Message_Array);
    subtype Source_Message_Vector is Source_Message_Vectors.Vector;
 
    function Message_Image
-     (File_Name : String; Sloc : Source_Location) return String is
-       (File_Name & ":" & Image (Sloc.Line) & ":" & Image (Sloc.Col));
+     (File_Name : String; Sloc : Source_Location) return String
+   is (File_Name & ":" & Image (Sloc.Line) & ":" & Image (Sloc.Col));
 
    Default_Pp_Off_String : aliased constant W_Str := "--!pp off";
-   Default_Pp_On_String : aliased constant W_Str := "--!pp on";
+   Default_Pp_On_String  : aliased constant W_Str := "--!pp on";
 
    type W_Str_Access_Constant is access constant W_Str;
    type Pp_Off_On_Delimiters_Rec is record
       Off : W_Str_Access_Constant := Default_Pp_Off_String'Access;
-      On : W_Str_Access_Constant := Default_Pp_On_String'Access;
+      On  : W_Str_Access_Constant := Default_Pp_On_String'Access;
       --  Text of comments for turning pretting printing off and on, including
       --  the leading '--'. For example, if the user specified --pp-off='pp-',
       --  then Off will be "--pp-". A whole-line comment of the form "--pp-"
@@ -350,8 +388,8 @@ package Pp.Scanner is
    --  Sloc_First of the new token that will be added next, but does not yet
    --  exist in the Tokn_Vec.
    function Next_Sloc_First (X : Tokn_Cursor) return Positive;
-   function Tokn_Length (X : Tokn_Cursor) return Natural is
-     (Next_Sloc_First (X) - Sloc_First (X));
+   function Tokn_Length (X : Tokn_Cursor) return Natural
+   is (Next_Sloc_First (X) - Sloc_First (X));
    --  The text of the token is equal to the slice
    --     Input(Sloc_First..Sloc_Last),
    --  where Input is the parameter of Get_Tokns.
@@ -376,23 +414,23 @@ package Pp.Scanner is
    --  is that GNATCOLL.Paragraph_Filling expects it, so it's simpler and
    --  more efficient this way.
 
-   function Leading_Blanks (X : Tokn_Cursor) return Natural with
-     Pre => Kind (X) in Comment_Kind;
+   function Leading_Blanks (X : Tokn_Cursor) return Natural
+   with Pre => Kind (X) in Comment_Kind;
    --  The number of leading blanks, which are blanks after the initial "--"
    --  and before any nonblank characters.
 
-   function Width (X : Tokn_Cursor) return Positive with
-     Pre => Kind (X) in Whole_Line_Comment;
+   function Width (X : Tokn_Cursor) return Positive
+   with Pre => Kind (X) in Whole_Line_Comment;
    --  For single-line Whole_Line_Comments, this is the width of the token,
    --  i.e. the same as Sloc.Last-Sloc.First+1, and the same as the length of
    --  Text. For multi-line comments, this is the width of the widest line.
    --  The initial "--" and any leading blanks are included, but the NL's are
    --  not.
 
-   function Token_Output_Len (X : Token) return Positive with
-     Pre => X.Kind in Comment_Kind;
-   function Token_Output_Len (X : Tokn_Cursor) return Positive with
-     Pre => Kind (X) in Comment_Kind;
+   function Token_Output_Len (X : Token) return Positive
+   with Pre => X.Kind in Comment_Kind;
+   function Token_Output_Len (X : Tokn_Cursor) return Positive
+   with Pre => Kind (X) in Comment_Kind;
    --  Returns the length of the comment as it will appear in the output. For
    --  fillable comment paragraphs, this uses Sloc_Col as the indentation. The
    --  comment is assumed to start at the initial "--" and go to the end of the
@@ -422,19 +460,20 @@ package Pp.Scanner is
    --  single identifier "Mumbleis". If Y cannot follow X according to the
    --  grammar, then it doesn't matter whether this returns True or False.
 
-   function Get_Num_Tokens (V : Tokn_Vec) return Tokn_Index is
-     (Get_Tokn_Index (Last (V'Unrestricted_Access)));
+   function Get_Num_Tokens (V : Tokn_Vec) return Tokn_Index
+   is (Get_Tokn_Index (Last (V'Unrestricted_Access)));
 
-   function Is_Blank_Line (X : Tokn_Cursor) return Boolean is
-     ((Kind (X) in EOL_Token and then Kind (Prev (X)) in EOL_Token)
-      or else
-     (Kind (X) in Enabled_LB_Token
-        and then Kind (Prev (X)) in Enabled_LB_Token));
+   function Is_Blank_Line (X : Tokn_Cursor) return Boolean
+   is ((Kind (X) in EOL_Token and then Kind (Prev (X)) in EOL_Token)
+       or else (Kind (X) in Enabled_LB_Token
+                and then Kind (Prev (X)) in Enabled_LB_Token));
 
-   subtype Nonlexeme_Kind is Opt_Token_Kind with Predicate =>
-     Nonlexeme_Kind in EOL_Token | Spaces | Comment_Kind | Tab_Token;
-   subtype Lexeme_Kind is Opt_Token_Kind with Predicate =>
-     Lexeme_Kind not in Nonlexeme_Kind;
+   subtype Nonlexeme_Kind is Opt_Token_Kind
+   with
+     Predicate =>
+       Nonlexeme_Kind in EOL_Token | Spaces | Comment_Kind | Tab_Token;
+   subtype Lexeme_Kind is Opt_Token_Kind
+   with Predicate => Lexeme_Kind not in Nonlexeme_Kind;
    --  Tokens classified (or not) as "lexemes"
 
    function Next_Lexeme (Cur : Tokn_Cursor) return Tokn_Cursor;
@@ -443,12 +482,16 @@ package Pp.Scanner is
    function Prev_Lexeme (Cur : Tokn_Cursor) return Tokn_Cursor;
    --  Returns the previous lexeme
 
-   procedure Append_Tokn (V : in out Tokn_Vec; X : Tokn_Cursor;
-                          Org : String := "Append Tokn_Cursor");
-   procedure Append_Tokn (V : in out Tokn_Vec; X : Same_Text_Kind;
-                          Org : String := "Append Kind");
    procedure Append_Tokn
-     (V : in out Tokn_Vec; X : Stored_Text_Kind; Tx : Syms.Symbol;
+     (V   : in out Tokn_Vec;
+      X   : Tokn_Cursor;
+      Org : String := "Append Tokn_Cursor");
+   procedure Append_Tokn
+     (V : in out Tokn_Vec; X : Same_Text_Kind; Org : String := "Append Kind");
+   procedure Append_Tokn
+     (V   : in out Tokn_Vec;
+      X   : Stored_Text_Kind;
+      Tx  : Syms.Symbol;
       Org : String := "Append Kind&Text");
    --  Append X onto the end of V. If an identifier matches a reserved word in
    --  the latest language version, we append a reserved word token.
@@ -461,9 +504,10 @@ package Pp.Scanner is
    --  with a confusing bug.
 
    procedure Append_Spaces
-     (V : in out Tokn_Vec; Count : Natural;
+     (V           : in out Tokn_Vec;
+      Count       : Natural;
       Existing_OK : Boolean := False;
-      Org : String := "Append_Spaces");
+      Org         : String := "Append_Spaces");
    --  Append a Spaces token; Count is the number of blanks.
    --  We don't want two Spaces in a row; by default we blow
    --  up if the previously appended token was a Spaces.
@@ -471,33 +515,29 @@ package Pp.Scanner is
    --  tokens.
 
    procedure Append_Comment
-     (V : in out Tokn_Vec; X : Tokn_Cursor; Org : String) with
-     Pre => Kind (X) in Comment_Kind;
+     (V : in out Tokn_Vec; X : Tokn_Cursor; Org : String)
+   with Pre => Kind (X) in Comment_Kind;
    --  Append a comment token, adjusting the length for zero indentation
 
-   function Is_Header_Comment
-     (Tkn : Token)
-      return Boolean with
-     Pre => Tkn.Kind in Comment_Kind;
+   function Is_Header_Comment (Tkn : Token) return Boolean
+   with Pre => Tkn.Kind in Comment_Kind;
    --  Check if Tkn (which must be a comment) ends with -- or --\NL
 
-   function Is_Empty_Comment
-     (Token : Pp.Scanner.Token)
-      return Boolean with
-     Pre => Token.Kind in Comment_Kind;
+   function Is_Empty_Comment (Token : Pp.Scanner.Token) return Boolean
+   with Pre => Token.Kind in Comment_Kind;
    --  Check if Token (which must be a comment) is an empty comment (starts
    --  with --, optionally followed by spaces and a NL).
 
    procedure Append_Comment_Text
-     (V                       : in out Tokn_Vec;
-      X                       : Tokn_Cursor;
-      Tx                      : W_Str;
-      Recompute_Length        : Boolean;
-      Comments_Only           : Boolean;
-      Leading_Blanks          : Natural;
-      Indent                  : Natural := 0;
-      Org                     : String) with
-     Pre => Kind (X) in Comment_Kind;
+     (V                : in out Tokn_Vec;
+      X                : Tokn_Cursor;
+      Tx               : W_Str;
+      Recompute_Length : Boolean;
+      Comments_Only    : Boolean;
+      Leading_Blanks   : Natural;
+      Indent           : Natural := 0;
+      Org              : String)
+   with Pre => Kind (X) in Comment_Kind;
    --  Append a comment token, adjusting the length for zero indentation,
    --  and using the possibly-filled text Tx. I don't think it's
    --  zero indentation!
@@ -514,10 +554,9 @@ package Pp.Scanner is
    --  and the template language. They are mostly the treated the same, but
    --  this is used to indicate differences.
 
-   type Optional_EOL_Formats is (Nil, CRLF, LF) with
-     Default_Value => Nil;
-   subtype EOL_Formats is Optional_EOL_Formats with
-     Predicate => EOL_Formats in CRLF | LF;
+   type Optional_EOL_Formats is (Nil, CRLF, LF) with Default_Value => Nil;
+   subtype EOL_Formats is Optional_EOL_Formats
+   with Predicate => EOL_Formats in CRLF | LF;
    --  Conventions for ends of lines
 
    procedure Get_Tokns
@@ -539,8 +578,7 @@ package Pp.Scanner is
       Result              : out Tokn_Vec;
       Comments_Special_On : Boolean;
       Max_Tokens          : Tokn_Index := Tokn_Index'Last;
-      Lang                : Language := Ada_Lang)
-     return Boolean;
+      Lang                : Language := Ada_Lang) return Boolean;
    --  This is to get around the annoying restriction in Ada that you can't mix
    --  declarations and statements. It does the same thing as the procedure,
    --  and the result is to be ignored. ???It might make sense to return the
@@ -589,7 +627,8 @@ package Pp.Scanner is
    --  This puts all the tokens in the vector that Tok points to, highlighting
    --  Tok.
 
-   Show_Origin : Boolean := False with Export;
+   Show_Origin : Boolean := False
+   with Export;
    --  Set to True in debugger to see Origins
 
    Check_Comment_Length : Boolean := True;
@@ -619,17 +658,23 @@ private
                         --  The following are used to compute the Sloc of the
                         --  EOL_Token token that follows the comment.
 
-                        Num_Lines : Positive;
+                        Num_Lines     : Positive;
                         --  Number of lines in the comment; this can be greater
                         --  than one for comments combined into a fillable
                         --  comment "paragraph".
                         Last_Line_Len : Positive;
                         --  Length of the last line of the comment
-                     when others => null;
+
+                     when others =>
+                        null;
                   end case;
-               when others => null;
+
+               when others =>
+                  null;
             end case;
-         when others => null;
+
+         when others =>
+            null;
       end case;
    end record; -- Token
 
@@ -643,23 +688,23 @@ private
    --  encoding.
 
    type Fixed_Part is record
-      Kind : Token_Kind;
-      Sloc_Line : Positive;
-      Sloc_Col : Positive;
+      Kind       : Token_Kind;
+      Sloc_Line  : Positive;
+      Sloc_Col   : Positive;
       Sloc_First : Positive;
-      Origin : Syms.Symbol;
+      Origin     : Syms.Symbol;
    end record;
 
    type Fixed_Part_Array is array (Tokn_Index range <>) of Fixed_Part;
 
-   package Fixed_Part_Vectors is new Utils.Vectors
-     (Tokn_Index, Fixed_Part, Fixed_Part_Array);
+   package Fixed_Part_Vectors is new
+     Utils.Vectors (Tokn_Index, Fixed_Part, Fixed_Part_Array);
    subtype Fixed_Part_Vector is Fixed_Part_Vectors.Vector;
 
    type Tokn_Vec is record
       New_Sloc_First : Positive := 1;
-      Fixed : Fixed_Part_Vector;
-      Octets : Octet_Vector;
+      Fixed          : Fixed_Part_Vector;
+      Octets         : Octet_Vector;
    end record;
 
    type Tokn_Cursor (V : Tokn_Vec_Ref := null) is record
@@ -669,15 +714,15 @@ private
 
    --  The following are private, for use by child package Lines:
 
-   function Index (X : Tokn_Cursor) return Positive with
-     Pre => Kind (X) in Line_Break_Token | Tab_Token;
+   function Index (X : Tokn_Cursor) return Positive
+   with Pre => Kind (X) in Line_Break_Token | Tab_Token;
 
    procedure Append_Tokn_With_Index
      (V     : in out Tokn_Vec;
       X     : Token_Kind;
       Index : Positive;
       Len   : Natural := 0;
-      Org   : String := "Append Kind") with
-     Pre => X in Line_Break_Token | Tab_Token;
+      Org   : String := "Append Kind")
+   with Pre => X in Line_Break_Token | Tab_Token;
 
 end Pp.Scanner;

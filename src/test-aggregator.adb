@@ -23,20 +23,20 @@
 
 with Ada.Containers.Indefinite_Ordered_Maps;
 
-with Ada.Characters.Handling;    use Ada.Characters.Handling;
-with Ada.Strings;                use Ada.Strings;
-with Ada.Strings.Fixed;          use Ada.Strings.Fixed;
-with Ada.Text_IO;                use Ada.Text_IO;
-with GNAT.OS_Lib;                use GNAT.OS_Lib;
-with GNAT.Directory_Operations;  use GNAT.Directory_Operations;
+with Ada.Characters.Handling;   use Ada.Characters.Handling;
+with Ada.Strings;               use Ada.Strings;
+with Ada.Strings.Fixed;         use Ada.Strings.Fixed;
+with Ada.Text_IO;               use Ada.Text_IO;
+with GNAT.OS_Lib;               use GNAT.OS_Lib;
+with GNAT.Directory_Operations; use GNAT.Directory_Operations;
 
-with GNATCOLL.VFS;               use GNATCOLL.VFS;
-with GNATCOLL.Traces;            use GNATCOLL.Traces;
+with GNATCOLL.VFS;    use GNATCOLL.VFS;
+with GNATCOLL.Traces; use GNATCOLL.Traces;
 
-with Test.Common;                use Test.Common;
+with Test.Common; use Test.Common;
 
-with Utils.Command_Lines;        use Utils.Command_Lines;
-with Utils.Environment;          use Utils.Environment;
+with Utils.Command_Lines; use Utils.Command_Lines;
+with Utils.Environment;   use Utils.Environment;
 
 package body Test.Aggregator is
 
@@ -49,8 +49,7 @@ package body Test.Aggregator is
 
    Target_Dirs : File_Array_Access := new File_Array'(Empty_File_Array);
 
-   type TD_Status is
-     (Waiting, Processing, Analysis, Invalid, Done);
+   type TD_Status is (Waiting, Processing, Analysis, Invalid, Done);
 
    package TD_Tables is new
      Ada.Containers.Indefinite_Ordered_Maps (String, TD_Status);
@@ -87,19 +86,19 @@ package body Test.Aggregator is
    Currently_Running : Natural := 0;
    --  The number of test drivers started and in unknown state
 
-   subtype Full_Driver_Process_Table_Idx is Natural
-     range No_Process .. Natural'Last;
+   subtype Full_Driver_Process_Table_Idx is
+     Natural range No_Process .. Natural'Last;
 
-   subtype Driver_Process_Table_Idx is Natural
-     range First_Process .. Natural'Last;
+   subtype Driver_Process_Table_Idx is
+     Natural range First_Process .. Natural'Last;
 
    type Driver_Process is record
       Name : String_Access := new String'("");
-      PId : Process_Id     := Invalid_Pid;
+      PId  : Process_Id := Invalid_Pid;
    end record;
 
-   type Driver_Process_Table_Type is array (Positive range <>)
-     of Driver_Process;
+   type Driver_Process_Table_Type is
+     array (Positive range <>) of Driver_Process;
 
    type Driver_Process_Table_Type_Access is access Driver_Process_Table_Type;
 
@@ -112,12 +111,10 @@ package body Test.Aggregator is
    Last_Stored_Old, Last_Finished_Old : Full_Driver_Process_Table_Idx;
 
    function Get_Corresponding_Dir
-     (Idx : Driver_Process_Table_Idx)
-      return String
-   is
-     (Target_Dirs (Target_Dirs'First + Idx - 1).Display_Full_Name);
-      --  Gets the full name of directory from Target_Dirs with correpsonding
-      --  index.
+     (Idx : Driver_Process_Table_Idx) return String
+   is (Target_Dirs (Target_Dirs'First + Idx - 1).Display_Full_Name);
+   --  Gets the full name of directory from Target_Dirs with correpsonding
+   --  index.
 
    function Not_A_Comment (S : String) return Boolean;
    --  True if S doesn't start with "--  ".
@@ -129,8 +126,7 @@ package body Test.Aggregator is
    --  Waits for the first test driver to terminate and returns its number
 
    procedure Store_Process_Termination
-     (Process : Process_Id;
-      Success : Boolean);
+     (Process : Process_Id; Success : Boolean);
    --  Locates the record corresponding to Process in Driver_Process_Table.
    --  Changes the status of the corresponding driver according to Success and
    --  removes the record about this process from Driver_Process_Table;
@@ -141,14 +137,14 @@ package body Test.Aggregator is
    procedure Parse_Test_Driver_Output;
    --  Parses output file from dir number For_Analysis.
 
-   Cumulative_Output_Passed  : List_Of_Strings.List
-     := List_Of_Strings.Empty_List;
-   Cumulative_Output_Failed  : List_Of_Strings.List
-     := List_Of_Strings.Empty_List;
-   Cumulative_Output_Crashed : List_Of_Strings.List
-     := List_Of_Strings.Empty_List;
-   Cumulative_Output_Unsure : List_Of_Strings.List
-     := List_Of_Strings.Empty_List;
+   Cumulative_Output_Passed  : List_Of_Strings.List :=
+     List_Of_Strings.Empty_List;
+   Cumulative_Output_Failed  : List_Of_Strings.List :=
+     List_Of_Strings.Empty_List;
+   Cumulative_Output_Crashed : List_Of_Strings.List :=
+     List_Of_Strings.Empty_List;
+   Cumulative_Output_Unsure  : List_Of_Strings.List :=
+     List_Of_Strings.Empty_List;
 
    Total_Passed  : Natural := 0;
    Total_Failed  : Natural := 0;
@@ -159,18 +155,18 @@ package body Test.Aggregator is
    -------------------------------
 
    function Get_Index_For_New_Process return Driver_Process_Table_Idx is
-      Idx : Driver_Process_Table_Idx range First_Process .. Queues_Number
-        := First_Process;
+      Idx   : Driver_Process_Table_Idx range First_Process .. Queues_Number :=
+        First_Process;
       Count : Natural := 0;
-      Res : Driver_Process_Table_Idx;
+      Res   : Driver_Process_Table_Idx;
    begin
       --  Saving in case new process will fail
-      Last_Stored_Old   := Last_Stored;
+      Last_Stored_Old := Last_Stored;
       Last_Finished_Old := Last_Finished;
 
       if Last_Finished /= No_Process then
          Res := Last_Finished;
-         Last_Stored   := Last_Finished;
+         Last_Stored := Last_Finished;
          Last_Finished := No_Process;
          return Res;
       end if;
@@ -235,10 +231,10 @@ package body Test.Aggregator is
       Wait_Process (Next_Proc, Success);
       Trace
         (Me,
-        "process terminated:"
-        & Integer'Image (Pid_To_Integer (Next_Proc))
-        & "; success="
-        & Boolean'Image (Success));
+         "process terminated:"
+         & Integer'Image (Pid_To_Integer (Next_Proc))
+         & "; success="
+         & Boolean'Image (Success));
 
       while Next_Proc /= Invalid_Pid loop
          Currently_Running := Currently_Running - 1;
@@ -253,10 +249,10 @@ package body Test.Aggregator is
          Wait_Process (Next_Proc, Success);
          Trace
            (Me,
-           "process terminated:"
-           & Integer'Image (Pid_To_Integer (Next_Proc))
-           & "; success="
-           & Boolean'Image (Success));
+            "process terminated:"
+            & Integer'Image (Pid_To_Integer (Next_Proc))
+            & "; success="
+            & Boolean'Image (Success));
       end loop;
       Decrease_Indent (Me);
    end Set_Terminated_Process_Index;
@@ -339,8 +335,8 @@ package body Test.Aggregator is
       Idx1, Idx2 : Integer;
 
       Suspicious_Output_Global : Boolean := False;
-      Suspicious_Output  : Boolean := False;
-      Traceback_Possible : Boolean := False;
+      Suspicious_Output        : Boolean := False;
+      Traceback_Possible       : Boolean := False;
 
       type Test_Kinds is (Passed, Failed, Crashed, Unsure);
       Current_Kind : Test_Kinds;
@@ -351,38 +347,38 @@ package body Test.Aggregator is
       --  exception, returns 0.
 
       procedure Classify_Output
-        (S                  :        String;
-         Suspicious_Output  :    out Boolean;
+        (S                  : String;
+         Suspicious_Output  : out Boolean;
          Traceback_Possible : in out Boolean;
-         Test_Kind          : out    Test_Kinds);
+         Test_Kind          : out Test_Kinds);
       --  Looks for patterns that gnattest test reportes puts for passed,
       --  failed or crashed tests. I neither is present, this is most likely
       --  not test driver's output.
 
       procedure Classify_Output
-        (S                  :        String;
-         Suspicious_Output  :    out Boolean;
+        (S                  : String;
+         Suspicious_Output  : out Boolean;
          Traceback_Possible : in out Boolean;
-         Test_Kind          :    out Test_Kinds) is
+         Test_Kind          : out Test_Kinds) is
       begin
          Suspicious_Output := True;
 
          if Index (S, "corresponding test PASSED") /= 0 then
-            Suspicious_Output  := False;
-            Test_Kind          := Passed;
+            Suspicious_Output := False;
+            Test_Kind := Passed;
             Traceback_Possible := False;
          end if;
          if Index (S, "corresponding test FAILED") /= 0 then
-            Suspicious_Output  := False;
-            Test_Kind          := Failed;
+            Suspicious_Output := False;
+            Test_Kind := Failed;
             Traceback_Possible := False;
          end if;
          if Index (S, "corresponding test CRASHED") /= 0 then
             --  Traceback lines look "suspicious to this check, so we have to
             --  put additional flag ON.
             Traceback_Possible := True;
-            Suspicious_Output  := False;
-            Test_Kind          := Crashed;
+            Suspicious_Output := False;
+            Test_Kind := Crashed;
          end if;
 
          if Suspicious_Output then
@@ -433,7 +429,7 @@ package body Test.Aggregator is
                --  probably crashed.
                declare
                   Passed_Add, Failed_Add, Crashed_Add : Integer;
-                  Unexpected : Boolean := False;
+                  Unexpected                          : Boolean := False;
                begin
                   Idx1 := Index (S, ":");
                   Idx2 := Index (S, "passed");
@@ -479,10 +475,13 @@ package body Test.Aggregator is
                case Current_Kind is
                   when Passed =>
                      Cumulative_Output_Passed.Append (S);
+
                   when Failed =>
                      Cumulative_Output_Failed.Append (S);
+
                   when Crashed =>
                      Cumulative_Output_Crashed.Append (S);
+
                   when Unsure =>
                      Cumulative_Output_Unsure.Append (S);
                end case;
@@ -524,9 +523,9 @@ package body Test.Aggregator is
            (Target_Dirs,
             Create
               (+(Tool_Temp_Dir.all
-               & Directory_Separator
-               & "dir"
-               & Trim (Positive'Image (I), Both))));
+                 & Directory_Separator
+                 & "dir"
+                 & Trim (Positive'Image (I), Both))));
       end loop;
       Create_Dirs (Target_Dirs);
 
@@ -551,11 +550,10 @@ package body Test.Aggregator is
       end if;
 
       --  Initialise Driver Process Table
-      Driver_Process_Table := new
-        Driver_Process_Table_Type (First_Process .. Queues_Number);
+      Driver_Process_Table :=
+        new Driver_Process_Table_Type (First_Process .. Queues_Number);
 
-      while
-        Get_Next_Driver_To_Run /= ""
+      while Get_Next_Driver_To_Run /= ""
         or else Get_Next_Driver_To_Analyze /= ""
         or else Unfinished_Processes
       loop
@@ -567,11 +565,10 @@ package body Test.Aggregator is
          end if;
       end loop;
 
-      if
-        Cumulative_Output_Passed.Is_Empty and then
-        Cumulative_Output_Failed.Is_Empty and then
-        Cumulative_Output_Crashed.Is_Empty and then
-        Cumulative_Output_Unsure.Is_Empty
+      if Cumulative_Output_Passed.Is_Empty
+        and then Cumulative_Output_Failed.Is_Empty
+        and then Cumulative_Output_Crashed.Is_Empty
+        and then Cumulative_Output_Unsure.Is_Empty
       then
          Cmd_Error_No_Help ("no test drivers terminated succesfully");
       end if;
@@ -601,9 +598,7 @@ package body Test.Aggregator is
 
       Ada.Text_IO.Put_Line
         (Trim
-           (Integer'Image
-                (Total_Failed + Total_Passed + Total_Crashed),
-            Both)
+           (Integer'Image (Total_Failed + Total_Passed + Total_Crashed), Both)
          & " tests run: "
          & Trim (Integer'Image (Total_Passed), Both)
          & " passed; "
@@ -644,9 +639,7 @@ package body Test.Aggregator is
 
          --  We need to spawn it at the right place.
          Change_Dir (Get_Corresponding_Dir (Idx));
-         Trace
-           (Me,
-            "switching dir: " & Get_Current_Dir);
+         Trace (Me, "switching dir: " & Get_Current_Dir);
          Next_Process :=
            Non_Blocking_Spawn
              (Tmp.all,
@@ -669,7 +662,7 @@ package body Test.Aggregator is
             Mark_As_Invalid (Tmp.all);
 
             --  Rolling back Last_Stored and Last_Finished.
-            Last_Stored   := Last_Stored_Old;
+            Last_Stored := Last_Stored_Old;
             Last_Finished := Last_Finished_Old;
          else
             Mark_As_Processing (Tmp.all);
@@ -687,11 +680,10 @@ package body Test.Aggregator is
    -------------------------------
 
    procedure Store_Process_Termination
-     (Process : Process_Id;
-      Success : Boolean)
+     (Process : Process_Id; Success : Boolean)
    is
-      Idx : Full_Driver_Process_Table_Idx range No_Process .. Queues_Number
-        := No_Process;
+      Idx : Full_Driver_Process_Table_Idx range No_Process .. Queues_Number :=
+        No_Process;
    begin
       Trace (Me, "Store_Process_Termination");
       Increase_Indent (Me);
@@ -752,17 +744,13 @@ package body Test.Aggregator is
       Idx : Integer;
    begin
       --  Fill up the source table.
-      Open
-        (TD_List_File,
-         In_File,
-         File_Name);
+      Open (TD_List_File, In_File, File_Name);
 
       while not End_Of_File (TD_List_File) loop
          Tmp := new String'(Get_Line (TD_List_File));
          if Not_A_Comment (Tmp.all) and then Tmp.all /= "" then
             if Aggregate_Subdir_Name.all /= "" then
-               Idx :=
-                 Index (Tmp.all, [1 => Directory_Separator], Backward);
+               Idx := Index (Tmp.all, [1 => Directory_Separator], Backward);
                if Idx /= 0 then
                   TD_Table.Include
                     (Tmp (Tmp.all'First .. Idx)
@@ -772,9 +760,7 @@ package body Test.Aggregator is
                      Waiting);
                else
                   TD_Table.Include
-                    (Aggregate_Subdir_Name.all
-                     & Directory_Separator
-                     & Tmp.all,
+                    (Aggregate_Subdir_Name.all & Directory_Separator & Tmp.all,
                      Waiting);
                end if;
             else

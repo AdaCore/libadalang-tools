@@ -21,7 +21,7 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with GNAT.OS_Lib;                use GNAT.OS_Lib;
+with GNAT.OS_Lib; use GNAT.OS_Lib;
 
 with Ada.Containers.Indefinite_Vectors;
 
@@ -53,7 +53,7 @@ package Test.Harness is
       Nesting : String_Access;
 
       --  Following component used only in full mode
-      Tested_Type         : Ada_Node;
+      Tested_Type : Ada_Node;
    end record;
 
    package TT_Info is new
@@ -66,7 +66,7 @@ package Test.Harness is
       Test_Type_Numb : Positive;
       Nesting        : String_Access;
 
-      Tested_Sloc    : String_Access := null;
+      Tested_Sloc : String_Access := null;
    end record;
 
    package TR_Info is new
@@ -79,8 +79,8 @@ package Test.Harness is
       TR_Rarent_Unit_Name : String_Access;
 
       --  Following components used only in full mode
-      Inheritance_Depth   : Natural;
-      Tested_Type         : Ada_Node;
+      Inheritance_Depth : Natural;
+      Tested_Type       : Ada_Node;
 
    end record;
 
@@ -99,9 +99,7 @@ package Test.Harness is
 
    use TC_Info;
 
-   type Data_Kind_Type is
-     (Declaration_Data,
-      Instantination_Data);
+   type Data_Kind_Type is (Declaration_Data, Instantination_Data);
 
    type Data_Holder (Data_Kind : Data_Kind_Type := Declaration_Data) is record
 
@@ -123,7 +121,7 @@ package Test.Harness is
             Test_Types : TT_Info.Vector;
             --  List of test types
 
-            TR_List  : TR_Info.Vector;
+            TR_List : TR_Info.Vector;
             --  List of test routines declared in the test package
 
             ITR_List : TR_Info_Enhanced.Vector;
@@ -137,7 +135,7 @@ package Test.Harness is
             --  List of test_case types in current package
 
             --  Flags:
-            Generic_Kind                    : Boolean := False;
+            Generic_Kind : Boolean := False;
             --  On, when the given package is generic
 
             Top_Level_Generic_Instantiation : Boolean := False;
@@ -148,10 +146,10 @@ package Test.Harness is
             --
             --  where `Foo` is a generic package
 
-            Good_For_Suite       : Boolean := False;
+            Good_For_Suite : Boolean := False;
             --  The suite should be generated
 
-            Good_For_Substitution       : Boolean := False;
+            Good_For_Substitution : Boolean := False;
             --  Substitution suite should be generated
 
          when Instantination_Data =>
@@ -179,9 +177,7 @@ package Test.Harness is
    --  generation.
 
    procedure Generate_Test_Drivers
-     (Data      : Data_Holder;
-      UUT       : String;
-      Stub_List : Ada_Nodes_List.List);
+     (Data : Data_Holder; UUT : String; Stub_List : Ada_Nodes_List.List);
    --  For the given UUT generates a set of independent test driver mains,
    --  one per subprogram under test, inherited or declared.
 

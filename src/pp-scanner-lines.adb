@@ -25,15 +25,17 @@ with Ada.Text_IO;
 
 package body Pp.Scanner.Lines is
 
-   function Line_Break_Token_Index (X : Tokn_Cursor) return Line_Break_Index is
-     (Line_Break_Index (Index (X)));
+   function Line_Break_Token_Index (X : Tokn_Cursor) return Line_Break_Index
+   is (Line_Break_Index (Index (X)));
 
-   function Tab_Token_Index (X : Tokn_Cursor) return Tab_Index is
-     (Tab_Index (Index (X)));
+   function Tab_Token_Index (X : Tokn_Cursor) return Tab_Index
+   is (Tab_Index (Index (X)));
 
    procedure Append_Line_Break_Tokn
-     (V : in out Tokn_Vec; Enabled : Boolean; Index : Line_Break_Index;
-      Org : String := "Append_Line_Break_Tokn") is
+     (V       : in out Tokn_Vec;
+      Enabled : Boolean;
+      Index   : Line_Break_Index;
+      Org     : String := "Append_Line_Break_Tokn") is
    begin
       if Enabled then
          Append_Tokn_With_Index
@@ -51,10 +53,12 @@ package body Pp.Scanner.Lines is
    end Append_Line_Break_Tokn;
 
    procedure Append_Tab_Tokn
-     (V : in out Tokn_Vec; Index : Tab_Index; Tab_Len : Natural := 0;
-      Org : String := "Append_Tab_Tokn") is
+     (V       : in out Tokn_Vec;
+      Index   : Tab_Index;
+      Tab_Len : Natural := 0;
+      Org     : String := "Append_Tab_Tokn") is
    begin
-      Append_Tokn_With_Index  (V, Tab_Token, Positive (Index), Tab_Len, Org);
+      Append_Tokn_With_Index (V, Tab_Token, Positive (Index), Tab_Len, Org);
    end Append_Tab_Tokn;
 
    procedure Put_Index_Info (All_LB : Line_Break_Vector; X : Tokn_Cursor) is
@@ -66,14 +70,22 @@ package body Pp.Scanner.Lines is
             begin
                Text_IO.Put
                  (Text_IO.Standard_Output,
-                  "ind = " & Image (Break.Indentation) &
-                  ", " & (if Break.Hard then "hard" else "soft") &
-                  ", " & (if Break.Enabled then "enabled" else "disabled") &
-                  ", " & "lev = " & Image (Integer (Break.Level)));
+                  "ind = "
+                  & Image (Break.Indentation)
+                  & ", "
+                  & (if Break.Hard then "hard" else "soft")
+                  & ", "
+                  & (if Break.Enabled then "enabled" else "disabled")
+                  & ", "
+                  & "lev = "
+                  & Image (Integer (Break.Level)));
             end;
+
          when Tab_Token =>
             null; -- not yet implemented
-         when others => raise Program_Error;
+
+         when others =>
+            raise Program_Error;
       end case;
    end Put_Index_Info;
 

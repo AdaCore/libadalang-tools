@@ -24,11 +24,11 @@ pragma Ada_2012;
 
 with Ada.Containers.Indefinite_Ordered_Maps;
 
-with GNAT.OS_Lib;                use GNAT.OS_Lib;
-with GNAT.Directory_Operations;  use GNAT.Directory_Operations;
+with GNAT.OS_Lib;               use GNAT.OS_Lib;
+with GNAT.Directory_Operations; use GNAT.Directory_Operations;
 
-with GNATCOLL.VFS;               use GNATCOLL.VFS;
-with GNATCOLL.Traces;            use GNATCOLL.Traces;
+with GNATCOLL.VFS;    use GNATCOLL.VFS;
+with GNATCOLL.Traces; use GNATCOLL.Traces;
 
 with Ada.Characters.Handling; use Ada.Characters.Handling;
 
@@ -71,7 +71,7 @@ package body Test.Skeleton.Source_Table is
       Corresponding_Body : String_Access := null;
       --  Set in Stub Mode for package specs.
 
-      Theoretical_Body   : String_Access := null;
+      Theoretical_Body : String_Access := null;
       --  Set for creating an instrumented body in case a bodyless spec would
       --  nned a body due to expression functions.
 
@@ -85,7 +85,7 @@ package body Test.Skeleton.Source_Table is
 
       Project_Name : String_Access;
       --  Name of corresponding project. Only relevant for bodies.
-      Unit_Name : String_Access := null;
+      Unit_Name    : String_Access := null;
 
       Inst_Dir : String_Access;
       --  Directory for overriding instrumented sources
@@ -108,9 +108,9 @@ package body Test.Skeleton.Source_Table is
    SFL_Table : Source_File_Locations.Set;
    --  A set of paths to source files. Used for creation of project file.
 
-   SF_Process_Iterator  : Source_File_Table.Cursor;
-   SF_Access_Iterator   : Source_File_Table.Cursor;
-   SFL_Iterator         : Source_File_Locations.Cursor;
+   SF_Process_Iterator : Source_File_Table.Cursor;
+   SF_Access_Iterator  : Source_File_Table.Cursor;
+   SFL_Iterator        : Source_File_Locations.Cursor;
 
    Short_Source_Name_String : String_Access;
    Full_Source_Name_String  : String_Access;
@@ -122,8 +122,9 @@ package body Test.Skeleton.Source_Table is
      (Proj             : String;
       Current_Infix    : String;
       Subroot_Stub_Prj : String;
-      Get_Sources      : access procedure
-        (Proj : String; Current_Proj_Present_Sources : out String_Set.Set));
+      Get_Sources      :
+        access procedure
+          (Proj : String; Current_Proj_Present_Sources : out String_Set.Set));
    --  Create a extending project tree rooted at Proj, overriding the default
    --  sources in the tree with the required stubs and helper units.
    --  Get_Sources is a callback to get the list of sources that should be part
@@ -192,15 +193,14 @@ package body Test.Skeleton.Source_Table is
 
       --  Check if we already have a file with the same short name:
       Short_Source_Name_String := new String'(Base_Name (Fname));
-      Full_Source_Name_String  :=
-        new String'(Normalize_Pathname
-          (Fname,
-           Resolve_Links  => False,
-             Case_Sensitive => False));
+      Full_Source_Name_String :=
+        new String'
+          (Normalize_Pathname
+             (Fname, Resolve_Links => False, Case_Sensitive => False));
 
-      if
-        Source_Present (Full_Source_Name_String.all) and then
-        Get_Source_Status (Full_Source_Name_String.all) = Body_Reference
+      if Source_Present (Full_Source_Name_String.all)
+        and then Get_Source_Status (Full_Source_Name_String.all)
+                 = Body_Reference
       then
          Trace (Me, "...replacing body reference");
          New_SF_Record := SF_Table.Element (Full_Source_Name_String.all);
@@ -218,9 +218,9 @@ package body Test.Skeleton.Source_Table is
         new String'(Full_Source_Name_String.all);
 
       First_Idx := Short_Source_Name_String'First;
-      Last_Idx  := Short_Source_Name_String'Last;
+      Last_Idx := Short_Source_Name_String'Last;
 
-      for J in reverse  First_Idx + 1 .. Last_Idx loop
+      for J in reverse First_Idx + 1 .. Last_Idx loop
 
          if Short_Source_Name_String (J) = '.' then
             Last_Idx := J - 1;
@@ -236,13 +236,12 @@ package body Test.Skeleton.Source_Table is
 
       if Stub_Mode_ON then
          declare
-            Given_File : constant GNATCOLL.VFS.Virtual_File :=
-              Create (+Fname);
+            Given_File : constant GNATCOLL.VFS.Virtual_File := Create (+Fname);
             Other_File : constant GNATCOLL.VFS.Virtual_File :=
               Source_Project_Tree.Other_File (Given_File);
-            F_Info     : constant File_Info                 :=
+            F_Info     : constant File_Info :=
               Source_Project_Tree.Info (Given_File);
-            P : Project_Type;
+            P          : Project_Type;
          begin
             if Given_File /= Other_File
               and then Is_Regular_File (Other_File.Display_Full_Name)
@@ -251,25 +250,25 @@ package body Test.Skeleton.Source_Table is
                  new String'(Other_File.Display_Full_Name);
             end if;
 
-            New_SF_Record.Stub_Data_Base_Spec := new String'
-              (+
-                 (File_From_Unit
-                      (Project         => F_Info.Project,
-                       Unit_Name       =>
-                         F_Info.Unit_Name & "." & Stub_Data_Unit_Name,
-                       Part            => Unit_Spec,
-                       Language        => F_Info.Language,
-                       File_Must_Exist => False)));
+            New_SF_Record.Stub_Data_Base_Spec :=
+              new String'
+                (+(File_From_Unit
+                     (Project         => F_Info.Project,
+                      Unit_Name       =>
+                        F_Info.Unit_Name & "." & Stub_Data_Unit_Name,
+                      Part            => Unit_Spec,
+                      Language        => F_Info.Language,
+                      File_Must_Exist => False)));
 
-            New_SF_Record.Stub_Data_Base_Body := new String'
-              (+
-                 (File_From_Unit
-                      (Project         => F_Info.Project,
-                       Unit_Name       =>
-                         F_Info.Unit_Name & "." & Stub_Data_Unit_Name,
-                       Part            => Unit_Body,
-                       Language        => F_Info.Language,
-                       File_Must_Exist => False)));
+            New_SF_Record.Stub_Data_Base_Body :=
+              new String'
+                (+(File_From_Unit
+                     (Project         => F_Info.Project,
+                      Unit_Name       =>
+                        F_Info.Unit_Name & "." & Stub_Data_Unit_Name,
+                      Part            => Unit_Body,
+                      Language        => F_Info.Language,
+                      File_Must_Exist => False)));
 
             P := F_Info.Project;
             loop
@@ -284,17 +283,17 @@ package body Test.Skeleton.Source_Table is
 
       if Instrument then
          declare
-            Given_File : constant GNATCOLL.VFS.Virtual_File :=
-              Create (+Fname);
+            Given_File : constant GNATCOLL.VFS.Virtual_File := Create (+Fname);
             Other_File : constant GNATCOLL.VFS.Virtual_File :=
               Source_Project_Tree.Other_File (Given_File);
-            F_Info     : constant File_Info                 :=
+            F_Info     : constant File_Info :=
               Source_Project_Tree.Info (Given_File);
-            P : constant Project_Type := F_Info.Project;
+            P          : constant Project_Type := F_Info.Project;
          begin
-            New_SF_Record.Inst_Dir := new String'
-              (Display_Full_Name
-                 (P.Object_Dir / (+(To_Lower (P.Name) & Instr_Suffix))));
+            New_SF_Record.Inst_Dir :=
+              new String'
+                (Display_Full_Name
+                   (P.Object_Dir / (+(To_Lower (P.Name) & Instr_Suffix))));
             if Given_File /= Other_File then
                if Is_Regular_File (Other_File.Display_Full_Name) then
                   New_SF_Record.Corresponding_Body :=
@@ -311,11 +310,12 @@ package body Test.Skeleton.Source_Table is
 
       Include
         (SFL_Table,
-         Normalize_Pathname (Name => Dir_Name (Full_Source_Name_String.all),
-                             Resolve_Links  => False,
-                             Case_Sensitive => False));
+         Normalize_Pathname
+           (Name           => Dir_Name (Full_Source_Name_String.all),
+            Resolve_Links  => False,
+            Case_Sensitive => False));
 
-      Sources_Left  := Sources_Left + 1;
+      Sources_Left := Sources_Left + 1;
       Total_Sources := Total_Sources + 1;
 
       Free (Short_Source_Name_String);
@@ -338,20 +338,19 @@ package body Test.Skeleton.Source_Table is
       Trace (Me, "adding " & Fname & " from project " & Pname);
       --  Check if we already have a file with the same short name:
       Short_Source_Name_String := new String'(Base_Name (Fname));
-      Full_Source_Name_String  :=
-        new String'(Normalize_Pathname
-                    (Fname,
-                       Resolve_Links  => False,
-                       Case_Sensitive => False));
+      Full_Source_Name_String :=
+        new String'
+          (Normalize_Pathname
+             (Fname, Resolve_Links => False, Case_Sensitive => False));
 
       --  Making the new SF_Record
       New_SF_Record.Full_Source_Name :=
         new String'(Full_Source_Name_String.all);
 
       First_Idx := Short_Source_Name_String'First;
-      Last_Idx  := Short_Source_Name_String'Last;
+      Last_Idx := Short_Source_Name_String'Last;
 
-      for J in reverse  First_Idx + 1 .. Last_Idx loop
+      for J in reverse First_Idx + 1 .. Last_Idx loop
 
          if Short_Source_Name_String (J) = '.' then
             Last_Idx := J - 1;
@@ -372,9 +371,10 @@ package body Test.Skeleton.Source_Table is
 
       Include
         (SFL_Table,
-         Normalize_Pathname (Name => Dir_Name (Full_Source_Name_String.all),
-                             Resolve_Links  => False,
-                             Case_Sensitive => False));
+         Normalize_Pathname
+           (Name           => Dir_Name (Full_Source_Name_String.all),
+            Resolve_Links  => False,
+            Case_Sensitive => False));
 
       Free (Short_Source_Name_String);
       Free (Full_Source_Name_String);
@@ -398,16 +398,14 @@ package body Test.Skeleton.Source_Table is
       end if;
 
       Short_Source_Name_String := new String'(Base_Name (Fname));
-      Full_Source_Name_String  :=
-        new String'(Normalize_Pathname
-          (Fname,
-           Resolve_Links  => False,
-             Case_Sensitive => False));
+      Full_Source_Name_String :=
+        new String'
+          (Normalize_Pathname
+             (Fname, Resolve_Links => False, Case_Sensitive => False));
 
       --  Already present specs should not be overridden
-      if
-        SF_Table.Find
-          (Full_Source_Name_String.all) /= Source_File_Table.No_Element
+      if SF_Table.Find (Full_Source_Name_String.all)
+        /= Source_File_Table.No_Element
       then
          return;
       end if;
@@ -417,9 +415,9 @@ package body Test.Skeleton.Source_Table is
         new String'(Full_Source_Name_String.all);
 
       First_Idx := Short_Source_Name_String'First;
-      Last_Idx  := Short_Source_Name_String'Last;
+      Last_Idx := Short_Source_Name_String'Last;
 
-      for J in reverse  First_Idx + 1 .. Last_Idx loop
+      for J in reverse First_Idx + 1 .. Last_Idx loop
 
          if Short_Source_Name_String (J) = '.' then
             Last_Idx := J - 1;
@@ -434,13 +432,12 @@ package body Test.Skeleton.Source_Table is
       New_SF_Record.Status := Body_Reference;
 
       declare
-         Given_File : constant GNATCOLL.VFS.Virtual_File :=
-           Create (+Fname);
+         Given_File : constant GNATCOLL.VFS.Virtual_File := Create (+Fname);
          Other_File : constant GNATCOLL.VFS.Virtual_File :=
            Source_Project_Tree.Other_File (Given_File);
-         F_Info     : constant File_Info                 :=
+         F_Info     : constant File_Info :=
            Source_Project_Tree.Info (Given_File);
-         P : Project_Type;
+         P          : Project_Type;
       begin
          if Given_File /= Other_File
            and then Is_Regular_File (Other_File.Display_Full_Name)
@@ -449,25 +446,25 @@ package body Test.Skeleton.Source_Table is
               new String'(Other_File.Display_Full_Name);
          end if;
 
-         New_SF_Record.Stub_Data_Base_Spec := new String'
-           (+
-              (File_From_Unit
-                   (Project         => F_Info.Project,
-                    Unit_Name       =>
-                      F_Info.Unit_Name & "." & Stub_Data_Unit_Name,
-                    Part            => Unit_Spec,
-                    Language        => F_Info.Language,
-                    File_Must_Exist => False)));
+         New_SF_Record.Stub_Data_Base_Spec :=
+           new String'
+             (+(File_From_Unit
+                  (Project         => F_Info.Project,
+                   Unit_Name       =>
+                     F_Info.Unit_Name & "." & Stub_Data_Unit_Name,
+                   Part            => Unit_Spec,
+                   Language        => F_Info.Language,
+                   File_Must_Exist => False)));
 
-         New_SF_Record.Stub_Data_Base_Body := new String'
-           (+
-              (File_From_Unit
-                   (Project         => F_Info.Project,
-                    Unit_Name       =>
-                      F_Info.Unit_Name & "." & Stub_Data_Unit_Name,
-                    Part            => Unit_Body,
-                    Language        => F_Info.Language,
-                    File_Must_Exist => False)));
+         New_SF_Record.Stub_Data_Base_Body :=
+           new String'
+             (+(File_From_Unit
+                  (Project         => F_Info.Project,
+                   Unit_Name       =>
+                     F_Info.Unit_Name & "." & Stub_Data_Unit_Name,
+                   Part            => Unit_Body,
+                   Language        => F_Info.Language,
+                   File_Must_Exist => False)));
 
          P := F_Info.Project;
          loop
@@ -498,26 +495,25 @@ package body Test.Skeleton.Source_Table is
          return;
       end if;
 
-      Full_Source_Name_String  :=
-        new String'(Normalize_Pathname
-          (Fname,
-           Resolve_Links  => False,
-             Case_Sensitive => False));
+      Full_Source_Name_String :=
+        new String'
+          (Normalize_Pathname
+             (Fname, Resolve_Links => False, Case_Sensitive => False));
 
       --  Making the new SF_Record
       New_SF_Record.Full_Source_Name :=
         new String'(Full_Source_Name_String.all);
 
       declare
-         Given_File : constant GNATCOLL.VFS.Virtual_File :=
-           Create (+Fname);
-         F_Info     : constant File_Info                 :=
+         Given_File : constant GNATCOLL.VFS.Virtual_File := Create (+Fname);
+         F_Info     : constant File_Info :=
            Source_Project_Tree.Info (Given_File);
-         P : constant Project_Type := F_Info.Project;
+         P          : constant Project_Type := F_Info.Project;
       begin
-         New_SF_Record.Inst_Dir := new String'
-           (Display_Full_Name
-              (P.Object_Dir / (+(To_Lower (P.Name) & Instr_Suffix))));
+         New_SF_Record.Inst_Dir :=
+           new String'
+             (Display_Full_Name
+                (P.Object_Dir / (+(To_Lower (P.Name) & Instr_Suffix))));
       end;
 
       Insert (SF_Table, Full_Source_Name_String.all, New_SF_Record);
@@ -553,24 +549,21 @@ package body Test.Skeleton.Source_Table is
    -- Get_Imported_Projects --
    ---------------------------
 
-   function Get_Imported_Projects (Project_Name : String)
-                                   return List_Of_Strings.List
-   is
+   function Get_Imported_Projects
+     (Project_Name : String) return List_Of_Strings.List is
    begin
-      return Project_File_Table.Element
-        (PF_Table, Project_Name).Imported_List;
+      return Project_File_Table.Element (PF_Table, Project_Name).Imported_List;
    end Get_Imported_Projects;
 
    ----------------------------
    -- Get_Importing_Projects --
    ----------------------------
 
-   function Get_Importing_Projects (Project_Name : String)
-                                    return List_Of_Strings.List
-   is
+   function Get_Importing_Projects
+     (Project_Name : String) return List_Of_Strings.List is
    begin
-      return Project_File_Table.Element
-        (PF_Table, Project_Name).Importing_List;
+      return
+        Project_File_Table.Element (PF_Table, Project_Name).Importing_List;
    end Get_Importing_Projects;
 
    ----------------------
@@ -579,8 +572,7 @@ package body Test.Skeleton.Source_Table is
 
    function Get_Project_Path (Project_Name : String) return String is
    begin
-      return Project_File_Table.Element
-        (PF_Table, Project_Name).Path.all;
+      return Project_File_Table.Element (PF_Table, Project_Name).Path.all;
    end Get_Project_Path;
 
    --------------------------
@@ -589,17 +581,15 @@ package body Test.Skeleton.Source_Table is
 
    function Get_Project_Stub_Dir (Project_Name : String) return String is
    begin
-      return Project_File_Table.Element
-        (PF_Table, Project_Name).Stub_Dir.all;
+      return Project_File_Table.Element (PF_Table, Project_Name).Stub_Dir.all;
    end Get_Project_Stub_Dir;
 
    ---------------------
    -- Get_Source_Body --
    ---------------------
 
-   function Get_Source_Body (Source_Name : String) return String
-   is
-      SN : constant String :=
+   function Get_Source_Body (Source_Name : String) return String is
+      SN  : constant String :=
         Normalize_Pathname
           (Name           => Source_Name,
            Resolve_Links  => False,
@@ -628,9 +618,8 @@ package body Test.Skeleton.Source_Table is
    -- Get_Source_Instr_Body --
    ---------------------------
 
-   function Get_Source_Instr_Body (Source_Name : String) return String
-   is
-      SN : constant String :=
+   function Get_Source_Instr_Body (Source_Name : String) return String is
+      SN  : constant String :=
         Normalize_Pathname
           (Name           => Source_Name,
            Resolve_Links  => False,
@@ -649,8 +638,7 @@ package body Test.Skeleton.Source_Table is
    -----------------------------
    --  Get_Source_Output_Dir  --
    -----------------------------
-   function Get_Source_Output_Dir (Source_Name : String) return String
-   is
+   function Get_Source_Output_Dir (Source_Name : String) return String is
       SN : constant String :=
         Normalize_Pathname
           (Name           => Source_Name,
@@ -669,126 +657,110 @@ package body Test.Skeleton.Source_Table is
    -- Get_Source_Project --
    ------------------------
 
-   function Get_Source_Project_Name (Source_Name : String) return String
-   is
+   function Get_Source_Project_Name (Source_Name : String) return String is
       SN : constant String :=
         Normalize_Pathname
           (Name           => Source_Name,
            Resolve_Links  => False,
            Case_Sensitive => False);
    begin
-      return Source_File_Table.Element
-        (SF_Table, SN).Project_Name.all;
+      return Source_File_Table.Element (SF_Table, SN).Project_Name.all;
    end Get_Source_Project_Name;
 
    --------------------------
    -- Get_Source_Unit_Name --
    --------------------------
 
-   function Get_Source_Unit_Name (Source_Name : String) return String
-   is
+   function Get_Source_Unit_Name (Source_Name : String) return String is
       SN : constant String :=
         Normalize_Pathname
           (Name           => Source_Name,
            Resolve_Links  => False,
            Case_Sensitive => False);
    begin
-      return Source_File_Table.Element
-        (SF_Table, SN).Unit_Name.all;
+      return Source_File_Table.Element (SF_Table, SN).Unit_Name.all;
    end Get_Source_Unit_Name;
 
    -------------------------
    -- Get_Source_Stub_Dir --
    -------------------------
 
-   function Get_Source_Stub_Dir (Source_Name : String) return String
-   is
+   function Get_Source_Stub_Dir (Source_Name : String) return String is
       SN : constant String :=
         Normalize_Pathname
           (Name           => Source_Name,
            Resolve_Links  => False,
            Case_Sensitive => False);
    begin
-      return Source_File_Table.Element
-        (SF_Table, SN).Stub_Destination.all;
+      return Source_File_Table.Element (SF_Table, SN).Stub_Destination.all;
    end Get_Source_Stub_Dir;
 
    -------------------------------
    -- Get_Source_Stub_Data_Body --
    -------------------------------
 
-   function Get_Source_Stub_Data_Body  (Source_Name : String) return String
-   is
+   function Get_Source_Stub_Data_Body (Source_Name : String) return String is
       SN : constant String :=
         Normalize_Pathname
           (Name           => Source_Name,
            Resolve_Links  => False,
            Case_Sensitive => False);
    begin
-      return Source_File_Table.Element
-        (SF_Table, SN).Stub_Data_Base_Body.all;
+      return Source_File_Table.Element (SF_Table, SN).Stub_Data_Base_Body.all;
    end Get_Source_Stub_Data_Body;
 
    -------------------------------
    -- Get_Source_Stub_Data_Spec --
    -------------------------------
 
-   function Get_Source_Stub_Data_Spec  (Source_Name : String) return String
-   is
+   function Get_Source_Stub_Data_Spec (Source_Name : String) return String is
       SN : constant String :=
         Normalize_Pathname
           (Name           => Source_Name,
            Resolve_Links  => False,
            Case_Sensitive => False);
    begin
-      return Source_File_Table.Element
-        (SF_Table, SN).Stub_Data_Base_Spec.all;
+      return Source_File_Table.Element (SF_Table, SN).Stub_Data_Base_Spec.all;
    end Get_Source_Stub_Data_Spec;
 
    -------------------------
    --  Get_Source_Status  --
    -------------------------
-   function Get_Source_Status (Source_Name : String) return SF_Status
-   is
+   function Get_Source_Status (Source_Name : String) return SF_Status is
       SN : constant String :=
         Normalize_Pathname
           (Name           => Source_Name,
            Resolve_Links  => False,
            Case_Sensitive => False);
    begin
-      return Source_File_Table.Element
-        (SF_Table, SN).Status;
+      return Source_File_Table.Element (SF_Table, SN).Status;
    end Get_Source_Status;
 
    ----------------------------------
    --  Get_Source_Suffixless_Name  --
    ----------------------------------
-   function Get_Source_Suffixless_Name (Source_Name : String) return String
-   is
+   function Get_Source_Suffixless_Name (Source_Name : String) return String is
       SN : constant String :=
         Normalize_Pathname
           (Name           => Source_Name,
            Resolve_Links  => False,
            Case_Sensitive => False);
    begin
-      return Source_File_Table.Element
-        (SF_Table, SN).Suffixless_Name.all;
+      return Source_File_Table.Element (SF_Table, SN).Suffixless_Name.all;
    end Get_Source_Suffixless_Name;
 
    --------------------------
    -- Get_Source_Instr_Dir --
    --------------------------
 
-   function Get_Source_Instr_Dir (Source_Name : String) return String
-   is
+   function Get_Source_Instr_Dir (Source_Name : String) return String is
       SN : constant String :=
         Normalize_Pathname
           (Name           => Source_Name,
            Resolve_Links  => False,
            Case_Sensitive => False);
    begin
-      return Source_File_Table.Element
-        (SF_Table, SN).Inst_Dir.all;
+      return Source_File_Table.Element (SF_Table, SN).Inst_Dir.all;
    end Get_Source_Instr_Dir;
 
    ------------------------------
@@ -797,15 +769,16 @@ package body Test.Skeleton.Source_Table is
 
    procedure Initialize_Project_Table (Source_Project_Tree : Project_Tree) is
       Iter, Importing, Imported : Project_Iterator;
-      P, P2 : Project_Type;
+      P, P2                     : Project_Type;
 
-      Attr   : constant Attribute_Pkg_String := Build ("", "externally_built");
+      Attr : constant Attribute_Pkg_String := Build ("", "externally_built");
    begin
       Trace (Me, "Initialize_Project_Table");
       Increase_Indent (Me);
-      Iter := Start
-        (Source_Project_Tree.Root_Project,
-         Include_Aggregate_Libraries => True);
+      Iter :=
+        Start
+          (Source_Project_Tree.Root_Project,
+           Include_Aggregate_Libraries => True);
       while Current (Iter) /= No_Project loop
          P := Current (Iter);
          Trace (Me, "processing " & P.Name);
@@ -842,19 +815,18 @@ package body Test.Skeleton.Source_Table is
             PR.Path := new String'(P.Project_Path.Display_Full_Name);
             PR.Obj_Dir := new String'(P.Object_Dir.Display_Full_Name);
             if Is_Absolute_Path (Stub_Dir_Name.all) then
-               PR.Stub_Dir := new String'
-                 (Stub_Dir_Name.all
-                  & Directory_Separator
-                  & P.Name);
+               PR.Stub_Dir :=
+                 new String'(Stub_Dir_Name.all & Directory_Separator & P.Name);
             else
-               PR.Stub_Dir := new String'
-                 (Normalize_Pathname
-                    (P.Object_Dir.Display_Full_Name
-                     & Stub_Dir_Name.all
-                     & Directory_Separator
-                     & P.Name,
-                     Resolve_Links  => False,
-                     Case_Sensitive => False));
+               PR.Stub_Dir :=
+                 new String'
+                   (Normalize_Pathname
+                      (P.Object_Dir.Display_Full_Name
+                       & Stub_Dir_Name.all
+                       & Directory_Separator
+                       & P.Name,
+                       Resolve_Links  => False,
+                       Case_Sensitive => False));
             end if;
 
             Increase_Indent (Me, "imported projects:");
@@ -894,8 +866,8 @@ package body Test.Skeleton.Source_Table is
                --  extended projects are skipped.
 
                PR.Importing_List.Append
-                 (Current (Importing)
-                  .Extending_Project (Recurse => True).Name);
+                 (Current (Importing).Extending_Project (Recurse => True)
+                    .Name);
                Trace (Me, Current (Importing).Name);
                Next (Importing);
             end loop;
@@ -917,16 +889,15 @@ package body Test.Skeleton.Source_Table is
    -- Is_Body --
    -------------
 
-   function Is_Body (Source_Name : String) return Boolean
-   is
+   function Is_Body (Source_Name : String) return Boolean is
       SN : constant String :=
         Normalize_Pathname
           (Name           => Source_Name,
            Resolve_Links  => False,
            Case_Sensitive => False);
    begin
-      return Source_File_Table.Element
-        (SF_Table, SN).Corresponding_Body = null;
+      return
+        Source_File_Table.Element (SF_Table, SN).Corresponding_Body = null;
    end Is_Body;
 
    ----------------------------------------
@@ -935,7 +906,7 @@ package body Test.Skeleton.Source_Table is
 
    procedure Mark_Projects_With_Stubbed_Sources is
       S_Cur : Source_File_Table.Cursor := SF_Table.First;
-      PR : Project_Record;
+      PR    : Project_Record;
 
       Processed_Projects : String_Set.Set;
 
@@ -944,7 +915,7 @@ package body Test.Skeleton.Source_Table is
       procedure Process_Project (S : String);
 
       procedure Process_Project (S : String) is
-         Cur : List_Of_Strings.Cursor;
+         Cur      : List_Of_Strings.Cursor;
          Local_PR : Project_Record;
       begin
          Trace (Me, "Process_Project " & S);
@@ -988,8 +959,7 @@ package body Test.Skeleton.Source_Table is
                & " has stubbed sources");
 
             PF_Table.Replace
-              (Source_File_Table.Element (S_Cur).Project_Name.all,
-               PR);
+              (Source_File_Table.Element (S_Cur).Project_Name.all, PR);
          end if;
 
          Next (S_Cur);
@@ -1000,8 +970,7 @@ package body Test.Skeleton.Source_Table is
 
       P_Cur := PF_Table.First;
       while P_Cur /= Project_File_Table.No_Element loop
-         if
-           not Processed_Projects.Contains (Project_File_Table.Key (P_Cur))
+         if not Processed_Projects.Contains (Project_File_Table.Key (P_Cur))
            and then Project_File_Table.Element (P_Cur).Needed_For_Extention
          then
             Process_Project (Project_File_Table.Key (P_Cur));
@@ -1019,7 +988,7 @@ package body Test.Skeleton.Source_Table is
 
    procedure Mark_Sourse_Stubbed (Source_Name : String) is
       SF_Rec : SF_Record;
-      SN : constant String :=
+      SN     : constant String :=
         Normalize_Pathname
           (Name           => Source_Name,
            Resolve_Links  => False,
@@ -1039,13 +1008,13 @@ package body Test.Skeleton.Source_Table is
       Reset_Source_Process_Iterator;
 
       loop
-         if Cur = Source_File_Table.No_Element and then
-           Source_File_Table.Element (SF_Process_Iterator).Status = Pending
+         if Cur = Source_File_Table.No_Element
+           and then Source_File_Table.Element (SF_Process_Iterator).Status
+                    = Pending
          then
             Cur := SF_Process_Iterator;
          end if;
-         if
-           Source_File_Table.Element (SF_Process_Iterator).Status = Waiting
+         if Source_File_Table.Element (SF_Process_Iterator).Status = Waiting
          then
             Free (Current_Source);
             Current_Source := new String'(Key (SF_Process_Iterator));
@@ -1115,8 +1084,9 @@ package body Test.Skeleton.Source_Table is
 
    function Project_Extended (Project_Name : String) return Boolean is
    begin
-      return Project_File_Table.Element
-        (PF_Table, Project_Name).Needed_For_Extention;
+      return
+        Project_File_Table.Element (PF_Table, Project_Name)
+          .Needed_For_Extention;
    end Project_Extended;
 
    ------------------------
@@ -1125,8 +1095,7 @@ package body Test.Skeleton.Source_Table is
 
    function Project_Is_Library (Project_Name : String) return Boolean is
    begin
-      return Project_File_Table.Element
-        (PF_Table, Project_Name).Is_Library;
+      return Project_File_Table.Element (PF_Table, Project_Name).Is_Library;
    end Project_Is_Library;
 
    -------------------------------
@@ -1157,10 +1126,10 @@ package body Test.Skeleton.Source_Table is
    --  Set_Status  --
    ------------------
 
-   procedure Set_Source_Status (Source_Name : String;
-                                New_Status : SF_Status) is
+   procedure Set_Source_Status (Source_Name : String; New_Status : SF_Status)
+   is
       SF_Rec : SF_Record;
-      SN : constant String :=
+      SN     : constant String :=
         Normalize_Pathname
           (Name           => Source_Name,
            Resolve_Links  => False,
@@ -1194,9 +1163,8 @@ package body Test.Skeleton.Source_Table is
          Tmp_Str := new String'(Dir_Name (SF_Rec.Full_Source_Name.all));
 
          SF_Rec.Test_Destination :=
-           new String'(Tmp_Str.all          &
-                       Test_Subdir_Name.all &
-                       Directory_Separator);
+           new String'
+             (Tmp_Str.all & Test_Subdir_Name.all & Directory_Separator);
 
          Replace (SF_Table, SF_Rec_Key.all, SF_Rec);
 
@@ -1224,7 +1192,7 @@ package body Test.Skeleton.Source_Table is
       Increase_Indent (Me, "Set_Separate_Root");
 
       loop
-         exit when  Cur = Source_File_Table.No_Element;
+         exit when Cur = Source_File_Table.No_Element;
 
          SF_Rec := Source_File_Table.Element (Cur);
          SF_Rec_Key := new String'(Key (Cur));
@@ -1236,9 +1204,10 @@ package body Test.Skeleton.Source_Table is
          Idx := Max_Common_Root'Last + 1;
 
          SF_Rec.Test_Destination :=
-           new String'(Separate_Root_Dir.all &
-                       Directory_Separator   &
-                       Tmp_Str.all (Idx .. Tmp_Str.all'Last));
+           new String'
+             (Separate_Root_Dir.all
+              & Directory_Separator
+              & Tmp_Str.all (Idx .. Tmp_Str.all'Last));
 
          Replace (SF_Table, SF_Rec_Key.all, SF_Rec);
 
@@ -1268,7 +1237,7 @@ package body Test.Skeleton.Source_Table is
    begin
 
       loop
-         exit when  Cur = Source_File_Table.No_Element;
+         exit when Cur = Source_File_Table.No_Element;
 
          SF_Rec := Source_File_Table.Element (Cur);
          SF_Rec_Key := new String'(Key (Cur));
@@ -1276,11 +1245,14 @@ package body Test.Skeleton.Source_Table is
          if TD_Name.Is_Absolute_Path then
             SF_Rec.Test_Destination := new String'(Test_Dir_Name.all);
          else
-            Project := GNATCOLL.Projects.Project (Info
-              (Source_Project_Tree,
-               GNATCOLL.VFS.Create (+SF_Rec.Full_Source_Name.all)));
-            SF_Rec.Test_Destination := new String'
-              (Project.Object_Dir.Display_Full_Name & Test_Dir_Name.all);
+            Project :=
+              GNATCOLL.Projects.Project
+                (Info
+                   (Source_Project_Tree,
+                    GNATCOLL.VFS.Create (+SF_Rec.Full_Source_Name.all)));
+            SF_Rec.Test_Destination :=
+              new String'
+                (Project.Object_Dir.Display_Full_Name & Test_Dir_Name.all);
          end if;
 
          Replace (SF_Table, SF_Rec_Key.all, SF_Rec);
@@ -1308,14 +1280,16 @@ package body Test.Skeleton.Source_Table is
    begin
 
       loop
-         exit when  Cur = Source_File_Table.No_Element;
+         exit when Cur = Source_File_Table.No_Element;
 
          SF_Rec := Source_File_Table.Element (Cur);
          SF_Rec_Key := new String'(Key (Cur));
 
-         Project := GNATCOLL.Projects.Project
-           (Info (Source_Project_Tree,
-            GNATCOLL.VFS.Create (+SF_Rec.Full_Source_Name.all)));
+         Project :=
+           GNATCOLL.Projects.Project
+             (Info
+                (Source_Project_Tree,
+                 GNATCOLL.VFS.Create (+SF_Rec.Full_Source_Name.all)));
 
          loop
             exit when Extending_Project (Project) = No_Project;
@@ -1324,19 +1298,19 @@ package body Test.Skeleton.Source_Table is
 
          --  Better use subdirs to separate stubs from different projects.
          if TD_Name.Is_Absolute_Path then
-            SF_Rec.Stub_Destination := new String'
-              (Stub_Dir_Name.all
-               & Directory_Separator
-               & Project.Name);
+            SF_Rec.Stub_Destination :=
+              new String'
+                (Stub_Dir_Name.all & Directory_Separator & Project.Name);
          else
-            SF_Rec.Stub_Destination := new String'
-              (Normalize_Pathname
-                 (Project.Object_Dir.Display_Full_Name
-                  & Stub_Dir_Name.all
-                  & Directory_Separator
-                  & Project.Name,
-                  Resolve_Links  => False,
-                  Case_Sensitive => False));
+            SF_Rec.Stub_Destination :=
+              new String'
+                (Normalize_Pathname
+                   (Project.Object_Dir.Display_Full_Name
+                    & Stub_Dir_Name.all
+                    & Directory_Separator
+                    & Project.Name,
+                    Resolve_Links  => False,
+                    Case_Sensitive => False));
          end if;
 
          Replace (SF_Table, SF_Rec_Key.all, SF_Rec);
@@ -1353,7 +1327,7 @@ package body Test.Skeleton.Source_Table is
 
    procedure Set_Output_Dir (Source_Name : String; Output_Dir : String) is
       SF_Rec : SF_Record;
-      SN : constant String :=
+      SN     : constant String :=
         Normalize_Pathname
           (Name           => Source_Name,
            Resolve_Links  => False,
@@ -1389,8 +1363,7 @@ package body Test.Skeleton.Source_Table is
            Resolve_Links  => False,
            Case_Sensitive => False);
    begin
-      return Source_File_Table.Element
-        (SF_Table, SN).Stub_Created;
+      return Source_File_Table.Element (SF_Table, SN).Stub_Created;
    end Source_Stubbed;
 
    -------------------------------------
@@ -1401,8 +1374,9 @@ package body Test.Skeleton.Source_Table is
      (Proj             : String;
       Current_Infix    : String;
       Subroot_Stub_Prj : String;
-      Get_Sources      : access procedure
-        (Proj : String; Current_Proj_Present_Sources : out String_Set.Set))
+      Get_Sources      :
+        access procedure
+          (Proj : String; Current_Proj_Present_Sources : out String_Set.Set))
    is
       Processed_Projects : String_Set.Set := String_Set.Empty_Set;
 
@@ -1417,8 +1391,8 @@ package body Test.Skeleton.Source_Table is
 
       procedure Generate_Stub_Extension_Project_Aux (Proj : String) is
          Cur, I_Cur : List_Of_Strings.Cursor;
-         E_Cur : String_Set.Cursor;
-         Arg_Proj : Project_Record;
+         E_Cur      : String_Set.Cursor;
+         Arg_Proj   : Project_Record;
 
          Relative_P_Path, Relative_I_Path : String_Access;
 
@@ -1426,8 +1400,8 @@ package body Test.Skeleton.Source_Table is
          --  List of relative paths to the stub project dependencies of Proj
 
          Sources_Names : String_Set.Set := String_Set.Empty_Set;
-      --  Used to store the names of all sources of this project to be able to
-      --  add those needed in the interface if the project is a library.
+         --  Used to store the names of all sources of this project to be able
+         --  to add those needed in the interface if the project is a library.
       begin
          if Processed_Projects.Contains (Proj) then
             return;
@@ -1445,51 +1419,47 @@ package body Test.Skeleton.Source_Table is
             declare
                F : File_Array_Access;
             begin
-               Append
-                 (F,
-                  GNATCOLL.VFS.Create
-                    (+(Arg_Proj.Stub_Dir.all)));
+               Append (F, GNATCOLL.VFS.Create (+(Arg_Proj.Stub_Dir.all)));
                Append
                  (F,
                   GNATCOLL.VFS.Create
                     (+(Arg_Proj.Stub_Dir.all
-                     & Directory_Separator
-                     & Unit_To_File_Name
-                       (Stub_Project_Prefix & Current_Infix & Proj))));
+                       & Directory_Separator
+                       & Unit_To_File_Name
+                           (Stub_Project_Prefix & Current_Infix & Proj))));
 
                if Arg_Proj.Is_Library then
                   Append
                     (F,
                      GNATCOLL.VFS.Create
                        (+(Arg_Proj.Stub_Dir.all
-                        & Directory_Separator
-                        & Unit_To_File_Name
-                          (Stub_Project_Prefix
-                           & Current_Infix
-                           & Proj
-                           & "_lib"))));
+                          & Directory_Separator
+                          & Unit_To_File_Name
+                              (Stub_Project_Prefix
+                               & Current_Infix
+                               & Proj
+                               & "_lib"))));
                end if;
                Create_Dirs (F);
             end;
 
-            Relative_P_Path := new String'
-              (+Relative_Path
-                 (Create (+Arg_Proj.Path.all),
-                  Create (+Arg_Proj.Stub_Dir.all)));
+            Relative_P_Path :=
+              new String'
+                (+Relative_Path
+                    (Create (+Arg_Proj.Path.all),
+                     Create (+Arg_Proj.Stub_Dir.all)));
 
             Trace
               (Me,
                "Creating "
                & Arg_Proj.Stub_Dir.all
                & Directory_Separator
-               & Unit_To_File_Name
-                 (Stub_Project_Prefix & Current_Infix & Proj)
+               & Unit_To_File_Name (Stub_Project_Prefix & Current_Infix & Proj)
                & ".gpr");
             Create
               (Arg_Proj.Stub_Dir.all
                & Directory_Separator
-               & Unit_To_File_Name
-                 (Stub_Project_Prefix & Current_Infix & Proj)
+               & Unit_To_File_Name (Stub_Project_Prefix & Current_Infix & Proj)
                & ".gpr");
 
             --  Generate the list of stubbed projects on which Proj depends.
@@ -1501,30 +1471,34 @@ package body Test.Skeleton.Source_Table is
 
             I_Cur := Arg_Proj.Imported_List.First;
             while I_Cur /= List_Of_Strings.No_Element loop
-               if
-                 PF_Table.Element
-                 (List_Of_Strings.Element (I_Cur)).Needed_For_Extention
+               if PF_Table.Element (List_Of_Strings.Element (I_Cur))
+                    .Needed_For_Extention
                then
                   declare
                      Imported_Sub_Project : constant String :=
-                       PF_Table.Element
-                         (List_Of_Strings.Element (I_Cur)).Stub_Dir.all
-                         & Directory_Separator
-                       & To_Lower (Stub_Project_Prefix
-                                   & Current_Infix
-                                   & List_Of_Strings.Element (I_Cur))
+                       PF_Table.Element (List_Of_Strings.Element (I_Cur))
+                         .Stub_Dir.all
+                       & Directory_Separator
+                       & To_Lower
+                           (Stub_Project_Prefix
+                            & Current_Infix
+                            & List_Of_Strings.Element (I_Cur))
                        & ".gpr";
                   begin
                      if List_Of_Strings.Element (I_Cur)
                        = Generate_Stub_Extension_Project.Proj
                      then
-                        Relative_I_Path := new String'
-                          (+Relative_Path (Create (+Subroot_Stub_Prj),
-                           Create (+Arg_Proj.Stub_Dir.all)));
+                        Relative_I_Path :=
+                          new String'
+                            (+Relative_Path
+                                (Create (+Subroot_Stub_Prj),
+                                 Create (+Arg_Proj.Stub_Dir.all)));
                      else
-                        Relative_I_Path := new String'
-                          (+Relative_Path (Create (+Imported_Sub_Project),
-                           Create (+Arg_Proj.Stub_Dir.all)));
+                        Relative_I_Path :=
+                          new String'
+                            (+Relative_Path
+                                (Create (+Imported_Sub_Project),
+                                 Create (+Arg_Proj.Stub_Dir.all)));
                      end if;
                   end;
                   if Arg_Proj.Aggregate_Lib then
@@ -1532,17 +1506,13 @@ package body Test.Skeleton.Source_Table is
                        ("""" & Relative_I_Path.all & """");
 
                   elsif Arg_Proj.Limited_Withed.Contains
-                    (List_Of_Strings.Element (I_Cur))
+                          (List_Of_Strings.Element (I_Cur))
                   then
                      Resolved_Dep_List.Append
-                       ("limited with """
-                        & Relative_I_Path.all
-                        & """;");
+                       ("limited with """ & Relative_I_Path.all & """;");
                   else
                      Resolved_Dep_List.Append
-                       ("with """
-                        & Relative_I_Path.all
-                        & """;");
+                       ("with """ & Relative_I_Path.all & """;");
                   end if;
                end if;
                Next (I_Cur);
@@ -1594,7 +1564,8 @@ package body Test.Skeleton.Source_Table is
 
                while E_Cur /= String_Set.No_Element loop
                   declare
-                     Source : constant String := String_Set.Element (E_Cur);
+                     Source         : constant String :=
+                       String_Set.Element (E_Cur);
                      Stub_Data_Spec : constant String :=
                        Get_Source_Stub_Data_Spec (Source);
                      Stub_Data_Body : constant String :=
@@ -1650,8 +1621,7 @@ package body Test.Skeleton.Source_Table is
             S_Put
               (3,
                "for Object_Dir use """
-               & Unit_To_File_Name
-                 (Stub_Project_Prefix & Current_Infix & Proj)
+               & Unit_To_File_Name (Stub_Project_Prefix & Current_Infix & Proj)
                & """;");
             Put_New_Line;
             if Arg_Proj.Is_Library then
@@ -1659,15 +1629,14 @@ package body Test.Skeleton.Source_Table is
                  (3,
                   "for Library_Dir use """
                   & Unit_To_File_Name
-                    (Stub_Project_Prefix
-                     & Current_Infix & Proj & "_lib")
+                      (Stub_Project_Prefix & Current_Infix & Proj & "_lib")
                   & """;");
                Put_New_Line;
                S_Put
                  (3,
                   "for Library_Name use """
                   & Unit_To_File_Name
-                    (Stub_Project_Prefix & Current_Infix & Proj)
+                      (Stub_Project_Prefix & Current_Infix & Proj)
                   & """;");
                Put_New_Line;
 
@@ -1685,8 +1654,7 @@ package body Test.Skeleton.Source_Table is
                   --  add them to the driver's interface.
                   declare
                      Exposed_List : constant String_List :=
-                       Project.Attribute_Value
-                         (Interfaces_Attribute).all;
+                       Project.Attribute_Value (Interfaces_Attribute).all;
                   begin
                      for Source of Exposed_List loop
                         S_Put (0, """" & Source.all & """,");
@@ -1727,7 +1695,7 @@ package body Test.Skeleton.Source_Table is
                        (9,
                         """"
                         & Get_Source_Unit_Name
-                          (Get_Source_Body (String_Set.Element (E_Cur)))
+                            (Get_Source_Body (String_Set.Element (E_Cur)))
                         & """");
                      Next (E_Cur);
                      if E_Cur = String_Set.No_Element then
@@ -1743,12 +1711,7 @@ package body Test.Skeleton.Source_Table is
             end if;
 
             S_Put
-              (0,
-               "end "
-               & Stub_Project_Prefix
-               & Current_Infix
-               & Proj
-               & ";");
+              (0, "end " & Stub_Project_Prefix & Current_Infix & Proj & ";");
 
             Close_File;
          end if;
@@ -1763,7 +1726,7 @@ package body Test.Skeleton.Source_Table is
          end loop;
       end Generate_Stub_Extension_Project_Aux;
 
-   --  Start of processing for Generate_Stub_Extension_Project
+      --  Start of processing for Generate_Stub_Extension_Project
    begin
       Generate_Stub_Extension_Project_Aux (Proj);
    end Generate_Stub_Extension_Project;
@@ -1779,23 +1742,21 @@ package body Test.Skeleton.Source_Table is
    is
       Short_Name : constant String := Base_Name (File_Name);
 
-      Excluded_Sources             : String_Set.Set := String_Set.Empty_Set;
+      Excluded_Sources : String_Set.Set := String_Set.Empty_Set;
 
-      SS_Cur  : String_Set.Cursor;
+      SS_Cur           : String_Set.Cursor;
       Subroot_Prj_Name : constant String :=
         Get_Source_Project_Name (File_Name);
 
       procedure Set_Present_Subset_For_Project
-        (Proj                         : String;
-         Current_Proj_Present_Sources : out String_Set.Set);
+        (Proj : String; Current_Proj_Present_Sources : out String_Set.Set);
 
       ------------------------------------
       -- Set_Present_Subset_For_Project --
       ------------------------------------
 
       procedure Set_Present_Subset_For_Project
-        (Proj                         : String;
-         Current_Proj_Present_Sources : out String_Set.Set)
+        (Proj : String; Current_Proj_Present_Sources : out String_Set.Set)
       is
          Cur : Source_File_Table.Cursor := SF_Table.First;
       begin
@@ -1803,13 +1764,12 @@ package body Test.Skeleton.Source_Table is
 
          while Cur /= Source_File_Table.No_Element loop
             declare
-               Key  : constant String := Source_File_Table.Key (Cur);
+               Key : constant String := Source_File_Table.Key (Cur);
             begin
                if Source_File_Table.Element (Cur).Project_Name.all = Proj
                  and then not Is_Body (Key)
                  and then Source_Stubbed (Key)
-                 and then not Excluded_Sources.Contains
-                                (Base_Name (Key))
+                 and then not Excluded_Sources.Contains (Base_Name (Key))
                then
                   Current_Proj_Present_Sources.Include
                     (Source_File_Table.Key (Cur));
@@ -1819,7 +1779,7 @@ package body Test.Skeleton.Source_Table is
          end loop;
       end Set_Present_Subset_For_Project;
 
-   --  Start of processing for Enforce_Custom_Project_Extension
+      --  Start of processing for Enforce_Custom_Project_Extension
    begin
       Union (Excluded_Sources, Default_Stub_Exclusion_List);
       if Stub_Exclusion_Lists.Contains (Short_Name) then
@@ -1842,10 +1802,10 @@ package body Test.Skeleton.Source_Table is
          Trace (Me_Verbose, "excluded sources are:");
          Increase_Indent (Me_Verbose);
          SS_Cur := Excluded_Sources.First;
-            while SS_Cur /= String_Set.No_Element loop
-               Trace (Me_Verbose, String_Set.Element (SS_Cur));
-               Next (SS_Cur);
-            end loop;
+         while SS_Cur /= String_Set.No_Element loop
+            Trace (Me_Verbose, String_Set.Element (SS_Cur));
+            Next (SS_Cur);
+         end loop;
          Decrease_Indent (Me_Verbose);
       end if;
 
@@ -1882,13 +1842,13 @@ package body Test.Skeleton.Source_Table is
 
          while Cur /= Source_File_Table.No_Element loop
             declare
-               Key  : constant String := Source_File_Table.Key (Cur);
+               Key : constant String := Source_File_Table.Key (Cur);
             begin
                if Source_File_Table.Element (Cur).Project_Name.all = Proj
                  and then not Is_Body (Key)
                  and then Source_Stubbed (Key)
-                 and then not
-                   Default_Stub_Exclusion_List.Contains (Base_Name (Key))
+                 and then not Default_Stub_Exclusion_List.Contains
+                                (Base_Name (Key))
                then
                   Current_Proj_Present_Sources.Include
                     (Source_File_Table.Key (Cur));
@@ -1898,7 +1858,7 @@ package body Test.Skeleton.Source_Table is
          end loop;
       end Set_Present_Subset_For_Project;
 
-   --  Start of processing for Enforce_Project_Extension
+      --  Start of processing for Enforce_Project_Extension
    begin
       Generate_Stub_Extension_Project
         (Prj_Name,

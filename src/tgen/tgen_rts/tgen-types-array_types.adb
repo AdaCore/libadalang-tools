@@ -38,8 +38,7 @@ package body TGen.Types.Array_Types is
    ---------------------
 
    function Get_Diagnostics
-     (Self   : Array_Typ;
-      Prefix : String := "") return String_Vector
+     (Self : Array_Typ; Prefix : String := "") return String_Vector
    is
       Res : String_Vector;
    begin
@@ -82,20 +81,28 @@ package body TGen.Types.Array_Types is
          if Self.Index_Types (J) /= SP.Null_Ref then
             Res := Res & Typ (Self.Index_Types (J).Get.Element.all).Image;
             if Self.Index_Constraints (J).Present
+              and then Self.Index_Constraints (J).Discrete_Range.Low_Bound.Kind
+                       = Static
               and then Self.Index_Constraints (J)
-                       .Discrete_Range.Low_Bound.Kind = Static
-              and then Self.Index_Constraints (J)
-                       .Discrete_Range.High_Bound.Kind = Static
+                         .Discrete_Range
+                         .High_Bound
+                         .Kind
+                       = Static
             then
                Res :=
-                 Res & " range "
+                 Res
+                 & " range "
                  & As_Discrete_Typ (Self.Index_Types (J)).Lit_Image
-                     (Self.Index_Constraints (J).Discrete_Range.Low_Bound
-                      .Int_Val)
+                     (Self.Index_Constraints (J)
+                        .Discrete_Range
+                        .Low_Bound
+                        .Int_Val)
                  & " .. "
                  & As_Discrete_Typ (Self.Index_Types (J)).Lit_Image
-                     (Self.Index_Constraints (J).Discrete_Range.High_Bound
-                      .Int_Val);
+                     (Self.Index_Constraints (J)
+                        .Discrete_Range
+                        .High_Bound
+                        .Int_Val);
             end if;
          else
             Res := Res & "null type ..";
@@ -107,9 +114,12 @@ package body TGen.Types.Array_Types is
             Res := Res & ") ";
          end if;
       end loop;
-      Res := Res & "of " & (if Self.Component_Type /= SP.Null_Ref
-                            then Self.Component_Type.Get.Image
-                            else "null type ..");
+      Res :=
+        Res
+        & "of "
+        & (if Self.Component_Type /= SP.Null_Ref
+           then Self.Component_Type.Get.Image
+           else "null type ..");
       return To_String (Res);
    end Image;
 
@@ -118,27 +128,29 @@ package body TGen.Types.Array_Types is
    ----------
 
    function Size (Self : Constrained_Array_Typ) return Big_Integer is
-      Total_Size  : Big_Integer := To_Big_Integer (1);
+      Total_Size : Big_Integer := To_Big_Integer (1);
    begin
       for I in 1 .. Self.Num_Dims loop
          if not Self.Index_Constraints (I).Present then
             if As_Discrete_Typ (Self.Index_Types (I)).Is_Static then
-               Total_Size := Total_Size *
-                 (As_Discrete_Typ (Self.Index_Types (I)).High_Bound
-                  - As_Discrete_Typ (Self.Index_Types (I)).Low_Bound
-                  + To_Big_Integer (1));
+               Total_Size :=
+                 Total_Size
+                 * (As_Discrete_Typ (Self.Index_Types (I)).High_Bound
+                    - As_Discrete_Typ (Self.Index_Types (I)).Low_Bound
+                    + To_Big_Integer (1));
             else
                Total_Size := To_Big_Integer (-1);
             end if;
          elsif Self.Index_Constraints (I).Discrete_Range.High_Bound.Kind
-               = Static
-              and then Self.Index_Constraints (I).Discrete_Range.Low_Bound.Kind
-                       = Static
+           = Static
+           and then Self.Index_Constraints (I).Discrete_Range.Low_Bound.Kind
+                    = Static
          then
-            Total_Size := Total_Size *
-              (Self.Index_Constraints (I).Discrete_Range.High_Bound.Int_Val
-               - Self.Index_Constraints (I).Discrete_Range.Low_Bound.Int_Val
-               + To_Big_Integer (1));
+            Total_Size :=
+              Total_Size
+              * (Self.Index_Constraints (I).Discrete_Range.High_Bound.Int_Val
+                 - Self.Index_Constraints (I).Discrete_Range.Low_Bound.Int_Val
+                 + To_Big_Integer (1));
          else
             Total_Size := To_Big_Integer (-1);
          end if;
@@ -153,9 +165,10 @@ package body TGen.Types.Array_Types is
    procedure Callback_On_Constraint
      (Self     : Constrained_Array_Typ;
       Var_Name : Unbounded_String;
-      Callback : access procedure
-        (T          : Discrete_Typ'Class;
-         Constraint : TGen.Types.Constraints.Index_Constraint));
+      Callback :
+        access procedure
+          (T          : Discrete_Typ'Class;
+           Constraint : TGen.Types.Constraints.Index_Constraint));
    --  Call callback whenever an indexing constraint referencing Var_Name is
    --  found. If the variable constrains several indexing constraints, then
    --  callback will be called multiple times.
@@ -167,18 +180,18 @@ package body TGen.Types.Array_Types is
    procedure Callback_On_Constraint
      (Self     : Constrained_Array_Typ;
       Var_Name : Unbounded_String;
-      Callback : access procedure
-        (T          : Discrete_Typ'Class;
-         Constraint : TGen.Types.Constraints.Index_Constraint))
-   is
+      Callback :
+        access procedure
+          (T          : Discrete_Typ'Class;
+           Constraint : TGen.Types.Constraints.Index_Constraint)) is
    begin
       for I in Self.Index_Constraints'Range loop
          declare
-            Index_Constraint : TGen.Types.Constraints.Index_Constraint
+            Index_Constraint     : TGen.Types.Constraints.Index_Constraint
               renames Self.Index_Constraints (I);
             Index_Type_Classwide : constant Typ'Class :=
               Self.Index_Types (I).Get;
-            Index_Type : constant Discrete_Typ'Class :=
+            Index_Type           : constant Discrete_Typ'Class :=
               Discrete_Typ'Class (Index_Type_Classwide);
          begin
             if Index_Constraint.Present then
@@ -222,9 +235,8 @@ package body TGen.Types.Array_Types is
       --------------
 
       procedure Callback
-        (T    : Discrete_Typ'Class with Unreferenced;
-         Cst : TGen.Types.Constraints.Index_Constraint)
-      is
+        (T   : Discrete_Typ'Class with Unreferenced;
+         Cst : TGen.Types.Constraints.Index_Constraint) is
       begin
          Found := True;
          Constraint := Cst;
@@ -286,8 +298,9 @@ package body TGen.Types.Array_Types is
                Max_Size : constant Natural := Size_Intervals (I).Max_Size;
             begin
                Average_Sizes (I) :=
-                 Natural'Min (Natural'Max (Min_Size * 2, Min_Size + 5),
-                              Min_Size + ((Max_Size - Min_Size) / 2));
+                 Natural'Min
+                   (Natural'Max (Min_Size * 2, Min_Size + 5),
+                    Min_Size + ((Max_Size - Min_Size) / 2));
             end;
          end loop;
          Result.Average_Sizes := Average_Sizes;
@@ -295,9 +308,10 @@ package body TGen.Types.Array_Types is
       end Generic_Array_Strategy;
 
       function Draw
-        (Self : Generic_Array_Strategy_Type;
-         Data : Data_Type;
-         Dimension_Sizes : out Nat_Array) return Generic_Array_Type is
+        (Self            : Generic_Array_Strategy_Type;
+         Data            : Data_Type;
+         Dimension_Sizes : out Nat_Array) return Generic_Array_Type
+      is
          Arr_Length : Natural := 0;
       begin
 
@@ -305,7 +319,7 @@ package body TGen.Types.Array_Types is
 
          for I in 1 .. Self.Dimensions loop
             declare
-               Elements    : Many_Type :=
+               Elements : Many_Type :=
                  Many
                    (Self.Size_Intervals (I).Min_Size,
                     Self.Size_Intervals (I).Max_Size,
@@ -345,7 +359,8 @@ package body TGen.Types.Array_Types is
    function Length
      (I_Constraint : TGen.Types.Constraints.Index_Constraint;
       I_Type       : SP.Ref;
-      Disc_Context : Disc_Value_Map) return Big_Integer with Unreferenced;
+      Disc_Context : Disc_Value_Map) return Big_Integer
+   with Unreferenced;
    --  Returns the length of the array from its Index_Constraint
 
    type Index_Value is record
@@ -354,33 +369,30 @@ package body TGen.Types.Array_Types is
 
    type Index_Values_Array is array (Positive range <>) of Index_Value;
 
-   type Index_Strategies_Type is
-      record
-         Low_Bound_Strat, High_Bound_Strat : Strategy_Acc;
-      end record;
+   type Index_Strategies_Type is record
+      Low_Bound_Strat, High_Bound_Strat : Strategy_Acc;
+   end record;
 
-   type Index_Strategy_Array is array (Positive range <>)
-     of Index_Strategies_Type;
+   type Index_Strategy_Array is
+     array (Positive range <>) of Index_Strategies_Type;
 
-   type Array_Strategy_Type (Num_Dims : Positive) is
-     new Random_Strategy_Type with
-      record
-         T                         : SP.Ref;
-         Generate_Element_Strategy : Strategy_Acc;
-         Generate_Index_Strategies : Index_Strategy_Array
-           (1 .. Num_Dims);
-      end record;
+   type Array_Strategy_Type (Num_Dims : Positive) is new Random_Strategy_Type
+   with record
+      T                         : SP.Ref;
+      Generate_Element_Strategy : Strategy_Acc;
+      Generate_Index_Strategies : Index_Strategy_Array (1 .. Num_Dims);
+   end record;
 
-   overriding function Generate
-     (S            : in out Array_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return JSON_Value;
+   overriding
+   function Generate
+     (S : in out Array_Strategy_Type; Disc_Context : Disc_Value_Map)
+      return JSON_Value;
 
    function Generate_Static_Common
      (Self                   : Array_Typ'Class;
       Disc_Context           : Disc_Value_Map;
       Generate_Element_Strat : in out Strategy_Type'Class;
-      Generate_Index_Strat   : in out Index_Strategy_Array)
-      return JSON_Value;
+      Generate_Index_Strat   : in out Index_Strategy_Array) return JSON_Value;
 
    function Generate_Enum_Array
      (Arr_T       : Array_Typ'Class;
@@ -404,15 +416,14 @@ package body TGen.Types.Array_Types is
 
    is
       function Constraint_Value
-        (Constraint : Discrete_Constraint_Value) return Big_Integer is
-        (case Constraint.Kind is
-            when Static =>
-               Constraint.Int_Val,
+        (Constraint : Discrete_Constraint_Value) return Big_Integer
+      is (case Constraint.Kind is
+            when Static => Constraint.Int_Val,
             when Discriminant =>
-               Disc_Context.Element (Constraint.Disc_Name).Get,
+              Disc_Context.Element (Constraint.Disc_Name).Get,
             when others =>
-               raise Program_Error with
-                 "Dynamic constraint unsupported for static generation");
+              raise Program_Error
+                with "Dynamic constraint unsupported for static generation");
 
       LB, HB : Big_Integer;
    begin
@@ -437,12 +448,10 @@ package body TGen.Types.Array_Types is
       Generate_Index_Strat   : in out Index_Strategy_Array) return JSON_Value
    is
       pragma Warnings (Off);
-      function Generate_Component_Wrapper
-        (Data : Data_Type) return JSON_Value;
+      function Generate_Component_Wrapper (Data : Data_Type) return JSON_Value;
       pragma Warnings (On);
 
-      function Generate_Component_Wrapper
-        (Data : Data_Type) return JSON_Value
+      function Generate_Component_Wrapper (Data : Data_Type) return JSON_Value
       is
          pragma Unreferenced (Data);
       begin
@@ -456,9 +465,10 @@ package body TGen.Types.Array_Types is
 
       Data : Data_Type;
 
-      package Array_Generation_Static is new Array_Generation_Package
-        (Element_Type   => JSON_Value,
-         Generate_Value => Generate_Component_Wrapper);
+      package Array_Generation_Static is new
+        Array_Generation_Package
+          (Element_Type   => JSON_Value,
+           Generate_Value => Generate_Component_Wrapper);
 
       use Array_Generation_Static;
 
@@ -501,8 +511,10 @@ package body TGen.Types.Array_Types is
 
             Disc_Context_With_Low_Bound.Include
               (Low_Bound_Disc_Name, Create (Low_Bound));
-            High_Bound := Index_Strat.High_Bound_Strat.Generate
-              (Disc_Context_With_Low_Bound).Get;
+            High_Bound :=
+              Index_Strat.High_Bound_Strat.Generate
+                (Disc_Context_With_Low_Bound)
+                .Get;
             Index_Values (I).High_Bound := High_Bound;
          end;
       end loop;
@@ -517,7 +529,7 @@ package body TGen.Types.Array_Types is
               (Sizes_JSON,
                Create
                  (To_String
-                      (Index_Value.High_Bound - Index_Value.Low_Bound + 1)));
+                    (Index_Value.High_Bound - Index_Value.Low_Bound + 1)));
          end loop;
          Set_Field (Result, "sizes", Sizes_JSON);
       end;
@@ -527,7 +539,7 @@ package body TGen.Types.Array_Types is
       if Self in Unconstrained_Array_Typ'Class then
          declare
             Dimensions_JSON : JSON_Array;
-            Dimension_JSON : JSON_Value;
+            Dimension_JSON  : JSON_Value;
          begin
             for Index_Value of Index_Values loop
                Dimension_JSON := Create_Object;
@@ -543,14 +555,13 @@ package body TGen.Types.Array_Types is
       --  sizes.
 
       Sizes :=
-        [for I in 1 .. Self.Num_Dims =>
-        (Min_Size =>
-           Nat_Conversions.From_Big_Integer
-             (Index_Values (I).High_Bound - Index_Values (I).Low_Bound + 1),
-         Max_Size =>
-           Nat_Conversions.From_Big_Integer
-             (Index_Values (I).High_Bound - Index_Values (I).Low_Bound + 1)
-        )];
+        [for I in 1 .. Self.Num_Dims
+         => (Min_Size =>
+            Nat_Conversions.From_Big_Integer
+              (Index_Values (I).High_Bound - Index_Values (I).Low_Bound + 1),
+          Max_Size =>
+            Nat_Conversions.From_Big_Integer
+              (Index_Values (I).High_Bound - Index_Values (I).Low_Bound + 1))];
 
       Strat := Generic_Array_Strategy (Sizes);
 
@@ -562,8 +573,7 @@ package body TGen.Types.Array_Types is
          for Elem of Random_Arr loop
             Append (JSON_Arr, Self.Component_Type.Get.Encode (Elem));
          end loop;
-         Set_Field (Result, "array",
-                    Create (JSON_Arr));
+         Set_Field (Result, "array", Create (JSON_Arr));
       end;
       return Result;
    end Generate_Static_Common;
@@ -573,15 +583,15 @@ package body TGen.Types.Array_Types is
    --------------
 
    function Generate
-     (S            : in out Array_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return JSON_Value
-   is
+     (S : in out Array_Strategy_Type; Disc_Context : Disc_Value_Map)
+      return JSON_Value is
    begin
-      return Generate_Static_Common
-        (As_Array_Typ (S.T),
-         Disc_Context,
-         S.Generate_Element_Strategy.all,
-         S.Generate_Index_Strategies);
+      return
+        Generate_Static_Common
+          (As_Array_Typ (S.T),
+           Disc_Context,
+           S.Generate_Element_Strategy.all,
+           S.Generate_Index_Strategies);
    end Generate;
 
    ----------------------
@@ -607,11 +617,12 @@ package body TGen.Types.Array_Types is
             Index_Constraint : constant Discrete_Range_Constraint :=
               (if Self.Index_Constraints (I).Present
                then Self.Index_Constraints (I).Discrete_Range
-               else Discrete_Range_Constraint'
-                 (Discrete_Constraint_Value'
-                    (Kind => Static, Int_Val => Index_Type.Low_Bound),
-                  Discrete_Constraint_Value'
-                    (Kind => Static, Int_Val => Index_Type.High_Bound)));
+               else
+                 Discrete_Range_Constraint'
+                   (Discrete_Constraint_Value'
+                      (Kind => Static, Int_Val => Index_Type.Low_Bound),
+                    Discrete_Constraint_Value'
+                      (Kind => Static, Int_Val => Index_Type.High_Bound)));
          begin
 
             --  For the sake of consistency with unconstrained arrays, we will
@@ -622,19 +633,17 @@ package body TGen.Types.Array_Types is
 
             Strat.Generate_Index_Strategies (I).Low_Bound_Strat :=
               new Strategy_Type'Class'
-                (Discrete_Typ'Class
-                   (Self.Index_Types (I).Unchecked_Get.all).
-                     Generate_Identity_Constraint_Strategy
-                       (Index_Constraint.Low_Bound));
+                (Discrete_Typ'Class (Self.Index_Types (I).Unchecked_Get.all)
+                   .Generate_Identity_Constraint_Strategy
+                      (Index_Constraint.Low_Bound));
 
             --  This one is for the upper bound
 
             Strat.Generate_Index_Strategies (I).High_Bound_Strat :=
               new Strategy_Type'Class'
-                (Discrete_Typ'Class
-                   (Self.Index_Types (I).Unchecked_Get.all).
-                     Generate_Identity_Constraint_Strategy
-                       (Index_Constraint.High_Bound));
+                (Discrete_Typ'Class (Self.Index_Types (I).Unchecked_Get.all)
+                   .Generate_Identity_Constraint_Strategy
+                      (Index_Constraint.High_Bound));
          end;
       end loop;
       return Strat;
@@ -647,7 +656,7 @@ package body TGen.Types.Array_Types is
    function Default_Strategy
      (Self : Unconstrained_Array_Typ) return Strategy_Type'Class
    is
-      Strat : Array_Strategy_Type (Self.Num_Dims);
+      Strat            : Array_Strategy_Type (Self.Num_Dims);
       Element_Strategy : constant Strategy_Type'Class :=
         Self.Component_Type.Get.Default_Strategy;
    begin
@@ -659,8 +668,8 @@ package body TGen.Types.Array_Types is
 
          Strat.Generate_Index_Strategies (I).Low_Bound_Strat :=
            new Strategy_Type'Class'
-             (Discrete_Typ'Class (Self.Index_Types (I).Unchecked_Get.all).
-                Default_Strategy);
+             (Discrete_Typ'Class (Self.Index_Types (I).Unchecked_Get.all)
+                .Default_Strategy);
 
          declare
             --  HACK: we generate an artificial discrete constraint so that
@@ -671,26 +680,25 @@ package body TGen.Types.Array_Types is
             --  High_Bound from that.
 
             Artificial_Constraint :
-            constant TGen.Types.Constraints.Index_Constraint :=
-              TGen.Types.Constraints.Index_Constraint'
-                (Present => True,
-                 Discrete_Range =>
-                   Discrete_Range_Constraint'
-                     (Low_Bound =>
-                            Discrete_Constraint_Value'
-                        (Kind => Discriminant,
-                         Disc_Name => Low_Bound_Disc_Name),
-                      High_Bound =>
-                        Discrete_Constraint_Value'
-                          (Kind => Discriminant,
-                           Disc_Name => High_Bound_Disc_Name)));
+              constant TGen.Types.Constraints.Index_Constraint :=
+                TGen.Types.Constraints.Index_Constraint'
+                  (Present        => True,
+                   Discrete_Range =>
+                     Discrete_Range_Constraint'
+                       (Low_Bound  =>
+                          Discrete_Constraint_Value'
+                            (Kind      => Discriminant,
+                             Disc_Name => Low_Bound_Disc_Name),
+                        High_Bound =>
+                          Discrete_Constraint_Value'
+                            (Kind      => Discriminant,
+                             Disc_Name => High_Bound_Disc_Name)));
          begin
 
             Strat.Generate_Index_Strategies (I).High_Bound_Strat :=
               new Strategy_Type'Class'
-                (Discrete_Typ'Class
-                   (Self.Index_Types (I).Unchecked_Get.all).
-                     Generate_Array_Index_Constraint_Strategy
+                (Discrete_Typ'Class (Self.Index_Types (I).Unchecked_Get.all)
+                   .Generate_Array_Index_Constraint_Strategy
                       (Var_Name   => High_Bound_Disc_Name,
                        Constraint => Artificial_Constraint));
          end;
@@ -712,8 +720,7 @@ package body TGen.Types.Array_Types is
 
       if Val.Has_Field ("dimensions") then
          declare
-            Dimensions         : constant JSON_Array :=
-              Val.Get ("dimensions");
+            Dimensions         : constant JSON_Array := Val.Get ("dimensions");
             Encoded_Dimensions : JSON_Array;
             Dimension_Index    : Positive := 1;
          begin
@@ -724,10 +731,12 @@ package body TGen.Types.Array_Types is
                   Encoded_Dimension : constant JSON_Value := Create_Object;
                begin
                   Set_Field
-                    (Encoded_Dimension, "First",
+                    (Encoded_Dimension,
+                     "First",
                      T.Get.Encode (Dimension.Get ("First")));
                   Set_Field
-                    (Encoded_Dimension, "Last",
+                    (Encoded_Dimension,
+                     "Last",
                      T.Get.Encode (Dimension.Get ("Last")));
                   Dimension_Index := Array_Next (Dimensions, Dimension_Index);
                   Append (Encoded_Dimensions, Encoded_Dimension);
@@ -753,20 +762,21 @@ package body TGen.Types.Array_Types is
    -- Has_Next --
    --------------
 
-   overriding function Has_Next
-     (S : Unconst_Array_Enum_Strat) return Boolean is
-     (S.Current_Size < S.Num_Sizes);
+   overriding
+   function Has_Next (S : Unconst_Array_Enum_Strat) return Boolean
+   is (S.Current_Size < S.Num_Sizes);
 
    --------------
    -- Generate --
    --------------
 
-   overriding function Generate
-     (S            : in out Unconst_Array_Enum_Strat;
-      Disc_Context : Disc_Value_Map) return JSON_Value
+   overriding
+   function Generate
+     (S : in out Unconst_Array_Enum_Strat; Disc_Context : Disc_Value_Map)
+      return JSON_Value
    is
-      Arr_T  : Unconstrained_Array_Typ renames
-        Unconstrained_Array_Typ (S.Arr_T.Unchecked_Get.all);
+      Arr_T  : Unconstrained_Array_Typ
+        renames Unconstrained_Array_Typ (S.Arr_T.Unchecked_Get.all);
       Bounds : Index_Values_Array (1 .. Arr_T.Num_Dims);
       Len    : Natural renames S.Sizes (S.Current_Size);
       Res    : JSON_Value;
@@ -789,8 +799,8 @@ package body TGen.Types.Array_Types is
             --  Whether the index type consists of a single element
 
             Is_Signed_Int_Typ : constant Boolean :=
-              As_Discrete_Typ (Arr_T.Index_Types (I)) in
-                TGen.Types.Int_Types.Signed_Int_Typ'Class;
+              As_Discrete_Typ (Arr_T.Index_Types (I))
+              in TGen.Types.Int_Types.Signed_Int_Typ'Class;
             --  Whether this is a modular or enum type
 
          begin
@@ -818,8 +828,8 @@ package body TGen.Types.Array_Types is
                end if;
             else
                Bounds (I).Low_Bound := LB;
-               Bounds (I).High_Bound := Min
-                 (LB + To_Big_Integer (Len - 1), HB);
+               Bounds (I).High_Bound :=
+                 Min (LB + To_Big_Integer (Len - 1), HB);
             end if;
          end;
       end loop;
@@ -853,24 +863,25 @@ package body TGen.Types.Array_Types is
    -----------------------------------
 
    function Make_Unconst_Array_Enum_Strat
-     (Arr_T : Unconstrained_Array_Typ;
-      Sizes : Nat_Array) return Unconst_Array_Enum_Strat'Class
-   is
+     (Arr_T : Unconstrained_Array_Typ; Sizes : Nat_Array)
+      return Unconst_Array_Enum_Strat'Class is
    begin
       return Res : Unconst_Array_Enum_Strat (Num_Sizes => Sizes'Length) do
          Res.Current_Size := 1;
          Res.Arr_T.From_Element (Arr_T'Unrestricted_Access);
-         Res.Comp_Strat := new Enum_Strategy_Type'Class'
-           (Enum_Strategy_Type'Class
-              (Arr_T.Component_Type.Get.Default_Enum_Strategy));
+         Res.Comp_Strat :=
+           new Enum_Strategy_Type'Class'
+             (Enum_Strategy_Type'Class
+                (Arr_T.Component_Type.Get.Default_Enum_Strategy));
          Res.Has_Generated := False;
          Res.Sizes := Sizes;
       end return;
    end Make_Unconst_Array_Enum_Strat;
 
-   overriding function Default_Enum_Strategy
-     (Self : Unconstrained_Array_Typ) return Enum_Strategy_Type'Class is
-     (Self.Make_Unconst_Array_Enum_Strat ([0, 1, 10, 1000]));
+   overriding
+   function Default_Enum_Strategy
+     (Self : Unconstrained_Array_Typ) return Enum_Strategy_Type'Class
+   is (Self.Make_Unconst_Array_Enum_Strat ([0, 1, 10, 1000]));
 
    -------------------------
    -- Generate_Enum_Array --
@@ -926,7 +937,7 @@ package body TGen.Types.Array_Types is
               (Sizes_JSON,
                Create
                  (To_String
-                      (Index_Value.High_Bound - Index_Value.Low_Bound + 1)));
+                    (Index_Value.High_Bound - Index_Value.Low_Bound + 1)));
          end loop;
          Set_Field (Res, "sizes", Sizes_JSON);
       end;
@@ -948,27 +959,28 @@ package body TGen.Types.Array_Types is
    -- Has_Next --
    --------------
 
-   function Has_Next (S : Constr_Array_Enum_Strat) return Boolean is
-     (not S.Has_Generated);
+   function Has_Next (S : Constr_Array_Enum_Strat) return Boolean
+   is (not S.Has_Generated);
 
    --------------
    -- Generate --
    --------------
 
-   overriding function Generate
-     (S            : in out Constr_Array_Enum_Strat;
-      Disc_Context : Disc_Value_Map) return JSON_Value
+   overriding
+   function Generate
+     (S : in out Constr_Array_Enum_Strat; Disc_Context : Disc_Value_Map)
+      return JSON_Value
    is
-      Arr_T  : Constrained_Array_Typ'Class renames
-        Constrained_Array_Typ'Class (S.Arr_T.Unchecked_Get.all);
-      Bounds : Index_Values_Array (1 ..  Arr_T.Num_Dims);
+      Arr_T  : Constrained_Array_Typ'Class
+        renames Constrained_Array_Typ'Class (S.Arr_T.Unchecked_Get.all);
+      Bounds : Index_Values_Array (1 .. Arr_T.Num_Dims);
    begin
       S.Has_Generated := True;
       for Dim in 1 .. Arr_T.Num_Dims loop
          if not Arr_T.Index_Constraints (Dim).Present then
             Bounds (Dim).Low_Bound :=
               As_Discrete_Typ (Arr_T.Index_Types (Dim)).Low_Bound;
-                        Bounds (Dim).High_Bound :=
+            Bounds (Dim).High_Bound :=
               As_Discrete_Typ (Arr_T.Index_Types (Dim)).High_Bound;
          else
             Bounds (Dim).Low_Bound :=
@@ -994,8 +1006,9 @@ package body TGen.Types.Array_Types is
       Res : Constr_Array_Enum_Strat;
    begin
       Res.Arr_T.From_Element (Self'Unrestricted_Access);
-      Res.Comp_Strat := new Enum_Strategy_Type'Class'
-        (Self.Component_Type.Get.Default_Enum_Strategy);
+      Res.Comp_Strat :=
+        new Enum_Strategy_Type'Class'
+          (Self.Component_Type.Get.Default_Enum_Strategy);
       Res.Has_Generated := False;
       return Res;
    end Default_Enum_Strategy;

@@ -28,7 +28,8 @@ with Ada.Wide_Characters.Handling; use Ada.Wide_Characters.Handling;
 with Ada.Strings.Unbounded;
 with Ada.Strings.Wide_Unbounded;
 with Ada.Text_IO;
-with Ada.Wide_Text_IO;             use Ada;
+with Ada.Wide_Text_IO;
+use Ada;
 
 package body Utils.String_Utilities is
 
@@ -41,7 +42,7 @@ package body Utils.String_Utilities is
       if X.Length = X.Max_Length then
          raise Constraint_Error with "Bounded_Str overflow";
       end if;
-      X.Length           := X.Length + 1;
+      X.Length := X.Length + 1;
       X.Chars (X.Length) := C;
    end Append;
 
@@ -57,7 +58,7 @@ package body Utils.String_Utilities is
       if X.Length = X.Max_Length then
          raise Constraint_Error with "Bounded_W_Str overflow";
       end if;
-      X.Length           := X.Length + 1;
+      X.Length := X.Length + 1;
       X.Chars (X.Length) := C;
    end Append;
 
@@ -339,16 +340,15 @@ package body Utils.String_Utilities is
    -- Replace_All --
    -----------------
 
-   function Replace_All (S, From, To : W_Str;
-      Replaced : out Boolean) return W_Str;
    function Replace_All
-     (S        : W_Str_Access;
-      From, To : W_Str;
-      Replaced : out Boolean)
-      return     W_Str_Access;
+     (S, From, To : W_Str; Replaced : out Boolean) return W_Str;
+   function Replace_All
+     (S : W_Str_Access; From, To : W_Str; Replaced : out Boolean)
+      return W_Str_Access;
 
-   function Replace_All (S, From, To : W_Str;
-      Replaced : out Boolean) return W_Str is
+   function Replace_All
+     (S, From, To : W_Str; Replaced : out Boolean) return W_Str
+   is
       use Ada.Strings.Wide_Unbounded;
       Result : Unbounded_Wide_String;
 
@@ -374,13 +374,11 @@ package body Utils.String_Utilities is
    end Replace_All;
 
    function Replace_All
-     (S        : W_Str_Access;
-      From, To : W_Str;
-      Replaced : out Boolean)
-      return     W_Str_Access
+     (S : W_Str_Access; From, To : W_Str; Replaced : out Boolean)
+      return W_Str_Access
    is
       Result : constant W_Str := Replace_All (S.all, From, To, Replaced);
-      Temp   : W_Str_Access   := S;
+      Temp   : W_Str_Access := S;
 
    begin
       if Result'Length = Temp'Length then
@@ -401,9 +399,7 @@ package body Utils.String_Utilities is
    end Replace_All;
 
    function Replace_All
-     (S        : W_Str_Access;
-      From, To : W_Str)
-      return     W_Str_Access
+     (S : W_Str_Access; From, To : W_Str) return W_Str_Access
    is
       Ignore : Boolean;
    begin
@@ -419,14 +415,12 @@ package body Utils.String_Utilities is
    end Must_Replace;
 
    function Must_Replace
-     (S        : W_Str_Access;
-      From, To : W_Str)
-      return     W_Str_Access
+     (S : W_Str_Access; From, To : W_Str) return W_Str_Access
    is
       Replaced : Boolean;
    begin
-      return Result : constant W_Str_Access :=
-        Replace_All (S, From, To, Replaced)
+      return
+         Result : constant W_Str_Access := Replace_All (S, From, To, Replaced)
       do
          pragma Assert (Replaced);
       end return;
@@ -532,10 +526,7 @@ package body Utils.String_Utilities is
    begin
       loop
          This_Read :=
-           Read
-             (FD,
-              A => Buffer.all'Address,
-              N => Length + 1 - Read_Ptr);
+           Read (FD, A => Buffer.all'Address, N => Length + 1 - Read_Ptr);
          Read_Ptr := Read_Ptr + Integer'Max (This_Read, 0);
          exit when This_Read <= 0 or else Read_Ptr = Length + 1;
       end loop;
@@ -548,7 +539,8 @@ package body Utils.String_Utilities is
    end Read_File;
 
    function Read_File (File_Name : String) return String_Access is
-      FD : constant File_Descriptor := Open_Read (File_Name, Fmode => Binary);
+      FD     : constant File_Descriptor :=
+        Open_Read (File_Name, Fmode => Binary);
       Status : Boolean;
    begin
       if FD = Invalid_FD then
@@ -576,7 +568,7 @@ package body Utils.String_Utilities is
    end Write_File;
 
    procedure Write_File (File_Name : String; S : String) is
-      FD : constant File_Descriptor :=
+      FD     : constant File_Descriptor :=
         Create_File (File_Name, Fmode => Binary);
       Status : Boolean;
    begin
@@ -613,11 +605,10 @@ package body Utils.String_Utilities is
                null;
          end;
       end if;
-      if not Exists (New_Directory)
-        or else Kind (New_Directory) /= Directory
+      if not Exists (New_Directory) or else Kind (New_Directory) /= Directory
       then
-         raise Ada.Directories.Use_Error with
-           "cannot create directory " & New_Directory;
+         raise Ada.Directories.Use_Error
+           with "cannot create directory " & New_Directory;
       end if;
    end Parallel_Make_Dir;
 
@@ -647,8 +638,8 @@ package body Utils.String_Utilities is
          Copy_File (Old_Name, New_Name, Success, Mode => Overwrite);
          Delete_File (Old_Name, Delete_Success);
          if not Success then
-            raise Move_Failure with
-              "unable to copy " & Old_Name & " to " & New_Name;
+            raise Move_Failure
+              with "unable to copy " & Old_Name & " to " & New_Name;
          end if;
          if not Delete_Success then
             raise Move_Failure with "unable to delete " & Old_Name;

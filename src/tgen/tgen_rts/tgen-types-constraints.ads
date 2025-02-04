@@ -41,8 +41,8 @@ package TGen.Types.Constraints is
 
    type Constraint_Acc is access all Constraint'Class;
 
-   procedure Free is new Ada.Unchecked_Deallocation
-     (Constraint'Class, Constraint_Acc);
+   procedure Free is new
+     Ada.Unchecked_Deallocation (Constraint'Class, Constraint_Acc);
 
    type Constraint_Value_Kind is (Static, Non_Static, Discriminant);
    --  Constraint kind. Discriminant means that the constraint value is the
@@ -50,7 +50,8 @@ package TGen.Types.Constraints is
    --  make sense if the constraints are not applied to a component of a
    --  discriminated record type.
 
-   type Discrete_Constraint_Value (Kind : Constraint_Value_Kind := Non_Static)
+   type Discrete_Constraint_Value
+     (Kind : Constraint_Value_Kind := Non_Static)
    is record
       case Kind is
          when Static =>
@@ -71,8 +72,8 @@ package TGen.Types.Constraints is
    --  A constraint value for a discrete type
 
    function Value
-     (Cst          : Discrete_Constraint_Value;
-      Disc_Context : Disc_Value_Map) return Big_Int.Big_Integer;
+     (Cst : Discrete_Constraint_Value; Disc_Context : Disc_Value_Map)
+      return Big_Int.Big_Integer;
    --  Return the integer value of Cst, looking up the context for the
    --  discriminant value if needed. Raises Program_Error if the value of the
    --  constraint could not be determined.
@@ -80,7 +81,8 @@ package TGen.Types.Constraints is
    subtype Real_Constraint_Value_Kind is
      Constraint_Value_Kind range Static .. Non_Static;
 
-   type Real_Constraint_Value (Kind : Real_Constraint_Value_Kind := Non_Static)
+   type Real_Constraint_Value
+     (Kind : Real_Constraint_Value_Kind := Non_Static)
    is record
       case Kind is
          when Static =>
@@ -107,9 +109,9 @@ package TGen.Types.Constraints is
 
    function Image (Self : Discrete_Range_Constraint) return String;
 
-   function Static (Self : Discrete_Range_Constraint) return Boolean is
-     (Self.Low_Bound.Kind in Static | Discriminant
-      and then Self.High_Bound.Kind in Static | Discriminant);
+   function Static (Self : Discrete_Range_Constraint) return Boolean
+   is (Self.Low_Bound.Kind in Static | Discriminant
+       and then Self.High_Bound.Kind in Static | Discriminant);
    --  A discriminant constraint is considered as static because we get to
    --  choose its value.
 
@@ -125,15 +127,15 @@ package TGen.Types.Constraints is
 
    function Image (Self : Real_Range_Constraint) return String;
 
-   function Static (Self : Real_Range_Constraint) return Boolean is
-     (Self.Low_Bound.Kind = Static and then Self.High_Bound.Kind = Static);
+   function Static (Self : Real_Range_Constraint) return Boolean
+   is (Self.Low_Bound.Kind = Static and then Self.High_Bound.Kind = Static);
 
-   type Digits_Constraint (Has_Range : Boolean) is new Constraint
-   with record
+   type Digits_Constraint (Has_Range : Boolean) is new Constraint with record
       Digits_Value : Discrete_Constraint_Value;
       case Has_Range is
          when True =>
             Range_Value : Real_Range_Constraint;
+
          when False =>
             null;
       end case;
@@ -142,14 +144,15 @@ package TGen.Types.Constraints is
 
    function Image (Self : Digits_Constraint) return String;
 
-   function Static (Self : Digits_Constraint) return Boolean is
-     (Self.Digits_Value.Kind = Static
-      and then (if Self.Has_Range then Self.Range_Value.Static));
+   function Static (Self : Digits_Constraint) return Boolean
+   is (Self.Digits_Value.Kind = Static
+       and then (if Self.Has_Range then Self.Range_Value.Static));
 
    type Index_Constraint (Present : Boolean := False) is record
       case Present is
          when True =>
             Discrete_Range : Discrete_Range_Constraint;
+
          when others =>
             null;
       end case;
@@ -160,8 +163,8 @@ package TGen.Types.Constraints is
    --  range of the index type. TODO: why can't we put the discrete range
    --  constraint either way?
 
-   function Static (Self : Index_Constraint) return Boolean is
-      (if Self.Present then Self.Discrete_Range.Static);
+   function Static (Self : Index_Constraint) return Boolean
+   is (if Self.Present then Self.Discrete_Range.Static);
 
    type Index_Constraint_Arr is array (Positive range <>) of Index_Constraint;
 
@@ -172,14 +175,15 @@ package TGen.Types.Constraints is
 
    function Image (Self : Index_Constraints) return String;
 
-   function Static (Self : Index_Constraints) return Boolean is
-     (for all J in 1 .. Self.Num_Dims => Static (Self.Constraint_Array (J)));
+   function Static (Self : Index_Constraints) return Boolean
+   is (for all J in 1 .. Self.Num_Dims => Static (Self.Constraint_Array (J)));
 
-   package Discriminant_Constraint_Maps is new Ada.Containers.Hashed_Maps
-     (Key_Type        => Unbounded_String,
-      Element_Type    => Discrete_Constraint_Value,
-      Hash            => Ada.Strings.Unbounded.Hash,
-      Equivalent_Keys => "=");
+   package Discriminant_Constraint_Maps is new
+     Ada.Containers.Hashed_Maps
+       (Key_Type        => Unbounded_String,
+        Element_Type    => Discrete_Constraint_Value,
+        Hash            => Ada.Strings.Unbounded.Hash,
+        Equivalent_Keys => "=");
    subtype Discriminant_Constraint_Map is Discriminant_Constraint_Maps.Map;
    --  Maps to represent discriminant constraints. Each entry specifies the
    --  value given to the discriminant of which the defining name is used as
@@ -194,20 +198,21 @@ package TGen.Types.Constraints is
 
    function Image (Self : Discriminant_Constraints) return String;
 
-   function Static (Self : Discriminant_Constraints) return Boolean is
-     (for all Val of Self.Constraint_Map => Val.Kind in Static | Discriminant);
+   function Static (Self : Discriminant_Constraints) return Boolean
+   is (for all Val of Self.Constraint_Map
+       => Val.Kind in Static | Discriminant);
 
    type Anonymous_Typ is new Typ with record
       Named_Ancestor      : SP.Ref;
       Subtype_Constraints : Constraint_Acc;
    end record;
 
-   function Kind (Self : Anonymous_Typ) return Typ_Kind is (Anonymous_Kind);
+   function Kind (Self : Anonymous_Typ) return Typ_Kind
+   is (Anonymous_Kind);
 
-   function As_Anonymous_Typ (Self : SP.Ref) return Anonymous_Typ'Class is
-     (Anonymous_Typ'Class (Self.Unchecked_Get.all)) with
-     Pre => not SP.Is_Null (Self)
-            and then Self.Get.Kind in Anonymous_Kind;
+   function As_Anonymous_Typ (Self : SP.Ref) return Anonymous_Typ'Class
+   is (Anonymous_Typ'Class (Self.Unchecked_Get.all))
+   with Pre => not SP.Is_Null (Self) and then Self.Get.Kind in Anonymous_Kind;
    pragma Inline (As_Anonymous_Typ);
 
    function Image (Self : Anonymous_Typ) return String;
@@ -218,58 +223,57 @@ package TGen.Types.Constraints is
    --  This operation performs lots of map copies for record types so it may be
    --  relatively slow.
 
-   function Supports_Static_Gen (Self : Anonymous_Typ) return Boolean is
-     (Self.Named_Ancestor.Get.Supports_Static_Gen
-      and then Self.Subtype_Constraints.Static);
+   function Supports_Static_Gen (Self : Anonymous_Typ) return Boolean
+   is (Self.Named_Ancestor.Get.Supports_Static_Gen
+       and then Self.Subtype_Constraints.Static);
    --  Whether values for this Typ can be statically generated
 
    function Encode (Self : Anonymous_Typ; Val : JSON_Value) return JSON_Value;
 
    function Get_Diagnostics
-     (Self   : Anonymous_Typ;
-      Prefix : String := "") return String_Vector is
-     (Self.Named_Ancestor.Get.Get_Diagnostics (Prefix));
+     (Self : Anonymous_Typ; Prefix : String := "") return String_Vector
+   is (Self.Named_Ancestor.Get.Get_Diagnostics (Prefix));
 
-   overriding function Default_Strategy
-     (Self : Anonymous_Typ) return Strategy_Type'Class;
+   overriding
+   function Default_Strategy (Self : Anonymous_Typ) return Strategy_Type'Class;
 
-   overriding function Default_Enum_Strategy
+   overriding
+   function Default_Enum_Strategy
      (Self : Anonymous_Typ) return Enum_Strategy_Type'Class;
 
    procedure Free_Content (Self : in out Anonymous_Typ);
 
-   function Supports_Gen (Self : Anonymous_Typ) return Boolean is
-     (Self.Named_Ancestor.Get.Supports_Gen);
+   function Supports_Gen (Self : Anonymous_Typ) return Boolean
+   is (Self.Named_Ancestor.Get.Supports_Gen);
 
    type Instance_Typ is new Typ with record
       Orig_Typ : SP.Ref;
    end record;
    --  Special type to handle strategy customization
 
-   function Kind (Self : Instance_Typ) return Typ_Kind is (Instance_Kind);
+   function Kind (Self : Instance_Typ) return Typ_Kind
+   is (Instance_Kind);
 
-   function As_Instance_Typ (Self : SP.Ref) return Instance_Typ'Class is
-     (Instance_Typ'Class (Self.Unchecked_Get.all)) with
-     Pre => not SP.Is_Null (Self)
-            and then Self.Get.Kind in Instance_Kind;
+   function As_Instance_Typ (Self : SP.Ref) return Instance_Typ'Class
+   is (Instance_Typ'Class (Self.Unchecked_Get.all))
+   with Pre => not SP.Is_Null (Self) and then Self.Get.Kind in Instance_Kind;
    pragma Inline (As_Instance_Typ);
 
    function Image (Self : Instance_Typ) return String;
 
-   function Supports_Static_Gen (Self : Instance_Typ) return Boolean is
-     (False);
+   function Supports_Static_Gen (Self : Instance_Typ) return Boolean
+   is (False);
    --  Whether values for this Typ can be statically generated
 
    function Get_Diagnostics
-     (Self   : Instance_Typ;
-      Prefix : String := "") return String_Vector is
-     (Self.Orig_Typ.Get.Get_Diagnostics (Prefix));
+     (Self : Instance_Typ; Prefix : String := "") return String_Vector
+   is (Self.Orig_Typ.Get.Get_Diagnostics (Prefix));
 
-   function Supports_Gen (Self : Instance_Typ) return Boolean is
-     (Self.Orig_Typ.Get.Supports_Gen);
+   function Supports_Gen (Self : Instance_Typ) return Boolean
+   is (Self.Orig_Typ.Get.Supports_Gen);
 
-   overriding function Default_Strategy
-     (Self : Instance_Typ) return Strategy_Type'Class
+   overriding
+   function Default_Strategy (Self : Instance_Typ) return Strategy_Type'Class
    is (raise Program_Error);
 
 end TGen.Types.Constraints;

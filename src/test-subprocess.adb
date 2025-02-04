@@ -54,9 +54,7 @@ package body Test.Subprocess is
    ---------
 
    procedure Run
-     (Cmd         : Argument_List;
-      What        : String := "";
-      Out_To_Null : Boolean := False)
+     (Cmd : Argument_List; What : String := ""; Out_To_Null : Boolean := False)
    is
       use GNATCOLL.OS.FS;
       Return_Status : Integer;
@@ -69,8 +67,7 @@ package body Test.Subprocess is
       then
          PP_Cmd (Cmd, "Running");
       end if;
-      Return_Status :=
-        Run (Cmd, Stdout => Out_FD, Stderr => Out_FD);
+      Return_Status := Run (Cmd, Stdout => Out_FD, Stderr => Out_FD);
       if Return_Status /= 0 then
          Report_Err
            ((if What = "" then Cmd.First_Element else What) & " failed.");
@@ -85,7 +82,8 @@ package body Test.Subprocess is
             Report_Err (Ada.Exceptions.Exception_Information (Exc));
          else
             Report_Err
-              (Ada.Exceptions.Exception_Name (Exc) & ": "
+              (Ada.Exceptions.Exception_Name (Exc)
+               & ": "
                & Ada.Exceptions.Exception_Message (Exc));
          end if;
          Utils.Environment.Clean_Up;
@@ -97,7 +95,7 @@ package body Test.Subprocess is
    ---------------------
 
    procedure Populate_X_Vars
-      (Cmd : in out Argument_List; Gnattest_Cmd : Command_Line)
+     (Cmd : in out Argument_List; Gnattest_Cmd : Command_Line)
    is
       use Common_String_Seq_Switches;
       Ext_Vars : constant String_Ref_Array :=

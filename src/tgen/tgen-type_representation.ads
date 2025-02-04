@@ -22,12 +22,12 @@
 ------------------------------------------------------------------------------
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO;           use Ada.Text_IO;
 
 with Templates_Parser; use Templates_Parser;
 
 with TGen.Libgen;
-with TGen.Types;             use TGen.Types;
+with TGen.Types;          use TGen.Types;
 with TGen.Parse_Strategy; use TGen.Parse_Strategy;
 
 package TGen.Type_Representation is

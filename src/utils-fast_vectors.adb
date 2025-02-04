@@ -32,34 +32,32 @@ package body Utils.Fast_Vectors is
 
    pragma Suppress (All_Checks);
 
-   procedure Free is new Ada.Unchecked_Deallocation
-     (Elements_Type,
-      Elements_Access);
+   procedure Free is new
+     Ada.Unchecked_Deallocation (Elements_Type, Elements_Access);
 
-   type Iterator is new Vector_Iterator_Interfaces.Reversible_Iterator with
-   record
+   type Iterator is new Vector_Iterator_Interfaces.Reversible_Iterator
+   with record
       Container : Vector_Access;
       Index     : Index_Type'Base;
    end record;
 
-   overriding function First (Object : Iterator) return Cursor;
-   overriding function Last (Object : Iterator) return Cursor;
+   overriding
+   function First (Object : Iterator) return Cursor;
+   overriding
+   function Last (Object : Iterator) return Cursor;
 
-   overriding function Next
-     (Object   : Iterator;
-      Position : Cursor)
-      return     Cursor;
+   overriding
+   function Next (Object : Iterator; Position : Cursor) return Cursor;
 
-   overriding function Previous
-     (Object   : Iterator;
-      Position : Cursor)
-      return     Cursor;
+   overriding
+   function Previous (Object : Iterator; Position : Cursor) return Cursor;
 
    ---------
    -- "=" --
    ---------
 
-   overriding function "=" (Left, Right : Vector) return Boolean is
+   overriding
+   function "=" (Left, Right : Vector) return Boolean is
    begin
       if Left'Address = Right'Address then
          return True;
@@ -90,10 +88,9 @@ package body Utils.Fast_Vectors is
       end if;
 
       declare
-         L : constant Index_Type := Container.Last;
-         EA :
-           Elements_Array renames
-           Container.Elements.EA (Index_Type'First .. L);
+         L  : constant Index_Type := Container.Last;
+         EA : Elements_Array
+           renames Container.Elements.EA (Index_Type'First .. L);
 
       begin
          Container.Elements := Empty_Elements'Access;
@@ -103,9 +100,9 @@ package body Utils.Fast_Vectors is
          --  used in case 'new Elements_Type' below raises an exception, to
          --  keep Container in a consistent state.
 
-         Container.Last     := No_Index;
+         Container.Last := No_Index;
          Container.Elements := new Elements_Type'(L, EA);
-         Container.Last     := L;
+         Container.Last := L;
       end;
    end Adjust;
 
@@ -149,25 +146,23 @@ package body Utils.Fast_Vectors is
    ------------------------
 
    function Constant_Reference
-     (Container : aliased Vector;
-      Position  : Cursor)
-      return      Constant_Reference_Type
-   is
+     (Container : aliased Vector; Position : Cursor)
+      return Constant_Reference_Type is
    begin
-      return R : constant Constant_Reference_Type :=
-        (Element =>
-           Container.Elements.EA (Position.Index)'Unrestricted_Access);
+      return
+         R : constant Constant_Reference_Type :=
+           (Element =>
+              Container.Elements.EA (Position.Index)'Unrestricted_Access);
    end Constant_Reference;
 
    function Constant_Reference
-     (Container : aliased Vector;
-      Index     : Index_Type)
-      return      Constant_Reference_Type
-   is
+     (Container : aliased Vector; Index : Index_Type)
+      return Constant_Reference_Type is
    begin
       pragma Assert (Index in 1 .. Last_Index (Container));
-      return R : constant Constant_Reference_Type :=
-        (Element => Container.Elements.EA (Index)'Unrestricted_Access);
+      return
+         R : constant Constant_Reference_Type :=
+           (Element => Container.Elements.EA (Index)'Unrestricted_Access);
    end Constant_Reference;
 
    -----------------
@@ -184,10 +179,7 @@ package body Utils.Fast_Vectors is
    -------------
 
    function Element
-     (Container : Vector;
-      Index     : Index_Type)
-      return      Element_Type
-   is
+     (Container : Vector; Index : Index_Type) return Element_Type is
    begin
 
       return Container.Elements.EA (Index);
@@ -213,9 +205,8 @@ package body Utils.Fast_Vectors is
    ------------------
 
    function Elems_Var (Container : Vector) return Big_Ptr_Var is
-      function Cast is new Ada.Unchecked_Conversion
-        (System.Address,
-         Big_Ptr_Var);
+      function Cast is new
+        Ada.Unchecked_Conversion (System.Address, Big_Ptr_Var);
    begin
       return Cast (Container.Elements.EA'Address);
    end Elems_Var;
@@ -267,7 +258,7 @@ package body Utils.Fast_Vectors is
       else
          Free (Container.Elements);
          Container.Elements := Empty_Elements'Access;
-         Container.Last     := No_Index;
+         Container.Last := No_Index;
       end if;
    end Finalize;
 
@@ -326,11 +317,13 @@ package body Utils.Fast_Vectors is
          --  the ARG was that if Target and Source denote the same non-empty
          --  container object, then Program_Error is raised.
 
-         if Source.Last < Index_Type'First then  -- Source is empty
+         if Source.Last < Index_Type'First then
+            --  Source is empty
             return;
          end if;
 
-         if Target.Last < Index_Type'First then  -- Target is empty
+         if Target.Last < Index_Type'First then
+            --  Target is empty
             Move (Target => Target, Source => Source);
             return;
          end if;
@@ -344,9 +337,10 @@ package body Utils.Fast_Vectors is
          begin
             J := Target.Last;
             while Source.Last >= Index_Type'First loop
-               pragma Assert
-                 (Source.Last <= Index_Type'First
-                  or else not (SA (Source.Last) < SA (Source.Last - 1)));
+               pragma
+                 Assert
+                   (Source.Last <= Index_Type'First
+                      or else not (SA (Source.Last) < SA (Source.Last - 1)));
 
                if I < Index_Type'First then
                   TA (Index_Type'First .. J) :=
@@ -356,15 +350,16 @@ package body Utils.Fast_Vectors is
                   return;
                end if;
 
-               pragma Assert
-                 (I <= Index_Type'First or else not (TA (I) < TA (I - 1)));
+               pragma
+                 Assert
+                   (I <= Index_Type'First or else not (TA (I) < TA (I - 1)));
 
                if SA (Source.Last) < TA (I) then
                   TA (J) := TA (I);
-                  I      := I - 1;
+                  I := I - 1;
 
                else
-                  TA (J)      := SA (Source.Last);
+                  TA (J) := SA (Source.Last);
                   Source.Last := Source.Last - 1;
                end if;
 
@@ -378,11 +373,12 @@ package body Utils.Fast_Vectors is
       ----------
 
       procedure Sort (Container : in out Vector) is
-         procedure Sort is new Generic_Array_Sort
-           (Index_Type   => Index_Type,
-            Element_Type => Element_Type,
-            Array_Type   => Elements_Array,
-            "<"          => "<");
+         procedure Sort is new
+           Generic_Array_Sort
+             (Index_Type   => Index_Type,
+              Element_Type => Element_Type,
+              Array_Type   => Elements_Array,
+              "<"          => "<");
 
       begin
          if Container.Last <= Index_Type'First then
@@ -429,8 +425,7 @@ package body Utils.Fast_Vectors is
 
    procedure Iterate
      (Container : Vector;
-      Process   : not null access procedure (Position : Cursor))
-   is
+      Process   : not null access procedure (Position : Cursor)) is
    begin
       for Indx in Index_Type'First .. Container.Last loop
          Process (Cursor'(Container'Unrestricted_Access, Indx));
@@ -439,7 +434,7 @@ package body Utils.Fast_Vectors is
 
    function Iterate
      (Container : Vector)
-      return      Vector_Iterator_Interfaces.Reversible_Iterator'Class
+      return Vector_Iterator_Interfaces.Reversible_Iterator'Class
    is
       V : constant Vector_Access := Container'Unrestricted_Access;
    begin
@@ -459,9 +454,8 @@ package body Utils.Fast_Vectors is
    end Iterate;
 
    function Iterate
-     (Container : Vector;
-      Start     : Cursor)
-      return      Vector_Iterator_Interfaces.Reversible_Iterator'Class
+     (Container : Vector; Start : Cursor)
+      return Vector_Iterator_Interfaces.Reversible_Iterator'Class
    is
       V : constant Vector_Access := Container'Unrestricted_Access;
    begin
@@ -485,8 +479,7 @@ package body Utils.Fast_Vectors is
       --  the start position has the same value irrespective of whether this
       --  is a forward or reverse iteration.
 
-      return
-        It : constant Iterator := (Container => V, Index => Start.Index)
+      return It : constant Iterator := (Container => V, Index => Start.Index)
       do
          null;
       end return;
@@ -658,25 +651,23 @@ package body Utils.Fast_Vectors is
    ---------------
 
    function Reference
-     (Container : aliased in out Vector;
-      Position  : Cursor)
-      return      Reference_Type
-   is
+     (Container : aliased in out Vector; Position : Cursor)
+      return Reference_Type is
    begin
-      return R : constant Reference_Type :=
-        (Element =>
-           Container.Elements.EA (Position.Index)'Unrestricted_Access);
+      return
+         R : constant Reference_Type :=
+           (Element =>
+              Container.Elements.EA (Position.Index)'Unrestricted_Access);
    end Reference;
 
    function Reference
-     (Container : aliased in out Vector;
-      Index     : Index_Type)
-      return      Reference_Type
-   is
+     (Container : aliased in out Vector; Index : Index_Type)
+      return Reference_Type is
    begin
       pragma Assert (Index in 1 .. Last_Index (Container));
-      return R : constant Reference_Type :=
-        (Element => Container.Elements.EA (Index)'Unrestricted_Access);
+      return
+         R : constant Reference_Type :=
+           (Element => Container.Elements.EA (Index)'Unrestricted_Access);
    end Reference;
 
    ---------------------
@@ -685,8 +676,7 @@ package body Utils.Fast_Vectors is
 
    procedure Reverse_Iterate
      (Container : Vector;
-      Process   : not null access procedure (Position : Cursor))
-   is
+      Process   : not null access procedure (Position : Cursor)) is
    begin
       for Indx in reverse Index_Type'First .. Container.Last loop
          Process (Cursor'(Container'Unrestricted_Access, Indx));
@@ -704,7 +694,7 @@ package body Utils.Fast_Vectors is
    begin
       if Container.Elements = Empty_Elements'Access then
          pragma Assert (Container.Last = 0);
-         New_Elts           := new Elements_Type (Last => New_Last);
+         New_Elts := new Elements_Type (Last => New_Last);
          Container.Elements := New_Elts;
       elsif New_Last > Container.Elements.Last then
          New_Elts := new Elements_Type (Last => New_Last);
@@ -722,10 +712,7 @@ package body Utils.Fast_Vectors is
    ---------------
 
    function To_Cursor
-     (Container : Vector;
-      Index     : Extended_Index)
-      return      Cursor
-   is
+     (Container : Vector; Index : Extended_Index) return Cursor is
    begin
       if Index not in Index_Type'First .. Container.Last then
          return No_Element;
@@ -754,22 +741,20 @@ package body Utils.Fast_Vectors is
    --  Extra operations not in Ada.Containers.Vectors:
 
    function Slice
-     (Container : Vector;
-      First     : Index_Type;
-      Last      : Extended_Index)
-      return      Elements_Array
+     (Container : Vector; First : Index_Type; Last : Extended_Index)
+      return Elements_Array
    is
 
-      Jj : Extended_Index          := Index_Type'First;
+      Jj : Extended_Index := Index_Type'First;
       L  : constant Extended_Index :=
         (if Last < First then Jj - 1 else Last - First + Index_Type'First);
-   --  Handle super-null slices properly
+      --  Handle super-null slices properly
 
    begin
       return Result : Elements_Array (Index_Type'First .. L) do
          for J in First .. Last loop
             Result (Jj) := Elems (Container) (J);
-            Jj          := Jj + 1;
+            Jj := Jj + 1;
          end loop;
          pragma Assert (Jj = Result'Last + 1);
       end return;
@@ -799,19 +784,19 @@ package body Utils.Fast_Vectors is
       elsif New_Last > Container.Elements.Last then
          New_Elts :=
            new Elements_Type
-           (Last => Index_Type'Max (New_Last, 2 * Container.Last));
+                 (Last => Index_Type'Max (New_Last, 2 * Container.Last));
          New_Elts.EA (1 .. Container.Last) := Container.Elements.EA;
          Free (Container.Elements);
          Container.Elements := New_Elts;
       end if;
 
       Container.Elements.EA (Container.Last + 1 .. New_Last) := New_Items;
-      Container.Last                                         := New_Last;
+      Container.Last := New_Last;
    end Append;
 
    procedure Put
-     (Container : Vector;
-      Put : not null access procedure (Item : Element_Type);
+     (Container   : Vector;
+      Put         : not null access procedure (Item : Element_Type);
       Put_Between : not null access procedure)
    is
       First_Time : Boolean := True;

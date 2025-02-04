@@ -51,11 +51,11 @@ package body TGen.Marshalling.JSON_Marshallers is
       package Templates is new TGen.Templates (TRD);
       use Templates.JSON_Marshalling;
 
-      Ty_Name       : constant String := Typ.FQN (No_Std => True);
-      Ty_Prefix     : constant String := Prefix_For_Typ (Typ.Slug);
-      Generic_Name  : constant String :=
+      Ty_Name      : constant String := Typ.FQN (No_Std => True);
+      Ty_Prefix    : constant String := Prefix_For_Typ (Typ.Slug);
+      Generic_Name : constant String :=
         (if Needs_Header (Typ) then "In_Out_Unconstrained" else "In_Out");
-      Assocs        : constant Translate_Table :=
+      Assocs       : constant Translate_Table :=
         [1 => Assoc ("TY_NAME", Ty_Name),
          2 => Assoc ("TY_PREFIX", Ty_Prefix),
          3 => Assoc ("MARSHALLING_LIB", Marshalling_Lib),
@@ -74,8 +74,7 @@ package body TGen.Marshalling.JSON_Marshallers is
         (Assocs : Translate_Table) return Unbounded_String;
       function Variant_Read_Write
         (Assocs : Translate_Table) return Unbounded_String;
-      function Variant_Size
-        (Assocs : Translate_Table) return Unbounded_String;
+      function Variant_Size (Assocs : Translate_Table) return Unbounded_String;
       function Variant_Size_Max
         (Assocs : Translate_Table) return Unbounded_String;
       procedure Print_Header (Assocs : Translate_Table);
@@ -90,8 +89,7 @@ package body TGen.Marshalling.JSON_Marshallers is
       ---------------------
 
       function Component_Write
-        (Assocs : Translate_Table) return Unbounded_String
-      is
+        (Assocs : Translate_Table) return Unbounded_String is
       begin
          return Parse (Component_Write_Template, Assocs);
       end Component_Write;
@@ -101,8 +99,7 @@ package body TGen.Marshalling.JSON_Marshallers is
       --------------------
 
       function Component_Read
-        (Assocs : Translate_Table) return Unbounded_String
-      is
+        (Assocs : Translate_Table) return Unbounded_String is
       begin
          return Parse (Component_Read_Template, Assocs);
       end Component_Read;
@@ -112,8 +109,7 @@ package body TGen.Marshalling.JSON_Marshallers is
       --------------------
 
       function Component_Size
-        (Assocs : Translate_Table with Unreferenced) return Unbounded_String
-      is
+        (Assocs : Translate_Table with Unreferenced) return Unbounded_String is
       begin
          return +"";
       end Component_Size;
@@ -123,8 +119,7 @@ package body TGen.Marshalling.JSON_Marshallers is
       ------------------------
 
       function Component_Size_Max
-        (Assocs : Translate_Table with Unreferenced) return Unbounded_String
-      is
+        (Assocs : Translate_Table with Unreferenced) return Unbounded_String is
       begin
          return +"";
       end Component_Size_Max;
@@ -134,8 +129,7 @@ package body TGen.Marshalling.JSON_Marshallers is
       ------------------------
 
       function Variant_Read_Write
-        (Assocs : Translate_Table) return Unbounded_String
-      is
+        (Assocs : Translate_Table) return Unbounded_String is
       begin
          return Parse (Variant_Read_Write_Template, Assocs);
       end Variant_Read_Write;
@@ -145,8 +139,7 @@ package body TGen.Marshalling.JSON_Marshallers is
       ------------------
 
       function Variant_Size
-        (Assocs : Translate_Table with Unreferenced) return Unbounded_String
-      is
+        (Assocs : Translate_Table with Unreferenced) return Unbounded_String is
       begin
          return +"";
       end Variant_Size;
@@ -156,8 +149,7 @@ package body TGen.Marshalling.JSON_Marshallers is
       ----------------------
 
       function Variant_Size_Max
-        (Assocs : Translate_Table with Unreferenced) return Unbounded_String
-      is
+        (Assocs : Translate_Table with Unreferenced) return Unbounded_String is
       begin
          return +"";
       end Variant_Size_Max;
@@ -179,12 +171,10 @@ package body TGen.Marshalling.JSON_Marshallers is
       ------------------
 
       procedure Print_Scalar
-        (Assocs   : Translate_Table;
-         For_Base : Boolean with Unreferenced) is
+        (Assocs : Translate_Table; For_Base : Boolean with Unreferenced) is
       begin
          if For_Base and then Typ.Private_Extension then
-            Put_Line
-              (Private_Part, Parse (Scalar_Base_Spec_Template, Assocs));
+            Put_Line (Private_Part, Parse (Scalar_Base_Spec_Template, Assocs));
             New_Line (Private_Part);
          else
             Put_Line (Spec_Part, Parse (Scalar_Base_Spec_Template, Assocs));
@@ -224,8 +214,7 @@ package body TGen.Marshalling.JSON_Marshallers is
 
       procedure Print_Header_Wrappers (Assocs : Translate_Table) is
       begin
-         Put_Line
-           (Spec_Part, Parse (Header_Wrappers_Spec_Template, Assocs));
+         Put_Line (Spec_Part, Parse (Header_Wrappers_Spec_Template, Assocs));
          New_Line (Spec_Part);
          Put_Line (Body_Part, Parse (Header_Wrappers_Body_Template, Assocs));
          New_Line (Body_Part);
@@ -261,10 +250,7 @@ package body TGen.Marshalling.JSON_Marshallers is
 
       --  Generate the Input and Output subprograms
 
-      Put_Line
-        (Spec_Part,
-         Parse
-           (In_Out_Spec_Template, Assocs));
+      Put_Line (Spec_Part, Parse (In_Out_Spec_Template, Assocs));
       New_Line (Spec_Part);
 
       Put_Line (Body_Part, Parse (In_Out_Body_Template, Assocs));
@@ -313,19 +299,19 @@ package body TGen.Marshalling.JSON_Marshallers is
       end if;
       Assocs.Insert (Assoc ("GLOBAL_PREFIX", Global_Prefix));
       Assocs.Insert
-        (Assoc ("PROC_NAME",
-         (if Is_Operator (Proc_Name)
-         then Map_Operator_Name (Proc_Name)
-         else Proc_Name)));
-      Assocs.Insert (Assoc
-        ("PROC_FQN",
-         Utils.String_Utilities.Escape_String_Literal
-           (FN_Typ.FQN (No_Std => True))));
+        (Assoc
+           ("PROC_NAME",
+            (if Is_Operator (Proc_Name) then Map_Operator_Name (Proc_Name)
+             else Proc_Name)));
+      Assocs.Insert
+        (Assoc
+           ("PROC_FQN",
+            Utils.String_Utilities.Escape_String_Literal
+              (FN_Typ.FQN (No_Std => True))));
       Assocs.Insert (Assoc ("PROC_UID", FN_Typ.Subp_UID));
       if FN_Typ.Ret_Typ /= SP.Null_Ref then
-         Assocs.Insert (Assoc
-           ("PROC_RETURN_TY",
-            FN_Typ.Ret_Typ.Get.FQN (No_Std => True)));
+         Assocs.Insert
+           (Assoc ("PROC_RETURN_TY", FN_Typ.Ret_Typ.Get.FQN (No_Std => True)));
       else
          Assocs.Insert (Assoc ("PROC_RETURN_TY", ""));
       end if;
@@ -335,14 +321,16 @@ package body TGen.Marshalling.JSON_Marshallers is
       for Param_Cur in FN_Typ.Component_Types.Iterate loop
          Param_Names.Append (Unbounded_String (Key (Param_Cur)));
          Param_Types.Append
-           (FN_Typ.Component_Types
-            .Constant_Reference (Param_Cur).Get.FQN (No_Std => True));
+           (FN_Typ.Component_Types.Constant_Reference (Param_Cur).Get.FQN
+              (No_Std => True));
          Param_Full_Types.Append
-           (FN_Typ.Component_Types
-            .Constant_Reference (Param_Cur).Get.FQN (No_Std => False));
+           (FN_Typ.Component_Types.Constant_Reference (Param_Cur).Get.FQN
+              (No_Std => False));
          Param_FNs.Append
-           (Output_Fname_For_Typ (FN_Typ.Component_Types
-            .Constant_Reference (Param_Cur).Get.Name));
+           (Output_Fname_For_Typ
+              (FN_Typ.Component_Types.Constant_Reference (Param_Cur)
+                 .Get
+                 .Name));
       end loop;
       Assocs.Insert (Assoc ("PARAM_NAME", Param_Names));
       Assocs.Insert (Assoc ("PARAM_TY", Param_Types));
@@ -363,9 +351,7 @@ package body TGen.Marshalling.JSON_Marshallers is
            (Output_Fname_For_Typ
               (FN_Typ.Globals.Constant_Reference (Global_Cur).Get.Name));
          Global_Slugs.Append
-           (To_Symbol
-              (To_Qualified_Name (+Key (Global_Cur)),
-               Sep => '_'));
+           (To_Symbol (To_Qualified_Name (+Key (Global_Cur)), Sep => '_'));
       end loop;
       Assocs.Insert (Assoc ("GLOBAL_NAME", Global_Names));
       Assocs.Insert (Assoc ("GLOBAL_TY", Global_Types));

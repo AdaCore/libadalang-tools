@@ -31,9 +31,9 @@ with Ada.Wide_Characters.Handling; use Ada.Wide_Characters.Handling;
 
 with GNATCOLL.Traces;
 
-with Utils; use Utils;
+with Utils;                  use Utils;
 with Utils.Dbg_Out;
-with Utils_Debug; use Utils_Debug;
+with Utils_Debug;            use Utils_Debug;
 with Utils.String_Utilities; use Utils.String_Utilities;
 pragma Warnings (On);
 
@@ -41,24 +41,22 @@ package Pp is
 
    type Log_Level is (Debug, Info, Error);
 
-   procedure Trace
-     (Message  : String;
-      Level    : Log_Level := Info);
+   procedure Trace (Message : String; Level : Log_Level := Info);
    --  Output Message to the stream associated with Level.
    --  If Level = Error and GNATpp is being used in bin mode, then also
    --  logs to stderr using Utils.Err_Out.
 
    procedure Trace
-     (E        : Ada.Exceptions.Exception_Occurrence;
-      Message  : String := "Unexpected exception: ";
-      Level    : Log_Level := Error);
+     (E       : Ada.Exceptions.Exception_Occurrence;
+      Message : String := "Unexpected exception: ";
+      Level   : Log_Level := Error);
    --  Output E information to the stream associated with Level.
    --  If Level = Error and GNATpp is being used in bin mode, then also
    --  logs to stderr using Utils.Err_Out.
 
 private
 
-   Info_Logger : constant GNATCOLL.Traces.Logger :=
+   Info_Logger  : constant GNATCOLL.Traces.Logger :=
      GNATCOLL.Traces.Create ("GNATPP.INFO");
    Debug_Logger : constant GNATCOLL.Traces.Logger :=
      GNATCOLL.Traces.Create ("GNATPP.DEBUG");

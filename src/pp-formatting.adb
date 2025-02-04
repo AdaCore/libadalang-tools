@@ -36,10 +36,11 @@ with Utils.Formatted_Output;
 with Utils.Generic_Formatted_Output;
 with Utils.Symbols; use Utils.Symbols;
 
-with Langkit_Support.Slocs; use Langkit_Support;
+with Langkit_Support.Slocs;
+use Langkit_Support;
 
 with Pp.Command_Lines; use Pp.Command_Lines;
-with Pp.Error_Slocs; use Pp.Error_Slocs;
+with Pp.Error_Slocs;   use Pp.Error_Slocs;
 with Pp.Scanner.Lines;
 
 package body Pp.Formatting is
@@ -48,15 +49,15 @@ package body Pp.Formatting is
    use Pp_Flag_Switches, Pp_Boolean_Switches, Pp_Nat_Switches;
 
    function Next_Enabled
-     (Lines_Data : Lines_Data_Rec;
-      F : Line_Break_Index_Index)
-     return Line_Break_Index_Index;
+     (Lines_Data : Lines_Data_Rec; F : Line_Break_Index_Index)
+      return Line_Break_Index_Index;
    --  Next currently-enabled line break after F. Thus, F..Next_Enabled(F) is a
    --  line.
 
    procedure Tokns_To_Buffer
-     (Buf : in out Buffer; Tokns : Scanner.Tokn_Vec;
-      Cmd : Utils.Command_Lines.Command_Line);
+     (Buf   : in out Buffer;
+      Tokns : Scanner.Tokn_Vec;
+      Cmd   : Utils.Command_Lines.Command_Line);
    --  Turns a sequence of tokens back into text. Overwrites Buf, and leaves
    --  'point' at the beginning. Whole_Line_Comment takes their indentation
    --  from the previous Spaces token, if any.
@@ -84,8 +85,8 @@ package body Pp.Formatting is
 
       if Kind (Cur) = Spaces then
          Next (Cur);
-         pragma Assert
-           (Kind (Cur) not in Enabled_LB_Token | EOL_Token | Spaces);
+         pragma
+           Assert (Kind (Cur) not in Enabled_LB_Token | EOL_Token | Spaces);
       end if;
    end Next_ssnl;
 
@@ -130,8 +131,10 @@ package body Pp.Formatting is
 
    subtype Ada_Node is Libadalang.Analysis.Ada_Node;
    use type Ada_Node;
-   function Is_Null (Tree : Ada_Node) return Boolean is (Tree.Is_Null);
-   function T_Img (Tree : Ada_Node) return String is (Tree.Image);
+   function Is_Null (Tree : Ada_Node) return Boolean
+   is (Tree.Is_Null);
+   function T_Img (Tree : Ada_Node) return String
+   is (Tree.Image);
 
    Op_Sym_Table : constant array (Positive range <>) of Symbol :=
      [Name_Q_And,
@@ -142,11 +145,11 @@ package body Pp.Formatting is
       Name_Q_Abs,
       Name_Q_Not];
 
-   function Is_Op_Sym_With_Letters (N : Symbol) return Boolean is
-     (for some Op of Op_Sym_Table => Case_Insensitive_Equal (N, Op));
-      --  True if N looks like a string literal that can be used as an operator
-      --  symbol containing letters, so case might matter. N should be in all
-      --  lower case.
+   function Is_Op_Sym_With_Letters (N : Symbol) return Boolean
+   is (for some Op of Op_Sym_Table => Case_Insensitive_Equal (N, Op));
+   --  True if N looks like a string literal that can be used as an operator
+   --  symbol containing letters, so case might matter. N should be in all
+   --  lower case.
 
    function Sname_83 (Tok : Scanner.Tokn_Cursor) return Boolean;
    --  True if Tok can be a simple_name (in Ada 83). This includes reserved
@@ -160,9 +163,9 @@ package body Pp.Formatting is
    end Sname_83;
 
    procedure Insert_Comment_Text
-     (Lines_Data_P   : Lines_Data_Ptr;
-      Cmd            : Utils.Command_Lines.Command_Line;
-      Comment_Token  : Scanner.Tokn_Cursor);
+     (Lines_Data_P  : Lines_Data_Ptr;
+      Cmd           : Utils.Command_Lines.Command_Line;
+      Comment_Token : Scanner.Tokn_Cursor);
    --  Insert the text of the comment into New_Tokns, including the initial
    --  "--" and leading blanks.
    --  This will eventually be replaced by Comment_Tokn_To_Buf.
@@ -185,31 +188,30 @@ package body Pp.Formatting is
          return True;
       end if;
 
-      return Replace_String
-        (Str (Src_S).S, From => [1 => ASCII.CR], To => "")
-       = Str (Out_S).S;
+      return
+        Replace_String (Str (Src_S).S, From => [1 => ASCII.CR], To => "")
+        = Str (Out_S).S;
    end Equal_Ignoring_CR;
 
    ----------------
 
    function Next_Enabled
-     (Lines_Data : Lines_Data_Rec;
-      F : Line_Break_Index_Index)
-     return Line_Break_Index_Index
+     (Lines_Data : Lines_Data_Rec; F : Line_Break_Index_Index)
+      return Line_Break_Index_Index
    is
-      All_LB : Line_Break_Vector renames Lines_Data.All_LB;
+      All_LB  : Line_Break_Vector renames Lines_Data.All_LB;
       All_LBI : Line_Break_Index_Vector renames Lines_Data.All_LBI;
-      First :  Line_Break renames All_LB (All_LBI (F));
+      First   : Line_Break renames All_LB (All_LBI (F));
       pragma Assert (First.Enabled);
-      Result : Line_Break_Index_Index := F + 1;
-      Last   : Line_Break := All_LB (All_LBI (Result));
+      Result  : Line_Break_Index_Index := F + 1;
+      Last    : Line_Break := All_LB (All_LBI (Result));
    begin
       while not Last.Enabled loop
          --  Add this verification to prevent, in case of partial formatting
          --  mode of gnatpp, to get an exceeding value for the table index.
          if Result /= Last_Index (All_LBI) then
             Result := Result + 1;
-            Last   := All_LB (All_LBI (Result));
+            Last := All_LB (All_LBI (Result));
          end if;
 
          --  In some situation when partial formatting is performed no line
@@ -240,8 +242,8 @@ package body Pp.Formatting is
 
    procedure Final_Check_Helper
      (Lines_Data_P : Lines_Data_Ptr;
-      Src_Buf : in out Buffer;
-      Cmd : Utils.Command_Lines.Command_Line);
+      Src_Buf      : in out Buffer;
+      Cmd          : Utils.Command_Lines.Command_Line);
    procedure Final_Check
      (Lines_Data_P   : Lines_Data_Ptr;
       Src_Buf        : in out Buffer;
@@ -261,12 +263,12 @@ package body Pp.Formatting is
 
    function Num_Lits_Match
      (Src_Tok, Out_Tok : Scanner.Tokn_Cursor;
-      Cmd : Utils.Command_Lines.Command_Line) return Boolean;
+      Cmd              : Utils.Command_Lines.Command_Line) return Boolean;
    --  Called by the Match functions for Numeric_Literal
 
    function Num_Lits_Match
      (Src_Tok, Out_Tok : Scanner.Tokn_Cursor;
-      Cmd : Utils.Command_Lines.Command_Line) return Boolean
+      Cmd              : Utils.Command_Lines.Command_Line) return Boolean
    is
       use Scanner;
    begin
@@ -283,7 +285,7 @@ package body Pp.Formatting is
                --  contains underscores, we don't modify it.
 
                if (Arg (Cmd, Decimal_Grouping) = 0
-                     and then Arg (Cmd, Based_Grouping) = 0)
+                   and then Arg (Cmd, Based_Grouping) = 0)
                  or else Find (Src_Tok_Text, "_") /= 0
                then
                   R := False;
@@ -315,16 +317,17 @@ package body Pp.Formatting is
    procedure Append_Temp_Line_Break
      (Lines_Data_P : Lines_Data_Ptr; Org : String)
    is
-      Lines_Data : Lines_Data_Rec renames Lines_Data_P.all;
-      New_Tokns : Scanner.Tokn_Vec renames Lines_Data.New_Tokns;
+      Lines_Data      : Lines_Data_Rec renames Lines_Data_P.all;
+      New_Tokns       : Scanner.Tokn_Vec renames Lines_Data.New_Tokns;
       Cur_Indentation : Natural renames Lines_Data.Cur_Indentation;
-      All_LB : Line_Break_Vector renames Lines_Data.All_LB;
-      Temp_LBI : Line_Break_Index_Vector renames Lines_Data.Temp_LBI;
+      All_LB          : Line_Break_Vector renames Lines_Data.All_LB;
+      Temp_LBI        : Line_Break_Index_Vector renames Lines_Data.Temp_LBI;
    begin
       Append
         (All_LB,
          Line_Break'
-           (Tok | Tokn_Val             => <>, -- Initial value not used
+           (Tok | Tokn_Val             => <>,
+            --  Initial value not used
             Hard                       => True,
             Affects_Comments           => False,
             Enabled                    => True,
@@ -336,8 +339,7 @@ package body Pp.Formatting is
       Append (Temp_LBI, Last_Index (All_LB));
 
       Scanner.Lines.Append_Line_Break_Tokn
-        (New_Tokns, Enabled => True,
-         Index => Last_Index (All_LB), Org => Org);
+        (New_Tokns, Enabled => True, Index => Last_Index (All_LB), Org => Org);
    end Append_Temp_Line_Break;
 
    -------------------------
@@ -345,9 +347,9 @@ package body Pp.Formatting is
    -------------------------
 
    procedure Insert_Comment_Text
-     (Lines_Data_P   : Lines_Data_Ptr;
-      Cmd            : Utils.Command_Lines.Command_Line;
-      Comment_Token  : Scanner.Tokn_Cursor)
+     (Lines_Data_P  : Lines_Data_Ptr;
+      Cmd           : Utils.Command_Lines.Command_Line;
+      Comment_Token : Scanner.Tokn_Cursor)
    is
       use Scanner;
 
@@ -356,9 +358,7 @@ package body Pp.Formatting is
       New_Tokns       : Scanner.Tokn_Vec renames Lines_Data.New_Tokns;
 
       function Filled_Text
-        (Comment_Tok    : Tokn_Cursor;
-         Leading_Blanks : Natural)
-         return W_Str;
+        (Comment_Tok : Tokn_Cursor; Leading_Blanks : Natural) return W_Str;
       --  Returns the text of the comment after filling (see
       --  GNATCOLL.Paragraph_Filling).
 
@@ -367,9 +367,7 @@ package body Pp.Formatting is
       ----------------
 
       function Filled_Text
-        (Comment_Tok    : Tokn_Cursor;
-         Leading_Blanks : Natural)
-         return           W_Str
+        (Comment_Tok : Tokn_Cursor; Leading_Blanks : Natural) return W_Str
       is
          use GNATCOLL.Paragraph_Filling, Ada.Strings.Unbounded;
 
@@ -379,8 +377,10 @@ package body Pp.Formatting is
              (Pretty_Fill
                 (Paragraph       => S1,
                  Max_Line_Length =>
-                   Arg (Cmd, Max_Line_Length) -
-                   (Cur_Indentation + String'("--")'Length + Leading_Blanks)));
+                   Arg (Cmd, Max_Line_Length)
+                   - (Cur_Indentation
+                      + String'("--")'Length
+                      + Leading_Blanks)));
 
       begin
          return From_UTF8 (S2);
@@ -395,8 +395,8 @@ package body Pp.Formatting is
       Leading_Blanks : constant Natural :=
         (if Arg (Cmd, Comments_Gnat_Beginning)
            and then not Is_Header_Comment (Token_At_Cursor (Comment_Token))
-           and then Kind (Comment_Token) in
-                      Fillable_Comment | Other_Whole_Line_Comment
+           and then Kind (Comment_Token)
+                    in Fillable_Comment | Other_Whole_Line_Comment
          then
            (if Is_Empty_Comment (Token_At_Cursor (Comment_Token)) then 0
             else Natural'Max (Scanner.Leading_Blanks (Comment_Token), 2))
@@ -411,7 +411,7 @@ package body Pp.Formatting is
         (if Do_Filling then Filled_Text (Comment_Token, Leading_Blanks)
          else To_W_Str (Scanner.Text (Comment_Token)));
 
-   --  Start of processing for Insert_Comment_Text
+      --  Start of processing for Insert_Comment_Text
 
    begin
       Append_Comment_Text
@@ -445,8 +445,8 @@ package body Pp.Formatting is
       use Scanner;
 
       function Compute_Indentation
-        (Comment_Token : Scanner.Tokn_Cursor;
-         Prev_Token    : Scanner.Tokn_Cursor) return W_Str;
+        (Comment_Token : Scanner.Tokn_Cursor; Prev_Token : Scanner.Tokn_Cursor)
+         return W_Str;
       --  This function is called only if the use-tabs switch is passed and
       --  returns the proper indentation text according to the required number
       --  of tabs and spaces computed based on the current sloc column value
@@ -457,22 +457,22 @@ package body Pp.Formatting is
       ---------------------------
 
       function Compute_Indentation
-        (Comment_Token : Scanner.Tokn_Cursor;
-         Prev_Token    : Scanner.Tokn_Cursor) return W_Str
+        (Comment_Token : Scanner.Tokn_Cursor; Prev_Token : Scanner.Tokn_Cursor)
+         return W_Str
       is
-         pragma Assert (Arg (Cmd, Use_Tabs)
-                        and then Kind (Prev_Token) = Tab_Token);
+         pragma
+           Assert (Arg (Cmd, Use_Tabs) and then Kind (Prev_Token) = Tab_Token);
 
-         Tab_Str : constant W_Str    := To_W_Str (Text (Prev_Token));
+         Tab_Str : constant W_Str := To_W_Str (Text (Prev_Token));
          Indent  : constant Positive := Sloc_Col (Comment_Token) - 1;
 
          --  Compute the number of tabs and spaces to get the right
          --  indentation based on the indentation switch value
          Tab_Size  : constant Positive := PP_Indentation (Cmd);
-         Tabs_Nb   : constant Integer  := Indent / Tab_Size;
-         Spaces_Nb : constant Integer  := Indent mod Tab_Size;
+         Tabs_Nb   : constant Integer := Indent / Tab_Size;
+         Spaces_Nb : constant Integer := Indent mod Tab_Size;
 
-         Result    : Bounded_W_Str (Max_Length => Natural (Indent));
+         Result : Bounded_W_Str (Max_Length => Natural (Indent));
       begin
          if Tabs_Nb > 1 then
             for I in 1 .. Tabs_Nb loop
@@ -489,9 +489,7 @@ package body Pp.Formatting is
          return To_String (Result);
       end Compute_Indentation;
 
-      function Filled_Text
-        (Comment_Token : Tokn_Cursor)
-         return W_Str;
+      function Filled_Text (Comment_Token : Tokn_Cursor) return W_Str;
       --  Returns the text of the comment after filling (see
       --  GNATCOLL.Paragraph_Filling).
 
@@ -502,41 +500,44 @@ package body Pp.Formatting is
       --  Other_Whole_Line_Comment tokens that are not part of a header
       --  comment.
 
-      pragma Assert
-        (if Arg (Cmd, Comments_Gnat_Beginning)
-           and then not Is_Header_Comment (Token_At_Cursor (Comment_Token))
-           and then Kind (Comment_Token) in
-                      Fillable_Comment | Other_Whole_Line_Comment
-         then
-            (if Is_Empty_Comment (Token_At_Cursor (Comment_Token))
-             then Scanner.Leading_Blanks (Comment_Token) = 0
-             else Scanner.Leading_Blanks (Comment_Token) >= 2));
+      pragma
+        Assert
+          (if Arg (Cmd, Comments_Gnat_Beginning)
+               and then not Is_Header_Comment (Token_At_Cursor (Comment_Token))
+               and then Kind (Comment_Token)
+                        in Fillable_Comment | Other_Whole_Line_Comment
+             then
+               (if Is_Empty_Comment (Token_At_Cursor (Comment_Token))
+                then Scanner.Leading_Blanks (Comment_Token) = 0
+                else Scanner.Leading_Blanks (Comment_Token) >= 2));
 
       Prev_Tok : constant Tokn_Cursor := Prev (Comment_Token);
-      pragma Assert
-        (if Kind (Comment_Token) in Whole_Line_Comment then
-           (if not Arg (Cmd, Use_Tabs) then
-              Kind (Prev_Tok) in Spaces | EOL_Token | Line_Break_Token
-            else
-              Kind (Prev_Tok) in
-                    Spaces | Tab_Token | EOL_Token | Line_Break_Token));
+      pragma
+        Assert
+          (if Kind (Comment_Token) in Whole_Line_Comment
+             then
+               (if not Arg (Cmd, Use_Tabs)
+                then Kind (Prev_Tok) in Spaces | EOL_Token | Line_Break_Token
+                else
+                  Kind (Prev_Tok)
+                  in Spaces | Tab_Token | EOL_Token | Line_Break_Token));
 
-      Indentation : constant W_Str :=
-        (if Kind (Comment_Token) in Whole_Line_Comment then
-             (if Kind (Prev_Tok) in Spaces then
-                 To_W_Str (Text (Prev_Tok))
-              elsif Arg (Cmd, Use_Tabs)
-                 and then Kind (Prev_Tok) = Tab_Token
-              then
-                 Compute_Indentation (Comment_Token, Prev_Tok)
-              else "")
+      Indentation        : constant W_Str :=
+        (if Kind (Comment_Token) in Whole_Line_Comment
+         then
+           (if Kind (Prev_Tok) in Spaces then To_W_Str (Text (Prev_Tok))
+            elsif Arg (Cmd, Use_Tabs) and then Kind (Prev_Tok) = Tab_Token
+            then Compute_Indentation (Comment_Token, Prev_Tok)
+            else "")
          else "");
-      pragma Assert
-        (if Kind (Comment_Token) in Whole_Line_Comment then
-             (if Kind (Prev_Tok) = Spaces then
-                 Indentation'Length = Sloc_Col (Comment_Token) - 1));
+      pragma
+        Assert
+          (if Kind (Comment_Token) in Whole_Line_Comment
+             then
+               (if Kind (Prev_Tok) = Spaces
+                then Indentation'Length = Sloc_Col (Comment_Token) - 1));
       First_Line_Prelude : constant W_Str :=
-          "--" & [1 .. Scanner.Leading_Blanks (Comment_Token) => ' '];
+        "--" & [1 .. Scanner.Leading_Blanks (Comment_Token) => ' '];
       --  String that precedes the comment Text (first line)
       Subsequent_Prelude : constant W_Str := Indentation & First_Line_Prelude;
       --  String that precedes subsequent line of the comment Text
@@ -545,10 +546,7 @@ package body Pp.Formatting is
       -- Filled_Text --
       -----------------
 
-      function Filled_Text
-        (Comment_Token : Tokn_Cursor)
-         return W_Str
-      is
+      function Filled_Text (Comment_Token : Tokn_Cursor) return W_Str is
          use GNATCOLL.Paragraph_Filling, Ada.Strings.Unbounded;
 
          S1 : String renames Str (Text (Comment_Token)).S;
@@ -574,7 +572,7 @@ package body Pp.Formatting is
       --  Skip last NL
       Text       : W_Str renames Text_NL (Text_NL'First .. Text_NL'Last - 1);
 
-   --  Start of processing for Comment_Token_To_Buffer
+      --  Start of processing for Comment_Token_To_Buffer
    begin
       Insert (Buffer, First_Line_Prelude);
 
@@ -589,8 +587,9 @@ package body Pp.Formatting is
    end Comment_Token_To_Buffer;
 
    procedure Tokns_To_Buffer
-     (Buf : in out Buffer; Tokns : Scanner.Tokn_Vec;
-      Cmd : Utils.Command_Lines.Command_Line)
+     (Buf   : in out Buffer;
+      Tokns : Scanner.Tokn_Vec;
+      Cmd   : Utils.Command_Lines.Command_Line)
    is
       use Scanner;
    begin
@@ -632,18 +631,20 @@ package body Pp.Formatting is
       Initial_Indentation : Natural renames Lines_Data.Initial_Indentation;
       Cur_Indentation     : Natural renames Lines_Data.Cur_Indentation;
 
-      Src_Toks            : aliased Tokn_Vec;
+      Src_Toks : aliased Tokn_Vec;
       pragma Assert (Is_Empty (Src_Toks));
-      Ignored             : Boolean := Get_Tokns
-        (Src_Buf, Src_Toks,
-         Comments_Special_On => Arg (Cmd, Comments_Special));
-      Cur_Tok             : Tokn_Cursor :=
+      Ignored  : Boolean :=
+        Get_Tokns
+          (Src_Buf,
+           Src_Toks,
+           Comments_Special_On => Arg (Cmd, Comments_Special));
+      Cur_Tok  : Tokn_Cursor :=
         Next (First (Src_Toks'Unchecked_Access)); -- skip sentinel
 
       Saved_New_Tokns : Scanner.Tokn_Vec renames Lines_Data.Saved_New_Tokns;
-      New_Tokns : Scanner.Tokn_Vec renames Lines_Data.New_Tokns;
-      Ignore : Boolean := Move_Tokns
-        (Target => Saved_New_Tokns, Source => New_Tokns);
+      New_Tokns       : Scanner.Tokn_Vec renames Lines_Data.New_Tokns;
+      Ignore          : Boolean :=
+        Move_Tokns (Target => Saved_New_Tokns, Source => New_Tokns);
 
       procedure Reset_Indentation;
       --  Set the indentation to it's initial value (usually 0, but can be set
@@ -654,7 +655,7 @@ package body Pp.Formatting is
          Cur_Indentation := Initial_Indentation;
       end Reset_Indentation;
 
-   --  Start of processing for Do_Comments_Only
+      --  Start of processing for Do_Comments_Only
 
    begin
       Append_Tokn (New_Tokns, Start_Of_Input);
@@ -671,6 +672,7 @@ package body Pp.Formatting is
             case Comment_Kind'(Kind (Cur_Tok)) is
                when Whole_Line_Comment =>
                   Cur_Indentation := Sloc (Cur_Tok).Col - 1;
+
                when End_Of_Line_Comment =>
                   Cur_Indentation :=
                     Sloc (Cur_Tok).First - Sloc (Prev_ss (Cur_Tok)).Last - 1;
@@ -697,14 +699,12 @@ package body Pp.Formatting is
    Post_Tree_Phases_Done : exception;
 
    procedure Keyword_Casing
-     (Lines_Data_P : Lines_Data_Ptr;
-      Cmd : Command_Line);
+     (Lines_Data_P : Lines_Data_Ptr; Cmd : Command_Line);
    --  Convert reserved words to lower/upper case based on command-line
    --  options.
 
    procedure Insert_Form_Feeds
-     (Lines_Data_P : Lines_Data_Ptr;
-      Cmd : Command_Line);
+     (Lines_Data_P : Lines_Data_Ptr; Cmd : Command_Line);
    --  Insert FF after "pragma Page;" if --ff-after-pragma-page switch was
    --  given. It might seem silly to have a whole extra pass for this little
    --  feature, but it's a rarely used feature, so we don't care if it's a
@@ -728,9 +728,7 @@ package body Pp.Formatting is
    --  regions of Out_Buf with the corresponding regions of Src_Buf. Note
    --  that this destroys any markers that might be pointing to Out_Buf.
 
-   procedure Keyword_Casing
-     (Lines_Data_P : Lines_Data_Ptr;
-      Cmd : Command_Line)
+   procedure Keyword_Casing (Lines_Data_P : Lines_Data_Ptr; Cmd : Command_Line)
    is
    begin
       --  The usual case is Lower_Case, in which case there's nothing to do,
@@ -745,12 +743,14 @@ package body Pp.Formatting is
             declare
                use Scanner;
                Lines_Data : Lines_Data_Rec renames Lines_Data_P.all;
-               Out_Buf : Buffer renames Lines_Data.Out_Buf;
-               Out_Tokns : Scanner.Tokn_Vec renames Lines_Data.Out_Tokns;
+               Out_Buf    : Buffer renames Lines_Data.Out_Buf;
+               Out_Tokns  : Scanner.Tokn_Vec renames Lines_Data.Out_Tokns;
 
-               Ignored : Boolean := Get_Tokns
-                 (Out_Buf, Out_Tokns,
-                  Comments_Special_On => Arg (Cmd, Comments_Special));
+               Ignored : Boolean :=
+                 Get_Tokns
+                   (Out_Buf,
+                    Out_Tokns,
+                    Comments_Special_On => Arg (Cmd, Comments_Special));
 
                Out_Tok : Tokn_Cursor := First (Out_Tokns'Access);
 
@@ -782,12 +782,10 @@ package body Pp.Formatting is
    end Keyword_Casing;
 
    procedure Insert_Form_Feeds_Helper
-     (Lines_Data_P : Lines_Data_Ptr;
-      Cmd : Command_Line);
+     (Lines_Data_P : Lines_Data_Ptr; Cmd : Command_Line);
 
    procedure Insert_Form_Feeds
-     (Lines_Data_P : Lines_Data_Ptr;
-      Cmd : Command_Line) is
+     (Lines_Data_P : Lines_Data_Ptr; Cmd : Command_Line) is
    begin
       --  Ignore this switch for now. It's not clear that anyone uses it, and
       --  we have much bigger issues that need fixing.
@@ -798,21 +796,22 @@ package body Pp.Formatting is
    end Insert_Form_Feeds;
 
    procedure Insert_Form_Feeds_Helper
-     (Lines_Data_P : Lines_Data_Ptr;
-      Cmd : Command_Line)
+     (Lines_Data_P : Lines_Data_Ptr; Cmd : Command_Line)
    is
       Lines_Data : Lines_Data_Rec renames Lines_Data_P.all;
-      Out_Buf : Buffer renames Lines_Data.Out_Buf;
-      Out_Tokns : Scanner.Tokn_Vec renames Lines_Data.Out_Tokns;
+      Out_Buf    : Buffer renames Lines_Data.Out_Buf;
+      Out_Tokns  : Scanner.Tokn_Vec renames Lines_Data.Out_Tokns;
       use Scanner;
 
-      Ignored : Boolean := Get_Tokns
-        (Out_Buf, Out_Tokns,
-         Comments_Special_On => Arg (Cmd, Comments_Special));
+      Ignored : Boolean :=
+        Get_Tokns
+          (Out_Buf,
+           Out_Tokns,
+           Comments_Special_On => Arg (Cmd, Comments_Special));
 
       Prev_Prev_Tok : Tokn_Cursor := Next_ss (First (Out_Tokns'Access));
-      Prev_Tok : Tokn_Cursor := Next_ss (Prev_Prev_Tok);
-      Out_Tok : Tokn_Cursor := Next_ss (Prev_Tok);
+      Prev_Tok      : Tokn_Cursor := Next_ss (Prev_Prev_Tok);
+      Out_Tok       : Tokn_Cursor := Next_ss (Prev_Tok);
       --  Out_Tok skips sentinel and first 3 tokens
    begin
       while not At_Last (Out_Tok) loop
@@ -840,9 +839,7 @@ package body Pp.Formatting is
    end Insert_Form_Feeds_Helper;
 
    procedure Copy_Pp_Off_Regions_Helper
-     (Input        : Char_Vector;
-      Lines_Data_P : Lines_Data_Ptr;
-      Cmd          : Command_Line);
+     (Input : Char_Vector; Lines_Data_P : Lines_Data_Ptr; Cmd : Command_Line);
 
    procedure Copy_Pp_Off_Regions
      (Input          : Char_Vector;
@@ -857,11 +854,9 @@ package body Pp.Formatting is
    end Copy_Pp_Off_Regions;
 
    procedure Copy_Pp_Off_Regions_Helper
-     (Input        : Char_Vector;
-      Lines_Data_P : Lines_Data_Ptr;
-      Cmd          : Command_Line)
+     (Input : Char_Vector; Lines_Data_P : Lines_Data_Ptr; Cmd : Command_Line)
    is
-      Src_Buf   : Buffer;
+      Src_Buf : Buffer;
 
       Lines_Data : Lines_Data_Rec renames Lines_Data_P.all;
       Out_Buf    : Buffer renames Lines_Data.Out_Buf;
@@ -876,8 +871,7 @@ package body Pp.Formatting is
       --  Buffer. This will be moved into Out_Buf when we are done.
 
       procedure Get_Next_Off_On
-        (Tok    : in out Tokn_Cursor;
-         Expect : Pp_Off_On_Comment);
+        (Tok : in out Tokn_Cursor; Expect : Pp_Off_On_Comment);
       --  Get the next OFF or ON (or End_Of_Input). The token itself is
       --  returned in Tok. Expect is purely for assertions; it alternates
       --  between OFF and ON; Tok must be as expected (or End_Of_Input).
@@ -889,8 +883,10 @@ package body Pp.Formatting is
       --  Move forward in Buf, up to the given position, ignoring the
       --  characters.
 
-      procedure Indent_Pp_Off (Src_Tok, Out_Tok : Tokn_Cursor) with
-        Pre => Kind (Src_Tok) = Kind (Out_Tok)
+      procedure Indent_Pp_Off (Src_Tok, Out_Tok : Tokn_Cursor)
+      with
+        Pre =>
+          Kind (Src_Tok) = Kind (Out_Tok)
           and then Kind (Src_Tok) in Pp_Off_Comment | End_Of_Input
           and then Kind (Out_Tok) in Pp_Off_Comment | End_Of_Input;
       --  This is called just after copying Spaces from Out_Buf, and just
@@ -900,20 +896,17 @@ package body Pp.Formatting is
       --  indentation preceding those is copied from Src_Buf.
 
       procedure Get_Next_Off_On
-        (Tok    : in out Tokn_Cursor;
-         Expect : Pp_Off_On_Comment) is
+        (Tok : in out Tokn_Cursor; Expect : Pp_Off_On_Comment) is
       begin
          loop
             Next (Tok);
             Error_Sloc :=
-              (if Kind (Tok) in End_Of_Input then
-                 Slocs.No_Source_Location
+              (if Kind (Tok) in End_Of_Input then Slocs.No_Source_Location
                else To_Langkit (Scanner.Sloc (Tok)));
             exit when Kind (Tok) in Expect | End_Of_Input;
          end loop;
          pragma Assert (Kind (Tok) in Expect | End_Of_Input);
-         pragma Assert
-           (Kind (Prev_ss (Tok)) in Start_Of_Input | EOL_Token);
+         pragma Assert (Kind (Prev_ss (Tok)) in Start_Of_Input | EOL_Token);
       end Get_Next_Off_On;
 
       procedure Copy (Buf : in out Buffer; Up_To : Positive) is
@@ -934,19 +927,21 @@ package body Pp.Formatting is
       procedure Indent_Pp_Off (Src_Tok, Out_Tok : Tokn_Cursor) is
       begin
          if Kind (Out_Tok) = Pp_Off_Comment then
-            Insert (New_Buf,
-                    [Sloc_Col (Out_Tok) .. Sloc_Col (Src_Tok) - 1 => ' ']);
+            Insert
+              (New_Buf, [Sloc_Col (Out_Tok) .. Sloc_Col (Src_Tok) - 1 => ' ']);
          end if;
       end Indent_Pp_Off;
 
-      Ignored : Boolean := Get_Tokns
-        (Out_Buf, Out_Tokns,
-         Comments_Special_On => Arg (Cmd, Comments_Special));
+      Ignored : Boolean :=
+        Get_Tokns
+          (Out_Buf,
+           Out_Tokns,
+           Comments_Special_On => Arg (Cmd, Comments_Special));
 
       Src_Tok : Tokn_Cursor;
       Out_Tok : Tokn_Cursor := First (Out_Tokns'Access);
 
-   --  Start of processing for Copy_Pp_Off_Regions_Helper
+      --  Start of processing for Copy_Pp_Off_Regions_Helper
 
    begin
       Clear (Src_Tokns);
@@ -957,14 +952,13 @@ package body Pp.Formatting is
       Insert_Ada_Source
         (Buf                     => Src_Buf,
          Input                   =>
-           Utils.Char_Vectors.Char_Vectors.Elems
-             (Input) (1 .. Utils.Char_Vectors.Char_Vectors.Last_Index (Input)),
+           Utils.Char_Vectors.Char_Vectors.Elems (Input)
+             (1 .. Utils.Char_Vectors.Char_Vectors.Last_Index (Input)),
          Wide_Character_Encoding =>
            Utils.Command_Lines.Common.Wide_Character_Encoding (Cmd),
          Expand_Tabs             => True,
-         Tab_Len                 => (if Arg (Cmd, Use_Tabs)
-                                     then Natural (PP_Indentation (Cmd))
-                                     else 0),
+         Tab_Len                 =>
+           (if Arg (Cmd, Use_Tabs) then Natural (PP_Indentation (Cmd)) else 0),
          Include_Trailing_Spaces => True);
 
       --  The Src_Buf contains a sequence of zero or more OFF and ON
@@ -1025,8 +1019,10 @@ package body Pp.Formatting is
          Skip (Out_Buf, Up_To => Next_Sloc_First (Prev (Out_Tok)));
 
          --  Make sure we reach the end of both token vector at the same time
-         pragma Assert
-           ((Kind (Out_Tok) = End_Of_Input) = (Kind (Src_Tok) = End_Of_Input));
+         pragma
+           Assert
+             ((Kind (Out_Tok) = End_Of_Input)
+                = (Kind (Src_Tok) = End_Of_Input));
 
          exit when Kind (Src_Tok) = End_Of_Input;
       end loop;
@@ -1044,26 +1040,26 @@ package body Pp.Formatting is
       --  Tok_Phases once it's all working.
 
       procedure Split_Lines
-        (Lines_Data_P : Lines_Data_Ptr;
-         Cmd : Command_Line;
-         First_Time : Boolean;
+        (Lines_Data_P   : Lines_Data_Ptr;
+         Cmd            : Command_Line;
+         First_Time     : Boolean;
          Partial_GNATPP : Boolean := False);
       --  Enable soft line breaks as necessary to prevent too-long lines.
       --  First_Time is for debugging.
 
       procedure Enable_Line_Breaks_For_EOL_Comments
-        (Src_Buf : in out Buffer;
-         Lines_Data_P : Lines_Data_Ptr;
-         Cmd : Command_Line;
+        (Src_Buf        : in out Buffer;
+         Lines_Data_P   : Lines_Data_Ptr;
+         Cmd            : Command_Line;
          Partial_GNATPP : Boolean := False);
       --  For all end-of-line comments that occur at a soft line break, enable
       --  the line break. Note that this does not modify the output.
 
       procedure Insert_Comments_And_Blank_Lines
-        (Src_Buf : in out Buffer;
-         Messages : out Scanner.Source_Message_Vector;
-         Lines_Data_P : Lines_Data_Ptr;
-         Cmd : Command_Line;
+        (Src_Buf        : in out Buffer;
+         Messages       : out Scanner.Source_Message_Vector;
+         Lines_Data_P   : Lines_Data_Ptr;
+         Cmd            : Command_Line;
          Pp_Off_Present : in out Boolean;
          Partial_GNATPP : Boolean := False);
       --  New_Tokns doesn't contain any comments; they are inserted into the
@@ -1084,8 +1080,8 @@ package body Pp.Formatting is
          Partial_GNATPP : Boolean := False);
       --  Expand tabs as necessary to align things
 
-      procedure Insert_Tabs (Lines_Data_P : Lines_Data_Ptr;
-                             Cmd          : Command_Line);
+      procedure Insert_Tabs
+        (Lines_Data_P : Lines_Data_Ptr; Cmd : Command_Line);
       --  Replace spaces by tabs instead of spaces when --use-tabs switch is
       --  passed. The spaces will be replaces by tabs following the logic:
       --  * use --indentation to know how many spaces a tab has
@@ -1110,8 +1106,8 @@ package body Pp.Formatting is
       Partial_GNATPP : Boolean := False)
    is
       Lines_Data : Lines_Data_Rec renames Lines_Data_P.all;
-      All_LB : Line_Break_Vector renames Lines_Data.All_LB;
-      All_LBI : Line_Break_Index_Vector renames Lines_Data.All_LBI;
+      All_LB     : Line_Break_Vector renames Lines_Data.All_LB;
+      All_LBI    : Line_Break_Index_Vector renames Lines_Data.All_LBI;
 
       Pp_Off_Present : Boolean := False;
       --  True if there is at least one Pp_Off_Comment. We don't care about
@@ -1132,17 +1128,12 @@ package body Pp.Formatting is
       end if;
 
       if not Partial_GNATPP then
-         Tok_Phases.Split_Lines
-           (Lines_Data_P, Cmd,
-            First_Time => True);
+         Tok_Phases.Split_Lines (Lines_Data_P, Cmd, First_Time => True);
          Tok_Phases.Enable_Line_Breaks_For_EOL_Comments
            (Src_Buf, Lines_Data_P, Cmd);
          Tok_Phases.Insert_Comments_And_Blank_Lines
-           (Src_Buf, Messages, Lines_Data_P,
-            Cmd, Pp_Off_Present);
-         Tok_Phases.Split_Lines
-           (Lines_Data_P, Cmd,
-            First_Time => False);
+           (Src_Buf, Messages, Lines_Data_P, Cmd, Pp_Off_Present);
+         Tok_Phases.Split_Lines (Lines_Data_P, Cmd, First_Time => False);
          Tok_Phases.Insert_Indentation (Lines_Data_P);
          Tok_Phases.Insert_Alignment (Lines_Data_P, Cmd);
 
@@ -1169,21 +1160,26 @@ package body Pp.Formatting is
          --  since applying for the entire file for now.
 
          Tok_Phases.Split_Lines
-           (Lines_Data_P, Cmd,
-            First_Time => True,
+           (Lines_Data_P,
+            Cmd,
+            First_Time     => True,
             Partial_GNATPP => Partial_GNATPP);
 
          Tok_Phases.Enable_Line_Breaks_For_EOL_Comments
            (Src_Buf, Lines_Data_P, Cmd, Partial_GNATPP);
 
          Tok_Phases.Insert_Comments_And_Blank_Lines
-           (Src_Buf, Messages, Lines_Data_P, Cmd,
+           (Src_Buf,
+            Messages,
+            Lines_Data_P,
+            Cmd,
             Pp_Off_Present,
             Partial_GNATPP);
 
          Tok_Phases.Split_Lines
-           (Lines_Data_P, Cmd,
-            First_Time => False,
+           (Lines_Data_P,
+            Cmd,
+            First_Time     => False,
             Partial_GNATPP => Partial_GNATPP);
 
          Tok_Phases.Insert_Indentation (Lines_Data_P);
@@ -1202,7 +1198,8 @@ package body Pp.Formatting is
          Keyword_Casing (Lines_Data_P, Cmd);
       end if;
    exception
-      when Post_Tree_Phases_Done => null;
+      when Post_Tree_Phases_Done =>
+         null;
    end Post_Tree_Phases;
 
    --------------------------
@@ -1219,16 +1216,23 @@ package body Pp.Formatting is
       Out_Buf : Buffer renames Lines_Data.Out_Buf;
 
       use Scanner;
-      subtype Q is Opt_Token_Kind with
-        Predicate => Q in Nil | Spaces | Start_Of_Input | End_Of_Input |
-                          EOL_Token | Line_Break_Token;
+      subtype Q is Opt_Token_Kind
+      with
+        Predicate =>
+          Q
+          in Nil
+           | Spaces
+           | Start_Of_Input
+           | End_Of_Input
+           | EOL_Token
+           | Line_Break_Token;
 
-      function Txt (Tok : Tokn_Cursor) return String is
-        (if Kind (Tok) in Q then "``" & Str (Text (Tok)).S & "''"
-         else Str (Text (Tok)).S);
+      function Txt (Tok : Tokn_Cursor) return String
+      is (if Kind (Tok) in Q then "``" & Str (Text (Tok)).S & "''"
+          else Str (Text (Tok)).S);
       --  Text to print. Put quotes around some kinds.
 
-   --  Start of processing for Raise_Token_Mismatch
+      --  Start of processing for Raise_Token_Mismatch
 
    begin
       Error_Sloc := To_Langkit (Sloc (Src_Tok));
@@ -1249,7 +1253,9 @@ package body Pp.Formatting is
 
             Err_Out.Put
               ("\1: Token mismatch: \2 --> \3\n",
-               Message, Txt (Src_Tok), Txt (Out_Tok));
+               Message,
+               Txt (Src_Tok),
+               Txt (Out_Tok));
             Err_Out.Put ("Src tokens:\n");
             Put_Tokens
               (Highlight => Src_Tok, File => Ada.Text_IO.Standard_Error);
@@ -1270,13 +1276,13 @@ package body Pp.Formatting is
 
    procedure Final_Check_Helper
      (Lines_Data_P : Lines_Data_Ptr;
-      Src_Buf : in out Buffer;
-      Cmd : Utils.Command_Lines.Command_Line)
+      Src_Buf      : in out Buffer;
+      Cmd          : Utils.Command_Lines.Command_Line)
    is
       Lines_Data : Lines_Data_Rec renames Lines_Data_P.all;
-      Out_Buf : Buffer renames Lines_Data.Out_Buf;
-      Src_Tokns : Scanner.Tokn_Vec renames Lines_Data.Src_Tokns;
-      Out_Tokns : Scanner.Tokn_Vec renames Lines_Data.Out_Tokns;
+      Out_Buf    : Buffer renames Lines_Data.Out_Buf;
+      Src_Tokns  : Scanner.Tokn_Vec renames Lines_Data.Src_Tokns;
+      Out_Tokns  : Scanner.Tokn_Vec renames Lines_Data.Out_Tokns;
 
       use Scanner;
 
@@ -1295,7 +1301,8 @@ package body Pp.Formatting is
       function Match (Src_Tok, Out_Tok : Tokn_Cursor) return Boolean is
       begin
          if Arg (Cmd, Spaces_Only) then
-            return Kind (Src_Tok) = Kind (Out_Tok)
+            return
+              Kind (Src_Tok) = Kind (Out_Tok)
               and then Case_Insensitive_Equal (Text (Src_Tok), Text (Out_Tok));
          end if;
 
@@ -1305,21 +1312,27 @@ package body Pp.Formatting is
                   when EOL_Token | Spaces | Line_Break_Token =>
                      raise Program_Error;
 
-                  when Start_Of_Input | End_Of_Input |
-                    Tab_Token | Other_Lexeme | Illegal_Character =>
-                     pragma Assert
-                       (Equal_Ignoring_CR (Text (Src_Tok), Text (Out_Tok)));
+                  when Start_Of_Input
+                     | End_Of_Input
+                     | Tab_Token
+                     | Other_Lexeme
+                     | Illegal_Character
+                  =>
+                     pragma
+                       Assert
+                         (Equal_Ignoring_CR (Text (Src_Tok), Text (Out_Tok)));
                      R := True;
 
                   when Reserved_Word =>
-                     pragma Assert
-                       (Case_Insensitive_Equal
-                          (Text (Src_Tok), Text (Out_Tok)));
+                     pragma
+                       Assert
+                         (Case_Insensitive_Equal
+                            (Text (Src_Tok), Text (Out_Tok)));
                      R := True;
 
                   when Ident =>
-                     R := Case_Insensitive_Equal
-                       (Text (Src_Tok), Text (Out_Tok));
+                     R :=
+                       Case_Insensitive_Equal (Text (Src_Tok), Text (Out_Tok));
 
                   when Numeric_Literal =>
                      R := Num_Lits_Match (Src_Tok, Out_Tok, Cmd);
@@ -1329,8 +1342,9 @@ package body Pp.Formatting is
 
                   when String_Lit =>
                      if Is_Op_Sym_With_Letters (Text (Src_Tok)) then
-                        R := Case_Insensitive_Equal
-                          (Text (Src_Tok), Text (Out_Tok));
+                        R :=
+                          Case_Insensitive_Equal
+                            (Text (Src_Tok), Text (Out_Tok));
                      else
                         R := Text (Src_Tok) = Text (Out_Tok);
                      end if;
@@ -1341,8 +1355,8 @@ package body Pp.Formatting is
                   when Comment_Kind =>
                      R :=
                        (Arg (Cmd, Comments_Gnat_Beginning)
-                        or else Leading_Blanks (Src_Tok) =
-                                Leading_Blanks (Out_Tok))
+                        or else Leading_Blanks (Src_Tok)
+                                = Leading_Blanks (Out_Tok))
                        and then Text (Src_Tok) = Text (Out_Tok);
                end case;
 
@@ -1354,12 +1368,12 @@ package body Pp.Formatting is
             elsif Kind (Src_Tok) = End_Of_Line_Comment
               and then Kind (Out_Tok) in Whole_Line_Comment
             then
-               R := Text (Src_Tok) = Text (Out_Tok)
-                 and then
-                 (if
-                    not Arg (Cmd, Comments_Gnat_Beginning)
-                  then
-                    Leading_Blanks (Src_Tok) = Leading_Blanks (Out_Tok));
+               R :=
+                 Text (Src_Tok) = Text (Out_Tok)
+                 and then (if not Arg (Cmd, Comments_Gnat_Beginning)
+                           then
+                             Leading_Blanks (Src_Tok)
+                             = Leading_Blanks (Out_Tok));
                --  ???This case will be needed if/when we turn end-of-line
                --  comments that don't fit into whole-line comments. That
                --  transformation seems questionable, because it would
@@ -1373,9 +1387,11 @@ package body Pp.Formatting is
          end return;
       end Match;
 
-      Ignored : Boolean := Get_Tokns
-        (Out_Buf, Out_Tokns,
-         Comments_Special_On => Arg (Cmd, Comments_Special));
+      Ignored : Boolean :=
+        Get_Tokns
+          (Out_Buf,
+           Out_Tokns,
+           Comments_Special_On => Arg (Cmd, Comments_Special));
 
       Src_Tok : Tokn_Cursor := Next_ss (First (Src_Tokns'Access));
       Out_Tok : Tokn_Cursor := Next_ss (First (Out_Tokns'Access));
@@ -1383,25 +1399,23 @@ package body Pp.Formatting is
       --  first Start_Of_Input token, which is just a sentinel.
 
       procedure Collect_Comments
-        (Tok    : in out Tokn_Cursor;
-         Result : in out WChar_Vector)
-      is
+        (Tok : in out Tokn_Cursor; Result : in out WChar_Vector) is
       begin
          while Kind (Tok) in Whole_Line_Comment loop
             declare
                Text : constant W_Str := To_W_Str (Scanner.Text (Tok));
-               function White (X : Positive) return Boolean is
-                 (X <= Text'Last
-                  and then
-                    (Is_Space (Text (X))
-                     or else Is_Line_Terminator (Text (X))));
+               function White (X : Positive) return Boolean
+               is (X <= Text'Last
+                   and then (Is_Space (Text (X))
+                             or else Is_Line_Terminator (Text (X))));
                --  True if X points to a space or NL character
 
-               pragma Assert
-                 (Text'First = 1
-                  and then Text'Last >= 1
-                  and then (if Text'Last > 1 then not White (1))
-                  and then White (Text'Last));
+               pragma
+                 Assert
+                   (Text'First = 1
+                      and then Text'Last >= 1
+                      and then (if Text'Last > 1 then not White (1))
+                      and then White (Text'Last));
                X : Positive := 1;
             begin
                while X <= Text'Last loop
@@ -1436,7 +1450,7 @@ package body Pp.Formatting is
 
       end Collect_Comments;
 
-   --  Start of processing for Final_Check_Helper
+      --  Start of processing for Final_Check_Helper
 
    begin
       --  Skip initial EOL_Token token
@@ -1480,9 +1494,9 @@ package body Pp.Formatting is
 
          else
             if Kind (Src_Tok) not in EOL_Token
-              and then
-                (Match (Src_Tok, Out_Tok)
-                 or else (Kind (Src_Tok) = '!' and then Kind (Out_Tok) = '|'))
+              and then (Match (Src_Tok, Out_Tok)
+                        or else (Kind (Src_Tok) = '!'
+                                 and then Kind (Out_Tok) = '|'))
             then
                exit when Kind (Src_Tok) = End_Of_Input;
                --  i.e. exit when both Src and Out are at end of input
@@ -1530,18 +1544,21 @@ package body Pp.Formatting is
 
                         Raise_Token_Mismatch
                           ("Final_Check 2",
-                           Lines_Data, Src_Buf, Src_Tok, Out_Tok);
+                           Lines_Data,
+                           Src_Buf,
+                           Src_Tok,
+                           Out_Tok);
                      end if;
                   end;
 
-               --  Check for "end;" --> "end Some_Name;" case
+                  --  Check for "end;" --> "end Some_Name;" case
 
                elsif Kind (Src_Tok) = ';'
-                 and then
-                   Kind (Prev_Lexeme (Src_Tok)) = Res_End
+                 and then Kind (Prev_Lexeme (Src_Tok)) = Res_End
                  and then Sname_83 (Out_Tok)
                then
-                  loop -- could be "end A.B.C;"
+                  loop
+                     --  could be "end A.B.C;"
                      Next_ssnl (Out_Tok);
 
                      exit when Kind (Out_Tok) /= '.';
@@ -1551,13 +1568,19 @@ package body Pp.Formatting is
                      if not Sname_83 (Out_Tok) then
                         Raise_Token_Mismatch
                           ("Final_Check 3",
-                           Lines_Data, Src_Buf, Src_Tok, Out_Tok);
+                           Lines_Data,
+                           Src_Buf,
+                           Src_Tok,
+                           Out_Tok);
                      end if;
                   end loop;
                   if Kind (Out_Tok) /= ';' then
                      Raise_Token_Mismatch
                        ("Final_Check 4",
-                        Lines_Data, Src_Buf, Src_Tok, Out_Tok);
+                        Lines_Data,
+                        Src_Buf,
+                        Src_Tok,
+                        Out_Tok);
                   end if;
 
                elsif Kind (Src_Tok) in EOL_Token then
@@ -1566,8 +1589,8 @@ package body Pp.Formatting is
                elsif Kind (Out_Tok) in EOL_Token | Tab_Token then
                   Next_ss (Out_Tok);
 
-               --  Else print out debugging information and crash. This avoids
-               --  damaging the source code in case of bugs.
+                  --  Else print out debugging information and crash. This
+                  --  avoids damaging the source code in case of bugs.
 
                else
                   Raise_Token_Mismatch
@@ -1626,8 +1649,8 @@ package body Pp.Formatting is
             end;
          end;
 
-      --  In production mode, we don't print debugging information, but we
-      --  still raise the exception.
+         --  In production mode, we don't print debugging information, but we
+         --  still raise the exception.
 
       else
          Final_Check_Helper (Lines_Data_P, Src_Buf, Cmd);
@@ -1685,16 +1708,15 @@ package body Pp.Formatting is
    end Put_All_Tokens;
 
    function Line_Text
-     (Lines_Data : Lines_Data_Rec;
-      F, L : Line_Break_Index_Index) return W_Str
+     (Lines_Data : Lines_Data_Rec; F, L : Line_Break_Index_Index) return W_Str
    is
       Out_Buf : Buffer renames Lines_Data.Out_Buf;
-      All_LB : Line_Break_Vector renames Lines_Data.All_LB;
+      All_LB  : Line_Break_Vector renames Lines_Data.All_LB;
       All_LBI : Line_Break_Index_Vector renames Lines_Data.All_LBI;
-      First  : constant Line_Break := All_LB (All_LBI (F));
-      Last   : constant Line_Break := All_LB (All_LBI (L));
+      First   : constant Line_Break := All_LB (All_LBI (F));
+      Last    : constant Line_Break := All_LB (All_LBI (L));
       use Scanner;
-      Result : constant W_Str      :=
+      Result  : constant W_Str :=
         Slice (Out_Buf, Sloc_First (First.Tok), Sloc_First (Last.Tok));
    begin
       return Result (Result'First + 1 .. Result'Last);
@@ -1703,24 +1725,22 @@ package body Pp.Formatting is
    function Tab_Image (Tabs : Tab_Vector; X : Tab_Index) return String is
       Tab : constant Tab_Rec := Tabs (X);
    begin
-      return "Tabs(" &
-        Image (Integer (X)) &
-        ") = ^" &
-        Image (Integer (Tab.Index_In_Line)) &
-        Str (Tab.Token).S &
-        ASCII.HT &
-        " at " &
-        (if Tab.Col = Positive'Last
-           then ""
-           else " Col = " & Image (Tab.Col)) &
-        (if Tab.Num_Blanks = 0 then ""
-         else " Blanks = " & Image (Tab.Num_Blanks)) &
-        (if Tab.Is_Fake then " FAKE" else "") &
-        (if Is_Null (Tab.Tree)
-           then ""
-           else "(Tr = " & T_Img (Tab.Tree) & ")") &
-        (if Is_Null (Tab.Parent) then ""
-         else "(Pa = " & T_Img (Tab.Parent) & ")");
+      return
+        "Tabs("
+        & Image (Integer (X))
+        & ") = ^"
+        & Image (Integer (Tab.Index_In_Line))
+        & Str (Tab.Token).S
+        & ASCII.HT
+        & " at "
+        & (if Tab.Col = Positive'Last then "" else " Col = " & Image (Tab.Col))
+        & (if Tab.Num_Blanks = 0 then ""
+           else " Blanks = " & Image (Tab.Num_Blanks))
+        & (if Tab.Is_Fake then " FAKE" else "")
+        & (if Is_Null (Tab.Tree) then ""
+           else "(Tr = " & T_Img (Tab.Tree) & ")")
+        & (if Is_Null (Tab.Parent) then ""
+           else "(Pa = " & T_Img (Tab.Parent) & ")");
    end Tab_Image;
 
    procedure Put_Line_Break (Break : Line_Break) is
@@ -1759,16 +1779,15 @@ package body Pp.Formatting is
          declare
             LBI : constant Line_Break_Index := LBI_Vec (LBII);
          begin
-            Put ("\1 => \2\n",
-                 Image (Integer (LBII)), Image (Integer (LBI)));
+            Put ("\1 => \2\n", Image (Integer (LBII)), Image (Integer (LBI)));
          end;
       end loop;
    end Put_LBIs;
 
    procedure Put_Line_Breaks (Lines_Data : Lines_Data_Rec) is
-      Dummy : Enable_Dbg_Out.Enable_Dbg_Out;
-      All_LB : Line_Break_Vector renames Lines_Data.All_LB;
-      All_LBI : Line_Break_Index_Vector renames Lines_Data.All_LBI;
+      Dummy    : Enable_Dbg_Out.Enable_Dbg_Out;
+      All_LB   : Line_Break_Vector renames Lines_Data.All_LB;
+      All_LBI  : Line_Break_Index_Vector renames Lines_Data.All_LBI;
       L        : Line_Break_Index_Index;
       Line_Num : Natural := 0; -- only counts enabled lines
       use Dbg_Out;
@@ -1790,9 +1809,9 @@ package body Pp.Formatting is
 
          Put (" lev=\1", Image (Integer (All_LB (All_LBI (Cur_Line)).Level)));
 
---         if False then
---            Put ("\t\1", Image (All_LB (All_LBI (Cur_Line)).Kind));
---         end if;
+         --         if False then
+         --            Put ("\t\1", Image (All_LB (All_LBI (Cur_Line)).Kind));
+         --         end if;
 
          if All_LB (All_LBI (Cur_Line)).Enabled
            and then Cur_Line /= Last_Index (All_LBI)
@@ -1822,7 +1841,7 @@ package body Pp.Formatting is
      (Lines_Data : Lines_Data_Rec; Message : String)
    is
       Out_Buf : Buffer renames Lines_Data.Out_Buf;
-      Tabs : Tab_Vector renames Lines_Data.Tabs;
+      Tabs    : Tab_Vector renames Lines_Data.Tabs;
 
       use Dbg_Out;
    begin
@@ -1860,14 +1879,16 @@ package body Pp.Formatting is
       procedure Put_Between is null;
    begin
       Utils.Char_Vectors.Char_Vectors.Put
-        (Container, Utils.Formatted_Output.Put_Char'Access,
+        (Container,
+         Utils.Formatted_Output.Put_Char'Access,
          Put_Between'Access);
    end Put_Char_Vector;
 
-   package Wide_Formatted_Output is new Utils.Generic_Formatted_Output
-     (Char_Type => W_Char,
-      Str_Type => W_Str,
-      Basic_Put_Char => Wide_Text_IO_Put_Char);
+   package Wide_Formatted_Output is new
+     Utils.Generic_Formatted_Output
+       (Char_Type      => W_Char,
+        Str_Type       => W_Str,
+        Basic_Put_Char => Wide_Text_IO_Put_Char);
 
    procedure Put_WChar_Vector (Container : WChar_Vector) is
       procedure Put_Between is null;
@@ -1890,19 +1911,17 @@ package body Pp.Formatting is
       use Scanner, Scanner.Lines;
 
       function Line_Len
-        (All_LB : Line_Break_Vector; F, L : Line_Break_Index)
-        return Natural;
+        (All_LB : Line_Break_Vector; F, L : Line_Break_Index) return Natural;
       --  F and L are the first and last index forming a line; returns the
       --  length of the line, not counting new-lines. F must be enabled.
 
       function Forms_Blank_Line
-        (All_LB : Line_Break_Vector;
-         F, L : Line_Break_Index) return Boolean;
+        (All_LB : Line_Break_Vector; F, L : Line_Break_Index) return Boolean;
       --  True if F..L forms an empty line (or would, if both were enabled).
 
       procedure Collect_Line_Breaks
-        (Lines_Data_P : Lines_Data_Ptr;
-         Tokns : in out Scanner.Tokn_Vec;
+        (Lines_Data_P                              : Lines_Data_Ptr;
+         Tokns                                     : in out Scanner.Tokn_Vec;
          Do_All, Do_Enabled, Do_Syntax, First_Time : Boolean);
       --  Collect line breaks from New_Tokns, ignoring soft line breaks that
       --  would form blank lines. These ignored ones are also removed from
@@ -1915,13 +1934,12 @@ package body Pp.Formatting is
       --  Set the Tok of each line break to Nil
 
       function Forms_Blank_Line
-        (All_LB : Line_Break_Vector;
-         F, L : Line_Break_Index) return Boolean
+        (All_LB : Line_Break_Vector; F, L : Line_Break_Index) return Boolean
       is
          First : Line_Break renames All_LB (F);
          Last  : Line_Break renames All_LB (L);
-         FP    : Positive            := Sloc_First (LB_Tok (First));
-         LP    : constant Positive   := Sloc_First (LB_Tok (Last));
+         FP    : Positive := Sloc_First (LB_Tok (First));
+         LP    : constant Positive := Sloc_First (LB_Tok (Last));
       begin
          --  Take into account the fact that a hard line break occupies one
          --  character (the NL), whereas a soft line break does not, and the fact
@@ -1941,23 +1959,26 @@ package body Pp.Formatting is
       end Forms_Blank_Line;
 
       procedure Collect_Line_Breaks
-        (Lines_Data_P : Lines_Data_Ptr;
-         Tokns : in out Scanner.Tokn_Vec;
+        (Lines_Data_P                              : Lines_Data_Ptr;
+         Tokns                                     : in out Scanner.Tokn_Vec;
          Do_All, Do_Enabled, Do_Syntax, First_Time : Boolean)
       is
-         Lines_Data : Lines_Data_Rec renames Lines_Data_P.all;
-         All_LB : Line_Break_Vector renames Lines_Data.All_LB;
-         All_LBI : Line_Break_Index_Vector renames Lines_Data.All_LBI;
-         Enabled_LBI : Line_Break_Index_Vector renames Lines_Data.Enabled_LBI;
-         Syntax_LBI : Line_Break_Index_Vector renames Lines_Data.Syntax_LBI;
+         Lines_Data      : Lines_Data_Rec renames Lines_Data_P.all;
+         All_LB          : Line_Break_Vector renames Lines_Data.All_LB;
+         All_LBI         : Line_Break_Index_Vector renames Lines_Data.All_LBI;
+         Enabled_LBI     : Line_Break_Index_Vector
+           renames Lines_Data.Enabled_LBI;
+         Syntax_LBI      : Line_Break_Index_Vector
+           renames Lines_Data.Syntax_LBI;
          Saved_New_Tokns : aliased Scanner.Tokn_Vec;
-         Ignore : Boolean := Move_Tokns
-           (Target => Saved_New_Tokns, Source => Tokns);
+         Ignore          : Boolean :=
+           Move_Tokns (Target => Saved_New_Tokns, Source => Tokns);
          pragma Assert (not Is_Empty (Saved_New_Tokns));
-         P : Tokn_Cursor := First (Saved_New_Tokns'Unchecked_Access);
+         P               : Tokn_Cursor :=
+           First (Saved_New_Tokns'Unchecked_Access);
          --  token preceding Tok
          pragma Assert (Kind (P) = Start_Of_Input);
-         Tok : Tokn_Cursor := Next (P);
+         Tok             : Tokn_Cursor := Next (P);
       begin
          Clear (All_LBI);
          pragma Assert (Is_Empty (Lines_Data.Temp_LBI));
@@ -1967,12 +1988,14 @@ package body Pp.Formatting is
          while not After_Last (Tok) loop
 
             if Kind (P) in Line_Break_Token then
-               pragma Assert
-                 (not (Kind (Prev (Tok)) = Spaces and then Kind (Tok) = Spaces));
+               pragma
+                 Assert
+                   (not (Kind (Prev (Tok)) = Spaces
+                         and then Kind (Tok) = Spaces));
                declare
                   LBI : constant Line_Break_Index :=
                     Line_Break_Token_Index (P);
-                  LB : Line_Break renames All_LB (LBI);
+                  LB  : Line_Break renames All_LB (LBI);
                begin
                   Append_Tokn (Tokns, P);
                   LB.Tok := Last (Tokns'Unrestricted_Access);
@@ -1986,7 +2009,7 @@ package body Pp.Formatting is
                   if LB.Enabled
                     or else not First_Time
                     or else not Forms_Blank_Line
-                      (All_LB, Last_Element (All_LBI), LBI)
+                                  (All_LB, Last_Element (All_LBI), LBI)
                   then
                      if Do_All then
                         Append (All_LBI, LBI);
@@ -1995,7 +2018,7 @@ package body Pp.Formatting is
                      if LB.Enabled then
                         if All_LB (LBI).Hard
                           and then (All_LB (LBI).Length /= 0
-                                      or else LBI = Last_Index (All_LB))
+                                    or else LBI = Last_Index (All_LB))
                         then
                            if Do_Syntax then
                               Append (Syntax_LBI, LBI);
@@ -2021,9 +2044,14 @@ package body Pp.Formatting is
          pragma Assert (Kind (P) = End_Of_Input);
          Append_Tokn (Tokns, P);
 
-         pragma Debug (Check_Same_Tokens
-           (Tokns, Saved_New_Tokns,
-            "Collect_Line_Breaks", "Tokns", "Saved_New_Tokns"));
+         pragma
+           Debug
+             (Check_Same_Tokens
+                (Tokns,
+                 Saved_New_Tokns,
+                 "Collect_Line_Breaks",
+                 "Tokns",
+                 "Saved_New_Tokns"));
       end Collect_Line_Breaks;
 
       procedure Erase_LB_Toks (All_LB : in out Line_Break_Vector) is
@@ -2038,8 +2066,7 @@ package body Pp.Formatting is
       end Erase_LB_Toks;
 
       function Line_Len
-        (All_LB : Line_Break_Vector; F, L : Line_Break_Index)
-        return Natural
+        (All_LB : Line_Break_Vector; F, L : Line_Break_Index) return Natural
       is
          pragma Assert (All_LB (F).Enabled);
          First : Line_Break renames All_LB (F);
@@ -2047,7 +2074,7 @@ package body Pp.Formatting is
          F_Pos : constant Natural := Sloc_First (Next (LB_Tok (First)));
          L_Pos : constant Natural := Sloc_First (LB_Tok (Last));
 
-         Leading_Blank : constant Natural :=
+         Leading_Blank  : constant Natural :=
            (if not First.Hard
               and then L_Pos > F_Pos + 1
               and then Kind (Next (LB_Tok (First))) = Spaces
@@ -2060,7 +2087,7 @@ package body Pp.Formatting is
             then 1
             else 0);
          Without_Indent : constant Natural :=
-             L_Pos - F_Pos - Leading_Blank - Trailing_Blank;
+           L_Pos - F_Pos - Leading_Blank - Trailing_Blank;
          --  The length without the indentation is just the difference between
          --  the positions, except that if the first or last character is ' '
          --  adjacent to a soft line break, it doesn't count.
@@ -2081,17 +2108,17 @@ package body Pp.Formatting is
       -----------------
 
       procedure Split_Lines
-        (Lines_Data_P : Lines_Data_Ptr;
-         Cmd : Command_Line;
-         First_Time : Boolean;
+        (Lines_Data_P   : Lines_Data_Ptr;
+         Cmd            : Command_Line;
+         First_Time     : Boolean;
          Partial_GNATPP : Boolean := False)
       is
          Lines_Data          : Lines_Data_Rec renames Lines_Data_P.all;
          First_Line_Offset   : Natural renames Lines_Data.First_Line_Offset;
          Initial_Indentation : Natural renames Lines_Data.Initial_Indentation;
          All_LB              : Line_Break_Vector renames Lines_Data.All_LB;
-         All_LBI             : Line_Break_Index_Vector renames
-           Lines_Data.All_LBI;
+         All_LBI             : Line_Break_Index_Vector
+           renames Lines_Data.All_LBI;
          New_Tokns           : Scanner.Tokn_Vec renames Lines_Data.New_Tokns;
 
          function Worthwhile_Line_Break
@@ -2113,11 +2140,13 @@ package body Pp.Formatting is
                   if X = Last_Index (All_LBI) then
                      pragma Assert (Break.Enabled and then Break.Length = 0);
                   elsif Break.Enabled then
-                     pragma Assert
-                       (Break.Length =
-                        Line_Len
-                          (All_LB, All_LBI (X),
-                           All_LBI (Next_Enabled (Lines_Data, X))));
+                     pragma
+                       Assert
+                         (Break.Length
+                            = Line_Len
+                                (All_LB,
+                                 All_LBI (X),
+                                 All_LBI (Next_Enabled (Lines_Data, X))));
                   else
                      pragma Assert (Break.Length = Natural'Last);
                   end if;
@@ -2134,6 +2163,7 @@ package body Pp.Formatting is
          begin
             if All_LB (F).Hard then
                Prev := Prev + 1; -- skip NL
+
             end if;
 
             --  If we have something like:
@@ -2173,20 +2203,23 @@ package body Pp.Formatting is
          First_Line : Boolean := True;
          Offset     : Natural := Initial_Indentation + First_Line_Offset;
 
-      --  Start of processing for Split_Lines
+         --  Start of processing for Split_Lines
 
       begin
          if Arg (Cmd, Source_Line_Breaks) then
             return;
          end if;
 
-         pragma Debug
-           (Format_Debug_Output
-              (Lines_Data, "before Split_Lines " & Again));
+         pragma
+           Debug
+             (Format_Debug_Output (Lines_Data, "before Split_Lines " & Again));
 
          Collect_Line_Breaks
-           (Lines_Data_P, New_Tokns,
-            Do_All => True, Do_Enabled => False, Do_Syntax => False,
+           (Lines_Data_P,
+            New_Tokns,
+            Do_All     => True,
+            Do_Enabled => False,
+            Do_Syntax  => False,
             First_Time => First_Time);
 
          if False then
@@ -2196,14 +2229,15 @@ package body Pp.Formatting is
             end loop;
             return;
          end if;
-         while F /= Last_Index (All_LBI) loop -- through line breaks
-            Level       := 1;
+         while F /= Last_Index (All_LBI) loop
+            --  through line breaks
+            Level := 1;
             More_Levels := True;
 
-            loop -- through levels
-               L   := Next_Enabled (Lines_Data, F);
-               Len :=
-                 Line_Len (All_LB, All_LBI (F), All_LBI (L)) + Offset;
+            loop
+               --  through levels
+               L := Next_Enabled (Lines_Data, F);
+               Len := Line_Len (All_LB, All_LBI (F), All_LBI (L)) + Offset;
 
                exit when Len <= Arg (Cmd, Max_Line_Length); -- short enough
                exit when not More_Levels; -- no more line breaks to enable
@@ -2224,8 +2258,8 @@ package body Pp.Formatting is
                Append (LB, All_LBI (L));
 
                declare
-                  FF : Line_Break_Index := All_LBI (F);
-                  LL : Line_Break_Index;
+                  FF      : Line_Break_Index := All_LBI (F);
+                  LL      : Line_Break_Index;
                   Prev_LL : Line_Break_Index;
                begin
                   --  Loop through line breaks at current level
@@ -2244,15 +2278,14 @@ package body Pp.Formatting is
                      then
                         null;
 
-                     --  If the line is too long, enable this soft line
-                     --  break. In --no-compact mode, if one line break is
-                     --  enabled, we enable all line breaks at the same nesting
-                     --  level, except that we don't do that within binary
-                     --  operators.
+                        --  If the line is too long, enable this soft line
+                        --  break. In --no-compact mode, if one line break is
+                        --  enabled, we enable all line breaks at the same
+                        --  nesting level, except that we don't do that within
+                        --  binary operators.
 
-                     elsif Line_Len (All_LB, FF, LB (X + 1))
-                           + Offset
-                           > Arg (Cmd, Max_Line_Length)
+                     elsif Line_Len (All_LB, FF, LB (X + 1)) + Offset
+                       > Arg (Cmd, Max_Line_Length)
                        or else (not Arg (Cmd, Compact)
                                 and then All_LB (LL).Bin_Op_Count = 0)
                      then
@@ -2287,19 +2320,22 @@ package body Pp.Formatting is
             end loop; -- through levels
 
             All_LB (All_LBI (F)).Length := Len;
-            pragma Assert
-              (All_LB (All_LBI (F)).Length
-               = Line_Len (All_LB, All_LBI (F),
-                           All_LBI (Next_Enabled (Lines_Data, F)))
-                 + Offset);
+            pragma
+              Assert
+                (All_LB (All_LBI (F)).Length
+                   = Line_Len
+                       (All_LB,
+                        All_LBI (F),
+                        All_LBI (Next_Enabled (Lines_Data, F)))
+                    + Offset);
             F := L;
          end loop; -- through line breaks
 
          All_LB (All_LBI (F)).Length := 0; -- last line
 
-         pragma Debug
-           (Format_Debug_Output
-              (Lines_Data, "after Split_Lines " & Again));
+         pragma
+           Debug
+             (Format_Debug_Output (Lines_Data, "after Split_Lines " & Again));
 
          --  In case of partial reformatting of an enum type makes that the
          --  last LB is not always enabled. This is why this assertion will
@@ -2310,24 +2346,25 @@ package body Pp.Formatting is
       end Split_Lines;
 
       procedure Enable_Line_Breaks_For_EOL_Comments
-        (Src_Buf : in out Buffer;
-         Lines_Data_P : Lines_Data_Ptr;
-         Cmd : Command_Line;
+        (Src_Buf        : in out Buffer;
+         Lines_Data_P   : Lines_Data_Ptr;
+         Cmd            : Command_Line;
          Partial_GNATPP : Boolean := False)
       is
          Lines_Data : Lines_Data_Rec renames Lines_Data_P.all;
-         All_LB : Line_Break_Vector renames Lines_Data.All_LB;
-         All_LBI : Line_Break_Index_Vector renames Lines_Data.All_LBI;
-         Src_Tokns : Scanner.Tokn_Vec renames Lines_Data.Src_Tokns;
-         New_Tokns : Scanner.Tokn_Vec renames Lines_Data.New_Tokns;
+         All_LB     : Line_Break_Vector renames Lines_Data.All_LB;
+         All_LBI    : Line_Break_Index_Vector renames Lines_Data.All_LBI;
+         Src_Tokns  : Scanner.Tokn_Vec renames Lines_Data.Src_Tokns;
+         New_Tokns  : Scanner.Tokn_Vec renames Lines_Data.New_Tokns;
 
          function Match (Src_Tok, Out_Tok : Tokn_Cursor) return Boolean;
-         --  True if the tokens have the same kind and same text, except that the
-         --  matching is case insensitive for identifiers, reserved words, and
-         --  string literals that could be operator symbols. The source locations
-         --  are ignored.
+         --  True if the tokens have the same kind and same text, except that
+         --  the matching is case insensitive for identifiers, reserved words,
+         --  and string literals that could be operator symbols. The source
+         --  locations are ignored.
 
-         function Looking_At_Paren_Or_Comma (Break : Line_Break) return Boolean;
+         function Looking_At_Paren_Or_Comma
+           (Break : Line_Break) return Boolean;
          --  True if we're look at '(' or ',', skipping any Disabled_LB_Tokens
          --  and Spaces tokens.
 
@@ -2342,30 +2379,43 @@ package body Pp.Formatting is
                Dbg_Out.Output_Enabled := True;
                Dbg_Out.Put
                  ("match ""\1"", ""\2"" ? ",
-                  Str (Text (Src_Tok)).S, Str (Text (Out_Tok)).S);
+                  Str (Text (Src_Tok)).S,
+                  Str (Text (Out_Tok)).S);
             end if;
             return R : Boolean do
                if Kind (Src_Tok) = Kind (Out_Tok) then
                   case Kind (Src_Tok) is
-                     when Line_Break_Token | Tab_Token | EOL_Token | Spaces |
-                       Comment_Kind | Preprocessor_Directive =>
+                     when Line_Break_Token
+                        | Tab_Token
+                        | EOL_Token
+                        | Spaces
+                        | Comment_Kind
+                        | Preprocessor_Directive
+                     =>
                         raise Program_Error;
 
-                     when Start_Of_Input | End_Of_Input | Other_Lexeme |
-                       Illegal_Character =>
-                        pragma Assert
-                          (Equal_Ignoring_CR (Text (Src_Tok), Text (Out_Tok)));
+                     when Start_Of_Input
+                        | End_Of_Input
+                        | Other_Lexeme
+                        | Illegal_Character
+                     =>
+                        pragma
+                          Assert
+                            (Equal_Ignoring_CR
+                               (Text (Src_Tok), Text (Out_Tok)));
                         R := True;
 
                      when Reserved_Word =>
-                        pragma Assert
-                          (Case_Insensitive_Equal
-                            (Text (Src_Tok), Text (Out_Tok)));
+                        pragma
+                          Assert
+                            (Case_Insensitive_Equal
+                               (Text (Src_Tok), Text (Out_Tok)));
                         R := True;
 
                      when Ident =>
-                        R := Case_Insensitive_Equal
-                          (Text (Src_Tok), Text (Out_Tok));
+                        R :=
+                          Case_Insensitive_Equal
+                            (Text (Src_Tok), Text (Out_Tok));
 
                      when Numeric_Literal =>
                         R := Num_Lits_Match (Src_Tok, Out_Tok, Cmd);
@@ -2375,15 +2425,16 @@ package body Pp.Formatting is
 
                      when String_Lit =>
                         if Is_Op_Sym_With_Letters (Text (Src_Tok)) then
-                           R := Case_Insensitive_Equal
-                             (Text (Src_Tok), Text (Out_Tok));
+                           R :=
+                             Case_Insensitive_Equal
+                               (Text (Src_Tok), Text (Out_Tok));
                         else
                            R := Text (Src_Tok) = Text (Out_Tok);
                         end if;
                   end case;
 
-               --  Allow, for example, reserved word "interface" to match
-               --  identifier "INTERFACE".
+                  --  Allow, for example, reserved word "interface" to match
+                  --  identifier "INTERFACE".
 
                elsif Kind (Src_Tok) in Reserved_Word_New
                  and then Kind (Out_Tok) = Ident
@@ -2422,10 +2473,11 @@ package body Pp.Formatting is
                if Kind (New_Tok) = Disabled_LB_Token then
                   Last_LB := New_Tok;
                   New_Cur_Line := New_Cur_Line + 1;
-                  pragma Assert
-                    (Insert_Blank_Lines (Cmd)
-                       or else LB_Tok (All_LB (All_LBI (New_Cur_Line))) =
-                         New_Tok);
+                  pragma
+                    Assert
+                      (Insert_Blank_Lines (Cmd)
+                         or else LB_Tok (All_LB (All_LBI (New_Cur_Line)))
+                                 = New_Tok);
                end if;
                Next (New_Tok);
             end loop;
@@ -2433,13 +2485,16 @@ package body Pp.Formatting is
             if Kind (New_Tok) = Enabled_LB_Token then
                Last_LB := New_Tok;
                New_Cur_Line := New_Cur_Line + 1;
-               pragma Assert
-                 (Insert_Blank_Lines (Cmd)
-                    or else LB_Tok (All_LB (All_LBI (New_Cur_Line))) = New_Tok);
+               pragma
+                 Assert
+                   (Insert_Blank_Lines (Cmd)
+                      or else LB_Tok (All_LB (All_LBI (New_Cur_Line)))
+                              = New_Tok);
             end if;
          end Move_Past_Out_Tok;
 
-         function Looking_At_Paren_Or_Comma (Break : Line_Break) return Boolean is
+         function Looking_At_Paren_Or_Comma (Break : Line_Break) return Boolean
+         is
             T : Tokn_Cursor := LB_Tok (Break);
          begin
             while Kind (T) in Disabled_LB_Token | Spaces loop
@@ -2456,10 +2511,12 @@ package body Pp.Formatting is
             --  previous line breaks that are at the same level, or that belong
             --  to '('. We stop when we see an enabled line break.
 
-            pragma Assert
-              (if Kind (Last_LB) /= Start_Of_Input then
-                (Sloc_First (LB_Tok (LB)) = Sloc_First (Last_LB)) =
-                (LB_Tok (LB) = Last_LB));
+            pragma
+              Assert
+                (if Kind (Last_LB) /= Start_Of_Input
+                   then
+                     (Sloc_First (LB_Tok (LB)) = Sloc_First (Last_LB))
+                     = (LB_Tok (LB) = Last_LB));
             if LB_Tok (LB) = Last_LB then
                for Break in reverse 1 .. New_Cur_Line loop
                   declare
@@ -2468,9 +2525,8 @@ package body Pp.Formatting is
                      exit when Prev_LB.Enabled;
 
                      if Prev_LB.Level = LB.Level
-                       or else
-                        (Prev_LB.Level < LB.Level
-                           and then Looking_At_Paren_Or_Comma (Prev_LB))
+                       or else (Prev_LB.Level < LB.Level
+                                and then Looking_At_Paren_Or_Comma (Prev_LB))
                      then
                         Prev_LB.Enabled := True;
                         Prev_LB.Affects_Comments := True;
@@ -2482,18 +2538,19 @@ package body Pp.Formatting is
          end Do_End_Of_Line_Comment;
 
          Qual_Nesting : Natural := 0;
-      --  Count the nesting level of qualified expressions containing aggregates
-      --  with extra parentheses.
+         --  Count the nesting level of qualified expressions containing
+         --  aggregates with extra parentheses.
 
-      --  Start of processing for Enable_Line_Breaks_For_EOL_Comments
+         --  Start of processing for Enable_Line_Breaks_For_EOL_Comments
 
       begin
          if Arg (Cmd, Source_Line_Breaks) then
             return;
          end if;
-         pragma Debug
-           (Format_Debug_Output
-              (Lines_Data, "before Enable_Line_Breaks_For_EOL_Comments"));
+         pragma
+           Debug
+             (Format_Debug_Output
+                (Lines_Data, "before Enable_Line_Breaks_For_EOL_Comments"));
 
          --  Skip initial EOL_Token token
          pragma Assert (Kind (New_Tok) = Enabled_LB_Token);
@@ -2506,9 +2563,9 @@ package body Pp.Formatting is
             Error_Sloc := To_Langkit (Scanner.Sloc (Src_Tok));
 
             if Kind (Src_Tok) not in EOL_Token
-              and then
-              (Match (Src_Tok, New_Tok)
-               or else (Kind (Src_Tok) = '!' and then Kind (New_Tok) = '|'))
+              and then (Match (Src_Tok, New_Tok)
+                        or else (Kind (Src_Tok) = '!'
+                                 and then Kind (New_Tok) = '|'))
             then
                exit when Kind (Src_Tok) = End_Of_Input;
                --  i.e. exit when both Src and Out are at end of input
@@ -2520,11 +2577,11 @@ package body Pp.Formatting is
                --  Check for "end;" --> "end Some_Name;" case
 
                if Kind (Src_Tok) = ';'
-                 and then
-                   Kind (Prev_Lexeme (Src_Tok)) = Res_End
+                 and then Kind (Prev_Lexeme (Src_Tok)) = Res_End
                  and then Sname_83 (New_Tok)
                then
-                  loop -- could be "end A.B.C;"
+                  loop
+                     --  could be "end A.B.C;"
                      Move_Past_Out_Tok;
 
                      exit when Kind (New_Tok) /= '.';
@@ -2533,49 +2590,54 @@ package body Pp.Formatting is
                      pragma Assert (Sname_83 (New_Tok));
                   end loop;
 
-                  pragma Assert
-                    (Disable_Final_Check or else
-                       Kind (Src_Tok) in ';' | EOL_Token | Comment_Kind);
+                  pragma
+                    Assert
+                      (Disable_Final_Check
+                         or else Kind (Src_Tok)
+                                 in ';' | EOL_Token | Comment_Kind);
 
-               --  Check for "end Some_Name;" --> "end;" case. This only happens
-               --  when the --no-end-id switch was given. Here, the name was
-               --  present in the source, so we insert it.
+                  --  Check for "end Some_Name;" --> "end;" case. This only
+                  --  happens when the --no-end-id switch was given. Here, the
+                  --  name was present in the source, so we insert it.
 
                elsif not Arg (Cmd, End_Id)
                  and then Kind (New_Tok) = ';'
-                 and then
-                   Kind (Prev_Lexeme (New_Tok)) = Res_End
+                 and then Kind (Prev_Lexeme (New_Tok)) = Res_End
                  and then Kind (Src_Tok) in Ident | String_Lit
                then
-                  loop -- could be "end A.B.C;"
+                  loop
+                     --  could be "end A.B.C;"
                      Next_ss (Src_Tok);
 
                      exit when Kind (Src_Tok) /= '.';
 
                      Next_ss (Src_Tok);
-                     pragma Assert
-                       (Kind (Src_Tok) in Ident | String_Lit);
+                     pragma Assert (Kind (Src_Tok) in Ident | String_Lit);
                   end loop;
-                  pragma Assert
-                    (Disable_Final_Check or else
-                       Kind (Src_Tok) in ';' | EOL_Token | Comment_Kind);
+                  pragma
+                    Assert
+                      (Disable_Final_Check
+                         or else Kind (Src_Tok)
+                                 in ';' | EOL_Token | Comment_Kind);
 
-               --  Check for "private end" --> "end" case, with a possible
-               --  comment between "private" and "end".
+                  --  Check for "private end" --> "end" case, with a possible
+                  --  comment between "private" and "end".
 
                elsif Kind (Src_Tok) = Res_Private
                  and then Kind (New_Tok) = Res_End
                then
-                  pragma Assert
-                    (Disable_Final_Check
-                       or else Kind (Next_Lexeme (Src_Tok)) = Res_End);
+                  pragma
+                    Assert
+                      (Disable_Final_Check
+                         or else Kind (Next_Lexeme (Src_Tok)) = Res_End);
                   Next_ss (Src_Tok);
 
-               --  Check for "T'((X, Y, Z))" --> "T'(X, Y, Z)" case
+                  --  Check for "T'((X, Y, Z))" --> "T'(X, Y, Z)" case
 
                elsif Kind (Src_Tok) = '('
-                 and then Kind (Prev_Lexeme (Src_Tok)) = '('
-                  --???Also check that the one before that is a tick!
+                 and then Kind (Prev_Lexeme (Src_Tok))
+                          = '('
+                           --???Also check that the one before that is a tick!
                then
                   Qual_Nesting := Qual_Nesting + 1;
                   Next_ss (Src_Tok);
@@ -2612,10 +2674,17 @@ package body Pp.Formatting is
                   if Partial_GNATPP then
 
                      if Kind (Src_Tok) = ';'
-                       and then Kind (Prev (Src_Tok)) in
-                             Res_End | Res_Record | Res_Loop | Ident
-                           | Res_Tagged | Res_Abstract | Res_Null
-                           | Numeric_Literal | String_Lit | ')'
+                       and then Kind (Prev (Src_Tok))
+                                in Res_End
+                                 | Res_Record
+                                 | Res_Loop
+                                 | Ident
+                                 | Res_Tagged
+                                 | Res_Abstract
+                                 | Res_Null
+                                 | Numeric_Literal
+                                 | String_Lit
+                                 | ')'
                        and then Kind (New_Tok) = End_Of_Input
                      then
                         Next_ss (Src_Tok);
@@ -2637,17 +2706,18 @@ package body Pp.Formatting is
 
          pragma Assert (At_Last (Src_Tok));
          pragma Assert (At_Last (New_Tok));
-         <<Done>> null;
+         <<Done>>
+         null;
 
          pragma Assert (Disable_Final_Check or else Qual_Nesting = 0);
          pragma Assert (At_Beginning (Src_Buf));
       end Enable_Line_Breaks_For_EOL_Comments;
 
       procedure Insert_Comments_And_Blank_Lines
-        (Src_Buf : in out Buffer;
-         Messages : out Scanner.Source_Message_Vector;
-         Lines_Data_P : Lines_Data_Ptr;
-         Cmd : Command_Line;
+        (Src_Buf        : in out Buffer;
+         Messages       : out Scanner.Source_Message_Vector;
+         Lines_Data_P   : Lines_Data_Ptr;
+         Cmd            : Command_Line;
          Pp_Off_Present : in out Boolean;
          Partial_GNATPP : Boolean := False)
       is
@@ -2657,25 +2727,25 @@ package body Pp.Formatting is
          Initial_Indentation : Natural renames Lines_Data.Initial_Indentation;
          Cur_Indentation     : Natural renames Lines_Data.Cur_Indentation;
          All_LB              : Line_Break_Vector renames Lines_Data.All_LB;
-         Temp_LBI            : Line_Break_Index_Vector renames
-           Lines_Data.Temp_LBI;
-         Enabled_LBI         : Line_Break_Index_Vector renames
-           Lines_Data.Enabled_LBI;
-         Syntax_LBI          : Line_Break_Index_Vector renames
-           Lines_Data.Syntax_LBI;
+         Temp_LBI            : Line_Break_Index_Vector
+           renames Lines_Data.Temp_LBI;
+         Enabled_LBI         : Line_Break_Index_Vector
+           renames Lines_Data.Enabled_LBI;
+         Syntax_LBI          : Line_Break_Index_Vector
+           renames Lines_Data.Syntax_LBI;
          Src_Tokns           : Scanner.Tokn_Vec renames Lines_Data.Src_Tokns;
-         Saved_New_Tokns     : Scanner.Tokn_Vec renames
-           Lines_Data.Saved_New_Tokns;
+         Saved_New_Tokns     : Scanner.Tokn_Vec
+           renames Lines_Data.Saved_New_Tokns;
 
          procedure Reset_Indentation;
-         --  Set the indentation to it's initial value (usually 0, but can be set
-         --  by the --initial-indentation switch.
+         --  Set the indentation to it's initial value (usually 0, but can be
+         --  set by the --initial-indentation switch.
 
          function Match (Src_Tok, Out_Tok : Tokn_Cursor) return Boolean;
-         --  True if the tokens have the same kind and same text, except that the
-         --  matching is case insensitive for identifiers, reserved words, and
-         --  string literals that could be operator symbols. The source locations
-         --  are ignored.
+         --  True if the tokens have the same kind and same text, except that
+         --  the matching is case insensitive for identifiers, reserved words,
+         --  and string literals that could be operator symbols. The source
+         --  locations are ignored.
 
          procedure New_To_Newer (Expect : Opt_Token_Kind := Nil);
          --  Copy New_Tok to New_Tokns, and move New_Tok one forward in
@@ -2706,7 +2776,8 @@ package body Pp.Formatting is
          --  there is a comment, this re-inserts "private" before the comment,
          --  to avoid messing up the formatting.
 
-         function LB_Needs_To_Be_Enabled (Src_Tok : Tokn_Cursor) return Boolean;
+         function LB_Needs_To_Be_Enabled
+           (Src_Tok : Tokn_Cursor) return Boolean;
 
          function LB_Needs_To_Be_Enabled (Src_Tok : Tokn_Cursor) return Boolean
          is
@@ -2714,14 +2785,14 @@ package body Pp.Formatting is
             return
               Kind (Src_Tok) in Other_Whole_Line_Comment | Fillable_Comment
               and then Kind (Prev_ss (Src_Tok)) in True_End_Of_Line
-              and then
-                (Kind (Prev (Prev_ss (Src_Tok))) in  ',' | Res_Is
-                 or else Kind (Prev (Prev_ss (Src_Tok))) = End_Of_Line_Comment
-                 or else
-                   (Kind (Prev (Prev_ss (Src_Tok))) in True_End_Of_Line
-                    and then
-                    Kind (Prev
-                          (Prev (Prev_ss (Src_Tok)))) = End_Of_Line_Comment));
+              and then (Kind (Prev (Prev_ss (Src_Tok))) in ',' | Res_Is
+                        or else Kind (Prev (Prev_ss (Src_Tok)))
+                                = End_Of_Line_Comment
+                        or else (Kind (Prev (Prev_ss (Src_Tok)))
+                                 in True_End_Of_Line
+                                 and then Kind
+                                            (Prev (Prev (Prev_ss (Src_Tok))))
+                                          = End_Of_Line_Comment));
          end LB_Needs_To_Be_Enabled;
 
          procedure Reset_Indentation is
@@ -2735,30 +2806,43 @@ package body Pp.Formatting is
                Dbg_Out.Output_Enabled := True;
                Dbg_Out.Put
                  ("match ""\1"", ""\2"" ? ",
-                  Str (Text (Src_Tok)).S, Str (Text (Out_Tok)).S);
+                  Str (Text (Src_Tok)).S,
+                  Str (Text (Out_Tok)).S);
             end if;
             return R : Boolean do
                if Kind (Src_Tok) = Kind (Out_Tok) then
                   case Kind (Src_Tok) is
-                     when EOL_Token | Spaces | Comment_Kind |
-                       Preprocessor_Directive | Line_Break_Token =>
+                     when EOL_Token
+                        | Spaces
+                        | Comment_Kind
+                        | Preprocessor_Directive
+                        | Line_Break_Token
+                     =>
                         raise Program_Error;
 
-                     when Start_Of_Input | End_Of_Input |
-                       Tab_Token | Other_Lexeme | Illegal_Character =>
-                        pragma Assert
-                          (Equal_Ignoring_CR (Text (Src_Tok), Text (Out_Tok)));
+                     when Start_Of_Input
+                        | End_Of_Input
+                        | Tab_Token
+                        | Other_Lexeme
+                        | Illegal_Character
+                     =>
+                        pragma
+                          Assert
+                            (Equal_Ignoring_CR
+                               (Text (Src_Tok), Text (Out_Tok)));
                         R := True;
 
                      when Reserved_Word =>
-                        pragma Assert
-                          (Case_Insensitive_Equal
-                            (Text (Src_Tok), Text (Out_Tok)));
+                        pragma
+                          Assert
+                            (Case_Insensitive_Equal
+                               (Text (Src_Tok), Text (Out_Tok)));
                         R := True;
 
                      when Ident =>
-                        R := Case_Insensitive_Equal
-                          (Text (Src_Tok), Text (Out_Tok));
+                        R :=
+                          Case_Insensitive_Equal
+                            (Text (Src_Tok), Text (Out_Tok));
 
                      when Numeric_Literal =>
                         R := Num_Lits_Match (Src_Tok, Out_Tok, Cmd);
@@ -2768,8 +2852,9 @@ package body Pp.Formatting is
 
                      when String_Lit =>
                         if Is_Op_Sym_With_Letters (Text (Src_Tok)) then
-                           R := Case_Insensitive_Equal
-                             (Text (Src_Tok), Text (Out_Tok));
+                           R :=
+                             Case_Insensitive_Equal
+                               (Text (Src_Tok), Text (Out_Tok));
                         else
                            R := Text (Src_Tok) = Text (Out_Tok);
                         end if;
@@ -2791,8 +2876,8 @@ package body Pp.Formatting is
          end Match;
 
          New_Tokns : Scanner.Tokn_Vec renames Lines_Data.New_Tokns;
-         Ignore : Boolean := Move_Tokns
-           (Target => Saved_New_Tokns, Source => New_Tokns);
+         Ignore    : Boolean :=
+           Move_Tokns (Target => Saved_New_Tokns, Source => New_Tokns);
          --  After Collect_Line_Breaks below, the Tok field of each line break
          --  will point into Saved_New_Tokns.
 
@@ -2835,7 +2920,7 @@ package body Pp.Formatting is
          --  also for Qual_Nesting.
 
          New_Line_Start_Out : Tokn_Cursor :=
-             Next (First (Saved_New_Tokns'Access));
+           Next (First (Saved_New_Tokns'Access));
          --  Used only in --preserve-line-breaks mode. The first token on the
          --  current line in Out_Tokns. Since Split_Lines has not yet been run,
          --  there is no indentation present in the output.
@@ -2846,10 +2931,11 @@ package body Pp.Formatting is
          end record;
          type Paren_Stack_Element_Array is
            array (Paren_Stack_Index range <>) of Paren_Stack_Element;
-         package Paren_Vectors is new Utils.Vectors
-           (Paren_Stack_Index,
-            Paren_Stack_Element,
-            Paren_Stack_Element_Array);
+         package Paren_Vectors is new
+           Utils.Vectors
+             (Paren_Stack_Index,
+              Paren_Stack_Element,
+              Paren_Stack_Element_Array);
          Paren_Stack : Paren_Vectors.Vector;
          use Paren_Vectors;
 
@@ -2897,8 +2983,7 @@ package body Pp.Formatting is
             end if;
          end L_Paren_Indent_For_Preserve;
 
-         procedure Update_L_Paren_Indent_For_Preserve (Indent : Natural)
-         is
+         procedure Update_L_Paren_Indent_For_Preserve (Indent : Natural) is
             pragma Assert (not Is_Empty (Paren_Stack));
          begin
             Pop (Paren_Stack);
@@ -2935,8 +3020,9 @@ package body Pp.Formatting is
                --  Step past Syntax_LBI at the current position
 
                while Syntax_Cur_Line <= Last_Index (Syntax_LBI)
-                 and then Sloc_First (New_Tok) >=
-                   Sloc_First (LB_Tok (All_LB (Syntax_LBI (Syntax_Cur_Line))))
+                 and then Sloc_First (New_Tok)
+                          >= Sloc_First
+                               (LB_Tok (All_LB (Syntax_LBI (Syntax_Cur_Line))))
                loop
                   Syntax_Cur_Line := Syntax_Cur_Line + 1;
                end loop;
@@ -2945,8 +3031,10 @@ package body Pp.Formatting is
                --  to avoid going past the end.
 
                while Enabled_Cur_Line < Last_Index (Enabled_LBI)
-                 and then Sloc_First (New_Tok) >=
-                   Sloc_First (LB_Tok (All_LB (Enabled_LBI (Enabled_Cur_Line))))
+                 and then Sloc_First (New_Tok)
+                          >= Sloc_First
+                               (LB_Tok
+                                  (All_LB (Enabled_LBI (Enabled_Cur_Line))))
                loop
                   Enabled_Cur_Line := Enabled_Cur_Line + 1;
                end loop;
@@ -2961,20 +3049,24 @@ package body Pp.Formatting is
                                 .Source_Line_Breaks_Enabled
                then
                   if Tokens_Require_Space
-                    (Last (New_Tokns'Access), Next_Lexeme (New_Tok))
+                       (Last (New_Tokns'Access), Next_Lexeme (New_Tok))
                   then
                      Append_Spaces (New_Tokns, Count => 1);
                   end if;
                elsif Kind (Last (New_Tokns'Access)) in Line_Break_Token
-                 and then All_LB (Line_Break_Token_Index
-                                    (Last (New_Tokns'Access))).Enabled
+                 and then All_LB
+                            (Line_Break_Token_Index (Last (New_Tokns'Access)))
+                            .Enabled
                then
-                  pragma Assert
-                    (Kind (Last (New_Tokns'Access)) not in Disabled_LB_Token);
+                  pragma
+                    Assert
+                      (Kind (Last (New_Tokns'Access))
+                       not in Disabled_LB_Token);
                   if Kind (Prev (Last (New_Tokns'Access))) in Comment_Kind
                     and then not Arg (Cmd, Source_Line_Breaks)
                   then
                      null; -- Append_Temp_Line_Break already put one
+
                   else
                      if not Is_Blank_Line (Last (New_Tokns'Access))
                        or else Preserve_Blank_Lines (Cmd)
@@ -3013,17 +3105,19 @@ package body Pp.Formatting is
                   return False;
                end if;
 
-               pragma Assert
-                 (Kind (Last (Pending_Tokns'Unchecked_Access)) =
-                  Kind (Prev (New_Tok)));
-               pragma Assert
-                 (Kind (Prev (Last (Pending_Tokns'Unchecked_Access))) =
-                  Kind (Prev (Prev (New_Tok))));
+               pragma
+                 Assert
+                   (Kind (Last (Pending_Tokns'Unchecked_Access))
+                      = Kind (Prev (New_Tok)));
+               pragma
+                 Assert
+                   (Kind (Prev (Last (Pending_Tokns'Unchecked_Access)))
+                      = Kind (Prev (Prev (New_Tok))));
 
                declare
                   Pending_Space : constant Boolean :=
                     Kind (Prev (Prev (New_Tok))) = Spaces;
-                  At_LB : constant Boolean :=
+                  At_LB         : constant Boolean :=
                     Kind (Prev (New_Tok)) = Disabled_LB_Token
                     or else Kind (Prev (New_Tok)) = Tab_Token;
                begin
@@ -3031,24 +3125,25 @@ package body Pp.Formatting is
                end;
             end New_Space_NL;
 
-            Prev_LB : Line_Break renames
-              All_LB (Enabled_LBI (Enabled_Cur_Line - 1));
-            LB      : Line_Break renames All_LB (Enabled_LBI (Enabled_Cur_Line));
-            Indentation : constant Natural := Prev_LB.Indentation;
-            New_Prev_Src_Tok : constant Tokn_Cursor := Prev (Src_Tok);
+            Prev_LB              : Line_Break
+              renames All_LB (Enabled_LBI (Enabled_Cur_Line - 1));
+            LB                   : Line_Break
+              renames All_LB (Enabled_LBI (Enabled_Cur_Line));
+            Indentation          : constant Natural := Prev_LB.Indentation;
+            New_Prev_Src_Tok     : constant Tokn_Cursor := Prev (Src_Tok);
             New_Preceding_Blanks : Natural :=
-              (if Kind (New_Prev_Src_Tok) = Spaces then
-               Tokn_Length (Prev (Src_Tok))
+              (if Kind (New_Prev_Src_Tok) = Spaces
+               then Tokn_Length (Prev (Src_Tok))
                else 0);
             --  Number of blanks between the previous token and this comment.
             --  Note that tab characters have been expanded into spaces in
             --  Src_Buf.
 
-         --  Start of procedding for Insert_End_Of_Line_Comment
+            --  Start of procedding for Insert_End_Of_Line_Comment
 
          begin
-            --  If we're just before a blank followed by NL, move past the blank,
-            --  so we won't add a new NL below.
+            --  If we're just before a blank followed by NL, move past the
+            --  blank, so we won't add a new NL below.
 
             if New_Space_NL then
 
@@ -3060,8 +3155,9 @@ package body Pp.Formatting is
 
                declare
                   New_Pending_Tokns : Tokn_Vec;
-                  Pending : Tokn_Cursor := First (Pending_Tokns'Unchecked_Access);
-                  Spaces_Found : Boolean := False;
+                  Pending           : Tokn_Cursor :=
+                    First (Pending_Tokns'Unchecked_Access);
+                  Spaces_Found      : Boolean := False;
                begin
 
                   while not After_Last (Pending) loop
@@ -3069,8 +3165,10 @@ package body Pp.Formatting is
                         pragma Assert (Tokn_Length (Pending) = 1);
                         Spaces_Found := True;
                      else
-                        Append_Tokn (New_Pending_Tokns, Pending,
-                                     Org => "Pending for comment");
+                        Append_Tokn
+                          (New_Pending_Tokns,
+                           Pending,
+                           Org => "Pending for comment");
                      end if;
                      Next (Pending);
                   end loop;
@@ -3108,13 +3206,13 @@ package body Pp.Formatting is
                At_Tok : Boolean := False;
             begin
                if Get_Num_Tokens (Pending_Tokns) >= 3 then
-                  At_Tok := Kind (Prev (Prev (New_Tok))) = Disabled_LB_Token
+                  At_Tok :=
+                    Kind (Prev (Prev (New_Tok))) = Disabled_LB_Token
                     and then Kind (Prev (New_Tok)) = Spaces
                     and then LB_Tok (LB) = Prev (Prev (New_Tok));
                end if;
 
-               if LB_Tok (LB) = Prev (New_Tok)
-                 or else LB_Tok (LB) = New_Tok
+               if LB_Tok (LB) = Prev (New_Tok) or else LB_Tok (LB) = New_Tok
                then
                   At_Tok := True;
                end if;
@@ -3123,24 +3221,29 @@ package body Pp.Formatting is
                   Append_Tokn (New_Tokns, False_End_Of_Line, "eol extra");
                   --  This is needed because every comment in New_Tokns must be
                   --  followed by EOL_Token.
+
                else
 
-                  pragma Assert
-                    (if Kind (New_Tok) = Disabled_LB_Token then
-                       not All_LB (Line_Break_Token_Index (New_Tok)).Enabled);
+                  pragma
+                    Assert
+                      (if Kind (New_Tok) = Disabled_LB_Token
+                         then
+                           not All_LB (Line_Break_Token_Index (New_Tok))
+                                 .Enabled);
 
                   if Kind (New_Tok) = Enabled_LB_Token then
                      declare
-                        This_LB : Line_Break renames
-                          All_LB (Line_Break_Token_Index (New_Tok));
+                        This_LB : Line_Break
+                          renames All_LB (Line_Break_Token_Index (New_Tok));
                      begin
-                        Append_Spaces (New_Tokns, Count => This_LB.Indentation);
+                        Append_Spaces
+                          (New_Tokns, Count => This_LB.Indentation);
                      end;
 
-                  --  Avoid inserting an extra line break if we're just past a
-                  --  line break followed by spaces. This happens for soft line
-                  --  breaks, e.g. a comment on an enumeration literal
-                  --  specification.
+                     --  Avoid inserting an extra line break if we're just past a
+                     --  line break followed by spaces. This happens for soft line
+                     --  breaks, e.g. a comment on an enumeration literal
+                     --  specification.
 
                   elsif Kind (Prev (New_Tok)) = Spaces
                     and then Kind (Prev (Prev (New_Tok))) in Line_Break_Token
@@ -3155,16 +3258,17 @@ package body Pp.Formatting is
                         --         Mode range Some_Value_A .. Some_Value_B;
                         --  In this case the disabled LB token is not enabled.
                         --  So, enabling it here.
-                        All_LB (Line_Break_Token_Index
-                                (Prev_ss (New_Tok))).Enabled := True;
+                        All_LB (Line_Break_Token_Index (Prev_ss (New_Tok)))
+                          .Enabled :=
+                          True;
                      end if;
 
                   else
                      if Kind (New_Tok) = Ident
                        and then Kind (Prev (New_Tok)) = '('
                      then
-                        --  Handling the situation where EOL comment follows '('
-                        --  or "is" keyword
+                        --  Handling the situation where EOL comment follows
+                        --  '(' or "is" keyword
                         --  (i.e., the situations like
                         --      function X
                         --        (-- some EOL comment here
@@ -3184,8 +3288,7 @@ package body Pp.Formatting is
 
                            Cur_Indentation := Crt_Indent;
 
-                           if L_Paren_Indent_For_Preserve /= Crt_Indent
-                           then
+                           if L_Paren_Indent_For_Preserve /= Crt_Indent then
                               Update_L_Paren_Indent_For_Preserve
                                 (Crt_Indent - 2);
                            end if;
@@ -3209,9 +3312,9 @@ package body Pp.Formatting is
             Next_ss (Src_Tok);
          end Insert_End_Of_Line_Comment;
 
-         Pp_On : Boolean := True;
-         --  True initially, and if the most recently encountered Pp_Off_Comment
-         --  or Pp_On_Comment was Pp_On_Comment.
+         Pp_On          : Boolean := True;
+         --  True initially, and if the most recently encountered
+         --  Pp_Off_Comment or Pp_On_Comment was Pp_On_Comment.
          Last_Pp_Off_On : Tokn_Cursor := First (Src_Tokns'Access);
          --  If > First, this points to the most recently encountered
          --  Pp_Off_Comment or Pp_On_Comment in Src_Tokns. Used to check for
@@ -3221,8 +3324,7 @@ package body Pp.Formatting is
             X : Line_Break_Index_Index :=
               (if Syntax_Cur_Line = 1 then 1 else Syntax_Cur_Line - 1);
          begin
-            while X > 1 and then
-              not All_LB (Syntax_LBI (X)).Affects_Comments
+            while X > 1 and then not All_LB (Syntax_LBI (X)).Affects_Comments
             loop
                X := X - 1;
             end loop;
@@ -3247,8 +3349,8 @@ package body Pp.Formatting is
             if X <= Last_Index (Syntax_LBI) then
                return All_LB (Syntax_LBI (X)).Indentation;
             else
-               pragma Assert (Arg (Cmd, Source_Line_Breaks)
-                              or else Partial_GNATPP);
+               pragma
+                 Assert (Arg (Cmd, Source_Line_Breaks) or else Partial_GNATPP);
                return 0;
             end if;
          end After_Indentation;
@@ -3285,16 +3387,17 @@ package body Pp.Formatting is
                --  no blank lines in between, then we try to keep it lined up,
                --  even if "begin" (etc) follows.
 
-               pragma Assert
-                 (Sloc (Start_Line_Src_Tok).Line < Sloc (Src_Tok).Line);
+               pragma
+                 Assert (Sloc (Start_Line_Src_Tok).Line < Sloc (Src_Tok).Line);
                if Sloc (Start_Line_Src_Tok).Line = Sloc (Src_Tok).Line - 1
                  and then Sloc (Start_Line_Src_Tok).Col = Sloc (Src_Tok).Col
                then
                   return True;
                end if;
 
-               return Kind (New_Tok) not in
-                 Res_Begin | Res_Else | Res_Elsif | Res_When;
+               return
+                 Kind (New_Tok)
+                 not in Res_Begin | Res_Else | Res_Elsif | Res_When;
             end Look_Before;
 
             -------------------------
@@ -3303,8 +3406,8 @@ package body Pp.Formatting is
 
             procedure Set_Cur_Indentation is
             begin
-               if Kind (Src_Tok) in
-                    Special_Comment | Pp_Off_Comment | Pp_On_Comment
+               if Kind (Src_Tok)
+                  in Special_Comment | Pp_Off_Comment | Pp_On_Comment
                  or else Arg (Cmd, Comments_Unchanged)
                then
                   --  Keep as in input
@@ -3315,65 +3418,70 @@ package body Pp.Formatting is
                end if;
             end Set_Cur_Indentation;
 
-            function Next_Is_Action (Tok : Tokn_Cursor) return Boolean is
-              (not After_Last (Next (Tok))
-               and then Kind (Next (Tok)) in
-                          Res_Procedure | Res_Function | Res_Overriding);
+            function Next_Is_Action (Tok : Tokn_Cursor) return Boolean
+            is (not After_Last (Next (Tok))
+                and then Kind (Next (Tok))
+                         in Res_Procedure | Res_Function | Res_Overriding);
 
-            function Next_Is_Identifier (Tok : Tokn_Cursor) return Boolean is
-              (not After_Last (Next (Tok))
-               and then Kind (Next (Tok)) in Ident);
+            function Next_Is_Identifier (Tok : Tokn_Cursor) return Boolean
+            is (not After_Last (Next (Tok))
+                and then Kind (Next (Tok)) in Ident);
 
-            function Next_Is_Type (Tok : Tokn_Cursor) return Boolean is
-              (not After_Last (Next (Tok))
-               and then Kind (Next (Tok)) = Res_Type);
+            function Next_Is_Type (Tok : Tokn_Cursor) return Boolean
+            is (not After_Last (Next (Tok))
+                and then Kind (Next (Tok)) = Res_Type);
 
-            function Next_Is_Begin (Tok : Tokn_Cursor) return Boolean is
-              (not After_Last (Next (Tok)) and then
-               Kind (Next (Tok)) = Res_Begin);
+            function Next_Is_Begin (Tok : Tokn_Cursor) return Boolean
+            is (not After_Last (Next (Tok))
+                and then Kind (Next (Tok)) = Res_Begin);
 
-            function Next_Is_End (Tok : Tokn_Cursor) return Boolean is
-              (not After_Last (Next (Tok)) and then
-               (Kind (Next (Tok)) = Res_End
-                  or else Kind (Next_ss (Tok)) = Res_End));
+            function Next_Is_End (Tok : Tokn_Cursor) return Boolean
+            is (not After_Last (Next (Tok))
+                and then (Kind (Next (Tok)) = Res_End
+                          or else Kind (Next_ss (Tok)) = Res_End));
 
-            function Next_Is_End_Record (Tok : Tokn_Cursor) return Boolean is
-              (not After_Last (Next (Tok)) and then
-                 ((Kind (Next (Tok)) = Res_End
-                   and then (not After_Last (Next_ss (Next (Tok)))
-                             and then Kind (Next_ss (Next (Tok))) = Res_Record))
-                  or else
-                    (Kind (Next_ss (Tok)) = Res_End
-                     and then
-                       (not After_Last (Next_ss (Next_ss (Tok)))
-                        and then Kind (Next_ss (Next_ss (Tok))) = Res_Record))));
+            function Next_Is_End_Record (Tok : Tokn_Cursor) return Boolean
+            is (not After_Last (Next (Tok))
+                and then ((Kind (Next (Tok)) = Res_End
+                           and then (not After_Last (Next_ss (Next (Tok)))
+                                     and then Kind (Next_ss (Next (Tok)))
+                                              = Res_Record))
+                          or else (Kind (Next_ss (Tok)) = Res_End
+                                   and then (not After_Last
+                                                   (Next_ss (Next_ss (Tok)))
+                                             and then Kind
+                                                        (Next_ss
+                                                           (Next_ss (Tok)))
+                                                      = Res_Record))));
 
-            function Next_Is_End_Case (Tok : Tokn_Cursor) return Boolean is
-              (not After_Last (Next (Tok)) and then
-                 ((Kind (Next (Tok)) = Res_End
-                   and then (not After_Last (Next_ss (Next (Tok)))
-                             and then Kind (Next_ss (Next (Tok))) = Res_Case))
-                  or else
-                    (Kind (Next_ss (Tok)) = Res_End
-                     and then
-                       (not After_Last (Next_ss (Next_ss (Tok)))
-                        and then Kind (Next_ss (Next_ss (Tok))) = Res_Case))));
+            function Next_Is_End_Case (Tok : Tokn_Cursor) return Boolean
+            is (not After_Last (Next (Tok))
+                and then ((Kind (Next (Tok)) = Res_End
+                           and then (not After_Last (Next_ss (Next (Tok)))
+                                     and then Kind (Next_ss (Next (Tok)))
+                                              = Res_Case))
+                          or else (Kind (Next_ss (Tok)) = Res_End
+                                   and then (not After_Last
+                                                   (Next_ss (Next_ss (Tok)))
+                                             and then Kind
+                                                        (Next_ss
+                                                           (Next_ss (Tok)))
+                                                      = Res_Case))));
 
             function Next_Is_Inside_Case (Tok : Tokn_Cursor) return Boolean
-            is
-              (not After_Last (Next (Tok)) and then
-               Kind (Next (Tok)) in Res_Case | Res_When);
+            is (not After_Last (Next (Tok))
+                and then Kind (Next (Tok)) in Res_Case | Res_When);
 
-            function Next_Is_Inside_If (Tok : Tokn_Cursor) return Boolean is
-              (not After_Last (Next (Tok)) and then
-               Kind (Next (Tok)) in Res_Else | Res_Elsif);
+            function Next_Is_Inside_If (Tok : Tokn_Cursor) return Boolean
+            is (not After_Last (Next (Tok))
+                and then Kind (Next (Tok)) in Res_Else | Res_Elsif);
 
             use Source_Message_Vectors;
 
             Other_Sloc : constant String := Sloc_Image (Sloc (Last_Pp_Off_On));
-            Message : Source_Message := (Sloc (Src_Tok), others => <>);
+            Message    : Source_Message := (Sloc (Src_Tok), others => <>);
 
-         --  Start of processing for Insert_Whole_Line_Comment
+            --  Start of processing for Insert_Whole_Line_Comment
 
          begin
 
@@ -3386,7 +3494,8 @@ package body Pp.Formatting is
                   if Pp_On then
                      Pp_On := False;
                      Last_Pp_Off_On := Src_Tok;
-                     pragma Assert (Last_Pp_Off_On /= First (Src_Tokns'Access));
+                     pragma
+                       Assert (Last_Pp_Off_On /= First (Src_Tokns'Access));
                   else
                      Utils.Char_Vectors.Char_Vectors.Append
                        (Message.Text,
@@ -3394,6 +3503,7 @@ package body Pp.Formatting is
                      Append (Messages, Message);
                      raise Post_Tree_Phases_Done;
                   end if;
+
                when Pp_On_Comment =>
                   if Pp_On then
                      Utils.Char_Vectors.Char_Vectors.Append
@@ -3404,10 +3514,15 @@ package body Pp.Formatting is
                   else
                      Pp_On := True;
                      Last_Pp_Off_On := Src_Tok;
-                     pragma Assert (Last_Pp_Off_On /= First (Src_Tokns'Access));
+                     pragma
+                       Assert (Last_Pp_Off_On /= First (Src_Tokns'Access));
                   end if;
-               when Other_Whole_Line_Comment |
-                 Special_Comment | Fillable_Comment => null;
+
+               when Other_Whole_Line_Comment
+                  | Special_Comment
+                  | Fillable_Comment
+               =>
+                  null;
             end case;
 
             --  Comments at the beginning are not indented. The "2" is to skip
@@ -3415,53 +3530,55 @@ package body Pp.Formatting is
             if Kind (Prev (Prev (New_Tok))) = Start_Of_Input then
                Indentation := Lines_Data.Initial_Indentation;
 
-            --  Otherwise, we indent as for the max of the preceding and
-            --  following line breaks, except when Look_Before is False (as it
-            --  is for this comment, which is followed by "else").
+               --  Otherwise, we indent as for the max of the preceding and
+               --  following line breaks, except when Look_Before is False (as
+               --  it is for this comment, which is followed by "else").
+
             else
                Indentation := After_Indentation;
 
                if Look_Before then
                   --  If last lines-breaks indentation does not affect comments
-                  --  and if the previous line is a blank line and the following
-                  --  line is a subprogram declaration, the after indentation
-                  --  value is kept.
-                  if not Prev_Indentation_Affect_Comments and then
-                    Next_Is_Action (New_Tok) and then
-                    (Is_Blank_Line (Prev_ss (Src_Tok))
-                     or else
-                       (Kind (Src_Tok) = Other_Whole_Line_Comment and then
-                        Kind (New_Tok) = Enabled_LB_Token and then
-                        Kind (Prev (New_Tok)) = ';'))
+                  --  and if the previous line is a blank line and the
+                  --  following line is a subprogram declaration, the after
+                  --  indentation value is kept.
+                  if not Prev_Indentation_Affect_Comments
+                    and then Next_Is_Action (New_Tok)
+                    and then (Is_Blank_Line (Prev_ss (Src_Tok))
+                              or else (Kind (Src_Tok)
+                                       = Other_Whole_Line_Comment
+                                       and then Kind (New_Tok)
+                                                = Enabled_LB_Token
+                                       and then Kind (Prev (New_Tok)) = ';'))
                   then
                      null;
 
-                  --  Handling the case where a new comment is added after a
-                  --  sequence of ");" and separated by a blank line from a
-                  --  code line. In this case the alignment will be based on
-                  --  the following line indentation.
-                  elsif Prev_Indentation_Affect_Comments and then
-                    Is_Blank_Line (Prev_ss (Src_Tok)) and then
-                    Kind (New_Tok) = Enabled_LB_Token and then
-                    Kind (Prev (New_Tok)) = ';' and then
-                    Kind (Prev (Prev (New_Tok))) = ')'
+                     --  Handling the case where a new comment is added after a
+                     --  sequence of ");" and separated by a blank line from a
+                     --  code line. In this case the alignment will be based on
+                     --  the following line indentation.
+                  elsif Prev_Indentation_Affect_Comments
+                    and then Is_Blank_Line (Prev_ss (Src_Tok))
+                    and then Kind (New_Tok) = Enabled_LB_Token
+                    and then Kind (Prev (New_Tok)) = ';'
+                    and then Kind (Prev (Prev (New_Tok))) = ')'
                   then
                      --  Preserve the maximal indentation level when the
                      --  current ');' is followed by an IF statement part or a
                      --  CASE statement part or a BEGIN or END keyword align
                      --  with the following line of code otherwise (i.e., keep
                      --  the after indentation level).
-                     if Next_Is_Begin (New_Tok) or else
-                       Next_Is_End (New_Tok) or else
-                       Next_Is_Inside_If (New_Tok) or else
-                       Next_Is_Inside_Case (New_Tok)
+                     if Next_Is_Begin (New_Tok)
+                       or else Next_Is_End (New_Tok)
+                       or else Next_Is_Inside_If (New_Tok)
+                       or else Next_Is_Inside_Case (New_Tok)
                      then
                         Indentation :=
                           Natural'Max (Indentation, Before_Indentation);
                      end if;
 
-                  --  Preserve the following type indentation level when
-                  --  the current ';' is followed by a type declaration.
+                     --  Preserve the following type indentation level when
+                     --  the current ';' is followed by a type declaration.
                   elsif Prev_Indentation_Affect_Comments
                     and then Is_Blank_Line (Prev_ss (Src_Tok))
                     and then Kind (New_Tok) = Enabled_LB_Token
@@ -3470,11 +3587,11 @@ package body Pp.Formatting is
                   then
                      null;
 
-                  --  This is for the situation where no Enabled_LB_Token is
-                  --  present and the indentation information is held by
-                  --  Disabled_LB_Token. In this situation, since if this
-                  --  information affects comments then this information should
-                  --  be used to compute the right indentation value.
+                     --  This is for the situation where no Enabled_LB_Token is
+                     --  present and the indentation information is held by
+                     --  Disabled_LB_Token. In this situation, since if this
+                     --  information affects comments then this information
+                     --  should be used to compute the right indentation value.
                   elsif Prev_Indentation_Affect_Comments
                     and then (Kind (Src_Tok) = Other_Whole_Line_Comment
                               or else Kind (Src_Tok) = Fillable_Comment)
@@ -3483,23 +3600,24 @@ package body Pp.Formatting is
                               or else Kind (New_Tok) = Res_When
                               or else Kind (New_Tok) = Numeric_Literal)
                     and then Kind (Prev (Prev (New_Tok))) = Disabled_LB_Token
-                    and then Kind (Prev (Prev (Prev (New_Tok)))) in  ',' | ';'
+                    and then Kind (Prev (Prev (Prev (New_Tok)))) in ',' | ';'
                   then
                      --  The corrected indentation is based on an already set
                      --  value on the LB Indentation and it is used to adjust
                      --  the Cur_Indentation in case of a parathesized context.
                      declare
                         P  : constant Tokn_Cursor := Prev (Prev (New_Tok));
-                        LB : Line_Break renames
-                          All_LB (Line_Break_Token_Index (P));
+                        LB : Line_Break
+                          renames All_LB (Line_Break_Token_Index (P));
                      begin
                         if LB.Enabled and then LB.Affects_Comments then
                            --  Do nothing when ');' is detected before
                            if not (Kind (Prev (Prev (Prev (New_Tok)))) = ';'
-                                   and then
-                                     Kind
-                                       (Prev (Prev (Prev (Prev (New_Tok))))) =
-                                          ')')
+                                   and then Kind
+                                              (Prev
+                                                 (Prev
+                                                    (Prev (Prev (New_Tok)))))
+                                            = ')')
                            then
                               Corrected_Indentation := LB.Indentation;
                               Indentation := Corrected_Indentation;
@@ -3511,25 +3629,25 @@ package body Pp.Formatting is
                         end if;
                      end;
 
-                  --  Whole line comment between last aggregate parameter and
-                  --  closing parathesis should be aligned with the others
-                  --  aggregates and closing parenthesis should have the right
-                  --  indentation too.
+                     --  Whole line comment between last aggregate parameter
+                     --  and closing parathesis should be aligned with the
+                     --  others aggregates and closing parenthesis should have
+                     --  the right indentation too.
                   elsif Prev_Indentation_Affect_Comments
                     and then (Kind (Src_Tok) = Other_Whole_Line_Comment
                               or else Kind (Src_Tok) = Fillable_Comment)
                     and then Kind (Prev (New_Tok)) = Ident
                     and then Kind (New_Tok) = ')'
                     and then Kind (Next (New_Tok)) = ';'
-                    and then
-                      Kind (Prev (Prev (Prev (New_Tok)))) = Disabled_LB_Token
+                    and then Kind (Prev (Prev (Prev (New_Tok))))
+                             = Disabled_LB_Token
                   then
 
                      declare
                         P  : constant Tokn_Cursor :=
                           Prev (Prev (Prev (New_Tok)));
-                        LB : Line_Break renames
-                          All_LB (Line_Break_Token_Index (P));
+                        LB : Line_Break
+                          renames All_LB (Line_Break_Token_Index (P));
                      begin
                         if LB.Enabled and then LB.Affects_Comments then
                            Indentation := LB.Indentation;
@@ -3537,9 +3655,9 @@ package body Pp.Formatting is
                         end if;
                      end;
 
-                  --  Preserve the following type indentation level when
-                  --  the current ';' is followed by a type declaration,
-                  --  action or identifier.
+                     --  Preserve the following type indentation level when
+                     --  the current ';' is followed by a type declaration,
+                     --  action or identifier.
                   elsif Prev_Indentation_Affect_Comments
                     and then Kind (Src_Tok) = Other_Whole_Line_Comment
                     and then Kind (New_Tok) = Enabled_LB_Token
@@ -3549,19 +3667,19 @@ package body Pp.Formatting is
                   then
                      null;
 
-                  --  The next case deals with comments between the
-                  --  Param_Spec and the return keyword.
-                  --
-                  --  function Foo
-                  --    (--  Comment about A
-                  --     A : Integer;
-                  --     --  Comment about B
-                  --     B : Float)
-                  --     --  Why put a comment here?
-                  --     return Boolean;
+                     --  The next case deals with comments between the
+                     --  Param_Spec and the return keyword.
+                     --
+                     --  function Foo
+                     --    (--  Comment about A
+                     --     A : Integer;
+                     --     --  Comment about B
+                     --     B : Float)
+                     --     --  Why put a comment here?
+                     --     return Boolean;
                   elsif Prev_Indentation_Affect_Comments
-                    and then Kind (Src_Tok) in
-                               Other_Whole_Line_Comment | Fillable_Comment
+                    and then Kind (Src_Tok)
+                             in Other_Whole_Line_Comment | Fillable_Comment
                     --  Here look for the sequence:
                     --  )
                     --  Line_Break_Token
@@ -3569,37 +3687,36 @@ package body Pp.Formatting is
                     --  return
                     and then (Kind (New_Tok) = Res_Return
                               and then Kind (Prev (New_Tok)) = Spaces
-                              and then Kind (Prev (Prev (New_Tok))) in
-                                         Line_Break_Token
-                              and then Kind (Prev (Prev (Prev (New_Tok)))) =
-                                         ')')
+                              and then Kind (Prev (Prev (New_Tok)))
+                                       in Line_Break_Token
+                              and then Kind (Prev (Prev (Prev (New_Tok))))
+                                       = ')')
                   then
                      declare
                         P  : constant Tokn_Cursor := Prev (Prev (New_Tok));
-                        LB : Line_Break renames
-                          All_LB (Line_Break_Token_Index (P));
+                        LB : Line_Break
+                          renames All_LB (Line_Break_Token_Index (P));
                      begin
                         Indentation := LB.Indentation;
                         Corrected_Indentation := Indentation;
                      end;
 
-                  --  The next case deals with a comment right after the with
-                  --  keyword of an aspect clause. This comment must be
-                  --  affected by the with keyword identation.
-                  elsif Kind (Src_Tok) in
-                          Other_Whole_Line_Comment | Fillable_Comment
+                     --  The next case deals with a comment right after the
+                     --  with keyword of an aspect clause. This comment must be
+                     --  affected by the with keyword identation.
+                  elsif Kind (Src_Tok)
+                        in Other_Whole_Line_Comment | Fillable_Comment
                     --  Here look for the sequence:
                     --  with
                     --  Line_Break_Token
                     --  Spaces
                     and then (Kind (New_Tok) = Enabled_LB_Token
                               and then Kind (Prev (New_Tok)) = Res_With
-                              and then Kind (Prev (Prev (New_Tok))) in
-                                         Spaces)
+                              and then Kind (Prev (Prev (New_Tok))) in Spaces)
                   then
                      declare
-                        LB : Line_Break renames
-                          All_LB (Line_Break_Token_Index (New_Tok));
+                        LB : Line_Break
+                          renames All_LB (Line_Break_Token_Index (New_Tok));
                      begin
                         Indentation := LB.Indentation;
                         Corrected_Indentation := Indentation;
@@ -3607,12 +3724,12 @@ package body Pp.Formatting is
 
                   elsif Prev_Indentation_Affect_Comments
                     and then Kind (New_Tok) = Res_Record
-                    and then Kind (Src_Tok) in
-                      Other_Whole_Line_Comment | Fillable_Comment
-                    and then
-                      Kind (Prev (Prev (Prev (Src_Tok)))) = End_Of_Line_Comment
-                    and then
-                      Kind (Prev_ss (Prev (Prev (Prev (Src_Tok))))) = Res_Is
+                    and then Kind (Src_Tok)
+                             in Other_Whole_Line_Comment | Fillable_Comment
+                    and then Kind (Prev (Prev (Prev (Src_Tok))))
+                             = End_Of_Line_Comment
+                    and then Kind (Prev_ss (Prev (Prev (Prev (Src_Tok)))))
+                             = Res_Is
                     and then Kind (Next (New_Tok)) = Enabled_LB_Token
                   then
                      --  This is the case of a type declaration having an EOL
@@ -3624,8 +3741,8 @@ package body Pp.Formatting is
 
                   elsif Prev_Indentation_Affect_Comments
                     and then Kind (New_Tok) = Enabled_LB_Token
-                    and then Kind (Src_Tok) in
-                      Other_Whole_Line_Comment | Fillable_Comment
+                    and then Kind (Src_Tok)
+                             in Other_Whole_Line_Comment | Fillable_Comment
                     and then Kind (Prev (New_Tok)) = ';'
                     and then Next_Is_Action (New_Tok)
                   then
@@ -3639,8 +3756,8 @@ package body Pp.Formatting is
                      end if;
 
                   elsif Prev_Indentation_Affect_Comments
-                    and then Kind (Src_Tok) in
-                      Other_Whole_Line_Comment | Fillable_Comment
+                    and then Kind (Src_Tok)
+                             in Other_Whole_Line_Comment | Fillable_Comment
                     and then Kind (New_Tok) = Enabled_LB_Token
                     and then Kind (Prev (New_Tok)) = ';'
                     and then (Next_Is_End (New_Tok)
@@ -3650,13 +3767,13 @@ package body Pp.Formatting is
                      if After_Indentation = Indentation then
                         Indentation := Indentation + PP_Indentation (Cmd);
                      else
-                        Indentation := Natural'Max (Indentation,
-                                                    Before_Indentation);
+                        Indentation :=
+                          Natural'Max (Indentation, Before_Indentation);
                      end if;
 
                   elsif not Prev_Indentation_Affect_Comments
-                    and then Kind (Src_Tok) in
-                      Other_Whole_Line_Comment | Fillable_Comment
+                    and then Kind (Src_Tok)
+                             in Other_Whole_Line_Comment | Fillable_Comment
                     and then Kind (New_Tok) = Enabled_LB_Token
                     and then Kind (Prev (New_Tok)) = ';'
                     and then (Next_Is_Type (New_Tok)
@@ -3665,8 +3782,8 @@ package body Pp.Formatting is
                      null;
 
                   elsif not Prev_Indentation_Affect_Comments
-                    and then Kind (Src_Tok) in
-                      Other_Whole_Line_Comment | Fillable_Comment
+                    and then Kind (Src_Tok)
+                             in Other_Whole_Line_Comment | Fillable_Comment
                     and then Kind (New_Tok) = Enabled_LB_Token
                     and then Kind (Prev (New_Tok)) = ';'
                     and then Next_Is_Begin (New_Tok)
@@ -3674,8 +3791,8 @@ package body Pp.Formatting is
                      Indentation := Indentation + PP_Indentation (Cmd);
 
                   elsif Prev_Indentation_Affect_Comments
-                    and then Kind (Src_Tok) in
-                      Other_Whole_Line_Comment | Fillable_Comment
+                    and then Kind (Src_Tok)
+                             in Other_Whole_Line_Comment | Fillable_Comment
                     and then Kind (New_Tok) = Enabled_LB_Token
                     and then Kind (Prev (New_Tok)) = ';'
                     and then Kind (Next (New_Tok)) = Ident
@@ -3704,8 +3821,8 @@ package body Pp.Formatting is
                     and then Kind (Next (New_Tok)) = Spaces
                     and then Kind (Prev_ss (Src_Tok)) in True_End_Of_Line
                     and then Kind (Next_ss (Src_Tok)) in True_End_Of_Line
-                    and then Kind
-                      (Next_ss (Next_ss (Src_Tok))) = Other_Whole_Line_Comment
+                    and then Kind (Next_ss (Next_ss (Src_Tok)))
+                             = Other_Whole_Line_Comment
                   then
                      Indentation := Before_Indentation;
 
@@ -3720,11 +3837,12 @@ package body Pp.Formatting is
             --  (Note : this is a particular alignment case handled to avoid
             --   regressions in internal-testsuite tests MB20-050 and R504-012)
 
-            if Kind (New_Tok) = ')' and then
-              (Kind (Next (Next (New_Tok))) = Res_Is
-               or else (Kind (Next (New_Tok)) = Disabled_LB_Token and then
-                        Kind (Next (Next (New_Tok))) = Spaces and then
-                        Kind (Next (Next (Next (New_Tok)))) = Res_Return))
+            if Kind (New_Tok) = ')'
+              and then (Kind (Next (Next (New_Tok))) = Res_Is
+                        or else (Kind (Next (New_Tok)) = Disabled_LB_Token
+                                 and then Kind (Next (Next (New_Tok))) = Spaces
+                                 and then Kind (Next (Next (Next (New_Tok))))
+                                          = Res_Return))
             then
                Indentation := Indentation + PP_Indentation (Cmd);
             end if;
@@ -3748,8 +3866,8 @@ package body Pp.Formatting is
                   declare
                      P : Tokn_Cursor := Last (New_Tokns'Access);
                   begin
-                     while Kind (P) in
-                       Line_Break_Token | End_Of_Line_Comment | Spaces
+                     while Kind (P)
+                           in Line_Break_Token | End_Of_Line_Comment | Spaces
                      loop
                         Prev (P);
                      end loop;
@@ -3774,8 +3892,11 @@ package body Pp.Formatting is
                pragma Assert (Kind (Src_Tok) in EOL_Token);
                Next_ss (Src_Tok);
 
-               exit when Kind (Src_Tok) not in
-                 Special_Comment | Fillable_Comment | Other_Whole_Line_Comment;
+               exit when
+                 Kind (Src_Tok)
+                 not in Special_Comment
+                      | Fillable_Comment
+                      | Other_Whole_Line_Comment;
 
                Set_Cur_Indentation;
                Append_Temp_Line_Break
@@ -3787,23 +3908,30 @@ package body Pp.Formatting is
             --  there, add one.
 
             if Kind (New_Tok) = Enabled_LB_Token then
-               while All_LB (Enabled_LBI (Enabled_Cur_Line)).Tok /= New_Tok loop
+               while All_LB (Enabled_LBI (Enabled_Cur_Line)).Tok /= New_Tok
+               loop
                   Enabled_Cur_Line := Enabled_Cur_Line + 1;
                end loop;
             end if;
 
             declare
                LB : Line_Break renames All_LB (Enabled_LBI (Enabled_Cur_Line));
-               pragma Assert (if Kind (New_Tok) = Enabled_LB_Token then
-                 LB.Tok = New_Tok);
-               pragma Assert
-                 (if LB_Tok (LB) = New_Tok then
-                    Kind (New_Tok) = Enabled_LB_Token);
-               pragma Assert
-                 (if not Partial_GNATPP then
-                    (if LB_Tok (LB) = Prev (New_Tok) then
-                         (if not Arg (Cmd, Source_Line_Breaks) then
-                                 Kind (Prev (New_Tok)) = Disabled_LB_Token)));
+               pragma
+                 Assert
+                   (if Kind (New_Tok) = Enabled_LB_Token
+                      then LB.Tok = New_Tok);
+               pragma
+                 Assert
+                   (if LB_Tok (LB) = New_Tok
+                      then Kind (New_Tok) = Enabled_LB_Token);
+               pragma
+                 Assert
+                   (if not Partial_GNATPP
+                      then
+                        (if LB_Tok (LB) = Prev (New_Tok)
+                         then
+                           (if not Arg (Cmd, Source_Line_Breaks)
+                            then Kind (Prev (New_Tok)) = Disabled_LB_Token)));
             begin
                if LB.Tok = New_Tok then
 
@@ -3812,15 +3940,13 @@ package body Pp.Formatting is
                   --  Take the Cur_Indentation value as reference in that case
                   --  for the current line break indentation.
 
-                  if Insert_Blank_Lines (Cmd) and then
-                    LB.Indentation = 0
-                  then
+                  if Insert_Blank_Lines (Cmd) and then LB.Indentation = 0 then
 
                      if LB.Indentation < Cur_Indentation then
                         LB.Indentation := Cur_Indentation;
 
-                     elsif Cur_Indentation = 0 and then
-                       LB.Indentation < Indentation
+                     elsif Cur_Indentation = 0
+                       and then LB.Indentation < Indentation
                      then
                         --  Update the indentation level for current line break
                         --  to the expected level after this comment.
@@ -3839,11 +3965,10 @@ package body Pp.Formatting is
                       or else Kind (New_Tok) = Numeric_Literal)
                  and then Kind (New_Tok) = Kind (Src_Tok)
                  and then Kind (Prev (Prev (Src_Tok))) in True_End_Of_Line
-                 and then (Kind
-                           (Prev (Prev (Prev (Src_Tok)))) =
-                             Other_Whole_Line_Comment
-                           or else Kind (Prev (Prev (Prev (Src_Tok)))) =
-                             Fillable_Comment)
+                 and then (Kind (Prev (Prev (Prev (Src_Tok))))
+                           = Other_Whole_Line_Comment
+                           or else Kind (Prev (Prev (Prev (Src_Tok))))
+                                   = Fillable_Comment)
                  and then Kind (Prev (Prev (Prev (New_Tok)))) in ',' | ';'
                  and then Kind (Prev (Prev (New_Tok))) in Disabled_LB_Token
                then
@@ -3854,9 +3979,9 @@ package body Pp.Formatting is
                   --     --  whole line comment
                   --     False);
                   --  In case of paranthesized expressions (like paramaters of
-                  --  and action call) the indentation must be corrected if this
-                  --  was not already taken as set in the Disabled_LB_Token
-                  --  Indentation field.
+                  --  and action call) the indentation must be corrected if
+                  --  this was not already taken as set in the
+                  --  Disabled_LB_Token Indentation field.
                   null;
 
                elsif Kind (Prev (New_Tok)) in Spaces
@@ -3865,8 +3990,8 @@ package body Pp.Formatting is
                  and then Kind (Next_ss (New_Tok)) in Tab_Token
                  and then Kind (Next (Next_ss (New_Tok))) in Arrow
                  and then not (Kind (Src_Tok) in True_End_Of_Line
-                               and then Kind (Prev (Src_Tok)) in
-                                 True_End_Of_Line)
+                               and then Kind (Prev (Src_Tok))
+                                        in True_End_Of_Line)
                then
 
                   --  U329-016
@@ -3890,6 +4015,7 @@ package body Pp.Formatting is
                   --  ...
                   null;
 
+                  --!format off
                elsif Arg (Cmd, Source_Line_Breaks)
                  and then not Partial_GNATPP
                  and then
@@ -3948,20 +4074,24 @@ package body Pp.Formatting is
                        and then Kind (Prev (Prev (Prev (New_Tok)))) =
                          Character_Literal))
                then
+                  --!format on
                   --  The Disabled_LB_Token was enabled and will match the
-                  --  True_End_Of_Line between the source token and a blank line
+                  --  True_End_Of_Line between the source token and a blank
+                  --  line
                   null;
 
                elsif Kind (LB.Tok) = Disabled_LB_Token
                  and then Kind (Src_Tok) = Res_Record
                  and then Kind (Src_Tok) = Kind (New_Tok)
                  and then Kind (Prev (Prev_ss (Src_Tok))) = Fillable_Comment
-                 and then
-                   Kind (Prev (Prev_ss (Prev (Prev (Prev_ss (Src_Tok)))))) =
-                     End_Of_Line_Comment
-                 and then
-                   Kind (Prev_ss (Prev
-                         (Prev_ss (Prev (Prev (Prev_ss (Src_Tok))))))) = Res_Is
+                 and then Kind
+                            (Prev (Prev_ss (Prev (Prev (Prev_ss (Src_Tok))))))
+                          = End_Of_Line_Comment
+                 and then Kind
+                            (Prev_ss
+                               (Prev
+                                  (Prev_ss (Prev (Prev (Prev_ss (Src_Tok)))))))
+                          = Res_Is
                then
                   null;
 
@@ -4018,8 +4148,7 @@ package body Pp.Formatting is
 
             Cur_Indentation := Sloc (Src_Tok).Col - 1; -- Keep as in input
             Append_Temp_Line_Break
-              (Lines_Data_P,
-               Org => "Append_Temp_ Preprocessor_Directive");
+              (Lines_Data_P, Org => "Append_Temp_ Preprocessor_Directive");
             Append_Tokn (New_Tokns, Src_Tok);
             Next (Src_Tok);
             Reset_Indentation;
@@ -4054,23 +4183,27 @@ package body Pp.Formatting is
          end Insert_Private;
 
          Qual_Nesting : Natural := 0;
-      --  Count the nesting level of qualified expressions containing aggregates
-      --  with extra parentheses.
+         --  Count the nesting level of qualified expressions containing
+         --  aggregates with extra parentheses.
 
-      --  Start of processing for Insert_Comments_And_Blank_Lines
+         --  Start of processing for Insert_Comments_And_Blank_Lines
 
       begin
-         pragma Debug
-           (Format_Debug_Output
-              (Lines_Data, "before Insert_Comments_And_Blank_Lines"));
+         pragma
+           Debug
+             (Format_Debug_Output
+                (Lines_Data, "before Insert_Comments_And_Blank_Lines"));
          --  ???At this point, we might need another pass to insert hard line
-         --  breaks after end-of-line comments, so they will be indented properly.
-         --  Or better yet, insert the EOL comments, with tabs and soft line break
-         --  before, hard line break after.
+         --  breaks after end-of-line comments, so they will be indented
+         --  properly. Or better yet, insert the EOL comments, with tabs and
+         --  soft line break before, hard line break after.
 
          Collect_Line_Breaks
-           (Lines_Data_P, Saved_New_Tokns,
-            Do_All => True, Do_Enabled => True, Do_Syntax => True,
+           (Lines_Data_P,
+            Saved_New_Tokns,
+            Do_All     => True,
+            Do_Enabled => True,
+            Do_Syntax  => True,
             First_Time => False);
          Append_Tokn (Pending_Tokns, Start_Of_Input);
 
@@ -4083,7 +4216,8 @@ package body Pp.Formatting is
 
          if Arg (Cmd, Source_Line_Breaks) then
             All_LB (Line_Break_Token_Index (New_Tok))
-              .Source_Line_Breaks_Enabled := True;
+              .Source_Line_Breaks_Enabled :=
+              True;
          end if;
 
          New_To_Newer;
@@ -4133,9 +4267,9 @@ package body Pp.Formatting is
             --  the blank line should precede the comment.
 
             if Kind (Src_Tok) not in EOL_Token
-              and then
-              (Match (Src_Tok, New_Tok)
-               or else (Kind (Src_Tok) = '!' and then Kind (New_Tok) = '|'))
+              and then (Match (Src_Tok, New_Tok)
+                        or else (Kind (Src_Tok) = '!'
+                                 and then Kind (New_Tok) = '|'))
             then
                exit when Kind (Src_Tok) = End_Of_Input;
                --  i.e. exit when both Src and Out are at end of input
@@ -4149,11 +4283,11 @@ package body Pp.Formatting is
             else
                --  Check for "end;" --> "end Some_Name;" case
                if Kind (Src_Tok) = ';'
-                 and then
-                   Kind (Prev_Lexeme (Src_Tok)) = Res_End
+                 and then Kind (Prev_Lexeme (Src_Tok)) = Res_End
                  and then Sname_83 (New_Tok)
                then
-                  loop -- could be "end A.B.C;"
+                  loop
+                     --  could be "end A.B.C;"
                      New_To_Newer;
 
                      exit when Kind (New_Tok) /= '.';
@@ -4161,22 +4295,24 @@ package body Pp.Formatting is
                      New_To_Newer ('.');
                      pragma Assert (Sname_83 (New_Tok));
                   end loop;
-                  pragma Assert
-                    (Disable_Final_Check or else
-                       Kind (Src_Tok) in ';' | EOL_Token | Comment_Kind);
+                  pragma
+                    Assert
+                      (Disable_Final_Check
+                         or else Kind (Src_Tok)
+                                 in ';' | EOL_Token | Comment_Kind);
 
-               --  Check for "end Some_Name;" --> "end;" case. This only happens
-               --  when the --no-end-id switch was given. Here, the name was
-               --  present in the source, so we insert it.
+                  --  Check for "end Some_Name;" --> "end;" case. This only
+                  --  happens when the --no-end-id switch was given. Here, the
+                  --  name was present in the source, so we insert it.
 
                elsif not Arg (Cmd, End_Id)
                  and then Kind (New_Tok) = ';'
-                 and then
-                   Kind (Prev_Lexeme (New_Tok)) = Res_End
+                 and then Kind (Prev_Lexeme (New_Tok)) = Res_End
                  and then Kind (Src_Tok) in Ident | String_Lit
                then
                   Append_Tokn (New_Tokns, Spaces, Name_Space);
-                  loop -- could be "end A.B.C;"
+                  loop
+                     --  could be "end A.B.C;"
                      Append_Tokn (New_Tokns, Src_Tok);
                      Next_ss (Src_Tok);
 
@@ -4184,29 +4320,29 @@ package body Pp.Formatting is
 
                      Append_Tokn (New_Tokns, Src_Tok);
                      Next_ss (Src_Tok);
-                     pragma Assert
-                       (Kind (Src_Tok) in Ident | String_Lit);
+                     pragma Assert (Kind (Src_Tok) in Ident | String_Lit);
                   end loop;
-                  pragma Assert
-                    (Disable_Final_Check or else Kind (Src_Tok) = ';');
+                  pragma
+                    Assert (Disable_Final_Check or else Kind (Src_Tok) = ';');
 
-               --  Check for "private end" --> "end" case, with a possible
-               --  comment between "private" and "end".
+                  --  Check for "private end" --> "end" case, with a possible
+                  --  comment between "private" and "end".
 
                elsif Kind (Src_Tok) = Res_Private
                  and then Kind (New_Tok) = Res_End
                then
-                  pragma Assert
-                    (Disable_Final_Check
-                       or else Kind (Next_Lexeme (Src_Tok)) = Res_End);
+                  pragma
+                    Assert
+                      (Disable_Final_Check
+                         or else Kind (Next_Lexeme (Src_Tok)) = Res_End);
                   Insert_Private;
 
-               --  Check for "T'((X, Y, Z))" --> "T'(X, Y, Z)" case
+                  --  Check for "T'((X, Y, Z))" --> "T'(X, Y, Z)" case
 
                elsif Kind (Src_Tok) = '('
                  and then Kind (Prev_Lexeme (Src_Tok)) = '('
-                  --???Also check that the one before that is a tick!
                then
+                  --  ???Also check that the one before that is a tick!
                   Qual_Nesting := Qual_Nesting + 1;
                   Append_Tokn (New_Tokns, Src_Tok);
                   Next_ss (Src_Tok);
@@ -4222,13 +4358,13 @@ package body Pp.Formatting is
                elsif Kind (Src_Tok) = End_Of_Line_Comment then
                   Insert_End_Of_Line_Comment;
 
-               --  If the source has a blank line at this point, send it to the
-               --  output (unless Insert_Blank_Lines is True, in which case we
-               --  want to ignore blank lines in the input, since a previous
-               --  phase inserted them in the "right" place). But avoid
-               --  multiple blank lines (unless either Preserve_Line_Breaks or
-               --  Preserve_Blank_Lines is True) and blank lines just before
-               --  End_Of_Input.
+                  --  If the source has a blank line at this point, send it to the
+                  --  output (unless Insert_Blank_Lines is True, in which case we
+                  --  want to ignore blank lines in the input, since a previous
+                  --  phase inserted them in the "right" place). But avoid
+                  --  multiple blank lines (unless either Preserve_Line_Breaks or
+                  --  Preserve_Blank_Lines is True) and blank lines just before
+                  --  End_Of_Input.
 
                elsif Is_Blank_Line (Src_Tok)
                  and then not Arg (Cmd, Source_Line_Breaks)
@@ -4243,23 +4379,22 @@ package body Pp.Formatting is
                   begin
                      loop
                         Next_ss (Src_Tok);
-                        exit when Kind (Src_Tok) not in EOL_Token
+                        exit when
+                          Kind (Src_Tok) not in EOL_Token
                           or else Preserve_Blank_Lines (Cmd);
                      end loop;
                      declare
                         Next_Tok_Kind : constant Opt_Token_Kind :=
-                          (if At_Last (Src_Tok)
-                             then Nil
-                             else Kind (Next_ss (Src_Tok)));
+                          (if At_Last (Src_Tok) then Nil
+                           else Kind (Next_ss (Src_Tok)));
                      begin
                         if Preserve_Blank_Lines (Cmd)
                           or else (not Insert_Blank_Lines (Cmd)
-                                     and then Kind (Src_Tok) /= End_Of_Input)
+                                   and then Kind (Src_Tok) /= End_Of_Input)
                           or else Prev_Prev_Tok_Kind in Comment_Kind
-                          or else
-                            (Prev_Prev_Tok_Kind in ';'
-                             and then Next_Tok_Kind not in Nil
-                             and then Kind (Src_Tok) not in Res_End)
+                          or else (Prev_Prev_Tok_Kind in ';'
+                                   and then Next_Tok_Kind not in Nil
+                                   and then Kind (Src_Tok) not in Res_End)
                           or else Next_Tok_Kind in Comment_Kind
                         then
                            Append_Temp_Line_Break
@@ -4268,20 +4403,21 @@ package body Pp.Formatting is
                      end;
                   end;
 
-               --  Normally, we simply ignore EOL_Token in the input. But for
-               --  --source-line-breaks mode, if we see a line break in the
-               --  input that is not yet in the output, we copy it over.
-               --  We set the indentation to take into account
-               --  surrounding indentation, plus line continuation if
-               --  appropriate, plus "("-related indentation. If the next
-               --  character in the output is already ' ', we subtract one from
-               --  the indentation to make up for that. (There can never be two
-               --  in a row.)
+                  --  Normally, we simply ignore EOL_Token in the input. But for
+                  --  --source-line-breaks mode, if we see a line break in the
+                  --  input that is not yet in the output, we copy it over.
+                  --  We set the indentation to take into account
+                  --  surrounding indentation, plus line continuation if
+                  --  appropriate, plus "("-related indentation. If the next
+                  --  character in the output is already ' ', we subtract one from
+                  --  the indentation to make up for that. (There can never be two
+                  --  in a row.)
 
                elsif Kind (Src_Tok) in EOL_Token then
-                  pragma Assert
-                    (not Is_Blank_Line (Src_Tok)
-                     or else Arg (Cmd, Source_Line_Breaks));
+                  pragma
+                    Assert
+                      (not Is_Blank_Line (Src_Tok)
+                         or else Arg (Cmd, Source_Line_Breaks));
 
                   Next_ss (Src_Tok);
 
@@ -4289,8 +4425,8 @@ package body Pp.Formatting is
 
                      if Kind (New_Tok) in Line_Break_Token then
                         declare
-                           LB : Line_Break renames
-                             All_LB (Line_Break_Token_Index (New_Tok));
+                           LB : Line_Break
+                             renames All_LB (Line_Break_Token_Index (New_Tok));
                         begin
 
                            --  If we have a line break with
@@ -4308,8 +4444,8 @@ package body Pp.Formatting is
                               Reset_Indentation;
                               New_Line_Start_Out := New_Tok;
 
-                           --  Source_Line_Breaks_Enabled is False, so tell
-                           --  New_To_Newer to use this line break.
+                              --  Source_Line_Breaks_Enabled is False, so tell
+                              --  New_To_Newer to use this line break.
 
                            else
                               LB.Enabled := True;
@@ -4322,9 +4458,9 @@ package body Pp.Formatting is
                            end if;
                         end;
 
-                     --  There is no line break in New_Tokns corresponding to
-                     --  the EOL_Token in the source, so create a new one using
-                     --  Append_Temp_Line_Break.
+                        --  There is no line break in New_Tokns corresponding to
+                        --  the EOL_Token in the source, so create a new one using
+                        --  Append_Temp_Line_Break.
 
                      else
                         declare
@@ -4359,8 +4495,9 @@ package body Pp.Formatting is
                                  end if;
 
                                  declare
-                                    LB : Line_Break renames
-                                      All_LB (Line_Break_Token_Index (P));
+                                    LB : Line_Break
+                                      renames All_LB
+                                                (Line_Break_Token_Index (P));
                                  begin
                                     if Kind (P) = Disabled_LB_Token
                                       and then LB_Needs_To_Be_Enabled (Src_Tok)
@@ -4372,93 +4509,103 @@ package body Pp.Formatting is
                                     if not Is_Empty (Paren_Stack)
                                       and then Kind (New_Tok) = Ident
                                       and then Kind (P) = Disabled_LB_Token
-                                      and then Kind (Prev (P)) =  ';'
-                                      and then Kind (Prev_ss (Prev (P))) in
-                                          Ident | Res_Null | ')'
+                                      and then Kind (Prev (P)) = ';'
+                                      and then Kind (Prev_ss (Prev (P)))
+                                               in Ident | Res_Null | ')'
                                     then
                                        LB.Indentation :=
                                          L_Paren_Indent_For_Preserve
-                                           + Before_Indentation - 1;
+                                         + Before_Indentation
+                                         - 1;
 
-                                    elsif  not Is_Empty (Paren_Stack)
-                                      and then Kind (New_Tok) in
-                                          Ident | String_Lit | Character_Literal
+                                    elsif not Is_Empty (Paren_Stack)
+                                      and then Kind (New_Tok)
+                                               in Ident
+                                                | String_Lit
+                                                | Character_Literal
                                       and then Kind (P) = Disabled_LB_Token
-                                      and then Kind (Prev (P)) =  ','
-                                      and then Kind (Prev_ss (Prev (P))) in
-                                          Ident | String_Lit |
-                                          Character_Literal | Numeric_Literal |
-                                          Res_All | Res_Null | Box | ')'
+                                      and then Kind (Prev (P)) = ','
+                                      and then Kind (Prev_ss (Prev (P)))
+                                               in Ident
+                                                | String_Lit
+                                                | Character_Literal
+                                                | Numeric_Literal
+                                                | Res_All
+                                                | Res_Null
+                                                | Box
+                                                | ')'
                                     then
-                                       if
-                                         (Kind (Prev_ss (Prev (P))) = ')'
-                                          and then
-                                          Kind (Prev_ss
-                                                (Prev_ss (Prev (P)))) = ')')
-                                         or else
-                                           (Kind (New_Tok) in Ident | String_Lit
-                                            and then
-                                            Kind
-                                              (Prev_ss (Prev (P))) = String_Lit)
+                                       if (Kind (Prev_ss (Prev (P))) = ')'
+                                           and then Kind
+                                                      (Prev_ss
+                                                         (Prev_ss (Prev (P))))
+                                                    = ')')
+                                         or else (Kind (New_Tok)
+                                                  in Ident | String_Lit
+                                                  and then Kind
+                                                             (Prev_ss
+                                                                (Prev (P)))
+                                                           = String_Lit)
                                        then
                                           --  already up to date indentation
                                           null;
 
-                                       elsif LB.Indentation /=
-                                         L_Paren_Indent_For_Preserve
-                                         + Before_Indentation + 1
+                                       elsif LB.Indentation
+                                         /= L_Paren_Indent_For_Preserve
+                                           + Before_Indentation
+                                           + 1
                                        then
                                           LB.Indentation :=
                                             L_Paren_Indent_For_Preserve
-                                              + Before_Indentation - 1;
+                                            + Before_Indentation
+                                            - 1;
 
                                        end if;
                                     else
                                        if not Is_Empty (Paren_Stack) then
                                           if Kind (New_Tok) = Ident
-                                            and then
-                                              Kind (P) = Disabled_LB_Token
-                                            and then
-                                              Kind (Prev (P)) in
-                                                Colon_Equal | Arrow
-                                            and then
-                                              Kind (Prev_ss (Prev (P))) =
-                                                Tab_Token
+                                            and then Kind (P)
+                                                     = Disabled_LB_Token
+                                            and then Kind (Prev (P))
+                                                     in Colon_Equal | Arrow
+                                            and then Kind (Prev_ss (Prev (P)))
+                                                     = Tab_Token
                                           then
                                              null;
 
                                           elsif Kind (New_Tok) = Ident
-                                            and then
-                                              Kind (P) = Disabled_LB_Token
-                                            and then
-                                              Kind
-                                                (Prev_ss (Prev (P))) = Res_With
+                                            and then Kind (P)
+                                                     = Disabled_LB_Token
+                                            and then Kind (Prev_ss (Prev (P)))
+                                                     = Res_With
                                           then
                                              Update_L_Paren_Indent_For_Preserve
                                                (LB.Indentation
                                                 - Before_Indentation);
 
-                                          elsif Kind (New_Tok) = Ident and then
-                                            Kind (P) = Disabled_LB_Token
+                                          elsif Kind (New_Tok) = Ident
+                                            and then Kind (P)
+                                                     = Disabled_LB_Token
                                             and then Kind (Prev (P)) = Res_If
-                                            and then
-                                              Kind (Prev_ss (Prev (P))) = '('
+                                            and then Kind (Prev_ss (Prev (P)))
+                                                     = '('
                                           then
                                              --  IF expression starts here
                                              Update_L_Paren_Indent_For_Preserve
                                                (LB.Indentation);
 
-                                          elsif Kind (New_Tok) in
-                                                Res_Then | Res_Else
-                                            and then
-                                              Kind (P) = Disabled_LB_Token
+                                          elsif Kind (New_Tok)
+                                                in Res_Then | Res_Else
+                                            and then Kind (P)
+                                                     = Disabled_LB_Token
                                           then
                                              Update_L_Paren_Indent_For_Preserve
                                                (LB.Indentation);
                                           else
                                              Update_L_Paren_Indent_For_Preserve
                                                (LB.Indentation
-                                                - Before_Indentation + 1);
+                                                - Before_Indentation
+                                                + 1);
                                           end if;
                                        end if;
                                     end if;
@@ -4486,6 +4633,7 @@ package body Pp.Formatting is
                   --  In a paranthesized context, the indentation level should
                   --  be increased by 1 related to the last left paranthesis
                   --  position
+                  --!format off
                   if (Kind (Src_Tok) = Other_Whole_Line_Comment
                       or else Kind (Src_Tok) = Fillable_Comment)
                     and then (Kind (New_Tok) = Ident
@@ -4508,11 +4656,12 @@ package body Pp.Formatting is
                                  Kind (Prev (Prev (Prev_ss (Src_Tok)))) =
                                    End_Of_Line_Comment))))
                   then
+                     --!format on
 
                      declare
-                        P : constant Tokn_Cursor := Prev (Prev (New_Tok));
-                        LB : Line_Break renames
-                          All_LB (Line_Break_Token_Index (P));
+                        P  : constant Tokn_Cursor := Prev (Prev (New_Tok));
+                        LB : Line_Break
+                          renames All_LB (Line_Break_Token_Index (P));
                      begin
                         LB.Enabled := True;
                         LB.Affects_Comments := True;
@@ -4522,9 +4671,8 @@ package body Pp.Formatting is
                            --  Nothing to do here since these situations
                            --  are handled by other means
                            if Arg (Cmd, Comments_Unchanged)
-                             or else
-                               Kind
-                                 (Prev (Prev (Prev (Prev (New_Tok))))) = ')'
+                             or else Kind (Prev (Prev (Prev (Prev (New_Tok)))))
+                                     = ')'
                              or else Kind (Src_Tok) = Fillable_Comment
                            then
                               null;
@@ -4555,11 +4703,11 @@ package body Pp.Formatting is
                   New_To_Newer;
                   New_Line_Start_Out := New_Tok;
 
-               --  Else print out debugging information and crash. This
-               --  avoids damaging the source code in case of bugs. However,
-               --  if the Disable_Final_Check debug flag is set, try to
-               --  continue by skipping one source token, or one output
-               --  token.
+                  --  Else print out debugging information and crash. This
+                  --  avoids damaging the source code in case of bugs. However,
+                  --  if the Disable_Final_Check debug flag is set, try to
+                  --  continue by skipping one source token, or one output
+                  --  token.
 
                elsif Disable_Final_Check then
                   Next_ss (Src_Tok);
@@ -4571,10 +4719,17 @@ package body Pp.Formatting is
                   --  token mismatch raise is needed
                   if Partial_GNATPP then
                      if Kind (Src_Tok) = ';'
-                       and then Kind (Prev (Src_Tok)) in
-                           Res_End | Res_Record | Res_Loop | Ident
-                         | Res_Tagged | Res_Abstract | Res_Null
-                         | Numeric_Literal | String_Lit | ')'
+                       and then Kind (Prev (Src_Tok))
+                                in Res_End
+                                 | Res_Record
+                                 | Res_Loop
+                                 | Ident
+                                 | Res_Tagged
+                                 | Res_Abstract
+                                 | Res_Null
+                                 | Numeric_Literal
+                                 | String_Lit
+                                 | ')'
                        and then Kind (New_Tok) = End_Of_Input
                      then
                         Next_ss (Src_Tok);
@@ -4614,7 +4769,8 @@ package body Pp.Formatting is
             pragma Assert (Enabled_Cur_Line = Last_Index (Enabled_LBI));
          end if;
 
-         <<Done>> null;
+         <<Done>>
+         null;
 
          Clear (Temp_LBI);
          pragma Assert (Disable_Final_Check or else Qual_Nesting = 0);
@@ -4624,19 +4780,18 @@ package body Pp.Formatting is
          Clear (Syntax_LBI);
       end Insert_Comments_And_Blank_Lines;
 
-      procedure Insert_Indentation (Lines_Data_P : Lines_Data_Ptr)
-      is
+      procedure Insert_Indentation (Lines_Data_P : Lines_Data_Ptr) is
          function Is_Action_Call_Parameter (Tok : Tokn_Cursor) return Boolean;
          --  Returns true if the line break token is part of an action call
          --  parameter..
 
-         function Called_As_Parameter_Of_An_Action_Call (Tok : Tokn_Cursor)
-                                                         return Boolean;
+         function Called_As_Parameter_Of_An_Action_Call
+           (Tok : Tokn_Cursor) return Boolean;
          --  Returns true if the line break token is part of an action call
          --  parameter and this call is a parameter of an other action call.
 
-         function Enclosing_Open_Paren (Tok      : Tokn_Cursor;
-                                        OP_Count : Natural) return Tokn_Cursor;
+         function Enclosing_Open_Paren
+           (Tok : Tokn_Cursor; OP_Count : Natural) return Tokn_Cursor;
          --  Returns the enclosing parenthesis corresponding token.
 
          function Prev_LB_Indentation (Paren : Tokn_Cursor) return Positive;
@@ -4652,19 +4807,22 @@ package body Pp.Formatting is
          Lines_Data : Lines_Data_Rec renames Lines_Data_P.all;
          All_LB     : Line_Break_Vector renames Lines_Data.All_LB;
 
-         function Enclosing_Open_Paren (Tok      : Tokn_Cursor;
-                                        OP_Count : Natural) return Tokn_Cursor
+         function Enclosing_Open_Paren
+           (Tok : Tokn_Cursor; OP_Count : Natural) return Tokn_Cursor
          is
-            Index   : constant Line_Break_Index := Line_Break_Token_Index (Tok);
+            Index   : constant Line_Break_Index :=
+              Line_Break_Token_Index (Tok);
             LB      : Line_Break renames All_LB (Index);
             Crt_Tok : Tokn_Cursor := Prev (Tok);
 
-            Crt_OP_Count : Natural     := 0;
-            Crt_CP_Count : Natural     := 0;
+            Crt_OP_Count : Natural := 0;
+            Crt_CP_Count : Natural := 0;
          begin
-            pragma Assert (Kind (Tok) in Line_Break_Token
-                           and then LB.Enabled
-                           and then not Is_Nil (Crt_Tok));
+            pragma
+              Assert
+                (Kind (Tok) in Line_Break_Token
+                   and then LB.Enabled
+                   and then not Is_Nil (Crt_Tok));
 
             while not Is_Nil (Crt_Tok) loop
                if Kind (Crt_Tok) = ')' then
@@ -4678,10 +4836,14 @@ package body Pp.Formatting is
                   return Crt_Tok;
                end if;
 
-               exit when Is_Nil (Crt_Tok)
-                 or else
-                   Kind (Crt_Tok)
-                    in Res_For | Res_When | Res_Begin | Res_Is | Colon_Equal;
+               exit when
+                 Is_Nil (Crt_Tok)
+                 or else Kind (Crt_Tok)
+                         in Res_For
+                          | Res_When
+                          | Res_Begin
+                          | Res_Is
+                          | Colon_Equal;
 
                Crt_Tok := Prev (Crt_Tok);
             end loop;
@@ -4691,23 +4853,25 @@ package body Pp.Formatting is
 
          function Is_Action_Call_Parameter (Tok : Tokn_Cursor) return Boolean
          is
-            Index : constant Line_Break_Index := Line_Break_Token_Index (Tok);
+            Index   : constant Line_Break_Index :=
+              Line_Break_Token_Index (Tok);
             LB      : Line_Break renames All_LB (Index);
             Crt_Tok : Tokn_Cursor := Prev (Tok);
 
-            function Pattern_Found (Tok : Tokn_Cursor) return Boolean is
-              ((Kind (Prev (Tok)) = Spaces
-               and then Kind (Prev (Prev (Tok))) = Ident)
-               or else
-                 (Kind (Prev (Tok)) in Line_Break_Token
-                  and then Kind (Prev (Prev (Tok))) = Ident));
+            function Pattern_Found (Tok : Tokn_Cursor) return Boolean
+            is ((Kind (Prev (Tok)) = Spaces
+                 and then Kind (Prev (Prev (Tok))) = Ident)
+                or else (Kind (Prev (Tok)) in Line_Break_Token
+                         and then Kind (Prev (Prev (Tok))) = Ident));
 
             --  Returns True if the pattern "Ident/Spaces/'('" is found
          begin
-            pragma Assert (Kind (Tok) in Line_Break_Token
-                           and then LB.Enabled
-                           and then not Is_Nil (Crt_Tok)
-                           and then Kind (Crt_Tok) in Arrow | ',');
+            pragma
+              Assert
+                (Kind (Tok) in Line_Break_Token
+                   and then LB.Enabled
+                   and then not Is_Nil (Crt_Tok)
+                   and then Kind (Crt_Tok) in Arrow | ',');
 
             while not Is_Nil (Crt_Tok) loop
                if Kind (Crt_Tok) = '(' then
@@ -4722,11 +4886,17 @@ package body Pp.Formatting is
 
                end if;
 
-               exit when Is_Nil (Crt_Tok)
-                 or else
-                   Kind (Crt_Tok)
-               in Res_For | Res_When | Res_Begin | Res_Is | Colon_Equal |
-                  Res_Package | Res_With | Start_Of_Input;
+               exit when
+                 Is_Nil (Crt_Tok)
+                 or else Kind (Crt_Tok)
+                         in Res_For
+                          | Res_When
+                          | Res_Begin
+                          | Res_Is
+                          | Colon_Equal
+                          | Res_Package
+                          | Res_With
+                          | Start_Of_Input;
 
                Crt_Tok := Prev (Crt_Tok);
             end loop;
@@ -4737,26 +4907,30 @@ package body Pp.Formatting is
          function Called_As_Parameter_Of_An_Action_Call
            (Tok : Tokn_Cursor) return Boolean
          is
-            Index : constant Line_Break_Index := Line_Break_Token_Index (Tok);
+            Index   : constant Line_Break_Index :=
+              Line_Break_Token_Index (Tok);
             LB      : Line_Break renames All_LB (Index);
             Crt_Tok : Tokn_Cursor := Prev (Tok);
 
-            function Call_Pattern_Found (Tok : Tokn_Cursor) return Boolean is
-              (not Is_Nil (Prev (Tok)) and then not Is_Nil (Prev (Prev (Tok)))
-               and then ((Kind (Prev (Tok)) = Spaces
-                          and then Kind (Prev (Prev (Tok))) = Ident)
-                         or else
-                         (Kind (Prev (Tok)) in Line_Break_Token
-                          and then Kind (Prev (Prev (Tok))) = Ident)));
+            function Call_Pattern_Found (Tok : Tokn_Cursor) return Boolean
+            is (not Is_Nil (Prev (Tok))
+                and then not Is_Nil (Prev (Prev (Tok)))
+                and then ((Kind (Prev (Tok)) = Spaces
+                           and then Kind (Prev (Prev (Tok))) = Ident)
+                          or else (Kind (Prev (Tok)) in Line_Break_Token
+                                   and then Kind (Prev (Prev (Tok)))
+                                            = Ident)));
 
-            Pattern_Found  : Boolean     := False;
+            Pattern_Found  : Boolean := False;
             Call_Ident_Tok : Tokn_Cursor := Nil_Tokn_Cursor;
-            Count          : Natural     := 0;
+            Count          : Natural := 0;
          begin
-            pragma Assert (Kind (Tok) in Line_Break_Token
-                           and then LB.Enabled
-                           and then not Is_Nil (Crt_Tok)
-                           and then Kind (Crt_Tok) in Arrow | ',');
+            pragma
+              Assert
+                (Kind (Tok) in Line_Break_Token
+                   and then LB.Enabled
+                   and then not Is_Nil (Crt_Tok)
+                   and then Kind (Crt_Tok) in Arrow | ',');
 
             if not Is_Action_Call_Parameter (Tok) then
                return False;
@@ -4769,19 +4943,23 @@ package body Pp.Formatting is
                      Pattern_Found := True;
                      Call_Ident_Tok :=
                        (if not Is_Nil (Prev (Crt_Tok))
-                           and then not Is_Nil (Prev (Prev (Crt_Tok)))
-                           and then not Is_Nil (Prev (Prev (Prev (Crt_Tok))))
+                          and then not Is_Nil (Prev (Prev (Crt_Tok)))
+                          and then not Is_Nil (Prev (Prev (Prev (Crt_Tok))))
                         then Prev (Prev (Prev (Crt_Tok)))
                         else Nil_Tokn_Cursor);
                      exit;
                   end if;
                end if;
 
-               exit when Is_Nil (Crt_Tok)
-                 or else
-                   Kind (Crt_Tok)
-                     in Res_For | Res_When | Res_Begin | Res_Is | Colon_Equal
-                        | Start_Of_Input;
+               exit when
+                 Is_Nil (Crt_Tok)
+                 or else Kind (Crt_Tok)
+                         in Res_For
+                          | Res_When
+                          | Res_Begin
+                          | Res_Is
+                          | Colon_Equal
+                          | Start_Of_Input;
 
                Crt_Tok := Prev (Crt_Tok);
             end loop;
@@ -4797,6 +4975,7 @@ package body Pp.Formatting is
                case Kind (Crt_Tok) is
                   when ',' | Arrow =>
                      return True;
+
                   when ')' =>
                      Count := Count + 1;
 
@@ -4809,14 +4988,19 @@ package body Pp.Formatting is
                         Count := Count - 1;
                      end if;
 
-                  when others => null;
+                  when others =>
+                     null;
                end case;
 
-               exit when Is_Nil (Crt_Tok)
-                 or else
-                   Kind (Crt_Tok)
-                   in Res_For | Res_When | Res_Begin | Res_Is | Colon_Equal
-                      | Start_Of_Input;
+               exit when
+                 Is_Nil (Crt_Tok)
+                 or else Kind (Crt_Tok)
+                         in Res_For
+                          | Res_When
+                          | Res_Begin
+                          | Res_Is
+                          | Colon_Equal
+                          | Start_Of_Input;
 
                Crt_Tok := Prev (Crt_Tok);
             end loop;
@@ -4828,8 +5012,7 @@ package body Pp.Formatting is
          is (Kind (Prev (Tok)) in ',' | '&' | ';' | ''' | Arrow
              or else (Kind (Prev (Tok)) = Ident and Kind (Next (Tok)) = '('));
 
-         function Prev_LB_Indentation (Paren : Tokn_Cursor) return Positive
-         is
+         function Prev_LB_Indentation (Paren : Tokn_Cursor) return Positive is
             Crt_Tok : Tokn_Cursor := Paren;
          begin
             while not Is_Nil (Crt_Tok) loop
@@ -4838,31 +5021,35 @@ package body Pp.Formatting is
                   declare
                      Index : constant Line_Break_Index :=
                        Line_Break_Token_Index (Crt_Tok);
-                     LB : Line_Break renames All_LB (Index);
+                     LB    : Line_Break renames All_LB (Index);
                   begin
                      return LB.Indentation;
                   end;
                end if;
 
-               exit when Is_Nil (Crt_Tok)
-                 or else
-                   Kind (Crt_Tok)
-                     in Res_For | Res_When | Res_Begin | Res_Is | Colon_Equal
-                       | Start_Of_Input;
+               exit when
+                 Is_Nil (Crt_Tok)
+                 or else Kind (Crt_Tok)
+                         in Res_For
+                          | Res_When
+                          | Res_Begin
+                          | Res_Is
+                          | Colon_Equal
+                          | Start_Of_Input;
                Prev (Crt_Tok);
             end loop;
 
             return 1;
          end Prev_LB_Indentation;
 
-         procedure Adjust_Indentation_After_Comma (Tok : Tokn_Cursor)
-         is
-            Index    : constant Line_Break_Index := Line_Break_Token_Index (Tok);
-            LB       : Line_Break renames All_LB (Index);
-            Crt_Tok  : Tokn_Cursor := Tok;
+         procedure Adjust_Indentation_After_Comma (Tok : Tokn_Cursor) is
+            Index   : constant Line_Break_Index :=
+              Line_Break_Token_Index (Tok);
+            LB      : Line_Break renames All_LB (Index);
+            Crt_Tok : Tokn_Cursor := Tok;
 
-            OP_Count  : Natural := 0;
-            CP_Count  : Natural := 0;
+            OP_Count : Natural := 0;
+            CP_Count : Natural := 0;
          begin
             pragma Assert (Kind (Tok) in Line_Break_Token and then LB.Enabled);
             if not Called_As_Parameter_Of_An_Action_Call (Crt_Tok) then
@@ -4879,15 +5066,14 @@ package body Pp.Formatting is
                case Kind (Crt_Tok) is
                   when Line_Break_Token =>
                      declare
-                        Crt_Index  : constant Line_Break_Index :=
+                        Crt_Index : constant Line_Break_Index :=
                           Line_Break_Token_Index (Crt_Tok);
-                        Crt_LB     : Line_Break renames All_LB (Crt_Index);
+                        Crt_LB    : Line_Break renames All_LB (Crt_Index);
 
                         EP         : Tokn_Cursor := Nil_Tokn_Cursor;
-                        PLB_Indent : Natural     := 0;
+                        PLB_Indent : Natural := 0;
                      begin
-                        if Crt_LB.Enabled
-                          and then Is_Expected_Token (Crt_Tok)
+                        if Crt_LB.Enabled and then Is_Expected_Token (Crt_Tok)
                         then
                            EP := Enclosing_Open_Paren (Crt_Tok, OP_Count);
 
@@ -4916,15 +5102,16 @@ package body Pp.Formatting is
 
                                  elsif CP_Count > OP_Count then
                                     LB.Indentation :=
-                                      (if CP_Count - OP_Count >= 1 then
-                                         (LB.Indentation -
-                                              (CP_Count - OP_Count) + 1)
-                                       else
-                                          LB.Indentation);
+                                      (if CP_Count - OP_Count >= 1
+                                       then
+                                         (LB.Indentation
+                                          - (CP_Count - OP_Count)
+                                          + 1)
+                                       else LB.Indentation);
 
                                  elsif OP_Count > CP_Count then
-                                    LB.Indentation := LB.Indentation -
-                                      (OP_Count - CP_Count);
+                                    LB.Indentation :=
+                                      LB.Indentation - (OP_Count - CP_Count);
                                  end if;
                               end if;
 
@@ -4939,7 +5126,8 @@ package body Pp.Formatting is
                                 and then OP_Count /= 0
                               then
                                  if LB.Indentation /= PLB_Indent + 1 then
-                                    LB.Indentation := PLB_Indent + OP_Count + 1;
+                                    LB.Indentation :=
+                                      PLB_Indent + OP_Count + 1;
                                  end if;
                               end if;
                            end if;
@@ -4954,17 +5142,18 @@ package body Pp.Formatting is
                   when ')' =>
                      CP_Count := CP_Count + 1;
 
-                  when others => null;
+                  when others =>
+                     null;
                end case;
             end loop;
 
          end Adjust_Indentation_After_Comma;
 
          Saved_New_Tokns : Scanner.Tokn_Vec renames Lines_Data.Saved_New_Tokns;
-         New_Tokns : Scanner.Tokn_Vec renames Lines_Data.New_Tokns;
-         Ignore : Boolean := Scanner.Move_Tokns
-           (Target => Saved_New_Tokns, Source => New_Tokns);
-         New_Tok : Tokn_Cursor := First (Saved_New_Tokns'Access);
+         New_Tokns       : Scanner.Tokn_Vec renames Lines_Data.New_Tokns;
+         Ignore          : Boolean :=
+           Scanner.Move_Tokns (Target => Saved_New_Tokns, Source => New_Tokns);
+         New_Tok         : Tokn_Cursor := First (Saved_New_Tokns'Access);
 
          --  Start of processing for Insert_Indentation
       begin
@@ -4980,7 +5169,7 @@ package body Pp.Formatting is
                   declare
                      Index : constant Line_Break_Index :=
                        Line_Break_Token_Index (New_Tok);
-                     LB : Line_Break renames All_LB (Index);
+                     LB    : Line_Break renames All_LB (Index);
                   begin
                      if LB.Enabled then
                         Append_Line_Break_Tokn
@@ -4988,12 +5177,16 @@ package body Pp.Formatting is
 
                         LB.Tok := Nil_Tokn_Cursor;
                         --  Tok is no longer needed
+
                      end if;
                   end;
+
                when False_End_Of_Line =>
                   null;
+
                when True_End_Of_Line =>
                   pragma Assert (False);
+
                when others =>
                   Append_Tokn (New_Tokns, New_Tok);
             end case;
@@ -5001,8 +5194,7 @@ package body Pp.Formatting is
             Next (New_Tok);
          end loop;
 
-         Scanner.Move_Tokns
-           (Target => Saved_New_Tokns, Source => New_Tokns);
+         Scanner.Move_Tokns (Target => Saved_New_Tokns, Source => New_Tokns);
          New_Tok := First (Saved_New_Tokns'Access);
 
          --  Remove Spaces at start or end of line
@@ -5015,8 +5207,12 @@ package body Pp.Formatting is
                   then
                      goto Skip;
                   end if;
-               when EOL_Token => pragma Assert (False);
-               when others => null;
+
+               when EOL_Token =>
+                  pragma Assert (False);
+
+               when others =>
+                  null;
             end case;
 
             Append_Tokn (New_Tokns, New_Tok);
@@ -5025,8 +5221,7 @@ package body Pp.Formatting is
             Next (New_Tok);
          end loop;
 
-         Scanner.Move_Tokns
-           (Target => Saved_New_Tokns, Source => New_Tokns);
+         Scanner.Move_Tokns (Target => Saved_New_Tokns, Source => New_Tokns);
          New_Tok := First (Saved_New_Tokns'Access);
 
          --  Insert indentation after each line break that is not immediately
@@ -5037,8 +5232,8 @@ package body Pp.Formatting is
             Append_Tokn (New_Tokns, New_Tok);
             if Kind (New_Tok) in Line_Break_Token then
                declare
-                  LB : Line_Break renames
-                    All_LB (Line_Break_Token_Index (New_Tok));
+                  LB : Line_Break
+                    renames All_LB (Line_Break_Token_Index (New_Tok));
                   pragma Assert (LB.Enabled);
                   pragma Assert (Kind (Next (New_Tok)) /= Spaces);
                begin
@@ -5054,7 +5249,7 @@ package body Pp.Formatting is
                   end if;
 
                   if Kind (Next (New_Tok))
-                    not in Line_Break_Token | End_Of_Input
+                     not in Line_Break_Token | End_Of_Input
                   then
                      Append_Spaces (New_Tokns, LB.Indentation);
                   end if;
@@ -5169,8 +5364,7 @@ package body Pp.Formatting is
          begin
             while not After_Last (New_Tok) loop
                if Kind (New_Tok) = Tab_Token then
-                  Tabs (Tab_Token_Index (New_Tok)).Insertion_Point :=
-                    New_Tok;
+                  Tabs (Tab_Token_Index (New_Tok)).Insertion_Point := New_Tok;
                end if;
 
                Next (New_Tok);
@@ -5213,7 +5407,8 @@ package body Pp.Formatting is
             --  If two lines come from the same construct, then the tokens
             --  should match. Raise an exception if they don't.
 
-            function Cur_Tab return Tab_Rec is (Tabs (Cur_Tab_Index));
+            function Cur_Tab return Tab_Rec
+            is (Tabs (Cur_Tab_Index));
             pragma Assert (not Cur_Tab.Deleted);
 
             procedure Flush_Paragraph
@@ -5296,8 +5491,7 @@ package body Pp.Formatting is
               (Paragraph : Tab_In_Line_Vector_Vectors.Vector);
 
             procedure Put_Tab_In_Line_Vector
-              (Name : String;
-               X    : Tab_In_Line_Vector);
+              (Name : String; X : Tab_In_Line_Vector);
 
             ------------------------
             -- Check_Tokens_Match --
@@ -5310,8 +5504,8 @@ package body Pp.Formatting is
                   declare
                      XX : constant Tab_Index := X (J);
                      YY : constant Tab_Index := Y (J);
-                     XT : constant Symbol   := Tabs (XX).Token;
-                     YT : constant Symbol   := Tabs (YY).Token;
+                     XT : constant Symbol := Tabs (XX).Token;
+                     YT : constant Symbol := Tabs (YY).Token;
                   begin
                      if XT /= YT then
                         --  "=>" matches a preceding "|", and vice versa
@@ -5321,9 +5515,12 @@ package body Pp.Formatting is
                            null;
                         else
                            Put_Token (New_Tok);
-                           raise Program_Error with
-                             "Tab token mismatch: " &
-                             Str (XT).S & " " & Str (YT).S;
+                           raise Program_Error
+                             with
+                               "Tab token mismatch: "
+                               & Str (XT).S
+                               & " "
+                               & Str (YT).S;
                         end if;
                      end if;
                   end;
@@ -5454,11 +5651,12 @@ package body Pp.Formatting is
                                  Tab.Col := Max_Col;
                               end if;
                               Tab.Num_Blanks := Max_Col - Tab.Col;
-                              pragma Assert
-                                (if Tab.Is_Fake then Tab.Num_Blanks = 0);
+                              pragma
+                                Assert
+                                  (if Tab.Is_Fake then Tab.Num_Blanks = 0);
 
-                              for X_In_Line in
-                                    Index_In_Line .. Last_Index (Line)
+                              for X_In_Line
+                                in Index_In_Line .. Last_Index (Line)
                               loop
                                  declare
                                     Tab_J : constant Tab_Index :=
@@ -5471,8 +5669,9 @@ package body Pp.Formatting is
 
                               pragma Assert (Tab.Col = Max_Col);
 
-                              pragma Assert
-                                (if Num_Lines = 1 then Tab.Num_Blanks = 0);
+                              pragma
+                                Assert
+                                  (if Num_Lines = 1 then Tab.Num_Blanks = 0);
                               --  Because of that fact, we can skip all this
                               --  for 1-line paragraphs.
                            end;
@@ -5501,27 +5700,29 @@ package body Pp.Formatting is
                       (Paragraphs_Maps.Element (All_Paragraphs_Cursor));
 
                   if Num_Lines > 1 then
-                     pragma Debug
-                              (Put_Paragraph
-                                 (Paragraphs_Maps.Element
-                                    (All_Paragraphs_Cursor)));
+                     pragma
+                       Debug
+                         (Put_Paragraph
+                            (Paragraphs_Maps.Element (All_Paragraphs_Cursor)));
                      pragma
                        Assert
                          (Last_Index
-                            (Paragraphs_Maps.Element
-                               (All_Paragraphs_Cursor) (1)) /= 0);
+                            (Paragraphs_Maps.Element (All_Paragraphs_Cursor)
+                               (1))
+                            /= 0);
 
-                     for Index_In_Line in
-                           1 .. Last_Index
-                                  (Paragraphs_Maps.Element
-                                     (All_Paragraphs_Cursor) (1))
+                     for Index_In_Line
+                       in 1
+                          .. Last_Index
+                               (Paragraphs_Maps.Element (All_Paragraphs_Cursor)
+                                  (1))
                      loop
                         declare
                            Max_Col : Positive := 1;
 
                         begin
-                           for Line of
-                             Paragraphs_Maps.Element (All_Paragraphs_Cursor)
+                           for Line
+                             of Paragraphs_Maps.Element (All_Paragraphs_Cursor)
                            loop
                               if Index_In_Line <= Last_Index (Line) then
                                  declare
@@ -5535,8 +5736,8 @@ package body Pp.Formatting is
                               end if;
                            end loop;
 
-                           for Line of
-                             Paragraphs_Maps.Element (All_Paragraphs_Cursor)
+                           for Line
+                             of Paragraphs_Maps.Element (All_Paragraphs_Cursor)
                            loop
                               if Index_In_Line <= Last_Index (Line) then
                                  declare
@@ -5549,11 +5750,13 @@ package body Pp.Formatting is
                                        Tab.Col := Max_Col;
                                     end if;
                                     Tab.Num_Blanks := Max_Col - Tab.Col;
-                                    pragma Assert
-                                      (if Tab.Is_Fake then Tab.Num_Blanks = 0);
+                                    pragma
+                                      Assert
+                                        (if Tab.Is_Fake
+                                           then Tab.Num_Blanks = 0);
 
-                                    for X_In_Line in
-                                      Index_In_Line .. Last_Index (Line)
+                                    for X_In_Line
+                                      in Index_In_Line .. Last_Index (Line)
                                     loop
                                        declare
                                           Tab_J : constant Tab_Index :=
@@ -5568,9 +5771,10 @@ package body Pp.Formatting is
 
                                     pragma Assert (Tab.Col = Max_Col);
 
-                                    pragma Assert
-                                      (if Num_Lines = 1 then
-                                          Tab.Num_Blanks = 0);
+                                    pragma
+                                      Assert
+                                        (if Num_Lines = 1
+                                           then Tab.Num_Blanks = 0);
                                     --  Because of that fact, we can skip all
                                     --  this for 1-line paragraphs.
                                  end;
@@ -5612,13 +5816,13 @@ package body Pp.Formatting is
                      if Cur_Tab.Tree = Tree then
                         --  Ignore if too many tabs in one line
                         if not Cur_Tab.Is_Insertion_Point
-                          and then Last_Index (Cur_Line_Tabs) <
-                                     Tab_Index_In_Line'Last
+                          and then Last_Index (Cur_Line_Tabs)
+                                   < Tab_Index_In_Line'Last
                         then
                            Append (Cur_Line_Tabs, Cur_Tab_Index);
 
-                           if Cur_Tab.Index_In_Line /=
-                             Last_Index (Cur_Line_Tabs)
+                           if Cur_Tab.Index_In_Line
+                             /= Last_Index (Cur_Line_Tabs)
                            then
                               Tab_Mismatch := True;
                            else
@@ -5659,7 +5863,7 @@ package body Pp.Formatting is
                        Tabs (Last_Element (Last_Element (Paragraph_Tabs)));
                      Parent : constant Ada_Node := Tab.Parent;
 
-                     Last_Tab  : Tab_Rec;
+                     Last_Tab : Tab_Rec;
 
                   begin
                      if All_Paragraphs.Contains (Parent) then
@@ -5672,11 +5876,11 @@ package body Pp.Formatting is
                           and then not Last_Tab.Tree.Is_Null
                           and then Tab.Tree.Kind = Last_Tab.Tree.Kind
                           and then not Last_Tab.Tree.Next_Sibling.Is_Null
-                          and then Last_Tab.Tree.Next_Sibling.Kind =
-                                     Tab.Tree.Kind
-                          and then (Allow_Joining_Paragraphs or else
-                                    Tab.Tree.Kind in
-                                      Ada_Case_Stmt_Alternative_Range)
+                          and then Last_Tab.Tree.Next_Sibling.Kind
+                                   = Tab.Tree.Kind
+                          and then (Allow_Joining_Paragraphs
+                                    or else Tab.Tree.Kind
+                                            in Ada_Case_Stmt_Alternative_Range)
                         then
                            for Line of Paragraph_Tabs loop
                               All_Paragraphs.Reference (Parent).Append (Line);
@@ -5723,8 +5927,7 @@ package body Pp.Formatting is
             ----------------------------
 
             procedure Put_Tab_In_Line_Vector
-              (Name : String;
-               X    : Tab_In_Line_Vector)
+              (Name : String; X : Tab_In_Line_Vector)
             is
                pragma Unreferenced (Name);
             begin
@@ -5743,9 +5946,9 @@ package body Pp.Formatting is
                --  Dbg_Out.Put ("\n");
             end Put_Tab_In_Line_Vector;
 
-            F_Tab, C_Tab             : Tab_Rec;
+            F_Tab, C_Tab : Tab_Rec;
 
-         --  Start of processing for Calculate_Num_Blanks
+            --  Start of processing for Calculate_Num_Blanks
 
          begin
             --  Debug printouts commented out for efficiency
@@ -5795,14 +5998,13 @@ package body Pp.Formatting is
                         C_Tab := Element (Tabs, Cur_Line_Tabs (1));
 
                         if C_Tab.Parent = F_Tab.Parent
-                          and then
-                            Last_Index (Cur_Line_Tabs) =
-                            Last_Index (First_Line_Tabs)
+                          and then Last_Index (Cur_Line_Tabs)
+                                   = Last_Index (First_Line_Tabs)
                         then
-                           pragma Debug
-                             (Check_Tokens_Match
-                                (Cur_Line_Tabs,
-                                 First_Line_Tabs));
+                           pragma
+                             Debug
+                               (Check_Tokens_Match
+                                  (Cur_Line_Tabs, First_Line_Tabs));
                         else
                            --  Dbg_Out.Put ("Flush_Para -- parent mismatch\n");
                            Process_Current_Paragraph;
@@ -5867,14 +6069,14 @@ package body Pp.Formatting is
             --  be expanded. Don't expand a tab if it would make the line too
             --  long. Remove the Tab_Tokens from the token sequence.
 
-            New_Tok : Tokn_Cursor := First (Saved_New_Tokns'Access);
+            New_Tok         : Tokn_Cursor := First (Saved_New_Tokns'Access);
             Next_Line_Break : Tokn_Cursor := Next (New_Tok);
             --  Sloc_Col of this is the length of the current line, not
             --  counting any spaces we have inserted.
             pragma Assert (Kind (Next_Line_Break) = Enabled_LB_Token);
-            Num_Spaces : Natural := 0;
+            Num_Spaces      : Natural := 0;
             --  Number of spaces inserted in the current line so far
-            Cur_Line_Num  : Positive  := 1; -- for errors
+            Cur_Line_Num    : Positive := 1; -- for errors
          begin
             Check_Comment_Length := False;
 
@@ -5888,14 +6090,16 @@ package body Pp.Formatting is
                      pragma Assert (New_Tok = Next_Line_Break);
                      loop
                         Next (Next_Line_Break);
-                        exit when Kind (Next_Line_Break) in
-                          Enabled_LB_Token | End_Of_Input;
+                        exit when
+                          Kind (Next_Line_Break)
+                          in Enabled_LB_Token | End_Of_Input;
                      end loop;
 
                   when Tab_Token =>
                      declare
-                        Tab_X : constant Tab_Index := Tab_Token_Index (New_Tok);
-                        Tab : Tab_Rec renames Tabs (Tab_X);
+                        Tab_X    : constant Tab_Index :=
+                          Tab_Token_Index (New_Tok);
+                        Tab      : Tab_Rec renames Tabs (Tab_X);
                         Next_Tab : Tab_Rec renames Tabs (Tab_X + 1);
                      begin
                         if not Tab.Deleted then
@@ -5911,7 +6115,7 @@ package body Pp.Formatting is
                            end if;
 
                            declare
-                              Line_Len : constant Natural :=
+                              Line_Len     : constant Natural :=
                                 Sloc_Col (Next_Line_Break) + Num_Spaces - 1;
                               --  Current length of current line
                               New_Line_Len : constant Natural :=
@@ -5922,9 +6126,11 @@ package body Pp.Formatting is
                               --  expand this tab. Don't do it if it will be
                               --  too long.
                            begin
-                              if New_Line_Len <= Arg (Cmd, Max_Line_Length) then
+                              if New_Line_Len <= Arg (Cmd, Max_Line_Length)
+                              then
                                  Append_Spaces
-                                   (New_Tokns, Count => Tab.Num_Blanks,
+                                   (New_Tokns,
+                                    Count       => Tab.Num_Blanks,
                                     Existing_OK => True);
                                  Num_Spaces := Num_Spaces + Tab.Num_Blanks;
                               end if;
@@ -5933,8 +6139,11 @@ package body Pp.Formatting is
                      end;
                      goto Skip_Append;
 
-                  when Disabled_LB_Token => pragma Assert (False);
-                  when others => null;
+                  when Disabled_LB_Token =>
+                     pragma Assert (False);
+
+                  when others =>
+                     null;
                end case;
 
                Append_Tokn (New_Tokns, New_Tok);
@@ -5945,7 +6154,7 @@ package body Pp.Formatting is
             Check_Comment_Length := True;
          end Do_Insertions;
 
-      --  Start of processing for Insert_Alignment_Helper
+         --  Start of processing for Insert_Alignment_Helper
 
       begin
          Assign_Insertion_Points;
@@ -5953,11 +6162,13 @@ package body Pp.Formatting is
          --  Go through the tabs and set their Num_Blanks field to the
          --  appropriate value. Tabs that are not expanded at all will
          --  have Num_Blanks left equal to zero.
-         pragma Debug
-           (Format_Debug_Output (Lines_Data, "before Calculate_Num_Blanks"));
+         pragma
+           Debug
+             (Format_Debug_Output (Lines_Data, "before Calculate_Num_Blanks"));
          Calculate_Num_Blanks;
-         pragma Debug
-           (Format_Debug_Output (Lines_Data, "after Calculate_Num_Blanks"));
+         pragma
+           Debug
+             (Format_Debug_Output (Lines_Data, "after Calculate_Num_Blanks"));
 
          --  Then do the actual insertions
          Do_Insertions;
@@ -5970,10 +6181,9 @@ package body Pp.Formatting is
       -- Insert_Tabs --
       -----------------
 
-      procedure Insert_Tabs (Lines_Data_P : Lines_Data_Ptr;
-                             Cmd          : Command_Line)
+      procedure Insert_Tabs (Lines_Data_P : Lines_Data_Ptr; Cmd : Command_Line)
       is
-         Lines_Data      : Lines_Data_Rec renames Lines_Data_P.all;
+         Lines_Data : Lines_Data_Rec renames Lines_Data_P.all;
 
          New_Tokns       : Scanner.Tokn_Vec renames Lines_Data.New_Tokns;
          Saved_New_Tokns : Scanner.Tokn_Vec renames Lines_Data.Saved_New_Tokns;
@@ -5981,35 +6191,34 @@ package body Pp.Formatting is
 
          --  Copy over New_Tokns to Saved_New_Tokns to iterate and create the
          --  New_Tokns buffer
-         Ignore          : Boolean     := Scanner.Move_Tokns
-           (Target => Saved_New_Tokns, Source => New_Tokns);
+         Ignore : Boolean :=
+           Scanner.Move_Tokns (Target => Saved_New_Tokns, Source => New_Tokns);
 
-         New_Tok   : Tokn_Cursor       := First (Saved_New_Tokns'Access);
-         Tab_Size  : constant Positive := PP_Indentation (Cmd);
+         New_Tok  : Tokn_Cursor := First (Saved_New_Tokns'Access);
+         Tab_Size : constant Positive := PP_Indentation (Cmd);
 
          Tabs_Nb   : Integer := 0;
          Spaces_Nb : Integer := 0;
 
-         procedure Insert_Tab (Col_Nb   : Positive;
-                               Tab_Size : Natural;
-                               Idx      : Natural);
+         procedure Insert_Tab
+           (Col_Nb : Positive; Tab_Size : Natural; Idx : Natural);
          --  Apends a tab toke into the current line at the given Col_Nb, having
          --  the Tab_Size specified as nb of spaces and the index in the line
          --  corresponds to the given Idx
 
-         procedure Insert_Tab (Col_Nb   : Positive;
-                               Tab_Size : Natural;
-                               Idx      : Natural)
+         procedure Insert_Tab
+           (Col_Nb : Positive; Tab_Size : Natural; Idx : Natural)
          is
-            Tab : Tab_Rec := Tab_Rec'
-              (Parent | Tree => Libadalang.Analysis.No_Ada_Node,
-               others => <>);
+            Tab : Tab_Rec :=
+              Tab_Rec'
+                (Parent | Tree => Libadalang.Analysis.No_Ada_Node,
+                 others        => <>);
 
          begin
-            Tab.Index_In_Line      := Tab_Index_In_Line (Idx);
-            Tab.Col                := Col_Nb;
-            Tab.Num_Blanks         := Tab_Size;
-            Tab.Is_Fake            := False;
+            Tab.Index_In_Line := Tab_Index_In_Line (Idx);
+            Tab.Col := Col_Nb;
+            Tab.Num_Blanks := Tab_Size;
+            Tab.Is_Fake := False;
             Tab.Is_Insertion_Point := True;
             Append (Tabs, Tab);
             Append_Tab_Tokn (New_Tokns, Last_Index (Tabs), Tab_Size);
@@ -6027,7 +6236,7 @@ package body Pp.Formatting is
                      --  Replace spaces in the indentation either by
                      --   * only tabs when n*tabs_nb == spaces
                      --   * a mix of tabs and spaces when  n*tabs_nb /= spaces
-                     Tabs_Nb   := Tokn_Length (New_Tok) / Tab_Size;
+                     Tabs_Nb := Tokn_Length (New_Tok) / Tab_Size;
                      Spaces_Nb := Tokn_Length (New_Tok) mod Tab_Size;
 
                      declare

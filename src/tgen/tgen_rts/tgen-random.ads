@@ -36,11 +36,11 @@ package TGen.Random is
    Generator_Instance : GNAT.Random_Numbers.Generator;
 
    function Draw_Bits (N : Positive) return Unsigned_128
-     with Pre => N <= Unsigned_128'Size;
+   with Pre => N <= Unsigned_128'Size;
    --  Return N random Bits as an Unsigned_128, up to a maximum of 128 bits
 
    function Draw_Bits (N : Positive) return Unsigned_64
-     with Pre => N <= Unsigned_64'Size;
+   with Pre => N <= Unsigned_64'Size;
    --  Return N random Bits as an Unsigned_64, up to a maximum of 64 bits
 
    function Biased_Coin (P_True : Float) return Boolean;
@@ -48,8 +48,7 @@ package TGen.Random is
 
    type Many_Type is tagged private;
 
-   function Many
-     (Min_Size, Max_Size, Average_Size : Natural) return Many_Type;
+   function Many (Min_Size, Max_Size, Average_Size : Natural) return Many_Type;
    --  Create a Many_Type which after calls to More until it returns False
    --  will have a value in range Min_Size .. Max_Size distributed according to
    --  a Bernoulli law.
@@ -69,18 +68,17 @@ package TGen.Random is
    function Rand_LLLI
      (Min, Max : Long_Long_Long_Integer) return Long_Long_Long_Integer;
 
-   function Rand_BI
-     (Min, Max : Big_Int.Big_Integer) return Big_Int.Big_Integer is
-      (LLLI_Conversions.To_Big_Integer
+   function Rand_BI (Min, Max : Big_Int.Big_Integer) return Big_Int.Big_Integer
+   is (LLLI_Conversions.To_Big_Integer
          (Rand_LLLI
-              (LLLI_Conversions.From_Big_Integer (Min),
-               LLLI_Conversions.From_Big_Integer (Max))));
+            (LLLI_Conversions.From_Big_Integer (Min),
+             LLLI_Conversions.From_Big_Integer (Max))));
    --  Assumes that Min / Max fit on a Long_Long_Long_Integer
 
    function Random (Min, Max : Any_Float) return Any_Float
-     with
-       Pre  => Min.Precision = Max.Precision,
-       Post => Random'Result.Precision = Min.Precision;
+   with
+     Pre  => Min.Precision = Max.Precision,
+     Post => Random'Result.Precision = Min.Precision;
 
 private
    type Many_Type is tagged record
@@ -89,6 +87,7 @@ private
       Stopping_Value     : Float;
    end record;
 
-   function Count (Elements : Many_Type) return Natural is (Elements.Count);
+   function Count (Elements : Many_Type) return Natural
+   is (Elements.Count);
 
 end TGen.Random;
