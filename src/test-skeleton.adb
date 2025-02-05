@@ -7669,7 +7669,9 @@ package body Test.Skeleton is
                                & Image
                                    (Start_Sloc
                                       (Subp.Subp_Declaration.Sloc_Range))
-                               & ":")),
+                               & ":"
+                               & Get_TR_Name_Suffix
+                                   (Subp.Subp_Declaration.As_Basic_Decl))),
                      Test_Package  => new String'(Test_Unit_Name),
                      Original_Type => No_Ada_Node,
                      Original_Subp => Subp.Subp_Declaration,

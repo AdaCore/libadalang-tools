@@ -1,9 +1,28 @@
-pkg.ads:8:4 (Pkg.Inherited_Prim): info: corresponding test PASSED
-pkg.ads:9:4 (Pkg.Overridden_Prim): info: corresponding test PASSED
+gnattest: Error while processing <SubpDecl ["Inherited_Prim"] pkg.ads:10:4-10:41>:
+pkg.inherited_prim.X: pkg.pkg_t is not supported (tagged types not supported)
+
+gnattest: Error while processing <SubpDecl ["Overridden_Prim"] pkg.ads:11:4-11:42>:
+pkg.overridden_prim.X: pkg.pkg_t is not supported (tagged types not supported)
+
+gnattest: Error while processing <SubpDecl ["Overridden_Prim"] user.ads:7:4-7:54>:
+user.overridden_prim.X: user.user_t is not supported (tagged types not supported)
+
+pkg.ads:10:4 (Pkg.Inherited_Prim): info: corresponding test PASSED
+pkg.ads:11:4 (Pkg.Overridden_Prim): info: corresponding test PASSED
+pkg.ads:3:4: (Pkg.Simple) info: corresponding test PASSED
+pkg.ads:3:4: (Pkg.Simple) info: corresponding test PASSED
+pkg.ads:3:4: (Pkg.Simple) info: corresponding test PASSED
+pkg.ads:3:4: (Pkg.Simple) info: corresponding test PASSED
+pkg.ads:3:4: (Pkg.Simple) info: corresponding test PASSED
+pkg.ads:4:4: (Pkg.With_TC) info: corresponding test PASSED
+pkg.ads:4:4: (Pkg.With_TC) info: corresponding test PASSED
+pkg.ads:4:4: (Pkg.With_TC) info: corresponding test PASSED
+pkg.ads:4:4: (Pkg.With_TC) info: corresponding test PASSED
+pkg.ads:4:4: (Pkg.With_TC) info: corresponding test PASSED
 pkg.ads:3:4 (Pkg.Simple): info: corresponding test PASSED
-pkg.ads:4:4 (Pkg.With_TC): info: corresponding test PASSED
+pkg.ads:5:6 (Trivial_TC): info: corresponding test PASSED
 gen.ads:4:4 (Gen.Gen) instance at user.ads:11:4: info: corresponding test PASSED
 user.ads:7:4 (User.Overridden_Prim): info: corresponding test PASSED
-pkg.ads:8:4 (Pkg.Inherited_Prim): inherited at user.ads:6:4: info: corresponding test PASSED
-pkg.ads:9:4 (Pkg.Overridden_Prim): overridden at user.ads:7:4: info: corresponding test PASSED
-8 tests run: 8 passed; 0 failed; 0 crashed.
+pkg.ads:10:4 (Pkg.Inherited_Prim): inherited at user.ads:6:4: info: corresponding test PASSED
+pkg.ads:11:4 (Pkg.Overridden_Prim): overridden at user.ads:7:4: info: corresponding test PASSED
+18 tests run: 18 passed; 0 failed; 0 crashed.
