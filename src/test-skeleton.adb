@@ -1550,6 +1550,7 @@ package body Test.Skeleton is
                     & Trim (Subp_Span.Start_Line'Img, Both)
                     & ":"
                     & Trim (Subp_Span.Start_Column'Img, Both)
+                    & ":"
                     & Get_TR_Name_Suffix (Subp.Subp_Declaration.As_Basic_Decl)
                     & " instance at "
                     & Instance_Sloc.all);
@@ -1561,8 +1562,9 @@ package body Test.Skeleton is
                     & Trim (Subp_Span.Start_Line'Img, Both)
                     & ":"
                     & Trim (Subp_Span.Start_Column'Img, Both)
-                    & Get_TR_Name_Suffix (Subp.Subp_Declaration.As_Basic_Decl)
-                    & ":");
+                    & ":"
+                    & Get_TR_Name_Suffix
+                        (Subp.Subp_Declaration.As_Basic_Decl));
             end if;
          end;
 
@@ -2060,8 +2062,9 @@ package body Test.Skeleton is
                                 & Trim (First_Line_Number (ISub)'Img, Both)
                                 & ":"
                                 & Trim (First_Column_Number (ISub)'Img, Both)
+                                & ":"
                                 & Get_TR_Name_Suffix (ISub)
-                                & ": inherited at "
+                                & " inherited at "
                                 & Base_Name (Type_Dec.Unit.Get_Filename)
                                 & ":"
                                 & Trim (First_Line_Number (Type_Dec)'Img, Both)
@@ -2210,8 +2213,9 @@ package body Test.Skeleton is
                        & Trim (First_Line_Number (OSub)'Img, Both)
                        & ":"
                        & Trim (First_Column_Number (OSub)'Img, Both)
+                       & ":"
                        & Get_TR_Name_Suffix (OSub)
-                       & ": overridden at "
+                       & " overridden at "
                        & Base_Name (TR_W.Original_Type.Unit.Get_Filename)
                        & ":"
                        & Trim
@@ -3637,8 +3641,9 @@ package body Test.Skeleton is
                  & Trim (First_Line_Number (TC.Elem)'Img, Both)
                  & ":"
                  & Trim (First_Column_Number (TC.Elem)'Img, Both)
-                 & (if Include_Subp_Name then " (" & TC.Name.all & ")" else "")
-                 & ":");
+                 & ":"
+                 & (if Include_Subp_Name then "(" & TC.Name.all & ")"
+                    else ""));
          else
             TR_Info_Add.TR_Info.Tested_Sloc :=
               new String'
@@ -3647,7 +3652,8 @@ package body Test.Skeleton is
                  & Trim (First_Line_Number (TC.Elem)'Img, Both)
                  & ":"
                  & Trim (First_Column_Number (TC.Elem)'Img, Both)
-                 & (if Include_Subp_Name then " (" & TC.Name.all & ")" else "")
+                 & ":"
+                 & (if Include_Subp_Name then "(" & TC.Name.all & ")" else "")
                  & " instance at "
                  & Instance_Sloc);
          end if;
