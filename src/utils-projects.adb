@@ -35,42 +35,40 @@ with Ada.Text_IO;
 with GNAT.Directory_Operations;
 with GNAT.Traceback.Symbolic;
 
-with GNATCOLL.VFS;      use GNATCOLL.VFS;
+with GNATCOLL.VFS; use GNATCOLL.VFS;
 with GNATCOLL.Traces;
 
-with Libadalang.Analysis;            use Libadalang.Analysis;
-with Libadalang.Project_Provider;    use Libadalang.Project_Provider;
+with Libadalang.Analysis;         use Libadalang.Analysis;
+with Libadalang.Project_Provider; use Libadalang.Project_Provider;
 
-with Utils.Command_Lines.Common;     use Utils.Command_Lines.Common;
+with Utils.Command_Lines.Common; use Utils.Command_Lines.Common;
 with Utils.Environment;
 with Utils.Err_Out;
 with Utils.Formatted_Output;
 with Utils.Projects.Aggregate;
-with Utils.String_Utilities; use Utils.String_Utilities;
-with Utils.Tool_Names; use Utils.Tool_Names;
+with Utils.String_Utilities;     use Utils.String_Utilities;
+with Utils.Tool_Names;           use Utils.Tool_Names;
 with Utils.Versions;
 
 package body Utils.Projects is
    use Ada.Text_IO;
 
-   use Common_Flag_Switches, Common_String_Switches,
-     Common_String_Seq_Switches, Source_Selection_Switches;
+   use Common_Flag_Switches,
+       Common_String_Switches,
+       Common_String_Seq_Switches,
+       Source_Selection_Switches;
 
    My_Project_Tree : aliased Project_Tree;
-   Project_Env : Project_Environment_Access;
+   Project_Env     : Project_Environment_Access;
 
-   function Project_File_Name (Cmd : Command_Line) return String with
-      Pre => Arg (Cmd, Project_File) /= null;
-      --  Returns the project file name with ".gpr" appended if necessary
+   function Project_File_Name (Cmd : Command_Line) return String
+   with Pre => Arg (Cmd, Project_File) /= null;
+   --  Returns the project file name with ".gpr" appended if necessary
 
-   function Main_Unit_Names
-     (Cmd : Command_Line) return String_Ref_Array is
-     (if
-        Arg (Cmd) = Update_All
-      then
-        (if Num_File_Names (Cmd) = 0 then []
-         else File_Names (Cmd))
-      else []);
+   function Main_Unit_Names (Cmd : Command_Line) return String_Ref_Array
+   is (if Arg (Cmd) = Update_All
+       then (if Num_File_Names (Cmd) = 0 then [] else File_Names (Cmd))
+       else []);
    --  If "-U main_unit_1 main_unit_2 ..." was specified, this returns the list
    --  of main units. Otherwise (-U was not specified, or was specified without
    --  main unit names), returns empty array.
@@ -89,19 +87,19 @@ package body Utils.Projects is
    --  know about a particular tool, but Init is called too late.
 
    procedure Process_Project
-     (Cmd                       : in out Command_Line;
-      Cmd_Text                  :        Argument_List_Access;
-      Global_Report_Dir         :    out String_Ref;
-      Preprocessing_Allowed     :        Boolean;
-      My_Project_Tree           : in out Project_Tree;
-      My_Project_Env            :        Project_Environment_Access;
-      Tool_Package_Name         :        String;
-      Compute_Project_Closure   :        Boolean;
-      Callback                  :        Parse_Callback);
+     (Cmd                     : in out Command_Line;
+      Cmd_Text                : Argument_List_Access;
+      Global_Report_Dir       : out String_Ref;
+      Preprocessing_Allowed   : Boolean;
+      My_Project_Tree         : in out Project_Tree;
+      My_Project_Env          : Project_Environment_Access;
+      Tool_Package_Name       : String;
+      Compute_Project_Closure : Boolean;
+      Callback                : Parse_Callback);
 
    function Project_File_Name (Cmd : Command_Line) return String is
       Name : String renames Arg (Cmd, Project_File).all;
-      Ext : constant String :=
+      Ext  : constant String :=
         (if Has_Suffix (Name, Suffix => ".gpr") then "" else ".gpr");
    begin
       return Name & Ext;
@@ -126,15 +124,15 @@ package body Utils.Projects is
    end Recompute_View_Errors;
 
    procedure Process_Project
-     (Cmd                       : in out Command_Line;
-      Cmd_Text                  :        Argument_List_Access;
-      Global_Report_Dir         :    out String_Ref;
-      Preprocessing_Allowed     :        Boolean;
-      My_Project_Tree           : in out Project_Tree;
-      My_Project_Env            :        Project_Environment_Access;
-      Tool_Package_Name         :        String;
-      Compute_Project_Closure   :        Boolean;
-      Callback                  :        Parse_Callback)
+     (Cmd                     : in out Command_Line;
+      Cmd_Text                : Argument_List_Access;
+      Global_Report_Dir       : out String_Ref;
+      Preprocessing_Allowed   : Boolean;
+      My_Project_Tree         : in out Project_Tree;
+      My_Project_Env          : Project_Environment_Access;
+      Tool_Package_Name       : String;
+      Compute_Project_Closure : Boolean;
+      Callback                : Parse_Callback)
    is
       use String_Access_Vectors;
 
@@ -227,12 +225,12 @@ package body Utils.Projects is
 
       procedure Initialize_Environment is
 
-         Target_Opt : constant String := (if Arg (Cmd, Target) /= null
-                                 then Arg (Cmd, Target).all
-                                 else "");
-         RTS_Opt : constant String := (if Arg (Cmd, Run_Time_System) /= null
-                              then Arg (Cmd, Run_Time_System).all
-                              else "");
+         Target_Opt : constant String :=
+           (if Arg (Cmd, Target) /= null then Arg (Cmd, Target).all else "");
+         RTS_Opt    : constant String :=
+           (if Arg (Cmd, Run_Time_System) /= null
+            then Arg (Cmd, Run_Time_System).all
+            else "");
       begin
          GNATCOLL.Traces.Parse_Config_File;
          Initialize (Project_Env);
@@ -263,7 +261,8 @@ package body Utils.Projects is
             if Index (S, " not a regular file") /= 0 then
                Err_Out.Put
                  ("\1: project file \2 not found\n",
-                  Tool_Name, Project_File_Name (Cmd));
+                  Tool_Name,
+                  Project_File_Name (Cmd));
             else
                Err_Out.Put ("\1: \2\n", Tool_Name, S);
             end if;
@@ -273,8 +272,8 @@ package body Utils.Projects is
          My_Project_Tree.Load
            (GNATCOLL.VFS.Create (+Project_File_Name (Cmd)),
             Project_Env,
-            Errors => Errors'Unrestricted_Access,
-            Recompute_View => False,
+            Errors              => Errors'Unrestricted_Access,
+            Recompute_View      => False,
             Report_Missing_Dirs => False);
 
          My_Project_Tree.Recompute_View
@@ -307,8 +306,9 @@ package body Utils.Projects is
                Load
                  (Self                => My_Project_Tree,
                   Root_Project_Path   =>
-                    Create (Filesystem_String
-                              (Aggregate.Get_Aggregated_Prj_Src.all)),
+                    Create
+                      (Filesystem_String
+                         (Aggregate.Get_Aggregated_Prj_Src.all)),
                   Env                 => Project_Env,
                   Errors              => Errors'Unrestricted_Access,
                   Report_Missing_Dirs => False);
@@ -336,14 +336,13 @@ package body Utils.Projects is
          procedure Errors (S : String) is
          begin
             if Index (S, " not a regular file") /= 0 then
-               Cmd_Error ("project file " &
-                          Project_File_Name (Cmd) &
-                          " not found");
+               Cmd_Error
+                 ("project file " & Project_File_Name (Cmd) & " not found");
             elsif Index (S, "is illegal for typed string") /= 0 then
                Cmd_Error (S);
             elsif Index (S, "warning") /= 0
-                 and then Index (S, "directory") /= 0
-                 and then Index (S, "not found") /= 0
+              and then Index (S, "directory") /= 0
+              and then Index (S, "not found") /= 0
             then
                return;
             else
@@ -354,7 +353,7 @@ package body Utils.Projects is
          Aggregated_Name : constant Filesystem_String :=
            Filesystem_String (Arg (Cmd, Aggregated_Project_File).all);
 
-      --  Start of processing for Load_Aggregated_Project
+         --  Start of processing for Load_Aggregated_Project
 
       begin
          My_Project_Tree.Load
@@ -378,8 +377,8 @@ package body Utils.Projects is
             Errors              => Errors'Unrestricted_Access,
             Report_Missing_Dirs => False);
 
-         pragma Assert
-           (not Is_Aggregate_Project (My_Project_Tree.Root_Project));
+         pragma
+           Assert (not Is_Aggregate_Project (My_Project_Tree.Root_Project));
       end Load_Aggregated_Project;
 
       -----------------
@@ -423,15 +422,14 @@ package body Utils.Projects is
               Env              => My_Project_Env,
               Is_Project_Owner => False);
 
-         Ctx  : constant Analysis_Context :=
+         Ctx : constant Analysis_Context :=
            Create_Context (Unit_Provider => Provider);
 
          Mains : constant String_Ref_Array := Main_Unit_Names (Cmd);
 
          Mains_From_Prj : GNAT.OS_Lib.String_List_Access :=
            My_Project_Tree.Root_Project.Attribute_Value
-             (Attribute    => Main_Attribute,
-              Use_Extended => True);
+             (Attribute => Main_Attribute, Use_Extended => True);
 
          package String_Sets is new
            Ada.Containers.Indefinite_Ordered_Sets (String);
@@ -469,12 +467,12 @@ package body Utils.Projects is
          -- Is_Source_Of_Interest --
          ---------------------------
 
-         function Is_Source_Of_Interest (Full_Name : String) return Boolean
-         is
+         function Is_Source_Of_Interest (Full_Name : String) return Boolean is
             Inf : constant File_Info :=
               My_Project_Tree.Info (Create (+Full_Name));
          begin
-            return Inf.Project /= No_Project
+            return
+              Inf.Project /= No_Project
               and then not Is_Externally_Built (Create (+Full_Name));
          end Is_Source_Of_Interest;
 
@@ -492,8 +490,8 @@ package body Utils.Projects is
             then
                declare
                   Main_Other : constant String :=
-                    My_Project_Tree.Other_File
-                      (Create (+Main_Full)).Display_Full_Name;
+                    My_Project_Tree.Other_File (Create (+Main_Full))
+                      .Display_Full_Name;
                begin
                   if Is_Source_Of_Interest (Main_Other) then
                      Update_Closure (Main_Other);
@@ -519,15 +517,14 @@ package body Utils.Projects is
             Closure.Insert (New_Source);
 
             Unit := Ctx.Get_From_File (New_Source);
-            CU   := Unit.Root.As_Compilation_Unit;
+            CU := Unit.Root.As_Compilation_Unit;
 
             for Dep of CU.P_Unit_Dependencies loop
 
                declare
-                  Src    : constant String       := Dep.Unit.Get_Filename;
+                  Src    : constant String := Dep.Unit.Get_Filename;
                   Src_VF : constant Virtual_File := Create (+Src);
-                  Inf    : constant File_Info    :=
-                    My_Project_Tree.Info (Src_VF);
+                  Inf    : constant File_Info := My_Project_Tree.Info (Src_VF);
                begin
 
                   if not Closure.Contains (Src)
@@ -536,8 +533,8 @@ package body Utils.Projects is
                      Closure.Insert (Src);
                      if Inf.Unit_Part = Unit_Spec then
                         Update_Closure
-                          (My_Project_Tree.Other_File (Src_VF).
-                               Display_Full_Name);
+                          (My_Project_Tree.Other_File (Src_VF)
+                             .Display_Full_Name);
 
                         if Separates.Contains (Src) then
                            for Sep of Separates.Element (Src) loop
@@ -580,8 +577,7 @@ package body Utils.Projects is
          begin
             for Src of Sources.all loop
 
-               if My_Project_Tree.Info (Src).Unit_Part = Unit_Separate
-               then
+               if My_Project_Tree.Info (Src).Unit_Part = Unit_Separate then
                   Spec_VF := My_Project_Tree.Other_File (Src);
 
                   if Separates.Contains (Spec_VF.Display_Full_Name) then
@@ -647,19 +643,19 @@ package body Utils.Projects is
       procedure Get_Sources_From_Project is
          Prj   : Project_Type;
          Files : File_Array_Access;
---         Success  : Boolean := False;
+         --         Success  : Boolean := False;
 
-         Num_Names : constant Natural := Num_File_Names (Cmd);
+         Num_Names               : constant Natural := Num_File_Names (Cmd);
          --  Number of File_Names on the command line
-         Num_Files_Switches : constant Natural :=
+         Num_Files_Switches      : constant Natural :=
            Arg_Length (Cmd, Common.Files);
          --  Number of "-files=..." switches on the command line
          Argument_File_Specified : constant Boolean :=
            (if Arg (Cmd) = Update_All then Num_Files_Switches > 0
             else Num_Names > 0 or else Num_Files_Switches > 0);
-      --  True if we have source files specified on the command line. If -U
-      --  (Update_All) was specified, then the "file name" (if any) is taken
-      --  to be the main unit name, not a file name.
+         --  True if we have source files specified on the command line. If -U
+         --  (Update_All) was specified, then the "file name" (if any) is taken
+         --  to be the main unit name, not a file name.
 
          function Has_Ada_Mains_Only return Boolean;
          --  Checks that root project has mains specified and all of them
@@ -672,12 +668,9 @@ package body Utils.Projects is
          function Has_Ada_Mains_Only return Boolean is
             Mains_From_Prj : GNAT.OS_Lib.String_List_Access :=
               My_Project_Tree.Root_Project.Attribute_Value
-                (Attribute    => Main_Attribute,
-                 Use_Extended => True);
+                (Attribute => Main_Attribute, Use_Extended => True);
          begin
-            if Mains_From_Prj = null
-              or else Mains_From_Prj.all'Length = 0
-            then
+            if Mains_From_Prj = null or else Mains_From_Prj.all'Length = 0 then
                Free (Mains_From_Prj);
                return False;
             end if;
@@ -707,9 +700,10 @@ package body Utils.Projects is
             then
                Prj := My_Project_Tree.Root_Project;
 
-               Files := Prj.Source_Files
-                 (Recursive => Arg (Cmd) /= No_Subprojects,
-                  Include_Externally_Built => False);
+               Files :=
+                 Prj.Source_Files
+                   (Recursive                => Arg (Cmd) /= No_Subprojects,
+                    Include_Externally_Built => False);
 
                if Arg (Cmd) = No_Subprojects then
                   Prj := Prj.Extended_Project;
@@ -730,14 +724,15 @@ package body Utils.Projects is
                   then
                      Append_File_Name (Cmd, Files (F).Display_Base_Name);
                      --  No need to call Callback for non-switches
+
                   end if;
                end loop;
 
                if Arg (Cmd) = Update_All then
                   if Num_File_Names (Cmd) = 0 then
                      Cmd_Error
-                       (Project_File_Name (Cmd) &
-                        "does not contain source files");
+                       (Project_File_Name (Cmd)
+                        & "does not contain source files");
                   end if;
                end if;
 
@@ -753,7 +748,8 @@ package body Utils.Projects is
       -------------------------
 
       procedure Set_External_Values is
-         X_Vars : constant String_Ref_Array := Arg (Cmd, External_Variable);
+         X_Vars       : constant String_Ref_Array :=
+           Arg (Cmd, External_Variable);
          GPR_TOOL_Set : Boolean := False;
          --  True if -XGPR_TOOL=... appears on the command line
       begin
@@ -766,7 +762,8 @@ package body Utils.Projects is
                X_Var : String renames X (1 .. Equal - 1);
                X_Val : String renames X (Equal + 1 .. X'Last);
             begin
-               if Equal = 0 then -- "=" not found (????say so)
+               if Equal = 0 then
+                  --  "=" not found (????say so)
                   Cmd_Error ("wrong parameter of -X option: " & X.all);
                end if;
 
@@ -797,15 +794,15 @@ package body Utils.Projects is
 
          Proj : constant Project_Type := Root_Project (My_Project_Tree);
 
-         Attr_Switches : constant Attribute_Pkg_List :=
+         Attr_Switches     : constant Attribute_Pkg_List :=
            Build (Tool_Package_Name, "Switches");
          Attr_Def_Switches : constant Attribute_Pkg_List :=
            Build (Tool_Package_Name, "Default_Switches");
-         Attr_GT_Switches : constant Attribute_Pkg_List :=
+         Attr_GT_Switches  : constant Attribute_Pkg_List :=
            Build (Tool_Package_Name, "GNATtest_Switches");
 
-         Attr_Indexes : String_List_Access;
-         Index_Found  : Boolean := False;
+         Attr_Indexes          : String_List_Access;
+         Index_Found           : Boolean := False;
          Project_Switches_Text : Argument_List_Access;
       begin
          if Num_File_Names (Cmd) = 1 then
@@ -850,6 +847,7 @@ package body Utils.Projects is
                Collect_File_Names => False);
             --  Collect_File_Names doesn't matter, because we're only parsing
             --  switches.
+
          end if;
       end Extract_Tool_Options;
 
@@ -906,10 +904,12 @@ package body Utils.Projects is
          procedure Add_Switch (S : String);
          --  Adds S to File_Switches;
 
-         Compiler_Local_Configuration_Pragmas : constant Attribute_Pkg_String
-           := Build (Compiler_Package, "Local_Configuration_Pragmas");
-         Compiler_Local_Config_File : constant Attribute_Pkg_String
-           := Build (Compiler_Package, "Local_Config_File");
+         Compiler_Local_Configuration_Pragmas :
+           constant Attribute_Pkg_String :=
+             Build (Compiler_Package, "Local_Configuration_Pragmas");
+         Compiler_Local_Config_File           :
+           constant Attribute_Pkg_String :=
+             Build (Compiler_Package, "Local_Config_File");
 
          function Normalize_Switch (S : String) return String;
          --  If the switch contains a path, normalizes this path. This is
@@ -945,41 +945,40 @@ package body Utils.Projects is
          end Scan_Switches;
 
          function Normalize_Switch (S : String) return String is
-            Res : constant String := Trim (S, Both);
+            Res        : constant String := Trim (S, Both);
             Opt_Start  : constant Natural := S'First;
-            Opt_End    :          Natural;
-            Path_Start :          Natural;
+            Opt_End    : Natural;
+            Path_Start : Natural;
             Path_End   : constant Natural := S'Last;
          begin
             if Res'Length >= 9
-              and then
-               Res (Opt_Start .. Opt_Start + 5) = "-gnate"
-              and then
-               Res (Opt_Start + 6) in 'e' | 'p'
+              and then Res (Opt_Start .. Opt_Start + 5) = "-gnate"
+              and then Res (Opt_Start + 6) in 'e' | 'p'
             then
-               Opt_End    := Opt_Start + 6;
+               Opt_End := Opt_Start + 6;
                Path_Start := Opt_End + 1;
 
-               while Path_Start < Path_End and then
-                     Res (Path_Start) in ' ' | '='
+               while Path_Start < Path_End
+                 and then Res (Path_Start) in ' ' | '='
                loop
                   Path_Start := Path_Start + 1;
                end loop;
 
-               return Res (Opt_Start .. Opt_End) &
-                           Normalize_Pathname (Res (Path_Start .. Path_End));
+               return
+                 Res (Opt_Start .. Opt_End)
+                 & Normalize_Pathname (Res (Path_Start .. Path_End));
             else
                return Res;
             end if;
          end Normalize_Switch;
 
-      --  Start of processing for Set_Individual_Source_Options
+         --  Start of processing for Set_Individual_Source_Options
 
       begin
          for S in Sources'Range loop
             Source_Info := My_Project_Tree.Info (Sources (S));
-            Project_U   := Project (Source_Info);
-            Name        := new String'(Display_Base_Name (Sources (S)));
+            Project_U := Project (Source_Info);
+            Name := new String'(Display_Base_Name (Sources (S)));
 
             if Debug_Flag_C then
                Put_Line ("Switches defined for " & Name.all);
@@ -1007,8 +1006,7 @@ package body Utils.Projects is
 
             if Arg (Cmd) /= Update_All
               and then Has_Attribute
-                (Project_U,
-                 Compiler_Local_Configuration_Pragmas)
+                         (Project_U, Compiler_Local_Configuration_Pragmas)
             then
                Attr_Proj :=
                  Attribute_Project
@@ -1017,24 +1015,21 @@ package body Utils.Projects is
                declare
                   Attr_Val : constant String :=
                     Attribute_Value
-                      (Project_U,
-                       Compiler_Local_Configuration_Pragmas);
+                      (Project_U, Compiler_Local_Configuration_Pragmas);
                begin
                   Add_Switch
-                    ("-gnatec=" &
-                     Normalize_Pathname
-                       (Name      => Attr_Val,
-                        Directory =>
-                          GNAT.Directory_Operations.Dir_Name
-                            (Display_Full_Name (Project_Path (Attr_Proj)))));
+                    ("-gnatec="
+                     & Normalize_Pathname
+                         (Name      => Attr_Val,
+                          Directory =>
+                            GNAT.Directory_Operations.Dir_Name
+                              (Display_Full_Name (Project_Path (Attr_Proj)))));
                end;
             end if;
 
             if Arg (Cmd) /= Update_All
               and then Has_Attribute
-                (Project_U,
-                 Compiler_Local_Config_File,
-                 "ada")
+                         (Project_U, Compiler_Local_Config_File, "ada")
             then
                Attr_Proj :=
                  Attribute_Project
@@ -1045,17 +1040,15 @@ package body Utils.Projects is
                declare
                   Attr_Val : constant String :=
                     Attribute_Value
-                      (Project_U,
-                       Compiler_Local_Config_File,
-                       "ada");
+                      (Project_U, Compiler_Local_Config_File, "ada");
                begin
                   Add_Switch
-                    ("-gnatec=" &
-                     Normalize_Pathname
-                       (Name      => Attr_Val,
-                        Directory =>
-                          GNAT.Directory_Operations.Dir_Name
-                            (Display_Full_Name (Project_Path (Attr_Proj)))));
+                    ("-gnatec="
+                     & Normalize_Pathname
+                         (Name      => Attr_Val,
+                          Directory =>
+                            GNAT.Directory_Operations.Dir_Name
+                              (Display_Full_Name (Project_Path (Attr_Proj)))));
                end;
             end if;
 
@@ -1082,8 +1075,9 @@ package body Utils.Projects is
             if Preprocessing_Allowed then
                Result := True;
             else
-               Cmd_Error ("cannot preprocess argument file, " &
-                            "do preprocessing as a separate step");
+               Cmd_Error
+                 ("cannot preprocess argument file, "
+                  & "do preprocessing as a separate step");
             end if;
          elsif Option = "-gnat83"
            or else Option = "-gnat95"
@@ -1100,7 +1094,7 @@ package body Utils.Projects is
          return Result;
       end Needed_For_Tree_Creation;
 
-   --  Start of processing for Process_Project
+      --  Start of processing for Process_Project
 
    begin
       Initialize_Environment;
@@ -1201,7 +1195,7 @@ package body Utils.Projects is
                Get (Arg_File, Next_Ch);
 
                while Next_Ch not in '"' | ASCII.LF | ASCII.CR loop
-                  File_Name_Len                    := File_Name_Len + 1;
+                  File_Name_Len := File_Name_Len + 1;
                   File_Name_Buffer (File_Name_Len) := Next_Ch;
 
                   Look_Ahead (Arg_File, Next_Ch, End_Of_Line);
@@ -1211,15 +1205,14 @@ package body Utils.Projects is
                   Get (Arg_File, Next_Ch);
                end loop;
 
-               if Next_Ch = '"'
-                 and then not Ada.Text_IO.End_Of_Line (Arg_File)
+               if Next_Ch = '"' and then not Ada.Text_IO.End_Of_Line (Arg_File)
                then
                   --  skip trailing '"'
                   Get (Arg_File, Next_Ch);
                end if;
             else
                while Next_Ch not in ' ' | ASCII.HT | ASCII.LF | ASCII.CR loop
-                  File_Name_Len                    := File_Name_Len + 1;
+                  File_Name_Len := File_Name_Len + 1;
                   File_Name_Buffer (File_Name_Len) := Next_Ch;
 
                   Look_Ahead (Arg_File, Next_Ch, End_Of_Line);
@@ -1235,7 +1228,7 @@ package body Utils.Projects is
          return File_Name_Buffer (1 .. File_Name_Len);
       end Get_File_Name;
 
-   --  Start of processing for Read_File_Names_From_File
+      --  Start of processing for Read_File_Names_From_File
 
    begin
       if not Is_Regular_File (Par_File_Name) then
@@ -1291,15 +1284,15 @@ package body Utils.Projects is
    end Post_Cmd_Line_1;
 
    procedure Process_Command_Line
-     (Cmd                             : in out Command_Line;
-      Global_Report_Dir               :    out String_Ref;
-      The_Project_Tree                :    out not null Project_Tree_Access;
-      The_Project_Env                : out not null Project_Environment_Access;
-      Preprocessing_Allowed           :        Boolean;
-      Tool_Package_Name               :        String;
-      Compute_Project_Closure         :        Boolean        := True;
-      Callback                        :        Parse_Callback := null;
-      Print_Help                      : not null access procedure)
+     (Cmd                     : in out Command_Line;
+      Global_Report_Dir       : out String_Ref;
+      The_Project_Tree        : out not null Project_Tree_Access;
+      The_Project_Env         : out not null Project_Environment_Access;
+      Preprocessing_Allowed   : Boolean;
+      Tool_Package_Name       : String;
+      Compute_Project_Closure : Boolean := True;
+      Callback                : Parse_Callback := null;
+      Print_Help              : not null access procedure)
    is
       --  We have to Parse the command line BEFORE we Parse the project file,
       --  because command-line args tell us the name of the project file, and
@@ -1353,12 +1346,11 @@ package body Utils.Projects is
 
       if Arg (Cmd, Cargs) then
          Cmd_Error_No_Tool_Name
-           ("-cargs switch is no longer supported; use " &
-            "e.g. --wide-character-encoding=8 instead of -cargs -gnatW8");
+           ("-cargs switch is no longer supported; use "
+            & "e.g. --wide-character-encoding=8 instead of -cargs -gnatW8");
       end if;
 
-      if Arg (Cmd, Verbose)
-        and then Arg (Cmd, Aggregated_Project_File) = null
+      if Arg (Cmd, Verbose) and then Arg (Cmd, Aggregated_Project_File) = null
       then
          Versions.Print_Version_Info;
       end if;
@@ -1420,8 +1412,7 @@ package body Utils.Projects is
                      use Ada.Characters.Handling;
                   begin
                      if Has_Attribute (Proj, Attr) then
-                        if
-                          To_Lower (Attribute_Value (Proj, Attr)) = "true"
+                        if To_Lower (Attribute_Value (Proj, Attr)) = "true"
                         then
                            Cmd_Error_No_Help
                              (File_Name.all
@@ -1489,10 +1480,10 @@ package body Utils.Projects is
          --  computation. And if there is no project file we already have
          --  all the switches from the first command line parsing.
 
---  Environment has:
---               if not Mimic_gcc then
---                  --  Ignore unrecognized switches in the inner invocation
---                  Error ...
+         --  Environment has:
+         --     if not Mimic_gcc then
+         --        --  Ignore unrecognized switches in the inner invocation
+         --        Error ...
 
          --  The following could just as well happen before the above
          --  Cmd_Line_2 Parse, because file names and "-files=par_file_name"

@@ -41,142 +41,141 @@ package body Pp.Scanner is
 
    Token_To_Symbol_Map : constant array (Same_Text_Kind) of Symbol :=
      [Start_Of_Input | End_Of_Input => Name_Empty,
-      Enabled_LB_Token      => Name_NL,
-      Disabled_LB_Token     => Name_Empty,
-      False_End_Of_Line     => Name_Empty,
-      True_End_Of_Line_LF   => Name_NL,
-      True_End_Of_Line_CR   => Name_CR,
-      True_End_Of_Line_CRLF => Name_CRLF,
-      Tab_Token             => Name_HT,
+      Enabled_LB_Token              => Name_NL,
+      Disabled_LB_Token             => Name_Empty,
+      False_End_Of_Line             => Name_Empty,
+      True_End_Of_Line_LF           => Name_NL,
+      True_End_Of_Line_CR           => Name_CR,
+      True_End_Of_Line_CRLF         => Name_CRLF,
+      Tab_Token                     => Name_HT,
 
-      '!' => Intern ("!"),
-      '#' => Intern ("#"),
-      '$' => Intern ("$"),
-      '?' => Intern ("?"),
-      '[' => Intern ("["),
-      '\' => Intern ("\"),
-      ']' => Intern ("]"),
-      '^' => Intern ("^"),
-      '`' => Intern ("`"),
-      '{' => Intern ("{"),
-      '}' => Intern ("}"),
-      '~' => Intern ("~"),
-      '_' => Intern ("_"),
+      '!'                           => Intern ("!"),
+      '#'                           => Intern ("#"),
+      '$'                           => Intern ("$"),
+      '?'                           => Intern ("?"),
+      '['                           => Intern ("["),
+      '\'                           => Intern ("\"),
+      ']'                           => Intern ("]"),
+      '^'                           => Intern ("^"),
+      '`'                           => Intern ("`"),
+      '{'                           => Intern ("{"),
+      '}'                           => Intern ("}"),
+      '~'                           => Intern ("~"),
+      '_'                           => Intern ("_"),
 
-      '-' => Intern ("-"),
-      ''' => Intern ("'"),
-      '&' => Intern ("&"),
-      '(' => Intern ("("),
-      ')' => Intern (")"),
-      '+' => Intern ("+"),
-      ',' => Intern (","),
-      ':' => Intern (":"),
-      ';' => Intern (";"),
-      '|' => Intern ("|"),
-      '@' => Intern ("@"),
-      '<' => Intern ("<"),
-      '>' => Intern (">"),
-      '.' => Intern ("."),
-      '*' => Intern ("*"),
-      '=' => Intern ("="),
-      '/' => Intern ("/"),
+      '-'                           => Intern ("-"),
+      '''                           => Intern ("'"),
+      '&'                           => Intern ("&"),
+      '('                           => Intern ("("),
+      ')'                           => Intern (")"),
+      '+'                           => Intern ("+"),
+      ','                           => Intern (","),
+      ':'                           => Intern (":"),
+      ';'                           => Intern (";"),
+      '|'                           => Intern ("|"),
+      '@'                           => Intern ("@"),
+      '<'                           => Intern ("<"),
+      '>'                           => Intern (">"),
+      '.'                           => Intern ("."),
+      '*'                           => Intern ("*"),
+      '='                           => Intern ("="),
+      '/'                           => Intern ("/"),
 
-      Arrow => Intern ("=>"),
-      Dot_Dot => Intern (".."),
-      Exp_Op => Intern ("**"),
-      Not_Equal => Intern ("/="),
-      Greater_Or_Equal => Intern (">="),
-      Right_Label_Bracket => Intern (">>"),
-      Less_Or_Equal => Intern ("<="),
-      Left_Label_Bracket => Intern ("<<"),
-      Box => Intern ("<>"),
-      Colon_Equal => Intern (":="),
+      Arrow                         => Intern ("=>"),
+      Dot_Dot                       => Intern (".."),
+      Exp_Op                        => Intern ("**"),
+      Not_Equal                     => Intern ("/="),
+      Greater_Or_Equal              => Intern (">="),
+      Right_Label_Bracket           => Intern (">>"),
+      Less_Or_Equal                 => Intern ("<="),
+      Left_Label_Bracket            => Intern ("<<"),
+      Box                           => Intern ("<>"),
+      Colon_Equal                   => Intern (":="),
 
       --  Ada 83 reserved words
 
-      Res_Abort => Intern ("abort"),
-      Res_Abs => Intern ("abs"),
-      Res_Accept => Intern ("accept"),
-      Res_Access => Intern ("access"),
-      Res_And => Intern ("and"),
-      Res_All => Intern ("all"),
-      Res_Array => Intern ("array"),
-      Res_At => Intern ("at"),
-      Res_Begin => Intern ("begin"),
-      Res_Body => Intern ("body"),
-      Res_Case => Intern ("case"),
-      Res_Constant => Intern ("constant"),
-      Res_Declare => Intern ("declare"),
-      Res_Delay => Intern ("delay"),
-      Res_Delta => Intern ("delta"),
-      Res_Digits => Intern ("digits"),
-      Res_Do => Intern ("do"),
-      Res_Else => Intern ("else"),
-      Res_Elsif => Intern ("elsif"),
-      Res_End => Intern ("end"),
-      Res_Entry => Intern ("entry"),
-      Res_Exception => Intern ("exception"),
-      Res_Exit => Intern ("exit"),
-      Res_For => Intern ("for"),
-      Res_Function => Intern ("function"),
-      Res_Generic => Intern ("generic"),
-      Res_Goto => Intern ("goto"),
-      Res_If => Intern ("if"),
-      Res_In => Intern ("in"),
-      Res_Is => Intern ("is"),
-      Res_Limited => Intern ("limited"),
-      Res_Loop => Intern ("loop"),
-      Res_Mod => Intern ("mod"),
-      Res_New => Intern ("new"),
-      Res_Not => Intern ("not"),
-      Res_Null => Intern ("null"),
-      Res_Of => Intern ("of"),
-      Res_Or => Intern ("or"),
-      Res_Others => Intern ("others"),
-      Res_Out => Intern ("out"),
-      Res_Package => Intern ("package"),
-      Res_Pragma => Intern ("pragma"),
-      Res_Private => Intern ("private"),
-      Res_Procedure => Intern ("procedure"),
-      Res_Raise => Intern ("raise"),
-      Res_Range => Intern ("range"),
-      Res_Record => Intern ("record"),
-      Res_Rem => Intern ("rem"),
-      Res_Renames => Intern ("renames"),
-      Res_Return => Intern ("return"),
-      Res_Reverse => Intern ("reverse"),
-      Res_Select => Intern ("select"),
-      Res_Separate => Intern ("separate"),
-      Res_Subtype => Intern ("subtype"),
-      Res_Task => Intern ("task"),
-      Res_Terminate => Intern ("terminate"),
-      Res_Then => Intern ("then"),
-      Res_Type => Intern ("type"),
-      Res_Use => Intern ("use"),
-      Res_When => Intern ("when"),
-      Res_While => Intern ("while"),
-      Res_With => Intern ("with"),
-      Res_Xor => Intern ("xor"),
+      Res_Abort                     => Intern ("abort"),
+      Res_Abs                       => Intern ("abs"),
+      Res_Accept                    => Intern ("accept"),
+      Res_Access                    => Intern ("access"),
+      Res_And                       => Intern ("and"),
+      Res_All                       => Intern ("all"),
+      Res_Array                     => Intern ("array"),
+      Res_At                        => Intern ("at"),
+      Res_Begin                     => Intern ("begin"),
+      Res_Body                      => Intern ("body"),
+      Res_Case                      => Intern ("case"),
+      Res_Constant                  => Intern ("constant"),
+      Res_Declare                   => Intern ("declare"),
+      Res_Delay                     => Intern ("delay"),
+      Res_Delta                     => Intern ("delta"),
+      Res_Digits                    => Intern ("digits"),
+      Res_Do                        => Intern ("do"),
+      Res_Else                      => Intern ("else"),
+      Res_Elsif                     => Intern ("elsif"),
+      Res_End                       => Intern ("end"),
+      Res_Entry                     => Intern ("entry"),
+      Res_Exception                 => Intern ("exception"),
+      Res_Exit                      => Intern ("exit"),
+      Res_For                       => Intern ("for"),
+      Res_Function                  => Intern ("function"),
+      Res_Generic                   => Intern ("generic"),
+      Res_Goto                      => Intern ("goto"),
+      Res_If                        => Intern ("if"),
+      Res_In                        => Intern ("in"),
+      Res_Is                        => Intern ("is"),
+      Res_Limited                   => Intern ("limited"),
+      Res_Loop                      => Intern ("loop"),
+      Res_Mod                       => Intern ("mod"),
+      Res_New                       => Intern ("new"),
+      Res_Not                       => Intern ("not"),
+      Res_Null                      => Intern ("null"),
+      Res_Of                        => Intern ("of"),
+      Res_Or                        => Intern ("or"),
+      Res_Others                    => Intern ("others"),
+      Res_Out                       => Intern ("out"),
+      Res_Package                   => Intern ("package"),
+      Res_Pragma                    => Intern ("pragma"),
+      Res_Private                   => Intern ("private"),
+      Res_Procedure                 => Intern ("procedure"),
+      Res_Raise                     => Intern ("raise"),
+      Res_Range                     => Intern ("range"),
+      Res_Record                    => Intern ("record"),
+      Res_Rem                       => Intern ("rem"),
+      Res_Renames                   => Intern ("renames"),
+      Res_Return                    => Intern ("return"),
+      Res_Reverse                   => Intern ("reverse"),
+      Res_Select                    => Intern ("select"),
+      Res_Separate                  => Intern ("separate"),
+      Res_Subtype                   => Intern ("subtype"),
+      Res_Task                      => Intern ("task"),
+      Res_Terminate                 => Intern ("terminate"),
+      Res_Then                      => Intern ("then"),
+      Res_Type                      => Intern ("type"),
+      Res_Use                       => Intern ("use"),
+      Res_When                      => Intern ("when"),
+      Res_While                     => Intern ("while"),
+      Res_With                      => Intern ("with"),
+      Res_Xor                       => Intern ("xor"),
 
       --  Ada 95 reserved words
 
-      Res_Abstract => Intern ("abstract"),
-      Res_Aliased => Intern ("aliased"),
-      Res_Protected => Intern ("protected"),
-      Res_Until => Intern ("until"),
-      Res_Requeue => Intern ("requeue"),
-      Res_Tagged => Intern ("tagged"),
+      Res_Abstract                  => Intern ("abstract"),
+      Res_Aliased                   => Intern ("aliased"),
+      Res_Protected                 => Intern ("protected"),
+      Res_Until                     => Intern ("until"),
+      Res_Requeue                   => Intern ("requeue"),
+      Res_Tagged                    => Intern ("tagged"),
 
       --  Ada 2005 reserved words
 
-      Res_Interface => Intern ("interface"),
-      Res_Overriding => Intern ("overriding"),
-      Res_Synchronized => Intern ("synchronized"),
+      Res_Interface                 => Intern ("interface"),
+      Res_Overriding                => Intern ("overriding"),
+      Res_Synchronized              => Intern ("synchronized"),
 
       --  Ada 2012 reserved words
 
-      Res_Some => Intern ("some")
-     ]; -- Token_To_Symbol_Map
+      Res_Some                      => Intern ("some")]; -- Token_To_Symbol_Map
 
    function Lookup_Reserved_Word (Text : Symbol) return Reserved_Word_Or_Id;
    --  If Text is a reserved word, return that Reserved_Word. Otherwise, return
@@ -185,8 +184,7 @@ package body Pp.Scanner is
 
    ----------------
 
-   procedure Poke_Kind
-     (Tok : in out Opt_Token; New_Kind : Reserved_Word);
+   procedure Poke_Kind (Tok : in out Opt_Token; New_Kind : Reserved_Word);
    --  Does the equivalent of "Tok.Kind := New_Kind;", preserving the value of
    --  the only other relevant component (Sloc).
 
@@ -195,9 +193,7 @@ package body Pp.Scanner is
       Sloc : Source_Location;
    end record;
 
-   procedure Poke_Kind
-     (Tok : in out Opt_Token; New_Kind : Reserved_Word)
-   is
+   procedure Poke_Kind (Tok : in out Opt_Token; New_Kind : Reserved_Word) is
       --  We're trying to set Tok.Kind, but discriminants are constant, so
       --  "Tok.Kind := New_Kind;" would be illegal. It would also make sense to
       --  use an aggregate, as in "Tok := (Kind => New_Kind, ...);", but that
@@ -209,15 +205,20 @@ package body Pp.Scanner is
       Tok := Cast (No_Discrim_Token'(Kind => New_Kind, Sloc => Tok.Sloc));
    end Poke_Kind;
 
-   function Text (X : Same_Text_Kind) return Syms.Symbol is
-     (Token_To_Symbol_Map (X));
+   function Text (X : Same_Text_Kind) return Syms.Symbol
+   is (Token_To_Symbol_Map (X));
 
    function Text (X : Token) return Syms.Symbol is
    begin
       case X.Kind is
-         when Same_Text_Kind => return Text (X.Kind);
-         when Stored_Text_Kind => return X.Text;
-         when Nil => raise Program_Error;
+         when Same_Text_Kind =>
+            return Text (X.Kind);
+
+         when Stored_Text_Kind =>
+            return X.Text;
+
+         when Nil =>
+            raise Program_Error;
       end case;
    end Text;
 
@@ -227,8 +228,10 @@ package body Pp.Scanner is
    package Natural_Encodings is new Encodings (Natural);
    use Fixed_Part_Vectors, Octet_Vectors, Symbol_Encodings, Natural_Encodings;
 
-   function Is_Nil (X : Tokn_Cursor) return Boolean is (X.V = null);
-   function Nil_Tokn_Cursor return Tokn_Cursor is (others => <>);
+   function Is_Nil (X : Tokn_Cursor) return Boolean
+   is (X.V = null);
+   function Nil_Tokn_Cursor return Tokn_Cursor
+   is (others => <>);
 
    function Kind (X : Tokn_Cursor) return Token_Kind is
    begin
@@ -238,10 +241,11 @@ package body Pp.Scanner is
 
    function Sloc (X : Tokn_Cursor) return Source_Location is
    begin
-      return (Line => Sloc_Line (X),
-              Col => Sloc_Col (X),
-              First => Sloc_First (X),
-              Last => Sloc_Last (X));
+      return
+        (Line  => Sloc_Line (X),
+         Col   => Sloc_Col (X),
+         First => Sloc_First (X),
+         Last  => Sloc_Last (X));
    end Sloc;
 
    function Sloc_Line (X : Tokn_Cursor) return Positive is
@@ -264,19 +268,22 @@ package body Pp.Scanner is
       return Next_Sloc_First (X) - 1;
    end Sloc_Last;
 
-   function New_Sloc_First (V : Tokn_Vec) return Positive is
-     (V.New_Sloc_First);
+   function New_Sloc_First (V : Tokn_Vec) return Positive
+   is (V.New_Sloc_First);
 
-   function Next_Sloc_First (X : Tokn_Cursor) return Positive is
-     (if At_Last (X) then New_Sloc_First (X.V.all)
-      else Sloc_First (Next (X)));
+   function Next_Sloc_First (X : Tokn_Cursor) return Positive
+   is (if At_Last (X) then New_Sloc_First (X.V.all)
+       else Sloc_First (Next (X)));
 
    function Text (X : Tokn_Cursor) return Symbol is
    begin
       pragma Assert (not After_Last (X));
       case Kind (X) is
-         when Same_Text_Kind => return Token_To_Symbol_Map (Kind (X));
-         when Stored_Text_Kind => return Decode (X.V.Octets, X.Oc);
+         when Same_Text_Kind =>
+            return Token_To_Symbol_Map (Kind (X));
+
+         when Stored_Text_Kind =>
+            return Decode (X.V.Octets, X.Oc);
       end case;
    end Text;
 
@@ -290,20 +297,19 @@ package body Pp.Scanner is
       return Decode (X.V.Octets, Next (X.V.Octets, Next (X.V.Octets, X.Oc)));
    end Width;
 
-   function Num_Lines (X : Tokn_Cursor) return Positive is
-     (Decode (X.V.Octets,
-              Next (X.V.Octets,
-                    Next (X.V.Octets,
-                          Next (X.V.Octets, X.Oc))))) with
-       Pre => Kind (X) in Whole_Line_Comment;
+   function Num_Lines (X : Tokn_Cursor) return Positive
+   is (Decode
+         (X.V.Octets,
+          Next (X.V.Octets, Next (X.V.Octets, Next (X.V.Octets, X.Oc)))))
+   with Pre => Kind (X) in Whole_Line_Comment;
 
-   function Last_Line_Len (X : Tokn_Cursor) return Positive is
-     (Decode (X.V.Octets,
-              Next (X.V.Octets,
-                    Next (X.V.Octets,
-                          Next (X.V.Octets,
-                                Next (X.V.Octets, X.Oc)))))) with
-       Pre => Kind (X) in Whole_Line_Comment;
+   function Last_Line_Len (X : Tokn_Cursor) return Positive
+   is (Decode
+         (X.V.Octets,
+          Next
+            (X.V.Octets,
+             Next (X.V.Octets, Next (X.V.Octets, Next (X.V.Octets, X.Oc))))))
+   with Pre => Kind (X) in Whole_Line_Comment;
 
    function Index (X : Tokn_Cursor) return Positive is
    begin
@@ -318,12 +324,13 @@ package body Pp.Scanner is
 
    function Token_Output_Len (X : Token) return Positive is
       Text_Len : constant Natural := To_W_Str (X.Text)'Length;
-      L : constant Positive :=
+      L        : constant Positive :=
         (if X.Kind in Whole_Line_Comment then X.Num_Lines else 1);
-        --  Number of lines in comment
+      --  Number of lines in comment
    begin
       return
-        L * (String'("--")'Length + X.Leading_Blanks)
+        L
+        * (String'("--")'Length + X.Leading_Blanks)
         --  Each line is missing the "--  ".
         + (L - 1) * (X.Sloc.Col - 1)
         --  All but the first line are missing the spaces before "--".
@@ -332,8 +339,8 @@ package body Pp.Scanner is
         ;
    end Token_Output_Len;
 
-   function Token_Output_Len (X : Tokn_Cursor) return Positive is
-     (Token_Output_Len (Token_At_Cursor (X)));
+   function Token_Output_Len (X : Tokn_Cursor) return Positive
+   is (Token_Output_Len (Token_At_Cursor (X)));
 
    procedure Clear (V : in out Tokn_Vec) is
    begin
@@ -342,14 +349,15 @@ package body Pp.Scanner is
       Clear (V.Octets);
    end Clear;
 
-   function Length (X : Token) return Natural is
-     (X.Sloc.Last - X.Sloc.First + 1);
+   function Length (X : Token) return Natural
+   is (X.Sloc.Last - X.Sloc.First + 1);
 
-   procedure Append_Tokn (V        : in out Tokn_Vec; X : Token;
-                          Org      : String := "Append Token");
+   procedure Append_Tokn
+     (V : in out Tokn_Vec; X : Token; Org : String := "Append Token");
 
-   procedure Append_Tokn (V        : in out Tokn_Vec; X : Token;
-                          Org      : String := "Append Token") is
+   procedure Append_Tokn
+     (V : in out Tokn_Vec; X : Token; Org : String := "Append Token")
+   is
       --  We require that X.Sloc.First and X.Sloc.Last indicate the right
       --  length, although they don't have to be right. X.Last_Line_Len must be
       --  correct, and X.Sloc.Col for whole-line comments. The other fields of
@@ -375,36 +383,42 @@ package body Pp.Scanner is
             end;
          end if;
 
-         pragma Assert
-           (if K not in EOL_Token | Comment_Kind | Tab_Token then
-              Length (X) = Text_Len);
-         pragma Assert
-           (if K in True_End_Of_Line then
-              Length (X) in 1 | 2 and then Text_Len in 1 | 2);
+         pragma
+           Assert
+             (if K not in EOL_Token | Comment_Kind | Tab_Token
+                then Length (X) = Text_Len);
+         pragma
+           Assert
+             (if K in True_End_Of_Line
+                then Length (X) in 1 | 2 and then Text_Len in 1 | 2);
          --  2 is for CR/LF
          if Check_Comment_Length and then K in Comment_Kind then
             declare
-               L : constant Positive :=
+               L                      : constant Positive :=
                  (if K in Whole_Line_Comment then X.Num_Lines else 1);
-                 --  Number of lines in comment
-               Expected_Len : constant Positive :=
-                 L * (String'("--")'Length + X.Leading_Blanks)
+               --  Number of lines in comment
+               Expected_Len           : constant Positive :=
+                 L
+                 * (String'("--")'Length + X.Leading_Blanks)
                  --  Each line is missing the "--  ".
                  + (L - 1) * (X.Sloc.Col - 1)
                  --  All but the first line are missing the spaces before "--".
                  + Text_Len -- Text includes the intermediate NL characters
                  - 1 -- for the extra NL at the end
-                 ;
+               ;
                Expected_Len_With_Tabs : constant Positive :=
-                 L * (String'("--")'Length + X.Leading_Blanks)
+                 L
+                 * (String'("--")'Length + X.Leading_Blanks)
                  --  Each line is missing the "--  ".
                  + Text_Len -- Text includes the intermediate NL characters
                  - 1; -- for the extra NL at the end
             begin
-               pragma Assert
-                 (Length (X) in
-                      Expected_Len | Expected_Len + (L - 1)
-                    | Expected_Len_With_Tabs);
+               pragma
+                 Assert
+                   (Length (X)
+                    in Expected_Len
+                     | Expected_Len + (L - 1)
+                     | Expected_Len_With_Tabs);
 
                --  The (L - 1) is in case the source has CRLF line endings;
                --  Text does not include the intermediate CR characters.
@@ -426,7 +440,8 @@ package body Pp.Scanner is
             else
                pragma Assert (K /= Start_Of_Input);
                declare
-                  Prev : constant Tokn_Cursor := Last (V'Unrestricted_Access);
+                  Prev      : constant Tokn_Cursor :=
+                    Last (V'Unrestricted_Access);
                   pragma Assert (if K = Spaces then Kind (Prev) /= Spaces);
                   --  We don't want two Spaces tokens in a row
                   Prev_Sloc : constant Source_Location := Sloc (Prev);
@@ -436,13 +451,12 @@ package body Pp.Scanner is
                      Result.Line := Prev_Sloc.Line + 1;
                      Result.Col := 1;
                   elsif Kind (Prev) in Whole_Line_Comment then
-                     Result.Line :=
-                       Prev_Sloc.Line + Num_Lines (Prev) - 1;
+                     Result.Line := Prev_Sloc.Line + Num_Lines (Prev) - 1;
                      Result.Col := Prev_Sloc.Col + Last_Line_Len (Prev);
                   else
                      Result.Line := Prev_Sloc.Line;
-                     Result.Col := Prev_Sloc.Col +
-                       Prev_Sloc.Last - Prev_Sloc.First + 1;
+                     Result.Col :=
+                       Prev_Sloc.Col + Prev_Sloc.Last - Prev_Sloc.First + 1;
                   end if;
 
                   Result.First := Prev_Sloc.Last + 1;
@@ -454,21 +468,24 @@ package body Pp.Scanner is
 
       Sloc : constant Source_Location := Get_Sloc;
 
-   --  Start of processing for Append_Tokn
+      --  Start of processing for Append_Tokn
 
    begin
       V.New_Sloc_First := Sloc.Last + 1;
-      Append (V.Fixed,
-              Fixed_Part'(K,
-                          Sloc_Line => Sloc.Line,
-                          Sloc_Col => Sloc.Col,
-                          Sloc_First => Sloc.First,
-                          Origin => Intern (Org)));
+      Append
+        (V.Fixed,
+         Fixed_Part'
+           (K,
+            Sloc_Line  => Sloc.Line,
+            Sloc_Col   => Sloc.Col,
+            Sloc_First => Sloc.First,
+            Origin     => Intern (Org)));
       case K is
          when Same_Text_Kind =>
             if K in Line_Break_Token | Tab_Token then
                Encode (V.Octets, X.Index);
             end if;
+
          when Stored_Text_Kind =>
             Encode (V.Octets, X.Text);
 
@@ -484,8 +501,10 @@ package body Pp.Scanner is
       end case;
    end Append_Tokn;
 
-   procedure Append_Tokn (V   : in out Tokn_Vec; X : Tokn_Cursor;
-                          Org : String := "Append Tokn_Cursor") is
+   procedure Append_Tokn
+     (V   : in out Tokn_Vec;
+      X   : Tokn_Cursor;
+      Org : String := "Append Tokn_Cursor") is
    begin
       --  ???It would be more efficient to simply copy over the data, and
       --  avoid converting back to type Token. Also below.
@@ -497,14 +516,11 @@ package body Pp.Scanner is
    end Append_Tokn;
 
    procedure Append_Tokn
-     (V   : in out Tokn_Vec;
-      X   : Same_Text_Kind;
-      Org : String := "Append Kind")
+     (V : in out Tokn_Vec; X : Same_Text_Kind; Org : String := "Append Kind")
    is
       Tok : Token (Kind => X);
    begin
-      Tok.Sloc :=
-        (First => 1, Last => Str (Text (X)).Length, others => <>);
+      Tok.Sloc := (First => 1, Last => Str (Text (X)).Length, others => <>);
       --  There are never any wide characters in these tokens, so the above
       --  Length is correct.
       Append_Tokn (V, Tok, Org);
@@ -519,8 +535,7 @@ package body Pp.Scanner is
       Tok : Token (Kind => X);
    begin
       pragma Assert (Str (Tx).Length > 0);
-      Tok.Sloc :=
-        (First => 1, Last => To_W_Str (Tx)'Length, others => <>);
+      Tok.Sloc := (First => 1, Last => To_W_Str (Tx)'Length, others => <>);
       --  ????We should store all text in UTF-8, so we don't have to do the
       --  conversion to wide string here and elsewhere. It would be more
       --  efficient to do "Str (Tx).Length".
@@ -529,21 +544,22 @@ package body Pp.Scanner is
    end Append_Tokn;
 
    procedure Append_Spaces
-     (V           : in out Tokn_Vec; Count : Natural;
+     (V           : in out Tokn_Vec;
+      Count       : Natural;
       Existing_OK : Boolean := False;
       Org         : String := "Append_Spaces") is
    begin
       pragma Assert (not Is_Empty (V));
       if Count > 0 then
-         if Existing_OK
-           and then Kind (Last (V'Unrestricted_Access)) = Spaces
+         if Existing_OK and then Kind (Last (V'Unrestricted_Access)) = Spaces
          then
             declare
                L : constant Token := Delete_Last (V);
             begin
                Append_Spaces
-                 (V, Count => Str (Text (L)).Length + Count,
-                  Org => "NLs/Ind combined space");
+                 (V,
+                  Count => Str (Text (L)).Length + Count,
+                  Org   => "NLs/Ind combined space");
             end;
          else
             Append_Tokn (V, Spaces, Intern (String'[1 .. Count => ' ']), Org);
@@ -553,8 +569,9 @@ package body Pp.Scanner is
       end if;
    end Append_Spaces;
 
-   procedure Append_Comment (V : in out Tokn_Vec; X : Tokn_Cursor;
-                             Org : String) is
+   procedure Append_Comment
+     (V : in out Tokn_Vec; X : Tokn_Cursor; Org : String)
+   is
       --  X is coming from Src_Tokns, and its length includes the spaces at the
       --  start of every line but the first. But indentation is not present in
       --  Newer_Tokns, so we need to subtract that off.
@@ -562,7 +579,9 @@ package body Pp.Scanner is
       Tok : Token := Token_At_Cursor (X);
    begin
       case Comment_Kind'(Tok.Kind) is
-         when End_Of_Line_Comment => null;
+         when End_Of_Line_Comment =>
+            null;
+
          when Whole_Line_Comment =>
             pragma Assert (Kind (Last (V'Unrestricted_Access)) /= Spaces);
             Tok.Sloc.Last :=
@@ -576,31 +595,24 @@ package body Pp.Scanner is
    -- Is_Header_Comment --
    -----------------------
 
-   function Is_Header_Comment
-     (Tkn : Token)
-      return Boolean
-   is
+   function Is_Header_Comment (Tkn : Token) return Boolean is
       Tkn_Txt : constant W_Str := To_W_Str (Text (Tkn));
    begin
       return
         (Tkn_Txt'Length >= 2
          and then Tkn_Txt (Tkn_Txt'Last) = '-'
          and then Tkn_Txt (Tkn_Txt'Last - 1) = '-')
-        or else
-          (Tkn_Txt'Length >= 3
-           and then Tkn_Txt (Tkn_Txt'Last) = NL
-           and then Tkn_Txt (Tkn_Txt'Last - 1) = '-'
-           and then Tkn_Txt (Tkn_Txt'Last - 2) = '-');
+        or else (Tkn_Txt'Length >= 3
+                 and then Tkn_Txt (Tkn_Txt'Last) = NL
+                 and then Tkn_Txt (Tkn_Txt'Last - 1) = '-'
+                 and then Tkn_Txt (Tkn_Txt'Last - 2) = '-');
    end Is_Header_Comment;
 
    ----------------------
    -- Is_Empty_Comment --
    ----------------------
 
-   function Is_Empty_Comment
-     (Token : Pp.Scanner.Token)
-      return Boolean
-   is
+   function Is_Empty_Comment (Token : Pp.Scanner.Token) return Boolean is
       Token_Text : constant W_Str := To_W_Str (Text (Token));
 
    begin
@@ -625,9 +637,9 @@ package body Pp.Scanner is
       Indent           : Natural := 0;
       Org              : String)
    is
-      Tok : Token := Token_At_Cursor (X);
+      Tok                        : Token := Token_At_Cursor (X);
       Line_Width, Max_Line_Width : Natural := 0;
-      Prefix_Len : Natural;
+      Prefix_Len                 : Natural;
 
    begin
       Tok.Leading_Blanks := Leading_Blanks;
@@ -638,7 +650,9 @@ package body Pp.Scanner is
          Tok.Sloc.Col := Indent + 1;
       end if;
       case Comment_Kind'(Tok.Kind) is
-         when End_Of_Line_Comment => null;
+         when End_Of_Line_Comment =>
+            null;
+
          when Whole_Line_Comment =>
             Tok.Num_Lines := 1;
             for J in Tx'Range loop
@@ -656,15 +670,16 @@ package body Pp.Scanner is
             end loop;
             Tok.Width := Max_Line_Width + Prefix_Len;
             declare
-               Text_Len : constant Natural := Tx'Length;
+               Text_Len     : constant Natural := Tx'Length;
                Expected_Len : constant Positive :=
-                 Tok.Num_Lines * (String'("--")'Length + Tok.Leading_Blanks)
+                 Tok.Num_Lines
+                 * (String'("--")'Length + Tok.Leading_Blanks)
                  --  Each line is missing the "--  ".
                  + (Tok.Num_Lines - 1) * (Tok.Sloc.Col - 1)
                  --  All but the first line are missing the spaces before "--".
                  + Text_Len -- Text includes the intermediate NL characters
                  - 1 -- for the extra NL at the end
-                 ;
+               ;
             begin
                if Recompute_Length then
                   Tok.Sloc.First := 1;
@@ -685,12 +700,11 @@ package body Pp.Scanner is
       Len   : Natural := 0;
       Org   : String := "Append Kind")
    is
-      Tok   : Token (X);
+      Tok : Token (X);
    begin
       Tok.Sloc :=
-        (First => 1,
-         Last => (if X in Enabled_LB_Token then 1
-                  else Len),
+        (First  => 1,
+         Last   => (if X in Enabled_LB_Token then 1 else Len),
          others => <>);
       Tok.Index := Index;
 
@@ -708,7 +722,8 @@ package body Pp.Scanner is
    end Append_Tokn_With_Index;
 
    procedure Delete_Last (V : in out Tokn_Vec) is
-      L : constant Tokn_Cursor := Last (V'Unrestricted_Access);
+      L                  : constant Tokn_Cursor :=
+        Last (V'Unrestricted_Access);
       New_New_Sloc_First : constant Positive := Next_Sloc_First (Prev (L));
    begin
       Delete_Last (V.Fixed);
@@ -782,8 +797,7 @@ package body Pp.Scanner is
       pragma Assert (Cur.Fi in 1 .. Last_Index (Cur.V.Fixed) + 1);
       pragma Assert (Cur.Oc in 1 .. Last_Index (Cur.V.Octets) + 1);
       pragma Warnings (On, "lower bound check only fails if it is invalid");
-      return Result : constant Boolean
-        := Cur.Fi = Last_Index (Cur.V.Fixed) + 1
+      return Result : constant Boolean := Cur.Fi = Last_Index (Cur.V.Fixed) + 1
       do
          pragma Assert (if Result then Cur.Oc = Last_Index (Cur.V.Octets) + 1);
       end return;
@@ -808,6 +822,7 @@ package body Pp.Scanner is
             if Kind (Cur) in Line_Break_Token | Tab_Token then
                Next (Cur.V.Octets, Cur.Oc);
             end if;
+
          when Stored_Text_Kind =>
             Next (Cur.V.Octets, Cur.Oc);
 
@@ -839,6 +854,7 @@ package body Pp.Scanner is
             if Kind (Cur) in Line_Break_Token | Tab_Token then
                Prev (Cur.V.Octets, Cur.Oc);
             end if;
+
          when Stored_Text_Kind =>
             if Kind (Cur) in Comment_Kind then
                if Kind (Cur) in Whole_Line_Comment then
@@ -877,7 +893,8 @@ package body Pp.Scanner is
 
    function Tokens_Require_Space (X, Y : Tokn_Cursor) return Boolean is
    begin
-      return Kind (X) in Ident | Reserved_Word
+      return
+        Kind (X) in Ident | Reserved_Word
         and then Kind (Y) in Ident | Reserved_Word | Numeric_Literal;
    end Tokens_Require_Space;
 
@@ -903,11 +920,10 @@ package body Pp.Scanner is
      array (Potential_Reserved_Word_Sym) of Reserved_Word_Or_Id;
 
    function Init_Symbol_To_Reserved_Word_Map
-     return Symbol_To_Reserved_Word_Mapping;
+      return Symbol_To_Reserved_Word_Mapping;
 
    function Init_Symbol_To_Reserved_Word_Map
-     return Symbol_To_Reserved_Word_Mapping
-   is
+      return Symbol_To_Reserved_Word_Mapping is
    begin
       return R : Symbol_To_Reserved_Word_Mapping := [others => Ident] do
          for Res in Reserved_Word loop
@@ -934,8 +950,7 @@ package body Pp.Scanner is
       Result              : out Tokn_Vec;
       Comments_Special_On : Boolean;
       Max_Tokens          : Tokn_Index := Tokn_Index'Last;
-      Lang                : Language := Ada_Lang)
-     return Boolean
+      Lang                : Language := Ada_Lang) return Boolean
    is
       Ignored : Optional_EOL_Formats;
    begin
@@ -956,13 +971,14 @@ package body Pp.Scanner is
       Cur_First         : Positive := 1;
 
       Name_Buffer : Bounded_Str;
-      Name_Len : Natural renames Name_Buffer.Length;
+      Name_Len    : Natural renames Name_Buffer.Length;
 
       CRLF_Seen, LF_Seen : Natural := 0;
       --  Count of the number of CRLF-style (respectively, LF-style) line
       --  endings that have been seen.
 
-      function Cur return W_Char is (Buffers.Cur (Input));
+      function Cur return W_Char
+      is (Buffers.Cur (Input));
 
       procedure Get;
       --  Move ahead one character in the input
@@ -1009,26 +1025,22 @@ package body Pp.Scanner is
       --
       --  Tok.Sloc has already been set before calling this.
 
-      procedure Collect_Comment_Paragraph (Tok : in out Token) with
-        Pre => Tok.Kind = Fillable_Comment;
+      procedure Collect_Comment_Paragraph (Tok : in out Token)
+      with Pre => Tok.Kind = Fillable_Comment;
       --  Collect series of Fillable_Comment into comment "paragraphs" that
       --  will be filled if the appropriate command-line option was given.
 
       procedure Skip_To_EOL is
       begin
-         while not Is_Line_Terminator (Cur)
-           and then Cur /= W_NUL
-         loop
+         while not Is_Line_Terminator (Cur) and then Cur /= W_NUL loop
             Get;
          end loop;
       end Skip_To_EOL;
 
       procedure Append_Tok_Text (Tok : Token) is
          Token_Text_First : constant Positive :=
-           (if
-              Tok.Kind in Comment_Kind
-            then
-              Tok.Sloc.First + String'("--")'Length + Tok.Leading_Blanks
+           (if Tok.Kind in Comment_Kind
+            then Tok.Sloc.First + String'("--")'Length + Tok.Leading_Blanks
             else Tok.Sloc.First);
       begin
          Append
@@ -1061,10 +1073,11 @@ package body Pp.Scanner is
       begin
          loop
             Get;
-            exit when not (Is_Letter (Cur)
-                             or else (Cur = '_' and Lang = Ada_Lang)
-                             or else Is_Digit (Cur)
-                             or else Is_Mark (Cur));
+            exit when
+              not (Is_Letter (Cur)
+                   or else (Cur = '_' and Lang = Ada_Lang)
+                   or else Is_Digit (Cur)
+                   or else Is_Mark (Cur));
          end loop;
       end Scan_Identifier_Chars;
 
@@ -1083,14 +1096,15 @@ package body Pp.Scanner is
          end loop;
       end Scan_String_Literal;
 
-      Preceding_Lexeme : Lexeme_Kind := Nil;
+      Preceding_Lexeme      : Lexeme_Kind := Nil;
       Preceding_Lexeme_Line : Positive := Integer'Last;
       --  These record the preceding token, which is necessary to properly deal
       --  with single quotes and line breaks, not counting comments and line
       --  breaks.
 
       procedure Scan_Comment
-        (Tok : in out Opt_Token; Allow_Short_Fillable : Boolean) is
+        (Tok : in out Opt_Token; Allow_Short_Fillable : Boolean)
+      is
          function Count_Blanks return Natural;
          --  Skip to next non-blank character, and return the number of blanks
          --  skipped
@@ -1105,10 +1119,10 @@ package body Pp.Scanner is
             end return;
          end Count_Blanks;
 
-         Kind_Of_Comment : Comment_Kind;
+         Kind_Of_Comment     : Comment_Kind;
          Is_Fillable_Comment : Boolean;
 
-      --  Start of processing for Scan_Comment
+         --  Start of processing for Scan_Comment
 
       begin
          if Preceding_Lexeme_Line = Cur_Line then
@@ -1121,20 +1135,19 @@ package body Pp.Scanner is
 
          if Comments_Special_On
            and then Kind_Of_Comment = Other_Whole_Line_Comment
-           and then not
-             (Is_Letter (Cur)
-                or else Is_Digit (Cur)
-                or else Is_Space (Cur)
-                or else Is_Line_Terminator (Cur)
-                or else Cur = '-')
-            --  We don't consider "-----" to be special, because otherwise
-            --  various comments are misformatted.
+           and then not (Is_Letter (Cur)
+                         or else Is_Digit (Cur)
+                         or else Is_Space (Cur)
+                         or else Is_Line_Terminator (Cur)
+                         or else Cur = '-')
+           --  We don't consider "-----" to be special, because otherwise
+           --  various comments are misformatted.
          then
             Kind_Of_Comment := Special_Comment;
          end if;
 
-         Is_Fillable_Comment := Kind_Of_Comment = Other_Whole_Line_Comment
-           and then Is_Space (Cur);
+         Is_Fillable_Comment :=
+           Kind_Of_Comment = Other_Whole_Line_Comment and then Is_Space (Cur);
          --  We don't fill comments unless there is at least one leading blank,
          --  because otherwise some special character like "#" could end up at
          --  the start of a line, causing it to turn into a special comment,
@@ -1166,12 +1179,12 @@ package body Pp.Scanner is
                     Buffers.Slice (Input, Tok.Sloc.First, Cur_First - 1);
                begin
                   if Has_Prefix
-                    (Comment_Text, Prefix => Pp_Off_On_Delimiters.Off.all)
+                       (Comment_Text, Prefix => Pp_Off_On_Delimiters.Off.all)
                   then
                      Is_Fillable_Comment := False;
                      Kind_Of_Comment := Pp_Off_Comment;
                   elsif Has_Prefix
-                    (Comment_Text, Prefix => Pp_Off_On_Delimiters.On.all)
+                          (Comment_Text, Prefix => Pp_Off_On_Delimiters.On.all)
                   then
                      Is_Fillable_Comment := False;
                      Kind_Of_Comment := Pp_On_Comment;
@@ -1180,7 +1193,7 @@ package body Pp.Scanner is
             end if;
 
             declare
-               W : constant Natural := Cur_First - Tok.Sloc.First;
+               W         : constant Natural := Cur_First - Tok.Sloc.First;
                Too_Short : constant Boolean := W < 30;
                --  The comment is too short to be considered as the start of a
                --  filled comment block.
@@ -1199,59 +1212,74 @@ package body Pp.Scanner is
 
                case Kind_Of_Comment is
                   when Pp_Off_Comment =>
-                     Tok := (Pp_Off_Comment,
-                             Tok.Sloc,
-                             Text => Intern ("invalid token text"),
-                             Leading_Blanks => Leading_Blanks, Width => W,
-                             Num_Lines => 1,
-                             Last_Line_Len => Cur_Col - Tok.Sloc.Col);
+                     Tok :=
+                       (Pp_Off_Comment,
+                        Tok.Sloc,
+                        Text           => Intern ("invalid token text"),
+                        Leading_Blanks => Leading_Blanks,
+                        Width          => W,
+                        Num_Lines      => 1,
+                        Last_Line_Len  => Cur_Col - Tok.Sloc.Col);
+
                   when Pp_On_Comment =>
-                     Tok := (Pp_On_Comment,
-                             Tok.Sloc,
-                             Text => Intern ("invalid token text"),
-                             Leading_Blanks => Leading_Blanks, Width => W,
-                             Num_Lines => 1,
-                             Last_Line_Len => Cur_Col - Tok.Sloc.Col);
+                     Tok :=
+                       (Pp_On_Comment,
+                        Tok.Sloc,
+                        Text           => Intern ("invalid token text"),
+                        Leading_Blanks => Leading_Blanks,
+                        Width          => W,
+                        Num_Lines      => 1,
+                        Last_Line_Len  => Cur_Col - Tok.Sloc.Col);
+
                   when Special_Comment =>
-                     Tok := (Special_Comment,
-                             Tok.Sloc,
-                             Text => Intern ("invalid token text"),
-                             Leading_Blanks => Leading_Blanks, Width => W,
-                             Num_Lines => 1,
-                             Last_Line_Len => Cur_Col - Tok.Sloc.Col);
+                     Tok :=
+                       (Special_Comment,
+                        Tok.Sloc,
+                        Text           => Intern ("invalid token text"),
+                        Leading_Blanks => Leading_Blanks,
+                        Width          => W,
+                        Num_Lines      => 1,
+                        Last_Line_Len  => Cur_Col - Tok.Sloc.Col);
+
                   when Fillable_Comment =>
-                     Tok := (Fillable_Comment,
-                             Tok.Sloc,
-                             Text => Intern ("invalid token text"),
-                             Leading_Blanks => Leading_Blanks, Width => W,
-                             Num_Lines => 1,
-                             Last_Line_Len => Cur_Col - Tok.Sloc.Col);
+                     Tok :=
+                       (Fillable_Comment,
+                        Tok.Sloc,
+                        Text           => Intern ("invalid token text"),
+                        Leading_Blanks => Leading_Blanks,
+                        Width          => W,
+                        Num_Lines      => 1,
+                        Last_Line_Len  => Cur_Col - Tok.Sloc.Col);
+
                   when Other_Whole_Line_Comment =>
-                     Tok := (Other_Whole_Line_Comment,
-                             Tok.Sloc,
-                             Text => Intern ("invalid token text"),
-                             Leading_Blanks => Leading_Blanks, Width => W,
-                             Num_Lines => 1,
-                             Last_Line_Len => Cur_Col - Tok.Sloc.Col);
+                     Tok :=
+                       (Other_Whole_Line_Comment,
+                        Tok.Sloc,
+                        Text           => Intern ("invalid token text"),
+                        Leading_Blanks => Leading_Blanks,
+                        Width          => W,
+                        Num_Lines      => 1,
+                        Last_Line_Len  => Cur_Col - Tok.Sloc.Col);
+
                   when End_Of_Line_Comment =>
-                     Tok := (End_Of_Line_Comment,
-                             Tok.Sloc,
-                             Text => Intern ("invalid token text"),
-                             Leading_Blanks => Leading_Blanks);
+                     Tok :=
+                       (End_Of_Line_Comment,
+                        Tok.Sloc,
+                        Text           => Intern ("invalid token text"),
+                        Leading_Blanks => Leading_Blanks);
                end case;
             end;
          end;
       end Scan_Comment;
 
       procedure Get_Tokn (Tok : out Token; Allow_Short_Fillable : Boolean) is
-         subtype Extended_Digit is W_Char with -- See RM-2.4.2(5)
+         subtype Extended_Digit is W_Char
+         with
+           -- See RM-2.4.2(5)
            Predicate => Extended_Digit in '0' .. '9' | 'A' .. 'F' | 'a' .. 'f';
       begin
          Tok.Sloc :=
-           (Line   => Cur_Line,
-            Col    => Cur_Col,
-            First  => Cur_First,
-            Last   => <>);
+           (Line => Cur_Line, Col => Cur_Col, First => Cur_First, Last => <>);
 
          --  end of line
 
@@ -1272,9 +1300,9 @@ package body Pp.Scanner is
             --  Might be ignored below
 
             Cur_Line := Cur_Line + 1;
-            Cur_Col  := 1;
+            Cur_Col := 1;
 
-         --  Spaces
+            --  Spaces
 
          elsif Is_Space (Cur) then
             Tok := (Kind => Spaces, Sloc => Tok.Sloc, Text => <>);
@@ -1282,14 +1310,13 @@ package body Pp.Scanner is
                Get;
             end loop;
 
-         --  identifier
+            --  identifier
 
-         --  We allow '$' at the start of an identifier because that's what
-         --  preprocessor symbols look like, and this allows us to process some
-         --  files that use preprocessing.
+            --  We allow '$' at the start of an identifier because that's what
+            --  preprocessor symbols look like, and this allows us to process
+            --  some files that use preprocessing.
 
-         elsif Is_Letter (Cur) or else
-           (Lang = Ada_Lang and then Cur = '$')
+         elsif Is_Letter (Cur) or else (Lang = Ada_Lang and then Cur = '$')
          then
             Tok := (Kind => Ident, Sloc => Tok.Sloc, Text => <>);
             --  We will check for reserved words below
@@ -1312,7 +1339,7 @@ package body Pp.Scanner is
                   Tok := (Kind => '_', Sloc => Tok.Sloc);
                   Get;
 
-               --  Minus sign or comment
+                  --  Minus sign or comment
 
                when '-' =>
                   if Buffers.Lookahead (Input) = '-' then
@@ -1322,15 +1349,17 @@ package body Pp.Scanner is
                      Tok := (Kind => '-', Sloc => Tok.Sloc);
                   end if;
 
-               --  numeric literal
+                  --  numeric literal
 
                when '0' .. '9' =>
-                  Tok := (Kind => Numeric_Literal,
-                          Sloc => Tok.Sloc, others => <>);
+                  Tok :=
+                    (Kind => Numeric_Literal, Sloc => Tok.Sloc, others => <>);
                   Scan_Decimal_Digit_Chars;
 
                   case Lang is
-                     when Template_Lang => null; -- we're done
+                     when Template_Lang =>
+                        null; -- we're done
+
                      when Ada_Lang =>
                         if Cur in '#' | ':'
                           and then Buffers.Lookahead (Input) in Extended_Digit
@@ -1363,7 +1392,7 @@ package body Pp.Scanner is
                         end if;
                   end case;
 
-               --  single quote or character literal
+                  --  single quote or character literal
 
                when ''' =>
                   Get;
@@ -1381,69 +1410,87 @@ package body Pp.Scanner is
                   --  (for an attribute reference or a qualified expression),
                   --  as opposed to Ada code.
 
-                  if Preceding_Lexeme in Ident | String_Lit |
-                      Res_Access | Res_All | ')' | '!'
-                  then -- it's a tick
-                     pragma Assert
-                       (if Preceding_Lexeme = '!' then Lang = Template_Lang);
+                  if Preceding_Lexeme
+                     in Ident | String_Lit | Res_Access | Res_All | ')' | '!'
+                  then
+                     --  it's a tick
+                     pragma
+                       Assert
+                         (if Preceding_Lexeme = '!' then Lang = Template_Lang);
                      Tok := (Kind => ''', Sloc => Tok.Sloc);
-                  else -- it's a character literal
-                     Tok := (Kind => Character_Literal,
-                             Sloc => Tok.Sloc, others => <>);
+                  else
+                     --  it's a character literal
+                     Tok :=
+                       (Kind   => Character_Literal,
+                        Sloc   => Tok.Sloc,
+                        others => <>);
                      Get;
                      pragma Assert (Cur = ''');
                      Get;
                   end if;
 
-               --  string literal
+                  --  string literal
 
                when '"' | '%' =>
-                  Tok := (Kind => String_Lit,
-                          Sloc => Tok.Sloc, others => <>);
+                  Tok := (Kind => String_Lit, Sloc => Tok.Sloc, others => <>);
                   Scan_String_Literal (Q_Char => Cur);
 
-               --  One-character tokens
+                  --  One-character tokens
 
                when '!' =>
                   Tok := (Kind => '!', Sloc => Tok.Sloc);
                   Get;
+
                when '#' =>
                   case Lang is
                      when Template_Lang =>
                         Tok := (Kind => '#', Sloc => Tok.Sloc);
                         Get;
+
                      when Ada_Lang =>
-                        Tok := (Kind => Preprocessor_Directive,
-                                Sloc => Tok.Sloc, others => <>);
+                        Tok :=
+                          (Kind   => Preprocessor_Directive,
+                           Sloc   => Tok.Sloc,
+                           others => <>);
                         Skip_To_EOL;
                   end case;
+
                when '$' =>
                   Tok := (Kind => '$', Sloc => Tok.Sloc);
                   Get;
+
                when '?' =>
                   Tok := (Kind => '?', Sloc => Tok.Sloc);
                   Get;
+
                when '[' =>
                   Tok := (Kind => '[', Sloc => Tok.Sloc);
                   Get;
+
                when '\' =>
                   Tok := (Kind => '\', Sloc => Tok.Sloc);
                   Get;
+
                when ']' =>
                   Tok := (Kind => ']', Sloc => Tok.Sloc);
                   Get;
+
                when '^' =>
                   Tok := (Kind => '^', Sloc => Tok.Sloc);
                   Get;
+
                when '`' =>
                   Tok := (Kind => '`', Sloc => Tok.Sloc);
                   Get;
+
                when '{' =>
                   Tok := (Kind => '{', Sloc => Tok.Sloc);
                   Get;
+
                when '}' =>
                   Tok := (Kind => '}', Sloc => Tok.Sloc);
                   Get;
+
                when '~' =>
                   Tok := (Kind => '~', Sloc => Tok.Sloc);
                   Get;
@@ -1451,31 +1498,38 @@ package body Pp.Scanner is
                when '&' =>
                   Tok := (Kind => '&', Sloc => Tok.Sloc);
                   Get;
+
                when '(' =>
                   Tok := (Kind => '(', Sloc => Tok.Sloc);
                   Get;
+
                when ')' =>
                   Tok := (Kind => ')', Sloc => Tok.Sloc);
                   Get;
+
                when '+' =>
                   Tok := (Kind => '+', Sloc => Tok.Sloc);
                   Get;
+
                when ',' =>
                   Tok := (Kind => ',', Sloc => Tok.Sloc);
                   Get;
+
                when ';' =>
                   Tok := (Kind => ';', Sloc => Tok.Sloc);
                   Get;
+
                when '|' =>
                   Tok := (Kind => '|', Sloc => Tok.Sloc);
                   Get;
+
                when '@' =>
                   --  '@' is for target_name (see RM-5.2.1, AI12-0125-3)
                   Tok := (Kind => '@', Sloc => Tok.Sloc);
                   Get;
 
-               --  Multiple-character tokens. We need to distinguish between
-               --  "=" and "=>", and between "." and ".." and so forth.
+                  --  Multiple-character tokens. We need to distinguish between
+                  --  "=" and "=>", and between "." and ".." and so forth.
 
                when '=' =>
                   Get;
@@ -1558,14 +1612,18 @@ package body Pp.Scanner is
 
                when others =>
                   Get;
-                  Tok := (Kind => Illegal_Character,
-                          Sloc => Tok.Sloc, others => <>);
+                  Tok :=
+                    (Kind   => Illegal_Character,
+                     Sloc   => Tok.Sloc,
+                     others => <>);
             end case;
          end if;
 
-         Tok.Sloc.Last  := Cur_First - 1;
-         pragma Assert (if Tok.Kind in Whole_Line_Comment then
-           Tok.Width = Tok.Sloc.Last - Tok.Sloc.First + 1);
+         Tok.Sloc.Last := Cur_First - 1;
+         pragma
+           Assert
+             (if Tok.Kind in Whole_Line_Comment
+                then Tok.Width = Tok.Sloc.Last - Tok.Sloc.First + 1);
 
          pragma Assert (Tok.Kind /= Nil);
       end Get_Tokn;
@@ -1588,14 +1646,16 @@ package body Pp.Scanner is
 
                   if Preceding_Lexeme /= ''' then
                      declare
-                        RW : constant Reserved_Word_Or_Id :=
+                        RW       : constant Reserved_Word_Or_Id :=
                           Lookup_Reserved_Word (Tok_Text);
                         Old_Sloc : constant Source_Location := Tok.Sloc;
                      begin
                         case RW is
                            when Reserved_Word =>
                               Poke_Kind (Tok, New_Kind => RW);
-                           when Ident => null;
+
+                           when Ident =>
+                              null;
                         end case;
 
                         pragma Assert (Tok.Kind = RW);
@@ -1624,9 +1684,10 @@ package body Pp.Scanner is
 
          if Assert_Enabled then
             declare
-               Inp : constant W_Str :=
+               Inp  : constant W_Str :=
                  Buffers.Slice (Input, Tok.Sloc.First, Tok.Sloc.Last);
-               L : constant Tokn_Cursor := Last (Result'Unrestricted_Access);
+               L    : constant Tokn_Cursor :=
+                 Last (Result'Unrestricted_Access);
                Outp : constant W_Str := To_W_Str (Text (L));
             begin
                --  Can't assert for comments because block comments.
@@ -1635,28 +1696,30 @@ package body Pp.Scanner is
                --  an assertion failure. However, this might cause some
                --  additional linebreaks to be added.
 
-               pragma Assert
-                 (case Tok.Kind is
-                    when Comment_Kind => True,
-                    when EOL_Token =>
-                      Inp in [1 => W_LF] | [W_CR, W_LF]
-                        | [1 => W_FF] | [1 => W_VT] | [1 => W_CR]
-                      and then Outp in
-                        [1 => NL] | [1 => W_CR] | [W_CR, W_LF],
-                    when Reserved_Word => To_Lower (Inp) = Outp,
-                    when Tab_Token => True,
-                    when others => Inp = Outp);
+               pragma
+                 Assert
+                   (case Tok.Kind is
+                        when Comment_Kind => True,
+                        when EOL_Token =>
+                          Inp
+                          in [1 => W_LF]
+                           | [W_CR, W_LF]
+                           | [1 => W_FF]
+                           | [1 => W_VT]
+                           | [1 => W_CR]
+                          and then Outp
+                                   in [1 => NL] | [1 => W_CR] | [W_CR, W_LF],
+                        when Reserved_Word => To_Lower (Inp) = Outp,
+                        when Tab_Token => True,
+                        when others => Inp = Outp);
             end;
          end if;
       end Append_To_Result;
 
-      Start_Token : constant Token  :=
+      Start_Token : constant Token :=
         (Start_Of_Input,
          Sloc =>
-           (Line  => Cur_Line,
-            Col   => Cur_Col,
-            First => Cur_First,
-            Last  => 0));
+           (Line => Cur_Line, Col => Cur_Col, First => Cur_First, Last => 0));
 
       procedure Collect_Comment_Paragraph (Tok : in out Token) is
          Tok_EOL, Possible_Spaces, Tok_2 : Opt_Token;
@@ -1707,7 +1770,7 @@ package body Pp.Scanner is
             end if;
          end Send_EOL_And_Possible_Spaces;
 
-      --  Start of processing for Collect_Comment_Paragraph
+         --  Start of processing for Collect_Comment_Paragraph
 
       begin
          --  Loop, repeatedly getting Possible_Spaces and Tok_2, and combining
@@ -1740,7 +1803,7 @@ package body Pp.Scanner is
                   Tok := Tok_2;
                   exit;
 
-               --  Tok_2 can be combined
+                  --  Tok_2 can be combined
 
                elsif Tok.Sloc.Col = Tok_2.Sloc.Col
                  and then Tok.Leading_Blanks = Tok_2.Leading_Blanks
@@ -1753,10 +1816,10 @@ package body Pp.Scanner is
                   --  Go around the loop again, in case the next Tok_2 can be
                   --  combined.
 
-               --  Tok_2 cannot be combined, but it might start a new
-               --  paragraph. Finish constructing Tok, send it to Result
-               --  followed by Tok_EOL and Possible_Spaces, and use Tok_2 as
-               --  the new Tok.
+                  --  Tok_2 cannot be combined, but it might start a new
+                  --  paragraph. Finish constructing Tok, send it to Result
+                  --  followed by Tok_EOL and Possible_Spaces, and use Tok_2 as
+                  --  the new Tok.
 
                else
                   Tok.Text := Intern (Name_Buffer);
@@ -1769,9 +1832,9 @@ package body Pp.Scanner is
                   --  the paragraph in Tok.
                end if;
 
-            --  Not a comment, so cannot be combined. Finish constructing Tok,
-            --  send it to Result followed by Tok_EOL, Possible_Spaces, and
-            --  Tok_2, then exit.
+               --  Not a comment, so cannot be combined. Finish constructing
+               --  Tok, send it to Result followed by Tok_EOL, Possible_Spaces,
+               --  and Tok_2, then exit.
 
             else
                pragma Assert (Tok_2.Kind not in Comment_Kind);
@@ -1787,7 +1850,7 @@ package body Pp.Scanner is
          end loop;
       end Collect_Comment_Paragraph;
 
-   --  Start of processing for Get_Tokns
+      --  Start of processing for Get_Tokns
 
    begin
       pragma Assert (Buffers.Point (Input) = 1);
@@ -1819,8 +1882,8 @@ package body Pp.Scanner is
                   Append_To_Result (Tok);
                end if;
 
-            --  The simple case: Tok is not a comment, so just finish
-            --  constructing it and send it to Result.
+               --  The simple case: Tok is not a comment, so just finish
+               --  constructing it and send it to Result.
 
             else
                pragma Assert (Tok.Kind not in Comment_Kind);
@@ -1862,20 +1925,27 @@ package body Pp.Scanner is
    begin
       --  Filling can cause a comment to shrink, which makes it unfillable:
 
-      if X.Kind = Fillable_Comment
-        and then YY.Kind = Other_Whole_Line_Comment
+      if X.Kind = Fillable_Comment and then YY.Kind = Other_Whole_Line_Comment
       then
-         YY := (Fillable_Comment, YY.Sloc,
-                Text => YY.Text, Leading_Blanks => YY.Leading_Blanks,
-                Width => YY.Width, Num_Lines => YY.Num_Lines,
-                Last_Line_Len => YY.Last_Line_Len);
+         YY :=
+           (Fillable_Comment,
+            YY.Sloc,
+            Text           => YY.Text,
+            Leading_Blanks => YY.Leading_Blanks,
+            Width          => YY.Width,
+            Num_Lines      => YY.Num_Lines,
+            Last_Line_Len  => YY.Last_Line_Len);
       elsif X.Kind = Other_Whole_Line_Comment
         and then YY.Kind = Fillable_Comment
       then
-         YY := (Other_Whole_Line_Comment, YY.Sloc,
-                Text => YY.Text, Leading_Blanks => YY.Leading_Blanks,
-                Width => YY.Width, Num_Lines => YY.Num_Lines,
-                Last_Line_Len => YY.Last_Line_Len);
+         YY :=
+           (Other_Whole_Line_Comment,
+            YY.Sloc,
+            Text           => YY.Text,
+            Leading_Blanks => YY.Leading_Blanks,
+            Width          => YY.Width,
+            Num_Lines      => YY.Num_Lines,
+            Last_Line_Len  => YY.Last_Line_Len);
       end if;
 
       if (X.Kind in EOL_Token and then YY.Kind = Enabled_LB_Token)
@@ -1888,8 +1958,7 @@ package body Pp.Scanner is
    end Same_Token;
 
    procedure Check_Same_Token
-     (X, Y : Tokn_Cursor;
-      Message, Name_1, Name_2 : String)
+     (X, Y : Tokn_Cursor; Message, Name_1, Name_2 : String)
    is
       XX : constant Token := Token_At_Cursor (X);
       YY : constant Token := Token_At_Cursor (Y);
@@ -1917,9 +1986,10 @@ package body Pp.Scanner is
          raise Program_Error;
       end if;
 
-      pragma Assert
-        (if XX.Kind not in Comment_Kind then
-           Length (XX) = To_W_Str (Text (XX))'Length);
+      pragma
+        Assert
+          (if XX.Kind not in Comment_Kind
+             then Length (XX) = To_W_Str (Text (XX))'Length);
    end Check_Same_Token;
 
    procedure Check_Same_Tokens
@@ -1927,8 +1997,8 @@ package body Pp.Scanner is
    is
       pragma Assert (not Is_Empty (X));
       pragma Assert (not Is_Empty (Y));
-      Xj : Tokn_Cursor := First (X'Unrestricted_Access);
-      Yj : Tokn_Cursor := First (Y'Unrestricted_Access);
+      Xj         : Tokn_Cursor := First (X'Unrestricted_Access);
+      Yj         : Tokn_Cursor := First (Y'Unrestricted_Access);
       First_Time : Boolean := True;
    begin
       --  Allow to disable this, because it can get false positives in case of
@@ -1947,8 +2017,8 @@ package body Pp.Scanner is
 
       loop
          declare
-            X_Tok  : constant Token   := Token_At_Cursor (Xj);
-            Y_Tok  : constant Token   := Token_At_Cursor (Yj);
+            X_Tok  : constant Token := Token_At_Cursor (Xj);
+            Y_Tok  : constant Token := Token_At_Cursor (Yj);
             X_Done : constant Boolean := X_Tok.Kind = End_Of_Input;
             Y_Done : constant Boolean := Y_Tok.Kind = End_Of_Input;
          begin
@@ -1984,8 +2054,7 @@ package body Pp.Scanner is
 
    procedure Put_Token
      (Tok  : Tokn_Cursor;
-      File : Ada.Text_IO.File_Type := Ada.Text_IO.Standard_Output)
-   is
+      File : Ada.Text_IO.File_Type := Ada.Text_IO.Standard_Output) is
    begin
       if Is_Nil (Tok) then
          Ada.Text_IO.Put_Line (File, " -- <nil token??>");
@@ -2015,9 +2084,7 @@ package body Pp.Scanner is
          & " at "
          & Image (Sloc (Tok)));
 
-      if Kind (Tok) in Comment_Kind | Spaces
-        or else Tokn_Length (Tok) > 2
-      then
+      if Kind (Tok) in Comment_Kind | Spaces or else Tokn_Length (Tok) > 2 then
          Ada.Text_IO.Put (File, " len = " & Image (Tokn_Length (Tok)));
       end if;
 
@@ -2040,9 +2107,7 @@ package body Pp.Scanner is
       if Show_Origin then
          Ada.Text_IO.Put
            (File,
-            ", origin = """
-            & Str (Tok.V.Fixed (Tok.Fi).Origin).S
-            & """");
+            ", origin = """ & Str (Tok.V.Fixed (Tok.Fi).Origin).S & """");
       end if;
 
       Text_IO.Put_Line (File, "");
@@ -2084,7 +2149,7 @@ package body Pp.Scanner is
       File      : Ada.Text_IO.File_Type := Ada.Text_IO.Standard_Output)
    is
       First : constant Tokn_Cursor := Pred (Highlight, Num_Toks);
-      Last : constant Tokn_Cursor := Succ (Highlight, Num_Toks);
+      Last  : constant Tokn_Cursor := Succ (Highlight, Num_Toks);
 
    begin
       Put_Tokens
@@ -2096,8 +2161,9 @@ package body Pp.Scanner is
 
    function Last (V : Tokn_Vec_Ref) return Tokn_Cursor is
    begin
-      return Result : Tokn_Cursor :=
-        (V, Last_Index (V.Fixed) + 1, Last_Index (V.Octets) + 1)
+      return
+         Result : Tokn_Cursor :=
+           (V, Last_Index (V.Fixed) + 1, Last_Index (V.Octets) + 1)
       do
          pragma Assert (After_Last (Result));
          Prev (Result);
@@ -2111,8 +2177,7 @@ package body Pp.Scanner is
 
    procedure Put_Tokens
      (Tokens : Tokn_Vec;
-      File   : Ada.Text_IO.File_Type := Ada.Text_IO.Standard_Output)
-   is
+      File   : Ada.Text_IO.File_Type := Ada.Text_IO.Standard_Output) is
    begin
       if Is_Empty (Tokens) then
          Ada.Text_IO.Put_Line (File, "empty tokens");

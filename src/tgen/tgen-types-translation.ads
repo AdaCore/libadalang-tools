@@ -36,6 +36,7 @@ package TGen.Types.Translation is
       case Success is
          when True =>
             Res : SP.Ref;
+
          when False =>
             Diagnostics : Unbounded_String :=
               To_Unbounded_String ("Error during translation");
@@ -43,35 +44,36 @@ package TGen.Types.Translation is
    end record;
 
    function Translate
-     (N       : LAL.Type_Expr;
-      Verbose : Boolean := False) return Translation_Result;
+     (N : LAL.Type_Expr; Verbose : Boolean := False) return Translation_Result;
    --  Translate N to TGen's internal type representation
 
    function Translate
-     (N       : LAL.Base_Type_Decl;
-      Verbose : Boolean := False) return Translation_Result;
+     (N : LAL.Base_Type_Decl; Verbose : Boolean := False)
+      return Translation_Result;
    --  Translate N to TGen's internal type representation
 
    function Translate
-     (N       : LAL.Basic_Decl;
-      Verbose : Boolean := False) return Translation_Result;
+     (N : LAL.Basic_Decl; Verbose : Boolean := False)
+      return Translation_Result;
 
-   package Translation_Maps is new Ada.Containers.Hashed_Maps
-     (Key_Type        => Ada_Qualified_Name,
-      Element_Type    => TGen.Types.SP.Ref,
-      Hash            => TGen.Strings.Hash2,
-      Equivalent_Keys => TGen.Strings.Ada_Identifier_Vectors."=",
-      "="             => TGen.Types.SP."=");
+   package Translation_Maps is new
+     Ada.Containers.Hashed_Maps
+       (Key_Type        => Ada_Qualified_Name,
+        Element_Type    => TGen.Types.SP.Ref,
+        Hash            => TGen.Strings.Hash2,
+        Equivalent_Keys => TGen.Strings.Ada_Identifier_Vectors."=",
+        "="             => TGen.Types.SP."=");
 
    Translation_Cache : Translation_Maps.Map;
    --  Cache used for the memoization of Translate.
 
-   package Type_Decl_Maps is new Ada.Containers.Hashed_Maps
-     (Key_Type        => Ada_Qualified_Name,
-      Element_Type    => LAL.Base_Type_Decl,
-      Hash            => TGen.Strings.Hash2,
-      Equivalent_Keys => TGen.Strings.Ada_Identifier_Vectors."=",
-      "="             => Libadalang.Analysis."=");
+   package Type_Decl_Maps is new
+     Ada.Containers.Hashed_Maps
+       (Key_Type        => Ada_Qualified_Name,
+        Element_Type    => LAL.Base_Type_Decl,
+        Hash            => TGen.Strings.Hash2,
+        Equivalent_Keys => TGen.Strings.Ada_Identifier_Vectors."=",
+        "="             => Libadalang.Analysis."=");
 
    Type_Decl_Cache : Type_Decl_Maps.Map;
    --  Cache to be able to find the LAL base type decl node from the fully

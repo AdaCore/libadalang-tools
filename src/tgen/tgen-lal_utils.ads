@@ -38,16 +38,15 @@ package TGen.LAL_Utils is
    function "+" (Str : String) return Text_Type renames From_UTF8;
 
    function "+" (T : Text_Type) return Unbounded_Text_Type
-                 renames To_Unbounded_Text;
+   renames To_Unbounded_Text;
 
-   function "+" (T : Unbounded_Text_Type) return Text_Type
-                 renames To_Text;
+   function "+" (T : Unbounded_Text_Type) return Text_Type renames To_Text;
 
-   function "+" (Text : Unbounded_Text_Type) return String is
-     (+(+Text));
+   function "+" (Text : Unbounded_Text_Type) return String
+   is (+(+Text));
 
-   function "+" (Str : String) return Unbounded_Text_Type is
-     (+(+Str));
+   function "+" (Str : String) return Unbounded_Text_Type
+   is (+(+Str));
 
    function To_Qualified_Name
      (Name : Libadalang.Analysis.Name) return Ada_Qualified_Name;
@@ -59,14 +58,14 @@ package TGen.LAL_Utils is
       return Ada_Qualified_Name;
 
    function JSON_Test_Filename
-     (Subp : Libadalang.Analysis.Basic_Decl) return String with
-     Pre => Subp.P_Is_Subprogram;
+     (Subp : Libadalang.Analysis.Basic_Decl) return String
+   with Pre => Subp.P_Is_Subprogram;
    --  Return the simple name for the JSON file in which the tests for Subp
    --  should be stored.
 
    function Default_Blob_Test_Filename
-     (Subp : Libadalang.Analysis.Basic_Decl) return String with
-     Pre => Subp.P_Is_Subprogram;
+     (Subp : Libadalang.Analysis.Basic_Decl) return String
+   with Pre => Subp.P_Is_Subprogram;
    --  Return the default simple name for the binary file in which a test
    --  for Subp should be stored. It has no extension, so it can be suffixed
    --  or prefixed with anything to differentiate various test cases for the
@@ -84,8 +83,8 @@ package TGen.LAL_Utils is
    --  the child package of the package containing the generic instantiation.
 
    function Top_Level_Instantiation_Test_File_Name
-      (Unit_Full_Name : String) return String
-      with Pre => Unit_Full_Name /= "";
+     (Unit_Full_Name : String) return String
+   with Pre => Unit_Full_Name /= "";
    --  Get JSON file name when the unit is a library level generic
    --  instantiation.
 end TGen.LAL_Utils;

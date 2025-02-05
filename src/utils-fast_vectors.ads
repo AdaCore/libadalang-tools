@@ -33,7 +33,8 @@ generic
 
    with function "=" (Left, Right : Element_Type) return Boolean is <>;
 
-package Utils.Fast_Vectors is
+package Utils.Fast_Vectors
+is
 
    --  This is a more efficient version of Ada.Containers.Vectors.
 
@@ -45,18 +46,19 @@ package Utils.Fast_Vectors is
    --  still inherit some such horsing from Ada.Containers.Vectors.
 
    subtype Extended_Index is
-     Index_Type'
-       Base range
-       Index_Type'First - 1 ..
-         Index_Type'Min (Index_Type'Base'Last - 1, Index_Type'Last) + 1;
+     Index_Type'Base
+       range Index_Type'First
+             - 1
+             .. Index_Type'Min (Index_Type'Base'Last - 1, Index_Type'Last) + 1;
 
    No_Index : constant Extended_Index := Extended_Index'First;
 
-   type Vector is tagged private with
-      Constant_Indexing => Constant_Reference,
-      Variable_Indexing => Reference,
-      Default_Iterator  => Iterate,
-      Iterator_Element  => Element_Type;
+   type Vector is tagged private
+   with
+     Constant_Indexing => Constant_Reference,
+     Variable_Indexing => Reference,
+     Default_Iterator  => Iterate,
+     Iterator_Element  => Element_Type;
 
    type Cursor is private;
 
@@ -64,13 +66,13 @@ package Utils.Fast_Vectors is
 
    function Has_Element (Position : Cursor) return Boolean;
 
-   package Vector_Iterator_Interfaces is new Ada.Iterator_Interfaces
-     (Cursor,
-      Has_Element);
+   package Vector_Iterator_Interfaces is new
+     Ada.Iterator_Interfaces (Cursor, Has_Element);
 
    Empty_Vector : constant Vector;
 
-   overriding function "=" (Left, Right : Vector) return Boolean;
+   overriding
+   function "=" (Left, Right : Vector) return Boolean;
 
    function Length (Container : Vector) return Count_Type;
 
@@ -84,51 +86,45 @@ package Utils.Fast_Vectors is
    --  Same as Clear, but also frees storage
 
    function To_Cursor
-     (Container : Vector;
-      Index     : Extended_Index)
-      return      Cursor;
+     (Container : Vector; Index : Extended_Index) return Cursor;
 
    function To_Index (Position : Cursor) return Extended_Index;
 
    function Element
-     (Container : Vector;
-      Index     : Index_Type)
-      return      Element_Type;
+     (Container : Vector; Index : Index_Type) return Element_Type;
 
    function Element (Position : Cursor) return Element_Type;
 
    type Constant_Reference_Type
-     (Element : not null access constant Element_Type) is private with
-      Implicit_Dereference => Element;
+     (Element : not null access constant Element_Type)
+   is
+     private
+   with Implicit_Dereference => Element;
 
-   type Reference_Type (Element : not null access Element_Type) is private with
-      Implicit_Dereference => Element;
-
-   function Constant_Reference
-     (Container : aliased Vector;
-      Position  : Cursor)
-      return      Constant_Reference_Type;
-
-   function Reference
-     (Container : aliased in out Vector;
-      Position  : Cursor)
-      return      Reference_Type;
+   type Reference_Type (Element : not null access Element_Type) is private
+   with Implicit_Dereference => Element;
 
    function Constant_Reference
-     (Container : aliased Vector;
-      Index     : Index_Type)
-      return      Constant_Reference_Type;
+     (Container : aliased Vector; Position : Cursor)
+      return Constant_Reference_Type;
 
    function Reference
-     (Container : aliased in out Vector;
-      Index     : Index_Type)
-      return      Reference_Type;
+     (Container : aliased in out Vector; Position : Cursor)
+      return Reference_Type;
+
+   function Constant_Reference
+     (Container : aliased Vector; Index : Index_Type)
+      return Constant_Reference_Type;
+
+   function Reference
+     (Container : aliased in out Vector; Index : Index_Type)
+      return Reference_Type;
 
    procedure Move (Target : in out Vector; Source : in out Vector);
 
    procedure Append (Container : in out Vector; New_Item : Element_Type);
    procedure Push (Container : in out Vector; New_Item : Element_Type)
-     renames Append;
+   renames Append;
 
    type Element_Access is access all Element_Type;
    function Last_Ptr (Container : in out Vector) return Element_Access;
@@ -163,12 +159,11 @@ package Utils.Fast_Vectors is
 
    function Iterate
      (Container : Vector)
-      return      Vector_Iterator_Interfaces.Reversible_Iterator'Class;
+      return Vector_Iterator_Interfaces.Reversible_Iterator'Class;
 
    function Iterate
-     (Container : Vector;
-      Start     : Cursor)
-      return      Vector_Iterator_Interfaces.Reversible_Iterator'Class;
+     (Container : Vector; Start : Cursor)
+      return Vector_Iterator_Interfaces.Reversible_Iterator'Class;
 
    generic
       with function "<" (Left, Right : Element_Type) return Boolean is <>;
@@ -191,12 +186,12 @@ package Utils.Fast_Vectors is
    pragma No_Strict_Aliasing (Big_Ptr_Var);
 
    function Elems (Container : Vector) return Big_Ptr; -- with
---      Post => Elems'Result'First = Index_Type'First;
+   --      Post => Elems'Result'First = Index_Type'First;
    function Elems_Var (Container : Vector) return Big_Ptr_Var; -- with
---      Post => Elems_Var'Result'First = Index_Type'First;
---  ???Above postconditions cause warnings These return a pointer to the
---  underlying data structure. This is of course dangerous. The idea is
---  that you can do:
+   --      Post => Elems_Var'Result'First = Index_Type'First;
+   --  ???Above postconditions cause warnings These return a pointer to the
+   --  underlying data structure. This is of course dangerous. The idea is
+   --  that you can do:
    --
    --     X : Elems_Array renames Elems (V) (1 .. Last_Index (V));
    --
@@ -205,30 +200,28 @@ package Utils.Fast_Vectors is
 
    type Subrange is record
       First : Index_Type;
-      Last : Extended_Index;
+      Last  : Extended_Index;
    end record;
 
-   function Full_Range (Container : Vector) return Subrange is
-     (1, Last_Index (Container));
+   function Full_Range (Container : Vector) return Subrange
+   is (1, Last_Index (Container));
 
    function Slice
-     (Container : Vector;
-      First     : Index_Type;
-      Last      : Extended_Index)
-      return      Elements_Array with
-      Post => Slice'Result'First = Index_Type'First;
+     (Container : Vector; First : Index_Type; Last : Extended_Index)
+      return Elements_Array
+   with Post => Slice'Result'First = Index_Type'First;
 
-   function Slice (Container : Vector; R : Subrange) return Elements_Array is
-     (Slice (Container, R.First, R.Last));
+   function Slice (Container : Vector; R : Subrange) return Elements_Array
+   is (Slice (Container, R.First, R.Last));
 
-   function To_Array (Container : Vector) return Elements_Array with
-      Post => To_Array'Result'First = Index_Type'First;
+   function To_Array (Container : Vector) return Elements_Array
+   with Post => To_Array'Result'First = Index_Type'First;
 
    procedure Append (Container : in out Vector; New_Items : Elements_Array);
 
    procedure Put
-     (Container : Vector;
-      Put : not null access procedure (Item : Element_Type);
+     (Container   : Vector;
+      Put         : not null access procedure (Item : Element_Type);
       Put_Between : not null access procedure);
    --  Prints out the Container for debugging. We don't want to depend on any
    --  output packages here, so you must pass in Put (to print out an element)
@@ -259,12 +252,14 @@ private
 
    type Vector is new Controlled with record
       Elements : Elements_Access := Empty_Elements'Access;
-      Last     : Extended_Index  := No_Index;
+      Last     : Extended_Index := No_Index;
    end record;
 
-   overriding procedure Adjust (Container : in out Vector);
+   overriding
+   procedure Adjust (Container : in out Vector);
 
-   overriding procedure Finalize (Container : in out Vector);
+   overriding
+   procedure Finalize (Container : in out Vector);
 
    type Vector_Access is access all Vector;
 
@@ -274,7 +269,8 @@ private
    end record;
 
    type Constant_Reference_Type
-     (Element : not null access constant Element_Type) is null record;
+     (Element : not null access constant Element_Type)
+   is null record;
 
    type Reference_Type (Element : not null access Element_Type) is null record;
 

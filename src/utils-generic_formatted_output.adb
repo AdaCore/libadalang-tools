@@ -83,8 +83,7 @@ package body Utils.Generic_Formatted_Output is
    ------------
 
    procedure Indent
-     (Indentation_Amount : Natural := Default_Indentation_Amount)
-   is
+     (Indentation_Amount : Natural := Default_Indentation_Amount) is
    begin
       Indentation_Level := Indentation_Level + Indentation_Amount;
    end Indent;
@@ -94,8 +93,7 @@ package body Utils.Generic_Formatted_Output is
    -------------
 
    procedure Outdent
-     (Indentation_Amount : Natural := Default_Indentation_Amount)
-   is
+     (Indentation_Amount : Natural := Default_Indentation_Amount) is
    begin
       Indentation_Level := Indentation_Level - Indentation_Amount;
    end Outdent;
@@ -104,11 +102,8 @@ package body Utils.Generic_Formatted_Output is
    -- Put --
    ---------
 
-   procedure Put
-     (T                      : Template;
-      X1, X2, X3, X4, X5, X6 : Str_Type := [])
-   is
-      J    : Positive                  := T'First;
+   procedure Put (T : Template; X1, X2, X3, X4, X5, X6 : Str_Type := []) is
+      J    : Positive := T'First;
       Used : array (1 .. 6) of Boolean := [others => False];
 
    begin

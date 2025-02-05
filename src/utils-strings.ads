@@ -33,8 +33,7 @@ package Utils.Strings is
    function Replace_String (S, From, To : String) return String;
    --  Replaces all occurrences of From in S with To
 
-   function Dashes
-     (S : String) return String is
-     (Replace_String (S, From => "_", To => "-"));
+   function Dashes (S : String) return String
+   is (Replace_String (S, From => "_", To => "-"));
 
 end Utils.Strings;

@@ -44,23 +44,22 @@ package body TGen.Types.Discrete_Types is
    -- Lit_Image --
    ---------------
 
-   function Lit_Image
-     (Self : Discrete_Typ; Lit : Big_Integer) return String is
-     (Big_Int.To_String (Lit));
+   function Lit_Image (Self : Discrete_Typ; Lit : Big_Integer) return String
+   is (Big_Int.To_String (Lit));
 
    ---------------
    -- Low_Bound --
    ---------------
 
-   function Low_Bound (Self : Discrete_Typ) return Big_Integer is
-     (Big_Zero);
+   function Low_Bound (Self : Discrete_Typ) return Big_Integer
+   is (Big_Zero);
 
    ----------------
    -- High_Bound --
    ----------------
 
-   function High_Bound (Self : Discrete_Typ) return Big_Integer is
-     (Big_Zero);
+   function High_Bound (Self : Discrete_Typ) return Big_Integer
+   is (Big_Zero);
 
    --  Sampling strategy: draw an arbitrary value from an arbitrary sample in
    --  a list of samples.
@@ -70,8 +69,8 @@ package body TGen.Types.Discrete_Types is
    --------------
 
    function Generate
-     (S            : in out Sample_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return JSON_Value
+     (S : in out Sample_Strategy_Type; Disc_Context : Disc_Value_Map)
+      return JSON_Value
    is
       Picked_Index  : constant Positive :=
         Positive (Rand_Int (1, Integer (S.Samples.Length)));
@@ -86,8 +85,8 @@ package body TGen.Types.Discrete_Types is
    --------------------------------
 
    function Generate_Sampling_Strategy
-     (Self    : Discrete_Typ;
-      Samples : Alternatives_Set_Vector) return Strategy_Type'Class
+     (Self : Discrete_Typ; Samples : Alternatives_Set_Vector)
+      return Strategy_Type'Class
    is
       Strat : Sample_Strategy_Type;
    begin
@@ -105,45 +104,42 @@ package body TGen.Types.Discrete_Types is
    ---------
 
    function Gen return T is
-      function Rand is new
-        GNAT.Random_Numbers.Random_Discrete (T, T'First);
+      function Rand is new GNAT.Random_Numbers.Random_Discrete (T, T'First);
    begin
       return Rand (Generator_Instance);
    end Gen;
 
-   function Generate_Value_Random
-     (Ty : Typ'Class) return JSON_Value;
+   function Generate_Value_Random (Ty : Typ'Class) return JSON_Value;
 
    ---------------------------
    -- Generate_Value_Random --
    ---------------------------
 
-   function Generate_Value_Random
-     (Ty : Typ'Class) return JSON_Value
-   is
+   function Generate_Value_Random (Ty : Typ'Class) return JSON_Value is
       Self : constant Discrete_Typ'Class := Discrete_Typ'Class (Ty);
-      package LLI_Conversions is
-        new Big_Int.Signed_Conversions (Int => Long_Long_Integer);
+      package LLI_Conversions is new
+        Big_Int.Signed_Conversions (Int => Long_Long_Integer);
 
       --  TODO??? Work around until V307-012 is fixed (can't convert to values
       --  outside of Long_Long_Integer bounds).
 
-      type T is new Long_Long_Integer range
-        LLI_Conversions.From_Big_Integer
-          (Big_Int.Max
-             (Self.Low_Bound,
-              LLI_Conversions.To_Big_Integer (Long_Long_Integer'First + 1)))
-          ..
-            LLI_Conversions.From_Big_Integer
-              (Big_Int.Min
-                 (Self.High_Bound,
-                  LLI_Conversions.To_Big_Integer
-                    (Long_Long_Integer'Last - 1)));
+      type T is
+        new Long_Long_Integer
+             range LLI_Conversions.From_Big_Integer
+                     (Big_Int.Max
+                        (Self.Low_Bound,
+                         LLI_Conversions.To_Big_Integer
+                           (Long_Long_Integer'First + 1)))
+                   .. LLI_Conversions.From_Big_Integer
+                        (Big_Int.Min
+                           (Self.High_Bound,
+                            LLI_Conversions.To_Big_Integer
+                              (Long_Long_Integer'Last - 1)));
 
       function Rand is new Gen (T);
    begin
-      return Create
-        (LLI_Conversions.To_Big_Integer (Long_Long_Integer (Rand)));
+      return
+        Create (LLI_Conversions.To_Big_Integer (Long_Long_Integer (Rand)));
    end Generate_Value_Random;
 
    --------------
@@ -151,8 +147,8 @@ package body TGen.Types.Discrete_Types is
    --------------
 
    function Generate
-     (S            : in out Array_Index_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return JSON_Value
+     (S : in out Array_Index_Strategy_Type; Disc_Context : Disc_Value_Map)
+      return JSON_Value
    is
       T_Classwide : constant Typ'Class := S.T.Get;
       T_Discrete  : constant Discrete_Typ'Class :=
@@ -189,10 +185,9 @@ package body TGen.Types.Discrete_Types is
          Avg_Size : Natural := S.Average_Size;
 
          Other_Index_Value : constant Big_Integer :=
-           (if S.Other_Index_Constraint.Kind =
-              TGen.Types.Constraints.Discriminant
-            then
-               Disc_Context (S.Other_Index_Constraint.Disc_Name).Get
+           (if S.Other_Index_Constraint.Kind
+              = TGen.Types.Constraints.Discriminant
+            then Disc_Context (S.Other_Index_Constraint.Disc_Name).Get
             else S.Other_Index_Constraint.Int_Val);
 
          Elements : Many_Type;
@@ -201,7 +196,7 @@ package body TGen.Types.Discrete_Types is
       begin
          if S.Index = End_Index
            and then T_Discrete.High_Bound - Other_Index_Value
-             < Nat_Conversions.To_Big_Integer (Max_Size)
+                    < Nat_Conversions.To_Big_Integer (Max_Size)
          then
             --  We are generating J, and Integer'Last - I < Max_Size,
             --  e.g. with:
@@ -221,7 +216,7 @@ package body TGen.Types.Discrete_Types is
 
          if S.Index = Start_Index
            and then Other_Index_Value - T_Discrete.Low_Bound
-             < Nat_Conversions.To_Big_Integer (Max_Size)
+                    < Nat_Conversions.To_Big_Integer (Max_Size)
          then
             --  We are generating I, and J - Integer'First < Max_Size,
             --  e.g. with:
@@ -277,8 +272,10 @@ package body TGen.Types.Discrete_Types is
          --  Min_Size and Max_Size.
 
          if Avg_Size < Min_Size or else Avg_Size > Max_Size then
-            Avg_Size := Natural'Min (Natural'Max (Min_Size * 2, Min_Size + 5),
-                                     Min_Size + ((Max_Size - Min_Size) / 2));
+            Avg_Size :=
+              Natural'Min
+                (Natural'Max (Min_Size * 2, Min_Size + 5),
+                 Min_Size + ((Max_Size - Min_Size) / 2));
          end if;
 
          --  Then, we can safely generate our size
@@ -294,11 +291,11 @@ package body TGen.Types.Discrete_Types is
          --  whole machinery above.
 
          if S.Index = Start_Index then
-            Result := Create
-              (Other_Index_Value - To_Big_Integer (Elements.Count) + 1);
+            Result :=
+              Create (Other_Index_Value - To_Big_Integer (Elements.Count) + 1);
          else
-            Result := Create
-              (Other_Index_Value + To_Big_Integer (Elements.Count) - 1);
+            Result :=
+              Create (Other_Index_Value + To_Big_Integer (Elements.Count) - 1);
          end if;
 
          return Result;
@@ -347,17 +344,16 @@ package body TGen.Types.Discrete_Types is
              (Self.High_Bound - Self.Low_Bound,
               Nat_Conversions.To_Big_Integer (Unconstrained_Array_Size_Max)));
       Average_Size :=
-        Natural'Min (Natural'Max (Min_Size * 2, Min_Size + 5),
-                     Min_Size + ((Max_Size - Min_Size) / 2));
+        Natural'Min
+          (Natural'Max (Min_Size * 2, Min_Size + 5),
+           Min_Size + ((Max_Size - Min_Size) / 2));
 
-      if ILB.Kind = Discriminant and then ILB.Disc_Name = Var_Name
-      then
+      if ILB.Kind = Discriminant and then ILB.Disc_Name = Var_Name then
          Strat.Index := Start_Index;
          Strat.Other_Index_Constraint := IHB;
       end if;
 
-      if IHB.Kind = Discriminant and then IHB.Disc_Name = Var_Name
-      then
+      if IHB.Kind = Discriminant and then IHB.Disc_Name = Var_Name then
          Strat.Index := End_Index;
          Strat.Other_Index_Constraint := ILB;
       end if;
@@ -377,8 +373,8 @@ package body TGen.Types.Discrete_Types is
    -------------------------------------------
 
    function Generate_Identity_Constraint_Strategy
-     (Self       : Discrete_Typ'Class;
-      Constraint : Discrete_Constraint_Value) return Strategy_Type'Class
+     (Self : Discrete_Typ'Class; Constraint : Discrete_Constraint_Value)
+      return Strategy_Type'Class
    is
       Strat : Identity_Constraint_Strategy_Type;
    begin
@@ -400,20 +396,23 @@ package body TGen.Types.Discrete_Types is
    -- Generate --
    --------------
 
-   overriding function Generate
-     (S            : in out First_Last_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return JSON_Value
+   overriding
+   function Generate
+     (S : in out First_Last_Strategy_Type; Disc_Context : Disc_Value_Map)
+      return JSON_Value
    is
-      Discrete_T : Discrete_Typ'Class renames
-        Discrete_Typ'Class (S.T.Unchecked_Get.all);
+      Discrete_T : Discrete_Typ'Class
+        renames Discrete_Typ'Class (S.T.Unchecked_Get.all);
    begin
       case S.Generation is
          when First =>
             S.Generation := Last;
             return Create (Discrete_T.Low_Bound);
+
          when Last =>
             S.Generation := Unknown;
             return Create (Discrete_T.High_Bound);
+
          when others =>
             raise Program_Error;
       end case;
@@ -423,7 +422,8 @@ package body TGen.Types.Discrete_Types is
    -- Default_Enum_Strategy --
    ---------------------------
 
-   overriding function Default_Enum_Strategy
+   overriding
+   function Default_Enum_Strategy
      (Self : Discrete_Typ) return Enum_Strategy_Type'Class
    is
       Strat : First_Last_Strategy_Type;
@@ -435,28 +435,32 @@ package body TGen.Types.Discrete_Types is
    type Big_Int_Array is array (Positive range <>) of Big_Integer;
 
    type Sequence_Enum_Strategy (Num_Values : Positive) is
-      new Enum_Strategy_Type with
-   record
-      Values      : Big_Int_Array (1 .. Num_Values);
+     new Enum_Strategy_Type
+   with record
+      Values : Big_Int_Array (1 .. Num_Values);
       --  Sequence of values to be output
 
       Current_Val : Positive;
       --  Index in the above array for the next value to be generated
    end record;
 
-   overriding procedure Init (S : in out Sequence_Enum_Strategy);
+   overriding
+   procedure Init (S : in out Sequence_Enum_Strategy);
 
-   overriding function Has_Next (S : Sequence_Enum_Strategy) return Boolean;
+   overriding
+   function Has_Next (S : Sequence_Enum_Strategy) return Boolean;
 
-   overriding function Generate
-     (S            : in out Sequence_Enum_Strategy;
-      Disc_Context : Disc_Value_Map) return JSON_Value;
+   overriding
+   function Generate
+     (S : in out Sequence_Enum_Strategy; Disc_Context : Disc_Value_Map)
+      return JSON_Value;
 
    ----------
    -- Init --
    ----------
 
-   overriding procedure Init (S : in out Sequence_Enum_Strategy) is
+   overriding
+   procedure Init (S : in out Sequence_Enum_Strategy) is
    begin
       S.Current_Val := 1;
    end Init;
@@ -465,16 +469,18 @@ package body TGen.Types.Discrete_Types is
    -- Has_Next --
    --------------
 
-   overriding function Has_Next (S : Sequence_Enum_Strategy) return Boolean is
-     (S.Current_Val <= S.Num_Values);
+   overriding
+   function Has_Next (S : Sequence_Enum_Strategy) return Boolean
+   is (S.Current_Val <= S.Num_Values);
 
    --------------
    -- Generate --
    --------------
 
-   overriding function Generate
-     (S            : in out Sequence_Enum_Strategy;
-      Disc_Context : Disc_Value_Map) return JSON_Value
+   overriding
+   function Generate
+     (S : in out Sequence_Enum_Strategy; Disc_Context : Disc_Value_Map)
+      return JSON_Value
    is
       pragma Unreferenced (Disc_Context);
       Res : constant JSON_Value := Create (S.Values (S.Current_Val));
@@ -489,23 +495,23 @@ package body TGen.Types.Discrete_Types is
 
    function Make_Single_Array_Constraint_Strat
      (T : SP.Ref; Constraints : Index_Constraint)
-     return Enum_Strategy_Type'Class
+      return Enum_Strategy_Type'Class
    is
-      Self       : Discrete_Typ'Class renames
-        Discrete_Typ'Class (T.Unchecked_Get.all);
+      Self       : Discrete_Typ'Class
+        renames Discrete_Typ'Class (T.Unchecked_Get.all);
       Res        : Sequence_Enum_Strategy (3);
       Disc_Is_LB : constant Boolean :=
         Constraints.Discrete_Range.Low_Bound.Kind = Discriminant;
 
-      Op  : constant access
-        function (L, R : Valid_Big_Integer) return Valid_Big_Integer :=
+      Op :
+        constant access function
+          (L, R : Valid_Big_Integer) return Valid_Big_Integer :=
           (if Disc_Is_LB then Big_Int."-"'Access else Big_Int."+"'Access);
 
-      Offsets     : constant Big_Int_Array :=
+      Offsets : constant Big_Int_Array :=
         [To_Big_Integer (0), To_Big_Integer (1), To_Big_Integer (1000)];
-      Base        : constant Big_Integer :=
-        (if Disc_Is_LB
-         then Constraints.Discrete_Range.High_Bound.Int_Val
+      Base    : constant Big_Integer :=
+        (if Disc_Is_LB then Constraints.Discrete_Range.High_Bound.Int_Val
          else Constraints.Discrete_Range.Low_Bound.Int_Val);
    begin
       for I in Offsets'Range loop
@@ -527,15 +533,14 @@ package body TGen.Types.Discrete_Types is
    --------------------------------------
 
    function Make_Dual_Array_Constraint_Strat
-     (T          : SP.Ref;
-      Constraint : Index_Constraint;
-      Disc_Name  : Unbounded_String) return Enum_Strategy_Type'Class
+     (T : SP.Ref; Constraint : Index_Constraint; Disc_Name : Unbounded_String)
+      return Enum_Strategy_Type'Class
    is
-      Self         : Discrete_Typ'Class renames
-        Discrete_Typ'Class (T.Unchecked_Get.all);
+      Self         : Discrete_Typ'Class
+        renames Discrete_Typ'Class (T.Unchecked_Get.all);
       Is_Low_Bound : constant Boolean :=
         Constraint.Discrete_Range.Low_Bound.Disc_Name = Disc_Name;
-      Res : Sequence_Enum_Strategy (if Is_Low_Bound then 2 else 3);
+      Res          : Sequence_Enum_Strategy (if Is_Low_Bound then 2 else 3);
    begin
       Res.Values (1) := Self.Low_Bound;
       Res.Values (2) := Self.Low_Bound + To_Big_Integer (1);
@@ -568,8 +573,7 @@ package body TGen.Types.Discrete_Types is
    -- Default_Strategy --
    ----------------------
 
-   function Default_Strategy
-     (Self : Discrete_Typ) return Strategy_Type'Class
+   function Default_Strategy (Self : Discrete_Typ) return Strategy_Type'Class
    is
    begin
       return Generate_Static_Common (Self);

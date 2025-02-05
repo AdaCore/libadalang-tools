@@ -33,18 +33,19 @@ package TGen.Types.Enum_Types is
 
    type Enum_Typ is new Discrete_Typ with null record;
 
-   type Char_Typ (Is_Static, Has_Range : Boolean) is
-     new Enum_Typ (Is_Static) with record
+   type Char_Typ (Is_Static, Has_Range : Boolean) is new Enum_Typ (Is_Static)
+   with record
       case Has_Range is
          when True =>
             Range_Value : Discrete_Range_Constraint;
+
          when others =>
             null;
       end case;
    end record;
 
-   function Supports_Static_Gen (Self : Char_Typ) return Boolean is
-      (not Self.Has_Range or else Self.Range_Value.Static);
+   function Supports_Static_Gen (Self : Char_Typ) return Boolean
+   is (not Self.Has_Range or else Self.Range_Value.Static);
    --  Whether values for this Typ can be statically generated
 
    function Image (Self : Char_Typ) return String;
@@ -54,23 +55,23 @@ package TGen.Types.Enum_Types is
    --  only returns values in Character'Range, even if Self is a
    --  Wide(_Wide)_Character.
 
-   function High_Bound (Self : Char_Typ) return Big_Integer with
-     Pre => Self.Is_Static;
+   function High_Bound (Self : Char_Typ) return Big_Integer
+   with Pre => Self.Is_Static;
 
-   function Low_Bound (Self : Char_Typ) return Big_Integer with
-     Pre => Self.Is_Static;
+   function Low_Bound (Self : Char_Typ) return Big_Integer
+   with Pre => Self.Is_Static;
 
-   function Kind (Self : Char_Typ) return Typ_Kind is (Char_Kind);
+   function Kind (Self : Char_Typ) return Typ_Kind
+   is (Char_Kind);
 
    function Encode (Self : Char_Typ; Val : JSON_Value) return JSON_Value;
 
    function Default_Strategy (Self : Char_Typ) return Strategy_Type'Class;
    --  Generate a strategy to statically generate (in one pass) values for Self
 
-   function As_Char_Typ (Self : SP.Ref) return Char_Typ'Class is
-     (Char_Typ'Class (Self.Unchecked_Get.all)) with
-     Pre => not SP.Is_Null (Self)
-            and then Self.Get.Kind in Char_Kind;
+   function As_Char_Typ (Self : SP.Ref) return Char_Typ'Class
+   is (Char_Typ'Class (Self.Unchecked_Get.all))
+   with Pre => not SP.Is_Null (Self) and then Self.Get.Kind in Char_Kind;
    pragma Inline (As_Char_Typ);
 
    type Bool_Typ is new Enum_Typ with null record;
@@ -82,56 +83,59 @@ package TGen.Types.Enum_Types is
 
    function Lit_Image (Self : Bool_Typ; Lit : Big_Integer) return String;
 
-   function High_Bound (Self : Bool_Typ) return Big_Integer with
-     Pre => Self.Is_Static;
+   function High_Bound (Self : Bool_Typ) return Big_Integer
+   with Pre => Self.Is_Static;
 
-   function Kind (Self : Bool_Typ) return Typ_Kind is (Bool_Kind);
+   function Kind (Self : Bool_Typ) return Typ_Kind
+   is (Bool_Kind);
 
    function Encode (Self : Bool_Typ; Val : JSON_Value) return JSON_Value;
 
-   function As_Bool_Typ (Self : SP.Ref) return Bool_Typ'Class is
-     (Bool_Typ'Class (Self.Unchecked_Get.all)) with
-     Pre => not SP.Is_Null (Self)
-            and then Self.Get.Kind in Bool_Kind;
+   function As_Bool_Typ (Self : SP.Ref) return Bool_Typ'Class
+   is (Bool_Typ'Class (Self.Unchecked_Get.all))
+   with Pre => not SP.Is_Null (Self) and then Self.Get.Kind in Bool_Kind;
    pragma Inline (As_Bool_Typ);
 
-   package Enum_Literal_Maps is new Ada.Containers.Ordered_Maps
-     (Key_Type     => Big_Integer,
-      Element_Type => Unbounded_String,
-       "<"         => Big_Int."<");
+   package Enum_Literal_Maps is new
+     Ada.Containers.Ordered_Maps
+       (Key_Type     => Big_Integer,
+        Element_Type => Unbounded_String,
+        "<"          => Big_Int."<");
 
-   type Other_Enum_Typ (Is_Static : Boolean) is new
-     Enum_Typ (Is_Static => Is_Static) with record
+   type Other_Enum_Typ (Is_Static : Boolean) is
+     new Enum_Typ (Is_Static => Is_Static)
+   with record
       case Is_Static is
          when True =>
             Literals : Enum_Literal_Maps.Map;
+
          when others =>
             null;
       end case;
    end record;
 
-   function Supports_Static_Gen (Self : Other_Enum_Typ) return Boolean is
-     (Self.Is_Static);
+   function Supports_Static_Gen (Self : Other_Enum_Typ) return Boolean
+   is (Self.Is_Static);
    --  Whether values for this Typ can be statically generated
 
    function Image (Self : Other_Enum_Typ) return String;
 
    function Lit_Image (Self : Other_Enum_Typ; Lit : Big_Integer) return String;
 
-   function Low_Bound (Self : Other_Enum_Typ) return Big_Integer with
-     Pre => Self.Is_Static;
+   function Low_Bound (Self : Other_Enum_Typ) return Big_Integer
+   with Pre => Self.Is_Static;
 
-   function High_Bound (Self : Other_Enum_Typ) return Big_Integer with
-     Pre => Self.Is_Static;
+   function High_Bound (Self : Other_Enum_Typ) return Big_Integer
+   with Pre => Self.Is_Static;
 
-   function Kind (Self : Other_Enum_Typ) return Typ_Kind is (Enum_Kind);
+   function Kind (Self : Other_Enum_Typ) return Typ_Kind
+   is (Enum_Kind);
 
    function Encode (Self : Other_Enum_Typ; Val : JSON_Value) return JSON_Value;
 
-   function As_Other_Enum_Typ (Self : SP.Ref) return Other_Enum_Typ'Class is
-     (Other_Enum_Typ'Class (Self.Unchecked_Get.all)) with
-     Pre => not SP.Is_Null (Self)
-            and then Self.Get.Kind in Enum_Kind;
+   function As_Other_Enum_Typ (Self : SP.Ref) return Other_Enum_Typ'Class
+   is (Other_Enum_Typ'Class (Self.Unchecked_Get.all))
+   with Pre => not SP.Is_Null (Self) and then Self.Get.Kind in Enum_Kind;
    pragma Inline (As_Other_Enum_Typ);
 
 end TGen.Types.Enum_Types;

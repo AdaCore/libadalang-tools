@@ -8,6 +8,13 @@ include:
   # Issue check
   - component: $CI_SERVER_FQDN/eng/gitlab-templates/check-issue@~latest
 
+  # gnatformat check
+  - component: $CI_SERVER_FQDN/eng/gitlab-templates/gnatformat@main
+    inputs:
+      stage: check
+      anod-spec: libadalang-tools
+      gnatformat-args: -P src/build.gpr --check
+
   # Build
   - component: $CI_SERVER_FQDN/eng/gitlab-templates/build@~latest
     inputs:

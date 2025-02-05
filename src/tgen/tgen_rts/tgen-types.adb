@@ -33,22 +33,20 @@ package body TGen.Types is
    --------------------------
 
    function Generic_Package_Instance_Name
-      (Pack_Name : Ada_Qualified_Name)
-      return Ada_Qualified_Name
+     (Pack_Name : Ada_Qualified_Name) return Ada_Qualified_Name
    is
-      Prefix : constant Ada_Identifier := Ada_Identifier
-         (+"TGen_Generic_Instantiation_");
+      Prefix             : constant Ada_Identifier :=
+        Ada_Identifier (+"TGen_Generic_Instantiation_");
       First_Element_Name : constant Ada_Identifier :=
-         Prefix & Pack_Name.First_Element;
-      Result : Ada_Qualified_Name;
+        Prefix & Pack_Name.First_Element;
+      Result             : Ada_Qualified_Name;
 
       use Ada_Identifier_Vectors;
    begin
       Result.Append (First_Element_Name);
       Result.Append (Ada_Identifier (+"Instance"));
-      for I in
-         Extended_Index'Succ (Pack_Name.First_Index)
-         .. Pack_Name.Last_Index
+      for I
+        in Extended_Index'Succ (Pack_Name.First_Index) .. Pack_Name.Last_Index
       loop
          Result.Append (Pack_Name.Element (I));
       end loop;
@@ -62,9 +60,9 @@ package body TGen.Types is
 
    function Image (Self : Typ) return String is
    begin
-      return (if Self.Name = Ada_Identifier_Vectors.Empty_Vector
-              then "Anonymous"
-              else Self.Type_Name);
+      return
+        (if Self.Name = Ada_Identifier_Vectors.Empty_Vector then "Anonymous"
+         else Self.Type_Name);
    end Image;
 
    ------------------
@@ -80,36 +78,35 @@ package body TGen.Types is
    -- Kind --
    ----------
 
-   function Kind (Self : Typ) return Typ_Kind is (Invalid_Kind);
+   function Kind (Self : Typ) return Typ_Kind
+   is (Invalid_Kind);
 
    -----------
    -- Image --
    -----------
 
-   function Image (Self : Access_Typ) return String is
-     (Typ (Self).Image & ": access type");
+   function Image (Self : Access_Typ) return String
+   is (Typ (Self).Image & ": access type");
 
    ---------
    -- FQN --
    ---------
 
-   function FQN (Self : Typ;
-      No_Std : Boolean := False;
-      Top_Level_Generic : Boolean := False) return String is
+   function FQN
+     (Self              : Typ;
+      No_Std            : Boolean := False;
+      Top_Level_Generic : Boolean := False) return String
+   is
       Name : constant Ada_Qualified_Name :=
-         (if Top_Level_Generic
-          then Generic_Package_Instance_Name (Self.Name)
-          else Self.Name);
+        (if Top_Level_Generic then Generic_Package_Instance_Name (Self.Name)
+         else Self.Name);
 
       function Append_Class_Wide_If_Needed (Type_Name : String) return String
-      is ((if Self.Is_Class_Wide then
-           Type_Name & "'Class"
-           else Type_Name));
+      is ((if Self.Is_Class_Wide then Type_Name & "'Class" else Type_Name));
    begin
       if not No_Std
         or else not Ada.Strings.Equal_Case_Insensitive
-                  (+Unbounded_String (Name.First_Element),
-                   "standard")
+                      (+Unbounded_String (Name.First_Element), "standard")
       then
          return Append_Class_Wide_If_Needed (To_Ada (Name));
       end if;
@@ -147,21 +144,21 @@ package body TGen.Types is
       return Pack_Name;
    end Compilation_Unit_Name;
 
-   function Compilation_Unit_Name (Self : Typ) return String is
-    (To_Ada (Self.Compilation_Unit_Name));
+   function Compilation_Unit_Name (Self : Typ) return String
+   is (To_Ada (Self.Compilation_Unit_Name));
 
    ------------
    -- Encode --
    ------------
 
-   function Encode (Self : Typ; Val : JSON_Value) return JSON_Value is (Val);
+   function Encode (Self : Typ; Val : JSON_Value) return JSON_Value
+   is (Val);
 
    ----------------------
    -- Default_Strategy --
    ----------------------
 
-   function Default_Strategy (Self : Typ) return Strategy_Type'Class
-   is
+   function Default_Strategy (Self : Typ) return Strategy_Type'Class is
    begin
       return raise Program_Error with "Static strategy not implemented";
    end Default_Strategy;
@@ -171,8 +168,7 @@ package body TGen.Types is
    ---------------------------
 
    function Default_Enum_Strategy
-     (Self : Typ) return TGen.Strategies.Enum_Strategy_Type'Class
-   is
+     (Self : Typ) return TGen.Strategies.Enum_Strategy_Type'Class is
    begin
       return raise Program_Error with "Enumerative strategy not implemented";
    end Default_Enum_Strategy;
@@ -182,15 +178,17 @@ package body TGen.Types is
    -------------------------
 
    function Try_Generate_Static
-     (Self : SP.Ref) return TGen.Strategies.Strategy_Type'Class
-   is
+     (Self : SP.Ref) return TGen.Strategies.Strategy_Type'Class is
    begin
       if Self.Get.Supports_Static_Gen then
          return Self.Get.Default_Enum_Strategy;
       else
-         return raise Program_Error with
-           "Type " & To_Ada (Self.Get.Name)
-           & " does not support static generation";
+         return
+           raise Program_Error
+             with
+               "Type "
+               & To_Ada (Self.Get.Name)
+               & " does not support static generation";
       end if;
    end Try_Generate_Static;
 
@@ -198,13 +196,12 @@ package body TGen.Types is
    -- Slug --
    ----------
 
-   function Slug (Self : Typ; Top_Level_Generic : Boolean := False)
-      return String
+   function Slug
+     (Self : Typ; Top_Level_Generic : Boolean := False) return String
    is
       Name : constant Ada_Qualified_Name :=
-         (if Top_Level_Generic
-          then Generic_Package_Instance_Name (Self.Name)
-          else Self.Name);
+        (if Top_Level_Generic then Generic_Package_Instance_Name (Self.Name)
+         else Self.Name);
    begin
       return To_Symbol (Name, '_');
    end Slug;
@@ -223,8 +220,7 @@ package body TGen.Types is
    ---------------------
 
    function Get_Diagnostics
-     (Self   : Unsupported_Typ;
-      Prefix : String := "") return String_Vector
+     (Self : Unsupported_Typ; Prefix : String := "") return String_Vector
    is
       Diag : Unbounded_String;
    begin
@@ -232,8 +228,11 @@ package body TGen.Types is
          Diag := +Prefix & ": ";
       end if;
       Diag :=
-        Diag & To_Ada (Self.Name) & " is not supported ("
-        & (+Self.Reason) & ")";
+        Diag
+        & To_Ada (Self.Name)
+        & " is not supported ("
+        & (+Self.Reason)
+        & ")";
       return String_Vectors.To_Vector (Diag, 1);
    end Get_Diagnostics;
 

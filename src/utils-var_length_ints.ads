@@ -37,14 +37,14 @@ package Utils.Var_Length_Ints is
    --  slow, at least in dev mode (9 times slower in one case). Didn't
    --  try prod mode.
 
---   type Octet is range 0 .. 2**8 - 1;
+   --   type Octet is range 0 .. 2**8 - 1;
    type Octet is mod 2**8;
    type Octet_Index is new Positive;
    type Octet_Array is array (Octet_Index range <>) of Octet;
    for Octet_Array'Component_Size use 8; -- needed if Octet is signed
 
-   package Octet_Vectors is new Utils.Vectors
-     (Octet_Index, Octet, Octet_Array);
+   package Octet_Vectors is new
+     Utils.Vectors (Octet_Index, Octet, Octet_Array);
    subtype Octet_Vector is Octet_Vectors.Vector;
    use Octet_Vectors;
 

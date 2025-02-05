@@ -24,17 +24,17 @@
 with Ada.Characters.Latin_1;
 with Ada.Environment_Variables;
 with Ada.Numerics.Big_Numbers.Big_Integers;
-use  Ada.Numerics.Big_Numbers.Big_Integers;
-with Ada.Strings;                  use Ada.Strings;
-with Ada.Strings.Fixed;            use Ada.Strings.Fixed;
-with Ada.Text_IO;                  use Ada.Text_IO;
+use Ada.Numerics.Big_Numbers.Big_Integers;
+with Ada.Strings;                           use Ada.Strings;
+with Ada.Strings.Fixed;                     use Ada.Strings.Fixed;
+with Ada.Text_IO;                           use Ada.Text_IO;
 
-with TGen.Types.Array_Types;       use TGen.Types.Array_Types;
-with TGen.Types.Discrete_Types;    use TGen.Types.Discrete_Types;
-with TGen.Types.Enum_Types;        use TGen.Types.Enum_Types;
-with TGen.Types.Int_Types;         use TGen.Types.Int_Types;
-with TGen.Types.Real_Types;        use TGen.Types.Real_Types;
-with TGen.Types.Record_Types;      use TGen.Types.Record_Types;
+with TGen.Types.Array_Types;    use TGen.Types.Array_Types;
+with TGen.Types.Discrete_Types; use TGen.Types.Discrete_Types;
+with TGen.Types.Enum_Types;     use TGen.Types.Enum_Types;
+with TGen.Types.Int_Types;      use TGen.Types.Int_Types;
+with TGen.Types.Real_Types;     use TGen.Types.Real_Types;
+with TGen.Types.Record_Types;   use TGen.Types.Record_Types;
 
 package body TGen.Marshalling is
 
@@ -116,15 +116,14 @@ package body TGen.Marshalling is
       Name_Tag : in out Tag;
       Typ_Tag  : in out Tag;
       Pref_Tag : in out Tag);
-     --  Compute the tags for the discriminant of a record type:
-     --    * Name_Tag contains the names of the  discriminants: Discr, ...,
-     --    * Typ_Tag contains their types: Discr_Ty ..., and
-     --    * Pref_Tag contains the prefix associated to the type:
-     --      Global_Prefix_Descr_Ty...,
+   --  Compute the tags for the discriminant of a record type:
+   --    * Name_Tag contains the names of the  discriminants: Discr, ...,
+   --    * Typ_Tag contains their types: Discr_Ty ..., and
+   --    * Pref_Tag contains the prefix associated to the type:
+   --      Global_Prefix_Descr_Ty...,
 
    function String_Value
-     (V   : TGen.Types.Big_Integer;
-      Typ : TGen.Types.Typ'Class) return String;
+     (V : TGen.Types.Big_Integer; Typ : TGen.Types.Typ'Class) return String;
    --  Get a string for the value at position V in Typ
 
    --------------------------------
@@ -137,16 +136,16 @@ package body TGen.Marshalling is
 
       function Bound_To_String
         (C      : Discrete_Constraint_Value;
-         Typ
-         : TGen.Types.Typ'Class;
+         Typ    : TGen.Types.Typ'Class;
          Is_Min : Boolean := True) return String
-      is
-        (case C.Kind is
-            when Static       => String_Value (C.Int_Val, Typ),
+      is (case C.Kind is
+            when Static => String_Value (C.Int_Val, Typ),
             when Discriminant =>
-             Global_Prefix & "_" & String'(+C.Disc_Name)
-             & (if Is_Min then "_D_Min" else "_D_Max"),
-            when Non_Static   => "");
+              Global_Prefix
+              & "_"
+              & String'(+C.Disc_Name)
+              & (if Is_Min then "_D_Min" else "_D_Max"),
+            when Non_Static => "");
       --  Compute the constraint from a discrete value C. If C has a
       --  static value, we use it. If it is a discriminant, we use the min or
       --  max value for this discriminant. We do not supply values for
@@ -154,9 +153,7 @@ package body TGen.Marshalling is
       --  attribute of the expected type) will be used instead.
 
       procedure Append_Association
-        (Name         : String;
-         Value        : String;
-         Associations : in out Tag);
+        (Name : String; Value : String; Associations : in out Tag);
       --  Append the association Name => Value to Associations
 
       ------------------------
@@ -164,10 +161,7 @@ package body TGen.Marshalling is
       ------------------------
 
       procedure Append_Association
-        (Name         : String;
-         Value        : String;
-         Associations : in out Tag)
-      is
+        (Name : String; Value : String; Associations : in out Tag) is
       begin
          if Value'Length = 0 then
             return;
@@ -194,10 +188,10 @@ package body TGen.Marshalling is
          if Constraint = null then
             return +"";
 
-         --  For a discrete range constraint:
-         --    range Low .. High
-         --  We generate:
-         --    First => Low, Last => High
+            --  For a discrete range constraint:
+            --    range Low .. High
+            --  We generate:
+            --    First => Low, Last => High
 
          elsif Constraint.all in Discrete_Range_Constraint'Class then
             declare
@@ -206,22 +200,22 @@ package body TGen.Marshalling is
             begin
                Append_Association
                  (Name         => Global_Prefix & "_First",
-                  Value        => Bound_To_String
-                    (D_Constr.Low_Bound, Typ => Ancestor),
+                  Value        =>
+                    Bound_To_String (D_Constr.Low_Bound, Typ => Ancestor),
                   Associations => Associations);
                Append_Association
                  (Name         => Global_Prefix & "_Last",
-                  Value        => Bound_To_String
-                    (D_Constr.High_Bound, Typ => Ancestor),
+                  Value        =>
+                    Bound_To_String (D_Constr.High_Bound, Typ => Ancestor),
                   Associations => Associations);
             end;
 
-         --  For an array constraint:
-         --    (F1 .. L1, ...)
-         --  We generate:
-         --    First_1 => F1, Last_1  => L1, ...
-         --  If F1 or L1 are discriminants, we generate instead:
-         --    First_1 => F1_Min, Last_1  => L1_Max, ...
+            --  For an array constraint:
+            --    (F1 .. L1, ...)
+            --  We generate:
+            --    First_1 => F1, Last_1  => L1, ...
+            --  If F1 or L1 are discriminants, we generate instead:
+            --    First_1 => F1_Min, Last_1  => L1_Max, ...
 
          elsif Constraint.all in Index_Constraints'Class then
             declare
@@ -240,34 +234,36 @@ package body TGen.Marshalling is
                   begin
                      if Idx_Constr.Present then
                         Append_Association
-                          (Name         =>
-                             Global_Prefix & "_First_" & Dim,
-                           Value        => Bound_To_String
-                             (Idx_Constr.Discrete_Range.Low_Bound, Idx_Typ,
-                              Is_Min => True),
+                          (Name         => Global_Prefix & "_First_" & Dim,
+                           Value        =>
+                             Bound_To_String
+                               (Idx_Constr.Discrete_Range.Low_Bound,
+                                Idx_Typ,
+                                Is_Min => True),
                            Associations => Associations);
                         Append_Association
-                          (Name         =>
-                             Global_Prefix & "_Last_" & Dim,
-                           Value        => Bound_To_String
-                             (Idx_Constr.Discrete_Range.High_Bound, Idx_Typ,
-                              Is_Min => False),
-                        Associations => Associations);
+                          (Name         => Global_Prefix & "_Last_" & Dim,
+                           Value        =>
+                             Bound_To_String
+                               (Idx_Constr.Discrete_Range.High_Bound,
+                                Idx_Typ,
+                                Is_Min => False),
+                           Associations => Associations);
                      end if;
                   end;
                end loop;
             end;
 
-         --  For a discriminant constraint:
-         --    (D1 => V1, ...)
-         --  We generate:
-         --    D1_Min => V1, D1_Max => V1, ...
-         --  If V1 is a discriminant, we generate instead:
-         --    D1_Min => V1_Min, D1_Max => V1_Max, ...
+            --  For a discriminant constraint:
+            --    (D1 => V1, ...)
+            --  We generate:
+            --    D1_Min => V1, D1_Max => V1, ...
+            --  If V1 is a discriminant, we generate instead:
+            --    D1_Min => V1_Min, D1_Max => V1_Max, ...
 
          elsif Constraint.all in Discriminant_Constraints'Class then
             declare
-               D_Typ        : constant Discriminated_Record_Typ'Class :=
+               D_Typ             : constant Discriminated_Record_Typ'Class :=
                  Discriminated_Record_Typ'Class (Ancestor);
                Discr_Constraints : constant Discriminant_Constraint_Map :=
                  Discriminant_Constraints (Constraint.all).Constraint_Map;
@@ -286,14 +282,16 @@ package body TGen.Marshalling is
                      Append_Association
                        (Name         =>
                           Global_Prefix & "_" & Discr_Name & "_D_Min",
-                        Value        => Bound_To_String
-                          (Discr_Constr, Discr_Typ, Is_Min => True),
+                        Value        =>
+                          Bound_To_String
+                            (Discr_Constr, Discr_Typ, Is_Min => True),
                         Associations => Associations);
                      Append_Association
                        (Name         =>
                           Global_Prefix & "_" & Discr_Name & "_D_Max",
-                        Value        => Bound_To_String
-                          (Discr_Constr, Discr_Typ, Is_Min => False),
+                        Value        =>
+                          Bound_To_String
+                            (Discr_Constr, Discr_Typ, Is_Min => False),
                         Associations => Associations);
                   end;
                end loop;
@@ -319,9 +317,11 @@ package body TGen.Marshalling is
          if Int.Min = Int.Max then
             Choices_Tag := Choices_Tag & String_Value (Int.Min, Typ);
          else
-            Choices_Tag := Choices_Tag &
-            (String_Value (Int.Min, Typ) & " .. "
-             & String_Value (Int.Max, Typ));
+            Choices_Tag :=
+              Choices_Tag
+              & (String_Value (Int.Min, Typ)
+                 & " .. "
+                 & String_Value (Int.Max, Typ));
          end if;
       end loop;
 
@@ -349,21 +349,20 @@ package body TGen.Marshalling is
          declare
             Index_Type : constant String :=
               U_Typ.Index_Types (I).Get.FQN (No_Std => True);
-            Index_Pref : constant String := Prefix_For_Typ
-              (U_Typ.Index_Types (I).Get.Slug);
-            Assocs     : constant Translate_Table :=
-              [1 => Assoc ("DIM", I)];
+            Index_Pref : constant String :=
+              Prefix_For_Typ (U_Typ.Index_Types (I).Get.Slug);
+            Assocs     : constant Translate_Table := [1 => Assoc ("DIM", I)];
          begin
-            Fst_Name_Tag := Fst_Name_Tag
-              & Translate (First_Name_Tmplt, Assocs);
-            Lst_Name_Tag := Lst_Name_Tag
-              & Translate (Last_Name_Tmplt, Assocs);
+            Fst_Name_Tag :=
+              Fst_Name_Tag & Translate (First_Name_Tmplt, Assocs);
+            Lst_Name_Tag := Lst_Name_Tag & Translate (Last_Name_Tmplt, Assocs);
 
             Typ_Tag := Typ_Tag & Index_Type;
             Pref_Tag := Pref_Tag & Index_Pref;
             Is_Enum_Tag :=
-              Is_Enum_Tag & (U_Typ.Index_Types (I).Get.Kind
-                               in Bool_Kind | Char_Kind | Enum_Kind);
+              Is_Enum_Tag
+              & (U_Typ.Index_Types (I).Get.Kind
+                 in Bool_Kind | Char_Kind | Enum_Kind);
          end;
       end loop;
    end Create_Tags_For_Array_Bounds;
@@ -373,20 +372,19 @@ package body TGen.Marshalling is
    --------------------------------
 
    function Create_Tags_For_Array_Dims (A_Typ : Array_Typ'Class) return Tag is
-      Ada_Dim_Tmplt    : constant String := "(@_DIM_@)";
+      Ada_Dim_Tmplt : constant String := "(@_DIM_@)";
 
    begin
       return Ada_Dim_Tag : Tag do
          for I in A_Typ.Index_Types'Range loop
             declare
-               Assocs     : constant Translate_Table :=
-                 [1 => Assoc ("DIM", I)];
+               Assocs : constant Translate_Table := [1 => Assoc ("DIM", I)];
             begin
                if A_Typ.Num_Dims = 1 then
                   Ada_Dim_Tag := Ada_Dim_Tag & "";
                else
-                  Ada_Dim_Tag := Ada_Dim_Tag
-                    & Translate (Ada_Dim_Tmplt, Assocs);
+                  Ada_Dim_Tag :=
+                    Ada_Dim_Tag & Translate (Ada_Dim_Tmplt, Assocs);
                end if;
             end;
          end loop;
@@ -401,8 +399,7 @@ package body TGen.Marshalling is
      (D_Typ    : Discriminated_Record_Typ'Class;
       Name_Tag : in out Tag;
       Typ_Tag  : in out Tag;
-      Pref_Tag : in out Tag)
-   is
+      Pref_Tag : in out Tag) is
    begin
       for Cu in D_Typ.Discriminant_Types.Iterate loop
          declare
@@ -424,12 +421,11 @@ package body TGen.Marshalling is
    -------------------------------------
 
    procedure Generate_Base_Functions_For_Typ
-     (Typ      : TGen.Types.Typ'Class;
-      For_Base : Boolean := False)
+     (Typ : TGen.Types.Typ'Class; For_Base : Boolean := False)
    is
-      B_Name         : constant String := Typ.FQN (No_Std => True);
-      Ty_Prefix      : constant String := Prefix_For_Typ (Typ.Slug);
-      Ty_Name        : constant String :=
+      B_Name    : constant String := Typ.FQN (No_Std => True);
+      Ty_Prefix : constant String := Prefix_For_Typ (Typ.Slug);
+      Ty_Name   : constant String :=
         (if For_Base then B_Name & "'Base" else B_Name);
 
       Common_Assocs : constant Translate_Table :=
@@ -452,17 +448,17 @@ package body TGen.Marshalling is
       Max_Arr_Spacing   : constant Natural := 6;
       Size_Arr_Spacing  : constant Natural := 9;
 
-      function Max_Spacing (Spacing : Natural) return String is
-        (if Typ in Array_Typ'Class then [1 .. Max_Arr_Spacing => ' ']
-         else [1 .. Max_Init_Spacing + Spacing * Var_Incr_Spacing => ' ']);
+      function Max_Spacing (Spacing : Natural) return String
+      is (if Typ in Array_Typ'Class then [1 .. Max_Arr_Spacing => ' ']
+          else [1 .. Max_Init_Spacing + Spacing * Var_Incr_Spacing => ' ']);
 
-      function RW_Spacing (Spacing : Natural) return String is
-        (if Typ in Array_Typ'Class then [1 .. RW_Arr_Spacing => ' ']
-         else [1 .. RW_Init_Spacing + Spacing * Var_Incr_Spacing => ' ']);
+      function RW_Spacing (Spacing : Natural) return String
+      is (if Typ in Array_Typ'Class then [1 .. RW_Arr_Spacing => ' ']
+          else [1 .. RW_Init_Spacing + Spacing * Var_Incr_Spacing => ' ']);
 
-      function Size_Spacing (Spacing : Natural) return String is
-        (if Typ in Array_Typ'Class then [1 .. Size_Arr_Spacing => ' ']
-         else [1 .. Size_Init_Spacing + Spacing * Var_Incr_Spacing => ' ']);
+      function Size_Spacing (Spacing : Natural) return String
+      is (if Typ in Array_Typ'Class then [1 .. Size_Arr_Spacing => ' ']
+          else [1 .. Size_Init_Spacing + Spacing * Var_Incr_Spacing => ' ']);
       --  Tags for the components of the header if any, their types, their
       --  prefix and the corresponding Ada Value.
 
@@ -537,25 +533,26 @@ package body TGen.Marshalling is
            Create_Tag_For_Constraints (Comp_Ty);
          Assocs           : constant Translate_Table :=
            Common_Assocs
-            & [1 => Assoc ("COMP_PREFIX", Comp_Prefix),
-               2 => Assoc ("COMPONENT", Comp),
-               3 => Assoc ("CONSTRAINTS", Comp_Constraints),
-               4 => Assoc ("COMP_SCALAR", Comp_Scalar),
-               5 => Assoc ("NEEDS_HEADER", Needs_Header (Named_Comp_Ty)),
-               6 => Assoc ("COMPONENT_KIND", Component_Kind'Image (Comp_Kind)),
-               7 => Assoc ("COMPONENT_NAME", Comp_Name)];
-         Comp_Kind_Str : constant String :=
+           & [1 => Assoc ("COMP_PREFIX", Comp_Prefix),
+              2 => Assoc ("COMPONENT", Comp),
+              3 => Assoc ("CONSTRAINTS", Comp_Constraints),
+              4 => Assoc ("COMP_SCALAR", Comp_Scalar),
+              5 => Assoc ("NEEDS_HEADER", Needs_Header (Named_Comp_Ty)),
+              6 => Assoc ("COMPONENT_KIND", Component_Kind'Image (Comp_Kind)),
+              7 => Assoc ("COMPONENT_NAME", Comp_Name)];
+         Comp_Kind_Str    : constant String :=
            Component_Kind'Image (Comp_Kind);
          pragma Unreferenced (Comp_Kind_Str);
       begin
-         Read_Tag := Component_Read
-           (Assocs & Assoc ("SPACING", RW_Spacing (Spacing)));
-         Write_Tag := Component_Write
-           (Assocs & Assoc ("SPACING", RW_Spacing (Spacing)));
-         Size_Tag := Component_Size
-           (Assocs & Assoc ("SPACING", Size_Spacing (Spacing)));
-         Size_Max_Tag := Component_Size_Max
-           (Assocs & Assoc ("SPACING", Max_Spacing (Spacing)));
+         Read_Tag :=
+           Component_Read (Assocs & Assoc ("SPACING", RW_Spacing (Spacing)));
+         Write_Tag :=
+           Component_Write (Assocs & Assoc ("SPACING", RW_Spacing (Spacing)));
+         Size_Tag :=
+           Component_Size (Assocs & Assoc ("SPACING", Size_Spacing (Spacing)));
+         Size_Max_Tag :=
+           Component_Size_Max
+             (Assocs & Assoc ("SPACING", Max_Spacing (Spacing)));
       end Collect_Info_For_Component;
 
       ---------------------------------
@@ -569,8 +566,7 @@ package body TGen.Marshalling is
          Size_Tag     : in out Vector_Tag;
          Size_Max_Tag : in out Vector_Tag;
          Spacing      : Natural;
-         Object_Name  : String)
-      is
+         Object_Name  : String) is
       begin
          --  Go over the record components to fill the associations
 
@@ -585,9 +581,15 @@ package body TGen.Marshalling is
                Size_Max  : Unbounded_String;
             begin
                Collect_Info_For_Component
-                 (Record_Component, Comp_Name,
-                  Object_Name & "." & Comp_Name, Comp_Ty,
-                  Read, Write, Size, Size_Max, Spacing);
+                 (Record_Component,
+                  Comp_Name,
+                  Object_Name & "." & Comp_Name,
+                  Comp_Ty,
+                  Read,
+                  Write,
+                  Size,
+                  Size_Max,
+                  Spacing);
                Read_Tag := Read_Tag & Read;
                Write_Tag := Write_Tag & Write;
                Size_Tag := Size_Tag & Size;
@@ -631,8 +633,8 @@ package body TGen.Marshalling is
             --  Get tags for the variant choices
 
             Choices_Tag :=
-              Choices_Tag & Create_Tag_For_Intervals
-                (V_Choice.Alt_Set, Discr_Typ.Get);
+              Choices_Tag
+              & Create_Tag_For_Intervals (V_Choice.Alt_Set, Discr_Typ.Get);
 
             --  Hanlde the components
 
@@ -644,7 +646,10 @@ package body TGen.Marshalling is
             begin
                Collect_Info_For_Components
                  (V_Choice.Components,
-                  Comp_Read, Comp_Write, Comp_Size, Comp_Size_Max,
+                  Comp_Read,
+                  Comp_Write,
+                  Comp_Size,
+                  Comp_Size_Max,
                   Spacing     => Spacing + 1,
                   Object_Name => Object_Name);
                Comp_Read_Tag := Comp_Read_Tag & Comp_Read;
@@ -668,10 +673,14 @@ package body TGen.Marshalling is
                   Variant_Size_Max : Tag;
                begin
                   Collect_Info_For_Variants
-                    (V_Choice.Variant.all, Discriminants,
-                     Variant_Read, Variant_Write,
-                     Variant_Size, Variant_Size_Max,
-                     Spacing + 1, Object_Name);
+                    (V_Choice.Variant.all,
+                     Discriminants,
+                     Variant_Read,
+                     Variant_Write,
+                     Variant_Size,
+                     Variant_Size_Max,
+                     Spacing + 1,
+                     Object_Name);
                   Variant_Read_Tag := Variant_Read_Tag & Variant_Read;
                   Variant_Write_Tag := Variant_Write_Tag & Variant_Write;
                   Variant_Size_Tag := Variant_Size_Tag & Variant_Size;
@@ -686,32 +695,36 @@ package body TGen.Marshalling is
          declare
             Assocs : constant Translate_Table :=
               Common_Assocs
-               & [1 => Assoc ("OBJECT_NAME", Object_Name),
-                  2 => Assoc ("DISCR_NAME", Discr_Name),
-                  3 => Assoc ("DISCR_TYP", Discr_Typ_FQN),
-                  4 => Assoc ("CHOICES", Choices_Tag)];
+              & [1 => Assoc ("OBJECT_NAME", Object_Name),
+                 2 => Assoc ("DISCR_NAME", Discr_Name),
+                 3 => Assoc ("DISCR_TYP", Discr_Typ_FQN),
+                 4 => Assoc ("CHOICES", Choices_Tag)];
 
          begin
-            Read_Tag := +Variant_Read_Write
-              (Assocs &
-               [1 => Assoc ("COMPONENT_ACTION", Comp_Read_Tag),
-                2 => Assoc ("VARIANT_PART", Variant_Read_Tag),
-                3 => Assoc ("SPACING", RW_Spacing (Spacing))]);
-            Write_Tag := +Variant_Read_Write
-              (Assocs &
-               [1 => Assoc ("COMPONENT_ACTION", Comp_Write_Tag),
-                2 => Assoc ("VARIANT_PART", Variant_Write_Tag),
-                3 => Assoc ("SPACING", RW_Spacing (Spacing))]);
-            Size_Tag := +Variant_Size
-              (Assocs &
-               [1 => Assoc ("COMPONENT_SIZE", Comp_Size_Tag),
-                2 => Assoc ("VARIANT_PART", Variant_Size_Tag),
-                3 => Assoc ("SPACING", Size_Spacing (Spacing))]);
-            Size_Max_Tag := +Variant_Size_Max
-              (Assocs &
-               [1 => Assoc ("COMPONENT_SIZE_MAX", Comp_Size_Max_Tag),
-                2 => Assoc ("VARIANT_PART", Variant_Size_Max_Tag),
-                3 => Assoc ("SPACING", Max_Spacing (Spacing))]);
+            Read_Tag :=
+              +Variant_Read_Write
+                 (Assocs
+                  & [1 => Assoc ("COMPONENT_ACTION", Comp_Read_Tag),
+                     2 => Assoc ("VARIANT_PART", Variant_Read_Tag),
+                     3 => Assoc ("SPACING", RW_Spacing (Spacing))]);
+            Write_Tag :=
+              +Variant_Read_Write
+                 (Assocs
+                  & [1 => Assoc ("COMPONENT_ACTION", Comp_Write_Tag),
+                     2 => Assoc ("VARIANT_PART", Variant_Write_Tag),
+                     3 => Assoc ("SPACING", RW_Spacing (Spacing))]);
+            Size_Tag :=
+              +Variant_Size
+                 (Assocs
+                  & [1 => Assoc ("COMPONENT_SIZE", Comp_Size_Tag),
+                     2 => Assoc ("VARIANT_PART", Variant_Size_Tag),
+                     3 => Assoc ("SPACING", Size_Spacing (Spacing))]);
+            Size_Max_Tag :=
+              +Variant_Size_Max
+                 (Assocs
+                  & [1 => Assoc ("COMPONENT_SIZE_MAX", Comp_Size_Max_Tag),
+                     2 => Assoc ("VARIANT_PART", Variant_Size_Max_Tag),
+                     3 => Assoc ("SPACING", Max_Spacing (Spacing))]);
          end;
       end Collect_Info_For_Variants;
 
@@ -735,8 +748,8 @@ package body TGen.Marshalling is
 
          if Typ in Unconstrained_Array_Typ'Class then
             declare
-               U_Typ :  Unconstrained_Array_Typ'Class renames
-                 Unconstrained_Array_Typ'Class (Typ);
+               U_Typ : Unconstrained_Array_Typ'Class
+                 renames Unconstrained_Array_Typ'Class (Typ);
 
             begin
                --  Fill the association maps
@@ -752,8 +765,8 @@ package body TGen.Marshalling is
 
          else
             declare
-               D_Typ : Discriminated_Record_Typ'Class renames
-                 Discriminated_Record_Typ'Class (Typ);
+               D_Typ : Discriminated_Record_Typ'Class
+                 renames Discriminated_Record_Typ'Class (Typ);
 
             begin
                --  Generate base functions for the discriminant types.
@@ -776,21 +789,21 @@ package body TGen.Marshalling is
          declare
             Assocs : constant Translate_Table :=
               Common_Assocs
-              & [1  => Assoc ("DISCR_NAME", Discr_Name_Tag),
-                 2  => Assoc ("FIRST_NAME", First_Name_Tag),
-                 3  => Assoc ("LAST_NAME", Last_Name_Tag),
-                 4  => Assoc ("COMP_TYP", Comp_Typ_Tag),
-                 5  => Assoc ("COMP_PREFIX", Comp_Pref_Tag),
-                 6  => Assoc ("ADA_DIM", Ada_Dim_Tag),
-                 7  => Assoc ("IS_ENUM", Is_Enum_Tag),
-                 8  => Assoc ("ARR_LIMIT", Get_Array_Size_Limit)];
+              & [1 => Assoc ("DISCR_NAME", Discr_Name_Tag),
+                 2 => Assoc ("FIRST_NAME", First_Name_Tag),
+                 3 => Assoc ("LAST_NAME", Last_Name_Tag),
+                 4 => Assoc ("COMP_TYP", Comp_Typ_Tag),
+                 5 => Assoc ("COMP_PREFIX", Comp_Pref_Tag),
+                 6 => Assoc ("ADA_DIM", Ada_Dim_Tag),
+                 7 => Assoc ("IS_ENUM", Is_Enum_Tag),
+                 8 => Assoc ("ARR_LIMIT", Get_Array_Size_Limit)];
 
          begin
             Print_Header (Assocs);
          end;
 
-      --  If the type does not need a header, still generate definitions for
-      --  the size of the header.
+         --  If the type does not need a header, still generate definitions for
+         --  the size of the header.
 
       elsif not For_Base then
          Print_Default_Header (Common_Assocs);
@@ -824,8 +837,8 @@ package body TGen.Marshalling is
             Print_Scalar (Assocs, For_Base);
          end;
 
-      --  3.2 For array types, we generate the calls for the components and we
-      --      instanciate the appropriate patterns.
+         --  3.2 For array types, we generate the calls for the components and
+         --      we instantiate the appropriate patterns.
 
       elsif Typ in Array_Typ'Class then
          declare
@@ -843,36 +856,41 @@ package body TGen.Marshalling is
             --  Contruct the calls for the components
 
             Collect_Info_For_Component
-              (Array_Component, Global_Prefix & "_E",
-               Global_Prefix & "_E", Comp_Ty,
-               Component_Read, Component_Write,
-               Component_Size, Component_Size_Max, 1);
+              (Array_Component,
+               Global_Prefix & "_E",
+               Global_Prefix & "_E",
+               Comp_Ty,
+               Component_Read,
+               Component_Write,
+               Component_Size,
+               Component_Size_Max,
+               1);
 
             --  Generate the basic operations
 
             declare
                Assocs : constant Translate_Table :=
                  Common_Assocs
-                 & [1  => Assoc ("COMPONENT_READ", Component_Read),
-                    2  => Assoc ("COMPONENT_WRITE", Component_Write),
-                    3  => Assoc ("COMPONENT_SIZE", Component_Size),
-                    4  => Assoc ("COMPONENT_SIZE_MAX", Component_Size_Max),
-                    5  => Assoc
-                      ("COMP_TYP", Named_Comp_Ty.FQN (No_Std => True)),
-                    6  => Assoc ("ADA_DIM", Ada_Dim_Tag),
-                    7  => Assoc ("FIRST_NAME", First_Name_Tag),
-                    8  => Assoc ("LAST_NAME", Last_Name_Tag),
-                    9  => Assoc ("BOUND_TYP", Comp_Typ_Tag)];
+                 & [1 => Assoc ("COMPONENT_READ", Component_Read),
+                    2 => Assoc ("COMPONENT_WRITE", Component_Write),
+                    3 => Assoc ("COMPONENT_SIZE", Component_Size),
+                    4 => Assoc ("COMPONENT_SIZE_MAX", Component_Size_Max),
+                    5 =>
+                      Assoc ("COMP_TYP", Named_Comp_Ty.FQN (No_Std => True)),
+                    6 => Assoc ("ADA_DIM", Ada_Dim_Tag),
+                    7 => Assoc ("FIRST_NAME", First_Name_Tag),
+                    8 => Assoc ("LAST_NAME", Last_Name_Tag),
+                    9 => Assoc ("BOUND_TYP", Comp_Typ_Tag)];
 
             begin
                Print_Array (Assocs);
             end;
          end;
 
-      --  3.3 For record types, we generate the calls for the components and
-      --      the variant part and instanciate the appropriate patterns.
+         --  3.3 For record types, we generate the calls for the components and
+         --      the variant part and instanciate the appropriate patterns.
 
-      --  Record types: generate a call per component
+         --  Record types: generate a call per component
 
       else
          pragma Assert (Typ in Record_Typ'Class);
@@ -892,8 +910,10 @@ package body TGen.Marshalling is
 
             Collect_Info_For_Components
               (Record_Typ'Class (Typ).Component_Types,
-               Component_Read, Component_Write,
-               Component_Size, Component_Size_Max,
+               Component_Read,
+               Component_Write,
+               Component_Size,
+               Component_Size_Max,
                Object_Name => Object_Name,
                Spacing     => 0);
 
@@ -901,15 +921,17 @@ package body TGen.Marshalling is
 
             if Typ in Discriminated_Record_Typ'Class then
                declare
-                  D_Typ : Discriminated_Record_Typ'Class renames
-                    Discriminated_Record_Typ'Class (Typ);
+                  D_Typ : Discriminated_Record_Typ'Class
+                    renames Discriminated_Record_Typ'Class (Typ);
                begin
                   if D_Typ.Variant /= null then
                      Collect_Info_For_Variants
                        (D_Typ.Variant.all,
                         D_Typ.Discriminant_Types,
-                        Variant_Read, Variant_Write,
-                        Variant_Size, Variant_Size_Max,
+                        Variant_Read,
+                        Variant_Write,
+                        Variant_Size,
+                        Variant_Size_Max,
                         Object_Name => Object_Name,
                         Spacing     => 0);
                   end if;
@@ -971,8 +993,7 @@ package body TGen.Marshalling is
       --------------------------
 
       function Is_Supported_Variant
-        (Variant_Part : Variant_Part_Acc) return Boolean
-      is
+        (Variant_Part : Variant_Part_Acc) return Boolean is
       begin
          if Variant_Part /= null then
 
@@ -1003,19 +1024,21 @@ package body TGen.Marshalling is
       if Typ in Scalar_Typ'Class then
          return True;
       elsif Typ in Constrained_Array_Typ'Class then
-         return Is_Supported_Type
-           (Constrained_Array_Typ'Class (Typ).Component_Type.Get);
+         return
+           Is_Supported_Type
+             (Constrained_Array_Typ'Class (Typ).Component_Type.Get);
       elsif Typ in Unconstrained_Array_Typ'Class then
-         return Is_Supported_Type
-           (Unconstrained_Array_Typ'Class (Typ).Component_Type.Get);
+         return
+           Is_Supported_Type
+             (Unconstrained_Array_Typ'Class (Typ).Component_Type.Get);
       elsif Typ in Record_Typ'Class then
 
          --  Check specific components of discriminated records
 
          if Typ in Discriminated_Record_Typ'Class then
             declare
-               D_Typ : Discriminated_Record_Typ'Class renames
-                 Discriminated_Record_Typ'Class (Typ);
+               D_Typ : Discriminated_Record_Typ'Class
+                 renames Discriminated_Record_Typ'Class (Typ);
 
             begin
                --  Check that the discriminant types are supported
@@ -1053,8 +1076,8 @@ package body TGen.Marshalling is
             Ada.Text_IO.Put_Line ("real constraints");
             return False;
          else
-            return Is_Supported_Type
-              (Anonymous_Typ'Class (Typ).Named_Ancestor.Get);
+            return
+              Is_Supported_Type (Anonymous_Typ'Class (Typ).Named_Ancestor.Get);
          end if;
 
       else
@@ -1066,32 +1089,33 @@ package body TGen.Marshalling is
    -- Needs_Header --
    ------------------
 
-   function Needs_Header (Typ : TGen.Types.Typ'Class) return Boolean is
-     (Typ in Unconstrained_Array_Typ'Class
-      or else (Typ in Discriminated_Record_Typ'Class
-            and then not Discriminated_Record_Typ'Class (Typ).Constrained));
+   function Needs_Header (Typ : TGen.Types.Typ'Class) return Boolean
+   is (Typ in Unconstrained_Array_Typ'Class
+       or else (Typ in Discriminated_Record_Typ'Class
+                and then not Discriminated_Record_Typ'Class (Typ)
+                               .Constrained));
 
    --------------------
    -- Needs_Wrappers --
    --------------------
 
-   function Needs_Wrappers (Typ : TGen.Types.Typ'Class) return Boolean is
-     (Typ in Discriminated_Record_Typ'Class
-      and then not Discriminated_Record_Typ'Class (Typ).Constrained
-      and then Discriminated_Record_Typ'Class (Typ).Mutable);
+   function Needs_Wrappers (Typ : TGen.Types.Typ'Class) return Boolean
+   is (Typ in Discriminated_Record_Typ'Class
+       and then not Discriminated_Record_Typ'Class (Typ).Constrained
+       and then Discriminated_Record_Typ'Class (Typ).Mutable);
 
    ------------------
    -- String_Value --
    ------------------
 
    function String_Value
-     (V   : TGen.Types.Big_Integer;
-      Typ : TGen.Types.Typ'Class) return String
-   is
+     (V : TGen.Types.Big_Integer; Typ : TGen.Types.Typ'Class) return String is
    begin
       if Typ in Enum_Typ'Class then
-         return To_Ada (Typ.Package_Name) & "."
-                & Lit_Image (Enum_Typ'Class (Typ), V);
+         return
+           To_Ada (Typ.Package_Name)
+           & "."
+           & Lit_Image (Enum_Typ'Class (Typ), V);
       else
          return Trim (To_String (V), Left);
       end if;
@@ -1138,7 +1162,8 @@ package body TGen.Marshalling is
    -- Get_Array_Size_Limit --
    --------------------------
 
-   function Get_Array_Size_Limit return Positive is (Array_Length_Limit);
+   function Get_Array_Size_Limit return Positive
+   is (Array_Length_Limit);
 
    --------------------------
    -- Set_Array_Size_Limit --
@@ -1163,10 +1188,12 @@ begin
          when Constraint_Error =>
             Put_Line
               (File => Standard_Error,
-               Item => "Warning: Could not interpret value of the "
-                       & Array_Length_Limit_Env_Var & "environment variable as"
-                       & " a positive, defaulting to"
-                       & Array_Length_Limit'Image);
+               Item =>
+                 "Warning: Could not interpret value of the "
+                 & Array_Length_Limit_Env_Var
+                 & "environment variable as"
+                 & " a positive, defaulting to"
+                 & Array_Length_Limit'Image);
       end;
    end if;
 

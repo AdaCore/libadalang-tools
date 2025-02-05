@@ -33,70 +33,70 @@ package Utils.Predefined_Symbols is
 
    --  Ada 83 reserved words
 
-   Name_Abort     : constant Symbol := Intern ("abort");
+   Name_Abort              : constant Symbol := Intern ("abort");
    First_Reserved_Word_Sym : constant Symbol := Last_Symbol;
-   Name_Abs       : constant Symbol := Intern ("abs");
-   Name_Accept    : constant Symbol := Intern ("accept");
-   Name_Access    : constant Symbol := Intern ("access");
-   Name_And       : constant Symbol := Intern ("and");
-   Name_All       : constant Symbol := Intern ("all");
-   Name_Array     : constant Symbol := Intern ("array");
-   Name_At        : constant Symbol := Intern ("at");
-   Name_Begin     : constant Symbol := Intern ("begin");
-   Name_Body      : constant Symbol := Intern ("body");
-   Name_Case      : constant Symbol := Intern ("case");
-   Name_Constant  : constant Symbol := Intern ("constant");
-   Name_Declare   : constant Symbol := Intern ("declare");
-   Name_Delay     : constant Symbol := Intern ("delay");
-   Name_Delta     : constant Symbol := Intern ("delta");
-   Name_Digits    : constant Symbol := Intern ("digits");
-   Name_Do        : constant Symbol := Intern ("do");
-   Name_Else      : constant Symbol := Intern ("else");
-   Name_Elsif     : constant Symbol := Intern ("elsif");
-   Name_End       : constant Symbol := Intern ("end");
-   Name_Entry     : constant Symbol := Intern ("entry");
-   Name_Exception : constant Symbol := Intern ("exception");
-   Name_Exit      : constant Symbol := Intern ("exit");
-   Name_For       : constant Symbol := Intern ("for");
-   Name_Function  : constant Symbol := Intern ("function");
-   Name_Generic   : constant Symbol := Intern ("generic");
-   Name_Goto      : constant Symbol := Intern ("goto");
-   Name_If        : constant Symbol := Intern ("if");
-   Name_In        : constant Symbol := Intern ("in");
-   Name_Is        : constant Symbol := Intern ("is");
-   Name_Limited   : constant Symbol := Intern ("limited");
-   Name_Loop      : constant Symbol := Intern ("loop");
-   Name_Mod       : constant Symbol := Intern ("mod");
-   Name_New       : constant Symbol := Intern ("new");
-   Name_Not       : constant Symbol := Intern ("not");
-   Name_Null      : constant Symbol := Intern ("null");
-   Name_Of        : constant Symbol := Intern ("of");
-   Name_Or        : constant Symbol := Intern ("or");
-   Name_Others    : constant Symbol := Intern ("others");
-   Name_Out       : constant Symbol := Intern ("out");
-   Name_Package   : constant Symbol := Intern ("package");
-   Name_Pragma    : constant Symbol := Intern ("pragma");
-   Name_Private   : constant Symbol := Intern ("private");
-   Name_Procedure : constant Symbol := Intern ("procedure");
-   Name_Raise     : constant Symbol := Intern ("raise");
-   Name_Range     : constant Symbol := Intern ("range");
-   Name_Record    : constant Symbol := Intern ("record");
-   Name_Rem       : constant Symbol := Intern ("rem");
-   Name_Renames   : constant Symbol := Intern ("renames");
-   Name_Return    : constant Symbol := Intern ("return");
-   Name_Reverse   : constant Symbol := Intern ("reverse");
-   Name_Select    : constant Symbol := Intern ("select");
-   Name_Separate  : constant Symbol := Intern ("separate");
-   Name_Subtype   : constant Symbol := Intern ("subtype");
-   Name_Task      : constant Symbol := Intern ("task");
-   Name_Terminate : constant Symbol := Intern ("terminate");
-   Name_Then      : constant Symbol := Intern ("then");
-   Name_Type      : constant Symbol := Intern ("type");
-   Name_Use       : constant Symbol := Intern ("use");
-   Name_When      : constant Symbol := Intern ("when");
-   Name_While     : constant Symbol := Intern ("while");
-   Name_With      : constant Symbol := Intern ("with");
-   Name_Xor       : constant Symbol := Intern ("xor");
+   Name_Abs                : constant Symbol := Intern ("abs");
+   Name_Accept             : constant Symbol := Intern ("accept");
+   Name_Access             : constant Symbol := Intern ("access");
+   Name_And                : constant Symbol := Intern ("and");
+   Name_All                : constant Symbol := Intern ("all");
+   Name_Array              : constant Symbol := Intern ("array");
+   Name_At                 : constant Symbol := Intern ("at");
+   Name_Begin              : constant Symbol := Intern ("begin");
+   Name_Body               : constant Symbol := Intern ("body");
+   Name_Case               : constant Symbol := Intern ("case");
+   Name_Constant           : constant Symbol := Intern ("constant");
+   Name_Declare            : constant Symbol := Intern ("declare");
+   Name_Delay              : constant Symbol := Intern ("delay");
+   Name_Delta              : constant Symbol := Intern ("delta");
+   Name_Digits             : constant Symbol := Intern ("digits");
+   Name_Do                 : constant Symbol := Intern ("do");
+   Name_Else               : constant Symbol := Intern ("else");
+   Name_Elsif              : constant Symbol := Intern ("elsif");
+   Name_End                : constant Symbol := Intern ("end");
+   Name_Entry              : constant Symbol := Intern ("entry");
+   Name_Exception          : constant Symbol := Intern ("exception");
+   Name_Exit               : constant Symbol := Intern ("exit");
+   Name_For                : constant Symbol := Intern ("for");
+   Name_Function           : constant Symbol := Intern ("function");
+   Name_Generic            : constant Symbol := Intern ("generic");
+   Name_Goto               : constant Symbol := Intern ("goto");
+   Name_If                 : constant Symbol := Intern ("if");
+   Name_In                 : constant Symbol := Intern ("in");
+   Name_Is                 : constant Symbol := Intern ("is");
+   Name_Limited            : constant Symbol := Intern ("limited");
+   Name_Loop               : constant Symbol := Intern ("loop");
+   Name_Mod                : constant Symbol := Intern ("mod");
+   Name_New                : constant Symbol := Intern ("new");
+   Name_Not                : constant Symbol := Intern ("not");
+   Name_Null               : constant Symbol := Intern ("null");
+   Name_Of                 : constant Symbol := Intern ("of");
+   Name_Or                 : constant Symbol := Intern ("or");
+   Name_Others             : constant Symbol := Intern ("others");
+   Name_Out                : constant Symbol := Intern ("out");
+   Name_Package            : constant Symbol := Intern ("package");
+   Name_Pragma             : constant Symbol := Intern ("pragma");
+   Name_Private            : constant Symbol := Intern ("private");
+   Name_Procedure          : constant Symbol := Intern ("procedure");
+   Name_Raise              : constant Symbol := Intern ("raise");
+   Name_Range              : constant Symbol := Intern ("range");
+   Name_Record             : constant Symbol := Intern ("record");
+   Name_Rem                : constant Symbol := Intern ("rem");
+   Name_Renames            : constant Symbol := Intern ("renames");
+   Name_Return             : constant Symbol := Intern ("return");
+   Name_Reverse            : constant Symbol := Intern ("reverse");
+   Name_Select             : constant Symbol := Intern ("select");
+   Name_Separate           : constant Symbol := Intern ("separate");
+   Name_Subtype            : constant Symbol := Intern ("subtype");
+   Name_Task               : constant Symbol := Intern ("task");
+   Name_Terminate          : constant Symbol := Intern ("terminate");
+   Name_Then               : constant Symbol := Intern ("then");
+   Name_Type               : constant Symbol := Intern ("type");
+   Name_Use                : constant Symbol := Intern ("use");
+   Name_When               : constant Symbol := Intern ("when");
+   Name_While              : constant Symbol := Intern ("while");
+   Name_With               : constant Symbol := Intern ("with");
+   Name_Xor                : constant Symbol := Intern ("xor");
 
    --  Ada 95 reserved words
 
@@ -118,16 +118,15 @@ package Utils.Predefined_Symbols is
    Name_Some : constant Symbol := Intern ("some");
 
    Last_Reserved_Word_Sym : constant Symbol := Last_Symbol;
-   subtype Potential_Reserved_Word_Sym is Symbol range
-     First_Reserved_Word_Sym .. Last_Reserved_Word_Sym;
+   subtype Potential_Reserved_Word_Sym is
+     Symbol range First_Reserved_Word_Sym .. Last_Reserved_Word_Sym;
    --  Might include some non-reserved-word symbols, depending on the order in
    --  which things get interned.
 
    --  Miscellaneous useful Symbols:
 
    Name_Empty : constant Symbol := Intern ("");
-   Name_NL    : constant Symbol :=
-     W_Intern ([1 => Utils.String_Utilities.NL]);
+   Name_NL    : constant Symbol := W_Intern ([1 => Utils.String_Utilities.NL]);
    Name_CR    : constant Symbol := W_Intern ([1 => Utils.String_Utilities.CR]);
    Name_CRLF  : constant Symbol := Intern (ASCII.CR & ASCII.LF);
    Name_HT    : constant Symbol :=
@@ -155,18 +154,18 @@ package Utils.Predefined_Symbols is
    Name_Q_Abs : constant Symbol := Intern ("""abs""");
    Name_Q_Not : constant Symbol := Intern ("""not""");
 
-   Name_Depends : constant Symbol := Intern ("Depends");
+   Name_Depends         : constant Symbol := Intern ("Depends");
    Name_Refined_Depends : constant Symbol := Intern ("Refined_Depends");
-   Name_Elab_Spec : constant Symbol := Intern ("Elab_Spec");
-   Name_Elab_Body : constant Symbol := Intern ("Elab_Body");
+   Name_Elab_Spec       : constant Symbol := Intern ("Elab_Spec");
+   Name_Elab_Body       : constant Symbol := Intern ("Elab_Body");
 
    Name_Tab_Insertion_Point : constant Symbol :=
      Intern ("tab insertion point");
-   Name_Tab_In_Out : constant Symbol := Intern ("tab in out");
-   Name_Dot_Dot : constant Symbol := Intern ("..");
-   Name_R_Sq : constant Symbol := Intern ("]");
+   Name_Tab_In_Out          : constant Symbol := Intern ("tab in out");
+   Name_Dot_Dot             : constant Symbol := Intern ("..");
+   Name_R_Sq                : constant Symbol := Intern ("]");
 
-   Name_Page : constant Symbol := Intern ("page");
+   Name_Page  : constant Symbol := Intern ("page");
    Name_Space : constant Symbol := Intern (" ");
 
 end Utils.Predefined_Symbols;

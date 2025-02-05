@@ -29,17 +29,17 @@ with TGen.Big_Reals_Aux; use TGen.Big_Reals_Aux;
 
 package body TGen.Marshalling_Lib is
 
-   function Size (V : Unsigned_8) return Offset_Type is
-     (case V is
-         when 0           => 0,
-         when 1           => 1,
-         when 2 .. 3      => 2,
-         when 4 .. 7      => 3,
-         when 8 .. 15     => 4,
-         when 16 .. 31    => 5,
-         when 32 .. 63    => 6,
-         when 64 .. 127   => 7,
-         when 128 .. 255  => 0);
+   function Size (V : Unsigned_8) return Offset_Type
+   is (case V is
+         when 0 => 0,
+         when 1 => 1,
+         when 2 .. 3 => 2,
+         when 4 .. 7 => 3,
+         when 8 .. 15 => 4,
+         when 16 .. 31 => 5,
+         when 32 .. 63 => 6,
+         when 64 .. 127 => 7,
+         when 128 .. 255 => 0);
 
    -----------------------
    -- Local Subprograms --
@@ -105,7 +105,7 @@ package body TGen.Marshalling_Lib is
             Read_Remainder (Stream, Buffer, Offset, Num, Byte);
             Val := Long_Long_Long_Unsigned (Byte);
             M := Shift_Right (M, Natural (Num));
-            Base := 2 ** Natural (Num);
+            Base := 2**Natural (Num);
          end;
       end if;
 
@@ -124,7 +124,7 @@ package body TGen.Marshalling_Lib is
       --  Read the remaining bits from the buffer
       if M > 0 then
          declare
-            Byte  : Unsigned_8;
+            Byte : Unsigned_8;
          begin
             Read_Remainder
               (Stream, Buffer, Offset, Size (Unsigned_8 (M)), Byte);
@@ -202,8 +202,7 @@ package body TGen.Marshalling_Lib is
       Buffer : in out Unsigned_8;
       Offset : in out Offset_Type;
       Num    : Offset_Type;
-      V      : out Unsigned_8)
-   is
+      V      : out Unsigned_8) is
    begin
       --  If the buffer is empty, read from the stream
       if Offset = 0 then
@@ -221,7 +220,7 @@ package body TGen.Marshalling_Lib is
       end if;
 
       --  Truncate V to its expected length
-      V := V and (2 ** Natural (Num) - 1);
+      V := V and (2**Natural (Num) - 1);
       Offset := Offset + Num;
    end Read_Remainder;
 
@@ -244,7 +243,7 @@ package body TGen.Marshalling_Lib is
             Num  : constant Offset_Type :=
               (if M < 128 then Offset_Type'Min (-Offset, Size (Unsigned_8 (M)))
                else -Offset);
-            Mask : constant Long_Long_Long_Unsigned := 2 ** Natural (Num) - 1;
+            Mask : constant Long_Long_Long_Unsigned := 2**Natural (Num) - 1;
          begin
             Write_Remainder
               (Stream, Buffer, Offset, Num, Unsigned_8 (V and Mask));
@@ -283,7 +282,7 @@ package body TGen.Marshalling_Lib is
 
       if Offset /= 0 then
          declare
-            Num  : constant Offset_Type :=
+            Num : constant Offset_Type :=
               (if Padding < 8
                then Offset_Type'Min (-Offset, Offset_Type (Padding))
                else -Offset);
@@ -316,8 +315,7 @@ package body TGen.Marshalling_Lib is
       Buffer : in out Unsigned_8;
       Offset : in out Offset_Type;
       Num    : Offset_Type;
-      V      : Unsigned_8)
-   is
+      V      : Unsigned_8) is
    begin
       --  Write V in Buffer after Offset
       Buffer := Buffer or Shift_Left (V, Natural (Offset));
@@ -342,19 +340,17 @@ package body TGen.Marshalling_Lib is
       -- Local Subprograms --
       -----------------------
 
-      function Norm (V : T; F : T) return Long_Long_Long_Unsigned is
-        (Long_Long_Long_Unsigned'Val (T'Pos (V) - T'Pos (F)));
+      function Norm (V : T; F : T) return Long_Long_Long_Unsigned
+      is (Long_Long_Long_Unsigned'Val (T'Pos (V) - T'Pos (F)));
 
-      function Denorm (V : Long_Long_Long_Unsigned; F : T) return T'Base is
-        (T'Val (T'Pos (F) + Long_Long_Long_Unsigned'Pos (V)));
+      function Denorm (V : Long_Long_Long_Unsigned; F : T) return T'Base
+      is (T'Val (T'Pos (F) + Long_Long_Long_Unsigned'Pos (V)));
 
       -----------
       -- Size --
       -----------
 
-      function Size
-        (First : T := T'First;
-         Last  : T := T'Last) return Natural
+      function Size (First : T := T'First; Last : T := T'Last) return Natural
       is
          Max : Long_Long_Long_Unsigned := Norm (Last, First);
       begin
@@ -455,13 +451,10 @@ package body TGen.Marshalling_Lib is
       -- Size --
       -----------
 
-      function Size
-        (First : T := T'First;
-         Last  : T := T'Last) return Natural
-      is
-         (Impl.Size
-           (Long_Long_Long_Integer'Integer_Value (First),
-            Long_Long_Long_Integer'Integer_Value (Last)));
+      function Size (First : T := T'First; Last : T := T'Last) return Natural
+      is (Impl.Size
+            (Long_Long_Long_Integer'Integer_Value (First),
+             Long_Long_Long_Integer'Integer_Value (Last)));
 
       -----------
       -- Write --
@@ -473,11 +466,13 @@ package body TGen.Marshalling_Lib is
          Offset : in out Offset_Type;
          V      : T;
          First  : T := T'First;
-         Last   : T := T'Last)
-      is
+         Last   : T := T'Last) is
       begin
          Impl.Write
-           (Stream, Buffer, Offset, Long_Long_Long_Integer'Integer_Value (V),
+           (Stream,
+            Buffer,
+            Offset,
+            Long_Long_Long_Integer'Integer_Value (V),
             Long_Long_Long_Integer'Integer_Value (First),
             Long_Long_Long_Integer'Integer_Value (Last));
       end Write;
@@ -497,7 +492,10 @@ package body TGen.Marshalling_Lib is
          R : Long_Long_Long_Integer;
       begin
          Impl.Read
-           (Stream, Buffer, Offset, R,
+           (Stream,
+            Buffer,
+            Offset,
+            R,
             Long_Long_Long_Integer'Integer_Value (First),
             Long_Long_Long_Integer'Integer_Value (Last));
          if T'Base'Fixed_Value (R) not in T then
@@ -524,8 +522,7 @@ package body TGen.Marshalling_Lib is
       -----------
 
       pragma Warnings (Off, "formal parameter * is read but never assigned");
-      procedure Write (JSON : in out TGen.JSON.JSON_Value; V : T)
-      is
+      procedure Write (JSON : in out TGen.JSON.JSON_Value; V : T) is
          V_Big_Real : constant TGen.Big_Reals.Big_Real :=
            T_Conversions.To_Big_Real (V);
       begin
@@ -542,8 +539,9 @@ package body TGen.Marshalling_Lib is
       begin
          --  Decode the big real from the string encoded as a quotient string
 
-         V := T_Conversions.From_Big_Real
-           (Big_Reals.From_Quotient_String (Get (JSON, "value")));
+         V :=
+           T_Conversions.From_Big_Real
+             (Big_Reals.From_Quotient_String (Get (JSON, "value")));
       end Read;
 
    end Read_Write_Decimal_Fixed_JSON;
@@ -565,13 +563,10 @@ package body TGen.Marshalling_Lib is
       -- Size --
       -----------
 
-      function Size
-        (First : T := T'First;
-         Last  : T := T'Last) return Natural
-      is
-         (Impl.Size
-           (Long_Long_Long_Integer'Integer_Value (First),
-            Long_Long_Long_Integer'Integer_Value (Last)));
+      function Size (First : T := T'First; Last : T := T'Last) return Natural
+      is (Impl.Size
+            (Long_Long_Long_Integer'Integer_Value (First),
+             Long_Long_Long_Integer'Integer_Value (Last)));
 
       -----------
       -- Write --
@@ -583,11 +578,13 @@ package body TGen.Marshalling_Lib is
          Offset : in out Offset_Type;
          V      : T;
          First  : T := T'First;
-         Last   : T := T'Last)
-      is
+         Last   : T := T'Last) is
       begin
          Impl.Write
-           (Stream, Buffer, Offset, Long_Long_Long_Integer'Integer_Value (V),
+           (Stream,
+            Buffer,
+            Offset,
+            Long_Long_Long_Integer'Integer_Value (V),
             Long_Long_Long_Integer'Integer_Value (First),
             Long_Long_Long_Integer'Integer_Value (Last));
       end Write;
@@ -607,7 +604,10 @@ package body TGen.Marshalling_Lib is
          R : Long_Long_Long_Integer;
       begin
          Impl.Read
-           (Stream, Buffer, Offset, R,
+           (Stream,
+            Buffer,
+            Offset,
+            R,
             Long_Long_Long_Integer'Integer_Value (First),
             Long_Long_Long_Integer'Integer_Value (Last));
          if T'Base'Fixed_Value (R) not in T then
@@ -625,8 +625,7 @@ package body TGen.Marshalling_Lib is
 
    package body Read_Write_Ordinary_Fixed_JSON is
 
-      package T_Conversions is new TGen.Big_Reals.Fixed_Conversions
-        (Num => T);
+      package T_Conversions is new TGen.Big_Reals.Fixed_Conversions (Num => T);
       --  To avoid the loss of precision, we encode the fixed point as a
       --  Big_Real and then represent it as a fraction.
 
@@ -635,8 +634,7 @@ package body TGen.Marshalling_Lib is
       -----------
 
       pragma Warnings (Off, "formal parameter * is read but never assigned");
-      procedure Write (JSON : in out TGen.JSON.JSON_Value; V : T)
-      is
+      procedure Write (JSON : in out TGen.JSON.JSON_Value; V : T) is
          V_Big_Real : constant TGen.Big_Reals.Big_Real :=
            T_Conversions.To_Big_Real (V);
       begin
@@ -653,8 +651,9 @@ package body TGen.Marshalling_Lib is
       begin
          --  Decode the big real from the string encoded as a quotient string
 
-         V := T_Conversions.From_Big_Real
-           (Big_Reals.From_Quotient_String (Get (JSON, "value")));
+         V :=
+           T_Conversions.From_Big_Real
+             (Big_Reals.From_Quotient_String (Get (JSON, "value")));
       end Read;
 
    end Read_Write_Ordinary_Fixed_JSON;
@@ -673,24 +672,21 @@ package body TGen.Marshalling_Lib is
 
       type Precision is (Single, Double, Extended);
 
-      function Get_Precision return Precision is
-        (case T'Machine_Mantissa is
-            when 24     => Single,
-            when 53     => Double,
-            when 64     => Extended,
+      function Get_Precision return Precision
+      is (case T'Machine_Mantissa is
+            when 24 => Single,
+            when 53 => Double,
+            when 64 => Extended,
             when others => raise Program_Error);
 
       -----------
       -- Size --
       -----------
 
-      function Size
-        (First : T := T'First;
-         Last  : T := T'Last) return Natural
-      is
-        (case Get_Precision is
-            when Single   => 32,
-            when Double   => 64,
+      function Size (First : T := T'First; Last : T := T'Last) return Natural
+      is (case Get_Precision is
+            when Single => 32,
+            when Double => 64,
             when Extended => 128);
 
       -----------
@@ -712,41 +708,59 @@ package body TGen.Marshalling_Lib is
          case Get_Precision is
             when Single =>
                declare
-                  function To_Bits is new Ada.Unchecked_Conversion
-                    (Source => Float, Target => Unsigned_32);
+                  function To_Bits is new
+                    Ada.Unchecked_Conversion
+                      (Source => Float,
+                       Target => Unsigned_32);
                   Max  : constant Long_Long_Long_Unsigned :=
                     Long_Long_Long_Unsigned (Unsigned_32'Last);
                   V_F  : constant Float := Float (V);
                   Bits : constant Unsigned_32 := To_Bits (V_F);
                begin
-                  Write (Stream, Buffer, Offset, Max,
-                         Long_Long_Long_Unsigned (Bits));
+                  Write
+                    (Stream,
+                     Buffer,
+                     Offset,
+                     Max,
+                     Long_Long_Long_Unsigned (Bits));
                end;
 
             when Double =>
                declare
-                  function To_Bits is new Ada.Unchecked_Conversion
-                    (Source => Long_Float, Target => Unsigned_64);
+                  function To_Bits is new
+                    Ada.Unchecked_Conversion
+                      (Source => Long_Float,
+                       Target => Unsigned_64);
                   Max  : constant Long_Long_Long_Unsigned :=
                     Long_Long_Long_Unsigned (Unsigned_64'Last);
                   V_F  : constant Long_Float := Long_Float (V);
                   Bits : constant Unsigned_64 := To_Bits (V_F);
                begin
-                  Write (Stream, Buffer, Offset, Max,
-                         Long_Long_Long_Unsigned (Bits));
+                  Write
+                    (Stream,
+                     Buffer,
+                     Offset,
+                     Max,
+                     Long_Long_Long_Unsigned (Bits));
                end;
 
             when Extended =>
                declare
-                  function To_Bits is new Ada.Unchecked_Conversion
-                    (Source => Long_Long_Float, Target => Unsigned_128);
+                  function To_Bits is new
+                    Ada.Unchecked_Conversion
+                      (Source => Long_Long_Float,
+                       Target => Unsigned_128);
                   Max  : constant Long_Long_Long_Unsigned :=
                     Long_Long_Long_Unsigned (Unsigned_128'Last);
                   V_F  : constant Long_Long_Float := Long_Long_Float (V);
                   Bits : constant Unsigned_128 := To_Bits (V_F);
                begin
-                  Write (Stream, Buffer, Offset, Max,
-                         Long_Long_Long_Unsigned (Bits));
+                  Write
+                    (Stream,
+                     Buffer,
+                     Offset,
+                     Max,
+                     Long_Long_Long_Unsigned (Bits));
                end;
          end case;
       end Write;
@@ -769,8 +783,10 @@ package body TGen.Marshalling_Lib is
          case Get_Precision is
             when Single =>
                declare
-                  function From_Bits is new Ada.Unchecked_Conversion
-                    (Source => Unsigned_32, Target => Float);
+                  function From_Bits is new
+                    Ada.Unchecked_Conversion
+                      (Source => Unsigned_32,
+                       Target => Float);
                   Max  : constant Long_Long_Long_Unsigned :=
                     Long_Long_Long_Unsigned (Unsigned_32'Last);
                   Bits : Long_Long_Long_Unsigned;
@@ -787,9 +803,9 @@ package body TGen.Marshalling_Lib is
                   if not V_F'Valid then
                      raise Invalid_Value;
 
-                  --  Check for out-of-bounds values and apply saturation
+                     --  Check for out-of-bounds values and apply saturation
 
-                  elsif  V_F < Float (First) then
+                  elsif V_F < Float (First) then
                      V_B := First;
                   elsif V_F > Float (Last) then
                      V_B := Last;
@@ -806,8 +822,10 @@ package body TGen.Marshalling_Lib is
 
             when Double =>
                declare
-                  function From_Bits is new Ada.Unchecked_Conversion
-                    (Source => Unsigned_64, Target => Long_Float);
+                  function From_Bits is new
+                    Ada.Unchecked_Conversion
+                      (Source => Unsigned_64,
+                       Target => Long_Float);
                   Max  : constant Long_Long_Long_Unsigned :=
                     Long_Long_Long_Unsigned (Unsigned_64'Last);
                   Bits : Long_Long_Long_Unsigned;
@@ -824,9 +842,9 @@ package body TGen.Marshalling_Lib is
                   if not V_F'Valid then
                      raise Invalid_Value;
 
-                  --  Check for out-of-bounds values and apply saturation
+                     --  Check for out-of-bounds values and apply saturation
 
-                  elsif  V_F < Long_Float (First) then
+                  elsif V_F < Long_Float (First) then
                      V_B := First;
                   elsif V_F > Long_Float (Last) then
                      V_B := Last;
@@ -843,8 +861,10 @@ package body TGen.Marshalling_Lib is
 
             when Extended =>
                declare
-                  function From_Bits is new Ada.Unchecked_Conversion
-                    (Source => Unsigned_128, Target => Long_Long_Float);
+                  function From_Bits is new
+                    Ada.Unchecked_Conversion
+                      (Source => Unsigned_128,
+                       Target => Long_Long_Float);
                   Max  : constant Long_Long_Long_Unsigned :=
                     Long_Long_Long_Unsigned (Unsigned_128'Last);
                   Bits : Long_Long_Long_Unsigned;
@@ -861,9 +881,9 @@ package body TGen.Marshalling_Lib is
                   if not V_F'Valid then
                      raise Invalid_Value;
 
-                  --  Check for out-of-bounds values and apply saturation
+                     --  Check for out-of-bounds values and apply saturation
 
-                  elsif  V_F < Long_Long_Float (First) then
+                  elsif V_F < Long_Long_Float (First) then
                      V_B := First;
                   elsif V_F > Long_Long_Float (Last) then
                      V_B := Last;
@@ -888,10 +908,14 @@ package body TGen.Marshalling_Lib is
 
    package body Read_Write_Signed is
 
-      function Coarse_Norm is new Ada.Unchecked_Conversion
-        (Source => Long_Long_Long_Integer, Target => Long_Long_Long_Unsigned);
-      function Coarse_Denorm is new Ada.Unchecked_Conversion
-        (Source => Long_Long_Long_Unsigned, Target => Long_Long_Long_Integer);
+      function Coarse_Norm is new
+        Ada.Unchecked_Conversion
+          (Source => Long_Long_Long_Integer,
+           Target => Long_Long_Long_Unsigned);
+      function Coarse_Denorm is new
+        Ada.Unchecked_Conversion
+          (Source => Long_Long_Long_Unsigned,
+           Target => Long_Long_Long_Integer);
 
       -----------------------
       -- Local Subprograms --
@@ -911,19 +935,20 @@ package body TGen.Marshalling_Lib is
       -- Denorm --
       ------------
 
-      function Denorm (V : Long_Long_Long_Unsigned; F : T) return T'Base is
-        (if Use_Coarse then T'Base (Coarse_Denorm (V))
-         else
+      function Denorm (V : Long_Long_Long_Unsigned; F : T) return T'Base
+      is (if Use_Coarse then T'Base (Coarse_Denorm (V))
+          else
             T'Base (Long_Long_Long_Integer (F) + Long_Long_Long_Integer (V)));
 
       ----------
       -- Norm --
       ----------
 
-      function Norm (V : T; F : T) return Long_Long_Long_Unsigned is
-        (if Use_Coarse then Coarse_Norm (Long_Long_Long_Integer (V))
-         else Long_Long_Long_Unsigned
-           (Long_Long_Long_Integer (V) - Long_Long_Long_Integer (F)));
+      function Norm (V : T; F : T) return Long_Long_Long_Unsigned
+      is (if Use_Coarse then Coarse_Norm (Long_Long_Long_Integer (V))
+          else
+            Long_Long_Long_Unsigned
+              (Long_Long_Long_Integer (V) - Long_Long_Long_Integer (F)));
 
       ----------------------
       -- Setup_Use_Coarse --
@@ -933,14 +958,15 @@ package body TGen.Marshalling_Lib is
       is
       begin
          if F < 0
-           and then Long_Long_Long_Integer (L) > Long_Long_Long_Integer'Last
-           + Long_Long_Long_Integer (F)
+           and then Long_Long_Long_Integer (L)
+                    > Long_Long_Long_Integer'Last + Long_Long_Long_Integer (F)
          then
             Max := Long_Long_Long_Unsigned'Last;
             Use_Coarse := True;
          else
-            Max := Long_Long_Long_Unsigned
-              (Long_Long_Long_Integer (L) - Long_Long_Long_Integer (F));
+            Max :=
+              Long_Long_Long_Unsigned
+                (Long_Long_Long_Integer (L) - Long_Long_Long_Integer (F));
             Use_Coarse := False;
          end if;
       end Setup_Use_Coarse;
@@ -949,9 +975,7 @@ package body TGen.Marshalling_Lib is
       -- Size --
       -----------
 
-      function Size
-        (First : T := T'First;
-         Last  : T := T'Last) return Natural
+      function Size (First : T := T'First; Last : T := T'Last) return Natural
       is
          Max : Long_Long_Long_Unsigned;
       begin
@@ -988,7 +1012,7 @@ package body TGen.Marshalling_Lib is
       ----------
 
       procedure Read
-      (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
+        (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
          V      : out T;
@@ -1020,19 +1044,17 @@ package body TGen.Marshalling_Lib is
       -- Local Subprograms --
       -----------------------
 
-      function Norm (V : T; F : T) return Long_Long_Long_Unsigned is
-        (Long_Long_Long_Unsigned (V) - Long_Long_Long_Unsigned (F));
+      function Norm (V : T; F : T) return Long_Long_Long_Unsigned
+      is (Long_Long_Long_Unsigned (V) - Long_Long_Long_Unsigned (F));
 
-      function Denorm (V : Long_Long_Long_Unsigned; F : T) return T'Base is
-        (T'Base (Long_Long_Long_Unsigned (F) + V));
+      function Denorm (V : Long_Long_Long_Unsigned; F : T) return T'Base
+      is (T'Base (Long_Long_Long_Unsigned (F) + V));
 
       -----------
       -- Size --
       -----------
 
-      function Size
-        (First : T := T'First;
-         Last  : T := T'Last) return Natural
+      function Size (First : T := T'First; Last : T := T'Last) return Natural
       is
          Max : Long_Long_Long_Unsigned := Norm (Last, First);
       begin
@@ -1096,8 +1118,7 @@ package body TGen.Marshalling_Lib is
 
    package body Read_Write_Float_JSON is
 
-      package T_Conversions is new TGen.Big_Reals.Float_Conversions
-        (Num => T);
+      package T_Conversions is new TGen.Big_Reals.Float_Conversions (Num => T);
       --  To avoid the loss of precision, we need to encode the float as a
       --  Big_Real and then represent it as a fraction.
 
@@ -1106,8 +1127,7 @@ package body TGen.Marshalling_Lib is
       -----------
 
       pragma Warnings (Off, "formal parameter * is read but never assigned");
-      procedure Write (JSON : in out TGen.JSON.JSON_Value; V : T)
-      is
+      procedure Write (JSON : in out TGen.JSON.JSON_Value; V : T) is
          V_Big_Real : constant TGen.Big_Reals.Big_Real :=
            T_Conversions.To_Big_Real (V);
       begin
@@ -1124,8 +1144,9 @@ package body TGen.Marshalling_Lib is
       begin
          --  Decode the big real from the string encoded as a quotient string
 
-         V := T_Conversions.From_Big_Real
-           (Big_Reals.From_Quotient_String (Get (JSON, "value")));
+         V :=
+           T_Conversions.From_Big_Real
+             (Big_Reals.From_Quotient_String (Get (JSON, "value")));
       end Read;
 
    end Read_Write_Float_JSON;
@@ -1141,8 +1162,7 @@ package body TGen.Marshalling_Lib is
       -----------
 
       function Input
-        (Stream : not null access Ada.Streams.Root_Stream_Type'Class)
-        return T
+        (Stream : not null access Ada.Streams.Root_Stream_Type'Class) return T
       is
          Buffer : Unsigned_8 := 0;
          Offset : Offset_Type := 0;
@@ -1158,8 +1178,7 @@ package body TGen.Marshalling_Lib is
 
       function Input
         (Header : not null access Ada.Streams.Root_Stream_Type'Class;
-         Stream : not null access Ada.Streams.Root_Stream_Type'Class)
-        return T
+         Stream : not null access Ada.Streams.Root_Stream_Type'Class) return T
       is
          pragma Unreferenced (Header);
       begin
@@ -1171,8 +1190,7 @@ package body TGen.Marshalling_Lib is
       ------------
 
       procedure Output
-        (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-         V      : T)
+        (Stream : not null access Ada.Streams.Root_Stream_Type'Class; V : T)
       is
          Buffer : Unsigned_8 := 0;
          Offset : Offset_Type := 0;
@@ -1220,8 +1238,7 @@ package body TGen.Marshalling_Lib is
       -- Output --
       ------------
 
-      function Output (V : T) return TGen.JSON.JSON_Value
-      is
+      function Output (V : T) return TGen.JSON.JSON_Value is
          JSON : TGen.JSON.JSON_Value := Create_Object;
       begin
          Write (JSON, V);
@@ -1241,8 +1258,7 @@ package body TGen.Marshalling_Lib is
       -----------
 
       function Input
-        (Stream : not null access Ada.Streams.Root_Stream_Type'Class)
-        return T
+        (Stream : not null access Ada.Streams.Root_Stream_Type'Class) return T
       is
          H      : constant Header_Type := Input_Header (Stream);
          Buffer : Unsigned_8 := 0;
@@ -1259,8 +1275,7 @@ package body TGen.Marshalling_Lib is
 
       function Input
         (Header : not null access Ada.Streams.Root_Stream_Type'Class;
-         Stream : not null access Ada.Streams.Root_Stream_Type'Class)
-        return T
+         Stream : not null access Ada.Streams.Root_Stream_Type'Class) return T
       is
          H      : constant Header_Type := Input_Header (Header);
          Buffer : Unsigned_8 := 0;
@@ -1276,8 +1291,7 @@ package body TGen.Marshalling_Lib is
       ------------
 
       procedure Output
-        (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
-         V      : T)
+        (Stream : not null access Ada.Streams.Root_Stream_Type'Class; V : T)
       is
          Buffer : Unsigned_8 := 0;
          Offset : Offset_Type := 0;
@@ -1332,8 +1346,7 @@ package body TGen.Marshalling_Lib is
       -- Output --
       ------------
 
-      function Output (V : T) return TGen.JSON.JSON_Value
-      is
+      function Output (V : T) return TGen.JSON.JSON_Value is
          JSON : TGen.JSON.JSON_Value := Create_Object;
       begin
          pragma Warnings (Off);

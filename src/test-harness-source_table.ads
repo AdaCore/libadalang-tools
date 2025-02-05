@@ -66,7 +66,7 @@ package Test.Harness.Source_Table is
       --  Tests. Such source file cause some code generation.
 
       Waiting);
-      --  Source file hasn't been processed yet
+   --  Source file hasn't been processed yet
 
    procedure Add_Source_To_Process (Fname : String);
    --  Adds source to the source table, if there is no source file with same
@@ -91,9 +91,9 @@ package Test.Harness.Source_Table is
    procedure Set_Source_Status (Source_Name : String; New_Status : SF_Status);
    --  Sets status of given source
 
-   function Get_Source_Status          (Source_Name : String) return SF_Status;
+   function Get_Source_Status (Source_Name : String) return SF_Status;
    --  Gets source status
-   function Get_Source_Full_Name       (Source_Name : String) return String;
+   function Get_Source_Full_Name (Source_Name : String) return String;
    --  Gets source full file name
    function Get_Source_Suffixless_Name (Source_Name : String) return String;
    --  Gets source base name without suffix

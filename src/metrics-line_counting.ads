@@ -21,9 +21,11 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Langkit_Support.Slocs; use Langkit_Support;
-with Libadalang.Analysis; use Libadalang.Analysis;
+with Langkit_Support.Slocs;
+use Langkit_Support;
+with Libadalang.Analysis;   use Libadalang.Analysis;
 with METRICS.Command_Lines; use METRICS.Command_Lines;
+
 package METRICS.Line_Counting is
 
    subtype Metric_Nat is Natural range 0 .. 1_000_000_000;
@@ -34,9 +36,11 @@ package METRICS.Line_Counting is
    --  Support for counting the number of lines of certain types
    --  (code lines, comment lines, etc).
 
-   subtype Cumulative_Metrics is Lines_Metrics with
-     Predicate => Cumulative_Metrics in
-       Lines_Code | Lines_Comment | Lines_Eol_Comment | Lines_Blank;
+   subtype Cumulative_Metrics is Lines_Metrics
+   with
+     Predicate =>
+       Cumulative_Metrics
+       in Lines_Code | Lines_Comment | Lines_Eol_Comment | Lines_Blank;
 
    type Cumulative_Counts_Array (<>) is private;
    function Last (Counts : Cumulative_Counts_Array) return Slocs.Line_Number;
@@ -46,9 +50,9 @@ package METRICS.Line_Counting is
    --  Precompute the data used by Line_Range_Count
 
    function Line_Range_Count
-     (Counts : Cumulative_Counts_Array;
+     (Counts                : Cumulative_Counts_Array;
       First_Line, Last_Line : Slocs.Line_Number;
-      Metric : Cumulative_Metrics) return Metric_Nat;
+      Metric                : Cumulative_Metrics) return Metric_Nat;
    --  Return the value of Metric for the range of lines given
 
 private

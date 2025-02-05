@@ -28,7 +28,7 @@
 
 with Test.Common; use Test.Common;
 
-with GNATCOLL.Projects;          use GNATCOLL.Projects;
+with GNATCOLL.Projects; use GNATCOLL.Projects;
 
 package Test.Skeleton.Source_Table is
 
@@ -69,7 +69,7 @@ package Test.Skeleton.Source_Table is
       --  Tests. Such source file cause some code generation.
 
       Waiting);
-      --  Source file hasn't been processed yet.
+   --  Source file hasn't been processed yet.
 
    procedure Add_Source_To_Process (Fname : String);
    --  Adds source to the source table, if there is no source file with same
@@ -107,17 +107,17 @@ package Test.Skeleton.Source_Table is
    ------------------------------------------
    procedure Set_Source_Status (Source_Name : String; New_Status : SF_Status);
 
-   function Get_Source_Status          (Source_Name : String) return SF_Status;
+   function Get_Source_Status (Source_Name : String) return SF_Status;
    function Get_Source_Suffixless_Name (Source_Name : String) return String;
-   function Get_Source_Output_Dir      (Source_Name : String) return String;
-   function Get_Source_Stub_Dir        (Source_Name : String) return String;
-   function Get_Source_Stub_Data_Spec  (Source_Name : String) return String;
-   function Get_Source_Stub_Data_Body  (Source_Name : String) return String;
-   function Get_Source_Body            (Source_Name : String) return String;
-   function Get_Source_Project_Name    (Source_Name : String) return String;
-   function Get_Source_Unit_Name       (Source_Name : String) return String;
-   function Get_Source_Instr_Dir       (Source_Name : String) return String;
-   function Get_Source_Instr_Body      (Source_Name : String) return String;
+   function Get_Source_Output_Dir (Source_Name : String) return String;
+   function Get_Source_Stub_Dir (Source_Name : String) return String;
+   function Get_Source_Stub_Data_Spec (Source_Name : String) return String;
+   function Get_Source_Stub_Data_Body (Source_Name : String) return String;
+   function Get_Source_Body (Source_Name : String) return String;
+   function Get_Source_Project_Name (Source_Name : String) return String;
+   function Get_Source_Unit_Name (Source_Name : String) return String;
+   function Get_Source_Instr_Dir (Source_Name : String) return String;
+   function Get_Source_Instr_Body (Source_Name : String) return String;
 
    procedure Mark_Sourse_Stubbed (Source_Name : String);
    function Source_Stubbed (Source_Name : String) return Boolean;
@@ -163,12 +163,12 @@ package Test.Skeleton.Source_Table is
 
    function Get_Project_Stub_Dir (Project_Name : String) return String;
 
-   function Get_Imported_Projects (Project_Name : String)
-                                   return List_Of_Strings.List;
+   function Get_Imported_Projects
+     (Project_Name : String) return List_Of_Strings.List;
    --  Returns a list of directly imported projects' names.
 
-   function Get_Importing_Projects (Project_Name : String)
-                                    return List_Of_Strings.List;
+   function Get_Importing_Projects
+     (Project_Name : String) return List_Of_Strings.List;
    --  Returns a list of names of all projects importing given project.
 
    function Project_Extended (Project_Name : String) return Boolean;

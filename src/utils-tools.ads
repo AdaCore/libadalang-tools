@@ -52,39 +52,38 @@ package Utils.Tools is
    end record;
 
    procedure Init (Tool : in out Tool_State; Cmd : in out Command_Line)
-      is abstract;
+   is abstract;
    procedure First_Per_File_Action
-     (Tool : in out Tool_State;
-      Cmd : Command_Line;
+     (Tool      : in out Tool_State;
+      Cmd       : Command_Line;
       File_Name : String;
-      Input : String;
-      BOM_Seen : Boolean;
-      Unit : Analysis_Unit)
-     is null;
+      Input     : String;
+      BOM_Seen  : Boolean;
+      Unit      : Analysis_Unit)
+   is null;
    procedure Second_Per_File_Action
-     (Tool : in out Tool_State;
-      Cmd : Command_Line;
+     (Tool      : in out Tool_State;
+      Cmd       : Command_Line;
       File_Name : String;
-      Input : String;
-      BOM_Seen : Boolean;
-      Unit : Analysis_Unit)
-     is abstract;
+      Input     : String;
+      BOM_Seen  : Boolean;
+      Unit      : Analysis_Unit)
+   is abstract;
    --  Input is the contents of the file named by File_Name.
    --  BOM_Seen is True if there was a BOM at the start of the file;
    --  the BOM is not included in Input.
 
    procedure First_Per_Invalid_File_Action
-     (Tool : in out Tool_State;
-      Cmd : Command_Line;
-      File_Name : String) is null;
+     (Tool : in out Tool_State; Cmd : Command_Line; File_Name : String)
+   is null;
    procedure Second_Per_Invalid_File_Action
-     (Tool : in out Tool_State;
-      Cmd : Command_Line;
-      File_Name : String) is null;
+     (Tool : in out Tool_State; Cmd : Command_Line; File_Name : String)
+   is null;
    --  Called for invalid sources that don't make it to <Nth>_Per_File_Action
 
    procedure First_Pass_Post_Process
-     (Tool : in out Tool_State; Cmd : in out Command_Line) is null;
+     (Tool : in out Tool_State; Cmd : in out Command_Line)
+   is null;
    --  Called in between First_Per_File_Action and Second_Per_File_Action
 
    procedure Process_File

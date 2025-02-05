@@ -30,7 +30,7 @@ with Ada.Containers.Vectors;
 with Ada.Containers.Indefinite_Hashed_Sets;
 with Ada.Containers.Indefinite_Hashed_Maps;
 
-with Libadalang.Common; use Libadalang.Common;
+with Libadalang.Common;    use Libadalang.Common;
 with Langkit_Support.Errors;
 with Langkit_Support.Text; use Langkit_Support.Text;
 
@@ -39,13 +39,13 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Characters.Handling; use Ada.Characters.Handling;
 with Ada.Directories;
 with Ada.Exceptions;
-with Ada.Strings; use Ada.Strings;
-with Ada.Strings.Fixed; use Ada.Strings.Fixed;
+with Ada.Strings;             use Ada.Strings;
+with Ada.Strings.Fixed;       use Ada.Strings.Fixed;
 with Ada.Strings.Maps;
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with Ada.Strings.Unbounded;   use Ada.Strings.Unbounded;
 
-with GNATCOLL.Traces; use GNATCOLL.Traces;
-with GNATCOLL.VFS; use GNATCOLL.VFS;
+with GNATCOLL.Traces;       use GNATCOLL.Traces;
+with GNATCOLL.VFS;          use GNATCOLL.VFS;
 with Langkit_Support.Slocs; use Langkit_Support.Slocs;
 
 with GNAT.OS_Lib;
@@ -53,13 +53,13 @@ with GNAT.SHA1;
 with GNAT.Directory_Operations; use GNAT.Directory_Operations;
 with GNAT.Strings;
 
-with Test.Common; use Test.Common;
+with Test.Common;                use Test.Common;
 with Test.Instrument;
 with Test.Harness;
 with Test.Skeleton.Source_Table; use Test.Skeleton.Source_Table;
-with Test.Mapping; use Test.Mapping;
+with Test.Mapping;               use Test.Mapping;
 with Test.Stub;
-with Utils.Command_Lines; use Utils.Command_Lines;
+with Utils.Command_Lines;        use Utils.Command_Lines;
 with Utils.Environment;
 with Utils.String_Utilities;
 
@@ -94,25 +94,23 @@ package body Test.Skeleton is
 
    Test_Info : Tests_Per_Unit.Map;
 
-   type Data_Kind_Type is
-     (Declaration_Data,
-      Instantiation);
+   type Data_Kind_Type is (Declaration_Data, Instantiation);
 
    type Base_Type_Info is tagged record
-      Main_Type_Elem            : Ada_Node := No_Ada_Node;
-      Main_Type_Abstract        : Boolean;
-      Main_Type_Text_Name       : String_Access;
+      Main_Type_Elem      : Ada_Node := No_Ada_Node;
+      Main_Type_Abstract  : Boolean;
+      Main_Type_Text_Name : String_Access;
 
       Has_Argument_Father       : Boolean;
       Argument_Father_Unit_Name : String_Access;
       Argument_Father_Type_Name : String_Access;
       Argument_Father_Nesting   : String_Access;
 
-      Nesting                   : String_Access;
+      Nesting : String_Access;
 
-      Type_Number               : Positive;
+      Type_Number : Positive;
 
-      No_Default_Discriminant   : Boolean;
+      No_Default_Discriminant : Boolean;
    end record;
 
    package Type_Info_Vect is new
@@ -155,19 +153,19 @@ package body Test.Skeleton is
       --  Transitions from older versions of hash should be performed
       --  automatically.
 
-      Subp_Hash_V1    : String_Access;
+      Subp_Hash_V1   : String_Access;
       --  Case-sensitive hash.
-      Subp_Hash_V2_1  : String_Access;
+      Subp_Hash_V2_1 : String_Access;
       --  Non-controlling parameters with same root type as controlling ones
       --  are replaced with root type before hashing.
 
-      Corresp_Type     : Natural;
-      Nesting          : String_Access;
+      Corresp_Type : Natural;
+      Nesting      : String_Access;
 
-      Has_TC_Info      : Boolean := False;
-      TC_Info          : Test_Case_Info;
+      Has_TC_Info : Boolean := False;
+      TC_Info     : Test_Case_Info;
 
-      Is_Overloaded    : Boolean;
+      Is_Overloaded : Boolean;
    end record;
 
    package Subp_Data_List is new
@@ -214,7 +212,7 @@ package body Test.Skeleton is
 
          when Declaration_Data =>
 
-            Is_Generic                         : Boolean := False;
+            Is_Generic : Boolean := False;
             --  Indicates if given argument package declaration is generic.
 
             Is_Top_Level_Generic_Instantiation : Boolean := False;
@@ -229,11 +227,11 @@ package body Test.Skeleton is
             --     package Instance is new Bar;
             --  end Generic_Instantiation_<package_name>;
 
-            Has_Simple_Case  : Boolean := False;
+            Has_Simple_Case : Boolean := False;
             --  Indicates if we have routines that are not primitives of any
             --  tagged type.
 
-            Needs_Set_Up     : Boolean := False;
+            Needs_Set_Up : Boolean := False;
             --  Indicates if we need the Set_Up routine for at least one test
             --  type;
 
@@ -289,7 +287,7 @@ package body Test.Skeleton is
       Original_Type : Ada_Node := No_Ada_Node;
       Original_Subp : Ada_Node := No_Ada_Node;
 
-      From_Generic  : Boolean := False;
+      From_Generic : Boolean := False;
    end record;
 
    package TR_Info is new
@@ -303,15 +301,16 @@ package body Test.Skeleton is
    end record;
 
    package TR_Info_Enhanced is new
-     Ada.Containers.Indefinite_Vectors (Positive,
-                                        Test_Routine_Info_Enhanced_Wrapper);
+     Ada.Containers.Indefinite_Vectors
+       (Positive,
+        Test_Routine_Info_Enhanced_Wrapper);
    use TR_Info_Enhanced;
 
    type Suites_Data_Type is record
-      Test_Types   : TT_Info.Vector;
-      TR_List      : TR_Info.Vector;
-      ITR_List     : TR_Info_Enhanced.Vector;
-      LTR_List     : TR_Info_Enhanced.Vector;
+      Test_Types : TT_Info.Vector;
+      TR_List    : TR_Info.Vector;
+      ITR_List   : TR_Info_Enhanced.Vector;
+      LTR_List   : TR_Info_Enhanced.Vector;
    end record;
 
    ------------------
@@ -395,7 +394,7 @@ package body Test.Skeleton is
 
    procedure Update_Generic_Packages (Instantiation : String);
    --  Updates Gen_Package_Storage with a name of processed instantiation
-   procedure Update_Generic_Packages (Gen_Pack      : Generic_Package);
+   procedure Update_Generic_Packages (Gen_Pack : Generic_Package);
    --  Updates Gen_Package_Storage with a new generic package info
 
    -----------------------
@@ -425,7 +424,7 @@ package body Test.Skeleton is
    Markered_Data_Map : Markered_Data_Maps.Map;
 
    procedure Gather_Data
-     (The_Unit          :     Compilation_Unit;
+     (The_Unit          : Compilation_Unit;
       Data              : out Data_Holder;
       Suite_Data_List   : out Suites_Data_Type;
       Apropriate_Source : out Boolean);
@@ -435,12 +434,12 @@ package body Test.Skeleton is
    --  Marks unappropriate sources in the source table.
 
    procedure Gather_Test_Cases
-     (Subp            :        Subp_Info;
-      TR_Info         :        Test_Routine_Info_Wrapper;
+     (Subp            : Subp_Info;
+      TR_Info         : Test_Routine_Info_Wrapper;
       Data            : in out Data_Holder;
       Suite_Data_List : in out Suites_Data_Type;
-      TC_Found        :    out Boolean;
-      Instance_Sloc   :        String := "");
+      TC_Found        : out Boolean;
+      Instance_Sloc   : String := "");
    --  Adds one subprogram-to-test per each test case.
    --  Sets TC_Found if at least one Test_Case aspect or pragma has been found
    --  for given subprogram.
@@ -449,8 +448,7 @@ package body Test.Skeleton is
    --  Creates dummy child packages copying nested packages from tested package
 
    procedure Generate_Test_Package
-     (Data    : Data_Holder;
-      TP_List : in out TP_Mapping_List.List);
+     (Data : Data_Holder; TP_List : in out TP_Mapping_List.List);
    --  Generates test package spec and body. Save in TP_List information about
    --  generated tests.
 
@@ -478,16 +476,14 @@ package body Test.Skeleton is
    procedure Get_Subprograms_From_Package (File : String);
 
    procedure Get_Subprogram_From_Separate
-     (File : String;
-      UH   : Unique_Hash;
-      Subp : Subp_Info);
+     (File : String; UH : Unique_Hash; Subp : Subp_Info);
 
    procedure Put_Opening_Comment_Section
      (Subp           : Subp_Info;
       Overloading_N  : Natural;
       Commented_Out  : Boolean := False;
       Use_Short_Name : Boolean := True;
-      Type_Name      : String  := "";
+      Type_Name      : String := "";
       Add_Cov_Dump   : Boolean := False);
 
    procedure Put_Closing_Comment_Section
@@ -508,8 +504,8 @@ package body Test.Skeleton is
    --  into original tested subprogram's name.
 
    function Find_Same_Short_Name
-     (MD_Map : Markered_Data_Maps.Map;
-      Subp   : Subp_Info) return Markered_Data_Maps.Cursor;
+     (MD_Map : Markered_Data_Maps.Map; Subp : Subp_Info)
+      return Markered_Data_Maps.Cursor;
    --  Searches for the test with given short name
 
    function Uncomment_Line (S : String) return String;
@@ -520,8 +516,7 @@ package body Test.Skeleton is
    --  Returns image of given time in 1901-01-01 00:00:00 format.
 
    procedure Get_Units_To_Stub
-     (The_Unit :        Compilation_Unit;
-      Data     : in out Data_Holder);
+     (The_Unit : Compilation_Unit; Data : in out Data_Holder);
    --  Populates the list of units that should be stubbed.
 
    procedure Process_Stubs (List : Ada_Nodes_List.List);
@@ -536,8 +531,8 @@ package body Test.Skeleton is
    --  Returns the list of possible setters for all subprograms called from
    --  the body of given subprogram.
 
-   function Get_TR_Name_Suffix (Subp : Basic_Decl'Class) return String is
-     (if Include_Subp_Name then " (" & Get_Subp_FQN (Subp) & ")" else "");
+   function Get_TR_Name_Suffix (Subp : Basic_Decl'Class) return String
+   is (if Include_Subp_Name then " (" & Get_Subp_FQN (Subp) & ")" else "");
    --  Return the string that either contains the name of the tested subprogram
    --  in Subp in parenthesis, or the empty string, based on whether
    --  --include-subp-name was passed on the command line.
@@ -564,23 +559,22 @@ package body Test.Skeleton is
    --------------------
 
    procedure Process_Source (The_Unit : Analysis_Unit) is
-      Data              : Data_Holder;
-      Suite_Data_List   : Suites_Data_Type;
-      Suite_Data        : Test.Harness.Data_Holder;
+      Data            : Data_Holder;
+      Suite_Data_List : Suites_Data_Type;
+      Suite_Data      : Test.Harness.Data_Holder;
 
       Apropriate_Source : Boolean;
 
       CU : Compilation_Unit;
 
       Test_Packages : String_Set.Set;
-      Cur : String_Set.Cursor;
+      Cur           : String_Set.Cursor;
 
       procedure Get_Test_Packages_List (S_Data : Suites_Data_Type);
       --  Fills suite data sorting out routines from generic packages
 
       function Get_Suite_Components
-        (S_Data       : Suites_Data_Type;
-         Package_Name : String)
+        (S_Data : Suites_Data_Type; Package_Name : String)
          return Test.Harness.Data_Holder;
 
       procedure Cleanup;
@@ -617,8 +611,7 @@ package body Test.Skeleton is
             end if;
          end loop;
 
-         for
-           K in S_Data.ITR_List.First_Index .. S_Data.ITR_List.Last_Index
+         for K in S_Data.ITR_List.First_Index .. S_Data.ITR_List.Last_Index
          loop
             Test_Packages.Include
               (S_Data.ITR_List.Element (K).Test_Package.all);
@@ -627,14 +620,13 @@ package body Test.Skeleton is
       end Get_Test_Packages_List;
 
       function Get_Suite_Components
-        (S_Data       : Suites_Data_Type;
-         Package_Name : String)
+        (S_Data : Suites_Data_Type; Package_Name : String)
          return Test.Harness.Data_Holder
       is
          Suite_Data   : Test.Harness.Data_Holder;
          Test_Routine : Test.Harness.Test_Routine_Info;
-         TT   : Test.Harness.Test_Type_Info;
-         TR_E : Test.Harness.Test_Routine_Info_Enhanced;
+         TT           : Test.Harness.Test_Type_Info;
+         TR_E         : Test.Harness.Test_Routine_Info_Enhanced;
 
          package Test_Type_Origins is new
            Ada.Containers.Vectors (Positive, Ada_Node);
@@ -650,12 +642,10 @@ package body Test.Skeleton is
 
          Suite_Data.Test_Unit_Full_Name := new String'(Package_Name);
 
-         for
-           K in S_Data.Test_Types.First_Index .. S_Data.Test_Types.Last_Index
+         for K in S_Data.Test_Types.First_Index .. S_Data.Test_Types.Last_Index
          loop
 
-            if
-              S_Data.Test_Types.Element (K).Test_Package.all = Package_Name
+            if S_Data.Test_Types.Element (K).Test_Package.all = Package_Name
             then
                TT := S_Data.Test_Types.Element (K).TT_Info;
                TT.Tested_Type := S_Data.Test_Types.Element (K).Original_Type;
@@ -690,8 +680,7 @@ package body Test.Skeleton is
             end if;
          end loop;
 
-         for
-           K in S_Data.ITR_List.First_Index .. S_Data.ITR_List.Last_Index
+         for K in S_Data.ITR_List.First_Index .. S_Data.ITR_List.Last_Index
          loop
             if S_Data.ITR_List.Element (K).Test_Package.all = Package_Name then
 
@@ -718,8 +707,7 @@ package body Test.Skeleton is
             end if;
          end loop;
 
-         for
-           K in S_Data.LTR_List.First_Index .. S_Data.LTR_List.Last_Index
+         for K in S_Data.LTR_List.First_Index .. S_Data.LTR_List.Last_Index
          loop
             if S_Data.LTR_List.Element (K).Test_Package.all = Package_Name then
 
@@ -741,7 +729,7 @@ package body Test.Skeleton is
                if Type_Found then
                   TR_E.Tested_Type := Original_Type;
                   Suite_Data.LTR_List.Append (TR_E);
-                  Suite_Data.Good_For_Substitution  := True;
+                  Suite_Data.Good_For_Substitution := True;
                end if;
             end if;
          end loop;
@@ -765,8 +753,7 @@ package body Test.Skeleton is
          --  Only interested in specs
          return;
       end if;
-      Gather_Data
-        (CU, Data, Suite_Data_List, Apropriate_Source);
+      Gather_Data (CU, Data, Suite_Data_List, Apropriate_Source);
 
       if Apropriate_Source then
 
@@ -803,7 +790,7 @@ package body Test.Skeleton is
                --  This is recorded in the Data holder.
 
                if Ada.Directories.Exists (Test.Common.JSON_Test_Dir.all)
-                  and not Data.Subp_List.Is_Empty
+                 and not Data.Subp_List.Is_Empty
                then
                   Data.Has_Gen_Tests :=
                     Output_Generated_Tests (Data, Suite_Data_List, TP_List);
@@ -818,9 +805,9 @@ package body Test.Skeleton is
             loop
                exit when Cur = String_Set.No_Element;
 
-               Suite_Data := Get_Suite_Components
-                 (Suite_Data_List,
-                  String_Set.Element (Cur));
+               Suite_Data :=
+                 Get_Suite_Components
+                   (Suite_Data_List, String_Set.Element (Cur));
 
                if Suite_Data.Good_For_Suite then
                   if not Stub_Mode_ON and then not Separate_Drivers then
@@ -843,9 +830,9 @@ package body Test.Skeleton is
                Cur := Test_Packages.First;
                while Cur /= String_Set.No_Element loop
 
-                  Suite_Data := Get_Suite_Components
-                    (Suite_Data_List,
-                     String_Set.Element (Cur));
+                  Suite_Data :=
+                    Get_Suite_Components
+                      (Suite_Data_List, String_Set.Element (Cur));
 
                   if Suite_Data.Good_For_Suite then
                      Test.Harness.Generate_Test_Drivers
@@ -874,8 +861,9 @@ package body Test.Skeleton is
 
          Source_Processing_Failed := True;
 
-         Report_Err ("lal error while creating test package for "
-                     & Base_Name (The_Unit.Get_Filename));
+         Report_Err
+           ("lal error while creating test package for "
+            & Base_Name (The_Unit.Get_Filename));
          Report_Err ("source file may be incomplete/invalid");
 
          Report_Ex (Ex);
@@ -885,8 +873,9 @@ package body Test.Skeleton is
 
          Source_Processing_Failed := True;
 
-         Report_Err ("unexpected error while creating test package for "
-                     & Base_Name (The_Unit.Get_Filename));
+         Report_Err
+           ("unexpected error while creating test package for "
+            & Base_Name (The_Unit.Get_Filename));
 
          Report_Ex (Ex);
          Cleanup;
@@ -897,7 +886,7 @@ package body Test.Skeleton is
    -----------------
 
    procedure Gather_Data
-     (The_Unit          :     Compilation_Unit;
+     (The_Unit          : Compilation_Unit;
       Data              : out Data_Holder;
       Suite_Data_List   : out Suites_Data_Type;
       Apropriate_Source : out Boolean)
@@ -908,7 +897,7 @@ package body Test.Skeleton is
       Unit : Ada_Node;
 
       Type_Counter       : Positive := 1;
-      Dummy_Type_Counter : Natural  := 0;
+      Dummy_Type_Counter : Natural := 0;
 
       function Get_Nested_Packages (Node : Ada_Node'Class) return Visit_Status;
       function Get_Records (Node : Ada_Node'Class) return Visit_Status;
@@ -929,8 +918,7 @@ package body Test.Skeleton is
       --  Stores sloc of instance that is used for test routine output
 
       procedure Gather_Inherited_Subprograms
-        (Dummy_Types     : Natural;
-         Suite_Data_List : in out Suites_Data_Type);
+        (Dummy_Types : Natural; Suite_Data_List : in out Suites_Data_Type);
       --  Populates the list of inherited subprograms. Dummy_Types indicates
       --  the number of Test types created for non-primitives.
 
@@ -938,14 +926,13 @@ package body Test.Skeleton is
         (Suite_Data_List : in out Suites_Data_Type);
       --  Populates the list of overridden subprograms
 
-      function Is_Callable_Subprogram (Subp : Basic_Decl) return Boolean is
-         (Subp.Kind not in Ada_Abstract_Subp_Decl | Ada_Null_Subp_Decl);
+      function Is_Callable_Subprogram (Subp : Basic_Decl) return Boolean
+      is (Subp.Kind not in Ada_Abstract_Subp_Decl | Ada_Null_Subp_Decl);
       --  Checks that given subprogram is neither an abstract subprogram
       --  nor a null procedure. This ensures that corresponding test routine
       --  is created for such subprogram.
 
-      function Is_Fully_Private
-        (Arg : Base_Type_Decl) return Boolean;
+      function Is_Fully_Private (Arg : Base_Type_Decl) return Boolean;
       --  Detects if Arg and its incomplete declaration (if present)
       --  are both in private part.
 
@@ -962,16 +949,14 @@ package body Test.Skeleton is
 
       function Test_Types_Linked
         (Inheritance_Root_Type  : Base_Type_Decl;
-         Inheritance_Final_Type : Base_Type_Decl)
-         return Boolean;
+         Inheritance_Final_Type : Base_Type_Decl) return Boolean;
       --  Checks that there is no fully private types between the root type
       --  and the final descendant, so that corresponding test types are
       --  members of same hierarchy.
 
       function No_Inheritance_Through_Generics
         (Inheritance_Root_Type  : Base_Type_Decl;
-         Inheritance_Final_Type : Base_Type_Decl)
-         return Boolean;
+         Inheritance_Final_Type : Base_Type_Decl) return Boolean;
       --  Checks that all types between the root type and the final descendant
       --  are declared in regular packages.
 
@@ -1006,17 +991,20 @@ package body Test.Skeleton is
          case Kind (Node) is
             when Ada_Package_Decl =>
                if Get_Nesting (Node) = "" then
-                  Package_Data.Name := new String'
-                    (Node_Image (Node.As_Basic_Decl.P_Defining_Name));
+                  Package_Data.Name :=
+                    new String'
+                      (Node_Image (Node.As_Basic_Decl.P_Defining_Name));
                else
-                  Package_Data.Name := new String'
-                    (Get_Nesting (Node) & "."
-                     & Node_Image (Node.As_Basic_Decl.P_Defining_Name));
+                  Package_Data.Name :=
+                    new String'
+                      (Get_Nesting (Node)
+                       & "."
+                       & Node_Image (Node.As_Basic_Decl.P_Defining_Name));
                end if;
 
                Package_Data.Is_Generic := False;
-               Package_Data.Data_Kind  := Declaration_Data;
-               Package_Data.Element    := Node.As_Ada_Node;
+               Package_Data.Data_Kind := Declaration_Data;
+               Package_Data.Element := Node.As_Ada_Node;
                Data.Package_Data_List.Append (Package_Data);
 
             when Ada_Generic_Package_Decl =>
@@ -1028,17 +1016,20 @@ package body Test.Skeleton is
                --  Only library level generics are processed
                if Node.Parent.Kind = Ada_Library_Item then
                   if Get_Nesting (Node) = "" then
-                     Package_Data.Name := new String'
-                       (Node_Image (Node.As_Basic_Decl.P_Defining_Name));
+                     Package_Data.Name :=
+                       new String'
+                         (Node_Image (Node.As_Basic_Decl.P_Defining_Name));
                   else
-                     Package_Data.Name := new String'
-                       (Get_Nesting (Node) & "."
-                        & Node_Image (Node.As_Basic_Decl.P_Defining_Name));
+                     Package_Data.Name :=
+                       new String'
+                         (Get_Nesting (Node)
+                          & "."
+                          & Node_Image (Node.As_Basic_Decl.P_Defining_Name));
                   end if;
 
-                  Package_Data.Is_Generic  := True;
-                  Package_Data.Data_Kind   := Declaration_Data;
-                  Package_Data.Element     := Node.As_Ada_Node;
+                  Package_Data.Is_Generic := True;
+                  Package_Data.Data_Kind := Declaration_Data;
+                  Package_Data.Element := Node.As_Ada_Node;
                   Data.Package_Data_List.Append (Package_Data);
                end if;
 
@@ -1070,14 +1061,15 @@ package body Test.Skeleton is
                      return Over;
                   end if;
 
-                  Package_Data.Name := new String'
-                    (Get_Nesting (Node)
-                     & "."
-                     & Node_Image (Node.As_Basic_Decl.P_Defining_Name));
+                  Package_Data.Name :=
+                    new String'
+                      (Get_Nesting (Node)
+                       & "."
+                       & Node_Image (Node.As_Basic_Decl.P_Defining_Name));
                   Package_Data.Data_Kind := Instantiation;
                   Package_Data.Is_Generic := False;
-                  Package_Data.Generic_Containing_Package := new String'
-                    (Node_Image (Gen_Decl.P_Defining_Name));
+                  Package_Data.Generic_Containing_Package :=
+                    new String'(Node_Image (Gen_Decl.P_Defining_Name));
                   Package_Data.Element := Node.As_Ada_Node;
                   Data.Package_Data_List.Append (Package_Data);
                   return Over;
@@ -1097,9 +1089,9 @@ package body Test.Skeleton is
       function Get_Records (Node : Ada_Node'Class) return Visit_Status is
          Cur_Node : Ada_Node;
 
-         Type_Data     : Base_Type_Info;
-         Test_Type     : Test.Harness.Test_Type_Info;
-         Test_Package  : String_Access;
+         Type_Data    : Base_Type_Info;
+         Test_Type    : Test.Harness.Test_Type_Info;
+         Test_Package : String_Access;
 
          procedure Get_Type_Parent_Data (Type_Data : in out Base_Type_Info);
          --  Gathers data on parent type
@@ -1122,10 +1114,10 @@ package body Test.Skeleton is
             procedure Set_No_Parent (Type_Data : in out Base_Type_Info) is
             begin
                Type_Data.Argument_Father_Type_Name := null;
-               Type_Data.Argument_Father_Nesting   := null;
+               Type_Data.Argument_Father_Nesting := null;
                Type_Data.Argument_Father_Unit_Name := null;
 
-               Type_Data.Has_Argument_Father       := False;
+               Type_Data.Has_Argument_Father := False;
             end Set_No_Parent;
          begin
 
@@ -1147,8 +1139,7 @@ package body Test.Skeleton is
                return;
             end if;
 
-            if
-              not Is_Declared_In_Regular_Package (Parent_Type.As_Ada_Node)
+            if not Is_Declared_In_Regular_Package (Parent_Type.As_Ada_Node)
               or else Parent_Type.As_Type_Decl.P_Is_Interface_Type
               or else Is_Fully_Private (Parent_Type)
             then
@@ -1161,19 +1152,18 @@ package body Test.Skeleton is
                return;
             end if;
 
-            Type_Data.Argument_Father_Type_Name := new
-              String'(Node_Image (Parent_Type.P_Defining_Name));
-            Type_Data.Argument_Father_Nesting   := new
-              String'(Get_Nesting (Parent_Type));
-            Type_Data.Argument_Father_Unit_Name := new String'
-                (Enclosing_Unit_Name (Parent_Type));
+            Type_Data.Argument_Father_Type_Name :=
+              new String'(Node_Image (Parent_Type.P_Defining_Name));
+            Type_Data.Argument_Father_Nesting :=
+              new String'(Get_Nesting (Parent_Type));
+            Type_Data.Argument_Father_Unit_Name :=
+              new String'(Enclosing_Unit_Name (Parent_Type));
 
-            Type_Data.Has_Argument_Father       := True;
+            Type_Data.Has_Argument_Father := True;
          end Get_Type_Parent_Data;
       begin
          if Node.Kind = Ada_Generic_Package_Decl
-           and then (Node.Parent.Kind /= Ada_Library_Item
-                     or else Stub_Mode_ON)
+           and then (Node.Parent.Kind /= Ada_Library_Item or else Stub_Mode_ON)
          then
             --  Nested generics are not supported
             return Over;
@@ -1199,7 +1189,8 @@ package body Test.Skeleton is
          end if;
 
          if Node.Kind = Ada_Generic_Package_Instantiation
-           and then not Inside_Inst and then not Data.Is_Generic
+           and then not Inside_Inst
+           and then not Data.Is_Generic
          then
             if Stub_Mode_ON then
                return Over;
@@ -1215,8 +1206,7 @@ package body Test.Skeleton is
                   return Over;
                end if;
 
-               Gen_Decl :=
-                 Gen_Decl.P_Get_Uninstantiated_Node.As_Generic_Decl;
+               Gen_Decl := Gen_Decl.P_Get_Uninstantiated_Node.As_Generic_Decl;
 
                --  No processing for instantiations of nested generics,
                --  also if corresponding generic is not processed (or going
@@ -1228,21 +1218,21 @@ package body Test.Skeleton is
                end if;
 
                Inside_Inst := True;
-               Instance_Nesting := new String'
-                 (Encode
-                    (Node.As_Basic_Decl.P_Fully_Qualified_Name,
-                     Node.Unit.Get_Charset));
-               Instance_Sloc := new String'
-                 (Base_Name (Data.Unit_File_Name.all)
-                  & ":"
-                  & Trim (First_Line_Number (Node)'Img, Both)
-                  & ":"
-                  & Trim (First_Column_Number (Node)'Img, Both)
-                  & ":");
+               Instance_Nesting :=
+                 new String'
+                   (Encode
+                      (Node.As_Basic_Decl.P_Fully_Qualified_Name,
+                       Node.Unit.Get_Charset));
+               Instance_Sloc :=
+                 new String'
+                   (Base_Name (Data.Unit_File_Name.all)
+                    & ":"
+                    & Trim (First_Line_Number (Node)'Img, Both)
+                    & ":"
+                    & Trim (First_Column_Number (Node)'Img, Both)
+                    & ":");
 
-               Increase_Indent
-                 (Me,
-                  "traversing instantiation " & Node.Image);
+               Increase_Indent (Me, "traversing instantiation " & Node.Image);
                Traverse (Gen_Decl, Get_Records'Access);
                Decrease_Indent (Me);
 
@@ -1274,8 +1264,8 @@ package body Test.Skeleton is
 
          --  Gathering basic data about type
          Type_Data.Main_Type_Elem := Cur_Node;
-         Type_Data.Main_Type_Text_Name := new
-           String'(Node_Image (Cur_Node.As_Basic_Decl.P_Defining_Name));
+         Type_Data.Main_Type_Text_Name :=
+           new String'(Node_Image (Cur_Node.As_Basic_Decl.P_Defining_Name));
          if Inside_Inst then
             Type_Data.Nesting := new String'(Instance_Nesting.all);
          else
@@ -1287,8 +1277,9 @@ package body Test.Skeleton is
             Stored_Type : Base_Type_Info;
          begin
 
-            for I in Data.Type_Data_List.First_Index ..
-              Data.Type_Data_List.Last_Index
+            for I
+              in Data.Type_Data_List.First_Index
+                 .. Data.Type_Data_List.Last_Index
             loop
                Stored_Type := Data.Type_Data_List.Element (I);
                if Stored_Type.Main_Type_Elem = Cur_Node
@@ -1313,44 +1304,44 @@ package body Test.Skeleton is
            Abstract_Type (Cur_Node.As_Base_Type_Decl);
 
          Type_Data.Type_Number := Type_Counter;
-         Type_Counter          := Type_Counter + 1;
+         Type_Counter := Type_Counter + 1;
 
          Data.Type_Data_List.Append (Type_Data);
 
-         if
-           Type_Data.Nesting.all = Data.Unit_Full_Name.all
-         then
-            Test_Package := new String'
-              (Data.Unit_Full_Name.all
-               & "."
-               & Type_Data.Main_Type_Text_Name.all
-               & Test_Data_Unit_Name_Suff
-               & "."
-               & Type_Data.Main_Type_Text_Name.all
-               & Test_Unit_Name_Suff);
+         if Type_Data.Nesting.all = Data.Unit_Full_Name.all then
+            Test_Package :=
+              new String'
+                (Data.Unit_Full_Name.all
+                 & "."
+                 & Type_Data.Main_Type_Text_Name.all
+                 & Test_Data_Unit_Name_Suff
+                 & "."
+                 & Type_Data.Main_Type_Text_Name.all
+                 & Test_Unit_Name_Suff);
 
          else
-            Test_Package := new String'
-              (Data.Unit_Full_Name.all
-                & "." & Test_Data_Unit_Name & "."
-                & Test_Unit_Name & "."
-                & Nesting_Difference
-                 (Type_Data.Nesting.all,
-                  Data.Unit_Full_Name.all)
-                & "."
-                & Type_Data.Main_Type_Text_Name.all
-                & Test_Data_Unit_Name_Suff
-                & "."
-                & Type_Data.Main_Type_Text_Name.all
-                & Test_Unit_Name_Suff);
+            Test_Package :=
+              new String'
+                (Data.Unit_Full_Name.all
+                 & "."
+                 & Test_Data_Unit_Name
+                 & "."
+                 & Test_Unit_Name
+                 & "."
+                 & Nesting_Difference
+                     (Type_Data.Nesting.all, Data.Unit_Full_Name.all)
+                 & "."
+                 & Type_Data.Main_Type_Text_Name.all
+                 & Test_Data_Unit_Name_Suff
+                 & "."
+                 & Type_Data.Main_Type_Text_Name.all
+                 & Test_Unit_Name_Suff);
          end if;
 
          Test_Type.Test_Type := No_Ada_Node;
-         Test_Type.Test_Type_Name := new String'
-           ("Test_" &
-              Type_Data.Main_Type_Text_Name.all);
-         Test_Type.Nesting := new String'
-           (Test_Package.all);
+         Test_Type.Test_Type_Name :=
+           new String'("Test_" & Type_Data.Main_Type_Text_Name.all);
+         Test_Type.Nesting := new String'(Test_Package.all);
 
          if not Type_Data.Main_Type_Abstract then
             Suite_Data_List.Test_Types.Append
@@ -1405,39 +1396,39 @@ package body Test.Skeleton is
          end if;
 
          if Node.Kind = Ada_Generic_Package_Decl
-           and then (Node.Parent.Kind /= Ada_Library_Item
-                     or else Stub_Mode_ON)
+           and then (Node.Parent.Kind /= Ada_Library_Item or else Stub_Mode_ON)
          then
             --  Nested generics are not supported
             return Over;
          end if;
 
          if (Node.Kind = Ada_Generic_Package_Instantiation
-            and Node.Parent.Kind = Ada_Library_Item)
-            or
-               (Node.Kind = Ada_Generic_Package_Instantiation
-                  and Inside_Top_Level_Inst)
+             and Node.Parent.Kind = Ada_Library_Item)
+           or (Node.Kind = Ada_Generic_Package_Instantiation
+               and Inside_Top_Level_Inst)
          then
             Inside_Inst := True;
             Inside_Top_Level_Inst := True;
-            Instance_Nesting := new String'
-              (Encode
-                 (Node
-                     .As_Generic_Package_Instantiation
-                     .P_Designated_Generic_Decl
-                     .P_Generic_Instantiations (1)
-                     .P_Fully_Qualified_Name,
-                  Node.Unit.Get_Charset));
-            Instance_Sloc := new String'
-              (Base_Name (Data.Unit_File_Name.all)
-               & ":"
-               & Trim (First_Line_Number (Node)'Img, Both)
-               & ":"
-               & Trim (First_Column_Number (Node)'Img, Both)
-               & ":");
+            Instance_Nesting :=
+              new String'
+                (Encode
+                   (Node
+                      .As_Generic_Package_Instantiation
+                      .P_Designated_Generic_Decl
+                      .P_Generic_Instantiations (1)
+                      .P_Fully_Qualified_Name,
+                    Node.Unit.Get_Charset));
+            Instance_Sloc :=
+              new String'
+                (Base_Name (Data.Unit_File_Name.all)
+                 & ":"
+                 & Trim (First_Line_Number (Node)'Img, Both)
+                 & ":"
+                 & Trim (First_Column_Number (Node)'Img, Both)
+                 & ":");
             Traverse
-               (Node.As_Generic_Instantiation.P_Designated_Generic_Decl,
-                Get_Subprograms'Access);
+              (Node.As_Generic_Instantiation.P_Designated_Generic_Decl,
+               Get_Subprograms'Access);
             Inside_Top_Level_Inst := False;
             Inside_Inst := False;
             Free (Instance_Nesting);
@@ -1446,8 +1437,8 @@ package body Test.Skeleton is
          end if;
 
          if Node.Kind = Ada_Package_Decl
-            and then Inside_Inst
-            and then not Inside_Top_Level_Inst
+           and then Inside_Inst
+           and then not Inside_Top_Level_Inst
          then
             --  No processing for packages nested inside generic ones
             return Over;
@@ -1458,7 +1449,8 @@ package body Test.Skeleton is
          end if;
 
          if Node.Kind = Ada_Generic_Package_Instantiation
-           and then not Inside_Inst and then not Data.Is_Generic
+           and then not Inside_Inst
+           and then not Data.Is_Generic
          then
             if Stub_Mode_ON then
                return Over;
@@ -1474,8 +1466,7 @@ package body Test.Skeleton is
                   return Over;
                end if;
 
-               Gen_Decl :=
-                 Gen_Decl.P_Get_Uninstantiated_Node.As_Generic_Decl;
+               Gen_Decl := Gen_Decl.P_Get_Uninstantiated_Node.As_Generic_Decl;
 
                --  No processing for instantiations of nested generics,
                --  also if corresponding generic is not processed (or going
@@ -1487,20 +1478,21 @@ package body Test.Skeleton is
                end if;
 
                Inside_Inst := True;
-               Instance_Nesting := new String'
-                 (Encode
-                    (Node.As_Basic_Decl.P_Fully_Qualified_Name,
-                     Node.Unit.Get_Charset));
-               Instance_Sloc := new String'
-                 (Base_Name (Data.Unit_File_Name.all)
-                  & ":"
-                  & Trim (First_Line_Number (Node)'Img, Both)
-                  & ":"
-                  & Trim (First_Column_Number (Node)'Img, Both)
-                  & ":");
+               Instance_Nesting :=
+                 new String'
+                   (Encode
+                      (Node.As_Basic_Decl.P_Fully_Qualified_Name,
+                       Node.Unit.Get_Charset));
+               Instance_Sloc :=
+                 new String'
+                   (Base_Name (Data.Unit_File_Name.all)
+                    & ":"
+                    & Trim (First_Line_Number (Node)'Img, Both)
+                    & ":"
+                    & Trim (First_Column_Number (Node)'Img, Both)
+                    & ":");
 
-               Increase_Indent
-                 (Me, "traversing instantiation " & Node.Image);
+               Increase_Indent (Me, "traversing instantiation " & Node.Image);
                Traverse (Gen_Decl, Get_Subprograms'Access);
                Decrease_Indent (Me);
 
@@ -1511,17 +1503,15 @@ package body Test.Skeleton is
             end;
          end if;
 
-         if
-           Node.Kind = Ada_Expr_Function
+         if Node.Kind = Ada_Expr_Function
            and then not Node.As_Base_Subp_Body.P_Previous_Part_For_Decl.Is_Null
          then
             --  It will be treated at spec.
             return Over;
          end if;
 
-         if
-           Node.Kind not in Ada_Subp_Decl
-             | Ada_Subp_Renaming_Decl | Ada_Expr_Function
+         if Node.Kind
+            not in Ada_Subp_Decl | Ada_Subp_Renaming_Decl | Ada_Expr_Function
          then
             return Into;
          end if;
@@ -1538,9 +1528,9 @@ package body Test.Skeleton is
             Subp_UT_Counter := Subp_UT_Counter + 1;
          end if;
          Subp.Subp_Declaration := Node.As_Ada_Node;
-         Subp.Subp_Text_Name   := new String'(Get_Subp_Name (Node));
-         Subp.Subp_Name_Image   := new String'
-           (Node_Image (Node.As_Basic_Decl.P_Defining_Name));
+         Subp.Subp_Text_Name := new String'(Get_Subp_Name (Node));
+         Subp.Subp_Name_Image :=
+           new String'(Node_Image (Node.As_Basic_Decl.P_Defining_Name));
          if Inside_Inst then
             Subp.Nesting := new String'(Instance_Nesting.all);
          else
@@ -1553,69 +1543,69 @@ package body Test.Skeleton is
               Subp.Subp_Declaration.Sloc_Range;
          begin
             if Inside_Inst then
-               Test_Routine.Tested_Sloc := new String'
-                 (Base_Name (Subp.Subp_Declaration.Unit.Get_Filename)
-                  & ":"
-                  & Trim (Subp_Span.Start_Line'Img, Both)
-                  & ":"
-                  & Trim (Subp_Span.Start_Column'Img, Both)
-                  & Get_TR_Name_Suffix (Subp.Subp_Declaration.As_Basic_Decl)
-                  & " instance at "
-                  & Instance_Sloc.all);
+               Test_Routine.Tested_Sloc :=
+                 new String'
+                   (Base_Name (Subp.Subp_Declaration.Unit.Get_Filename)
+                    & ":"
+                    & Trim (Subp_Span.Start_Line'Img, Both)
+                    & ":"
+                    & Trim (Subp_Span.Start_Column'Img, Both)
+                    & Get_TR_Name_Suffix (Subp.Subp_Declaration.As_Basic_Decl)
+                    & " instance at "
+                    & Instance_Sloc.all);
             else
-               Test_Routine.Tested_Sloc := new String'
-                 (Base_Name (Data.Unit_File_Name.all)
-                  & ":"
-                  & Trim (Subp_Span.Start_Line'Img, Both)
-                  & ":"
-                  & Trim (Subp_Span.Start_Column'Img, Both)
-                  & Get_TR_Name_Suffix (Subp.Subp_Declaration.As_Basic_Decl)
-                  & ":");
+               Test_Routine.Tested_Sloc :=
+                 new String'
+                   (Base_Name (Data.Unit_File_Name.all)
+                    & ":"
+                    & Trim (Subp_Span.Start_Line'Img, Both)
+                    & ":"
+                    & Trim (Subp_Span.Start_Column'Img, Both)
+                    & Get_TR_Name_Suffix (Subp.Subp_Declaration.As_Basic_Decl)
+                    & ":");
             end if;
          end;
 
          if Node.Kind = Ada_Expr_Function then
-            Owner_Decl := P_Primitive_Subp_Tagged_Type
-              (Node.As_Base_Subp_Body.F_Subp_Spec.As_Base_Subp_Spec);
+            Owner_Decl :=
+              P_Primitive_Subp_Tagged_Type
+                (Node.As_Base_Subp_Body.F_Subp_Spec.As_Base_Subp_Spec);
          elsif Node.Kind = Ada_Subp_Renaming_Decl then
-            Owner_Decl := P_Primitive_Subp_Tagged_Type
-              (Node.As_Subp_Renaming_Decl.F_Subp_Spec.As_Base_Subp_Spec);
+            Owner_Decl :=
+              P_Primitive_Subp_Tagged_Type
+                (Node.As_Subp_Renaming_Decl.F_Subp_Spec.As_Base_Subp_Spec);
          else
-            Owner_Decl := P_Primitive_Subp_Tagged_Type
-              (Node.As_Basic_Subp_Decl.P_Subp_Decl_Spec);
+            Owner_Decl :=
+              P_Primitive_Subp_Tagged_Type
+                (Node.As_Basic_Subp_Decl.P_Subp_Decl_Spec);
          end if;
 
-         if Owner_Decl /= No_Base_Type_Decl
-         --  If owner is incomplete private declaration (without "tagged"
-         --  keyword) subp should be treated as non-dispatching.
+         if Owner_Decl
+           /= No_Base_Type_Decl
+             --  If owner is incomplete private declaration (without "tagged"
+             --  keyword) subp should be treated as non-dispatching.
          then
             if Owner_Decl.As_Base_Type_Decl.P_Is_Private then
-               Owner_Decl :=
-                 Owner_Decl.As_Base_Type_Decl.P_Private_Completion;
+               Owner_Decl := Owner_Decl.As_Base_Type_Decl.P_Private_Completion;
             end if;
 
             Type_Found := False;
-            for
-              I in Data.Type_Data_List.First_Index ..
-                Data.Type_Data_List.Last_Index
+            for I
+              in Data.Type_Data_List.First_Index
+                 .. Data.Type_Data_List.Last_Index
             loop
 
-               if
-                 Data.Type_Data_List.Element (I).Main_Type_Elem = Owner_Decl
+               if Data.Type_Data_List.Element (I).Main_Type_Elem = Owner_Decl
                then
                   Subp.Corresp_Type :=
                     Data.Type_Data_List.Element (I).Type_Number;
 
-                  Subp.Subp_Mangle_Name := new
-                    String'(Mangle_Hash (Node));
-                  Subp.Subp_Full_Hash := new
-                    String'(Mangle_Hash_16 (Node));
-                  Subp.Subp_Hash_V1 := new
-                    String'(Mangle_Hash_16 (Node, True, True));
-                  Subp.Subp_Hash_V2_1 := new
-                    String'(Mangle_Hash_16
-                            (Node,
-                               N_Controlling => True));
+                  Subp.Subp_Mangle_Name := new String'(Mangle_Hash (Node));
+                  Subp.Subp_Full_Hash := new String'(Mangle_Hash_16 (Node));
+                  Subp.Subp_Hash_V1 :=
+                    new String'(Mangle_Hash_16 (Node, True, True));
+                  Subp.Subp_Hash_V2_1 :=
+                    new String'(Mangle_Hash_16 (Node, N_Controlling => True));
 
                   Type_Found := True;
                   exit;
@@ -1626,42 +1616,42 @@ package body Test.Skeleton is
          --  Setting suite info
          if Type_Found then
             Test_Routine.TR_Declaration := No_Ada_Node;
-            Test_Routine.TR_Text_Name := new String'
-              (Subp.Subp_Mangle_Name.all);
+            Test_Routine.TR_Text_Name :=
+              new String'(Subp.Subp_Mangle_Name.all);
             --  Not setting test type number since it will be reset
             --  during suite_data generation.
             Original_Type := Owner_Decl;
 
-            if
-              Nesting_Difference
-                (Data.Unit_Full_Name.all, Subp.Nesting.all) = ""
+            if Nesting_Difference (Data.Unit_Full_Name.all, Subp.Nesting.all)
+              = ""
             then
-               Test_Package_Name := new String'
-                 (Data.Unit_Full_Name.all
-                  & "."
-                  & Node_Image
-                    (Original_Type.As_Basic_Decl.P_Defining_Name)
-                  & Test_Data_Unit_Name_Suff & "."
-                  & Node_Image
-                    (Original_Type.As_Basic_Decl.P_Defining_Name)
-                  & Test_Unit_Name_Suff);
+               Test_Package_Name :=
+                 new String'
+                   (Data.Unit_Full_Name.all
+                    & "."
+                    & Node_Image (Original_Type.As_Basic_Decl.P_Defining_Name)
+                    & Test_Data_Unit_Name_Suff
+                    & "."
+                    & Node_Image (Original_Type.As_Basic_Decl.P_Defining_Name)
+                    & Test_Unit_Name_Suff);
 
             else
-               Test_Package_Name := new String'
-                 (Data.Unit_Full_Name.all & "."
-                  & Test_Data_Unit_Name & "."
-                  & Test_Unit_Name
-                  & "."
-                  & Nesting_Difference
-                    (Data.Unit_Full_Name.all,
-                     Subp.Nesting.all)
-                  & "."
-                  & Node_Image
-                    (Original_Type.As_Basic_Decl.P_Defining_Name)
-                  & Test_Data_Unit_Name_Suff & "."
-                  & Node_Image
-                    (Original_Type.As_Basic_Decl.P_Defining_Name)
-                  & Test_Unit_Name_Suff);
+               Test_Package_Name :=
+                 new String'
+                   (Data.Unit_Full_Name.all
+                    & "."
+                    & Test_Data_Unit_Name
+                    & "."
+                    & Test_Unit_Name
+                    & "."
+                    & Nesting_Difference
+                        (Data.Unit_Full_Name.all, Subp.Nesting.all)
+                    & "."
+                    & Node_Image (Original_Type.As_Basic_Decl.P_Defining_Name)
+                    & Test_Data_Unit_Name_Suff
+                    & "."
+                    & Node_Image (Original_Type.As_Basic_Decl.P_Defining_Name)
+                    & Test_Unit_Name_Suff);
             end if;
 
             Test_Routine.Nesting := new String'(Test_Package_Name.all);
@@ -1672,14 +1662,17 @@ package body Test.Skeleton is
             --  for the type in Get_Records so we need to launch it here.
 
             if Node.Kind = Ada_Expr_Function then
-               Owner_Decl := P_Primitive_Subp_Tagged_Type
-                 (Node.As_Base_Subp_Body.F_Subp_Spec.As_Base_Subp_Spec);
+               Owner_Decl :=
+                 P_Primitive_Subp_Tagged_Type
+                   (Node.As_Base_Subp_Body.F_Subp_Spec.As_Base_Subp_Spec);
             elsif Node.Kind = Ada_Subp_Renaming_Decl then
-               Owner_Decl := P_Primitive_Subp_Tagged_Type
-                 (Node.As_Subp_Renaming_Decl.F_Subp_Spec.As_Base_Subp_Spec);
+               Owner_Decl :=
+                 P_Primitive_Subp_Tagged_Type
+                   (Node.As_Subp_Renaming_Decl.F_Subp_Spec.As_Base_Subp_Spec);
             else
-               Owner_Decl := P_Primitive_Subp_Tagged_Type
-                 (Node.As_Basic_Subp_Decl.P_Subp_Decl_Spec);
+               Owner_Decl :=
+                 P_Primitive_Subp_Tagged_Type
+                   (Node.As_Basic_Subp_Decl.P_Subp_Decl_Spec);
             end if;
 
             if Owner_Decl /= No_Base_Type_Decl then
@@ -1688,61 +1681,70 @@ package body Test.Skeleton is
 
             --  In simple case the type is always found, because in fact
             --  we do not depend on it.
-            Type_Found            := True;
-            Subp.Corresp_Type     := 0;
+            Type_Found := True;
+            Subp.Corresp_Type := 0;
 
-            Subp.Subp_Mangle_Name := new
-              String'(Mangle_Hash (Node, Unwind_Controlling => False));
-            Subp.Subp_Full_Hash := new
-              String'(Mangle_Hash_16 (Node, N_Controlling => True));
-            Subp.Subp_Hash_V1 := new
-              String'(Mangle_Hash_16 (Node, True, True));
-            Subp.Subp_Hash_V2_1 := new
-              String'(Mangle_Hash_16
-                      (Node,
-                         N_Controlling => True));
+            Subp.Subp_Mangle_Name :=
+              new String'(Mangle_Hash (Node, Unwind_Controlling => False));
+            Subp.Subp_Full_Hash :=
+              new String'(Mangle_Hash_16 (Node, N_Controlling => True));
+            Subp.Subp_Hash_V1 :=
+              new String'(Mangle_Hash_16 (Node, True, True));
+            Subp.Subp_Hash_V2_1 :=
+              new String'(Mangle_Hash_16 (Node, N_Controlling => True));
 
-            Data.Has_Simple_Case  := True;
-            Data.Needs_Set_Up     := True;
+            Data.Has_Simple_Case := True;
+            Data.Needs_Set_Up := True;
             Data.Needs_Assertions := True;
 
             --  Adding corresponding test routines for non-primitives to
             --  the first element of suite data list.
 
             Test_Routine.TR_Declaration := No_Ada_Node;
-            Test_Routine.TR_Text_Name := new String'
-              (Subp.Subp_Mangle_Name.all);
+            Test_Routine.TR_Text_Name :=
+              new String'(Subp.Subp_Mangle_Name.all);
             Test_Routine.Test_Type_Numb := 1;
 
-            if
-              Nesting_Difference
-                (Data.Unit_Full_Name.all, Subp.Nesting.all) = ""
+            if Nesting_Difference (Data.Unit_Full_Name.all, Subp.Nesting.all)
+              = ""
             then
-               Test_Routine.Nesting := new String'
-                 (Subp.Nesting.all & "." &
-                    Test_Data_Unit_Name & "." &
-                    Test_Unit_Name);
+               Test_Routine.Nesting :=
+                 new String'
+                   (Subp.Nesting.all
+                    & "."
+                    & Test_Data_Unit_Name
+                    & "."
+                    & Test_Unit_Name);
 
             else
                if Data.Is_Top_Level_Generic_Instantiation then
-                  Test_Routine.Nesting := new String'
-                    (Data.Unit_Full_Name.all &
-                       "." & Test_Data_Unit_Name &
-                       "." & Test_Unit_Name);
+                  Test_Routine.Nesting :=
+                    new String'
+                      (Data.Unit_Full_Name.all
+                       & "."
+                       & Test_Data_Unit_Name
+                       & "."
+                       & Test_Unit_Name);
                else
-                  Test_Routine.Nesting := new String'
-                    (Nesting_Common_Prefix
-                       (Data.Unit_Full_Name.all, Subp.Nesting.all) &
-                       "." & Test_Data_Unit_Name &
-                       "." & Test_Unit_Name & "." &
-                       Nesting_Difference
-                       (Data.Unit_Full_Name.all, Subp.Nesting.all) &
-                       "." & Test_Data_Unit_Name & "." & Test_Unit_Name);
+                  Test_Routine.Nesting :=
+                    new String'
+                      (Nesting_Common_Prefix
+                         (Data.Unit_Full_Name.all, Subp.Nesting.all)
+                       & "."
+                       & Test_Data_Unit_Name
+                       & "."
+                       & Test_Unit_Name
+                       & "."
+                       & Nesting_Difference
+                           (Data.Unit_Full_Name.all, Subp.Nesting.all)
+                       & "."
+                       & Test_Data_Unit_Name
+                       & "."
+                       & Test_Unit_Name);
                end if;
             end if;
 
-            Test_Package_Name := new String'
-              (Test_Routine.Nesting.all);
+            Test_Package_Name := new String'(Test_Routine.Nesting.all);
             Original_Type := No_Base_Type_Decl;
 
          end if;
@@ -1777,8 +1779,7 @@ package body Test.Skeleton is
       ----------------------------------
 
       procedure Gather_Inherited_Subprograms
-        (Dummy_Types     : Natural;
-         Suite_Data_List : in out Suites_Data_Type)
+        (Dummy_Types : Natural; Suite_Data_List : in out Suites_Data_Type)
       is
          Type_Dec : Type_Decl;
 
@@ -1803,7 +1804,7 @@ package body Test.Skeleton is
             return True;
          end Is_Overridden;
 
-         Test_Routine : Test.Harness.Test_Routine_Info_Enhanced;
+         Test_Routine         : Test.Harness.Test_Routine_Info_Enhanced;
          Test_Routine_Wrapper : Test_Routine_Info_Enhanced_Wrapper;
 
          Tmp_Data        : Data_Holder;
@@ -1811,34 +1812,36 @@ package body Test.Skeleton is
          Tmp_Subp        : Subp_Info;
          Dummy_TR_Info   : Test_Routine_Info_Wrapper;
          Tmp_TR          : Test.Harness.Test_Routine_Info;
-         Tmp_Has_TC    : Boolean;
+         Tmp_Has_TC      : Boolean;
       begin
 
          --  Creating a stub for Subp_Info object
-         Tmp_Subp.Nesting          := new String'("");
-         Tmp_Subp.Subp_Text_Name   := new String'("");
-         Tmp_Subp.Subp_Full_Hash   := new String'("");
-         Tmp_Subp.Subp_Hash_V1     := new String'("");
-         Tmp_Subp.Subp_Hash_V2_1   := new String'("");
+         Tmp_Subp.Nesting := new String'("");
+         Tmp_Subp.Subp_Text_Name := new String'("");
+         Tmp_Subp.Subp_Full_Hash := new String'("");
+         Tmp_Subp.Subp_Hash_V1 := new String'("");
+         Tmp_Subp.Subp_Hash_V2_1 := new String'("");
 
-         for
-           K in Suite_Data_List.Test_Types.First_Index + Dummy_Type_Counter ..
-             Suite_Data_List.Test_Types.Last_Index
+         for K
+           in Suite_Data_List.Test_Types.First_Index
+              + Dummy_Type_Counter
+              .. Suite_Data_List.Test_Types.Last_Index
          loop
-            if Suite_Data_List.Test_Types.Element (K).Original_Type.Kind in
-              Ada_Task_Type_Decl | Ada_Protected_Type_Decl
+            if Suite_Data_List.Test_Types.Element (K).Original_Type.Kind
+               in Ada_Task_Type_Decl | Ada_Protected_Type_Decl
             then
                goto Skip_Inheritance;
             end if;
 
-            Type_Dec := As_Type_Decl
-              (Suite_Data_List.Test_Types.Element (K).Original_Type);
+            Type_Dec :=
+              As_Type_Decl
+                (Suite_Data_List.Test_Types.Element (K).Original_Type);
             declare
-               ISubs : constant Basic_Decl_Array :=
+               ISubs         : constant Basic_Decl_Array :=
                  Type_Dec.P_Get_Primitives (Only_Inherited => True);
-               ISubs2 : constant Basic_Decl_Array :=
+               ISubs2        : constant Basic_Decl_Array :=
                  Type_Dec.P_Get_Primitives (Only_Inherited => False);
-               ISub : Basic_Decl;
+               ISub          : Basic_Decl;
                Ancestor_Type : Base_Type_Decl;
             begin
 
@@ -1851,16 +1854,14 @@ package body Test.Skeleton is
                   --  - Is overriden
                   --  - Is synthetic, such as the inequality operator
 
-                  if
-                    Source_Present (ISub.Unit.Get_Filename)
+                  if Source_Present (ISub.Unit.Get_Filename)
                     and then Is_Callable_Subprogram (ISub)
                     and then not Is_Private (ISub)
                     and then not Is_Overridden (ISub, ISubs2)
                     and then not (ISub.Kind in Ada_Synthetic_Subp_Decl)
                     and then not ISub.P_Subp_Spec_Or_Null.Is_Null
-                    and then not
-                      (ISub.P_Subp_Spec_Or_Null.Kind
-                       in Ada_Synthetic_Binary_Spec)
+                    and then not (ISub.P_Subp_Spec_Or_Null.Kind
+                                  in Ada_Synthetic_Binary_Spec)
                   then
 
                      --  We need to go to original declaration of the inherited
@@ -1883,13 +1884,17 @@ package body Test.Skeleton is
                      if ISub.Kind = Ada_Expr_Function then
                         Ancestor_Type :=
                           P_Primitive_Subp_Tagged_Type
-                            (ISub.As_Base_Subp_Body.F_Subp_Spec.
-                               As_Base_Subp_Spec);
+                            (ISub
+                               .As_Base_Subp_Body
+                               .F_Subp_Spec
+                               .As_Base_Subp_Spec);
                      elsif ISub.Kind = Ada_Subp_Renaming_Decl then
                         Ancestor_Type :=
                           P_Primitive_Subp_Tagged_Type
-                            (ISub.As_Subp_Renaming_Decl.F_Subp_Spec.
-                               As_Base_Subp_Spec);
+                            (ISub
+                               .As_Subp_Renaming_Decl
+                               .F_Subp_Spec
+                               .As_Base_Subp_Spec);
                      else
                         Ancestor_Type :=
                           P_Primitive_Subp_Tagged_Type
@@ -1901,22 +1906,23 @@ package body Test.Skeleton is
                      end loop;
 
                      if Test_Types_Linked
-                       (Ancestor_Type, Type_Dec.As_Base_Type_Decl)
+                          (Ancestor_Type, Type_Dec.As_Base_Type_Decl)
                        and then No_Inheritance_Through_Generics
-                         (Ancestor_Type, Type_Dec.As_Base_Type_Decl)
+                                  (Ancestor_Type, Type_Dec.As_Base_Type_Decl)
                      then
                         --  Check if the inherited subprogram had
                         --  Test_Cases. In such case one test per Test_Case
                         --  should be inherited.
-                        Tmp_Data.Unit_File_Name := new
-                          String'(Base_Name (ISub.Unit.Get_Filename));
+                        Tmp_Data.Unit_File_Name :=
+                          new String'(Base_Name (ISub.Unit.Get_Filename));
                         Tmp_Subp.Subp_Declaration := ISub.As_Ada_Node;
                         Tmp_Subp.Subp_Text_Name :=
                           new String'(Get_Subp_Name (ISub));
                         Tmp_Subp.Subp_Mangle_Name :=
                           new String'(Mangle_Hash (ISub));
-                        Tmp_Subp.Subp_Name_Image := new String'
-                          (Node_Image (ISub.As_Basic_Decl.P_Defining_Name));
+                        Tmp_Subp.Subp_Name_Image :=
+                          new String'
+                            (Node_Image (ISub.As_Basic_Decl.P_Defining_Name));
                         Tmp_Subp.Corresp_Type := K;
 
                         Gather_Test_Cases
@@ -1926,82 +1932,79 @@ package body Test.Skeleton is
                            Tmp_Suites_Data,
                            Tmp_Has_TC);
 
-                        if
-                          Get_Nesting (ISub) = Enclosing_Unit_Name (ISub)
-                        then
-                           Test_Routine.TR_Rarent_Unit_Name := new String'
-                             (Enclosing_Unit_Name (ISub)
-                              & "."
-                              & Node_Image
-                                (P_Defining_Name
-                                     (Ancestor_Type.As_Basic_Decl))
-                              & Test_Data_Unit_Name_Suff
-                              & "."
-                              & Node_Image
-                                (P_Defining_Name
-                                     (Ancestor_Type.As_Basic_Decl))
-                              & Test_Unit_Name_Suff);
+                        if Get_Nesting (ISub) = Enclosing_Unit_Name (ISub) then
+                           Test_Routine.TR_Rarent_Unit_Name :=
+                             new String'
+                               (Enclosing_Unit_Name (ISub)
+                                & "."
+                                & Node_Image
+                                    (P_Defining_Name
+                                       (Ancestor_Type.As_Basic_Decl))
+                                & Test_Data_Unit_Name_Suff
+                                & "."
+                                & Node_Image
+                                    (P_Defining_Name
+                                       (Ancestor_Type.As_Basic_Decl))
+                                & Test_Unit_Name_Suff);
                         else
-                           Test_Routine.TR_Rarent_Unit_Name := new String'
-                             (Enclosing_Unit_Name (ISub)
-                              & "."
-                              & Test_Data_Unit_Name
-                              & "."
-                              & Test_Unit_Name
-                              & "."
-                              & Nesting_Difference
-                                (Get_Nesting (ISub),
-                                 Enclosing_Unit_Name (ISub))
-                              & Node_Image
-                                (P_Defining_Name
-                                     (Ancestor_Type.As_Basic_Decl))
-                              & Test_Data_Unit_Name_Suff
-                              & "."
-                              & Node_Image
-                                (P_Defining_Name
-                                     (Ancestor_Type.As_Basic_Decl))
-                              & Test_Unit_Name_Suff);
+                           Test_Routine.TR_Rarent_Unit_Name :=
+                             new String'
+                               (Enclosing_Unit_Name (ISub)
+                                & "."
+                                & Test_Data_Unit_Name
+                                & "."
+                                & Test_Unit_Name
+                                & "."
+                                & Nesting_Difference
+                                    (Get_Nesting (ISub),
+                                     Enclosing_Unit_Name (ISub))
+                                & Node_Image
+                                    (P_Defining_Name
+                                       (Ancestor_Type.As_Basic_Decl))
+                                & Test_Data_Unit_Name_Suff
+                                & "."
+                                & Node_Image
+                                    (P_Defining_Name
+                                       (Ancestor_Type.As_Basic_Decl))
+                                & Test_Unit_Name_Suff);
                         end if;
-                        Test_Routine.Nesting := new String'
-                          (Test_Routine.TR_Rarent_Unit_Name.all);
+                        Test_Routine.Nesting :=
+                          new String'(Test_Routine.TR_Rarent_Unit_Name.all);
 
-                        if
-                          Get_Nesting (Type_Dec) = Data.Unit_Full_Name.all
+                        if Get_Nesting (Type_Dec) = Data.Unit_Full_Name.all
                         then
-                           Test_Routine_Wrapper.Test_Package := new String'
-                             (Data.Unit_Full_Name.all
-                              & "."
-                              & Node_Image
-                                (P_Defining_Name
-                                     (Type_Dec.As_Basic_Decl))
-                              & Test_Data_Unit_Name_Suff
-                              & "."
-                              & Node_Image
-                                (P_Defining_Name
-                                     (Type_Dec.As_Basic_Decl))
-                              & Test_Unit_Name_Suff);
+                           Test_Routine_Wrapper.Test_Package :=
+                             new String'
+                               (Data.Unit_Full_Name.all
+                                & "."
+                                & Node_Image
+                                    (P_Defining_Name (Type_Dec.As_Basic_Decl))
+                                & Test_Data_Unit_Name_Suff
+                                & "."
+                                & Node_Image
+                                    (P_Defining_Name (Type_Dec.As_Basic_Decl))
+                                & Test_Unit_Name_Suff);
 
                         else
-                           Test_Routine_Wrapper.Test_Package := new String'
-                             (Data.Unit_Full_Name.all
-                              & "."
-                              & Test_Data_Unit_Name
-                              & "."
-                              & Test_Unit_Name
-                              & "."
-                              & Nesting_Difference
-                                (Get_Nesting (Type_Dec),
-                                 Data.Unit_Full_Name.all)
-                              & "."
-                              & Node_Image
-                                (P_Defining_Name
-                                     (Type_Dec.As_Basic_Decl))
-                              & Test_Data_Unit_Name_Suff
-                              & "."
-                              & Node_Image
-                                (P_Defining_Name
-                                     (Type_Dec.As_Basic_Decl))
-                              & Test_Unit_Name_Suff);
+                           Test_Routine_Wrapper.Test_Package :=
+                             new String'
+                               (Data.Unit_Full_Name.all
+                                & "."
+                                & Test_Data_Unit_Name
+                                & "."
+                                & Test_Unit_Name
+                                & "."
+                                & Nesting_Difference
+                                    (Get_Nesting (Type_Dec),
+                                     Data.Unit_Full_Name.all)
+                                & "."
+                                & Node_Image
+                                    (P_Defining_Name (Type_Dec.As_Basic_Decl))
+                                & Test_Data_Unit_Name_Suff
+                                & "."
+                                & Node_Image
+                                    (P_Defining_Name (Type_Dec.As_Basic_Decl))
+                                & Test_Unit_Name_Suff);
                         end if;
 
                         --  Type is always the same, test_cases or not
@@ -2011,8 +2014,9 @@ package body Test.Skeleton is
                         if Tmp_Has_TC then
 
                            --  There were Test_Cases
-                           for I in Tmp_Suites_Data.TR_List.First_Index ..
-                             Tmp_Suites_Data.TR_List.Last_Index
+                           for I
+                             in Tmp_Suites_Data.TR_List.First_Index
+                                .. Tmp_Suites_Data.TR_List.Last_Index
                            loop
                               Tmp_TR :=
                                 Tmp_Suites_Data.TR_List.Element (I).TR_Info;
@@ -2021,19 +2025,19 @@ package body Test.Skeleton is
                                 new String'(Tmp_TR.TR_Text_Name.all);
 
                               --  adding sloc info
-                              Test_Routine.Tested_Sloc := new String'
-                                (Tmp_TR.Tested_Sloc.all
-                                 & " inherited at "
-                                 & Base_Name
-                                   (Type_Dec.Unit.Get_Filename)
-                                 & ":"
-                                 & Trim
-                                   (First_Line_Number (Type_Dec)'Img, Both)
-                                 & ":"
-                                 & Trim
-                                   (First_Column_Number (Type_Dec)'Img,
-                                    Both)
-                                 & ":");
+                              Test_Routine.Tested_Sloc :=
+                                new String'
+                                  (Tmp_TR.Tested_Sloc.all
+                                   & " inherited at "
+                                   & Base_Name (Type_Dec.Unit.Get_Filename)
+                                   & ":"
+                                   & Trim
+                                       (First_Line_Number (Type_Dec)'Img, Both)
+                                   & ":"
+                                   & Trim
+                                       (First_Column_Number (Type_Dec)'Img,
+                                        Both)
+                                   & ":");
 
                               Test_Routine_Wrapper.TR_Info := Test_Routine;
 
@@ -2045,28 +2049,26 @@ package body Test.Skeleton is
                            --  There were no test_Cases, we just need
                            --  to add the single inherited test.
 
-                           Test_Routine.TR_Text_Name   := new String'
-                             (Mangle_Hash (ISub));
+                           Test_Routine.TR_Text_Name :=
+                             new String'(Mangle_Hash (ISub));
 
                            --  Adding sloc info
-                           Test_Routine.Tested_Sloc := new String'
-                             (Base_Name (ISub.Unit.Get_Filename)
-                              & ":"
-                              & Trim
-                                (First_Line_Number (ISub)'Img, Both)
-                              & ":"
-                              & Trim
-                                (First_Column_Number (ISub)'Img, Both)
-                              & Get_TR_Name_Suffix (ISub)
-                              & ": inherited at "
-                              & Base_Name (Type_Dec.Unit.Get_Filename)
-                              & ":"
-                              & Trim
-                                (First_Line_Number (Type_Dec)'Img, Both)
-                              & ":"
-                              & Trim
-                                (First_Column_Number (Type_Dec)'Img, Both)
-                              & ":");
+                           Test_Routine.Tested_Sloc :=
+                             new String'
+                               (Base_Name (ISub.Unit.Get_Filename)
+                                & ":"
+                                & Trim (First_Line_Number (ISub)'Img, Both)
+                                & ":"
+                                & Trim (First_Column_Number (ISub)'Img, Both)
+                                & Get_TR_Name_Suffix (ISub)
+                                & ": inherited at "
+                                & Base_Name (Type_Dec.Unit.Get_Filename)
+                                & ":"
+                                & Trim (First_Line_Number (Type_Dec)'Img, Both)
+                                & ":"
+                                & Trim
+                                    (First_Column_Number (Type_Dec)'Img, Both)
+                                & ":");
 
                            Test_Routine_Wrapper.TR_Info := Test_Routine;
 
@@ -2140,8 +2142,7 @@ package body Test.Skeleton is
                if OSub.Kind = Ada_Expr_Function then
                   Ancestor_Type :=
                     P_Primitive_Subp_Tagged_Type
-                      (OSub.As_Base_Subp_Body.F_Subp_Spec.
-                         As_Base_Subp_Spec);
+                      (OSub.As_Base_Subp_Body.F_Subp_Spec.As_Base_Subp_Spec);
                else
                   Ancestor_Type :=
                     P_Primitive_Subp_Tagged_Type
@@ -2155,19 +2156,22 @@ package body Test.Skeleton is
                if Source_Present (Ancestor_Type.Unit.Get_Filename)
                  and then Is_Callable_Subprogram (OSub)
                  and then Test_Types_Linked
-                   (Ancestor_Type, TR_W.Original_Type.As_Base_Type_Decl)
+                            (Ancestor_Type,
+                             TR_W.Original_Type.As_Base_Type_Decl)
                  and then No_Inheritance_Through_Generics
-                   (Ancestor_Type, TR_W.Original_Type.As_Base_Type_Decl)
+                            (Ancestor_Type,
+                             TR_W.Original_Type.As_Base_Type_Decl)
                then
-                  Depth := Inheritance_Depth
-                    (Ancestor_Type.As_Base_Type_Decl,
-                     TR_W.Original_Type.As_Base_Type_Decl);
+                  Depth :=
+                    Inheritance_Depth
+                      (Ancestor_Type.As_Base_Type_Decl,
+                       TR_W.Original_Type.As_Base_Type_Decl);
 
                   --  Inheritance depth of corresponding test type needs to be
                   --  updated
-                  for
-                    L in Suite_Data_List.Test_Types.First_Index ..
-                      Suite_Data_List.Test_Types.Last_Index
+                  for L
+                    in Suite_Data_List.Test_Types.First_Index
+                       .. Suite_Data_List.Test_Types.Last_Index
                   loop
 
                      Test_Type_Wrapper :=
@@ -2175,8 +2179,8 @@ package body Test.Skeleton is
 
                      if Test_Type_Wrapper.Original_Type = TR_W.Original_Type
                      then
-                        if Depth >
-                          Test_Type_Wrapper.TT_Info.Max_Inheritance_Depth
+                        if Depth
+                          > Test_Type_Wrapper.TT_Info.Max_Inheritance_Depth
                         then
                            Test_Type_Wrapper.TT_Info.Max_Inheritance_Depth :=
                              Depth;
@@ -2194,34 +2198,28 @@ package body Test.Skeleton is
                   TR := TR_W.TR_Info;
                   LTR.TR_Text_Name := new String'(TR.TR_Text_Name.all);
                   LTR.Inheritance_Depth := Depth;
-                  LTR_W.TR_Info         := LTR;
-                  LTR_W.Original_Type   := TR_W.Original_Type;
-                  LTR_W.Test_Package    := new String'(TR_W.Test_Package.all);
+                  LTR_W.TR_Info := LTR;
+                  LTR_W.Original_Type := TR_W.Original_Type;
+                  LTR_W.Test_Package := new String'(TR_W.Test_Package.all);
 
                   --  Adding sloc info
-                  LTR_W.TR_Info.Tested_Sloc := new String'
-                    (Base_Name (OSub.Unit.Get_Filename)
-                     & ":"
-                     & Trim
-                       (First_Line_Number (OSub)'Img,
-                        Both)
-                     & ":"
-                     & Trim
-                       (First_Column_Number (OSub)'Img,
-                        Both)
-                     & Get_TR_Name_Suffix (OSub)
-                     & ": overridden at "
-                     & Base_Name
-                       (TR_W.Original_Type.Unit.Get_Filename)
-                     & ":"
-                     & Trim
-                       (First_Line_Number (TR_W.Original_Subp)'Img,
-                        Both)
-                     & ":"
-                     & Trim
-                       (First_Column_Number (TR_W.Original_Subp)'Img,
-                        Both)
-                     & ":");
+                  LTR_W.TR_Info.Tested_Sloc :=
+                    new String'
+                      (Base_Name (OSub.Unit.Get_Filename)
+                       & ":"
+                       & Trim (First_Line_Number (OSub)'Img, Both)
+                       & ":"
+                       & Trim (First_Column_Number (OSub)'Img, Both)
+                       & Get_TR_Name_Suffix (OSub)
+                       & ": overridden at "
+                       & Base_Name (TR_W.Original_Type.Unit.Get_Filename)
+                       & ":"
+                       & Trim
+                           (First_Line_Number (TR_W.Original_Subp)'Img, Both)
+                       & ":"
+                       & Trim
+                           (First_Column_Number (TR_W.Original_Subp)'Img, Both)
+                       & ":");
 
                   Suite_Data_List.LTR_List.Append (LTR_W);
                end if;
@@ -2249,8 +2247,7 @@ package body Test.Skeleton is
 
       function Test_Types_Linked
         (Inheritance_Root_Type  : Base_Type_Decl;
-         Inheritance_Final_Type : Base_Type_Decl)
-            return Boolean
+         Inheritance_Final_Type : Base_Type_Decl) return Boolean
       is
          Intermidiate : Base_Type_Decl := Inheritance_Final_Type;
       begin
@@ -2275,8 +2272,7 @@ package body Test.Skeleton is
 
       function No_Inheritance_Through_Generics
         (Inheritance_Root_Type  : Base_Type_Decl;
-         Inheritance_Final_Type : Base_Type_Decl)
-         return Boolean
+         Inheritance_Final_Type : Base_Type_Decl) return Boolean
       is
          Intermidiate : Base_Type_Decl := Inheritance_Final_Type;
       begin
@@ -2298,8 +2294,7 @@ package body Test.Skeleton is
       -- Is_Node_From_Generic --
       --------------------------
 
-      function Is_Node_From_Generic (Node : Ada_Node'Class) return Boolean
-      is
+      function Is_Node_From_Generic (Node : Ada_Node'Class) return Boolean is
          Elem : Ada_Node := Node.As_Ada_Node;
       begin
          if Inside_Inst then
@@ -2339,8 +2334,8 @@ package body Test.Skeleton is
             Next : Ada_Node := Node.Next_Sibling;
          begin
             while not Next.Is_Null and then Next.Kind = Ada_Pragma_Node loop
-               if To_Lower (Node_Image (F_Id (Next.As_Pragma_Node))) =
-                 "preelaborable_initialization"
+               if To_Lower (Node_Image (F_Id (Next.As_Pragma_Node)))
+                 = "preelaborable_initialization"
                then
                   return True;
                end if;
@@ -2380,8 +2375,7 @@ package body Test.Skeleton is
                      & " for ancestor type of "
                      & Node_Image (Type_Dec.P_Defining_Name));
                   Report_Std
-                    ("this can cause circularity in the test harness",
-                     1);
+                    ("this can cause circularity in the test harness", 1);
                   return;
                end if;
 
@@ -2416,8 +2410,8 @@ package body Test.Skeleton is
 
             while not Dec2.Is_Null loop
 
-               if Dec2.Kind in Ada_Incomplete_Type_Decl
-                             | Ada_Incomplete_Tagged_Type_Decl
+               if Dec2.Kind
+                  in Ada_Incomplete_Type_Decl | Ada_Incomplete_Tagged_Type_Decl
                then
                   Discr := Dec2.As_Incomplete_Type_Decl.F_Discriminants;
 
@@ -2433,8 +2427,7 @@ package body Test.Skeleton is
 
                if not Discr.Is_Null then
 
-                  if Discr.Kind = Ada_Unknown_Discriminant_Part
-                  then
+                  if Discr.Kind = Ada_Unknown_Discriminant_Part then
                      return True;
                   end if;
 
@@ -2488,7 +2481,7 @@ package body Test.Skeleton is
       end case;
 
       if Unit.As_Basic_Decl.P_Has_Aspect
-        (To_Unbounded_Text (To_Text ("Remote_Call_Interface")))
+           (To_Unbounded_Text (To_Text ("Remote_Call_Interface")))
       then
          Apropriate_Source := False;
          Report_Std
@@ -2514,7 +2507,8 @@ package body Test.Skeleton is
                return;
             end if;
 
-            if not Stub_Mode_ON and then not Separate_Drivers
+            if not Stub_Mode_ON
+              and then not Separate_Drivers
               and then Sem_Parent.Parent.Kind in Ada_Library_Item_Range
               and then Sem_Parent.Parent.As_Library_Item.F_Has_Private
             then
@@ -2538,17 +2532,22 @@ package body Test.Skeleton is
 
       Increase_Indent
         (Me,
-         "processing " & Node_Image (Unit.As_Basic_Decl.P_Defining_Name)
-         &  " (" & Base_Name (The_Unit.Unit.Get_Filename) & ")");
+         "processing "
+         & Node_Image (Unit.As_Basic_Decl.P_Defining_Name)
+         & " ("
+         & Base_Name (The_Unit.Unit.Get_Filename)
+         & ")");
 
       Check_Unit_For_Elaboration (The_Unit);
 
       Data.Unit := The_Unit;
-      Data.Unit_Full_Name := new String'
-        (if Data.Is_Top_Level_Generic_Instantiation
-         then Generic_Instantiation_Name
-            & Node_Image (Unit.As_Basic_Decl.P_Defining_Name)
-         else Node_Image (Unit.As_Basic_Decl.P_Defining_Name));
+      Data.Unit_Full_Name :=
+        new String'
+          (if Data.Is_Top_Level_Generic_Instantiation
+           then
+             Generic_Instantiation_Name
+             & Node_Image (Unit.As_Basic_Decl.P_Defining_Name)
+           else Node_Image (Unit.As_Basic_Decl.P_Defining_Name));
       Data.Unit_File_Name := new String'(The_Unit.Unit.Get_Filename);
 
       Trace (Me, "Gathering nested packages");
@@ -2559,12 +2558,15 @@ package body Test.Skeleton is
          Pack_Cur  : Package_Info_List.Cursor;
 
          Test_Package : constant String :=
-           Data.Unit_Full_Name.all & "." &
-           Test_Data_Unit_Name & "." & Test_Unit_Name;
+           Data.Unit_Full_Name.all
+           & "."
+           & Test_Data_Unit_Name
+           & "."
+           & Test_Unit_Name;
 
          Nest_Dif : String_Access;
       begin
-         Test_Type.TT_Info.Test_Type      := No_Ada_Node;
+         Test_Type.TT_Info.Test_Type := No_Ada_Node;
          Test_Type.TT_Info.Test_Type_Name := new String'("Test");
 
          Pack_Cur := Data.Package_Data_List.First;
@@ -2572,26 +2574,32 @@ package body Test.Skeleton is
          loop
             exit when Pack_Cur = Package_Info_List.No_Element;
 
-            Nest_Dif := new String'
-              (Nesting_Difference
-                 (Package_Info_List.Element (Pack_Cur).Name.all,
-                  Data.Unit_Full_Name.all));
+            Nest_Dif :=
+              new String'
+                (Nesting_Difference
+                   (Package_Info_List.Element (Pack_Cur).Name.all,
+                    Data.Unit_Full_Name.all));
 
             if Nest_Dif.all = "" then
                Test_Type.TT_Info.Nesting := new String'(Test_Package);
 
             else
-               Test_Type.TT_Info.Nesting := new String'
-                 (Test_Package & "." &
-                    Nesting_Difference
-                    (Package_Info_List.Element (Pack_Cur).Name.all,
-                     Data.Unit_Full_Name.all) &
-                    "." & Test_Data_Unit_Name & "." & Test_Unit_Name);
+               Test_Type.TT_Info.Nesting :=
+                 new String'
+                   (Test_Package
+                    & "."
+                    & Nesting_Difference
+                        (Package_Info_List.Element (Pack_Cur).Name.all,
+                         Data.Unit_Full_Name.all)
+                    & "."
+                    & Test_Data_Unit_Name
+                    & "."
+                    & Test_Unit_Name);
             end if;
 
             Free (Nest_Dif);
-            Test_Type.Test_Package := new String'
-              (Test_Type.TT_Info.Nesting.all);
+            Test_Type.Test_Package :=
+              new String'(Test_Type.TT_Info.Nesting.all);
 
             Suite_Data_List.Test_Types.Append (Test_Type);
             Dummy_Type_Counter := Dummy_Type_Counter + 1;
@@ -2608,8 +2616,7 @@ package body Test.Skeleton is
       Decrease_Indent (Me, "Traversings finished");
 
       if Inheritance_To_Suite and then not Stub_Mode_ON then
-         Gather_Inherited_Subprograms
-           (Dummy_Type_Counter, Suite_Data_List);
+         Gather_Inherited_Subprograms (Dummy_Type_Counter, Suite_Data_List);
       end if;
 
       if Substitution_Suite and then not Stub_Mode_ON then
@@ -2633,9 +2640,9 @@ package body Test.Skeleton is
 
             Tmp_Subp := Subp_Data_List.Element (Cur);
 
-            if
-              Data.Subp_Name_Frequency.Element
-                (To_Lower (Tmp_Subp.Subp_Text_Name.all)) > 1
+            if Data.Subp_Name_Frequency.Element
+                 (To_Lower (Tmp_Subp.Subp_Text_Name.all))
+              > 1
             then
                Tmp_Subp.Is_Overloaded := True;
             else
@@ -2659,19 +2666,19 @@ package body Test.Skeleton is
    -----------------------
 
    procedure Gather_Test_Cases
-     (Subp            :        Subp_Info;
-      TR_Info         :        Test_Routine_Info_Wrapper;
+     (Subp            : Subp_Info;
+      TR_Info         : Test_Routine_Info_Wrapper;
       Data            : in out Data_Holder;
       Suite_Data_List : in out Suites_Data_Type;
-      TC_Found        :    out Boolean;
-      Instance_Sloc   :        String := "")
+      TC_Found        : out Boolean;
+      Instance_Sloc   : String := "")
    is
 
       Me_TC : constant Trace_Handle :=
         Create ("Skeletons.Test_Cases", Default => Off);
 
       procedure Get_TC_Info_From_Pragma
-        (TC_Pragma :     Pragma_Node;
+        (TC_Pragma : Pragma_Node;
          Name      : out String_Access;
          Mode      : out Test_Case_Mode;
          Requires  : out Expr;
@@ -2679,7 +2686,7 @@ package body Test.Skeleton is
       --  Processes pragma node and sets values of corresponding parameters
 
       procedure Get_TC_Info_From_Aspect
-        (TC_Aspect :     Aspect_Assoc;
+        (TC_Aspect : Aspect_Assoc;
          Name      : out String_Access;
          Mode      : out Test_Case_Mode;
          Requires  : out Expr;
@@ -2706,10 +2713,7 @@ package body Test.Skeleton is
       --  Gnattest_<expr>'Old in Elem's image.
 
       function Replace_Result_Attribute
-        (Post   : String;
-         F_Name : String;
-         R_Name : String)
-         return String;
+        (Post : String; F_Name : String; R_Name : String) return String;
       --  Replaces all entrances of function'Result in Post with R_Name
 
       function Get_Old_Attr_Locations
@@ -2729,8 +2733,8 @@ package body Test.Skeleton is
       Test_Cases : Ada_Nodes_List.List;
 
       Requiers, Ensures : Expr;
-      Mode : Test_Case_Mode;
-      Name : String_Access;
+      Mode              : Test_Case_Mode;
+      Name              : String_Access;
 
       GT_Prefix : constant String := "Gnattest_";
 
@@ -2743,14 +2747,14 @@ package body Test.Skeleton is
       -----------------------------
 
       procedure Get_TC_Info_From_Pragma
-        (TC_Pragma :     Pragma_Node;
+        (TC_Pragma : Pragma_Node;
          Name      : out String_Access;
          Mode      : out Test_Case_Mode;
          Requires  : out Expr;
          Ensures   : out Expr)
       is
          Pragma_Params : constant Base_Assoc_List := F_Args (TC_Pragma);
-         PP_First      : constant Positive        :=
+         PP_First      : constant Positive :=
            Pragma_Params.Base_Assoc_List_First;
 
          Param_Expr : Expr;
@@ -2760,22 +2764,24 @@ package body Test.Skeleton is
          Param_Expr :=
            Pragma_Params.List_Child (PP_First).As_Pragma_Argument_Assoc.F_Expr;
          if Param_Expr.Kind = Ada_String_Literal then
-            Name := new String'
-              (Encode
-                 (Text    => Param_Expr.As_String_Literal.P_Denoted_Value,
-                  Charset => Param_Expr.Unit.Get_Charset));
+            Name :=
+              new String'
+                (Encode
+                   (Text    => Param_Expr.As_String_Literal.P_Denoted_Value,
+                    Charset => Param_Expr.Unit.Get_Charset));
          else
-            Name     := null;
-            Mode     := Robustness;
+            Name := null;
+            Mode := Robustness;
             Requires := No_Expr;
-            Ensures  := No_Expr;
+            Ensures := No_Expr;
             return;
          end if;
 
          --  Mode
          Param_Expr :=
-           Pragma_Params.List_Child
-             (PP_First + 1).As_Pragma_Argument_Assoc.F_Expr;
+           Pragma_Params.List_Child (PP_First + 1)
+             .As_Pragma_Argument_Assoc
+             .F_Expr;
          if To_Lower (Node_Image (Param_Expr)) = "nominal" then
             Mode := Normal;
          else
@@ -2784,19 +2790,19 @@ package body Test.Skeleton is
 
          if Pragma_Params.List_Child (PP_First + 2).Is_Null then
             Requires := No_Expr;
-            Ensures  := No_Expr;
+            Ensures := No_Expr;
             return;
          end if;
 
          --  Requires and Ensures
-         P_Assoc := Pragma_Params.List_Child
-           (PP_First + 2).As_Pragma_Argument_Assoc;
+         P_Assoc :=
+           Pragma_Params.List_Child (PP_First + 2).As_Pragma_Argument_Assoc;
 
          if To_Lower (Node_Image (P_Assoc.F_Expr)) = "requires" then
             Requires := P_Assoc.F_Expr;
          else
             Requires := No_Expr;
-            Ensures  := P_Assoc.F_Expr;
+            Ensures := P_Assoc.F_Expr;
             return;
          end if;
 
@@ -2804,8 +2810,9 @@ package body Test.Skeleton is
             Ensures := No_Expr;
          else
             Ensures :=
-              Pragma_Params.List_Child
-                (PP_First + 3).As_Pragma_Argument_Assoc.F_Expr;
+              Pragma_Params.List_Child (PP_First + 3)
+                .As_Pragma_Argument_Assoc
+                .F_Expr;
          end if;
       end Get_TC_Info_From_Pragma;
 
@@ -2814,7 +2821,7 @@ package body Test.Skeleton is
       -----------------------------
 
       procedure Get_TC_Info_From_Aspect
-        (TC_Aspect :     Aspect_Assoc;
+        (TC_Aspect : Aspect_Assoc;
          Name      : out String_Access;
          Mode      : out Test_Case_Mode;
          Requires  : out Expr;
@@ -2822,7 +2829,7 @@ package body Test.Skeleton is
       is
          Aspect_Params : constant Basic_Assoc_List :=
            TC_Aspect.F_Expr.As_Aggregate.F_Assocs.As_Basic_Assoc_List;
-         AP_First      : constant Positive   :=
+         AP_First      : constant Positive :=
            Aspect_Params.Basic_Assoc_List_First;
 
          Param_Expr : Expr;
@@ -2832,22 +2839,22 @@ package body Test.Skeleton is
          Param_Expr :=
            Aspect_Params.List_Child (AP_First).As_Aggregate_Assoc.F_R_Expr;
          if Param_Expr.Kind = Ada_String_Literal then
-            Name := new String'
-              (Encode
-                 (Text    => Param_Expr.As_String_Literal.P_Denoted_Value,
-                  Charset => Param_Expr.Unit.Get_Charset));
+            Name :=
+              new String'
+                (Encode
+                   (Text    => Param_Expr.As_String_Literal.P_Denoted_Value,
+                    Charset => Param_Expr.Unit.Get_Charset));
          else
-            Name     := null;
-            Mode     := Robustness;
+            Name := null;
+            Mode := Robustness;
             Requires := No_Expr;
-            Ensures  := No_Expr;
+            Ensures := No_Expr;
             return;
          end if;
 
          --  Mode
          Param_Expr :=
-           Aspect_Params.List_Child
-             (AP_First + 1).As_Aggregate_Assoc.F_R_Expr;
+           Aspect_Params.List_Child (AP_First + 1).As_Aggregate_Assoc.F_R_Expr;
          if To_Lower (Node_Image (Param_Expr)) = "nominal" then
             Mode := Normal;
          else
@@ -2856,26 +2863,27 @@ package body Test.Skeleton is
 
          if Aspect_Params.List_Child (AP_First + 2).Is_Null then
             Requires := No_Expr;
-            Ensures  := No_Expr;
+            Ensures := No_Expr;
             return;
          end if;
 
          --  Requires and Ensures
-         A_Assoc := Aspect_Params.List_Child
-           (AP_First + 2).As_Aggregate_Assoc;
+         A_Assoc := Aspect_Params.List_Child (AP_First + 2).As_Aggregate_Assoc;
 
          declare
             Des : constant Ada_Node_List :=
               A_Assoc.F_Designators.As_Ada_Node_List;
          begin
 
-            if To_Lower (Node_Image (Des.Ada_Node_List_Element
-                         (Des.Ada_Node_List_First))) = "requires"
+            if To_Lower
+                 (Node_Image
+                    (Des.Ada_Node_List_Element (Des.Ada_Node_List_First)))
+              = "requires"
             then
                Requires := A_Assoc.F_R_Expr;
             else
                Requires := No_Expr;
-               Ensures  := A_Assoc.F_R_Expr;
+               Ensures := A_Assoc.F_R_Expr;
                return;
             end if;
          end;
@@ -2884,8 +2892,9 @@ package body Test.Skeleton is
             Ensures := No_Expr;
          else
             Ensures :=
-              Aspect_Params.List_Child
-                (AP_First + 3).As_Aggregate_Assoc.F_R_Expr;
+              Aspect_Params.List_Child (AP_First + 3)
+                .As_Aggregate_Assoc
+                .F_R_Expr;
          end if;
       end Get_TC_Info_From_Aspect;
 
@@ -2893,8 +2902,7 @@ package body Test.Skeleton is
       -- Replace_Old_Attribute --
       ---------------------------
 
-      function Replace_Old_Attribute (Elem : Expr) return String
-      is
+      function Replace_Old_Attribute (Elem : Expr) return String is
          Unprocessed_Start : Token_Reference;
          Expression_End    : Token_Reference;
 
@@ -2927,14 +2935,13 @@ package body Test.Skeleton is
          end loop;
 
          Unprocessed_Start := Elem.Token_Start;
-         Expression_End    := Elem.Token_End;
+         Expression_End := Elem.Token_End;
 
          for Attr_Ref of Old_Attr_Ref loop
             Append
               (Result,
                Encode
-                 (Text
-                      (Unprocessed_Start, Previous (Attr_Ref.El.Token_Start)),
+                 (Text (Unprocessed_Start, Previous (Attr_Ref.El.Token_Start)),
                   Elem.Unit.Get_Charset));
 
             if Attr_Ref.Needs_Deref then
@@ -2976,8 +2983,8 @@ package body Test.Skeleton is
 
       begin
          if Node.Kind /= Ada_Attribute_Ref
-           or else To_Lower
-             (Node_Image (Node.As_Attribute_Ref.F_Attribute)) /= "old"
+           or else To_Lower (Node_Image (Node.As_Attribute_Ref.F_Attribute))
+                   /= "old"
          then
             return Into;
          end if;
@@ -3016,25 +3023,32 @@ package body Test.Skeleton is
          case Dec.Kind is
             when Ada_Subp_Decl =>
 
-               Loc.Temp_Var_Name := new String'
-                 (GT_Prefix
-                  & Trim (Positive'Image (Old_Attr_Counter), Both)
-                  & "_"
-                  & Get_Subp_Name (Dec));
+               Loc.Temp_Var_Name :=
+                 new String'
+                   (GT_Prefix
+                    & Trim (Positive'Image (Old_Attr_Counter), Both)
+                    & "_"
+                    & Get_Subp_Name (Dec));
                Res := Dec.As_Subp_Decl.F_Subp_Spec.P_Returns;
 
                if Res.Kind = Ada_Anonymous_Type then
-                  Def := F_Type_Def
-                    (Res.As_Anonymous_Type.F_Type_Decl.As_Type_Decl);
+                  Def :=
+                    F_Type_Def
+                      (Res.As_Anonymous_Type.F_Type_Decl.As_Type_Decl);
                   if Def.Kind = Ada_Type_Access_Def then
-                     Type_Dec := Def.As_Type_Access_Def.F_Subtype_Indication.
-                       F_Name.P_Relative_Name.P_Referenced_Decl;
+                     Type_Dec :=
+                       Def
+                         .As_Type_Access_Def
+                         .F_Subtype_Indication
+                         .F_Name
+                         .P_Relative_Name
+                         .P_Referenced_Decl;
                      Params_To_Temp.Include
                        (Loc.Temp_Var_Name.all
                         & " : constant access "
                         & Encode
-                          (Type_Dec.P_Fully_Qualified_Name,
-                           Type_Dec.Unit.Get_Charset)
+                            (Type_Dec.P_Fully_Qualified_Name,
+                             Type_Dec.Unit.Get_Charset)
                         & " := "
                         & Node_Image (Nm)
                         & ";");
@@ -3048,14 +3062,18 @@ package body Test.Skeleton is
                         & ";");
                   end if;
                else
-                  Type_Dec := Res.As_Subtype_Indication.F_Name.
-                    P_Relative_Name.P_Referenced_Decl;
+                  Type_Dec :=
+                    Res
+                      .As_Subtype_Indication
+                      .F_Name
+                      .P_Relative_Name
+                      .P_Referenced_Decl;
                   Params_To_Temp.Include
                     (Loc.Temp_Var_Name.all
                      & " : constant "
                      & Encode
-                       (Type_Dec.P_Fully_Qualified_Name,
-                        Type_Dec.Unit.Get_Charset)
+                         (Type_Dec.P_Fully_Qualified_Name,
+                          Type_Dec.Unit.Get_Charset)
                      & " := "
                      & Node_Image (Nm)
                      & ";");
@@ -3063,11 +3081,12 @@ package body Test.Skeleton is
 
             when Ada_Param_Spec =>
 
-               Loc.Temp_Var_Name := new String'
-                 (GT_Prefix
-                  & Trim (Positive'Image (Old_Attr_Counter), Both)
-                  & "_"
-                  & Node_Image (Id));
+               Loc.Temp_Var_Name :=
+                 new String'
+                   (GT_Prefix
+                    & Trim (Positive'Image (Old_Attr_Counter), Both)
+                    & "_"
+                    & Node_Image (Id));
                Params_To_Temp.Include
                  (Loc.Temp_Var_Name.all
                   & " : constant "
@@ -3078,26 +3097,33 @@ package body Test.Skeleton is
 
             when Ada_Object_Decl =>
 
-               Loc.Temp_Var_Name := new String'
-                 (GT_Prefix
-                  & Trim (Positive'Image (Old_Attr_Counter), Both)
-                  & "_"
-                  & Node_Image (Id));
+               Loc.Temp_Var_Name :=
+                 new String'
+                   (GT_Prefix
+                    & Trim (Positive'Image (Old_Attr_Counter), Both)
+                    & "_"
+                    & Node_Image (Id));
 
                Obj := Dec.As_Object_Decl.F_Type_Expr;
 
                if Obj.Kind = Ada_Anonymous_Type then
-                  Def := F_Type_Def
-                    (Obj.As_Anonymous_Type.F_Type_Decl.As_Type_Decl);
+                  Def :=
+                    F_Type_Def
+                      (Obj.As_Anonymous_Type.F_Type_Decl.As_Type_Decl);
                   if Def.Kind = Ada_Type_Access_Def then
-                     Type_Dec := Def.As_Type_Access_Def.F_Subtype_Indication.
-                       F_Name.P_Relative_Name.P_Referenced_Decl;
+                     Type_Dec :=
+                       Def
+                         .As_Type_Access_Def
+                         .F_Subtype_Indication
+                         .F_Name
+                         .P_Relative_Name
+                         .P_Referenced_Decl;
                      Params_To_Temp.Include
                        (Loc.Temp_Var_Name.all
                         & " : constant access "
                         & Encode
-                          (Type_Dec.P_Fully_Qualified_Name,
-                           Type_Dec.Unit.Get_Charset)
+                            (Type_Dec.P_Fully_Qualified_Name,
+                             Type_Dec.Unit.Get_Charset)
                         & " := "
                         & Node_Image (Nm)
                         & ";");
@@ -3111,14 +3137,18 @@ package body Test.Skeleton is
                         & ";");
                   end if;
                else
-                  Type_Dec := Obj.As_Subtype_Indication.F_Name.
-                    P_Relative_Name.P_Referenced_Decl;
+                  Type_Dec :=
+                    Obj
+                      .As_Subtype_Indication
+                      .F_Name
+                      .P_Relative_Name
+                      .P_Referenced_Decl;
                   Params_To_Temp.Include
                     (Loc.Temp_Var_Name.all
                      & " : constant "
                      & Encode
-                       (Type_Dec.P_Fully_Qualified_Name,
-                        Type_Dec.Unit.Get_Charset)
+                         (Type_Dec.P_Fully_Qualified_Name,
+                          Type_Dec.Unit.Get_Charset)
                      & " := "
                      & Node_Image (Nm)
                      & ";");
@@ -3140,10 +3170,7 @@ package body Test.Skeleton is
       ------------------------------
 
       function Replace_Result_Attribute
-        (Post   : String;
-         F_Name : String;
-         R_Name : String)
-         return String
+        (Post : String; F_Name : String; R_Name : String) return String
       is
          Res : String_Access := new String'("");
          Tmp : String_Access;
@@ -3154,10 +3181,10 @@ package body Test.Skeleton is
          Trying_Quote     : Boolean := False;
 
          F_Name_Length : constant Integer := F_Name'Length + 7;
-         Idx           :          Integer := Post'First;
+         Idx           : Integer := Post'First;
 
-         function Eq (L, R : String) return Boolean is
-           (To_Lower (L) = To_Lower (R));
+         function Eq (L, R : String) return Boolean
+         is (To_Lower (L) = To_Lower (R));
          --  Case insensitive comparision
       begin
          if F_Name (F_Name'First) = '"' then
@@ -3185,10 +3212,8 @@ package body Test.Skeleton is
                if Post'Last >= I + F_Name_Length - 1 then
                   if Eq (Post (I .. I + F_Name_Length - 1), F_Name & "'Result")
                   then
-                     Tmp := new String'
-                       (Res.all
-                        & Post (Idx .. I - 1)
-                        & R_Name);
+                     Tmp :=
+                       new String'(Res.all & Post (Idx .. I - 1) & R_Name);
                      Free (Res);
                      Res := new String'(Tmp.all);
                      Free (Tmp);
@@ -3198,13 +3223,12 @@ package body Test.Skeleton is
 
                if Post'Last >= I + F_Name_Length then
                   if Eq (Post (I .. I + F_Name_Length), F_Name & "' Result")
-                    or else Eq (Post (I .. I + F_Name_Length),
-                                F_Name & " 'Result")
+                    or else Eq
+                              (Post (I .. I + F_Name_Length),
+                               F_Name & " 'Result")
                   then
-                     Tmp := new String'
-                       (Res.all
-                        & Post (Idx .. I - 1)
-                        & R_Name);
+                     Tmp :=
+                       new String'(Res.all & Post (Idx .. I - 1) & R_Name);
                      Free (Res);
                      Res := new String'(Tmp.all);
                      Free (Tmp);
@@ -3214,13 +3238,12 @@ package body Test.Skeleton is
                end if;
 
                if Post'Last >= I + F_Name_Length + 1 then
-                  if Eq (Post (I .. I + F_Name_Length + 1),
-                         F_Name & " ' Result")
+                  if Eq
+                       (Post (I .. I + F_Name_Length + 1),
+                        F_Name & " ' Result")
                   then
-                     Tmp := new String'
-                       (Res.all
-                        & Post (Idx .. I - 1)
-                        & R_Name);
+                     Tmp :=
+                       new String'(Res.all & Post (Idx .. I - 1) & R_Name);
                      Free (Res);
                      Res := new String'(Tmp.all);
                      Free (Tmp);
@@ -3245,8 +3268,7 @@ package body Test.Skeleton is
       -- Get_Condition_Image --
       -------------------------
 
-      function Get_Condition_Image (Elem : Expr) return String
-      is
+      function Get_Condition_Image (Elem : Expr) return String is
 
          Res, Tmp, Packed : String_Access;
 
@@ -3277,7 +3299,7 @@ package body Test.Skeleton is
 
             else
                if Space then
-                  Idx   := I;
+                  Idx := I;
                   Space := False;
                end if;
             end if;
@@ -3296,11 +3318,9 @@ package body Test.Skeleton is
    begin
       if Subp.Subp_Declaration.P_Generic_Instantiations'Length > 0 then
          Update_Generic_Packages
-            (Langkit_Support.Text.Encode
-               (Subp.Subp_Declaration
-                  .P_Parent_Basic_Decl
-                  .P_Defining_Name.Text,
-                "utf-8"));
+           (Langkit_Support.Text.Encode
+              (Subp.Subp_Declaration.P_Parent_Basic_Decl.P_Defining_Name.Text,
+               "utf-8"));
       end if;
 
       Increase_Indent
@@ -3317,8 +3337,7 @@ package body Test.Skeleton is
             if Pragma_Name = "test_case" then
 
                Get_TC_Info_From_Pragma
-                 (Next.As_Pragma_Node,
-                  Name, Mode, Requiers, Ensures);
+                 (Next.As_Pragma_Node, Name, Mode, Requiers, Ensures);
 
                if Name = null then
                   Report_Std
@@ -3336,17 +3355,21 @@ package body Test.Skeleton is
 
             elsif Pragma_Name = "pre" then
 
-               TC.Pre := List_Child
-                 (Next.As_Pragma_Node.F_Args,
-                  Next.As_Pragma_Node.F_Args.Base_Assoc_List_First)
-                 .As_Pragma_Argument_Assoc.F_Expr;
+               TC.Pre :=
+                 List_Child
+                   (Next.As_Pragma_Node.F_Args,
+                    Next.As_Pragma_Node.F_Args.Base_Assoc_List_First)
+                   .As_Pragma_Argument_Assoc
+                   .F_Expr;
 
             elsif Pragma_Name = "post" then
 
-               TC.Post := List_Child
-                 (Next.As_Pragma_Node.F_Args,
-                  Next.As_Pragma_Node.F_Args.Base_Assoc_List_First)
-                 .As_Pragma_Argument_Assoc.F_Expr;
+               TC.Post :=
+                 List_Child
+                   (Next.As_Pragma_Node.F_Args,
+                    Next.As_Pragma_Node.F_Args.Base_Assoc_List_First)
+                   .As_Pragma_Argument_Assoc
+                   .F_Expr;
 
             end if;
          end;
@@ -3364,8 +3387,7 @@ package body Test.Skeleton is
                if Aspect_Name = "test_case" then
 
                   Get_TC_Info_From_Aspect
-                    (Assoc.As_Aspect_Assoc,
-                     Name, Mode, Requiers, Ensures);
+                    (Assoc.As_Aspect_Assoc, Name, Mode, Requiers, Ensures);
 
                   if Name = null then
                      Report_Std
@@ -3410,25 +3432,23 @@ package body Test.Skeleton is
          TC.Elem := Test_Case;
 
          Subp_Add.Subp_Declaration := Subp.Subp_Declaration;
-         Subp_Add.Corresp_Type     := Subp.Corresp_Type;
-         Subp_Add.Nesting          := new String'(Subp.Nesting.all);
-         Subp_Add.Subp_Text_Name   := new String'(Subp.Subp_Text_Name.all);
-         Subp_Add.Subp_Name_Image  := new String'(Subp.Subp_Name_Image.all);
-         Subp_Add.Subp_Full_Hash   := new String'(Subp.Subp_Full_Hash.all);
-         Subp_Add.Subp_Hash_V1     := new String'(Subp.Subp_Hash_V1.all);
-         Subp_Add.Subp_Hash_V2_1   := new String'(Subp.Subp_Hash_V2_1.all);
+         Subp_Add.Corresp_Type := Subp.Corresp_Type;
+         Subp_Add.Nesting := new String'(Subp.Nesting.all);
+         Subp_Add.Subp_Text_Name := new String'(Subp.Subp_Text_Name.all);
+         Subp_Add.Subp_Name_Image := new String'(Subp.Subp_Name_Image.all);
+         Subp_Add.Subp_Full_Hash := new String'(Subp.Subp_Full_Hash.all);
+         Subp_Add.Subp_Hash_V1 := new String'(Subp.Subp_Hash_V1.all);
+         Subp_Add.Subp_Hash_V2_1 := new String'(Subp.Subp_Hash_V2_1.all);
 
          TC.Req := No_Expr;
          TC.Ens := No_Expr;
 
          if Test_Case.Kind = Ada_Pragma_Node then
             Get_TC_Info_From_Pragma
-              (Test_Case.As_Pragma_Node,
-               TC.Name, TC.Mode, TC.Req, TC.Ens);
+              (Test_Case.As_Pragma_Node, TC.Name, TC.Mode, TC.Req, TC.Ens);
          else
             Get_TC_Info_From_Aspect
-              (Test_Case.As_Aspect_Assoc,
-               TC.Name, TC.Mode, TC.Req, TC.Ens);
+              (Test_Case.As_Aspect_Assoc, TC.Name, TC.Mode, TC.Req, TC.Ens);
          end if;
 
          --  Creating second part of hash code for test routine name
@@ -3446,36 +3466,40 @@ package body Test.Skeleton is
                     & "#"
                     & Get_Condition_Image (TC.Ens));
             begin
-               TC.TC_Hash := new String'
-                 (Full_Hash (Full_Hash'First .. Full_Hash'First + 15));
+               TC.TC_Hash :=
+                 new String'
+                   (Full_Hash (Full_Hash'First .. Full_Hash'First + 15));
             end;
          else
             declare
                Full_Hash : constant String :=
                  GNAT.SHA1.Digest
-                 (TC.Name.all
-                  & "#"
-                  & Get_Condition_Image (TC.Req)
-                  & "#"
-                  & Get_Condition_Image (TC.Ens));
+                   (TC.Name.all
+                    & "#"
+                    & Get_Condition_Image (TC.Req)
+                    & "#"
+                    & Get_Condition_Image (TC.Ens));
             begin
-               TC.TC_Hash := new String'
-                 (Full_Hash (Full_Hash'First .. Full_Hash'First + 15));
+               TC.TC_Hash :=
+                 new String'
+                   (Full_Hash (Full_Hash'First .. Full_Hash'First + 15));
             end;
          end if;
 
          if Is_Function (Subp.Subp_Declaration.As_Basic_Decl) then
-            Result_Value := new String'
-              (Subp.Subp_Mangle_Name.all
-               & "_"
-               & TC.TC_Hash (TC.TC_Hash'First .. TC.TC_Hash'First + 5)
-               & "_Result");
+            Result_Value :=
+              new String'
+                (Subp.Subp_Mangle_Name.all
+                 & "_"
+                 & TC.TC_Hash (TC.TC_Hash'First .. TC.TC_Hash'First + 5)
+                 & "_Result");
          end if;
 
-         Subp_Add.Subp_Mangle_Name := new String'
-           (Subp.Subp_Mangle_Name.all
-            & "_"
-            & TC.TC_Hash (TC.TC_Hash'First .. TC.TC_Hash'First + 5));
+         Subp_Add.Subp_Mangle_Name :=
+           new String'
+             (Subp.Subp_Mangle_Name.all
+              & "_"
+              & TC.TC_Hash (TC.TC_Hash'First .. TC.TC_Hash'First + 5));
 
          Params_To_Temp.Clear;
          Old_Attr_Counter := 1;
@@ -3493,12 +3517,13 @@ package body Test.Skeleton is
                if TC.Pre.Is_Null then
                   TC.Req_Image := new String'(Get_Condition_Image (TC.Req));
                else
-                  TC.Req_Image := new String'
-                    ("("
-                     & Get_Condition_Image (TC.Pre)
-                     & ") and ("
-                     & Get_Condition_Image (TC.Req)
-                     & ")");
+                  TC.Req_Image :=
+                    new String'
+                      ("("
+                       & Get_Condition_Image (TC.Pre)
+                       & ") and ("
+                       & Get_Condition_Image (TC.Req)
+                       & ")");
                end if;
             end if;
 
@@ -3514,30 +3539,33 @@ package body Test.Skeleton is
                   if Result_Value = null then
                      TC.Ens_Image := new String'(Get_Condition_Image (TC.Ens));
                   else
-                     TC.Ens_Image := new String'
-                       (Replace_Result_Attribute
-                          (Get_Condition_Image (TC.Ens),
-                           Subp.Subp_Name_Image.all,
-                           Result_Value.all));
+                     TC.Ens_Image :=
+                       new String'
+                         (Replace_Result_Attribute
+                            (Get_Condition_Image (TC.Ens),
+                             Subp.Subp_Name_Image.all,
+                             Result_Value.all));
                   end if;
                else
                   if Result_Value = null then
-                     TC.Ens_Image := new String'
-                       ("("
-                        & Get_Condition_Image (TC.Post)
-                        & ") and ("
-                        & Get_Condition_Image (TC.Ens)
-                        & ")");
+                     TC.Ens_Image :=
+                       new String'
+                         ("("
+                          & Get_Condition_Image (TC.Post)
+                          & ") and ("
+                          & Get_Condition_Image (TC.Ens)
+                          & ")");
                   else
-                     TC.Ens_Image := new String'
-                       (Replace_Result_Attribute
-                          ("("
-                           & Get_Condition_Image (TC.Post)
-                           & ") and ("
-                           & Get_Condition_Image (TC.Ens)
-                           & ")",
-                           Subp.Subp_Name_Image.all,
-                           Result_Value.all));
+                     TC.Ens_Image :=
+                       new String'
+                         (Replace_Result_Attribute
+                            ("("
+                             & Get_Condition_Image (TC.Post)
+                             & ") and ("
+                             & Get_Condition_Image (TC.Ens)
+                             & ")",
+                             Subp.Subp_Name_Image.all,
+                             Result_Value.all));
                   end if;
                end if;
             end if;
@@ -3558,11 +3586,12 @@ package body Test.Skeleton is
                if Result_Value = null then
                   TC.Ens_Image := new String'(Get_Condition_Image (TC.Ens));
                else
-                  TC.Ens_Image := new String'
-                    (Replace_Result_Attribute
-                       (Get_Condition_Image (TC.Ens),
-                        Subp.Subp_Name_Image.all,
-                        Result_Value.all));
+                  TC.Ens_Image :=
+                    new String'
+                      (Replace_Result_Attribute
+                         (Get_Condition_Image (TC.Ens),
+                          Subp.Subp_Name_Image.all,
+                          Result_Value.all));
                end if;
             end if;
 
@@ -3574,49 +3603,53 @@ package body Test.Skeleton is
          Params_To_Temp.Clear;
 
          --  adding requiers and ensures slocs
-         TC.Req_Line := new String'
-           (Base_Name (Data.Unit_File_Name.all)
-            & ":"
-            & (if TC.Req.Is_Null then "0" else
-                   Trim (First_Line_Number (TC.Req)'Img, Both))
-            & ":");
-         TC.Ens_Line := new String'
-           (Base_Name (Data.Unit_File_Name.all)
-            & ":"
-            & (if TC.Ens.Is_Null then "0" else
-                   Trim (First_Line_Number (TC.Ens)'Img, Both))
-            & ":");
+         TC.Req_Line :=
+           new String'
+             (Base_Name (Data.Unit_File_Name.all)
+              & ":"
+              & (if TC.Req.Is_Null then "0"
+                 else Trim (First_Line_Number (TC.Req)'Img, Both))
+              & ":");
+         TC.Ens_Line :=
+           new String'
+             (Base_Name (Data.Unit_File_Name.all)
+              & ":"
+              & (if TC.Ens.Is_Null then "0"
+                 else Trim (First_Line_Number (TC.Ens)'Img, Both))
+              & ":");
 
          Subp_Add.TC_Info := TC;
 
          Data.Subp_List.Append (Subp_Add);
 
          TR_Info_Add := TR_Info;
-         TR_Info_Add.TR_Info.TR_Text_Name := new String'
-           (Subp_Add.Subp_Mangle_Name.all);
+         TR_Info_Add.TR_Info.TR_Text_Name :=
+           new String'(Subp_Add.Subp_Mangle_Name.all);
 
          --  Changing tested sloc so it corresponds to test case instead
          --  of tested subprogram
 
          if Instance_Sloc = "" then
-            TR_Info_Add.TR_Info.Tested_Sloc := new String'
-              (Base_Name (Data.Unit_File_Name.all)
-               & ":"
-               & Trim (First_Line_Number (TC.Elem)'Img, Both)
-               & ":"
-               & Trim (First_Column_Number (TC.Elem)'Img, Both)
-               & (if Include_Subp_Name then " (" & TC.Name.all & ")" else "")
-               & ":");
+            TR_Info_Add.TR_Info.Tested_Sloc :=
+              new String'
+                (Base_Name (Data.Unit_File_Name.all)
+                 & ":"
+                 & Trim (First_Line_Number (TC.Elem)'Img, Both)
+                 & ":"
+                 & Trim (First_Column_Number (TC.Elem)'Img, Both)
+                 & (if Include_Subp_Name then " (" & TC.Name.all & ")" else "")
+                 & ":");
          else
-            TR_Info_Add.TR_Info.Tested_Sloc := new String'
-              (Base_Name (Subp.Subp_Declaration.Unit.Get_Filename)
-               & ":"
-               & Trim (First_Line_Number (TC.Elem)'Img, Both)
-               & ":"
-               & Trim (First_Column_Number (TC.Elem)'Img, Both)
-               & (if Include_Subp_Name then " (" & TC.Name.all & ")" else "")
-               & " instance at "
-               & Instance_Sloc);
+            TR_Info_Add.TR_Info.Tested_Sloc :=
+              new String'
+                (Base_Name (Subp.Subp_Declaration.Unit.Get_Filename)
+                 & ":"
+                 & Trim (First_Line_Number (TC.Elem)'Img, Both)
+                 & ":"
+                 & Trim (First_Column_Number (TC.Elem)'Img, Both)
+                 & (if Include_Subp_Name then " (" & TC.Name.all & ")" else "")
+                 & " instance at "
+                 & Instance_Sloc);
          end if;
 
          Suite_Data_List.TR_List.Append (TR_Info_Add);
@@ -3630,34 +3663,34 @@ package body Test.Skeleton is
    -- Generate_Nested_Hierarchy --
    -------------------------------
 
-   procedure Generate_Nested_Hierarchy (Data : Data_Holder)
-   is
+   procedure Generate_Nested_Hierarchy (Data : Data_Holder) is
       use GNAT.OS_Lib;
-      Cur : Package_Info_List.Cursor := Data.Package_Data_List.First;
-      Output_Dir  : constant String :=
-         Get_Source_Output_Dir
-            (Skip_Prefix
-               (Data.Unit_File_Name.all, Generic_Instantiation_Name));
+      Cur        : Package_Info_List.Cursor := Data.Package_Data_List.First;
+      Output_Dir : constant String :=
+        Get_Source_Output_Dir
+          (Skip_Prefix (Data.Unit_File_Name.all, Generic_Instantiation_Name));
    begin
       loop
          exit when Cur = Package_Info_List.No_Element;
 
          declare
-            S           : constant String :=
+            S      : constant String :=
               Package_Info_List.Element (Cur).Name.all;
             S_Pack : constant String :=
-              Data.Unit_Full_Name.all & "." &
-              Test_Data_Unit_Name & "." &
-              Test_Unit_Name & (if Data.Is_Top_Level_Generic_Instantiation
-               then ""
-               else ("." & Nesting_Difference (Data.Unit_Full_Name.all, S)));
+              Data.Unit_Full_Name.all
+              & "."
+              & Test_Data_Unit_Name
+              & "."
+              & Test_Unit_Name
+              & (if Data.Is_Top_Level_Generic_Instantiation then ""
+                 else ("." & Nesting_Difference (Data.Unit_Full_Name.all, S)));
          begin
-            if
-              Data.Unit_Full_Name.all /= S
-            then
+            if Data.Unit_Full_Name.all /= S then
                Create
-                 (Output_Dir & Directory_Separator &
-                  Unit_To_File_Name (S_Pack) & ".ads");
+                 (Output_Dir
+                  & Directory_Separator
+                  & Unit_To_File_Name (S_Pack)
+                  & ".ads");
 
                S_Put (0, "package " & S_Pack & " is");
                Put_New_Line;
@@ -3674,65 +3707,84 @@ package body Test.Skeleton is
       --  Create generic instantiation package if it does not already exists
       if Data.Is_Top_Level_Generic_Instantiation then
          TGen.Libgen.Create_Generic_Wrapper_Package_If_Not_Exists
-            (Unit_To_File_Name (Data.Unit_Full_Name.all),
-             Skip_Prefix
-                (Data.Unit_Full_Name.all, Generic_Instantiation_Name),
-             Output_Dir);
+           (Unit_To_File_Name (Data.Unit_Full_Name.all),
+            Skip_Prefix (Data.Unit_Full_Name.all, Generic_Instantiation_Name),
+            Output_Dir);
       end if;
 
       if not Data.Has_Simple_Case then
          Create
-           (Output_Dir & Directory_Separator &
-            Unit_To_File_Name
-              (Data.Unit_Full_Name.all & "." &
-               Test_Data_Unit_Name & "." &
-               Test_Unit_Name) &
-            ".ads");
+           (Output_Dir
+            & Directory_Separator
+            & Unit_To_File_Name
+                (Data.Unit_Full_Name.all
+                 & "."
+                 & Test_Data_Unit_Name
+                 & "."
+                 & Test_Unit_Name)
+            & ".ads");
 
          S_Put
            (0,
-            "package " & Data.Unit_Full_Name.all &
-            "." & Test_Data_Unit_Name & "." & Test_Unit_Name & " is");
+            "package "
+            & Data.Unit_Full_Name.all
+            & "."
+            & Test_Data_Unit_Name
+            & "."
+            & Test_Unit_Name
+            & " is");
          Put_New_Line;
          S_Put
            (0,
-            "end " & Data.Unit_Full_Name.all &
-            "." & Test_Data_Unit_Name & "." & Test_Unit_Name  & ";");
+            "end "
+            & Data.Unit_Full_Name.all
+            & "."
+            & Test_Data_Unit_Name
+            & "."
+            & Test_Unit_Name
+            & ";");
          Put_New_Line;
 
          Close_File;
 
          Excluded_Test_Package_Bodies.Include
            (Unit_To_File_Name
-              (Data.Unit_Full_Name.all & "."
-               & Test_Data_Unit_Name & "."
+              (Data.Unit_Full_Name.all
+               & "."
+               & Test_Data_Unit_Name
+               & "."
                & Test_Unit_Name)
             & ".adb");
 
          Create
-           (Output_Dir & Directory_Separator &
-            Unit_To_File_Name
-              (Data.Unit_Full_Name.all & "." &
-               Test_Data_Unit_Name) &
-            ".ads");
+           (Output_Dir
+            & Directory_Separator
+            & Unit_To_File_Name
+                (Data.Unit_Full_Name.all & "." & Test_Data_Unit_Name)
+            & ".ads");
 
          S_Put
            (0,
-            "package " & Data.Unit_Full_Name.all &
-            "." & Test_Data_Unit_Name & " is");
+            "package "
+            & Data.Unit_Full_Name.all
+            & "."
+            & Test_Data_Unit_Name
+            & " is");
          Put_New_Line;
          S_Put
            (0,
-            "end " & Data.Unit_Full_Name.all &
-            "." & Test_Data_Unit_Name  & ";");
+            "end "
+            & Data.Unit_Full_Name.all
+            & "."
+            & Test_Data_Unit_Name
+            & ";");
          Put_New_Line;
 
          Close_File;
 
          Excluded_Test_Package_Bodies.Include
            (Unit_To_File_Name
-              (Data.Unit_Full_Name.all & "."
-               & Test_Data_Unit_Name)
+              (Data.Unit_Full_Name.all & "." & Test_Data_Unit_Name)
             & ".adb");
       end if;
 
@@ -3743,14 +3795,14 @@ package body Test.Skeleton is
    -----------------------------
 
    procedure Generate_Test_Package
-     (Data    : Data_Holder;
-      TP_List : in out TP_Mapping_List.List) is
+     (Data : Data_Holder; TP_List : in out TP_Mapping_List.List)
+   is
 
-      Output_Dir             : constant String :=
+      Output_Dir : constant String :=
         Get_Source_Output_Dir
-           (Skip_Prefix (Data.Unit_File_Name.all, Generic_Instantiation_Name));
+          (Skip_Prefix (Data.Unit_File_Name.all, Generic_Instantiation_Name));
 
-      Tmp_File_Name      : constant String :=
+      Tmp_File_Name : constant String :=
         Ada.Directories.Compose
           (Utils.Environment.Tool_Temp_Dir.all, "gnattest_tmp_test_package");
 
@@ -3762,8 +3814,8 @@ package body Test.Skeleton is
       Setters_Set : String_Set.Set;
       Set_Cur     : String_Set.Cursor;
 
-      Subp_Cur     : Subp_Data_List.Cursor;
-      Pack_Cur     : Package_Info_List.Cursor;
+      Subp_Cur : Subp_Data_List.Cursor;
+      Pack_Cur : Package_Info_List.Cursor;
 
       Current_Type : Base_Type_Info;
       --  The test type for which the primitives are
@@ -3786,11 +3838,11 @@ package body Test.Skeleton is
       MD     : Markered_Data;
       MD_Cur : Markered_Data_Maps.Cursor;
 
-      Subp_List : Subp_Data_List.List;
+      Subp_List    : Subp_Data_List.List;
       Current_Subp : Subp_Info;
       Current_Pack : Package_Info;
 
-      TP_Map  : TP_Mapping;
+      TP_Map : TP_Mapping;
 
       Tear_Down_Line_Add : Natural := 0;
 
@@ -3827,8 +3879,7 @@ package body Test.Skeleton is
       TR_SLOC_Buffer : TR_SLOC_Buffer_Lists.List;
 
       procedure Add_Buffered_TR_Slocs
-        (TP_List     : in out TP_Mapping_List.List;
-         Common_Time : String);
+        (TP_List : in out TP_Mapping_List.List; Common_Time : String);
       --  Pushes buffered test routine slocs into main mapping container.
 
       function Is_Unimplemented_Test
@@ -3867,8 +3918,10 @@ package body Test.Skeleton is
          case PS_Type is
             when With_Clauses =>
                S_Put (0, "--  id:" & Hash_Version & "/00/");
+
             when Body_Declarations =>
                S_Put (0, "--  id:" & Hash_Version & "/01/");
+
             when Body_Statements =>
                S_Put (0, "--  id:" & Hash_Version & "/02/");
          end case;
@@ -3877,14 +3930,22 @@ package body Test.Skeleton is
          New_Line_Count;
          case PS_Type is
             when With_Clauses =>
-               S_Put (0, "--  This section can be used to add with "
-                      & "clauses if necessary.");
+               S_Put
+                 (0,
+                  "--  This section can be used to add with "
+                  & "clauses if necessary.");
+
             when Body_Declarations =>
-               S_Put (0, "--  This section can be used to add global "
-                      & "variables and other elements.");
+               S_Put
+                 (0,
+                  "--  This section can be used to add global "
+                  & "variables and other elements.");
+
             when Body_Statements =>
-               S_Put (0, "--  This section can be used to add "
-                      & "elaboration code for the global state.");
+               S_Put
+                 (0,
+                  "--  This section can be used to add "
+                  & "elaboration code for the global state.");
          end case;
          New_Line_Count;
          S_Put (0, "--");
@@ -3900,8 +3961,10 @@ package body Test.Skeleton is
          case PS_Type is
             when With_Clauses =>
                UH.Hash := new String'("00");
+
             when Body_Declarations =>
                UH.Hash := new String'("01");
+
             when Body_Statements =>
                UH.Hash := new String'("02");
          end case;
@@ -3928,8 +3991,7 @@ package body Test.Skeleton is
       end Put_Persistent_Section;
 
       procedure Add_Buffered_TR_Slocs
-        (TP_List     : in out TP_Mapping_List.List;
-         Common_Time : String)
+        (TP_List : in out TP_Mapping_List.List; Common_Time : String)
       is
          Cur : TR_SLOC_Buffer_Lists.Cursor := TR_SLOC_Buffer.First;
       begin
@@ -3963,8 +4025,7 @@ package body Test.Skeleton is
       function Is_Unimplemented_Test
         (TR_Text : String_Vectors.Vector) return Boolean
       is
-         Unimplemented_Line : constant String :=
-           """Test not implemented.""";
+         Unimplemented_Line : constant String := """Test not implemented.""";
       begin
 
          if TR_Text.Is_Empty then
@@ -4013,8 +4074,7 @@ package body Test.Skeleton is
             & "modified in any way");
          Put_New_Line;
          S_Put
-           (0,
-            "--  except for sections surrounded by a 'read only' marker.");
+           (0, "--  except for sections surrounded by a 'read only' marker.");
          Put_New_Line;
          Put_New_Line;
       end Put_Test_Data_Header;
@@ -4045,33 +4105,27 @@ package body Test.Skeleton is
             "--  code intended to set up and tear down the test "
             & "environment should be");
          New_Line_Count;
-         S_Put
-           (0,
-            "--  placed into "
-            & TD_Package_Name & ".");
+         S_Put (0, "--  placed into " & TD_Package_Name & ".");
          New_Line_Count;
          New_Line_Count;
       end Put_TP_Header;
 
       procedure Put_Stub_Data_Import is
-         S_Cur : Ada_Nodes_List.Cursor := Data.Units_To_Stub.First;
-         Tmp : Unbounded_String;
+         S_Cur    : Ada_Nodes_List.Cursor := Data.Units_To_Stub.First;
+         Tmp      : Unbounded_String;
          Def_Name : Defining_Name;
          use Ada_Nodes_List;
       begin
          while S_Cur /= Ada_Nodes_List.No_Element loop
-            Tmp := To_Unbounded_String
-              (Element (S_Cur).Unit.Get_Filename);
+            Tmp := To_Unbounded_String (Element (S_Cur).Unit.Get_Filename);
 
-            if
-              Source_Stubbed (To_String (Tmp)) and then
-              not Excluded_Test_Data_Files.Contains
-                (Base_Name
-                   (Get_Source_Stub_Data_Spec (To_String (Tmp))))
+            if Source_Stubbed (To_String (Tmp))
+              and then not Excluded_Test_Data_Files.Contains
+                             (Base_Name
+                                (Get_Source_Stub_Data_Spec (To_String (Tmp))))
             then
                Def_Name :=
-                 Ada_Nodes_List.Element
-                   (S_Cur).As_Basic_Decl.P_Defining_Name;
+                 Ada_Nodes_List.Element (S_Cur).As_Basic_Decl.P_Defining_Name;
                S_Put
                  (0,
                   "with "
@@ -4109,8 +4163,8 @@ package body Test.Skeleton is
          Update_Generic_Packages (Current_Pack.Generic_Containing_Package.all);
       end if;
 
-      for I in
-        Data.Type_Data_List.First_Index .. Data.Type_Data_List.Last_Index
+      for I
+        in Data.Type_Data_List.First_Index .. Data.Type_Data_List.Last_Index
       loop
          Current_Type := Data.Type_Data_List.Element (I);
 
@@ -4133,19 +4187,24 @@ package body Test.Skeleton is
          if Data.Unit_Full_Name.all = Current_Type.Nesting.all then
             Unit_Pref := new String'(Data.Unit_Full_Name.all);
          else
-            Unit_Pref := new String'
-              (Data.Unit_Full_Name.all & "." &
-               Test_Data_Unit_Name & "." &
-               Test_Unit_Name & "." &
-               Nesting_Difference
-                 (Data.Unit_Full_Name.all,
-                  Current_Type.Nesting.all));
+            Unit_Pref :=
+              new String'
+                (Data.Unit_Full_Name.all
+                 & "."
+                 & Test_Data_Unit_Name
+                 & "."
+                 & Test_Unit_Name
+                 & "."
+                 & Nesting_Difference
+                     (Data.Unit_Full_Name.all, Current_Type.Nesting.all));
          end if;
 
-         Data_Unit_Name := new String'
-           (Unit_Pref.all & "."                  &
-            Current_Type.Main_Type_Text_Name.all &
-            Test_Data_Unit_Name_Suff);
+         Data_Unit_Name :=
+           new String'
+             (Unit_Pref.all
+              & "."
+              & Current_Type.Main_Type_Text_Name.all
+              & Test_Data_Unit_Name_Suff);
 
          Test_File_Name := new String'(Unit_To_File_Name (Data_Unit_Name.all));
 
@@ -4153,7 +4212,10 @@ package body Test.Skeleton is
          Test_Data_Package_Name := new String'(Data_Unit_Name.all);
 
          if not Is_Regular_File
-           (Output_Dir & Directory_Separator & Test_File_Name.all & ".ads")
+                  (Output_Dir
+                   & Directory_Separator
+                   & Test_File_Name.all
+                   & ".ads")
          then
 
             Create
@@ -4187,41 +4249,40 @@ package body Test.Skeleton is
                Put_New_Line;
                S_Put (0, "with AUnit.Test_Fixtures;");
             else
-               if
-                 Current_Type.Argument_Father_Unit_Name.all =
-                   Current_Type.Argument_Father_Nesting.all
+               if Current_Type.Argument_Father_Unit_Name.all
+                 = Current_Type.Argument_Father_Nesting.all
                then
                   S_Put
                     (0,
-                     "with "                                    &
-                     Current_Type.Argument_Father_Unit_Name.all &
-                     "."                                        &
-                     Current_Type.Argument_Father_Type_Name.all &
-                     Test_Data_Unit_Name_Suff                   &
-                     "."                                        &
-                     Current_Type.Argument_Father_Type_Name.all &
-                     Test_Unit_Suffix.all                       &
-                     ";");
+                     "with "
+                     & Current_Type.Argument_Father_Unit_Name.all
+                     & "."
+                     & Current_Type.Argument_Father_Type_Name.all
+                     & Test_Data_Unit_Name_Suff
+                     & "."
+                     & Current_Type.Argument_Father_Type_Name.all
+                     & Test_Unit_Suffix.all
+                     & ";");
                else
                   S_Put
                     (0,
-                     "with "                                      &
-                     Current_Type.Argument_Father_Unit_Name.all   &
-                     "."                                          &
-                     Test_Data_Unit_Name                          &
-                     "."                                          &
-                     Test_Unit_Name                               &
-                     "."                                          &
-                     Nesting_Difference
-                       (Current_Type.Argument_Father_Unit_Name.all,
-                        Current_Type.Argument_Father_Nesting.all) &
-                     "."                                          &
-                     Current_Type.Argument_Father_Type_Name.all   &
-                     Test_Data_Unit_Name_Suff                     &
-                     "."                                          &
-                     Current_Type.Argument_Father_Type_Name.all   &
-                     Test_Unit_Suffix.all                         &
-                     ";");
+                     "with "
+                     & Current_Type.Argument_Father_Unit_Name.all
+                     & "."
+                     & Test_Data_Unit_Name
+                     & "."
+                     & Test_Unit_Name
+                     & "."
+                     & Nesting_Difference
+                         (Current_Type.Argument_Father_Unit_Name.all,
+                          Current_Type.Argument_Father_Nesting.all)
+                     & "."
+                     & Current_Type.Argument_Father_Type_Name.all
+                     & Test_Data_Unit_Name_Suff
+                     & "."
+                     & Current_Type.Argument_Father_Type_Name.all
+                     & Test_Unit_Suffix.all
+                     & ";");
                end if;
             end if;
             Put_New_Line;
@@ -4253,9 +4314,7 @@ package body Test.Skeleton is
                   S_Put (0, GT_Marker_Begin);
                   Put_New_Line;
                   S_Put
-                    (3,
-                     "type Test_" &
-                       Current_Type.Main_Type_Text_Name.all);
+                    (3, "type Test_" & Current_Type.Main_Type_Text_Name.all);
                   if Current_Type.Main_Type_Abstract then
                      S_Put (0, " is abstract new");
                   else
@@ -4263,34 +4322,36 @@ package body Test.Skeleton is
                   end if;
                   Put_New_Line;
 
-                  if
-                    Current_Type.Argument_Father_Unit_Name.all /=
-                      Current_Type.Argument_Father_Nesting.all
+                  if Current_Type.Argument_Father_Unit_Name.all
+                    /= Current_Type.Argument_Father_Nesting.all
                   then
-                     Nesting_Add := new String'
-                       (Test_Data_Unit_Name & "." &
-                          Test_Unit_Name & "." &
-                          Nesting_Difference
-                          (Current_Type.Argument_Father_Unit_Name.all,
-                           Current_Type.Argument_Father_Nesting.all) &
-                          ".");
+                     Nesting_Add :=
+                       new String'
+                         (Test_Data_Unit_Name
+                          & "."
+                          & Test_Unit_Name
+                          & "."
+                          & Nesting_Difference
+                              (Current_Type.Argument_Father_Unit_Name.all,
+                               Current_Type.Argument_Father_Nesting.all)
+                          & ".");
                   else
                      Nesting_Add := new String'("");
                   end if;
 
                   S_Put
                     (5,
-                     "GNATtest_Generated.GNATtest_Standard."    &
-                       Current_Type.Argument_Father_Unit_Name.all &
-                       "."                                        &
-                       Nesting_Add.all                            &
-                       Current_Type.Argument_Father_Type_Name.all &
-                       Test_Data_Unit_Name_Suff                   &
-                       "."                                        &
-                       Current_Type.Argument_Father_Type_Name.all &
-                       Test_Unit_Suffix.all                       &
-                       ".Test_"                                   &
-                       Current_Type.Argument_Father_Type_Name.all);
+                     "GNATtest_Generated.GNATtest_Standard."
+                     & Current_Type.Argument_Father_Unit_Name.all
+                     & "."
+                     & Nesting_Add.all
+                     & Current_Type.Argument_Father_Type_Name.all
+                     & Test_Data_Unit_Name_Suff
+                     & "."
+                     & Current_Type.Argument_Father_Type_Name.all
+                     & Test_Unit_Suffix.all
+                     & ".Test_"
+                     & Current_Type.Argument_Father_Type_Name.all);
                   Put_New_Line;
                   S_Put (0, GT_Marker_End);
                   Put_New_Line;
@@ -4302,14 +4363,14 @@ package body Test.Skeleton is
                   --  Declaring access type to tested type.
                   S_Put
                     (3,
-                     "type "                                 &
-                       Current_Type.Main_Type_Text_Name.all    &
-                       "_Access is access all "                &
-                       "GNATtest_Generated.GNATtest_Standard." &
-                       Current_Type.Nesting.all                &
-                       "."                                     &
-                       Current_Type.Main_Type_Text_Name.all    &
-                       "'Class;");
+                     "type "
+                     & Current_Type.Main_Type_Text_Name.all
+                     & "_Access is access all "
+                     & "GNATtest_Generated.GNATtest_Standard."
+                     & Current_Type.Nesting.all
+                     & "."
+                     & Current_Type.Main_Type_Text_Name.all
+                     & "'Class;");
                   Put_New_Line;
                   Put_New_Line;
 
@@ -4318,9 +4379,9 @@ package body Test.Skeleton is
                   Put_New_Line;
                   S_Put
                     (3,
-                     "type Test_"                         &
-                       Current_Type.Main_Type_Text_Name.all &
-                       " is");
+                     "type Test_"
+                     & Current_Type.Main_Type_Text_Name.all
+                     & " is");
                   if Current_Type.Main_Type_Abstract then
                      S_Put (0, " abstract");
                   end if;
@@ -4332,9 +4393,9 @@ package body Test.Skeleton is
                   Put_New_Line;
                   S_Put
                     (6,
-                     "Fixture : "                         &
-                       Current_Type.Main_Type_Text_Name.all &
-                       "_Access;");
+                     "Fixture : "
+                     & Current_Type.Main_Type_Text_Name.all
+                     & "_Access;");
                   Put_New_Line;
                   S_Put (3, "end record;");
                end if;
@@ -4343,9 +4404,7 @@ package body Test.Skeleton is
                Put_New_Line;
                S_Put
                  (3,
-                  "type Test_"                         &
-                    Current_Type.Main_Type_Text_Name.all &
-                    " is");
+                  "type Test_" & Current_Type.Main_Type_Text_Name.all & " is");
                S_Put (0, " new AUnit.Test_Fixtures.Test_Fixture");
                Put_New_Line;
                S_Put (0, GT_Marker_End);
@@ -4359,15 +4418,15 @@ package body Test.Skeleton is
             if not Current_Type.Main_Type_Abstract then
                S_Put
                  (3,
-                  "procedure Set_Up (Gnattest_T : in out Test_" &
-                  Current_Type.Main_Type_Text_Name.all &
-                  ");");
+                  "procedure Set_Up (Gnattest_T : in out Test_"
+                  & Current_Type.Main_Type_Text_Name.all
+                  & ");");
                Put_New_Line;
                S_Put
                  (3,
-                  "procedure Tear_Down (Gnattest_T : in out Test_" &
-                  Current_Type.Main_Type_Text_Name.all &
-                  ");");
+                  "procedure Tear_Down (Gnattest_T : in out Test_"
+                  & Current_Type.Main_Type_Text_Name.all
+                  & ");");
                Put_New_Line;
                Put_New_Line;
             end if;
@@ -4405,8 +4464,7 @@ package body Test.Skeleton is
                Put_New_Line;
                Put_New_Line;
                S_Put
-                 (3,
-                  "procedure User_Set_Up (Gnattest_T : in out New_Test);");
+                 (3, "procedure User_Set_Up (Gnattest_T : in out New_Test);");
                Put_New_Line;
                S_Put
                  (3,
@@ -4439,9 +4497,12 @@ package body Test.Skeleton is
 
          end if;
 
-         if not Current_Type.Main_Type_Abstract and then
-           not Is_Regular_File
-           (Output_Dir & Directory_Separator & Test_File_Name.all & ".adb")
+         if not Current_Type.Main_Type_Abstract
+           and then not Is_Regular_File
+                          (Output_Dir
+                           & Directory_Separator
+                           & Test_File_Name.all
+                           & ".adb")
          then
 
             Create
@@ -4457,34 +4518,34 @@ package body Test.Skeleton is
                if Current_Type.No_Default_Discriminant then
                   S_Put
                     (3,
-                     "--  Local_"                            &
-                       Current_Type.Main_Type_Text_Name.all    &
-                       " : aliased "                           &
-                       "GNATtest_Generated.GNATtest_Standard." &
-                       Current_Type.Nesting.all                &
-                       "."                                     &
-                       Current_Type.Main_Type_Text_Name.all &
-                       ";");
+                     "--  Local_"
+                     & Current_Type.Main_Type_Text_Name.all
+                     & " : aliased "
+                     & "GNATtest_Generated.GNATtest_Standard."
+                     & Current_Type.Nesting.all
+                     & "."
+                     & Current_Type.Main_Type_Text_Name.all
+                     & ";");
                else
                   S_Put
                     (3,
-                     "Local_"                                &
-                       Current_Type.Main_Type_Text_Name.all    &
-                       " : aliased "                           &
-                       "GNATtest_Generated.GNATtest_Standard." &
-                       Current_Type.Nesting.all                &
-                       "."                                     &
-                       Current_Type.Main_Type_Text_Name.all    &
-                       ";");
+                     "Local_"
+                     & Current_Type.Main_Type_Text_Name.all
+                     & " : aliased "
+                     & "GNATtest_Generated.GNATtest_Standard."
+                     & Current_Type.Nesting.all
+                     & "."
+                     & Current_Type.Main_Type_Text_Name.all
+                     & ";");
                end if;
                Put_New_Line;
             end if;
 
             S_Put
               (3,
-               "procedure Set_Up (Gnattest_T : in out Test_" &
-               Current_Type.Main_Type_Text_Name.all      &
-               ") is");
+               "procedure Set_Up (Gnattest_T : in out Test_"
+               & Current_Type.Main_Type_Text_Name.all
+               & ") is");
             Put_New_Line;
 
             if Current_Pack.Data_Kind = Declaration_Data then
@@ -4504,48 +4565,50 @@ package body Test.Skeleton is
             Put_New_Line;
 
             if Current_Type.Has_Argument_Father then
-               if
-                 Current_Type.Argument_Father_Unit_Name.all /=
-                   Current_Type.Argument_Father_Nesting.all
+               if Current_Type.Argument_Father_Unit_Name.all
+                 /= Current_Type.Argument_Father_Nesting.all
                then
-                  Nesting_Add := new String'
-                    (Test_Data_Unit_Name & "." &
-                     Test_Unit_Name & "." &
-                     Nesting_Difference
-                       (Current_Type.Argument_Father_Unit_Name.all,
-                        Current_Type.Argument_Father_Nesting.all) &
-                     ".");
+                  Nesting_Add :=
+                    new String'
+                      (Test_Data_Unit_Name
+                       & "."
+                       & Test_Unit_Name
+                       & "."
+                       & Nesting_Difference
+                           (Current_Type.Argument_Father_Unit_Name.all,
+                            Current_Type.Argument_Father_Nesting.all)
+                       & ".");
                else
                   Nesting_Add := new String'("");
                end if;
 
                S_Put
                  (6,
-                  "GNATtest_Generated.GNATtest_Standard."    &
-                  Current_Type.Argument_Father_Unit_Name.all &
-                  "."                                        &
-                  Nesting_Add.all                            &
-                  Current_Type.Argument_Father_Type_Name.all &
-                  Test_Data_Unit_Name_Suff                   &
-                  "."                                        &
-                  Current_Type.Argument_Father_Type_Name.all &
-                  Test_Unit_Suffix.all                       &
-                  ".Set_Up");
+                  "GNATtest_Generated.GNATtest_Standard."
+                  & Current_Type.Argument_Father_Unit_Name.all
+                  & "."
+                  & Nesting_Add.all
+                  & Current_Type.Argument_Father_Type_Name.all
+                  & Test_Data_Unit_Name_Suff
+                  & "."
+                  & Current_Type.Argument_Father_Type_Name.all
+                  & Test_Unit_Suffix.all
+                  & ".Set_Up");
                Put_New_Line;
                S_Put
                  (8,
-                  "(GNATtest_Generated.GNATtest_Standard."    &
-                  Current_Type.Argument_Father_Unit_Name.all &
-                  "."                                        &
-                  Nesting_Add.all                            &
-                  Current_Type.Argument_Father_Type_Name.all &
-                  Test_Data_Unit_Name_Suff                   &
-                  "."                                        &
-                  Current_Type.Argument_Father_Type_Name.all &
-                  Test_Unit_Suffix.all                       &
-                  ".Test_"                                   &
-                  Current_Type.Argument_Father_Type_Name.all &
-                  " (Gnattest_T));");
+                  "(GNATtest_Generated.GNATtest_Standard."
+                  & Current_Type.Argument_Father_Unit_Name.all
+                  & "."
+                  & Nesting_Add.all
+                  & Current_Type.Argument_Father_Type_Name.all
+                  & Test_Data_Unit_Name_Suff
+                  & "."
+                  & Current_Type.Argument_Father_Type_Name.all
+                  & Test_Unit_Suffix.all
+                  & ".Test_"
+                  & Current_Type.Argument_Father_Type_Name.all
+                  & " (Gnattest_T));");
                Put_New_Line;
 
                Free (Nesting_Add);
@@ -4553,19 +4616,20 @@ package body Test.Skeleton is
 
             if Current_Pack.Data_Kind = Declaration_Data then
                if Current_Type.No_Default_Discriminant then
-                  S_Put
-                    (6, "null;");
+                  S_Put (6, "null;");
                   Put_New_Line;
                   S_Put
-                    (6, "--  Gnattest_T.Fixture := Local_"         &
-                       Current_Type.Main_Type_Text_Name.all &
-                       "'Access;");
+                    (6,
+                     "--  Gnattest_T.Fixture := Local_"
+                     & Current_Type.Main_Type_Text_Name.all
+                     & "'Access;");
                   Put_New_Line;
                else
                   S_Put
-                    (6, "Gnattest_T.Fixture := Local_"             &
-                       Current_Type.Main_Type_Text_Name.all &
-                       "'Access;");
+                    (6,
+                     "Gnattest_T.Fixture := Local_"
+                     & Current_Type.Main_Type_Text_Name.all
+                     & "'Access;");
                   Put_New_Line;
 
                   if Current_Pack.Data_Kind = Declaration_Data then
@@ -4577,8 +4641,7 @@ package body Test.Skeleton is
                end if;
 
             else
-               S_Put
-                 (6, "null;");
+               S_Put (6, "null;");
                Put_New_Line;
             end if;
             S_Put (3, "end Set_Up;");
@@ -4587,9 +4650,9 @@ package body Test.Skeleton is
 
             S_Put
               (3,
-               "procedure Tear_Down (Gnattest_T : in out Test_" &
-               Current_Type.Main_Type_Text_Name.all &
-               ") is");
+               "procedure Tear_Down (Gnattest_T : in out Test_"
+               & Current_Type.Main_Type_Text_Name.all
+               & ") is");
             Put_New_Line;
 
             if Current_Pack.Data_Kind = Declaration_Data then
@@ -4609,58 +4672,59 @@ package body Test.Skeleton is
             Put_New_Line;
 
             if Current_Type.Has_Argument_Father then
-               if
-                 Current_Type.Argument_Father_Unit_Name.all /=
-                   Current_Type.Argument_Father_Nesting.all
+               if Current_Type.Argument_Father_Unit_Name.all
+                 /= Current_Type.Argument_Father_Nesting.all
                then
-                  Nesting_Add := new String'
-                    (Test_Data_Unit_Name & "." &
-                     Test_Unit_Name & "." &
-                     Nesting_Difference
-                       (Current_Type.Argument_Father_Unit_Name.all,
-                        Current_Type.Argument_Father_Nesting.all) &
-                     ".");
+                  Nesting_Add :=
+                    new String'
+                      (Test_Data_Unit_Name
+                       & "."
+                       & Test_Unit_Name
+                       & "."
+                       & Nesting_Difference
+                           (Current_Type.Argument_Father_Unit_Name.all,
+                            Current_Type.Argument_Father_Nesting.all)
+                       & ".");
                else
                   Nesting_Add := new String'("");
                end if;
 
                S_Put
                  (6,
-                  "GNATtest_Generated.GNATtest_Standard."    &
-                  Current_Type.Argument_Father_Unit_Name.all &
-                  "."                                        &
-                  Nesting_Add.all                            &
-                  Current_Type.Argument_Father_Type_Name.all &
-                  Test_Data_Unit_Name_Suff                   &
-                  "."                                        &
-                  Current_Type.Argument_Father_Type_Name.all &
-                  Test_Unit_Suffix.all                       &
-                  ".Tear_Down");
+                  "GNATtest_Generated.GNATtest_Standard."
+                  & Current_Type.Argument_Father_Unit_Name.all
+                  & "."
+                  & Nesting_Add.all
+                  & Current_Type.Argument_Father_Type_Name.all
+                  & Test_Data_Unit_Name_Suff
+                  & "."
+                  & Current_Type.Argument_Father_Type_Name.all
+                  & Test_Unit_Suffix.all
+                  & ".Tear_Down");
                Put_New_Line;
                S_Put
                  (8,
-                  "(GNATtest_Generated.GNATtest_Standard."    &
-                  Current_Type.Argument_Father_Unit_Name.all &
-                  "."                                        &
-                  Nesting_Add.all                            &
-                  Current_Type.Argument_Father_Type_Name.all &
-                  Test_Data_Unit_Name_Suff                   &
-                  "."                                        &
-                  Current_Type.Argument_Father_Type_Name.all &
-                  Test_Unit_Suffix.all                       &
-                  ".Test_"                                   &
-                  Current_Type.Argument_Father_Type_Name.all &
-                  " (Gnattest_T));");
+                  "(GNATtest_Generated.GNATtest_Standard."
+                  & Current_Type.Argument_Father_Unit_Name.all
+                  & "."
+                  & Nesting_Add.all
+                  & Current_Type.Argument_Father_Type_Name.all
+                  & Test_Data_Unit_Name_Suff
+                  & "."
+                  & Current_Type.Argument_Father_Type_Name.all
+                  & Test_Unit_Suffix.all
+                  & ".Test_"
+                  & Current_Type.Argument_Father_Type_Name.all
+                  & " (Gnattest_T));");
 
                Free (Nesting_Add);
             else
                if Current_Pack.Data_Kind = Declaration_Data
                  and then Current_Pack.Is_Generic
                then
-                     S_Put (6, "User_Tear_Down (X);");
+                  S_Put (6, "User_Tear_Down (X);");
                else
-                  S_Put
-                    (6, "null;");
+                  S_Put (6, "null;");
                end if;
             end if;
 
@@ -4736,10 +4800,10 @@ package body Test.Skeleton is
 
          end if;
 
-         TP_Map.SetUp_Name    := new String'(Test_File_Name.all & ".adb");
+         TP_Map.SetUp_Name := new String'(Test_File_Name.all & ".adb");
          TP_Map.TearDown_Name := new String'(Test_File_Name.all & ".adb");
-         TP_Map.SetUp_Line    := 9;
-         TP_Map.SetUp_Column  := 4;
+         TP_Map.SetUp_Line := 9;
+         TP_Map.SetUp_Column := 4;
 
          Tear_Down_Line_Add := 0;
          if Current_Type.No_Default_Discriminant then
@@ -4753,14 +4817,15 @@ package body Test.Skeleton is
 
          Free (Test_File_Name);
 
-         Unit_Name := new
-           String'(Unit_Pref.all                        &
-                     "."                                  &
-                     Current_Type.Main_Type_Text_Name.all &
-                     Test_Data_Unit_Name_Suff             &
-                     "."                                  &
-                     Current_Type.Main_Type_Text_Name.all &
-                     Test_Unit_Name_Suff);
+         Unit_Name :=
+           new String'
+             (Unit_Pref.all
+              & "."
+              & Current_Type.Main_Type_Text_Name.all
+              & Test_Data_Unit_Name_Suff
+              & "."
+              & Current_Type.Main_Type_Text_Name.all
+              & Test_Unit_Name_Suff);
 
          Free (Unit_Pref);
 
@@ -4793,16 +4858,15 @@ package body Test.Skeleton is
                GP : Generic_Package;
             begin
                GP.Name := new String'(Current_Pack.Name.all);
-               GP.Sloc := new String'
-                 (Base_Name (Data.Unit_File_Name.all)
-                  & ":"
-                  & Trim
-                    (First_Line_Number (Current_Pack.Element)'Img,
-                     Both)
-                  & ":"
-                  & Trim
-                    (First_Column_Number (Current_Pack.Element)'Img,
-                     Both));
+               GP.Sloc :=
+                 new String'
+                   (Base_Name (Data.Unit_File_Name.all)
+                    & ":"
+                    & Trim (First_Line_Number (Current_Pack.Element)'Img, Both)
+                    & ":"
+                    & Trim
+                        (First_Column_Number (Current_Pack.Element)'Img,
+                         Both));
                Update_Generic_Packages (GP);
             end;
          end if;
@@ -4812,10 +4876,7 @@ package body Test.Skeleton is
          Put_New_Line;
 
          if Current_Pack.Data_Kind = Declaration_Data then
-            S_Put
-              (3,
-               "type Test_" &
-                 Current_Type.Main_Type_Text_Name.all);
+            S_Put (3, "type Test_" & Current_Type.Main_Type_Text_Name.all);
             if Current_Type.Main_Type_Abstract then
                S_Put (0, " is abstract new");
             else
@@ -4826,33 +4887,32 @@ package body Test.Skeleton is
             if Data.Unit_Full_Name.all = Current_Type.Nesting.all then
                S_Put
                  (5,
-                  "GNATtest_Generated.GNATtest_Standard."    &
-                    Data.Unit_Full_Name.all                    &
-                    "."                                        &
-                    Current_Type.Main_Type_Text_Name.all &
-                    Test_Data_Unit_Name_Suff                   &
-                    ".Test_"                                   &
-                    Current_Type.Main_Type_Text_Name.all &
-                    " with null record;");
+                  "GNATtest_Generated.GNATtest_Standard."
+                  & Data.Unit_Full_Name.all
+                  & "."
+                  & Current_Type.Main_Type_Text_Name.all
+                  & Test_Data_Unit_Name_Suff
+                  & ".Test_"
+                  & Current_Type.Main_Type_Text_Name.all
+                  & " with null record;");
             else
                S_Put
                  (5,
-                  "GNATtest_Generated.GNATtest_Standard."    &
-                    Data.Unit_Full_Name.all                    &
-                    "."                                        &
-                    Test_Data_Unit_Name                        &
-                    "."                                        &
-                    Test_Unit_Name                             &
-                    "."                                        &
-                    Nesting_Difference
-                    (Data.Unit_Full_Name.all,
-                     Current_Type.Nesting.all)               &
-                    "."                                        &
-                    Current_Type.Main_Type_Text_Name.all &
-                    Test_Data_Unit_Name_Suff                   &
-                    ".Test_"                                   &
-                    Current_Type.Main_Type_Text_Name.all &
-                    " with null record;");
+                  "GNATtest_Generated.GNATtest_Standard."
+                  & Data.Unit_Full_Name.all
+                  & "."
+                  & Test_Data_Unit_Name
+                  & "."
+                  & Test_Unit_Name
+                  & "."
+                  & Nesting_Difference
+                      (Data.Unit_Full_Name.all, Current_Type.Nesting.all)
+                  & "."
+                  & Current_Type.Main_Type_Text_Name.all
+                  & Test_Data_Unit_Name_Suff
+                  & ".Test_"
+                  & Current_Type.Main_Type_Text_Name.all
+                  & " with null record;");
             end if;
 
          else
@@ -4861,7 +4921,8 @@ package body Test.Skeleton is
                "type Test_"
                & Current_Type.Main_Type_Text_Name.all
                & " is new GNATtest_Generated.GNATtest_Standard."
-               & Data_Unit_Name.all & ".New_Test with null record;");
+               & Data_Unit_Name.all
+               & ".New_Test with null record;");
 
             Update_Generic_Packages
               (Current_Pack.Generic_Containing_Package.all);
@@ -4876,16 +4937,14 @@ package body Test.Skeleton is
             loop
                exit when Subp_Cur = Subp_Data_List.No_Element;
 
-               if
-                 Subp_Data_List.Element (Subp_Cur).Corresp_Type =
-                 Current_Type.Type_Number
+               if Subp_Data_List.Element (Subp_Cur).Corresp_Type
+                 = Current_Type.Type_Number
                then
 
                   S_Put
                     (3,
                      "procedure "
-                     & Subp_Data_List.Element
-                       (Subp_Cur).Subp_Mangle_Name.all
+                     & Subp_Data_List.Element (Subp_Cur).Subp_Mangle_Name.all
                      & " (Gnattest_T : in out Test_"
                      & Current_Type.Main_Type_Text_Name.all
                      & ");");
@@ -4954,19 +5013,19 @@ package body Test.Skeleton is
 
                      Current_Subp := Subp_Data_List.Element (Subp_Cur);
 
-                     if
-                       Current_Subp.Corresp_Type = Current_Type.Type_Number
+                     if Current_Subp.Corresp_Type = Current_Type.Type_Number
                      then
                         UH.Version := new String'("1");
-                        UH.Hash := new String'
-                          (Subp_Data_List.Element
-                             (Subp_Cur).Subp_Hash_V1.all);
-                        if
-                          Subp_Data_List.Element (Subp_Cur).Has_TC_Info
-                        then
-                           UH.TC_Hash := new String'
-                             (Subp_Data_List.Element
-                                (Subp_Cur).TC_Info.TC_Hash.all);
+                        UH.Hash :=
+                          new String'
+                            (Subp_Data_List.Element (Subp_Cur)
+                               .Subp_Hash_V1.all);
+                        if Subp_Data_List.Element (Subp_Cur).Has_TC_Info then
+                           UH.TC_Hash :=
+                             new String'
+                               (Subp_Data_List.Element (Subp_Cur)
+                                  .TC_Info
+                                  .TC_Hash.all);
                         else
                            UH.TC_Hash := new String'("");
                         end if;
@@ -4977,19 +5036,22 @@ package body Test.Skeleton is
                           (Output_Dir
                            & Directory_Separator
                            & Unit_To_File_Name
-                             (Unit_Name.all
-                              & "."
-                              & Test_Routine_Prefix
-                              & Current_Subp.Subp_Text_Name.all
-                              & "_"
-                              & Current_Subp.Subp_Hash_V1
-                                (Current_Subp.Subp_Hash_V1'First ..
-                                   Current_Subp.Subp_Hash_V1'First + 5)
-                              & (if Current_Subp.Has_TC_Info
-                                then "_" & Current_Subp.TC_Info.TC_Hash
-                                  (Current_Subp.TC_Info.TC_Hash'First ..
-                                     Current_Subp.TC_Info.TC_Hash'First + 5)
-                                else ""))
+                               (Unit_Name.all
+                                & "."
+                                & Test_Routine_Prefix
+                                & Current_Subp.Subp_Text_Name.all
+                                & "_"
+                                & Current_Subp.Subp_Hash_V1
+                                    (Current_Subp.Subp_Hash_V1'First
+                                     .. Current_Subp.Subp_Hash_V1'First + 5)
+                                & (if Current_Subp.Has_TC_Info
+                                   then
+                                     "_"
+                                     & Current_Subp.TC_Info.TC_Hash
+                                         (Current_Subp.TC_Info.TC_Hash'First
+                                          .. Current_Subp.TC_Info.TC_Hash'First
+                                             + 5)
+                                   else ""))
                            & ".adb",
                            UH,
                            Current_Subp);
@@ -5005,17 +5067,13 @@ package body Test.Skeleton is
 
                   Current_Subp := Subp_Data_List.Element (Subp_Cur);
 
-                  if
-                    Current_Subp.Corresp_Type = Current_Type.Type_Number
-                  then
+                  if Current_Subp.Corresp_Type = Current_Type.Type_Number then
                      UH.Version := new String'(Hash_Version);
-                     UH.Hash := new String'
-                       (Current_Subp.Subp_Full_Hash.all);
-                     if
-                       Current_Subp.Has_TC_Info
-                     then
-                        UH.TC_Hash := new String'
-                          (Sanitize_TC_Name (Current_Subp.TC_Info.Name.all));
+                     UH.Hash := new String'(Current_Subp.Subp_Full_Hash.all);
+                     if Current_Subp.Has_TC_Info then
+                        UH.TC_Hash :=
+                          new String'
+                            (Sanitize_TC_Name (Current_Subp.TC_Info.Name.all));
                      else
                         UH.TC_Hash := new String'("");
                      end if;
@@ -5049,17 +5107,12 @@ package body Test.Skeleton is
 
                   Current_Subp := Subp_Data_List.Element (Subp_Cur);
 
-                  if
-                    Current_Subp.Corresp_Type = Current_Type.Type_Number
-                  then
+                  if Current_Subp.Corresp_Type = Current_Type.Type_Number then
                      UH.Version := new String'("1");
-                     UH.Hash := new String'
-                       (Current_Subp.Subp_Hash_V1.all);
-                     if
-                       Current_Subp.Has_TC_Info
-                     then
-                        UH.TC_Hash := new String'
-                          (Current_Subp.TC_Info.TC_Hash.all);
+                     UH.Hash := new String'(Current_Subp.Subp_Hash_V1.all);
+                     if Current_Subp.Has_TC_Info then
+                        UH.TC_Hash :=
+                          new String'(Current_Subp.TC_Info.TC_Hash.all);
                      else
                         UH.TC_Hash := new String'("");
                      end if;
@@ -5071,8 +5124,8 @@ package body Test.Skeleton is
 
                         Markered_Data_Map.Delete (MD_Cur);
                         Free (UH.Hash);
-                        UH.Hash := new String'
-                          (Current_Subp.Subp_Hash_V2_1.all);
+                        UH.Hash :=
+                          new String'(Current_Subp.Subp_Hash_V2_1.all);
                         Free (UH.Version);
                         UH.Version := new String'("2");
 
@@ -5091,16 +5144,13 @@ package body Test.Skeleton is
 
                   Current_Subp := Subp_Data_List.Element (Subp_Cur);
 
-                  if
-                    Current_Subp.Corresp_Type = Current_Type.Type_Number
-                  then
+                  if Current_Subp.Corresp_Type = Current_Type.Type_Number then
                      UH.Version := new String'("2");
-                     UH.Hash := new String'
-                       (Current_Subp.Subp_Hash_V2_1 .all);
+                     UH.Hash := new String'(Current_Subp.Subp_Hash_V2_1.all);
 
                      if Current_Subp.Has_TC_Info then
-                        UH.TC_Hash := new String'
-                          (Current_Subp.TC_Info.TC_Hash.all);
+                        UH.TC_Hash :=
+                          new String'(Current_Subp.TC_Info.TC_Hash.all);
                      else
                         UH.TC_Hash := new String'("");
                      end if;
@@ -5115,9 +5165,10 @@ package body Test.Skeleton is
                         UH.Version := new String'("2.1");
                         if UH.TC_Hash.all /= "" then
                            Free (UH.TC_Hash);
-                           UH.TC_Hash := new String'
-                             (Sanitize_TC_Name
-                                (Current_Subp.TC_Info.Name.all));
+                           UH.TC_Hash :=
+                             new String'
+                               (Sanitize_TC_Name
+                                  (Current_Subp.TC_Info.Name.all));
                         end if;
 
                         Markered_Data_Map.Include (UH, MD);
@@ -5136,17 +5187,14 @@ package body Test.Skeleton is
 
                   Current_Subp := Subp_Data_List.Element (Subp_Cur);
 
-                  if
-                    Current_Subp.Corresp_Type = Current_Type.Type_Number
-                  then
+                  if Current_Subp.Corresp_Type = Current_Type.Type_Number then
                      UH.Version := new String'("2.1");
-                     UH.Hash := new String'
-                       (Current_Subp.Subp_Hash_V2_1 .all);
+                     UH.Hash := new String'(Current_Subp.Subp_Hash_V2_1.all);
 
                      if Current_Subp.Has_TC_Info then
-                        UH.TC_Hash := new String'
-                          (Sanitize_TC_Name
-                             (Current_Subp.TC_Info.Name.all));
+                        UH.TC_Hash :=
+                          new String'
+                            (Sanitize_TC_Name (Current_Subp.TC_Info.Name.all));
                      else
                         UH.TC_Hash := new String'("");
                      end if;
@@ -5156,10 +5204,9 @@ package body Test.Skeleton is
                      if MD_Cur /= Markered_Data_Maps.No_Element then
                         MD := Markered_Data_Maps.Element (MD_Cur);
 
-                        if not
-                          Short_Names_Used.Contains (MD.Short_Name.all)
+                        if not Short_Names_Used.Contains (MD.Short_Name.all)
                           or else Shortnamed_Subps.Contains
-                            (Current_Subp.Subp_Declaration)
+                                    (Current_Subp.Subp_Declaration)
                         then
                            Short_Names_Used.Include (MD.Short_Name.all);
                            Shortnamed_Subps.Include
@@ -5175,8 +5222,8 @@ package body Test.Skeleton is
 
                         Markered_Data_Map.Delete (MD_Cur);
                         Free (UH.Hash);
-                        UH.Hash := new String'
-                          (Current_Subp.Subp_Full_Hash.all);
+                        UH.Hash :=
+                          new String'(Current_Subp.Subp_Full_Hash.all);
                         Free (UH.Version);
                         UH.Version := new String'(Hash_Version);
                         Markered_Data_Map.Include (UH, MD);
@@ -5194,15 +5241,13 @@ package body Test.Skeleton is
 
                   Current_Subp := Subp_Data_List.Element (Subp_Cur);
 
-                  if
-                    Current_Subp.Corresp_Type = Current_Type.Type_Number
-                  then
+                  if Current_Subp.Corresp_Type = Current_Type.Type_Number then
                      UH.Version := new String'(Hash_Version);
-                     UH.Hash := new String'
-                       (Current_Subp.Subp_Full_Hash.all);
+                     UH.Hash := new String'(Current_Subp.Subp_Full_Hash.all);
                      if Current_Subp.Has_TC_Info then
-                        UH.TC_Hash := new String'
-                          (Sanitize_TC_Name (Current_Subp.TC_Info.Name.all));
+                        UH.TC_Hash :=
+                          new String'
+                            (Sanitize_TC_Name (Current_Subp.TC_Info.Name.all));
                      else
                         UH.TC_Hash := new String'("");
                      end if;
@@ -5213,15 +5258,15 @@ package body Test.Skeleton is
 
                         MD.Commented_Out := False;
                         MD.Short_Name_Used := False;
-                        MD.Short_Name := new String'
-                          (To_Lower (Current_Subp.Subp_Text_Name.all));
+                        MD.Short_Name :=
+                          new String'
+                            (To_Lower (Current_Subp.Subp_Text_Name.all));
                         MD.TR_Text.Clear;
 
-                        if
-                          not Short_Names_Used.Contains
-                          (To_Lower (Current_Subp.Subp_Text_Name.all))
+                        if not Short_Names_Used.Contains
+                                 (To_Lower (Current_Subp.Subp_Text_Name.all))
                           or else Shortnamed_Subps.Contains
-                            (Current_Subp.Subp_Declaration)
+                                    (Current_Subp.Subp_Declaration)
                         then
                            --  Short name is free, we can use it
                            MD.Short_Name_Used := True;
@@ -5237,9 +5282,9 @@ package body Test.Skeleton is
 
                            --  Looking for a dangling test with same short
                            --  name but different hash.
-                           MD_Cur := Find_Same_Short_Name
-                             (Markered_Data_Map,
-                              Current_Subp);
+                           MD_Cur :=
+                             Find_Same_Short_Name
+                               (Markered_Data_Map, Current_Subp);
 
                            if MD_Cur /= Markered_Data_Maps.No_Element then
                               --  Using corresponding dangling test
@@ -5252,8 +5297,8 @@ package body Test.Skeleton is
                               --  the test can be dangling for a long time
                               --  or just become dangling
                               MD.Commented_Out :=
-                                Markered_Data_Maps.Element
-                                  (MD_Cur).Commented_Out;
+                                Markered_Data_Maps.Element (MD_Cur)
+                                  .Commented_Out;
 
                               Markered_Data_Map.Delete (MD_Cur);
                               MD.Issue_Warning := True;
@@ -5277,14 +5322,11 @@ package body Test.Skeleton is
 
                   Current_Subp := Subp_Data_List.Element (Subp_Cur);
 
-                  if
-                    Current_Subp.Corresp_Type = Current_Type.Type_Number
-                  then
+                  if Current_Subp.Corresp_Type = Current_Type.Type_Number then
 
-                     if
-                       Name_Numbers.Find
-                         (To_Lower (Current_Subp.Subp_Text_Name.all)) =
-                       Name_Frequency.No_Element
+                     if Name_Numbers.Find
+                          (To_Lower (Current_Subp.Subp_Text_Name.all))
+                       = Name_Frequency.No_Element
                      then
 
                         Name_Numbers.Include
@@ -5293,17 +5335,14 @@ package body Test.Skeleton is
                           (Current_Subp.Subp_Declaration, 1);
 
                      else
-                        if
-                          Elem_Numbers.Find
-                            (Current_Subp.Subp_Declaration) =
-                            Elem_Number_Maps.No_Element
+                        if Elem_Numbers.Find (Current_Subp.Subp_Declaration)
+                          = Elem_Number_Maps.No_Element
                         then
 
                            declare
                               X : constant Natural :=
                                 Name_Numbers.Element
-                                  (To_Lower
-                                       (Current_Subp.Subp_Text_Name.all));
+                                  (To_Lower (Current_Subp.Subp_Text_Name.all));
                            begin
                               Name_Numbers.Replace
                                 (To_Lower (Current_Subp.Subp_Text_Name.all),
@@ -5354,16 +5393,16 @@ package body Test.Skeleton is
             loop
                exit when Subp_Cur = Subp_Data_List.No_Element;
 
-               if
-                 Subp_Data_List.Element (Subp_Cur).Corresp_Type =
-                 Current_Type.Type_Number
+               if Subp_Data_List.Element (Subp_Cur).Corresp_Type
+                 = Current_Type.Type_Number
                then
                   Current_Subp := Subp_Data_List.Element (Subp_Cur);
 
                   if Subp_Data_List.Element (Subp_Cur).Has_TC_Info then
                      if Is_Function
-                       (Subp_Data_List.Element
-                          (Subp_Cur).Subp_Declaration.As_Basic_Decl)
+                          (Subp_Data_List.Element (Subp_Cur)
+                             .Subp_Declaration
+                             .As_Basic_Decl)
                      then
                         Generate_Function_Wrapper
                           (Subp_Data_List.Element (Subp_Cur));
@@ -5376,12 +5415,12 @@ package body Test.Skeleton is
                   if Generate_Separates then
                      S_Put
                        (3,
-                        "procedure "                         &
-                          Subp_Data_List.Element
-                          (Subp_Cur).Subp_Mangle_Name.all    &
-                          " (Gnattest_T : in out Test_"        &
-                          Current_Type.Main_Type_Text_Name.all &
-                          ") is separate;");
+                        "procedure "
+                        & Subp_Data_List.Element (Subp_Cur)
+                            .Subp_Mangle_Name.all
+                        & " (Gnattest_T : in out Test_"
+                        & Current_Type.Main_Type_Text_Name.all
+                        & ") is separate;");
 
                      New_Line_Count;
                      Print_Comment_Declaration
@@ -5397,14 +5436,17 @@ package body Test.Skeleton is
                      All_Tests_Counter := All_Tests_Counter + 1;
 
                      UH.Version := new String'(Hash_Version);
-                     UH.Hash := new String'
-                       (Subp_Data_List.Element
-                          (Subp_Cur).Subp_Full_Hash.all);
+                     UH.Hash :=
+                       new String'
+                         (Subp_Data_List.Element (Subp_Cur)
+                            .Subp_Full_Hash.all);
                      if Subp_Data_List.Element (Subp_Cur).Has_TC_Info then
-                        UH.TC_Hash := new String'
-                          (Sanitize_TC_Name
-                             (Subp_Data_List.Element
-                                  (Subp_Cur).TC_Info.Name.all));
+                        UH.TC_Hash :=
+                          new String'
+                            (Sanitize_TC_Name
+                               (Subp_Data_List.Element (Subp_Cur)
+                                  .TC_Info
+                                  .Name.all));
                      else
                         UH.TC_Hash := new String'("");
                      end if;
@@ -5414,8 +5456,7 @@ package body Test.Skeleton is
 
                      Put_Opening_Comment_Section
                        (Subp_Data_List.Element (Subp_Cur),
-                        Elem_Numbers.Element
-                          (Current_Subp.Subp_Declaration),
+                        Elem_Numbers.Element (Current_Subp.Subp_Declaration),
                         Use_Short_Name => MD.Short_Name_Used,
                         Type_Name      => Current_Type.Main_Type_Text_Name.all,
                         Add_Cov_Dump   =>
@@ -5424,24 +5465,25 @@ package body Test.Skeleton is
                      if Is_Unimplemented_Test (MD.TR_Text) then
                         TR_SLOC_Buffer.Append
                           ((new String'(Data.Unit_Full_Name.all),
-                           new String'(Test_File_Name.all & ".adb"),
-                           null,
-                           Subp_Data_List.Element (Subp_Cur),
-                           New_Line_Counter));
+                            new String'(Test_File_Name.all & ".adb"),
+                            null,
+                            Subp_Data_List.Element (Subp_Cur),
+                            New_Line_Counter));
                      else
                         TR_SLOC_Buffer.Append
                           ((new String'(Data.Unit_Full_Name.all),
-                           new String'(Test_File_Name.all & ".adb"),
-                           new String'("modified"),
-                           Subp_Data_List.Element (Subp_Cur),
-                           New_Line_Counter));
+                            new String'(Test_File_Name.all & ".adb"),
+                            new String'("modified"),
+                            Subp_Data_List.Element (Subp_Cur),
+                            New_Line_Counter));
                      end if;
 
                      if MD.TR_Text.Is_Empty then
 
                         if Stub_Mode_ON then
-                           Setters_Set := Get_Direct_Callees_Setters
-                             (Current_Subp.Subp_Declaration.As_Basic_Decl);
+                           Setters_Set :=
+                             Get_Direct_Callees_Setters
+                               (Current_Subp.Subp_Declaration.As_Basic_Decl);
                         end if;
 
                         New_Tests_Counter := New_Tests_Counter + 1;
@@ -5469,10 +5511,9 @@ package body Test.Skeleton is
 
                         S_Put (6, "AUnit.Assertions.Assert");
                         New_Line_Count;
-                        S_Put
-                        (8, "(Gnattest_Generated.Default_Assert_Value,");
+                        S_Put (8, "(Gnattest_Generated.Default_Assert_Value,");
                         New_Line_Count;
-                        S_Put (9,  """Test not implemented."");");
+                        S_Put (9, """Test not implemented."");");
                         New_Line_Count;
                         New_Line_Count;
                      else
@@ -5483,34 +5524,31 @@ package body Test.Skeleton is
                               & Base_Name (Data.Unit_File_Name.all)
                               & ":"
                               & Trim
-                                (First_Line_Number
-                                 (Current_Subp.Subp_Declaration)'Img,
-                                 Both)
+                                  (First_Line_Number
+                                     (Current_Subp.Subp_Declaration)'Img,
+                                   Both)
                               & ":"
                               & Trim
-                                (First_Column_Number
-                                 (Current_Subp.Subp_Declaration)'Img,
-                                 Both)
+                                  (First_Column_Number
+                                     (Current_Subp.Subp_Declaration)'Img,
+                                   Both)
                               & ": test for "
                               & MD.Short_Name.all
                               & " at "
                               & Unit_Name.all
                               & ":"
-                              & Trim
-                                (Integer'Image (New_Line_Counter),
-                                 Both)
+                              & Trim (Integer'Image (New_Line_Counter), Both)
                               & " might be out of date ("
                               & MD.Short_Name.all
                               & " has been changed)");
                         end if;
 
-                        for I in
-                          MD.TR_Text.First_Index .. MD.TR_Text.Last_Index
+                        for I
+                          in MD.TR_Text.First_Index .. MD.TR_Text.Last_Index
                         loop
                            if MD.Commented_Out then
                               S_Put
-                                (0,
-                                 Uncomment_Line (MD.TR_Text.Element (I)));
+                                (0, Uncomment_Line (MD.TR_Text.Element (I)));
                            else
                               S_Put (0, MD.TR_Text.Element (I));
                            end if;
@@ -5522,8 +5560,7 @@ package body Test.Skeleton is
 
                      Put_Closing_Comment_Section
                        (Subp_Data_List.Element (Subp_Cur),
-                        Elem_Numbers.Element
-                          (Current_Subp.Subp_Declaration),
+                        Elem_Numbers.Element (Current_Subp.Subp_Declaration),
                         Use_Short_Name => MD.Short_Name_Used,
                         Add_Cov_Dump   =>
                           Data.Has_Gen_Tests and then Minimize);
@@ -5556,31 +5593,37 @@ package body Test.Skeleton is
                      Stub : Subp_Info;
                   begin
 
-                     Stub.Subp_Full_Hash := new String'
-                       (Markered_Data_Maps.Key (MD_Cur).Hash.all);
+                     Stub.Subp_Full_Hash :=
+                       new String'(Markered_Data_Maps.Key (MD_Cur).Hash.all);
 
-                     Stub.Subp_Text_Name := new String'
-                       (Markered_Data_Maps.Element (MD_Cur).Short_Name.all);
+                     Stub.Subp_Text_Name :=
+                       new String'
+                         (Markered_Data_Maps.Element (MD_Cur).Short_Name.all);
 
-                     Stub.Subp_Mangle_Name := new String'
-                       (Test_Routine_Prefix
-                        & Stub.Subp_Text_Name.all
-                        & "_"
-                        & Stub.Subp_Full_Hash
-                          (Stub.Subp_Full_Hash'First ..
-                               Stub.Subp_Full_Hash'First + 5));
+                     Stub.Subp_Mangle_Name :=
+                       new String'
+                         (Test_Routine_Prefix
+                          & Stub.Subp_Text_Name.all
+                          & "_"
+                          & Stub.Subp_Full_Hash
+                              (Stub.Subp_Full_Hash'First
+                               .. Stub.Subp_Full_Hash'First + 5));
 
                      if Markered_Data_Maps.Key (MD_Cur).TC_Hash.all = "" then
                         Stub.Has_TC_Info := False;
                      else
                         Stub.Has_TC_Info := True;
-                        Stub.TC_Info.TC_Hash := new String'
-                          (Markered_Data_Maps.Key (MD_Cur).TC_Hash.all);
+                        Stub.TC_Info.TC_Hash :=
+                          new String'
+                            (Markered_Data_Maps.Key (MD_Cur).TC_Hash.all);
                         Stub.TC_Info.Name := Stub.TC_Info.TC_Hash;
                      end if;
 
                      Put_Opening_Comment_Section
-                       (Stub, 0, True, False,
+                       (Stub,
+                        0,
+                        True,
+                        False,
                         Current_Type.Main_Type_Text_Name.all,
                         Add_Cov_Dump => Data.Has_Gen_Tests and then Minimize);
 
@@ -5591,8 +5634,7 @@ package body Test.Skeleton is
                         New_Line_Counter,
                         1);
 
-                     for I in
-                       MD.TR_Text.First_Index .. MD.TR_Text.Last_Index
+                     for I in MD.TR_Text.First_Index .. MD.TR_Text.Last_Index
                      loop
                         if MD.Commented_Out then
                            S_Put (0, MD.TR_Text.Element (I));
@@ -5623,26 +5665,25 @@ package body Test.Skeleton is
             Close_File;
 
             Add_Buffered_TR_Slocs
-              (TP_List,
-               Format_Time
-                 (File_Time_Stamp
-                    (Tmp_File_Name)));
+              (TP_List, Format_Time (File_Time_Stamp (Tmp_File_Name)));
 
             if not Generate_Separates then
                declare
                   Old_Package : constant String :=
-                       (if Test.Common.Instrument then
-                          Harness_Dir_Str.all
-                          & Directory_Separator
-                          & "test_obj"
-                          & Directory_Separator
-                          & Test_Prj_Prefix
-                          & To_Lower (Source_Project_Tree.Root_Project.Name)
-                          & Instr_Suffix
-                        else Output_Dir)
+                    (if Test.Common.Instrument
+                     then
+                       Harness_Dir_Str.all
                        & Directory_Separator
-                       & Test_File_Name.all & ".adb";
-                  Success : Boolean;
+                       & "test_obj"
+                       & Directory_Separator
+                       & Test_Prj_Prefix
+                       & To_Lower (Source_Project_Tree.Root_Project.Name)
+                       & Instr_Suffix
+                     else Output_Dir)
+                    & Directory_Separator
+                    & Test_File_Name.all
+                    & ".adb";
+                  Success     : Boolean;
                begin
                   if Is_Regular_File (Old_Package) then
                      Delete_File (Old_Package, Success);
@@ -5694,43 +5735,53 @@ package body Test.Skeleton is
             end loop;
 
             if Current_Pack.Name.all = Data.Unit_Full_Name.all then
-               Data_Unit_Name := new String'
-                 (Current_Pack.Name.all & "." &  Test_Data_Unit_Name);
+               Data_Unit_Name :=
+                 new String'
+                   (Current_Pack.Name.all & "." & Test_Data_Unit_Name);
             else
                if Data.Is_Top_Level_Generic_Instantiation then
-                  Data_Unit_Name := new String'
-                     (Data.Unit_Full_Name.all & "." &
-                      Test_Data_Unit_Name);
+                  Data_Unit_Name :=
+                    new String'
+                      (Data.Unit_Full_Name.all & "." & Test_Data_Unit_Name);
                else
-                  Data_Unit_Name := new String'
-                    (Data.Unit_Full_Name.all & "." &
-                     Test_Data_Unit_Name & "." &
-                     Test_Unit_Name & "." &
-                     Nesting_Difference
-                       (Current_Pack.Name.all,
-                        Data.Unit_Full_Name.all) &
-                     "." & Test_Data_Unit_Name);
+                  Data_Unit_Name :=
+                    new String'
+                      (Data.Unit_Full_Name.all
+                       & "."
+                       & Test_Data_Unit_Name
+                       & "."
+                       & Test_Unit_Name
+                       & "."
+                       & Nesting_Difference
+                           (Current_Pack.Name.all, Data.Unit_Full_Name.all)
+                       & "."
+                       & Test_Data_Unit_Name);
                end if;
             end if;
 
-            Test_File_Name := new String'
-              (Unit_To_File_Name (Data_Unit_Name.all));
+            Test_File_Name :=
+              new String'(Unit_To_File_Name (Data_Unit_Name.all));
 
             --  saving test data package name for further reference
             Test_Data_Package_Name := new String'(Data_Unit_Name.all);
 
             --  Generating simple test data package spec
             if not Is_Regular_File
-              (Output_Dir & Directory_Separator & Test_File_Name.all & ".ads")
+                     (Output_Dir
+                      & Directory_Separator
+                      & Test_File_Name.all
+                      & ".ads")
             then
                Create
-                 (Output_Dir & Directory_Separator &
-                  Test_File_Name.all & ".ads");
+                 (Output_Dir
+                  & Directory_Separator
+                  & Test_File_Name.all
+                  & ".ads");
 
                Put_Test_Data_Header;
 
                if Current_Pack.Data_Kind = Instantiation
-                  and not Data.Is_Top_Level_Generic_Instantiation
+                 and not Data.Is_Top_Level_Generic_Instantiation
                then
                   S_Put
                     (0,
@@ -5770,9 +5821,7 @@ package body Test.Skeleton is
                Put_New_Line;
                S_Put (0, GT_Marker_Begin);
                Put_New_Line;
-               S_Put
-                 (3,
-                  "type Test is new AUnit.Test_Fixtures.Test_Fixture");
+               S_Put (3, "type Test is new AUnit.Test_Fixtures.Test_Fixture");
                Put_New_Line;
                S_Put (0, GT_Marker_End);
                Put_New_Line;
@@ -5786,7 +5835,7 @@ package body Test.Skeleton is
                Put_New_Line;
 
                if Current_Pack.Data_Kind = Instantiation
-                  and not Data.Is_Top_Level_Generic_Instantiation
+                 and not Data.Is_Top_Level_Generic_Instantiation
                then
                   S_Put (0, GT_Marker_Begin);
                   Put_New_Line;
@@ -5816,7 +5865,7 @@ package body Test.Skeleton is
                   Put_New_Line;
                   S_Put
                     (3,
-                    "procedure User_Set_Up (Gnattest_T : in out New_Test);");
+                     "procedure User_Set_Up (Gnattest_T : in out New_Test);");
                   Put_New_Line;
                   S_Put
                     (3,
@@ -5828,12 +5877,11 @@ package body Test.Skeleton is
 
                if Current_Pack.Is_Generic then
                   S_Put
-                    (3,
-                    "procedure User_Set_Up (Gnattest_T : in out Test);");
+                    (3, "procedure User_Set_Up (Gnattest_T : in out Test);");
                   Put_New_Line;
                   S_Put
                     (3,
-                    "procedure User_Tear_Down (Gnattest_T : in out Test);");
+                     "procedure User_Tear_Down (Gnattest_T : in out Test);");
                   Put_New_Line;
                   Put_New_Line;
                end if;
@@ -5845,11 +5893,16 @@ package body Test.Skeleton is
             end if;
 
             if not Is_Regular_File
-              (Output_Dir & Directory_Separator & Test_File_Name.all & ".adb")
+                     (Output_Dir
+                      & Directory_Separator
+                      & Test_File_Name.all
+                      & ".adb")
             then
                Create
-                 (Output_Dir & Directory_Separator &
-                  Test_File_Name.all & ".adb");
+                 (Output_Dir
+                  & Directory_Separator
+                  & Test_File_Name.all
+                  & ".adb");
 
                Put_Test_Data_Header;
 
@@ -5857,7 +5910,7 @@ package body Test.Skeleton is
                Put_New_Line;
                Put_New_Line;
                if Current_Pack.Data_Kind = Declaration_Data
-                  or Data.Is_Top_Level_Generic_Instantiation
+                 or Data.Is_Top_Level_Generic_Instantiation
                then
                   S_Put (3, "procedure Set_Up (Gnattest_T : in out Test) is");
                   Put_New_Line;
@@ -5902,9 +5955,7 @@ package body Test.Skeleton is
                   Put_New_Line;
                else
                   S_Put
-                    (3,
-                     "procedure Set_Up "
-                     & "(Gnattest_T : in out Test) is");
+                    (3, "procedure Set_Up " & "(Gnattest_T : in out Test) is");
                   Put_New_Line;
                   S_Put (6, "pragma Unreferenced (Gnattest_T);");
                   Put_New_Line;
@@ -5917,8 +5968,7 @@ package body Test.Skeleton is
                   Put_New_Line;
                   S_Put
                     (3,
-                     "procedure Tear_Down "
-                     & "(Gnattest_T : in out Test) is");
+                     "procedure Tear_Down " & "(Gnattest_T : in out Test) is");
                   Put_New_Line;
                   S_Put (6, "pragma Unreferenced (Gnattest_T);");
                   Put_New_Line;
@@ -5993,37 +6043,48 @@ package body Test.Skeleton is
                Close_File;
             end if;
 
-            TP_Map.SetUp_Name      := new String'(Test_File_Name.all & ".adb");
-            TP_Map.TearDown_Name   := new String'(Test_File_Name.all & ".adb");
-            TP_Map.SetUp_Line      := 8;
-            TP_Map.SetUp_Column    := 4;
-            TP_Map.TearDown_Line   := 14;
+            TP_Map.SetUp_Name := new String'(Test_File_Name.all & ".adb");
+            TP_Map.TearDown_Name := new String'(Test_File_Name.all & ".adb");
+            TP_Map.SetUp_Line := 8;
+            TP_Map.SetUp_Column := 4;
+            TP_Map.TearDown_Line := 14;
             TP_Map.TearDown_Column := 4;
 
             Free (Test_File_Name);
 
             if Current_Pack.Name.all = Data.Unit_Full_Name.all then
-               Unit_Name := new String'
-                 (Current_Pack.Name.all & "." &
-                  Test_Data_Unit_Name & "." &
-                  Test_Unit_Name);
+               Unit_Name :=
+                 new String'
+                   (Current_Pack.Name.all
+                    & "."
+                    & Test_Data_Unit_Name
+                    & "."
+                    & Test_Unit_Name);
             else
-               if Data.Is_Top_Level_Generic_Instantiation
-                  or Data.Is_Generic
+               if Data.Is_Top_Level_Generic_Instantiation or Data.Is_Generic
                then
-                  Unit_Name := new String'
-                     (Data.Unit_Full_Name.all & "." &
-                     Test_Data_Unit_Name & "." &
-                     Test_Unit_Name);
+                  Unit_Name :=
+                    new String'
+                      (Data.Unit_Full_Name.all
+                       & "."
+                       & Test_Data_Unit_Name
+                       & "."
+                       & Test_Unit_Name);
                else
-                  Unit_Name := new String'
-                     (Data.Unit_Full_Name.all & "." &
-                     Test_Data_Unit_Name & "." &
-                     Test_Unit_Name & "." &
-                     Nesting_Difference
-                        (Current_Pack.Name.all,
-                        Data.Unit_Full_Name.all) &
-                        "." & Test_Data_Unit_Name & "." & Test_Unit_Name);
+                  Unit_Name :=
+                    new String'
+                      (Data.Unit_Full_Name.all
+                       & "."
+                       & Test_Data_Unit_Name
+                       & "."
+                       & Test_Unit_Name
+                       & "."
+                       & Nesting_Difference
+                           (Current_Pack.Name.all, Data.Unit_Full_Name.all)
+                       & "."
+                       & Test_Data_Unit_Name
+                       & "."
+                       & Test_Unit_Name);
                end if;
             end if;
 
@@ -6054,16 +6115,16 @@ package body Test.Skeleton is
                   GP : Generic_Package;
                begin
                   GP.Name := new String'(Current_Pack.Name.all);
-                  GP.Sloc := new String'
-                    (Base_Name (Data.Unit_File_Name.all)
-                     & ":"
-                     & Trim
-                       (First_Line_Number (Current_Pack.Element)'Img,
-                        Both)
-                     & ":"
-                     & Trim
-                       (First_Column_Number (Current_Pack.Element)'Img,
-                        Both));
+                  GP.Sloc :=
+                    new String'
+                      (Base_Name (Data.Unit_File_Name.all)
+                       & ":"
+                       & Trim
+                           (First_Line_Number (Current_Pack.Element)'Img, Both)
+                       & ":"
+                       & Trim
+                           (First_Column_Number (Current_Pack.Element)'Img,
+                            Both));
                   Update_Generic_Packages (GP);
                end;
             end if;
@@ -6074,18 +6135,20 @@ package body Test.Skeleton is
 
             --  Declaring simple test type.
             if Current_Pack.Data_Kind = Declaration_Data
-               or Data.Is_Top_Level_Generic_Instantiation
+              or Data.Is_Top_Level_Generic_Instantiation
             then
                S_Put
                  (3,
-                  "type Test is new GNATtest_Generated.GNATtest_Standard." &
-                    Data_Unit_Name.all & ".Test");
+                  "type Test is new GNATtest_Generated.GNATtest_Standard."
+                  & Data_Unit_Name.all
+                  & ".Test");
 
             else
                S_Put
                  (3,
-                  "type Test is new GNATtest_Generated.GNATtest_Standard." &
-                    Data_Unit_Name.all & ".New_Test");
+                  "type Test is new GNATtest_Generated.GNATtest_Standard."
+                  & Data_Unit_Name.all
+                  & ".New_Test");
 
                Update_Generic_Packages
                  (Current_Pack.Generic_Containing_Package.all);
@@ -6107,14 +6170,13 @@ package body Test.Skeleton is
                      S_Put
                        (3,
                         "procedure "
-                        & Subp_Data_List.Element
-                          (Subp_Cur).Subp_Mangle_Name.all
+                        & Subp_Data_List.Element (Subp_Cur)
+                            .Subp_Mangle_Name.all
                         & " (Gnattest_T : in out Test);");
 
                      Put_New_Line;
                      Print_Comment_Declaration
-                       (Subp_Data_List.Element (Subp_Cur),
-                        3);
+                       (Subp_Data_List.Element (Subp_Cur), 3);
                      Put_New_Line;
 
                      Actual_Test := True;
@@ -6167,15 +6229,16 @@ package body Test.Skeleton is
 
                      if Subp_Data_List.Element (Subp_Cur).Corresp_Type = 0 then
                         UH.Version := new String'("2");
-                        UH.Hash := new String'
-                          (Subp_Data_List.Element
-                             (Subp_Cur).Subp_Full_Hash.all);
-                        if
-                          Subp_Data_List.Element (Subp_Cur).Has_TC_Info
-                        then
-                           UH.TC_Hash := new String'
-                             (Subp_Data_List.Element
-                                (Subp_Cur).TC_Info.TC_Hash.all);
+                        UH.Hash :=
+                          new String'
+                            (Subp_Data_List.Element (Subp_Cur)
+                               .Subp_Full_Hash.all);
+                        if Subp_Data_List.Element (Subp_Cur).Has_TC_Info then
+                           UH.TC_Hash :=
+                             new String'
+                               (Subp_Data_List.Element (Subp_Cur)
+                                  .TC_Info
+                                  .TC_Hash.all);
                         else
                            UH.TC_Hash := new String'("");
                         end if;
@@ -6189,10 +6252,12 @@ package body Test.Skeleton is
                            UH.Version := new String'(Hash_Version);
                            if UH.TC_Hash.all /= "" then
                               Free (UH.TC_Hash);
-                              UH.TC_Hash := new String'
-                                (Sanitize_TC_Name
-                                   (Subp_Data_List.Element
-                                      (Subp_Cur).TC_Info.Name.all));
+                              UH.TC_Hash :=
+                                new String'
+                                  (Sanitize_TC_Name
+                                     (Subp_Data_List.Element (Subp_Cur)
+                                        .TC_Info
+                                        .Name.all));
                            end if;
                         end if;
 
@@ -6207,19 +6272,20 @@ package body Test.Skeleton is
                      loop
                         exit when Subp_Cur = Subp_Data_List.No_Element;
 
-                        if
-                          Subp_Data_List.Element (Subp_Cur).Corresp_Type = 0
+                        if Subp_Data_List.Element (Subp_Cur).Corresp_Type = 0
                         then
                            UH.Version := new String'("1");
-                           UH.Hash := new String'
-                             (Subp_Data_List.Element
-                                (Subp_Cur).Subp_Hash_V1.all);
-                           if
-                             Subp_Data_List.Element (Subp_Cur).Has_TC_Info
+                           UH.Hash :=
+                             new String'
+                               (Subp_Data_List.Element (Subp_Cur)
+                                  .Subp_Hash_V1.all);
+                           if Subp_Data_List.Element (Subp_Cur).Has_TC_Info
                            then
-                              UH.TC_Hash := new String'
-                                (Subp_Data_List.Element
-                                   (Subp_Cur).TC_Info.TC_Hash.all);
+                              UH.TC_Hash :=
+                                new String'
+                                  (Subp_Data_List.Element (Subp_Cur)
+                                     .TC_Info
+                                     .TC_Hash.all);
                            else
                               UH.TC_Hash := new String'("");
                            end if;
@@ -6230,19 +6296,24 @@ package body Test.Skeleton is
                              (Output_Dir
                               & Directory_Separator
                               & Unit_To_File_Name
-                                (Unit_Name.all
-                                 & "."
-                                 & Test_Routine_Prefix
-                                 & Current_Subp.Subp_Text_Name.all
-                                 & "_"
-                                 & Current_Subp.Subp_Hash_V1
-                                   (Current_Subp.Subp_Hash_V1'First ..
-                                      Current_Subp.Subp_Hash_V1'First + 5)
-                                 & (if Current_Subp.Has_TC_Info
-                                   then "_" & Current_Subp.TC_Info.TC_Hash
-                                     (Current_Subp.TC_Info.TC_Hash'First ..
-                                        Current_Subp.TC_Info.TC_Hash'First + 5)
-                                   else ""))
+                                  (Unit_Name.all
+                                   & "."
+                                   & Test_Routine_Prefix
+                                   & Current_Subp.Subp_Text_Name.all
+                                   & "_"
+                                   & Current_Subp.Subp_Hash_V1
+                                       (Current_Subp.Subp_Hash_V1'First
+                                        .. Current_Subp.Subp_Hash_V1'First + 5)
+                                   & (if Current_Subp.Has_TC_Info
+                                      then
+                                        "_"
+                                        & Current_Subp.TC_Info.TC_Hash
+                                            (Current_Subp.TC_Info.TC_Hash'First
+                                             .. Current_Subp
+                                                  .TC_Info
+                                                  .TC_Hash'First
+                                                + 5)
+                                      else ""))
                               & ".adb",
                               UH,
                               Current_Subp);
@@ -6260,16 +6331,17 @@ package body Test.Skeleton is
 
                      if Subp_Data_List.Element (Subp_Cur).Corresp_Type = 0 then
                         UH.Version := new String'(Hash_Version);
-                        UH.Hash := new String'
-                          (Subp_Data_List.Element
-                             (Subp_Cur).Subp_Full_Hash.all);
-                        if
-                          Subp_Data_List.Element (Subp_Cur).Has_TC_Info
-                        then
-                           UH.TC_Hash := new String'
-                             (Sanitize_TC_Name
-                                (Subp_Data_List.Element
-                                   (Subp_Cur).TC_Info.Name.all));
+                        UH.Hash :=
+                          new String'
+                            (Subp_Data_List.Element (Subp_Cur)
+                               .Subp_Full_Hash.all);
+                        if Subp_Data_List.Element (Subp_Cur).Has_TC_Info then
+                           UH.TC_Hash :=
+                             new String'
+                               (Sanitize_TC_Name
+                                  (Subp_Data_List.Element (Subp_Cur)
+                                     .TC_Info
+                                     .Name.all));
                         else
                            UH.TC_Hash := new String'("");
                         end if;
@@ -6309,11 +6381,9 @@ package body Test.Skeleton is
                         UH.Version := new String'("1");
                         UH.Hash := new String'(Current_Subp.Subp_Hash_V1.all);
 
-                        if
-                          Current_Subp.Has_TC_Info
-                        then
-                           UH.TC_Hash := new String'
-                             (Current_Subp.TC_Info.TC_Hash.all);
+                        if Current_Subp.Has_TC_Info then
+                           UH.TC_Hash :=
+                             new String'(Current_Subp.TC_Info.TC_Hash.all);
                         else
                            UH.TC_Hash := new String'("");
                         end if;
@@ -6325,15 +6395,16 @@ package body Test.Skeleton is
 
                            Markered_Data_Map.Delete (MD_Cur);
                            Free (UH.Hash);
-                           UH.Hash := new String'
-                             (Current_Subp.Subp_Hash_V2_1.all);
+                           UH.Hash :=
+                             new String'(Current_Subp.Subp_Hash_V2_1.all);
                            Free (UH.Version);
                            UH.Version := new String'(Hash_Version);
                            if UH.TC_Hash.all /= "" then
                               Free (UH.TC_Hash);
-                              UH.TC_Hash := new String'
-                                (Sanitize_TC_Name
-                                   (Current_Subp.TC_Info.Name.all));
+                              UH.TC_Hash :=
+                                new String'
+                                  (Sanitize_TC_Name
+                                     (Current_Subp.TC_Info.Name.all));
                            end if;
                            Markered_Data_Map.Include (UH, MD);
                         end if;
@@ -6353,15 +6424,14 @@ package body Test.Skeleton is
 
                      if Subp_Data_List.Element (Subp_Cur).Corresp_Type = 0 then
                         UH.Version := new String'("2.1");
-                        UH.Hash := new String'
-                          (Current_Subp.Subp_Hash_V2_1.all);
+                        UH.Hash :=
+                          new String'(Current_Subp.Subp_Hash_V2_1.all);
 
-                        if
-                          Current_Subp.Has_TC_Info
-                        then
-                           UH.TC_Hash := new String'
-                             (Sanitize_TC_Name
-                                (Current_Subp.TC_Info.Name.all));
+                        if Current_Subp.Has_TC_Info then
+                           UH.TC_Hash :=
+                             new String'
+                               (Sanitize_TC_Name
+                                  (Current_Subp.TC_Info.Name.all));
                         else
                            UH.TC_Hash := new String'("");
                         end if;
@@ -6371,10 +6441,9 @@ package body Test.Skeleton is
                         if MD_Cur /= Markered_Data_Maps.No_Element then
                            MD := Markered_Data_Maps.Element (MD_Cur);
 
-                           if not
-                             Short_Names_Used.Contains (MD.Short_Name.all)
+                           if not Short_Names_Used.Contains (MD.Short_Name.all)
                              or else Shortnamed_Subps.Contains
-                               (Current_Subp.Subp_Declaration)
+                                       (Current_Subp.Subp_Declaration)
                            then
                               Short_Names_Used.Include (MD.Short_Name.all);
                               Shortnamed_Subps.Include
@@ -6391,8 +6460,8 @@ package body Test.Skeleton is
 
                            Markered_Data_Map.Delete (MD_Cur);
                            Free (UH.Hash);
-                           UH.Hash := new String'
-                             (Current_Subp.Subp_Full_Hash.all);
+                           UH.Hash :=
+                             new String'(Current_Subp.Subp_Full_Hash.all);
                            Free (UH.Version);
                            UH.Version := new String'(Hash_Version);
 
@@ -6413,14 +6482,13 @@ package body Test.Skeleton is
 
                      if Subp_Data_List.Element (Subp_Cur).Corresp_Type = 0 then
                         UH.Version := new String'(Hash_Version);
-                        UH.Hash := new String'
-                          (Current_Subp.Subp_Full_Hash.all);
-                        if
-                          Subp_Data_List.Element (Subp_Cur).Has_TC_Info
-                        then
-                           UH.TC_Hash := new String'
-                             (Sanitize_TC_Name
-                                (Current_Subp.TC_Info.Name.all));
+                        UH.Hash :=
+                          new String'(Current_Subp.Subp_Full_Hash.all);
+                        if Subp_Data_List.Element (Subp_Cur).Has_TC_Info then
+                           UH.TC_Hash :=
+                             new String'
+                               (Sanitize_TC_Name
+                                  (Current_Subp.TC_Info.Name.all));
                         else
                            UH.TC_Hash := new String'("");
                         end if;
@@ -6431,15 +6499,16 @@ package body Test.Skeleton is
 
                            MD.Commented_Out := False;
                            MD.Short_Name_Used := False;
-                           MD.Short_Name := new String'
-                             (To_Lower (Current_Subp.Subp_Text_Name.all));
+                           MD.Short_Name :=
+                             new String'
+                               (To_Lower (Current_Subp.Subp_Text_Name.all));
                            MD.TR_Text.Clear;
 
-                           if
-                             not Short_Names_Used.Contains
-                               (To_Lower (Current_Subp.Subp_Text_Name.all))
+                           if not Short_Names_Used.Contains
+                                    (To_Lower
+                                       (Current_Subp.Subp_Text_Name.all))
                              or else Shortnamed_Subps.Contains
-                               (Current_Subp.Subp_Declaration)
+                                       (Current_Subp.Subp_Declaration)
                            then
                               --  Short name is free, we can use it
                               MD.Short_Name_Used := True;
@@ -6456,9 +6525,9 @@ package body Test.Skeleton is
 
                               --  Looking for a dangling test with same short
                               --  name but different hash.
-                              MD_Cur := Find_Same_Short_Name
-                                (Markered_Data_Map,
-                                 Current_Subp);
+                              MD_Cur :=
+                                Find_Same_Short_Name
+                                  (Markered_Data_Map, Current_Subp);
 
                               if MD_Cur /= Markered_Data_Maps.No_Element then
                                  --  Using corresponding dangling test
@@ -6471,8 +6540,8 @@ package body Test.Skeleton is
                                  --  the test can be dangling for a long time
                                  --  or just become dangling
                                  MD.Commented_Out :=
-                                   Markered_Data_Maps.Element
-                                     (MD_Cur).Commented_Out;
+                                   Markered_Data_Maps.Element (MD_Cur)
+                                     .Commented_Out;
 
                                  Markered_Data_Map.Delete (MD_Cur);
                                  MD.Issue_Warning := True;
@@ -6498,10 +6567,9 @@ package body Test.Skeleton is
 
                      if Subp_Data_List.Element (Subp_Cur).Corresp_Type = 0 then
 
-                        if
-                          Name_Numbers.Find
-                            (To_Lower (Current_Subp.Subp_Text_Name.all)) =
-                            Name_Frequency.No_Element
+                        if Name_Numbers.Find
+                             (To_Lower (Current_Subp.Subp_Text_Name.all))
+                          = Name_Frequency.No_Element
                         then
 
                            Name_Numbers.Include
@@ -6510,16 +6578,14 @@ package body Test.Skeleton is
                              (Current_Subp.Subp_Declaration, 1);
 
                         else
-                           if
-                             Elem_Numbers.Find
-                               (Current_Subp.Subp_Declaration) =
-                               Elem_Number_Maps.No_Element
+                           if Elem_Numbers.Find (Current_Subp.Subp_Declaration)
+                             = Elem_Number_Maps.No_Element
                            then
                               declare
                                  X : constant Natural :=
                                    Name_Numbers.Element
                                      (To_Lower
-                                          (Current_Subp.Subp_Text_Name.all));
+                                        (Current_Subp.Subp_Text_Name.all));
                               begin
                                  Name_Numbers.Replace
                                    (To_Lower (Current_Subp.Subp_Text_Name.all),
@@ -6578,8 +6644,9 @@ package body Test.Skeleton is
 
                      if Subp_Data_List.Element (Subp_Cur).Has_TC_Info then
                         if Is_Function
-                          (Subp_Data_List.Element
-                             (Subp_Cur).Subp_Declaration.As_Basic_Decl)
+                             (Subp_Data_List.Element (Subp_Cur)
+                                .Subp_Declaration
+                                .As_Basic_Decl)
                         then
                            Generate_Function_Wrapper
                              (Subp_Data_List.Element (Subp_Cur));
@@ -6593,8 +6660,8 @@ package body Test.Skeleton is
                         S_Put
                           (3,
                            "procedure "
-                           & Subp_Data_List.Element
-                             (Subp_Cur).Subp_Mangle_Name.all
+                           & Subp_Data_List.Element (Subp_Cur)
+                               .Subp_Mangle_Name.all
                            & " (Gnattest_T : in out Test) is separate;");
 
                         New_Line_Count;
@@ -6611,14 +6678,17 @@ package body Test.Skeleton is
                         All_Tests_Counter := All_Tests_Counter + 1;
 
                         UH.Version := new String'(Hash_Version);
-                        UH.Hash := new String'
-                          (Subp_Data_List.Element
-                             (Subp_Cur).Subp_Full_Hash.all);
+                        UH.Hash :=
+                          new String'
+                            (Subp_Data_List.Element (Subp_Cur)
+                               .Subp_Full_Hash.all);
                         if Subp_Data_List.Element (Subp_Cur).Has_TC_Info then
-                           UH.TC_Hash := new String'
-                             (Sanitize_TC_Name
-                                (Subp_Data_List.Element
-                                   (Subp_Cur).TC_Info.Name.all));
+                           UH.TC_Hash :=
+                             new String'
+                               (Sanitize_TC_Name
+                                  (Subp_Data_List.Element (Subp_Cur)
+                                     .TC_Info
+                                     .Name.all));
                         else
                            UH.TC_Hash := new String'("");
                         end if;
@@ -6637,24 +6707,27 @@ package body Test.Skeleton is
                         if Is_Unimplemented_Test (MD.TR_Text) then
                            TR_SLOC_Buffer.Append
                              ((new String'(Data.Unit_Full_Name.all),
-                              new String'(Test_File_Name.all & ".adb"),
-                              null,
-                              Subp_Data_List.Element (Subp_Cur),
-                              New_Line_Counter));
+                               new String'(Test_File_Name.all & ".adb"),
+                               null,
+                               Subp_Data_List.Element (Subp_Cur),
+                               New_Line_Counter));
                         else
                            TR_SLOC_Buffer.Append
                              ((new String'(Data.Unit_Full_Name.all),
-                              new String'(Test_File_Name.all & ".adb"),
-                              new String'("modified"),
-                              Subp_Data_List.Element (Subp_Cur),
-                              New_Line_Counter));
+                               new String'(Test_File_Name.all & ".adb"),
+                               new String'("modified"),
+                               Subp_Data_List.Element (Subp_Cur),
+                               New_Line_Counter));
                         end if;
 
                         if MD.TR_Text.Is_Empty then
 
                            if Stub_Mode_ON then
-                              Setters_Set := Get_Direct_Callees_Setters
-                                (Current_Subp.Subp_Declaration.As_Basic_Decl);
+                              Setters_Set :=
+                                Get_Direct_Callees_Setters
+                                  (Current_Subp
+                                     .Subp_Declaration
+                                     .As_Basic_Decl);
                            end if;
 
                            New_Tests_Counter := New_Tests_Counter + 1;
@@ -6682,9 +6755,9 @@ package body Test.Skeleton is
                            S_Put (6, "AUnit.Assertions.Assert");
                            New_Line_Count;
                            S_Put
-                           (8, "(Gnattest_Generated.Default_Assert_Value,");
+                             (8, "(Gnattest_Generated.Default_Assert_Value,");
                            New_Line_Count;
-                           S_Put (9,  """Test not implemented."");");
+                           S_Put (9, """Test not implemented."");");
                            New_Line_Count;
                            New_Line_Count;
                         else
@@ -6695,29 +6768,28 @@ package body Test.Skeleton is
                                  & Base_Name (Data.Unit_File_Name.all)
                                  & ":"
                                  & Trim
-                                   (First_Line_Number
-                                    (Current_Subp.Subp_Declaration)'Img,
-                                    Both)
+                                     (First_Line_Number
+                                        (Current_Subp.Subp_Declaration)'Img,
+                                      Both)
                                  & ":"
                                  & Trim
-                                   (First_Column_Number
-                                    (Current_Subp.Subp_Declaration)'Img,
-                                    Both)
+                                     (First_Column_Number
+                                        (Current_Subp.Subp_Declaration)'Img,
+                                      Both)
                                  & ": test for "
                                  & MD.Short_Name.all
                                  & " at "
                                  & Unit_Name.all
                                  & ":"
                                  & Trim
-                                   (Integer'Image (New_Line_Counter),
-                                    Both)
+                                     (Integer'Image (New_Line_Counter), Both)
                                  & " might be out of date ("
                                  & MD.Short_Name.all
                                  & " has been changed)");
                            end if;
 
-                           for I in
-                             MD.TR_Text.First_Index .. MD.TR_Text.Last_Index
+                           for I
+                             in MD.TR_Text.First_Index .. MD.TR_Text.Last_Index
                            loop
                               if MD.Commented_Out then
                                  S_Put
@@ -6768,44 +6840,50 @@ package body Test.Skeleton is
                         Stub : Subp_Info;
                      begin
 
-                        Stub.Subp_Full_Hash := new String'
-                          (Markered_Data_Maps.Key (MD_Cur).Hash.all);
-                        Stub.Subp_Text_Name := new String'
-                          (MD.Short_Name.all);
+                        Stub.Subp_Full_Hash :=
+                          new String'
+                            (Markered_Data_Maps.Key (MD_Cur).Hash.all);
+                        Stub.Subp_Text_Name := new String'(MD.Short_Name.all);
 
                         if Markered_Data_Maps.Key (MD_Cur).TC_Hash.all = ""
                         then
                            Stub.Has_TC_Info := False;
 
-                           Stub.Subp_Mangle_Name := new String'
-                             (Test_Routine_Prefix
-                              & Markered_Data_Maps.Element
-                                (MD_Cur).Short_Name.all
-                              & "_"
-                              & Stub.Subp_Full_Hash
-                                (Stub.Subp_Full_Hash'First ..
-                                     Stub.Subp_Full_Hash'First + 5));
+                           Stub.Subp_Mangle_Name :=
+                             new String'
+                               (Test_Routine_Prefix
+                                & Markered_Data_Maps.Element (MD_Cur)
+                                    .Short_Name.all
+                                & "_"
+                                & Stub.Subp_Full_Hash
+                                    (Stub.Subp_Full_Hash'First
+                                     .. Stub.Subp_Full_Hash'First + 5));
 
                         else
                            Stub.Has_TC_Info := True;
-                           Stub.TC_Info.TC_Hash := new String'
-                             (Markered_Data_Maps.Key (MD_Cur).TC_Hash.all);
+                           Stub.TC_Info.TC_Hash :=
+                             new String'
+                               (Markered_Data_Maps.Key (MD_Cur).TC_Hash.all);
 
                            Stub.TC_Info.Name := Stub.TC_Info.TC_Hash;
-                           Stub.Subp_Mangle_Name := new String'
-                             (Test_Routine_Prefix
-                              & Markered_Data_Maps.Element
-                                (MD_Cur).Short_Name.all
-                              & "_"
-                              & Stub.Subp_Full_Hash
-                                (Stub.Subp_Full_Hash'First ..
-                                     Stub.Subp_Full_Hash'First + 5)
-                              & "_"
-                              & Stub.TC_Info.TC_Hash.all);
+                           Stub.Subp_Mangle_Name :=
+                             new String'
+                               (Test_Routine_Prefix
+                                & Markered_Data_Maps.Element (MD_Cur)
+                                    .Short_Name.all
+                                & "_"
+                                & Stub.Subp_Full_Hash
+                                    (Stub.Subp_Full_Hash'First
+                                     .. Stub.Subp_Full_Hash'First + 5)
+                                & "_"
+                                & Stub.TC_Info.TC_Hash.all);
                         end if;
 
                         Put_Opening_Comment_Section
-                          (Stub, 0, True, MD.Short_Name_Used,
+                          (Stub,
+                           0,
+                           True,
+                           MD.Short_Name_Used,
                            Add_Cov_Dump =>
                              Data.Has_Gen_Tests and then Minimize);
 
@@ -6816,8 +6894,8 @@ package body Test.Skeleton is
                            New_Line_Counter,
                            1);
 
-                        for I in
-                          MD.TR_Text.First_Index .. MD.TR_Text.Last_Index
+                        for I
+                          in MD.TR_Text.First_Index .. MD.TR_Text.Last_Index
                         loop
                            if MD.Commented_Out then
                               S_Put (0, MD.TR_Text.Element (I));
@@ -6849,15 +6927,13 @@ package body Test.Skeleton is
                Close_File;
 
                Add_Buffered_TR_Slocs
-                 (TP_List,
-                  Format_Time
-                    (File_Time_Stamp
-                       (Tmp_File_Name)));
+                 (TP_List, Format_Time (File_Time_Stamp (Tmp_File_Name)));
 
                if not Generate_Separates then
                   declare
                      Old_Package : constant String :=
-                       (if Test.Common.Instrument then
+                       (if Test.Common.Instrument
+                        then
                           Harness_Dir_Str.all
                           & Directory_Separator
                           & "test_obj"
@@ -6867,8 +6943,9 @@ package body Test.Skeleton is
                           & Instr_Suffix
                         else Output_Dir)
                        & Directory_Separator
-                       & Test_File_Name.all & ".adb";
-                     Success : Boolean;
+                       & Test_File_Name.all
+                       & ".adb";
+                     Success     : Boolean;
                   begin
                      if Is_Regular_File (Old_Package) then
                         Delete_File (Old_Package, Success);
@@ -6925,16 +7002,19 @@ package body Test.Skeleton is
       --  subprogram fails, also investigate possibility to have tests not be
       --  overwritten if the hash hasn't changed.
 
-      JSON_Unit_File : constant Virtual_File := GNATCOLL.VFS.Create
-         (+Test.Common.JSON_Test_Dir.all)
-         / (+(if Data.Is_Top_Level_Generic_Instantiation
+      JSON_Unit_File : constant Virtual_File :=
+        GNATCOLL.VFS.Create (+Test.Common.JSON_Test_Dir.all)
+        / (+(if Data.Is_Top_Level_Generic_Instantiation
              then
-                TGen.LAL_Utils.Top_Level_Instantiation_Test_File_Name
-                   (Data.Unit_Full_Name.all)
+               TGen.LAL_Utils.Top_Level_Instantiation_Test_File_Name
+                 (Data.Unit_Full_Name.all)
              else
                TGen.LAL_Utils.JSON_Test_Filename
-                  (Data.Subp_List.First_Element
-                    .Subp_Declaration.As_Basic_Decl)));
+                 (Data
+                    .Subp_List
+                    .First_Element
+                    .Subp_Declaration
+                    .As_Basic_Decl)));
 
       Unit_Raw_Content : GNAT.Strings.String_Access;
 
@@ -6947,7 +7027,7 @@ package body Test.Skeleton is
       --  Diagnostics for TGen.Libgen.Include_Subp
 
       Output_Dir : constant String :=
-         Get_Source_Output_Dir (Data.Unit_File_Name.all);
+        Get_Source_Output_Dir (Data.Unit_File_Name.all);
 
       function Escape (Input_String : String) return String;
       --  Escape every double quote inside Input_String
@@ -6986,8 +7066,7 @@ package body Test.Skeleton is
          return False;
       end if;
 
-      Unit_Content := Read
-        (Unit_Raw_Content.all, +JSON_Unit_File.Full_Name);
+      Unit_Content := Read (Unit_Raw_Content.all, +JSON_Unit_File.Full_Name);
 
       for Subp of Data.Subp_List loop
 
@@ -7012,14 +7091,16 @@ package body Test.Skeleton is
 
          if not Test.Common.Unparse_Test_Vectors then
             if not TGen.Libgen.Include_Subp
-              (Test.Common.TGen_Libgen_Ctx,
-               Subp.Subp_Declaration.As_Basic_Decl,
-               Diags)
+                     (Test.Common.TGen_Libgen_Ctx,
+                      Subp.Subp_Declaration.As_Basic_Decl,
+                      Diags)
             then
                Report_Std
-                 ("Error while loading JSON tests:" & Join (Diags)
-                  & ASCII.LF & "Tests will not be loaded for " &
-                  Subp.Subp_Name_Image.all);
+                 ("Error while loading JSON tests:"
+                  & Join (Diags)
+                  & ASCII.LF
+                  & "Tests will not be loaded for "
+                  & Subp.Subp_Name_Image.all);
                goto Continue;
             else
                --  Indicate that we are actually needing the tgen_support lib
@@ -7043,8 +7124,11 @@ package body Test.Skeleton is
             Com : constant String :=
               (if Generation_Complete then "   " else "   --  ");
 
-            Test_Unit_Name : constant String :=
-              Data.Unit_Full_Name.all & "." & Test_Data_Unit_Name & "."
+            Test_Unit_Name      : constant String :=
+              Data.Unit_Full_Name.all
+              & "."
+              & Test_Data_Unit_Name
+              & "."
               & Subp.Subp_Mangle_Name.all;
             Test_Unit_File_Name : constant String :=
               Unit_To_File_Name (Test_Unit_Name);
@@ -7068,8 +7152,7 @@ package body Test.Skeleton is
             --  output source location information about the generated test
             --  cases.
 
-            procedure Pp_Subp_Call
-              (F : File_Type; Initial_Pad : Natural := 0);
+            procedure Pp_Subp_Call (F : File_Type; Initial_Pad : Natural := 0);
             --  Output a call to subp with the values in Param_Values, indented
             --  by Initial_Pad amount.
 
@@ -7115,13 +7198,15 @@ package body Test.Skeleton is
             begin
                Put
                  (F,
-                  Pad_Str & "Std." & Subp_Content.Get ("fully_qualified_name")
+                  Pad_Str
+                  & "Std."
+                  & Subp_Content.Get ("fully_qualified_name")
                   & (if Length (Param_Values) /= 0 then " (" else ""));
                for Param_Id in Param_Values loop
                   Put
                     (F,
-                     Array_Element (Param_Values, Param_Id)
-                     .Get ("name") & " => "
+                     Array_Element (Param_Values, Param_Id).Get ("name")
+                     & " => "
                      & "Param_"
                      & Array_Element (Param_Values, Param_Id).Get ("name"));
                   if Array_Has_Element (Param_Values, Param_Id + 1) then
@@ -7151,13 +7236,13 @@ package body Test.Skeleton is
             begin
                Put (Files (F), Com & Indent_Str & """");
                loop
-                  Next_NL := Multiline_JSON.Index
-                    (NL_Set, From => Start);
+                  Next_NL := Multiline_JSON.Index (NL_Set, From => Start);
                   exit when Next_NL = 0;
                   Put
                     (Files (F),
-                     Escape (Multiline_JSON.Slice
-                               (Low => Start, High => Next_NL - 1))
+                     Escape
+                       (Multiline_JSON.Slice
+                          (Low => Start, High => Next_NL - 1))
                      & """");
                   Start := Next_NL + 1;
                   New_Line (F);
@@ -7165,8 +7250,9 @@ package body Test.Skeleton is
                end loop;
                Put
                  (Files (F),
-                  Escape (Multiline_JSON.Slice
-                            (Low => Start, High => Multiline_JSON.Length))
+                  Escape
+                    (Multiline_JSON.Slice
+                       (Low => Start, High => Multiline_JSON.Length))
                   & """");
             end Pp_JSON_Object_Lit;
 
@@ -7185,16 +7271,18 @@ package body Test.Skeleton is
 
             --  Create a test type for this test package
 
-            Suite_Data_List.Test_Types.Append (Test_Type_Info_Wrapper'
-              (TT_Info       => Test.Harness.Test_Type_Info'
-                 (Test_Type             => No_Ada_Node,
-                  Test_Type_Name        => new String'("Test"),
-                  Good_For_Substitution => False,
-                  Max_Inheritance_Depth => 0,
-                  Nesting               => new String'(Test_Unit_Name),
-                  Tested_Type           => No_Ada_Node),
-               Test_Package  => new String'(Test_Unit_Name),
-               Original_Type => No_Ada_Node));
+            Suite_Data_List.Test_Types.Append
+              (Test_Type_Info_Wrapper'
+                 (TT_Info       =>
+                    Test.Harness.Test_Type_Info'
+                      (Test_Type             => No_Ada_Node,
+                       Test_Type_Name        => new String'("Test"),
+                       Good_For_Substitution => False,
+                       Max_Inheritance_Depth => 0,
+                       Nesting               => new String'(Test_Unit_Name),
+                       Tested_Type           => No_Ada_Node),
+                  Test_Package  => new String'(Test_Unit_Name),
+                  Original_Type => No_Ada_Node));
 
             Put_Line (Spec_Kind, "with GNATtest_Generated;");
             New_Line (Spec_Kind);
@@ -7203,7 +7291,9 @@ package body Test.Skeleton is
             Put_Line
               (Spec_Kind,
                "type Test is new GNATtest_Generated.GNATtest_Standard."
-               & Data.Unit_Full_Name.all & "." & Test_Data_Unit_Name
+               & Data.Unit_Full_Name.all
+               & "."
+               & Test_Data_Unit_Name
                & ".Test");
             Put_Line (Spec_Kind, "  with null record;");
             New_Line (Spec_Kind);
@@ -7220,18 +7310,18 @@ package body Test.Skeleton is
             end if;
 
             if not Test.Common.Unparse_Test_Vectors then
-               for Pack of TGen.Libgen.Required_Support_Packages
-                             (Ctx       => Test.Common.TGen_Libgen_Ctx,
-                              Unit_Name
-                                 => To_Qualified_Name
-                                       (if Data
-                                          .Is_Top_Level_Generic_Instantiation
-                                        then "TGen_"
-                                           & Data.Unit_Full_Name.all
-                                              else Data.Unit_Full_Name.all))
+               for Pack
+                 of TGen.Libgen.Required_Support_Packages
+                      (Ctx       => Test.Common.TGen_Libgen_Ctx,
+                       Unit_Name =>
+                         To_Qualified_Name
+                           (if Data.Is_Top_Level_Generic_Instantiation
+                            then "TGen_" & Data.Unit_Full_Name.all
+                            else Data.Unit_Full_Name.all))
                loop
-                  Put_Line (Body_Kind, "with " & To_Ada (Pack) & "; use "
-                                    & To_Ada (Pack) & ";");
+                  Put_Line
+                    (Body_Kind,
+                     "with " & To_Ada (Pack) & "; use " & To_Ada (Pack) & ";");
                end loop;
             end if;
 
@@ -7250,8 +7340,11 @@ package body Test.Skeleton is
 
             for Test_Vec of Subp_Vectors loop
 
-               Test_Routine_Name := +"Gen_" & Subp.Subp_Mangle_Name.all
-                 & "_" & Trim (Test_Count'Image, Both);
+               Test_Routine_Name :=
+                 +"Gen_"
+                 & Subp.Subp_Mangle_Name.all
+                 & "_"
+                 & Trim (Test_Count'Image, Both);
 
                --  Fill in information about each testcase that we are adding
 
@@ -7283,13 +7376,15 @@ package body Test.Skeleton is
 
                Put_Line
                  (Spec_Kind,
-                  "procedure " & (+Test_Routine_Name)
+                  "procedure "
+                  & (+Test_Routine_Name)
                   & " (Gnattest_T : in out Test);");
                New_Line (Spec_Kind);
 
                Put_Line
                  (Body_Kind,
-                  "procedure " & (+Test_Routine_Name)
+                  "procedure "
+                  & (+Test_Routine_Name)
                   & " (Gnattest_T : in out Test) is");
 
                if Test.Common.Instrument and then Instrument_Setup then
@@ -7298,21 +7393,25 @@ package body Test.Skeleton is
                   --  tests for the same routine so that we collect all inputs
                   --  without overwrtiting any of them.
                   Put_Line
-                    (Body_Kind, "      "
+                    (Body_Kind,
+                     "      "
                      & "function GNATTEST_Set_Current_Test return Boolean;");
                   Put_Line
-                    (Body_Kind, "      "
+                    (Body_Kind,
+                     "      "
                      & "function GNATTEST_Set_Current_Test return Boolean is");
                   Put_Line (Body_Kind, "      begin");
                   Put_Line
-                    (Body_Kind, "         "
+                    (Body_Kind,
+                     "         "
                      & "TGen.Instr_Support.Test_Input_Counter := 1;");
                   Put_Line
-                    (Body_Kind, "         "
+                    (Body_Kind,
+                     "         "
                      & "TGen.Instr_Support.Autogenerated := True;");
                   Put_Line
-                    (Body_Kind, "         "
-                     & "TGen.Instr_Support.Recursion_Depth := 0;");
+                    (Body_Kind,
+                     "         " & "TGen.Instr_Support.Recursion_Depth := 0;");
                   Put_Line
                     (Body_Kind,
                      "         TGen.Instr_Support.Subp_Hash := """
@@ -7324,10 +7423,10 @@ package body Test.Skeleton is
                      & GNAT.SHA1.Digest (Get_Nesting (Subp.Subp_Declaration))
                      & """;");
                   Put_Line (Body_Kind, "         return True;");
+                  Put_Line (Body_Kind, "      end GNATTEST_Set_Current_Test;");
                   Put_Line
-                    (Body_Kind, "      end GNATTEST_Set_Current_Test;");
-                  Put_Line
-                    (Body_Kind, "      "
+                    (Body_Kind,
+                     "      "
                      & "Dummy_GNATTEST : Boolean := "
                      & "GNATTEST_Set_Current_Test;");
                   New_Line (Body_Kind);
@@ -7354,12 +7453,17 @@ package body Test.Skeleton is
 
                         Put_Line
                           (Body_Kind,
-                           Com & "   Param_" & Param.Get ("name") & " : Std."
+                           Com
+                           & "   Param_"
+                           & Param.Get ("name")
+                           & " : Std."
                            & Utils.String_Utilities.Strip_Prefix
                                (Param.Get ("type_name"), "standard.")
                            & " "
                            & (+Constraints)
-                           &  " := " & (+Value) & ";");
+                           & " := "
+                           & (+Value)
+                           & ";");
                      end;
                   else
                      --  If unparsing was not requested, generate a call to
@@ -7383,8 +7487,13 @@ package body Test.Skeleton is
                      begin
                         Put_Line
                           (Body_Kind,
-                           Com & "   Param_" & Param.Get ("name") & " : "
-                           & Ada_Type & ":= " & (+Value));
+                           Com
+                           & "   Param_"
+                           & Param.Get ("name")
+                           & " : "
+                           & Ada_Type
+                           & ":= "
+                           & (+Value));
                         Pp_JSON_Object_Lit (Body_Kind, Param.Get ("value"), 5);
                         Put_Line (Body_Kind, "));");
                      end;
@@ -7411,8 +7520,13 @@ package body Test.Skeleton is
 
                         Put_Line
                           (Body_Kind,
-                           Com & Global.Get ("name") & " " & (+Constraints)
-                           &  " := " & (+Value) & ";");
+                           Com
+                           & Global.Get ("name")
+                           & " "
+                           & (+Constraints)
+                           & " := "
+                           & (+Value)
+                           & ";");
                      end;
                   else
                      --  Otherwise (unparsing not requested), retrieve the
@@ -7446,9 +7560,10 @@ package body Test.Skeleton is
                   Put_Line (Body_Kind, Com & "   declare");
                   Put_Line
                     (Body_Kind,
-                     Com & "      Ret_Val : Std."
+                     Com
+                     & "      Ret_Val : Std."
                      & Utils.String_Utilities.Strip_Prefix
-                       (Subp_Content.Get ("return_type"), "standard.")
+                         (Subp_Content.Get ("return_type"), "standard.")
                      & ":=");
                   Put (Files (Body_Kind), Com);
                   Pp_Subp_Call (Files (Body_Kind), 8);
@@ -7456,7 +7571,8 @@ package body Test.Skeleton is
                   Put_Line (Body_Kind, Com & "   begin");
                   Put_Line
                     (Body_Kind,
-                     Com & "      --  Insert function call result validation"
+                     Com
+                     & "      --  Insert function call result validation"
                      & " here");
                   Put_Line (Body_Kind, Com & "      null;");
                   Put_Line (Body_Kind, Com & "   end;");
@@ -7470,9 +7586,12 @@ package body Test.Skeleton is
                if Minimize then
                   Put_Line
                     (Body_Kind,
-                     Com & "   pragma Annotate (Xcov, Dump_Buffers, """
-                     & Subp.Subp_Full_Hash.all & "-gen-"
-                     & Trim (Integer'Image (Test_Count - 1), Both) & """);");
+                     Com
+                     & "   pragma Annotate (Xcov, Dump_Buffers, """
+                     & Subp.Subp_Full_Hash.all
+                     & "-gen-"
+                     & Trim (Integer'Image (Test_Count - 1), Both)
+                     & """);");
                   New_Line (Body_Kind);
                end if;
 
@@ -7485,9 +7604,12 @@ package body Test.Skeleton is
                if Minimize then
                   Put_Line
                     (Body_Kind,
-                     Com & "      pragma Annotate (Xcov, Dump_Buffers, """
-                     & Subp.Subp_Full_Hash.all & "-gen-"
-                     & Trim (Integer'Image (Test_Count - 1), Both) & """);");
+                     Com
+                     & "      pragma Annotate (Xcov, Dump_Buffers, """
+                     & Subp.Subp_Full_Hash.all
+                     & "-gen-"
+                     & Trim (Integer'Image (Test_Count - 1), Both)
+                     & """);");
                   New_Line (Body_Kind);
                end if;
 
@@ -7495,10 +7617,14 @@ package body Test.Skeleton is
                Put_Line (Body_Kind, Com & "        (False,");
                Put_Line
                  (Body_Kind,
-                  Com & "         ""Test" & Test_Count'Image & " for "
+                  Com
+                  & "         ""Test"
+                  & Test_Count'Image
+                  & " for "
                   & Utils.String_Utilities.Escape_String_Literal
                       (Subp.Subp_Name_Image.all)
-                  & ", generated by " & Test_Vec.Get ("origin")
+                  & ", generated by "
+                  & Test_Vec.Get ("origin")
                   & ", crashed: "" & ASCII.LF & Ada.Exceptions.Exception_"
                   & "Information (Exc));");
                if not Generation_Complete then
@@ -7506,35 +7632,48 @@ package body Test.Skeleton is
                   Put_Line (Body_Kind, "      AUnit.Assertions.Assert");
                   Put_Line (Body_Kind, "        (False,");
                   Put_Line
-                    (Body_Kind, "         ""Missing test values for "
-                     & Subp.Subp_Name_Image.all & "."
+                    (Body_Kind,
+                     "         ""Missing test values for "
+                     & Subp.Subp_Name_Image.all
+                     & "."
                      & " Please fill out manually."");");
                end if;
                Put_Line
                  (Body_Kind,
-                 "   end Gen_" & Subp.Subp_Mangle_Name.all & "_"
-                 & Trim (Test_Count'Image, Both) & ";");
+                  "   end Gen_"
+                  & Subp.Subp_Mangle_Name.all
+                  & "_"
+                  & Trim (Test_Count'Image, Both)
+                  & ";");
                New_Line (Body_Kind);
 
                --  Create TR info for each new testcase
 
-               Suite_Data_List.TR_List.Append (Test_Routine_Info_Wrapper'
-                 (TR_Info        => Test.Harness.Test_Routine_Info'
-                    (TR_Declaration => No_Ada_Node,
-                     TR_Text_Name   => new String'
-                       ("Gen_" & Subp.Subp_Mangle_Name.all & "_"
-                       & Trim (Test_Count'Image, Both)),
-                     Test_Type_Numb => 1,
-                     Nesting        => new String'(Test_Unit_Name),
-                     Tested_Sloc    => new String'(
-                       Base_Name (Data.Unit_File_Name.all) & ":" &
-                       Image (Start_Sloc (Subp.Subp_Declaration.Sloc_Range))
-                       & ":")),
-                  Test_Package  => new String'(Test_Unit_Name),
-                  Original_Type => No_Ada_Node,
-                  Original_Subp => Subp.Subp_Declaration,
-                  From_Generic  => False
-                 ));
+               Suite_Data_List.TR_List.Append
+                 (Test_Routine_Info_Wrapper'
+                    (TR_Info       =>
+                       Test.Harness.Test_Routine_Info'
+                         (TR_Declaration => No_Ada_Node,
+                          TR_Text_Name   =>
+                            new String'
+                              ("Gen_"
+                               & Subp.Subp_Mangle_Name.all
+                               & "_"
+                               & Trim (Test_Count'Image, Both)),
+                          Test_Type_Numb => 1,
+                          Nesting        => new String'(Test_Unit_Name),
+                          Tested_Sloc    =>
+                            new String'
+                              (Base_Name (Data.Unit_File_Name.all)
+                               & ":"
+                               & Image
+                                   (Start_Sloc
+                                      (Subp.Subp_Declaration.Sloc_Range))
+                               & ":")),
+                     Test_Package  => new String'(Test_Unit_Name),
+                     Original_Type => No_Ada_Node,
+                     Original_Subp => Subp.Subp_Declaration,
+                     From_Generic  => False));
 
                Test_Count := Test_Count + 1;
             end loop;
@@ -7558,7 +7697,7 @@ package body Test.Skeleton is
                raise;
          end;
 
-      <<Continue>>
+         <<Continue>>
       end loop;
 
       GNAT.Strings.Free (Unit_Raw_Content);
@@ -7619,15 +7758,16 @@ package body Test.Skeleton is
       Origin            : Test_Case_Origin_Type;
       Subp              : Subp_Info)
    is
-      TC : constant TC_Mapping := TC_Mapping'
-        (Origin    => Origin,
-         Line      => Test_Case_Line,
-         Column    => Test_Case_Column,
-         Test      => new String'(Test_File),
-         Test_Time => new String'(Test_Time),
-         TC_Name   => new String'(Test_Case_Name),
-         T_Name    => new String'(Test_Routine_Name),
-         TR_Line   => Test_Rout_Line);
+      TC : constant TC_Mapping :=
+        TC_Mapping'
+          (Origin    => Origin,
+           Line      => Test_Case_Line,
+           Column    => Test_Case_Column,
+           Test      => new String'(Test_File),
+           Test_Time => new String'(Test_Time),
+           TC_Name   => new String'(Test_Case_Name),
+           T_Name    => new String'(Test_Routine_Name),
+           TR_Line   => Test_Rout_Line);
       --  Representation of the new test case
 
       TR : TR_Mapping_List.Cursor;
@@ -7635,7 +7775,7 @@ package body Test.Skeleton is
 
       Subp_Name_Span : constant Source_Location_Range :=
         Subp.Subp_Declaration.As_Basic_Decl.P_Defining_Name.Sloc_Range;
-      Subp_Span : constant Source_Location_Range :=
+      Subp_Span      : constant Source_Location_Range :=
         Subp.Subp_Declaration.Sloc_Range;
 
    begin
@@ -7654,7 +7794,7 @@ package body Test.Skeleton is
       if TP = TP_Mapping_List.No_Element then
          TP_List.Append
            (TP_Mapping'(TP_Name => new String'(TPtarg), others => <>));
-            TP := TP_List.Last;
+         TP := TP_List.Last;
       end if;
 
       --  Find the subprogram under test ..
@@ -7685,8 +7825,9 @@ package body Test.Skeleton is
                TR_Hash   => new String'(Subp.Subp_Full_Hash.all),
                Decl_Line => Natural (Subp_Span.Start_Line),
                Decl_File =>
-                 new String'(Ada.Directories.Simple_Name
-                               (Subp.Subp_Declaration.Unit.Get_Filename)),
+                 new String'
+                   (Ada.Directories.Simple_Name
+                      (Subp.Subp_Declaration.Unit.Get_Filename)),
                others    => <>));
          TR := TP_Mapping_List.Reference (TP_List, TP).TR_List.Last;
       end if;
@@ -7728,7 +7869,7 @@ package body Test.Skeleton is
    begin
       if Subp.Has_TC_Info then
          declare
-            TC_Span   : constant Source_Location_Range :=
+            TC_Span : constant Source_Location_Range :=
               Subp.TC_Info.Elem.Sloc_Range;
          begin
             Add_TR
@@ -7769,8 +7910,8 @@ package body Test.Skeleton is
 
    procedure Print_Comment_Declaration (Subp : Subp_Info; Span : Natural := 0)
    is
-      File_Name : constant String := Base_Name
-        (Subp.Subp_Declaration.Unit.Get_Filename);
+      File_Name : constant String :=
+        Base_Name (Subp.Subp_Declaration.Unit.Get_Filename);
 
       Elem_Span : constant Source_Location_Range :=
         Subp.Subp_Declaration.Sloc_Range;
@@ -7780,14 +7921,14 @@ package body Test.Skeleton is
       end if;
       S_Put
         (Span,
-         "--  " &
-         File_Name &
-         ":" &
-         Trim (Elem_Span.Start_Line'Img, Both) &
-         ":" &
-         Trim (Elem_Span.Start_Column'Img, Both) &
-         ":" &
-         Subp.Subp_Text_Name.all);
+         "--  "
+         & File_Name
+         & ":"
+         & Trim (Elem_Span.Start_Line'Img, Both)
+         & ":"
+         & Trim (Elem_Span.Start_Column'Img, Both)
+         & ":"
+         & Subp.Subp_Text_Name.all);
       if Subp.Has_TC_Info then
          S_Put (0, ":" & Subp.TC_Info.Name.all);
       end if;
@@ -7814,8 +7955,7 @@ package body Test.Skeleton is
          --  exposed to possible crashes, so instead we just skip such cases
          --  and issue error data in the traces.
          begin
-            if (Node.Kind = Ada_Identifier
-                 and then Node.As_Name.P_Is_Call)
+            if (Node.Kind = Ada_Identifier and then Node.As_Name.P_Is_Call)
               or else Node.Kind in Ada_Op
             then
                Decl := Node.As_Name.P_Referenced_Decl;
@@ -7829,12 +7969,13 @@ package body Test.Skeleton is
 
          exception
             when Ex : Langkit_Support.Errors.Property_Error =>
-               Trace (Me_Direct_Callees,
-                      "Error while processing" & Node.Image);
-               Trace (Me_Direct_Callees,
-                      Ada.Exceptions.Exception_Name (Ex)
-                      & " : "
-                      & Ada.Exceptions.Exception_Message (Ex));
+               Trace
+                 (Me_Direct_Callees, "Error while processing" & Node.Image);
+               Trace
+                 (Me_Direct_Callees,
+                  Ada.Exceptions.Exception_Name (Ex)
+                  & " : "
+                  & Ada.Exceptions.Exception_Message (Ex));
                return Over;
          end;
 
@@ -7858,9 +7999,15 @@ package body Test.Skeleton is
          --  Process simple cases for now. Dispatchings, renamings and parts of
          --  instances are not yet supported.
 
-         if Decl.Kind in Ada_Generic_Subp_Instantiation | Ada_Formal_Subp_Decl
-           | Ada_Subp_Renaming_Decl | Ada_Enum_Literal_Decl | Ada_Entry_Decl
-           | Ada_Null_Subp_Decl | Ada_Subp_Body | Ada_Subp_Body_Stub
+         if Decl.Kind
+            in Ada_Generic_Subp_Instantiation
+             | Ada_Formal_Subp_Decl
+             | Ada_Subp_Renaming_Decl
+             | Ada_Enum_Literal_Decl
+             | Ada_Entry_Decl
+             | Ada_Null_Subp_Decl
+             | Ada_Subp_Body
+             | Ada_Subp_Body_Stub
          then
             return Over;
          end if;
@@ -7898,8 +8045,7 @@ package body Test.Skeleton is
 
    begin
       Increase_Indent
-        (Me_Direct_Callees,
-         "Gathering direct callees for " & Subp.Image);
+        (Me_Direct_Callees, "Gathering direct callees for " & Subp.Image);
 
       if Subp.Kind = Ada_Expr_Function then
          Traverse (Subp.As_Expr_Function.F_Expr, Get_Callees'Access);
@@ -7909,9 +8055,7 @@ package body Test.Skeleton is
          Traverse (Subp.As_Subp_Decl.P_Body_Part, Get_Callees'Access);
       end if;
 
-      Trace
-        (Me_Direct_Callees,
-         "Direct callees gathered");
+      Trace (Me_Direct_Callees, "Direct callees gathered");
       Decrease_Indent;
       return Result;
    end Get_Direct_Callees_Setters;
@@ -7921,13 +8065,11 @@ package body Test.Skeleton is
    ----------------------------------
 
    procedure Get_Subprogram_From_Separate
-     (File : String;
-      UH   : Unique_Hash;
-      Subp : Subp_Info)
+     (File : String; UH : Unique_Hash; Subp : Subp_Info)
    is
-      Input_File : Ada.Text_IO.File_Type;
-      MD : Markered_Data;
-      Line : String_Access;
+      Input_File  : Ada.Text_IO.File_Type;
+      MD          : Markered_Data;
+      Line        : String_Access;
       Append_Line : Boolean;
 
       use GNAT.OS_Lib;
@@ -7955,8 +8097,7 @@ package body Test.Skeleton is
          --  depending on line breaks it can take different number of lines
          if Index (To_Lower (Line.all), "separate", Line'First) /= 0 then
             loop
-               if
-                 Index (To_Lower (Line.all), ") is", Line'First) /= 0
+               if Index (To_Lower (Line.all), ") is", Line'First) /= 0
                  or else Trim (To_Lower (Line.all), Both) = "is"
                then
                   Append_Line := False;
@@ -7969,18 +8110,19 @@ package body Test.Skeleton is
          end if;
 
          --  skipping "end test_outine_name;"
-         if
-           Index
-             (To_Lower (Line.all),
-              "end "
-              & To_Lower
-                (Test_Routine_Prefix
-                 & Subp.Subp_Text_Name.all
-                 & "_"
-                 & Subp.Subp_Hash_V1
-                   (Subp.Subp_Hash_V1'First .. Subp.Subp_Hash_V1'First + 5))
-              & ";",
-              Line'First) /= 0
+         if Index
+              (To_Lower (Line.all),
+               "end "
+               & To_Lower
+                   (Test_Routine_Prefix
+                    & Subp.Subp_Text_Name.all
+                    & "_"
+                    & Subp.Subp_Hash_V1
+                        (Subp.Subp_Hash_V1'First
+                         .. Subp.Subp_Hash_V1'First + 5))
+               & ";",
+               Line'First)
+           /= 0
          then
             Append_Line := False;
          end if;
@@ -8045,10 +8187,10 @@ package body Test.Skeleton is
          return;
       end if;
 
-      MD.Commented_Out   := False;
+      MD.Commented_Out := False;
       MD.Short_Name_Used := False;
       MD.TR_Text := String_Vectors.Empty_Vector;
-      UH.Hash    := new String'("");
+      UH.Hash := new String'("");
       UH.TC_Hash := new String'("");
 
       Open (Input_File, In_File, File);
@@ -8073,19 +8215,19 @@ package body Test.Skeleton is
                if Idx /= 0 then
                   ID_Found := True;
 
-                  Idx  := Idx + 7;
+                  Idx := Idx + 7;
                   Idx2 := Index (Line.all, "/", Idx + 1);
                   UH.Version := new String'(Line (Idx .. Idx2 - 1));
 
-                  Idx  := Idx2 + 1;
+                  Idx := Idx2 + 1;
                   Idx2 := Index (Line.all, "/", Idx + 1);
                   UH.Hash := new String'(Line (Idx .. Idx2 - 1));
 
-                  Idx  := Idx2 + 1;
+                  Idx := Idx2 + 1;
                   Idx2 := Index (Line.all, "/", Idx + 1);
                   MD.Short_Name := new String'(Line (Idx .. Idx2 - 1));
 
-                  Idx  := Idx2 + 1;
+                  Idx := Idx2 + 1;
                   Idx2 := Index (Line.all, "/", Idx + 1);
                   if Line (Idx .. Idx2 - 1) = "1" then
                      MD.Short_Name_Used := True;
@@ -8093,7 +8235,7 @@ package body Test.Skeleton is
                      MD.Short_Name_Used := False;
                   end if;
 
-                  Idx  := Idx2 + 1;
+                  Idx := Idx2 + 1;
                   Idx2 := Index (Line.all, "/", Idx + 1);
                   if Line (Idx .. Idx2 - 1) = "1" then
                      MD.Commented_Out := True;
@@ -8103,7 +8245,7 @@ package body Test.Skeleton is
 
                   if Idx2 < Line'Last then
 
-                     Idx  := Idx2 + 1;
+                     Idx := Idx2 + 1;
                      Idx2 := Index (Line.all, "/", Idx + 1);
                      UH.TC_Hash := new String'(Line (Idx .. Idx2 - 1));
 
@@ -8133,10 +8275,10 @@ package body Test.Skeleton is
                   Prev_Parsing_Mode := TR;
                   Parsing_Mode := Marker;
 
-                  MD.Commented_Out   := False;
+                  MD.Commented_Out := False;
                   MD.Short_Name_Used := False;
                   MD.TR_Text := String_Vectors.Empty_Vector;
-                  UH.Hash    := new String'("");
+                  UH.Hash := new String'("");
                   UH.TC_Hash := new String'("");
                else
                   MD.TR_Text.Append (Line.all);
@@ -8154,11 +8296,10 @@ package body Test.Skeleton is
    -----------------------
 
    procedure Get_Units_To_Stub
-     (The_Unit :        Compilation_Unit;
-      Data     : in out Data_Holder)
+     (The_Unit : Compilation_Unit; Data : in out Data_Holder)
    is
-      Body_N : Body_Node;
-      Body_Unit   : Compilation_Unit;
+      Body_N    : Body_Node;
+      Body_Unit : Compilation_Unit;
 
       Parent : Ada_Node;
 
@@ -8181,13 +8322,11 @@ package body Test.Skeleton is
       -- Add_Units_To_Stub --
       -----------------------
 
-      procedure Add_Units_To_Stub (The_Unit : Compilation_Unit)
-      is
+      procedure Add_Units_To_Stub (The_Unit : Compilation_Unit) is
          Clauses : constant Ada_Node_List := The_Unit.F_Prelude;
       begin
          for Cl of Clauses loop
-            if
-              Cl.Kind = Ada_With_Clause
+            if Cl.Kind = Ada_With_Clause
               and then not Cl.As_With_Clause.F_Has_Limited
             then
                declare
@@ -8208,7 +8347,7 @@ package body Test.Skeleton is
                         begin
                            if Good_To_Stub (Withed_Spec.Unit)
                              and then not Already_Stubbing.Contains
-                               (Withed_Spec_Image)
+                                            (Withed_Spec_Image)
                            then
                               Already_Stubbing.Include (Withed_Spec_Image);
                               Data.Units_To_Stub.Append
@@ -8219,9 +8358,9 @@ package body Test.Skeleton is
 
                         --  Gathering parent packages
                         Parent_Unit := Withed_Spec.P_Semantic_Parent;
-                        while
-                        not Parent_Unit.Is_Null and then
-                          Parent_Unit.Unit /= Parent_Unit.P_Standard_Unit
+                        while not Parent_Unit.Is_Null
+                          and then Parent_Unit.Unit
+                                   /= Parent_Unit.P_Standard_Unit
                         loop
                            if Parent_Unit.Kind = Ada_Package_Decl then
                               declare
@@ -8230,7 +8369,7 @@ package body Test.Skeleton is
                               begin
                                  if Good_To_Stub (Parent_Unit.Unit)
                                    and then not Already_Stubbing.Contains
-                                     (Parent_File)
+                                                  (Parent_File)
                                  then
                                     Already_Stubbing.Include (Parent_File);
                                     Data.Units_To_Stub.Append (Parent_Unit);
@@ -8288,7 +8427,7 @@ package body Test.Skeleton is
            Base_Name (Check_Unit.Get_Filename);
          Arg_File_Name : constant String :=
            Base_Name (The_Unit.Unit.Get_Filename);
-         Lib_Item : constant Library_Item :=
+         Lib_Item      : constant Library_Item :=
            Check_Unit.Root.As_Compilation_Unit.F_Body.As_Library_Item;
       begin
          if not Source_Present (Check_Unit.Get_Filename) then
@@ -8305,7 +8444,7 @@ package body Test.Skeleton is
          end if;
 
          if Lib_Item.F_Item.As_Basic_Decl.P_Has_Aspect
-           (To_Unbounded_Text (To_Text ("Remote_Call_Interface")))
+              (To_Unbounded_Text (To_Text ("Remote_Call_Interface")))
          then
             return False;
          end if;
@@ -8315,8 +8454,8 @@ package body Test.Skeleton is
          end if;
 
          if Stub_Exclusion_Lists.Contains (Arg_File_Name) then
-            if
-              Stub_Exclusion_Lists.Element (Arg_File_Name).Contains (File_Name)
+            if Stub_Exclusion_Lists.Element (Arg_File_Name).Contains
+                 (File_Name)
             then
                return False;
             end if;
@@ -8326,17 +8465,19 @@ package body Test.Skeleton is
 
    begin
       Trace
-        (Me,
-         "units to stub for "
-         & Base_Name (The_Unit.Unit.Get_Filename));
+        (Me, "units to stub for " & Base_Name (The_Unit.Unit.Get_Filename));
       Increase_Indent (Me);
 
       --  Gathering with clauses from spec
       Add_Units_To_Stub (The_Unit);
 
       Body_N :=
-        The_Unit.F_Body.As_Library_Item.F_Item.As_Basic_Decl.
-          P_Body_Part_For_Decl;
+        The_Unit
+          .F_Body
+          .As_Library_Item
+          .F_Item
+          .As_Basic_Decl
+          .P_Body_Part_For_Decl;
 
       --  Gathering with clauses from body
       if Body_N /= No_Body_Node
@@ -8350,8 +8491,7 @@ package body Test.Skeleton is
       --  Gathering parent packages
       Parent :=
         The_Unit.F_Body.As_Library_Item.F_Item.As_Ada_Node.P_Semantic_Parent;
-      while
-        not Parent.Is_Null and then Parent.Unit /= Parent.P_Standard_Unit
+      while not Parent.Is_Null and then Parent.Unit /= Parent.P_Standard_Unit
       loop
          if Parent.Kind = Ada_Package_Decl then
             declare
@@ -8378,8 +8518,7 @@ package body Test.Skeleton is
    -- Sanitize_TC_Name --
    ----------------------
 
-   function Sanitize_TC_Name (TC_Name : String) return String
-   is
+   function Sanitize_TC_Name (TC_Name : String) return String is
       Name : String := Trim (TC_Name, Both);
 
       Tmp  : String_Access := new String'("");
@@ -8409,8 +8548,7 @@ package body Test.Skeleton is
                end if;
             end if;
          else
-            if
-              Is_Letter (Name (I))
+            if Is_Letter (Name (I))
               or else Is_Digit (Name (I))
               or else Name (I) = '_'
             then
@@ -8434,30 +8572,27 @@ package body Test.Skeleton is
    --------------------------
 
    function Find_Same_Short_Name
-     (MD_Map : Markered_Data_Maps.Map;
-      Subp   : Subp_Info) return Markered_Data_Maps.Cursor
+     (MD_Map : Markered_Data_Maps.Map; Subp : Subp_Info)
+      return Markered_Data_Maps.Cursor
    is
       Short_Name : constant String := Subp.Subp_Text_Name.all;
       TC_Hash    : constant String :=
-        (if Subp.Has_TC_Info then
-            Sanitize_TC_Name (Subp.TC_Info.Name.all)
+        (if Subp.Has_TC_Info then Sanitize_TC_Name (Subp.TC_Info.Name.all)
          else "");
-      Cur : Markered_Data_Maps.Cursor := MD_Map.First;
-      MD  : Markered_Data;
+      Cur        : Markered_Data_Maps.Cursor := MD_Map.First;
+      MD         : Markered_Data;
    begin
-      Trace
-        (Me,
-         "Looking for a compatible dangling test for " & Short_Name);
+      Trace (Me, "Looking for a compatible dangling test for " & Short_Name);
 
       loop
          exit when Cur = Markered_Data_Maps.No_Element;
 
          MD := Markered_Data_Maps.Element (Cur);
-         if
-           MD.Short_Name_Used
-           and then MD.Short_Name.all = Short_Name
-         --  It is hard to understand what happens when test case name
-         --  is changed, so we do not handle this scenario.
+         if MD.Short_Name_Used
+           and then MD.Short_Name.all
+                    = Short_Name
+                     --  It is hard to understand what happens when test case
+                     --  name is changed, so we do not handle this scenario.
            and then Markered_Data_Maps.Key (Cur).TC_Hash.all = TC_Hash
          then
             exit;
@@ -8487,8 +8622,8 @@ package body Test.Skeleton is
             if Use_Short_Name then
                Overloading_Prefix := new String'("1_");
             else
-               Overloading_Prefix := new String'
-                 (Trim (Natural'Image (Overloading_N), Both) & "_");
+               Overloading_Prefix :=
+                 new String'(Trim (Natural'Image (Overloading_N), Both) & "_");
             end if;
          else
             Overloading_Prefix := new String'("");
@@ -8500,8 +8635,10 @@ package body Test.Skeleton is
 
       if Add_Cov_Dump then
          S_Put
-           (6, "pragma Annotate (Xcov, Dump_Buffers, """
-               & Subp.Subp_Full_Hash.all & """);");
+           (6,
+            "pragma Annotate (Xcov, Dump_Buffers, """
+            & Subp.Subp_Full_Hash.all
+            & """);");
          New_Line_Count;
       end if;
 
@@ -8512,8 +8649,8 @@ package body Test.Skeleton is
             & Test_Routine_Prefix
             & Subp.Subp_Text_Name.all
             & (if Subp.Has_TC_Info
-              then "_" & Sanitize_TC_Name (Subp.TC_Info.Name.all)
-              else "")
+               then "_" & Sanitize_TC_Name (Subp.TC_Info.Name.all)
+               else "")
             & ";");
       else
          S_Put
@@ -8523,8 +8660,8 @@ package body Test.Skeleton is
             & Overloading_Prefix.all
             & Subp.Subp_Text_Name.all
             & (if Subp.Has_TC_Info
-              then "_" & Sanitize_TC_Name (Subp.TC_Info.Name.all)
-              else "")
+               then "_" & Sanitize_TC_Name (Subp.TC_Info.Name.all)
+               else "")
             & ";");
       end if;
       New_Line_Count;
@@ -8542,12 +8679,12 @@ package body Test.Skeleton is
       Overloading_N  : Natural;
       Commented_Out  : Boolean := False;
       Use_Short_Name : Boolean := True;
-      Type_Name      : String  := "";
+      Type_Name      : String := "";
       Add_Cov_Dump   : Boolean := False)
    is
       Hash_Length_Used : constant := 15;
-      Hash_First : constant Integer := Subp.Subp_Full_Hash'First;
-      Hash_Last  : constant Integer :=
+      Hash_First       : constant Integer := Subp.Subp_Full_Hash'First;
+      Hash_Last        : constant Integer :=
         Subp.Subp_Full_Hash'First + Hash_Length_Used;
 
       Overloading_Prefix : String_Access;
@@ -8558,8 +8695,8 @@ package body Test.Skeleton is
             if Use_Short_Name then
                Overloading_Prefix := new String'("1_");
             else
-               Overloading_Prefix := new String'
-                 (Trim (Natural'Image (Overloading_N), Both) & "_");
+               Overloading_Prefix :=
+                 new String'(Trim (Natural'Image (Overloading_N), Both) & "_");
             end if;
          else
             Overloading_Prefix := new String'("");
@@ -8578,20 +8715,20 @@ package body Test.Skeleton is
                & Test_Routine_Prefix
                & Subp.Subp_Text_Name.all
                & (if Subp.Has_TC_Info
-                 then "_" & Sanitize_TC_Name (Subp.TC_Info.Name.all)
-                 else "")
-               &  " (Gnattest_T : in out Test);");
+                  then "_" & Sanitize_TC_Name (Subp.TC_Info.Name.all)
+                  else "")
+               & " (Gnattest_T : in out Test);");
             New_Line_Count;
             S_Put
               (3,
                "--  procedure "
                & Subp.Subp_Mangle_Name.all
-               &  " (Gnattest_T : in out Test) renames "
+               & " (Gnattest_T : in out Test) renames "
                & Test_Routine_Prefix
                & Subp.Subp_Text_Name.all
                & (if Subp.Has_TC_Info
-                 then "_" & Sanitize_TC_Name (Subp.TC_Info.Name.all)
-                 else "")
+                  then "_" & Sanitize_TC_Name (Subp.TC_Info.Name.all)
+                  else "")
                & ";");
             New_Line_Count;
          else
@@ -8602,21 +8739,21 @@ package body Test.Skeleton is
                & Overloading_Prefix.all
                & Subp.Subp_Text_Name.all
                & (if Subp.Has_TC_Info
-                 then "_" & Sanitize_TC_Name (Subp.TC_Info.Name.all)
-                 else "")
-               &  " (Gnattest_T : in out Test);");
+                  then "_" & Sanitize_TC_Name (Subp.TC_Info.Name.all)
+                  else "")
+               & " (Gnattest_T : in out Test);");
             New_Line_Count;
             S_Put
               (3,
                "procedure "
                & Subp.Subp_Mangle_Name.all
-               &  " (Gnattest_T : in out Test) renames "
+               & " (Gnattest_T : in out Test) renames "
                & Test_Routine_Prefix
                & Overloading_Prefix.all
                & Subp.Subp_Text_Name.all
                & (if Subp.Has_TC_Info
-                 then "_" & Sanitize_TC_Name (Subp.TC_Info.Name.all)
-                 else "")
+                  then "_" & Sanitize_TC_Name (Subp.TC_Info.Name.all)
+                  else "")
                & ";");
             New_Line_Count;
          end if;
@@ -8628,9 +8765,9 @@ package body Test.Skeleton is
                & Test_Routine_Prefix
                & Subp.Subp_Text_Name.all
                & (if Subp.Has_TC_Info
-                 then "_" & Sanitize_TC_Name (Subp.TC_Info.Name.all)
-                 else "")
-               &  " (Gnattest_T : in out Test_"
+                  then "_" & Sanitize_TC_Name (Subp.TC_Info.Name.all)
+                  else "")
+               & " (Gnattest_T : in out Test_"
                & Type_Name
                & ");");
             New_Line_Count;
@@ -8638,14 +8775,14 @@ package body Test.Skeleton is
               (3,
                "--  procedure "
                & Subp.Subp_Mangle_Name.all
-               &  " (Gnattest_T : in out Test_"
+               & " (Gnattest_T : in out Test_"
                & Type_Name
                & ") renames "
                & Test_Routine_Prefix
                & Subp.Subp_Text_Name.all
                & (if Subp.Has_TC_Info
-                 then "_" & Sanitize_TC_Name (Subp.TC_Info.Name.all)
-                 else "")
+                  then "_" & Sanitize_TC_Name (Subp.TC_Info.Name.all)
+                  else "")
                & ";");
             New_Line_Count;
          else
@@ -8656,9 +8793,9 @@ package body Test.Skeleton is
                & Overloading_Prefix.all
                & Subp.Subp_Text_Name.all
                & (if Subp.Has_TC_Info
-                 then "_" & Sanitize_TC_Name (Subp.TC_Info.Name.all)
-                 else "")
-               &  " (Gnattest_T : in out Test_"
+                  then "_" & Sanitize_TC_Name (Subp.TC_Info.Name.all)
+                  else "")
+               & " (Gnattest_T : in out Test_"
                & Type_Name
                & ");");
             New_Line_Count;
@@ -8666,15 +8803,15 @@ package body Test.Skeleton is
               (3,
                "procedure "
                & Subp.Subp_Mangle_Name.all
-               &  " (Gnattest_T : in out Test_"
+               & " (Gnattest_T : in out Test_"
                & Type_Name
                & ") renames "
                & Test_Routine_Prefix
                & Overloading_Prefix.all
                & Subp.Subp_Text_Name.all
                & (if Subp.Has_TC_Info
-                 then "_" & Sanitize_TC_Name (Subp.TC_Info.Name.all)
-                 else "")
+                  then "_" & Sanitize_TC_Name (Subp.TC_Info.Name.all)
+                  else "")
                & ";");
             New_Line_Count;
          end if;
@@ -8694,10 +8831,7 @@ package body Test.Skeleton is
          & (if Commented_Out then "1" else "0")
          & "/");
       if Subp.Has_TC_Info then
-         S_Put
-           (0,
-            Sanitize_TC_Name (Subp.TC_Info.Name.all)
-            & "/");
+         S_Put (0, Sanitize_TC_Name (Subp.TC_Info.Name.all) & "/");
       end if;
       New_Line_Count;
 
@@ -8708,8 +8842,8 @@ package body Test.Skeleton is
             & Test_Routine_Prefix
             & Subp.Subp_Text_Name.all
             & (if Subp.Has_TC_Info
-              then "_" & Sanitize_TC_Name (Subp.TC_Info.Name.all)
-              else "")
+               then "_" & Sanitize_TC_Name (Subp.TC_Info.Name.all)
+               else "")
             & " (Gnattest_T : in out ");
       else
          S_Put
@@ -8719,18 +8853,14 @@ package body Test.Skeleton is
             & Overloading_Prefix.all
             & Subp.Subp_Text_Name.all
             & (if Subp.Has_TC_Info
-              then "_" & Sanitize_TC_Name (Subp.TC_Info.Name.all)
-              else "")
+               then "_" & Sanitize_TC_Name (Subp.TC_Info.Name.all)
+               else "")
             & " (Gnattest_T : in out ");
       end if;
       if Subp.Corresp_Type = 0 then
          S_Put (0, "Test) is");
       else
-         S_Put
-           (0,
-            "Test_"
-            & Type_Name
-            & ") is");
+         S_Put (0, "Test_" & Type_Name & ") is");
       end if;
 
       New_Line_Count;
@@ -8743,14 +8873,11 @@ package body Test.Skeleton is
             S_Put
               (3,
                "--  "
-               & Base_Name
-                 (Subp.Subp_Declaration.Unit.Get_Filename)
+               & Base_Name (Subp.Subp_Declaration.Unit.Get_Filename)
                & ":"
-               & Trim
-                 (First_Line_Number (Subp.Subp_Declaration)'Img, Both)
+               & Trim (First_Line_Number (Subp.Subp_Declaration)'Img, Both)
                & ":"
-               & Trim
-                 (First_Column_Number (Subp.Subp_Declaration)'Img, Both)
+               & Trim (First_Column_Number (Subp.Subp_Declaration)'Img, Both)
                & ":"
                & Subp.Subp_Name_Image.all);
             New_Line_Count;
@@ -8825,8 +8952,10 @@ package body Test.Skeleton is
          S_Put (6, "end GNATTEST_Reset_Cov;");
          New_Line_Count;
          New_Line_Count;
-         S_Put (6, "Dummy_GNATTEST_Reset_Cov : constant Boolean :="
-                   & " GNATTEST_Reset_Cov;");
+         S_Put
+           (6,
+            "Dummy_GNATTEST_Reset_Cov : constant Boolean :="
+            & " GNATTEST_Reset_Cov;");
          New_Line_Count;
       end if;
 
@@ -8877,12 +9006,17 @@ package body Test.Skeleton is
       use GNAT.OS_Lib;
    begin
       return
-        Trim (Integer'Image (GM_Year (Time)), Both) & "-" &
-      Prefix_With_Zero (Integer'Image (GM_Month (Time))) & "-" &
-      Prefix_With_Zero (Integer'Image (GM_Day (Time))) & " " &
-      Prefix_With_Zero (Integer'Image (GM_Hour (Time))) & ":" &
-      Prefix_With_Zero (Integer'Image (GM_Minute (Time))) & ":" &
-      Prefix_With_Zero (Integer'Image (GM_Second (Time)));
+        Trim (Integer'Image (GM_Year (Time)), Both)
+        & "-"
+        & Prefix_With_Zero (Integer'Image (GM_Month (Time)))
+        & "-"
+        & Prefix_With_Zero (Integer'Image (GM_Day (Time)))
+        & " "
+        & Prefix_With_Zero (Integer'Image (GM_Hour (Time)))
+        & ":"
+        & Prefix_With_Zero (Integer'Image (GM_Minute (Time)))
+        & ":"
+        & Prefix_With_Zero (Integer'Image (GM_Second (Time)));
    end Format_Time;
 
    ---------------------------
@@ -8891,8 +9025,7 @@ package body Test.Skeleton is
 
    procedure Generate_Project_File (Source_Prj : String) is
       Tmp_Str : GNAT.OS_Lib.String_Access;
-      package Srcs is new
-        Ada.Containers.Indefinite_Ordered_Sets (String);
+      package Srcs is new Ada.Containers.Indefinite_Ordered_Sets (String);
       use Srcs;
 
       Out_Dirs     : Srcs.Set;
@@ -8923,11 +9056,12 @@ package body Test.Skeleton is
       end loop;
 
       Output_Prj :=
-        new String'(Harness_Dir_Str.all
-                    & Directory_Separator
-                    & Test_Prj_Prefix
-                    & Source_Prj_Name
-                    & ".gpr");
+        new String'
+          (Harness_Dir_Str.all
+           & Directory_Separator
+           & Test_Prj_Prefix
+           & Source_Prj_Name
+           & ".gpr");
 
       Create (Output_Prj.all);
 
@@ -8939,7 +9073,8 @@ package body Test.Skeleton is
       if Get_Lib_Support_Status in Needed | Generated then
          S_Put
            (0,
-            "with ""tgen_support" & GNAT.OS_Lib.Directory_Separator
+            "with ""tgen_support"
+            & GNAT.OS_Lib.Directory_Separator
             & "tgen_support.gpr"";");
          Put_New_Line;
          S_Put (0, "with ""tgen_rts.gpr"";");
@@ -8947,17 +9082,12 @@ package body Test.Skeleton is
       S_Put (0, "with """);
       S_Put
         (0,
-         +Relative_Path
-           (Create (+Source_Prj),
-            Create (+Harness_Dir_Str.all)) &
-           """;");
+         +Relative_Path (Create (+Source_Prj), Create (+Harness_Dir_Str.all))
+         & """;");
       Put_New_Line;
       S_Put
         (0,
-         "project "
-         & Test_Prj_Prefix
-         & Base_Name (Source_Prj_Name)
-         & " is");
+         "project " & Test_Prj_Prefix & Base_Name (Source_Prj_Name) & " is");
       Put_New_Line;
       Put_New_Line;
 
@@ -8975,9 +9105,9 @@ package body Test.Skeleton is
          S_Put
            (0,
             +Relative_Path
-              (Create (+Srcs.Element (Out_Dirs_Cur)),
-               Create (+Harness_Dir_Str.all)) &
-              """");
+               (Create (+Srcs.Element (Out_Dirs_Cur)),
+                Create (+Harness_Dir_Str.all))
+            & """");
          loop
             Srcs.Next (Out_Dirs_Cur);
             exit when Out_Dirs_Cur = Srcs.No_Element;
@@ -8988,9 +9118,9 @@ package body Test.Skeleton is
             S_Put
               (0,
                +Relative_Path
-                 (Create (+Srcs.Element (Out_Dirs_Cur)),
-                  Create (+Harness_Dir_Str.all)) &
-                 """");
+                  (Create (+Srcs.Element (Out_Dirs_Cur)),
+                   Create (+Harness_Dir_Str.all))
+               & """");
 
          end loop;
          S_Put (0, ",");
@@ -9005,17 +9135,14 @@ package body Test.Skeleton is
       Put_New_Line;
       declare
          Obj_Dir : constant String :=
-           Harness_Dir_Str.all
-           & Directory_Separator
-           & "test_obj";
+           Harness_Dir_Str.all & Directory_Separator & "test_obj";
          Dir     : File_Array_Access;
       begin
          Append (Dir, GNATCOLL.VFS.Create (+Obj_Dir));
          Create_Dirs (Dir);
       exception
          when Directory_Error =>
-            Cmd_Error_No_Help
-              ("cannot create directory " & Obj_Dir);
+            Cmd_Error_No_Help ("cannot create directory " & Obj_Dir);
       end;
 
       S_Put (3, "for Languages use Gnattest_Common'Languages & (""Ada"");");
@@ -9028,9 +9155,9 @@ package body Test.Skeleton is
       if IDE_Package_Present then
          S_Put
            (3,
-            "package Ide renames " &
-            Base_Name (Source_Prj, File_Extension (Source_Prj)) &
-            ".Ide;");
+            "package Ide renames "
+            & Base_Name (Source_Prj, File_Extension (Source_Prj))
+            & ".Ide;");
          Put_New_Line;
          Put_New_Line;
       end if;
@@ -9038,9 +9165,9 @@ package body Test.Skeleton is
       if Make_Package_Present then
          S_Put
            (3,
-            "package Make renames " &
-            Base_Name (Source_Prj, File_Extension (Source_Prj)) &
-            ".Make;");
+            "package Make renames "
+            & Base_Name (Source_Prj, File_Extension (Source_Prj))
+            & ".Make;");
          Put_New_Line;
          Put_New_Line;
       end if;
@@ -9053,26 +9180,21 @@ package body Test.Skeleton is
       Put_New_Line;
       Put_New_Line;
 
-      S_Put
-        (0,
-         "end "
-         & Test_Prj_Prefix
-         & Base_Name (Source_Prj_Name)
-         & ";");
+      S_Put (0, "end " & Test_Prj_Prefix & Base_Name (Source_Prj_Name) & ";");
       Put_New_Line;
       Close_File;
 
-      Tmp_Test_Prj := new String'(Normalize_Pathname
-                                  (Name => Output_Prj.all,
-                                   Case_Sensitive => False));
+      Tmp_Test_Prj :=
+        new String'
+          (Normalize_Pathname
+             (Name => Output_Prj.all, Case_Sensitive => False));
    end Generate_Project_File;
 
    -------------------
    -- Process_Stubs --
    -------------------
 
-   procedure Process_Stubs (List : Ada_Nodes_List.List)
-   is
+   procedure Process_Stubs (List : Ada_Nodes_List.List) is
       Cur : Ada_Nodes_List.Cursor;
       Str : String_Access;
 
@@ -9148,27 +9270,22 @@ package body Test.Skeleton is
    -- Put_Wrapper_Rename --
    ------------------------
 
-   procedure Put_Wrapper_Rename (Span : Natural; Current_Subp : Subp_Info)
-   is
+   procedure Put_Wrapper_Rename (Span : Natural; Current_Subp : Subp_Info) is
       Spec    : constant Base_Subp_Spec'Class :=
-        (if Current_Subp.Subp_Declaration.Kind = Ada_Expr_Function then
-            Current_Subp.Subp_Declaration.As_Expr_Function.F_Subp_Spec
+        (if Current_Subp.Subp_Declaration.Kind = Ada_Expr_Function
+         then Current_Subp.Subp_Declaration.As_Expr_Function.F_Subp_Spec
          else
-            Current_Subp.Subp_Declaration.As_Basic_Subp_Decl.P_Subp_Decl_Spec);
+           Current_Subp.Subp_Declaration.As_Basic_Subp_Decl.P_Subp_Decl_Spec);
       Params  : constant Param_Spec_Array := Spec.P_Params;
-      Is_Func : constant Boolean          :=
+      Is_Func : constant Boolean :=
         Is_Function (Current_Subp.Subp_Declaration.As_Basic_Decl);
    begin
 
       if Is_Func then
-         S_Put
-           (Span,
-            "function " & Current_Subp.Subp_Name_Image.all);
+         S_Put (Span, "function " & Current_Subp.Subp_Name_Image.all);
 
       else
-         S_Put
-           (Span,
-            "procedure " & Current_Subp.Subp_Name_Image.all);
+         S_Put (Span, "procedure " & Current_Subp.Subp_Name_Image.all);
       end if;
 
       if Params'Length /= 0 then
@@ -9200,13 +9317,12 @@ package body Test.Skeleton is
    -- Generate_Function_Wrapper --
    -------------------------------
 
-   procedure Generate_Function_Wrapper (Current_Subp : Subp_Info)
-   is
-      Spec    : constant Base_Subp_Spec'Class :=
-        (if Current_Subp.Subp_Declaration.Kind = Ada_Expr_Function then
-            Current_Subp.Subp_Declaration.As_Expr_Function.F_Subp_Spec
+   procedure Generate_Function_Wrapper (Current_Subp : Subp_Info) is
+      Spec : constant Base_Subp_Spec'Class :=
+        (if Current_Subp.Subp_Declaration.Kind = Ada_Expr_Function
+         then Current_Subp.Subp_Declaration.As_Expr_Function.F_Subp_Spec
          else
-            Current_Subp.Subp_Declaration.As_Basic_Subp_Decl.P_Subp_Decl_Spec);
+           Current_Subp.Subp_Declaration.As_Basic_Subp_Decl.P_Subp_Decl_Spec);
 
       Params  : constant Param_Spec_Array := Spec.P_Params;
       Str_Set : String_Set.Set;
@@ -9215,10 +9331,7 @@ package body Test.Skeleton is
       S_Put (0, GT_Marker_Begin);
       New_Line_Count;
       S_Put
-        (3,
-         "function " &
-           Wrapper_Prefix &
-           Current_Subp.Subp_Mangle_Name.all);
+        (3, "function " & Wrapper_Prefix & Current_Subp.Subp_Mangle_Name.all);
 
       for I in Params'Range loop
          if I = Params'First then
@@ -9257,11 +9370,7 @@ package body Test.Skeleton is
          New_Line_Count;
          S_Put (9, "pragma Assert");
          New_Line_Count;
-         S_Put
-           (11,
-            "(" &
-              Current_Subp.TC_Info.Req_Image.all &
-              ");");
+         S_Put (11, "(" & Current_Subp.TC_Info.Req_Image.all & ");");
          New_Line_Count;
          S_Put (9, "null;");
          New_Line_Count;
@@ -9304,8 +9413,7 @@ package body Test.Skeleton is
          for I in Params'Range loop
             declare
                Name_List : constant Defining_Name_List := F_Ids (Params (I));
-               Idx       :          Positive :=
-                 Name_List.Defining_Name_List_First;
+               Idx       : Positive := Name_List.Defining_Name_List_First;
             begin
                while Name_List.Defining_Name_List_Has_Element (Idx) loop
                   S_Put
@@ -9336,11 +9444,7 @@ package body Test.Skeleton is
          New_Line_Count;
          S_Put (12, "pragma Assert");
          New_Line_Count;
-         S_Put
-           (14,
-            "(" &
-              Current_Subp.TC_Info.Ens_Image.all &
-              ");");
+         S_Put (14, "(" & Current_Subp.TC_Info.Ens_Image.all & ");");
          New_Line_Count;
          S_Put (12, "null;");
          New_Line_Count;
@@ -9364,22 +9468,14 @@ package body Test.Skeleton is
          New_Line_Count;
       end if;
 
-      S_Put
-        (9,
-         "return " &
-           Current_Subp.Subp_Mangle_Name.all &
-           "_Result;");
+      S_Put (9, "return " & Current_Subp.Subp_Mangle_Name.all & "_Result;");
       New_Line_Count;
 
       S_Put (6, "end;");
       New_Line_Count;
 
       S_Put
-        (3,
-         "end " &
-           Wrapper_Prefix &
-           Current_Subp.Subp_Mangle_Name.all &
-           ";");
+        (3, "end " & Wrapper_Prefix & Current_Subp.Subp_Mangle_Name.all & ";");
       New_Line_Count;
       S_Put (0, GT_Marker_End);
       New_Line_Count;
@@ -9390,9 +9486,8 @@ package body Test.Skeleton is
    -- Generate_Procedure_Wrapper --
    --------------------------------
 
-   procedure Generate_Procedure_Wrapper (Current_Subp : Subp_Info)
-   is
-      Spec    : constant Base_Subp_Spec   :=
+   procedure Generate_Procedure_Wrapper (Current_Subp : Subp_Info) is
+      Spec    : constant Base_Subp_Spec :=
         Current_Subp.Subp_Declaration.As_Basic_Subp_Decl.P_Subp_Decl_Spec;
       Params  : constant Param_Spec_Array := Spec.P_Params;
       Str_Set : String_Set.Set;
@@ -9401,10 +9496,7 @@ package body Test.Skeleton is
       S_Put (0, GT_Marker_Begin);
       New_Line_Count;
       S_Put
-        (3,
-         "procedure " &
-           Wrapper_Prefix &
-           Current_Subp.Subp_Mangle_Name.all);
+        (3, "procedure " & Wrapper_Prefix & Current_Subp.Subp_Mangle_Name.all);
 
       for I in Params'Range loop
          if I = Params'First then
@@ -9441,11 +9533,7 @@ package body Test.Skeleton is
          New_Line_Count;
          S_Put (9, "pragma Assert");
          New_Line_Count;
-         S_Put
-           (11,
-            "(" &
-              Current_Subp.TC_Info.Req_Image.all &
-              ");");
+         S_Put (11, "(" & Current_Subp.TC_Info.Req_Image.all & ");");
          New_Line_Count;
          S_Put (9, "null;");
          New_Line_Count;
@@ -9471,10 +9559,10 @@ package body Test.Skeleton is
 
       S_Put
         (6,
-         "GNATtest_Generated.GNATtest_Standard." &
-           Current_Subp.Nesting.all &
-           "." &
-           Current_Subp.Subp_Text_Name.all);
+         "GNATtest_Generated.GNATtest_Standard."
+         & Current_Subp.Nesting.all
+         & "."
+         & Current_Subp.Subp_Text_Name.all);
 
       if Params'Length = 0 then
          S_Put (0, ";");
@@ -9483,8 +9571,7 @@ package body Test.Skeleton is
          for I in Params'Range loop
             declare
                Name_List : constant Defining_Name_List := F_Ids (Params (I));
-               Idx       :          Positive :=
-                 Name_List.Defining_Name_List_First;
+               Idx       : Positive := Name_List.Defining_Name_List_First;
             begin
                while Name_List.Defining_Name_List_Has_Element (Idx) loop
                   S_Put
@@ -9512,11 +9599,7 @@ package body Test.Skeleton is
          New_Line_Count;
          S_Put (9, "pragma Assert");
          New_Line_Count;
-         S_Put
-           (11,
-            "(" &
-              Current_Subp.TC_Info.Ens_Image.all &
-              ");");
+         S_Put (11, "(" & Current_Subp.TC_Info.Ens_Image.all & ");");
          New_Line_Count;
          S_Put (9, "null;");
          New_Line_Count;
@@ -9541,11 +9624,7 @@ package body Test.Skeleton is
       end if;
 
       S_Put
-        (3,
-         "end " &
-           Wrapper_Prefix &
-           Current_Subp.Subp_Mangle_Name.all &
-           ";");
+        (3, "end " & Wrapper_Prefix & Current_Subp.Subp_Mangle_Name.all & ";");
       New_Line_Count;
       S_Put (0, GT_Marker_End);
       New_Line_Count;
@@ -9628,22 +9707,22 @@ package body Test.Skeleton is
          exit when Cur = Tests_Per_Unit.No_Element;
 
          Report_Std
-           (Natural'Image (Tests_Per_Unit.Element (Cur)) &
-              " testable subprograms in " &
-              Base_Name (Tests_Per_Unit.Key (Cur)));
+           (Natural'Image (Tests_Per_Unit.Element (Cur))
+            & " testable subprograms in "
+            & Base_Name (Tests_Per_Unit.Key (Cur)));
 
          Tests_Per_Unit.Next (Cur);
       end loop;
 
       Test_Info.Clear;
       Report_Std
-        ("gnattest:" &
-           Natural'Image (All_Tests_Counter) &
-           " testable subprogram(s) processed");
+        ("gnattest:"
+         & Natural'Image (All_Tests_Counter)
+         & " testable subprogram(s) processed");
       Report_Std
-        ("gnattest:" &
-           Natural'Image (New_Tests_Counter) &
-           " new skeleton(s) generated");
+        ("gnattest:"
+         & Natural'Image (New_Tests_Counter)
+         & " new skeleton(s) generated");
    end Report_Tests_Total;
 
    ---------------------------------
@@ -9659,8 +9738,7 @@ package body Test.Skeleton is
                & GP.Sloc.all
                & ": no instance of "
                & GP.Name.all);
-            Report_Std
-              (" corresponding tests are not included into harness");
+            Report_Std (" corresponding tests are not included into harness");
 
             Free (GP.Name);
             Free (GP.Sloc);

@@ -31,7 +31,7 @@ package body TGen.Subprograms is
 
    function To_String (Subp : Subprogram_Data) return String is
       Res : Unbounded_String;
-      I : Natural := 0;
+      I   : Natural := 0;
    begin
       Write_Line (Res, "function " & (+Subp.Name), I);
       I := I + 3;
@@ -53,9 +53,7 @@ package body TGen.Subprograms is
             if Next (Param_Cursor) = Parameters_Data_Vectors.No_Element then
                Write (Res, ")");
                Write
-                 (Res,
-                  " return "
-                  & (+Subp.Return_Type_Fully_Qualified_Name));
+                 (Res, " return " & (+Subp.Return_Type_Fully_Qualified_Name));
                I := I - 3;
                New_Line (Res);
             else

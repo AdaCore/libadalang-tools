@@ -30,12 +30,15 @@ procedure Utils.Var_Length_Ints.Test is
 
    V : Octet_Vector;
 
-   subtype Test_Cases is My_Int with
-     Predicate => Test_Cases in 1 .. 1000
-                             | 16_000 .. 17_000
-                             | 2_097_100 .. 2_097_200
-                             | 268_435_400 .. 268_435_500
-                             | My_Int'Last - 100 .. My_Int'Last;
+   subtype Test_Cases is My_Int
+   with
+     Predicate =>
+       Test_Cases
+       in 1 .. 1000
+        | 16_000 .. 17_000
+        | 2_097_100 .. 2_097_200
+        | 268_435_400 .. 268_435_500
+        | My_Int'Last - 100 .. My_Int'Last;
 
 begin
    for X in Test_Cases loop
@@ -43,7 +46,7 @@ begin
    end loop;
 
    declare
-      Index : Octet_Index := 1;
+      Index  : Octet_Index := 1;
       Actual : My_Int;
    begin
       for Expected in Test_Cases loop

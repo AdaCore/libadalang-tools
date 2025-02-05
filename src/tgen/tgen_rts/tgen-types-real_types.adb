@@ -34,11 +34,12 @@ package body TGen.Types.Real_Types is
    -- Init --
    ----------
 
-   overriding procedure Init (S : in out Real_Range_Strategy) is
-      LB : Big_Real renames
-        Real_Typ'Class (S.T.Unchecked_Get.all).Low_Bound_Or_Default;
-      HB : Big_Real renames
-        Real_Typ'Class (S.T.Unchecked_Get.all).High_Bound_Or_Default;
+   overriding
+   procedure Init (S : in out Real_Range_Strategy) is
+      LB : Big_Real
+        renames Real_Typ'Class (S.T.Unchecked_Get.all).Low_Bound_Or_Default;
+      HB : Big_Real
+        renames Real_Typ'Class (S.T.Unchecked_Get.all).High_Bound_Or_Default;
    begin
       S.Num_Generated := 0;
       S.Pitch := (HB - LB) / To_Real (S.Total_Values - 1);
@@ -49,9 +50,10 @@ package body TGen.Types.Real_Types is
    -- Generate --
    --------------
 
-   overriding function Generate
-     (S            : in out Real_Range_Strategy;
-      Disc_Context : Disc_Value_Map) return JSON_Value
+   overriding
+   function Generate
+     (S : in out Real_Range_Strategy; Disc_Context : Disc_Value_Map)
+      return JSON_Value
    is
       Res : constant JSON_Value := Create_Object;
    begin
@@ -82,26 +84,33 @@ package body TGen.Types.Real_Types is
    -- Default_Enum_Strategy --
    ---------------------------
 
-   overriding function Default_Enum_Strategy
-     (Self : Real_Typ) return Enum_Strategy_Type'Class is
-     (Make_Real_Range_Strategy (Self, 3));
+   overriding
+   function Default_Enum_Strategy
+     (Self : Real_Typ) return Enum_Strategy_Type'Class
+   is (Make_Real_Range_Strategy (Self, 3));
 
-   function Image (Self : Float_Typ) return String is
-     (Typ (Self).Image & ": Real Type"
-      & (if Self.Is_Static
-         then " digits " & Self.Digits_Value'Image
-              & (if Self.Has_Range
-                 then " range " & Big_Reals.To_String (Self.Range_Value.Min)
-                      & " .. " & Big_Reals.To_String (Self.Range_Value.Max)
-                 else "")
-         else " (non static)"));
+   function Image (Self : Float_Typ) return String
+   is (Typ (Self).Image
+       & ": Real Type"
+       & (if Self.Is_Static
+          then
+            " digits "
+            & Self.Digits_Value'Image
+            & (if Self.Has_Range
+               then
+                 " range "
+                 & Big_Reals.To_String (Self.Range_Value.Min)
+                 & " .. "
+                 & Big_Reals.To_String (Self.Range_Value.Max)
+               else "")
+          else " (non static)"));
 
    function Low_Bound_Or_Default (Self : Float_Typ) return Big_Real is
    begin
       if Self.Has_Range then
          return Self.Range_Value.Min;
       else
-         return -To_Real (10) ** (4 * Self.Digits_Value);
+         return -To_Real (10)**(4 * Self.Digits_Value);
       end if;
    end Low_Bound_Or_Default;
 
@@ -111,28 +120,40 @@ package body TGen.Types.Real_Types is
          return Self.Range_Value.Max;
       else
          --  return the minimum bound specified by the RM
-         return To_Real (10) ** (4 * Self.Digits_Value);
+         return To_Real (10)**(4 * Self.Digits_Value);
       end if;
    end High_Bound_Or_Default;
 
-   function Image (Self : Ordinary_Fixed_Typ) return String is
-     (Typ (Self).Image & ": Ordinary Fixed Point"
-      & (if Self.Is_Static
-         then " delta " & Big_Reals.To_String (Self.Delta_Value) & " range "
-              & Big_Reals.To_String (Self.Range_Value.Min) & " .. "
-              & Big_Reals.To_String (Self.Range_Value.Max)
-         else " (non static)"));
+   function Image (Self : Ordinary_Fixed_Typ) return String
+   is (Typ (Self).Image
+       & ": Ordinary Fixed Point"
+       & (if Self.Is_Static
+          then
+            " delta "
+            & Big_Reals.To_String (Self.Delta_Value)
+            & " range "
+            & Big_Reals.To_String (Self.Range_Value.Min)
+            & " .. "
+            & Big_Reals.To_String (Self.Range_Value.Max)
+          else " (non static)"));
 
-   function Image (Self : Decimal_Fixed_Typ) return String is
-     (Typ (Self).Image & ": Decimal Fixed Point"
-      & (if Self.Is_Static
-         then " delta " & Big_Reals.To_String (Self.Delta_Value) & " digits"
-              & Self.Digits_Value'Image
-              & (if Self.Has_Range
-                 then " range " & Big_Reals.To_String (Self.Range_Value.Min)
-                      & " .. " & Big_Reals.To_String (Self.Range_Value.Max)
-                 else "")
-         else " (non static)"));
+   function Image (Self : Decimal_Fixed_Typ) return String
+   is (Typ (Self).Image
+       & ": Decimal Fixed Point"
+       & (if Self.Is_Static
+          then
+            " delta "
+            & Big_Reals.To_String (Self.Delta_Value)
+            & " digits"
+            & Self.Digits_Value'Image
+            & (if Self.Has_Range
+               then
+                 " range "
+                 & Big_Reals.To_String (Self.Range_Value.Min)
+                 & " .. "
+                 & Big_Reals.To_String (Self.Range_Value.Max)
+               else "")
+          else " (non static)"));
 
    function Low_Bound_Or_Default (Self : Ordinary_Fixed_Typ) return Big_Real
    is (Self.Range_Value.Min);
@@ -140,22 +161,21 @@ package body TGen.Types.Real_Types is
    function High_Bound_Or_Default (Self : Ordinary_Fixed_Typ) return Big_Real
    is (Self.Range_Value.Max);
 
-   function Low_Bound_Or_Default (Self : Decimal_Fixed_Typ) return Big_Real
-   is
+   function Low_Bound_Or_Default (Self : Decimal_Fixed_Typ) return Big_Real is
    begin
-      return (if Self.Has_Range
-              then Self.Range_Value.Min
-              else -(To_Real (10) ** Self.Digits_Value - To_Real (1))
-                    * Self.Delta_Value);
+      return
+        (if Self.Has_Range then Self.Range_Value.Min
+         else
+           -(To_Real (10)**Self.Digits_Value - To_Real (1))
+           * Self.Delta_Value);
    end Low_Bound_Or_Default;
 
-   function High_Bound_Or_Default (Self : Decimal_Fixed_Typ) return Big_Real
-   is
+   function High_Bound_Or_Default (Self : Decimal_Fixed_Typ) return Big_Real is
    begin
-      return (if Self.Has_Range
-              then Self.Range_Value.Max
-              else (To_Real (10) ** Self.Digits_Value - To_Real (1))
-                   * Self.Delta_Value);
+      return
+        (if Self.Has_Range then Self.Range_Value.Max
+         else
+           (To_Real (10)**Self.Digits_Value - To_Real (1)) * Self.Delta_Value);
    end High_Bound_Or_Default;
 
    function Gen return T is
@@ -174,8 +194,7 @@ package body TGen.Types.Real_Types is
    -- Generate_Float_Typ --
    ------------------------
 
-   function Generate_Float_Typ (Ty : Typ'Class) return JSON_Value
-   is
+   function Generate_Float_Typ (Ty : Typ'Class) return JSON_Value is
       Result : constant JSON_Value := Create_Object;
       Self   : constant Float_Typ := Float_Typ (Ty);
 
@@ -206,9 +225,7 @@ package body TGen.Types.Real_Types is
    -- Default_Strategy --
    ----------------------
 
-   function Default_Strategy
-     (Self : Float_Typ) return Strategy_Type'Class
-   is
+   function Default_Strategy (Self : Float_Typ) return Strategy_Type'Class is
       Type_Ref : SP.Ref;
       Strat    : Basic_Strategy_Type;
    begin
@@ -218,19 +235,15 @@ package body TGen.Types.Real_Types is
       return Strat;
    end Default_Strategy;
 
-   function Generate_Ordinary_Fixed_Typ
-     (Ty : Typ'Class) return JSON_Value;
+   function Generate_Ordinary_Fixed_Typ (Ty : Typ'Class) return JSON_Value;
 
-   function Generate_Decimal_Fixed_Typ
-     (Ty : Typ'Class) return JSON_Value;
+   function Generate_Decimal_Fixed_Typ (Ty : Typ'Class) return JSON_Value;
 
    ---------------------------------
    -- Generate_Ordinary_Fixed_Typ --
    ---------------------------------
 
-   function Generate_Ordinary_Fixed_Typ
-     (Ty : Typ'Class) return JSON_Value
-   is
+   function Generate_Ordinary_Fixed_Typ (Ty : Typ'Class) return JSON_Value is
       use LLLI_Conversions;
       Result : constant JSON_Value := Create_Object;
       Self   : constant Ordinary_Fixed_Typ := Ordinary_Fixed_Typ (Ty);
@@ -265,10 +278,10 @@ package body TGen.Types.Real_Types is
          --  fixed point number.
 
          Set_Field (Result, "quotient", True);
-         Set_Field (Result,
-                    "value",
-                    To_Quotient_String
-                      (To_Big_Real (Rand_Val) * Self.Delta_Value));
+         Set_Field
+           (Result,
+            "value",
+            To_Quotient_String (To_Big_Real (Rand_Val) * Self.Delta_Value));
          return Result;
       end;
    end Generate_Ordinary_Fixed_Typ;
@@ -277,9 +290,7 @@ package body TGen.Types.Real_Types is
    -- Generate_Decimal_Fixed_Typ --
    --------------------------------
 
-   function Generate_Decimal_Fixed_Typ
-     (Ty : Typ'Class) return JSON_Value
-   is
+   function Generate_Decimal_Fixed_Typ (Ty : Typ'Class) return JSON_Value is
       use LLLI_Conversions;
       Result : constant JSON_Value := Create_Object;
       Self   : constant Decimal_Fixed_Typ := Decimal_Fixed_Typ (Ty);
@@ -318,16 +329,17 @@ package body TGen.Types.Real_Types is
          --  Cast it back to a fixed point value
 
          Set_Field (Result, "quotient", True);
-         Set_Field (Result,
-                    "value",
-                    To_Quotient_String
-                      (To_Big_Real (Rand_Val) * Self.Delta_Value));
+         Set_Field
+           (Result,
+            "value",
+            To_Quotient_String (To_Big_Real (Rand_Val) * Self.Delta_Value));
          return Result;
       end;
    end Generate_Decimal_Fixed_Typ;
 
-   overriding function Default_Strategy
-     (Self    : Ordinary_Fixed_Typ) return Strategy_Type'Class
+   overriding
+   function Default_Strategy
+     (Self : Ordinary_Fixed_Typ) return Strategy_Type'Class
    is
       Type_Ref : SP.Ref;
       Strat    : Basic_Strategy_Type;
@@ -338,8 +350,9 @@ package body TGen.Types.Real_Types is
       return Strat;
    end Default_Strategy;
 
-   overriding function Default_Strategy
-     (Self    : Decimal_Fixed_Typ) return Strategy_Type'Class
+   overriding
+   function Default_Strategy
+     (Self : Decimal_Fixed_Typ) return Strategy_Type'Class
    is
       Type_Ref : SP.Ref;
       Strat    : Basic_Strategy_Type;

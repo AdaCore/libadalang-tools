@@ -49,8 +49,7 @@ package body Laltools.Common is
    ------------------------
 
    procedure Append_If_Not_Null
-     (Vector : in out Ada_List_Vector;
-      List   : Ada_List'Class) is
+     (Vector : in out Ada_List_Vector; List : Ada_List'Class) is
    begin
       if not List.Is_Null then
          Vector.Append (List);
@@ -61,8 +60,8 @@ package body Laltools.Common is
    -- Compilation_Unit_Hash --
    ---------------------------
 
-   function Compilation_Unit_Hash (Comp_Unit : Compilation_Unit)
-                                   return Ada.Containers.Hash_Type is
+   function Compilation_Unit_Hash
+     (Comp_Unit : Compilation_Unit) return Ada.Containers.Hash_Type is
    begin
       return Hash (Comp_Unit.As_Ada_Node);
    end Compilation_Unit_Hash;
@@ -76,8 +75,7 @@ package body Laltools.Common is
       Pattern        : Wide_Wide_String;
       As_Word        : Boolean;
       Span           : out Source_Location_Range;
-      Case_Sensitive : Boolean := False)
-      return Boolean
+      Case_Sensitive : Boolean := False) return Boolean
    is
       T              : constant Text_Type :=
         (if Case_Sensitive then Text (Token)
@@ -85,8 +83,8 @@ package body Laltools.Common is
       Actual_Pattern : constant Wide_Wide_String :=
         (if Case_Sensitive then Pattern
          else Ada.Wide_Wide_Characters.Handling.To_Lower (Pattern));
-      Idx            : constant Integer := Ada.Strings.Wide_Wide_Fixed.Index
-        (T, Actual_Pattern);
+      Idx            : constant Integer :=
+        Ada.Strings.Wide_Wide_Fixed.Index (T, Actual_Pattern);
       Last           : Integer;
 
       function Is_Word_Delimiter (C : Wide_Wide_Character) return Boolean;
@@ -97,7 +95,8 @@ package body Laltools.Common is
 
       function Is_Word_Delimiter (C : Wide_Wide_Character) return Boolean is
       begin
-         return not Ada.Wide_Wide_Characters.Handling.Is_Alphanumeric (C)
+         return
+           not Ada.Wide_Wide_Characters.Handling.Is_Alphanumeric (C)
            and then C /= '_';
       end Is_Word_Delimiter;
 
@@ -108,25 +107,19 @@ package body Laltools.Common is
 
       --  Treat the Pattern as a word
       if As_Word then
-         if Idx > T'First
-           and then not Is_Word_Delimiter (T (Idx - 1))
-         then
+         if Idx > T'First and then not Is_Word_Delimiter (T (Idx - 1)) then
             return False;
          end if;
 
          Last := Idx + Pattern'Length;
-         if Last <= T'Last
-           and then not Is_Word_Delimiter (T (Last))
-         then
+         if Last <= T'Last and then not Is_Word_Delimiter (T (Last)) then
             return False;
          end if;
       end if;
 
       Span := Sloc_Range (Data (Token));
-      Span.Start_Column :=
-        Span.Start_Column + Column_Number (Idx - T'First);
-      Span.End_Column :=
-        Span.Start_Column + Column_Number (Pattern'Length);
+      Span.Start_Column := Span.Start_Column + Column_Number (Idx - T'First);
+      Span.End_Column := Span.Start_Column + Column_Number (Pattern'Length);
       return True;
    end Contains;
 
@@ -135,8 +128,7 @@ package body Laltools.Common is
    ---------------------------------
 
    function Count_Param_Spec_Parameters
-     (Param_Spec : Libadalang.Analysis.Param_Spec'Class)
-      return Natural is
+     (Param_Spec : Libadalang.Analysis.Param_Spec'Class) return Natural is
    begin
       return Count : Natural := 0 do
          if not Param_Spec.Is_Null then
@@ -151,9 +143,8 @@ package body Laltools.Common is
    -- Count_Subp_Param_Specs --
    ----------------------------
 
-   function Count_Subp_Param_Specs
-     (Subp_Params : Params'Class)
-      return Natural is
+   function Count_Subp_Param_Specs (Subp_Params : Params'Class) return Natural
+   is
    begin
       return Count : Natural := 0 do
          if not Subp_Params.Is_Null then
@@ -168,9 +159,8 @@ package body Laltools.Common is
    -- Count_Subp_Parameters --
    ---------------------------
 
-   function Count_Subp_Parameters
-     (Subp_Params : Params'Class)
-      return Natural is
+   function Count_Subp_Parameters (Subp_Params : Params'Class) return Natural
+   is
    begin
       return Count : Natural := 0 do
          if not Subp_Params.Is_Null then
@@ -186,8 +176,7 @@ package body Laltools.Common is
    -----------------------
 
    function Expand_SLOC_Range
-     (Node : Ada_Node'Class)
-      return Source_Location_Range
+     (Node : Ada_Node'Class) return Source_Location_Range
    is (Expand_SLOC_Range (Node.Unit, Node.Sloc_Range));
 
    -----------------------
@@ -195,8 +184,7 @@ package body Laltools.Common is
    -----------------------
 
    function Expand_SLOC_Range
-     (Unit       : Analysis_Unit;
-      SLOC_Range : Source_Location_Range)
+     (Unit : Analysis_Unit; SLOC_Range : Source_Location_Range)
       return Source_Location_Range
    is
       use Ada.Strings.Wide_Wide_Fixed;
@@ -210,29 +198,27 @@ package body Laltools.Common is
       First_Line_First_Non_Blank : constant Natural :=
         Index_Non_Blank (First_Line) + 1 - Natural (First_Line'First);
 
-      Last_Line         : constant Text_Type :=
+      Last_Line                         : constant Text_Type :=
         Unit.Get_Line (Positive (SLOC_Range.End_Line));
-      Rest_Of_Last_Line : constant Text_Type :=
-        Last_Line (Last_Line'First
-                   + Natural (SLOC_Range.End_Column)
-                   - 1
-                   .. Last_Line'Last);
+      Rest_Of_Last_Line                 : constant Text_Type :=
+        Last_Line
+          (Last_Line'First
+           + Natural (SLOC_Range.End_Column)
+           - 1
+           .. Last_Line'Last);
       First_Rest_Of_Last_Line_Non_Blank : constant Natural :=
-        (if Rest_Of_Last_Line'Length = 0 then
-            0
+        (if Rest_Of_Last_Line'Length = 0 then 0
          else
-            Index_Non_Blank (Rest_Of_Last_Line)
-         + 1
-         - Natural (Rest_Of_Last_Line'First));
+           Index_Non_Blank (Rest_Of_Last_Line)
+           + 1
+           - Natural (Rest_Of_Last_Line'First));
 
       Next_Line_Number : Natural := Natural (SLOC_Range.End_Line) + 1;
 
    begin
       return Expanded_SLOC_Range : Source_Location_Range := SLOC_Range do
          --  Add leading whitespaces
-         if First_Line_First_Non_Blank =
-              Natural (SLOC_Range.Start_Column)
-         then
+         if First_Line_First_Non_Blank = Natural (SLOC_Range.Start_Column) then
             Expanded_SLOC_Range.Start_Column := 1;
          end if;
 
@@ -241,8 +227,7 @@ package body Laltools.Common is
             if First_Rest_Of_Last_Line_Non_Blank = 0 then
                --  Add trailing whitespaces
                Expanded_SLOC_Range.End_Column :=
-                 Langkit_Support.Slocs.Column_Number (Last_Line'Length)
-                 + 1;
+                 Langkit_Support.Slocs.Column_Number (Last_Line'Length) + 1;
                --  Add any blank lines after that
                loop
                   exit when Next_Line_Number = Max_Line;
@@ -250,19 +235,17 @@ package body Laltools.Common is
                      Next_Line                 : constant Text_Type :=
                        Unit.Get_Line (Next_Line_Number);
                      Next_Line_First_Non_Blank : constant Natural :=
-                       (if Next_Line'Length /= 0 then
-                          Index_Non_Blank (Next_Line)
-                        else
-                          0);
+                       (if Next_Line'Length /= 0
+                        then Index_Non_Blank (Next_Line)
+                        else 0);
                   begin
-                     exit when Next_Line'Length /= 0
+                     exit when
+                       Next_Line'Length /= 0
                        and then Next_Line_First_Non_Blank /= 0;
                      Expanded_SLOC_Range.End_Line :=
-                       Langkit_Support.Slocs.Line_Number
-                         (Next_Line_Number);
+                       Langkit_Support.Slocs.Line_Number (Next_Line_Number);
                      Expanded_SLOC_Range.End_Column :=
-                       Langkit_Support.Slocs.Column_Number
-                         (Next_Line'Length)
+                       Langkit_Support.Slocs.Column_Number (Next_Line'Length)
                        + 1;
                   end;
                   Next_Line_Number := Next_Line_Number + 1;
@@ -278,20 +261,16 @@ package body Laltools.Common is
                   Next_Line                 : constant Text_Type :=
                     Unit.Get_Line (Next_Line_Number);
                   Next_Line_First_Non_Blank : constant Natural :=
-                    (if Next_Line'Length /= 0 then
-                       Index_Non_Blank (Next_Line)
-                     else
-                       0);
+                    (if Next_Line'Length /= 0 then Index_Non_Blank (Next_Line)
+                     else 0);
                begin
-                  exit when Next_Line'Length /= 0
+                  exit when
+                    Next_Line'Length /= 0
                     and then Next_Line_First_Non_Blank /= 0;
                   Expanded_SLOC_Range.End_Line :=
-                    Langkit_Support.Slocs.Line_Number
-                      (Next_Line_Number);
+                    Langkit_Support.Slocs.Line_Number (Next_Line_Number);
                   Expanded_SLOC_Range.End_Column :=
-                    Langkit_Support.Slocs.Column_Number
-                      (Next_Line'Length)
-                    + 1;
+                    Langkit_Support.Slocs.Column_Number (Next_Line'Length) + 1;
                end;
                Next_Line_Number := Next_Line_Number + 1;
             end loop;
@@ -304,8 +283,7 @@ package body Laltools.Common is
    ------------------------
 
    function Expand_SLOC_Ranges
-     (Unit        : Analysis_Unit;
-      SLOC_Ranges : Source_Location_Range_Ordered_Set)
+     (Unit : Analysis_Unit; SLOC_Ranges : Source_Location_Range_Ordered_Set)
       return Source_Location_Range_Ordered_Set is
    begin
       if Unit.Root.Is_Null then
@@ -327,9 +305,9 @@ package body Laltools.Common is
    procedure Find_All_References
      (Node     : Defining_Name'Class;
       Units    : Analysis_Unit_Array;
-      Callback : not null access procedure
-        (Reference : Ref_Result;
-         Stop      : in out Boolean))
+      Callback :
+        not null access procedure
+          (Reference : Ref_Result; Stop : in out Boolean))
    is
       Stop : Boolean := False;
    begin
@@ -337,8 +315,7 @@ package body Laltools.Common is
          return;
       end if;
 
-      for Ref of Node.P_Find_All_References (Units, False)
-      loop
+      for Ref of Node.P_Find_All_References (Units, False) loop
          Callback (Ref, Stop);
          exit when Stop;
       end loop;
@@ -349,23 +326,25 @@ package body Laltools.Common is
    --------------------------------------
 
    function Find_All_References_For_Renaming
-     (Definition : Defining_Name;
-      Units      : Analysis_Unit_Array)
+     (Definition : Defining_Name; Units : Analysis_Unit_Array)
       return Base_Id_Vectors.Vector
    is
       All_References : Base_Id_Vectors.Vector;
-      Is_Param : constant Boolean :=
+      Is_Param       : constant Boolean :=
         Definition.P_Basic_Decl.Kind in Ada_Param_Spec_Range;
-      Is_Subp  : constant Boolean :=
+      Is_Subp        : constant Boolean :=
         Is_Subprogram (Definition.P_Basic_Decl);
    begin
       if Definition.P_Canonical_Part.F_Name.Kind = Ada_Dotted_Name then
          All_References.Append
-           (Definition.P_Canonical_Part.F_Name.As_Dotted_Name.
-              F_Suffix.As_Base_Id);
+           (Definition
+              .P_Canonical_Part
+              .F_Name
+              .As_Dotted_Name
+              .F_Suffix
+              .As_Base_Id);
       else
-         All_References.Append
-           (Definition.P_Canonical_Part.F_Name.As_Base_Id);
+         All_References.Append (Definition.P_Canonical_Part.F_Name.As_Base_Id);
       end if;
 
       for Reference of Definition.P_Find_All_References (Units) loop
@@ -374,12 +353,15 @@ package body Laltools.Common is
 
       declare
          Vector : constant Base_Id_Vectors.Vector :=
-           (if Is_Param then Find_All_Param_References_In_Subp_Hierarchy
-              (Definition.P_Canonical_Part, Units)
-            elsif Is_Subp then Find_All_Subp_References_In_Subp_Hierarchy
-              (Definition.P_Canonical_Part.P_Basic_Decl, Units)
-            else
-               Base_Id_Vectors.Empty_Vector);
+           (if Is_Param
+            then
+              Find_All_Param_References_In_Subp_Hierarchy
+                (Definition.P_Canonical_Part, Units)
+            elsif Is_Subp
+            then
+              Find_All_Subp_References_In_Subp_Hierarchy
+                (Definition.P_Canonical_Part.P_Basic_Decl, Units)
+            else Base_Id_Vectors.Empty_Vector);
       begin
          for X of Vector loop
             All_References.Append (X);
@@ -394,8 +376,7 @@ package body Laltools.Common is
    --------------------------------------------
 
    function Find_All_Param_References_In_Subp_Hierarchy
-     (Param_Definition : Defining_Name;
-      Units            : Analysis_Unit_Array)
+     (Param_Definition : Defining_Name; Units : Analysis_Unit_Array)
       return Base_Id_Vectors.Vector
    is
       --  The semantic parent of this parameter can either be a subprogram
@@ -425,8 +406,8 @@ package body Laltools.Common is
          else No_Basic_Decl);
 
       Hierarchy : constant Basic_Decl_Array :=
-        (if Is_Semantic_Parent_Subp then
-            Get_Subp_Hierarchy (Semantic_Parent_Subp, Units)
+        (if Is_Semantic_Parent_Subp
+         then Get_Subp_Hierarchy (Semantic_Parent_Subp, Units)
          else []);
 
       Param_References : Base_Id_Vectors.Vector;
@@ -442,8 +423,8 @@ package body Laltools.Common is
                   if Param_Definition.Text = Param.Text then
                      Param_References.Append
                        (Param.P_Canonical_Part.F_Name.As_Base_Id);
-                     for Reference of
-                       Param.P_Canonical_Part.P_Find_All_References (Units)
+                     for Reference
+                       of Param.P_Canonical_Part.P_Find_All_References (Units)
                      loop
                         Param_References.Append (Ref (Reference).As_Base_Id);
                      end loop;
@@ -456,8 +437,8 @@ package body Laltools.Common is
          --  This is a parameter of an access to a subprogram definition, so
          --  only replace its references.
 
-         for Reference of
-           Param_Definition.P_Canonical_Part.P_Find_All_References (Units)
+         for Reference
+           of Param_Definition.P_Canonical_Part.P_Find_All_References (Units)
          loop
             Param_References.Append (Ref (Reference).As_Base_Id);
          end loop;
@@ -471,8 +452,7 @@ package body Laltools.Common is
    ------------------------------------------------
 
    function Find_All_Subp_References_In_Subp_Hierarchy
-     (Subp  : Basic_Decl;
-      Units : Analysis_Unit_Array)
+     (Subp : Basic_Decl; Units : Analysis_Unit_Array)
       return Base_Id_Vectors.Vector
    is
       Hierarchy : constant Basic_Decl_Array :=
@@ -491,8 +471,7 @@ package body Laltools.Common is
             Param_References.Append (Decl.P_Defining_Name.F_Name.As_Base_Id);
          end if;
 
-         for Reference of
-           Decl.P_Defining_Name.P_Find_All_References (Units)
+         for Reference of Decl.P_Defining_Name.P_Find_All_References (Units)
          loop
             Param_References.Append (Ref (Reference).As_Base_Id);
          end loop;
@@ -507,8 +486,7 @@ package body Laltools.Common is
    function Find_Canonical_Part
      (Definition         : Defining_Name;
       Trace              : GNATCOLL.Traces.Trace_Handle;
-      Imprecise_Fallback : Boolean := False)
-      return Defining_Name
+      Imprecise_Fallback : Boolean := False) return Defining_Name
    is
       Canonical : Defining_Name;
    begin
@@ -522,7 +500,7 @@ package body Laltools.Common is
       end if;
 
    exception
-      when E :  Libadalang.Common.Property_Error =>
+      when E : Libadalang.Common.Property_Error =>
          Log (Trace, E);
          return No_Defining_Name;
    end Find_Canonical_Part;
@@ -531,9 +509,7 @@ package body Laltools.Common is
    -- Is_Scopes_Owner --
    ---------------------
 
-   function Is_Scopes_Owner
-     (Node : Ada_Node'Class)
-      return Boolean
+   function Is_Scopes_Owner (Node : Ada_Node'Class) return Boolean
    is (not Node.Is_Null
        and then (Is_Declarative_Part_Owner (Node)
                  or Is_Decl_Expr_Owner (Node)
@@ -553,11 +529,11 @@ package body Laltools.Common is
 
       if Node.Kind in Ada_Basic_Decl
         and then not Node.As_Basic_Decl.P_Subp_Spec_Or_Null.Is_Null
-        and then Node.As_Basic_Decl.P_Subp_Spec_Or_Null.Kind in
-          Ada_Subp_Spec_Range
+        and then Node.As_Basic_Decl.P_Subp_Spec_Or_Null.Kind
+                 in Ada_Subp_Spec_Range
       then
-         return Node.As_Basic_Decl.P_Subp_Spec_Or_Null.As_Subp_Spec.
-           F_Subp_Params;
+         return
+           Node.As_Basic_Decl.P_Subp_Spec_Or_Null.As_Subp_Spec.F_Subp_Params;
       end if;
 
       --  Check for Entry_Decl / Accept_Stmt / Entry_Body
@@ -587,8 +563,7 @@ package body Laltools.Common is
    ---------------------
 
    function Find_Other_Part
-     (List : Param_Spec_List'Class)
-      return Param_Spec_List is
+     (List : Param_Spec_List'Class) return Param_Spec_List is
    begin
       if List.Is_Null then
          return No_Param_Spec_List;
@@ -598,12 +573,11 @@ package body Laltools.Common is
          Parent_Basic_Decl                   : constant Basic_Decl :=
            List.P_Parent_Basic_Decl;
          Parent_Basic_Decl_Other_Part        : constant Basic_Decl :=
-           (if not Parent_Basic_Decl.P_Next_Part_For_Decl.Is_Null then
-               Parent_Basic_Decl.P_Next_Part_For_Decl
-            elsif not Parent_Basic_Decl.P_Previous_Part_For_Decl.Is_Null then
-               Parent_Basic_Decl.P_Previous_Part_For_Decl
-            else
-               No_Basic_Decl);
+           (if not Parent_Basic_Decl.P_Next_Part_For_Decl.Is_Null
+            then Parent_Basic_Decl.P_Next_Part_For_Decl
+            elsif not Parent_Basic_Decl.P_Previous_Part_For_Decl.Is_Null
+            then Parent_Basic_Decl.P_Previous_Part_For_Decl
+            else No_Basic_Decl);
          Parent_Basic_Decl_Other_Part_Params : constant Params :=
            Get_Params (Parent_Basic_Decl_Other_Part);
       begin
@@ -626,8 +600,7 @@ package body Laltools.Common is
    function Find_First_Common_Parent
      (Start_Node : Ada_Node'Class;
       End_Node   : Ada_Node'Class;
-      With_Self  : Boolean := True)
-      return Ada_Node is
+      With_Self  : Boolean := True) return Ada_Node is
    begin
       --  Return quickly if Start_Node and End_Node are not in the same
       --  Analysis_Unit.
@@ -647,10 +620,9 @@ package body Laltools.Common is
 
       begin
          for Parent_Index in Positive'First .. Parents_Max_Length loop
-            exit when Start_Node_Parents
-                        (Start_Node_Parents'Last - Parent_Index + 1) /=
-                        End_Node_Parents
-                          (End_Node_Parents'Last - Parent_Index + 1);
+            exit when
+              Start_Node_Parents (Start_Node_Parents'Last - Parent_Index + 1)
+              /= End_Node_Parents (End_Node_Parents'Last - Parent_Index + 1);
             Enclosing_Common_Parent :=
               Start_Node_Parents (Start_Node_Parents'Last - Parent_Index + 1);
          end loop;
@@ -660,14 +632,12 @@ package body Laltools.Common is
    end Find_First_Common_Parent;
 
    procedure Include_If_Not_Null
-     (Set     : in out Ada_List_Hashed_Set;
-      Element : Param_Spec_List'Class);
+     (Set : in out Ada_List_Hashed_Set; Element : Param_Spec_List'Class);
    --  Checks if List is null, and if not, includes it in
    --  Enclosing_Param_Spec_List.
 
    procedure Include_If_Not_Null
-     (Set     : in out Ada_List_Hashed_Set;
-      Element : Param_Spec_List'Class) is
+     (Set : in out Ada_List_Hashed_Set; Element : Param_Spec_List'Class) is
    begin
       if not Element.Is_Null then
          Set.Include (Element);
@@ -679,14 +649,11 @@ package body Laltools.Common is
    ----------------------------------
 
    function Find_Enclosing_Declarative_Parts
-     (Node : Ada_Node'Class)
-      return Ada_List_Hashed_Set
+     (Node : Ada_Node'Class) return Ada_List_Hashed_Set
    is
       Enclosing_Declarative_Parts : Ada_List_Hashed_Set;
 
-      procedure Process_Scopes_Owner
-        (Owner : Ada_Node;
-         Stop  : in out Boolean);
+      procedure Process_Scopes_Owner (Owner : Ada_Node; Stop : in out Boolean);
       --  Checks if Owner has declarative parts, appending them to
       --  Enclosing_Declarative_Parts if so. If it doesn't, checks if its
       --  body part (if existent) has declarative parts, also appending them to
@@ -696,9 +663,8 @@ package body Laltools.Common is
       -- Process_Scopes_Owner --
       --------------------------
 
-      procedure Process_Scopes_Owner
-        (Owner : Ada_Node;
-         Stop  : in out Boolean) is
+      procedure Process_Scopes_Owner (Owner : Ada_Node; Stop : in out Boolean)
+      is
       begin
          if Is_Declarative_Part_Owner (Owner) then
             --  Owner has a Declarative_Part, include in the result and stop
@@ -709,8 +675,13 @@ package body Laltools.Common is
          elsif Is_Decl_Expr_Owner (Owner) then
             --  Owner has a Decl_Expr, include in the result and stop
             Enclosing_Declarative_Parts.Include
-              (Owner.As_Expr_Function.F_Expr.As_Paren_Expr.F_Expr.
-                 As_Decl_Expr.F_Decls);
+              (Owner
+                 .As_Expr_Function
+                 .F_Expr
+                 .As_Paren_Expr
+                 .F_Expr
+                 .As_Decl_Expr
+                 .F_Decls);
 
          elsif Owner.Kind in Ada_Basic_Decl
            and then not Owner.As_Basic_Decl.P_Body_Part_For_Decl.Is_Null
@@ -741,12 +712,11 @@ package body Laltools.Common is
    -------------------------------------
 
    function Find_Enclosing_Param_Spec_Lists
-     (Node : Ada_Node'Class)
-      return Ada_List_Hashed_Set
+     (Node : Ada_Node'Class) return Ada_List_Hashed_Set
    is
       Enclosing_Param_Spec_Lists : Ada_List_Hashed_Set;
-      Parent_Params             : Params := No_Params;
-      Parent_Param_Spec_List    : Param_Spec_List := No_Param_Spec_List;
+      Parent_Params              : Params := No_Params;
+      Parent_Param_Spec_List     : Param_Spec_List := No_Param_Spec_List;
 
    begin
       for Parent of Node.Parents (With_Self => False) loop
@@ -763,8 +733,9 @@ package body Laltools.Common is
 
          --  Node's enclosing declarative part does not have an associated
          --  Param_Spec_List, or we found a Param_Spec_List.
-         exit when not Parent_Param_Spec_List.Is_Null
-                     or else Is_Declarative_Part_Owner (Parent);
+         exit when
+           not Parent_Param_Spec_List.Is_Null
+           or else Is_Declarative_Part_Owner (Parent);
       end loop;
 
       return Enclosing_Param_Spec_Lists;
@@ -775,10 +746,9 @@ package body Laltools.Common is
    ---------------------------
 
    function Find_Enclosing_Scopes
-     (Node : Ada_Node'Class)
-      return Ada_List_Hashed_Set
+     (Node : Ada_Node'Class) return Ada_List_Hashed_Set
    is (Ada_List_Hashed_Sets.Union
-       (Find_Enclosing_Declarative_Parts (Node),
+         (Find_Enclosing_Declarative_Parts (Node),
           Find_Enclosing_Param_Spec_Lists (Node)));
 
    ------------------------------------
@@ -786,8 +756,7 @@ package body Laltools.Common is
    ------------------------------------
 
    function Find_Visible_Declarative_Parts
-     (Node : Ada_Node'Class)
-      return Ada_List_Hashed_Set
+     (Node : Ada_Node'Class) return Ada_List_Hashed_Set
    is
       --  TODO: Process_Scopes_Owner is very similar to the one defined in
       --  Find_Enclosing_Declarative_Parts. It does the exact same thing expect
@@ -796,9 +765,7 @@ package body Laltools.Common is
 
       Visible_Declarative_Parts : Ada_List_Hashed_Set;
 
-      procedure Process_Scopes_Owner
-        (Owner : Ada_Node;
-         Stop  : in out Boolean);
+      procedure Process_Scopes_Owner (Owner : Ada_Node; Stop : in out Boolean);
       --  Checks if Owner has declarative parts, appending them to
       --  Enclosing_Declarative_Parts if so. If it doesn't, checks if its
       --  body part (if existent) has declarative parts, also appending them to
@@ -808,9 +775,8 @@ package body Laltools.Common is
       -- Process_Scopes_Owner --
       --------------------------
 
-      procedure Process_Scopes_Owner
-        (Owner : Ada_Node;
-         Stop  : in out Boolean) is
+      procedure Process_Scopes_Owner (Owner : Ada_Node; Stop : in out Boolean)
+      is
       begin
          if Is_Declarative_Part_Owner (Owner) then
             --  Owner has a Declarative_Part, include in the result and
@@ -823,8 +789,13 @@ package body Laltools.Common is
             --  Owner has a Decl_Expr, include in the result and continue with
             --  the next parent
             Visible_Declarative_Parts.Include
-              (Owner.As_Expr_Function.F_Expr.As_Paren_Expr.F_Expr.
-                 As_Decl_Expr.F_Decls);
+              (Owner
+                 .As_Expr_Function
+                 .F_Expr
+                 .As_Paren_Expr
+                 .F_Expr
+                 .As_Decl_Expr
+                 .F_Decls);
 
          elsif Owner.Kind in Ada_Basic_Decl
            and then not Owner.As_Basic_Decl.P_Body_Part_For_Decl.Is_Null
@@ -853,12 +824,11 @@ package body Laltools.Common is
    ------------------------------
 
    function Find_Visible_Param_Spec_Lists
-     (Node : Ada_Node'Class)
-      return Ada_List_Hashed_Set
+     (Node : Ada_Node'Class) return Ada_List_Hashed_Set
    is
-      Visible_Param_Spec_Lists  : Ada_List_Hashed_Set;
-      Parent_Params             : Params := No_Params;
-      Parent_Param_Spec_List    : Param_Spec_List := No_Param_Spec_List;
+      Visible_Param_Spec_Lists : Ada_List_Hashed_Set;
+      Parent_Params            : Params := No_Params;
+      Parent_Param_Spec_List   : Param_Spec_List := No_Param_Spec_List;
 
    begin
       for Parent of Node.Parents (With_Self => False) loop
@@ -882,10 +852,9 @@ package body Laltools.Common is
    -------------------------
 
    function Find_Visible_Scopes
-     (Node : Ada_Node'Class)
-      return Ada_List_Hashed_Set
+     (Node : Ada_Node'Class) return Ada_List_Hashed_Set
    is (Ada_List_Hashed_Sets.Union
-       (Find_Visible_Declarative_Parts (Node),
+         (Find_Visible_Declarative_Parts (Node),
           Find_Visible_Param_Spec_Lists (Node)));
 
    ------------------------
@@ -893,22 +862,19 @@ package body Laltools.Common is
    ------------------------
 
    function Find_Nested_Scopes
-     (Node : Ada_Node'Class)
-      return Declarative_Part_Vector
+     (Node : Ada_Node'Class) return Declarative_Part_Vector
    is
       Nested_Declarative_Parts : Declarative_Part_Vectors.Vector;
 
       Parent_Declarative_Part_Owner : Ada_Node;
 
       procedure Set_Parent_Declarative_Part_Owner
-        (Owner : Ada_Node;
-         Stop  : in out Boolean);
+        (Owner : Ada_Node; Stop : in out Boolean);
       --  Callback of Find_Matching_Parents that sets
       --  Parent_Declarative_Part_Owner and stops the iteration.
 
       function Append_Nested_Declarative_Parts
-        (This_Node : Ada_Node'Class)
-         return Visit_Status;
+        (This_Node : Ada_Node'Class) return Visit_Status;
       --  Callback of Find_Matching_Parents that checks if This_Node is a
       --  Declarative_Part, and if so, appends it to Nested_Declarative_Parts.
 
@@ -917,8 +883,7 @@ package body Laltools.Common is
       -------------------------------------
 
       function Append_Nested_Declarative_Parts
-        (This_Node : Ada_Node'Class)
-         return Visit_Status is
+        (This_Node : Ada_Node'Class) return Visit_Status is
       begin
          if This_Node.Kind in Ada_Declarative_Part_Range then
             Nested_Declarative_Parts.Append (This_Node.As_Declarative_Part);
@@ -932,8 +897,7 @@ package body Laltools.Common is
       ---------------------------------------
 
       procedure Set_Parent_Declarative_Part_Owner
-        (Owner : Ada_Node;
-         Stop  : in out Boolean) is
+        (Owner : Ada_Node; Stop : in out Boolean) is
       begin
          Parent_Declarative_Part_Owner := Owner;
          Stop := True;
@@ -980,8 +944,9 @@ package body Laltools.Common is
 
             declare
                Pkg_Decl : constant Basic_Decl :=
-                 Parent_Declarative_Part_Owner.As_Package_Body.
-                   P_Canonical_Part;
+                 Parent_Declarative_Part_Owner
+                   .As_Package_Body
+                   .P_Canonical_Part;
 
             begin
                if not Pkg_Decl.Is_Null then
@@ -1022,13 +987,15 @@ package body Laltools.Common is
             Public_Decl_Part :=
               Parent_Declarative_Part_Owner.As_Base_Package_Decl.F_Public_Part;
             Private_Decl_Part :=
-              Parent_Declarative_Part_Owner.
-                As_Base_Package_Decl.F_Private_Part;
+              Parent_Declarative_Part_Owner
+                .As_Base_Package_Decl
+                .F_Private_Part;
 
             declare
                Pkg_Body : constant Package_Body :=
-                 Parent_Declarative_Part_Owner.As_Base_Package_Decl.
-                   P_Body_Part;
+                 Parent_Declarative_Part_Owner
+                   .As_Base_Package_Decl
+                   .P_Body_Part;
 
             begin
                if not Pkg_Body.Is_Null then
@@ -1054,20 +1021,17 @@ package body Laltools.Common is
 
       if not Body_Decl_Part.Is_Null then
          Traverse
-           (Body_Decl_Part.F_Decls,
-            Append_Nested_Declarative_Parts'Access);
+           (Body_Decl_Part.F_Decls, Append_Nested_Declarative_Parts'Access);
       end if;
 
       if not Public_Decl_Part.Is_Null then
          Traverse
-           (Public_Decl_Part.F_Decls,
-            Append_Nested_Declarative_Parts'Access);
+           (Public_Decl_Part.F_Decls, Append_Nested_Declarative_Parts'Access);
       end if;
 
       if not Private_Decl_Part.Is_Null then
          Traverse
-           (Private_Decl_Part.F_Decls,
-            Append_Nested_Declarative_Parts'Access);
+           (Private_Decl_Part.F_Decls, Append_Nested_Declarative_Parts'Access);
       end if;
 
       if not Stmts.Is_Null then
@@ -1084,8 +1048,7 @@ package body Laltools.Common is
    function Find_Next_Part
      (Definition         : Defining_Name;
       Trace              : GNATCOLL.Traces.Trace_Handle;
-      Imprecise_Fallback : Boolean := False)
-      return Defining_Name
+      Imprecise_Fallback : Boolean := False) return Defining_Name
    is
       Next : Defining_Name;
    begin
@@ -1098,7 +1061,7 @@ package body Laltools.Common is
          return Next;
       end if;
    exception
-      when E :  Libadalang.Common.Property_Error =>
+      when E : Libadalang.Common.Property_Error =>
          Log (Trace, E);
          return No_Defining_Name;
    end Find_Next_Part;
@@ -1110,14 +1073,12 @@ package body Laltools.Common is
    function Find_Next_Part_For_Decl
      (Decl               : Basic_Decl;
       Trace              : GNATCOLL.Traces.Trace_Handle;
-      Imprecise_Fallback : Boolean := False)
-      return Basic_Decl
+      Imprecise_Fallback : Boolean := False) return Basic_Decl
    is
       Next : Basic_Decl;
    begin
       Next :=
-        Decl.P_Next_Part_For_Decl
-          (Imprecise_Fallback => Imprecise_Fallback);
+        Decl.P_Next_Part_For_Decl (Imprecise_Fallback => Imprecise_Fallback);
 
       if Next = Decl then
          return No_Basic_Decl;
@@ -1125,7 +1086,7 @@ package body Laltools.Common is
          return Next;
       end if;
    exception
-      when E :  Libadalang.Common.Property_Error =>
+      when E : Libadalang.Common.Property_Error =>
          Log (Trace, E);
          return No_Basic_Decl;
 
@@ -1138,8 +1099,7 @@ package body Laltools.Common is
    function Find_Previous_Part
      (Definition         : Defining_Name;
       Trace              : GNATCOLL.Traces.Trace_Handle;
-      Imprecise_Fallback : Boolean := False)
-      return Defining_Name
+      Imprecise_Fallback : Boolean := False) return Defining_Name
    is
       Next : Defining_Name;
    begin
@@ -1152,7 +1112,7 @@ package body Laltools.Common is
          return Next;
       end if;
    exception
-      when E :  Libadalang.Common.Property_Error =>
+      when E : Libadalang.Common.Property_Error =>
          Log (Trace, E);
          return No_Defining_Name;
    end Find_Previous_Part;
@@ -1162,8 +1122,7 @@ package body Laltools.Common is
    ------------------------------
 
    function Find_Other_Part_Fallback
-     (Definition : Defining_Name;
-      Trace      : GNATCOLL.Traces.Trace_Handle)
+     (Definition : Defining_Name; Trace : GNATCOLL.Traces.Trace_Handle)
       return Defining_Name
    is
       Qualified_Name : constant Langkit_Support.Text.Text_Type :=
@@ -1173,16 +1132,14 @@ package body Laltools.Common is
       Found : Defining_Name := No_Defining_Name;
       --  The result that has been found
 
-      function Matches
-        (Node : Ada_Node'Class) return Visit_Status;
+      function Matches (Node : Ada_Node'Class) return Visit_Status;
       --  Return True if the name of Node matches Qualified_Name
 
       -------------
       -- Matches --
       -------------
 
-      function Matches
-        (Node : Ada_Node'Class) return Visit_Status is
+      function Matches (Node : Ada_Node'Class) return Visit_Status is
       begin
          if Node.Is_Null then
             return Libadalang.Common.Into;
@@ -1207,9 +1164,7 @@ package body Laltools.Common is
                begin
                   --  Search a declaration with the same qualified_name
                   --  which is not Definition itself.
-                  if Def /= Definition
-                    and then Def_Name = Qualified_Name
-                  then
+                  if Def /= Definition and then Def_Name = Qualified_Name then
                      Found := Def;
                      return Libadalang.Common.Stop;
                   end if;
@@ -1241,7 +1196,7 @@ package body Laltools.Common is
       --  or a null procedure.
 
       if Laltools.Common.Is_Definition_Without_Separate_Implementation
-        (Definition)
+           (Definition)
       then
          return No_Defining_Name;
       end if;
@@ -1272,8 +1227,8 @@ package body Laltools.Common is
          --  the current root.
          Other_Root := Laltools.Common.Find_Next_Part (Current_Root, Trace);
          if Other_Root = No_Defining_Name then
-            Other_Root := Laltools.Common.Find_Previous_Part
-              (Current_Root, Trace);
+            Other_Root :=
+              Laltools.Common.Find_Previous_Part (Current_Root, Trace);
          end if;
          --  Traverse the other root
          if Other_Root /= No_Defining_Name then
@@ -1312,8 +1267,7 @@ package body Laltools.Common is
    --------------------------------------
 
    function Get_Basic_Decl_Header_SLOC_Range
-     (Decl : Basic_Decl'Class)
-      return Source_Location_Range
+     (Decl : Basic_Decl'Class) return Source_Location_Range
    is
       use Ada.Strings;
       use Ada.Strings.Fixed;
@@ -1323,27 +1277,20 @@ package body Laltools.Common is
       --  ---------------------  -> This is a header edge
 
       function Is_Header_Edge
-        (Token           : Token_Reference;
-         Subprogram_Name : String)
-         return Boolean
-      is (Trim (To_UTF8 (Text (Token)), Both) =
-            String'((Subprogram_Name'Length + 6) * "-"));
+        (Token : Token_Reference; Subprogram_Name : String) return Boolean
+      is (Trim (To_UTF8 (Text (Token)), Both)
+          = String'((Subprogram_Name'Length + 6) * "-"));
       --  Checks if Token is the header edge
 
       function Is_Header_Body
-        (Token           : Token_Reference;
-         Subprogram_Name : String)
-         return Boolean
-      is (Trim (To_UTF8 (Text (Token)), Both) =
-            "-- " & Subprogram_Name & " --");
+        (Token : Token_Reference; Subprogram_Name : String) return Boolean
+      is (Trim (To_UTF8 (Text (Token)), Both)
+          = "-- " & Subprogram_Name & " --");
       --  Checks if Token is the header body
 
-      function Line_Feed_Count
-        (Token : Token_Reference)
-         return Natural
+      function Line_Feed_Count (Token : Token_Reference) return Natural
       is (Ada.Strings.Fixed.Count
-            (To_UTF8 (Text (Token)),
-             String'("" & Ada.Characters.Latin_1.LF)));
+            (To_UTF8 (Text (Token)), String'("" & Ada.Characters.Latin_1.LF)));
       --  Counts the number of LFs in Token
 
    begin
@@ -1390,8 +1337,8 @@ package body Laltools.Common is
          Aux_Token := Previous (Aux_Token);
          if not Is_Whole_Line_Comment (Aux_Token)
            or else not Is_Header_Edge (Aux_Token, Decl_Name)
-           or else Sloc_Range (Data (Aux_Token)).Start_Column /=
-                     Decl.Sloc_Range.Start_Column
+           or else Sloc_Range (Data (Aux_Token)).Start_Column
+                   /= Decl.Sloc_Range.Start_Column
          then
             return No_Source_Location_Range;
          end if;
@@ -1415,8 +1362,8 @@ package body Laltools.Common is
          Aux_Token := Previous (Aux_Token);
          if not Is_Whole_Line_Comment (Aux_Token)
            or else not Is_Header_Body (Aux_Token, Decl_Name)
-           or else Sloc_Range (Data (Aux_Token)).Start_Column /=
-                     Decl.Sloc_Range.Start_Column
+           or else Sloc_Range (Data (Aux_Token)).Start_Column
+                   /= Decl.Sloc_Range.Start_Column
          then
             return No_Source_Location_Range;
          end if;
@@ -1441,8 +1388,8 @@ package body Laltools.Common is
          Aux_Token := Previous (Aux_Token);
          if not Is_Whole_Line_Comment (Aux_Token)
            or else not Is_Header_Edge (Aux_Token, Decl_Name)
-           or else Sloc_Range (Data (Aux_Token)).Start_Column /=
-                     Decl.Sloc_Range.Start_Column
+           or else Sloc_Range (Data (Aux_Token)).Start_Column
+                   /= Decl.Sloc_Range.Start_Column
          then
             return No_Source_Location_Range;
          end if;
@@ -1465,8 +1412,7 @@ package body Laltools.Common is
    --------------------------
 
    function Get_Compilation_Unit
-     (Node : Ada_Node'Class)
-      return Compilation_Unit
+     (Node : Ada_Node'Class) return Compilation_Unit
    is
       C_Unit : Ada_Node :=
         (if Node.Is_Null then No_Ada_Node else Node.As_Ada_Node);
@@ -1480,8 +1426,7 @@ package body Laltools.Common is
          C_Unit := C_Unit.Parent;
       end loop;
 
-      if C_Unit.Is_Null
-        or else not (C_Unit.Kind in Ada_Compilation_Unit_Range)
+      if C_Unit.Is_Null or else not (C_Unit.Kind in Ada_Compilation_Unit_Range)
       then
          return No_Compilation_Unit;
       end if;
@@ -1506,11 +1451,14 @@ package body Laltools.Common is
             case Root.Kind is
                when Ada_Compilation_Unit =>
                   Compilation_Units.Append (Root.As_Compilation_Unit);
+
                when Ada_Compilation_Unit_List =>
                   for Node of Root.As_Compilation_Unit_List loop
                      Compilation_Units.Append (Node.As_Compilation_Unit);
                   end loop;
-               when others => null;
+
+               when others =>
+                  null;
             end case;
          end if;
       end return;
@@ -1522,14 +1470,12 @@ package body Laltools.Common is
 
    procedure Find_Matching_Parents
      (Node     : Ada_Node'Class;
-      Match    : not null access function
-        (Node : Ada_Node'Class) return Boolean;
-      Callback : not null access procedure
-        (Parent : Ada_Node;
-         Stop   : in out Boolean))
+      Match    :
+        not null access function (Node : Ada_Node'Class) return Boolean;
+      Callback :
+        not null access procedure (Parent : Ada_Node; Stop : in out Boolean))
    is
-      Parent : Ada_Node :=
-        (if Node.Is_Null then No_Ada_Node else Node.Parent);
+      Parent : Ada_Node := (if Node.Is_Null then No_Ada_Node else Node.Parent);
       Stop   : Boolean := False;
 
    begin
@@ -1600,13 +1546,11 @@ package body Laltools.Common is
    --------------------------
 
    function Get_Declarative_Part
-     (Node         : Ada_Node'Class;
-      Private_Part : Boolean := False)
+     (Node : Ada_Node'Class; Private_Part : Boolean := False)
       return Declarative_Part
    is
       function Get_Declarative_Part_From_Owner
-        (This_Node : Ada_Node'Class)
-         return Declarative_Part;
+        (This_Node : Ada_Node'Class) return Declarative_Part;
       --  Gets the Declarative_Part node of This_Node
 
       -------------------------------------
@@ -1614,8 +1558,7 @@ package body Laltools.Common is
       -------------------------------------
 
       function Get_Declarative_Part_From_Owner
-        (This_Node : Ada_Node'Class)
-         return Declarative_Part is
+        (This_Node : Ada_Node'Class) return Declarative_Part is
       begin
          case This_Node.Kind is
             when Ada_Decl_Block_Range =>
@@ -1639,38 +1582,48 @@ package body Laltools.Common is
                     This_Node.As_Subp_Decl.P_Body_Part;
                begin
                   return
-                    (if Body_Part.Kind in Ada_Subp_Body_Range then
-                        Body_Part.As_Subp_Body.F_Decls
-                     else
-                        No_Declarative_Part);
+                    (if Body_Part.Kind in Ada_Subp_Body_Range
+                     then Body_Part.As_Subp_Body.F_Decls
+                     else No_Declarative_Part);
                end;
 
             when Ada_Task_Body_Range =>
                return This_Node.As_Task_Body.F_Decls;
 
             when Ada_Base_Package_Decl =>
-               return (if Private_Part then
-                          This_Node.As_Base_Package_Decl.F_Private_Part.
-                            As_Declarative_Part
-                       else
-                          This_Node.As_Base_Package_Decl.F_Public_Part.
-                            As_Declarative_Part);
+               return
+                 (if Private_Part
+                  then
+                    This_Node
+                      .As_Base_Package_Decl
+                      .F_Private_Part
+                      .As_Declarative_Part
+                  else
+                    This_Node
+                      .As_Base_Package_Decl
+                      .F_Public_Part
+                      .As_Declarative_Part);
 
             when Ada_Protected_Def_Range =>
-               return (if Private_Part then
-                          This_Node.As_Protected_Def.F_Private_Part.
-                            As_Declarative_Part
-                       else
-                          This_Node.As_Protected_Def.F_Public_Part.
-                            As_Declarative_Part);
+               return
+                 (if Private_Part
+                  then
+                    This_Node
+                      .As_Protected_Def
+                      .F_Private_Part
+                      .As_Declarative_Part
+                  else
+                    This_Node
+                      .As_Protected_Def
+                      .F_Public_Part
+                      .As_Declarative_Part);
 
             when Ada_Task_Def_Range =>
-               return (if Private_Part then
-                          This_Node.As_Task_Def.F_Private_Part.
-                            As_Declarative_Part
-                       else
-                          This_Node.As_Task_Def.F_Public_Part.
-                            As_Declarative_Part);
+               return
+                 (if Private_Part
+                  then This_Node.As_Task_Def.F_Private_Part.As_Declarative_Part
+                  else
+                    This_Node.As_Task_Def.F_Public_Part.As_Declarative_Part);
 
             when others =>
                raise Assertion_Error;
@@ -1698,8 +1651,7 @@ package body Laltools.Common is
    ---------------------------
 
    function Get_Declarative_Parts
-     (Node : Ada_Node'Class)
-      return Declarative_Part_Vector
+     (Node : Ada_Node'Class) return Declarative_Part_Vector
    is
       Declarative_Parts : Declarative_Part_Vector;
 
@@ -1797,8 +1749,8 @@ package body Laltools.Common is
    -- Get_Defining_Name_Id --
    --------------------------
 
-   function Get_Defining_Name_Id (Definition : Defining_Name)
-                                  return Identifier is
+   function Get_Defining_Name_Id (Definition : Defining_Name) return Identifier
+   is
    begin
       case Definition.F_Name.Kind is
          when Ada_Identifier =>
@@ -1817,8 +1769,7 @@ package body Laltools.Common is
    --------------------------------
 
    function Get_Dotted_Name_First_Name
-     (Dotted_Name : Libadalang.Analysis.Dotted_Name'Class)
-      return Name is
+     (Dotted_Name : Libadalang.Analysis.Dotted_Name'Class) return Name is
    begin
       if Dotted_Name.Is_Null then
          return No_Name;
@@ -1842,8 +1793,7 @@ package body Laltools.Common is
 
    function Get_Dotted_Name_Definitions
      (Dotted_Name : Libadalang.Analysis.Dotted_Name'Class)
-      return Defining_Name_Array
-   is
+      return Defining_Name_Array is
    begin
       if Dotted_Name.Is_Null then
          return [];
@@ -1864,7 +1814,7 @@ package body Laltools.Common is
 
          --  Do a second pass where we get the defining name of each name
          declare
-            Index : Positive := 1;
+            Index          : Positive := 1;
             Defining_Names : Defining_Name_Array (1 .. Names_Count);
          begin
             Defining_Names (Index) :=
@@ -1906,9 +1856,7 @@ package body Laltools.Common is
    -- Get_Last_Name --
    -------------------
 
-   function Get_Last_Name (Name_Node : Name)
-                           return Unbounded_Text_Type
-   is
+   function Get_Last_Name (Name_Node : Name) return Unbounded_Text_Type is
       Names : constant Unbounded_Text_Type_Array :=
         P_As_Symbol_Array (Name_Node);
    begin
@@ -1919,11 +1867,9 @@ package body Laltools.Common is
    -- Get_Name_As_Defining --
    --------------------------
 
-   function Get_Name_As_Defining (Name_Node : Name)
-                                  return Defining_Name is
+   function Get_Name_As_Defining (Name_Node : Name) return Defining_Name is
    begin
-      if Name_Node = No_Name or else not Name_Node.P_Is_Defining
-      then
+      if Name_Node = No_Name or else not Name_Node.P_Is_Defining then
          return No_Defining_Name;
       end if;
 
@@ -1935,21 +1881,17 @@ package body Laltools.Common is
    ----------------------------------
 
    function Get_Enclosing_Declarative_Part
-     (Node : Ada_Node'Class)
-      return Declarative_Part
+     (Node : Ada_Node'Class) return Declarative_Part
    is
-      Nearest_Declarative_Part : Declarative_Part :=
-        No_Declarative_Part;
+      Nearest_Declarative_Part : Declarative_Part := No_Declarative_Part;
 
       procedure Set_Declarative_Part
-        (Parent : Ada_Node;
-         Stop   : in out Boolean);
+        (Parent : Ada_Node; Stop : in out Boolean);
       --  Sets Nearest_Declarative_Part to the declarative part of Parent.
       --  Sets Stop to True to stop the search.
 
-      procedure Set_Declarative_Part
-        (Parent : Ada_Node;
-         Stop   : in out Boolean) is
+      procedure Set_Declarative_Part (Parent : Ada_Node; Stop : in out Boolean)
+      is
       begin
          Nearest_Declarative_Part := Get_Declarative_Part (Parent);
          Stop := True;
@@ -1957,9 +1899,7 @@ package body Laltools.Common is
 
    begin
       Find_Matching_Parents
-        (Node,
-         Is_Declarative_Part_Owner'Access,
-         Set_Declarative_Part'Access);
+        (Node, Is_Declarative_Part_Owner'Access, Set_Declarative_Part'Access);
 
       return Nearest_Declarative_Part;
    end Get_Enclosing_Declarative_Part;
@@ -1968,12 +1908,9 @@ package body Laltools.Common is
    -- Get_Node_As_Name --
    ----------------------
 
-   function Get_Node_As_Name (Node : Ada_Node)
-                              return Name is
+   function Get_Node_As_Name (Node : Ada_Node) return Name is
    begin
-      if Node = No_Ada_Node
-        or else Node.Kind not in Ada_Name
-      then
+      if Node = No_Ada_Node or else Node.Kind not in Ada_Name then
          return No_Name;
       end if;
 
@@ -1998,8 +1935,8 @@ package body Laltools.Common is
    -- Get_Package_Body_Decls --
    ----------------------------
 
-   function Get_Package_Body_Decls (Pkg_Body : Package_Body)
-      return Ada_Node_List is
+   function Get_Package_Body_Decls
+     (Pkg_Body : Package_Body) return Ada_Node_List is
    begin
       if Pkg_Body = No_Package_Body then
          return No_Ada_Node_List;
@@ -2052,12 +1989,10 @@ package body Laltools.Common is
    -----------------------
 
    function Get_Package_Decls
-     (Pkg_Decl : Base_Package_Decl'Class)
-      return Ada_List_Vector is
+     (Pkg_Decl : Base_Package_Decl'Class) return Ada_List_Vector is
    begin
       return Result : Ada_List_Vector do
-         Append_If_Not_Null
-           (Result, Get_Package_Decl_Public_Decls (Pkg_Decl));
+         Append_If_Not_Null (Result, Get_Package_Decl_Public_Decls (Pkg_Decl));
          Append_If_Not_Null
            (Result, Get_Package_Decl_Private_Decls (Pkg_Decl));
          Append_If_Not_Null
@@ -2070,8 +2005,7 @@ package body Laltools.Common is
    -----------------------------------------------
 
    function Get_Package_Decl_Private_Declarative_Part
-     (Pkg_Decl : Base_Package_Decl'Class)
-      return Declarative_Part is
+     (Pkg_Decl : Base_Package_Decl'Class) return Declarative_Part is
    begin
       if Pkg_Decl.Is_Null or else Pkg_Decl.F_Private_Part.Is_Null then
          return No_Declarative_Part;
@@ -2085,8 +2019,7 @@ package body Laltools.Common is
    ------------------------------------
 
    function Get_Package_Decl_Private_Decls
-     (Pkg_Decl : Base_Package_Decl'Class)
-      return Ada_Node_List is
+     (Pkg_Decl : Base_Package_Decl'Class) return Ada_Node_List is
    begin
       if Pkg_Decl.Is_Null or else Pkg_Decl.F_Private_Part.Is_Null then
          return No_Ada_Node_List;
@@ -2100,8 +2033,7 @@ package body Laltools.Common is
    ----------------------------------------------
 
    function Get_Package_Decl_Public_Declarative_Part
-     (Pkg_Decl : Base_Package_Decl'Class)
-      return Declarative_Part is
+     (Pkg_Decl : Base_Package_Decl'Class) return Declarative_Part is
    begin
       if Pkg_Decl.Is_Null then
          return No_Declarative_Part;
@@ -2115,8 +2047,7 @@ package body Laltools.Common is
    -----------------------------------
 
    function Get_Package_Decl_Public_Decls
-     (Pkg_Decl : Base_Package_Decl'Class)
-      return Ada_Node_List is
+     (Pkg_Decl : Base_Package_Decl'Class) return Ada_Node_List is
    begin
       if Pkg_Decl.Is_Null then
          return No_Ada_Node_List;
@@ -2129,8 +2060,7 @@ package body Laltools.Common is
    -- Get_Param_Spec_Index --
    --------------------------
 
-   function Get_Param_Spec_Index (Target : Param_Spec) return Positive
-   is
+   function Get_Param_Spec_Index (Target : Param_Spec) return Positive is
       Index : Positive := 1;
 
    begin
@@ -2150,14 +2080,12 @@ package body Laltools.Common is
    ----------------------------------
 
    function Get_Parameter_Absolute_Index
-     (Target : Defining_Name)
-      return Natural
+     (Target : Defining_Name) return Natural
    is
       Index : Positive := 1;
 
    begin
-      for Param_Spec of
-        Get_Subp_Params (Target.P_Parent_Basic_Decl).F_Params
+      for Param_Spec of Get_Subp_Params (Target.P_Parent_Basic_Decl).F_Params
       loop
          for Parameter of Param_Spec.F_Ids loop
             if Target = Parameter then
@@ -2176,11 +2104,9 @@ package body Laltools.Common is
    ------------------------
 
    function Get_Parameter_Name
-     (Parameters      : Params'Class;
-      Parameter_Index : Positive)
-      return Text_Type
+     (Parameters : Params'Class; Parameter_Index : Positive) return Text_Type
    is
-      Index  : Positive := 1;
+      Index : Positive := 1;
 
    begin
       for Param_Spec of Parameters.F_Params loop
@@ -2201,9 +2127,7 @@ package body Laltools.Common is
    ------------------------
 
    function Get_Parameter_Name
-     (Subp            : Basic_Decl'Class;
-      Parameter_Index : Positive)
-      return Text_Type
+     (Subp : Basic_Decl'Class; Parameter_Index : Positive) return Text_Type
    is (Get_Parameter_Name (Get_Subp_Params (Subp), Parameter_Index));
 
    ------------------------------------
@@ -2224,51 +2148,50 @@ package body Laltools.Common is
    -- Get_Subp_Body_Decls --
    -------------------------
 
-   function Get_Subp_Body_Decls
-     (Subp_B : Subp_Body)
-      return Ada_Node_List
+   function Get_Subp_Body_Decls (Subp_B : Subp_Body) return Ada_Node_List
    is (if Subp_B.Is_Null then No_Ada_Node_List else Subp_B.F_Decls.F_Decls);
 
    ---------------------
    -- Get_Subp_Params --
    ---------------------
 
-   function Get_Subp_Params
-     (Subp : Basic_Decl'Class)
-      return Params is
-     (Get_Subp_Spec_Params (Get_Subp_Spec (Subp)));
+   function Get_Subp_Params (Subp : Basic_Decl'Class) return Params
+   is (Get_Subp_Spec_Params (Get_Subp_Spec (Subp)));
 
    -------------------
    -- Get_Subp_Spec --
    -------------------
 
-   function Get_Subp_Spec (Subp : Basic_Decl'Class) return Base_Subp_Spec is
-     (if Subp.Is_Null then No_Base_Subp_Spec
-      else Subp.P_Subp_Spec_Or_Null (True));
+   function Get_Subp_Spec (Subp : Basic_Decl'Class) return Base_Subp_Spec
+   is (if Subp.Is_Null then No_Base_Subp_Spec
+       else Subp.P_Subp_Spec_Or_Null (True));
 
    --------------------------
    -- Get_Subp_Spec_Params --
    --------------------------
 
    function Get_Subp_Spec_Params
-     (Subp_Spec : Base_Subp_Spec'Class)
-      return Params is
+     (Subp_Spec : Base_Subp_Spec'Class) return Params is
    begin
       if Subp_Spec.Is_Null then
          return No_Params;
       end if;
 
       case Ada_Base_Subp_Spec (Subp_Spec.Kind) is
-         when Ada_Entry_Spec_Range
-            => return Subp_Spec.As_Entry_Spec.F_Entry_Params;
-         when Ada_Enum_Subp_Spec_Range
-            => return No_Params;
-         when Ada_Subp_Spec_Range
-            => return Subp_Spec.As_Subp_Spec.F_Subp_Params;
-         when Ada_Synthetic_Binary_Spec
-            => return No_Params;
-         when Ada_Synthetic_Unary_Spec
-            => return No_Params;
+         when Ada_Entry_Spec_Range =>
+            return Subp_Spec.As_Entry_Spec.F_Entry_Params;
+
+         when Ada_Enum_Subp_Spec_Range =>
+            return No_Params;
+
+         when Ada_Subp_Spec_Range =>
+            return Subp_Spec.As_Subp_Spec.F_Subp_Params;
+
+         when Ada_Synthetic_Binary_Spec =>
+            return No_Params;
+
+         when Ada_Synthetic_Unary_Spec =>
+            return No_Params;
       end case;
    end Get_Subp_Spec_Params;
 
@@ -2290,8 +2213,7 @@ package body Laltools.Common is
    -- Get_Task_Body_Decls --
    -------------------------
 
-   function Get_Task_Body_Decls
-     (Task_B : Task_Body) return Ada_Node_List is
+   function Get_Task_Body_Decls (Task_B : Task_Body) return Ada_Node_List is
    begin
       if Task_B = No_Task_Body then
          return No_Ada_Node_List;
@@ -2305,8 +2227,7 @@ package body Laltools.Common is
    --------------------------------
 
    function Get_Use_Units_Public_Parts
-     (Node : Ada_Node'Class)
-      return Declarative_Part_Vector
+     (Node : Ada_Node'Class) return Declarative_Part_Vector
    is
       Public_Parts : Declarative_Part_Vector;
 
@@ -2350,8 +2271,11 @@ package body Laltools.Common is
                     and then DGD.Kind in Ada_Generic_Package_Decl_Range
                   then
                      Public_Parts.Append
-                       (DGD.As_Generic_Package_Decl.F_Package_Decl.
-                          F_Public_Part.As_Declarative_Part);
+                       (DGD
+                          .As_Generic_Package_Decl
+                          .F_Package_Decl
+                          .F_Public_Part
+                          .As_Declarative_Part);
                   end if;
 
                when Ada_Package_Renaming_Decl_Range =>
@@ -2387,8 +2311,7 @@ package body Laltools.Common is
    --------------------
 
    function Get_Used_Units
-     (Node : Compilation_Unit'Class)
-      return Compilation_Unit_Array
+     (Node : Compilation_Unit'Class) return Compilation_Unit_Array
    is
       Used_Units : Compilation_Unit_Vectors.Vector;
 
@@ -2414,9 +2337,7 @@ package body Laltools.Common is
 
       --  Copy the Used_Units elements to an array
 
-      return R : Compilation_Unit_Array
-        (1 .. Integer (Used_Units.Length))
-      do
+      return R : Compilation_Unit_Array (1 .. Integer (Used_Units.Length)) do
          declare
             Idx : Positive := 1;
 
@@ -2434,8 +2355,7 @@ package body Laltools.Common is
    ----------------------
 
    function Get_Withed_Units
-     (Node : Compilation_Unit'Class)
-      return Compilation_Unit_Array
+     (Node : Compilation_Unit'Class) return Compilation_Unit_Array
    is
       Used_Units : Compilation_Unit_Vectors.Vector;
 
@@ -2461,9 +2381,7 @@ package body Laltools.Common is
 
       --  Copy the Used_Units elements to an array
 
-      return R : Compilation_Unit_Array
-        (1 .. Integer (Used_Units.Length))
-      do
+      return R : Compilation_Unit_Array (1 .. Integer (Used_Units.Length)) do
          declare
             Idx : Positive := 1;
 
@@ -2489,10 +2407,8 @@ package body Laltools.Common is
          return;
       end if;
 
-      if Map.Contains (Key)
-      then
-         if not Map.Reference (Key).Contains (Element)
-         then
+      if Map.Contains (Key) then
+         if not Map.Reference (Key).Contains (Element) then
             Map.Reference (Key).Insert (Element);
          end if;
       else
@@ -2523,10 +2439,8 @@ package body Laltools.Common is
          declare
             Sibling : constant Ada_Node := Node.Next_Sibling;
             Text    : constant Wide_Wide_String :=
-              (if Sibling.Is_Null
-               then ""
-               else Ada.Wide_Wide_Characters.Handling.To_Lower
-                 (Sibling.Text));
+              (if Sibling.Is_Null then ""
+               else Ada.Wide_Wide_Characters.Handling.To_Lower (Sibling.Text));
          begin
             return
               Text = "access"
@@ -2547,7 +2461,8 @@ package body Laltools.Common is
       Trace     : GNATCOLL.Traces.Trace_Handle;
       Imprecise : in out Ref_Result_Kind) return Boolean is
    begin
-      return Node.As_Ada_Node /= No_Ada_Node
+      return
+        Node.As_Ada_Node /= No_Ada_Node
         and then Node.Kind in Ada_Name
         and then Node.As_Name.P_Is_Call
         and then Node.Kind = Ada_Identifier
@@ -2561,8 +2476,7 @@ package body Laltools.Common is
    function Is_Constant (Node : Basic_Decl) return Boolean is
    begin
       for Child of Node.Children loop
-         if Child /= No_Ada_Node
-           and then Child.Kind = Ada_Constant_Present
+         if Child /= No_Ada_Node and then Child.Kind = Ada_Constant_Present
          then
             return True;
          end if;
@@ -2575,59 +2489,51 @@ package body Laltools.Common is
    -- Is_Declarative_Part_Owner --
    -------------------------------
 
-   function Is_Declarative_Part_Owner
-     (Node : Ada_Node'Class)
-      return Boolean
+   function Is_Declarative_Part_Owner (Node : Ada_Node'Class) return Boolean
    is (not Node.Is_Null
-       and then Node.Kind in
-         Ada_Decl_Block_Range
-         | Ada_Entry_Body_Range
-         | Ada_Package_Body_Range
-         | Ada_Protected_Body_Range
-         | Ada_Subp_Body_Range
-         | Ada_Subp_Decl_Range
-         | Ada_Task_Body_Range
-         | Ada_Base_Package_Decl
-         | Ada_Protected_Def_Range
-         | Ada_Task_Def_Range);
+       and then Node.Kind
+                in Ada_Decl_Block_Range
+                 | Ada_Entry_Body_Range
+                 | Ada_Package_Body_Range
+                 | Ada_Protected_Body_Range
+                 | Ada_Subp_Body_Range
+                 | Ada_Subp_Decl_Range
+                 | Ada_Task_Body_Range
+                 | Ada_Base_Package_Decl
+                 | Ada_Protected_Def_Range
+                 | Ada_Task_Def_Range);
 
    ------------------------
    -- Is_Decl_Expr_Owner --
    ------------------------
 
-   function Is_Decl_Expr_Owner
-     (Node : Ada_Node'Class)
-      return Boolean
+   function Is_Decl_Expr_Owner (Node : Ada_Node'Class) return Boolean
    is (not Node.Is_Null
        and then Node.Kind in Ada_Expr_Function
        and then Node.As_Expr_Function.F_Expr.Kind in Ada_Paren_Expr_Range
-       and then Node.As_Expr_Function.F_Expr.As_Paren_Expr.F_Expr.Kind in
-         Ada_Decl_Expr_Range);
+       and then Node.As_Expr_Function.F_Expr.As_Paren_Expr.F_Expr.Kind
+                in Ada_Decl_Expr_Range);
 
    ---------------------
    -- Is_Params_Owner --
    ---------------------
 
-   function Is_Params_Owner
-     (Node : Ada_Node'Class)
-      return Boolean
+   function Is_Params_Owner (Node : Ada_Node'Class) return Boolean
    is (not Node.Is_Null
        and then ((Node.Kind in Ada_Basic_Decl
                   and then not Node.As_Basic_Decl.P_Subp_Spec_Or_Null.Is_Null
-                  and then Node.As_Basic_Decl.P_Subp_Spec_Or_Null.Kind in
-                             Ada_Subp_Spec_Range)
-                 or else Node.Kind in
-                           Ada_Entry_Decl_Range
-                             | Ada_Accept_Stmt_Range
-                             | Ada_Entry_Body_Range));
+                  and then Node.As_Basic_Decl.P_Subp_Spec_Or_Null.Kind
+                           in Ada_Subp_Spec_Range)
+                 or else Node.Kind
+                         in Ada_Entry_Decl_Range
+                          | Ada_Accept_Stmt_Range
+                          | Ada_Entry_Body_Range));
 
    ---------------------------
    -- Is_Whole_Line_Comment --
    ---------------------------
 
-   function Is_Whole_Line_Comment
-     (Token : Token_Reference)
-      return Boolean is
+   function Is_Whole_Line_Comment (Token : Token_Reference) return Boolean is
    begin
       if Token /= No_Token
         and then Kind (Data (Token)) in Ada_Comment
@@ -2662,12 +2568,14 @@ package body Laltools.Common is
    is
       Parents : constant Ada_Node_Array := Definition.Parents;
    begin
-      return Parents'Length > 2 and then Parents (Parents'First + 2).Kind in
-        Ada_Abstract_Subp_Decl
-      --  This is as abstract subprogram
-        | Ada_Null_Subp_Decl
-      --  This is an "is null" procedure
-        | Ada_Expr_Function;
+      return
+        Parents'Length > 2
+        and then Parents (Parents'First + 2).Kind
+                 in Ada_Abstract_Subp_Decl
+                  --  This is as abstract subprogram
+                  | Ada_Null_Subp_Decl
+                  --  This is an "is null" procedure
+                  | Ada_Expr_Function;
       --  This is an expression function
    end Is_Definition_Without_Separate_Implementation;
 
@@ -2683,14 +2591,12 @@ package body Laltools.Common is
       Definition : Defining_Name;
 
    begin
-      if Node.As_Ada_Node /= No_Ada_Node
-        and then Node.Kind in Ada_Name
-      then
-         Definition := Laltools.Common.Resolve_Name
-           (Node.As_Name, Trace, Imprecise);
-         return Definition /= No_Defining_Name
-           and then Definition.P_Basic_Decl.Kind =
-             Ada_Enum_Literal_Decl;
+      if Node.As_Ada_Node /= No_Ada_Node and then Node.Kind in Ada_Name then
+         Definition :=
+           Laltools.Common.Resolve_Name (Node.As_Name, Trace, Imprecise);
+         return
+           Definition /= No_Defining_Name
+           and then Definition.P_Basic_Decl.Kind = Ada_Enum_Literal_Decl;
       end if;
 
       return False;
@@ -2701,14 +2607,16 @@ package body Laltools.Common is
    ------------------
 
    function Is_Renamable (Node : Ada_Node'Class) return Boolean is
-      Node_Name : constant Libadalang.Analysis.Name
-        := Get_Node_As_Name (Node.As_Ada_Node);
+      Node_Name : constant Libadalang.Analysis.Name :=
+        Get_Node_As_Name (Node.As_Ada_Node);
    begin
       --  Only consider renamable if a precise definition is found
-      return Node_Name /= No_Name and then
-        (Node_Name.P_Is_Defining or else
-         Node.As_Name.P_Referenced_Defining_Name (Imprecise_Fallback => False)
-         /= No_Defining_Name);
+      return
+        Node_Name /= No_Name
+        and then (Node_Name.P_Is_Defining
+                  or else Node.As_Name.P_Referenced_Defining_Name
+                            (Imprecise_Fallback => False)
+                          /= No_Defining_Name);
    end Is_Renamable;
 
    ------------------
@@ -2718,9 +2626,7 @@ package body Laltools.Common is
    function Is_Structure (Node : Basic_Decl) return Boolean is
    begin
       for Child of Node.Children loop
-         if Child /= No_Ada_Node
-           and then Child.Kind = Ada_Record_Type_Def
-         then
+         if Child /= No_Ada_Node and then Child.Kind = Ada_Record_Type_Def then
             return True;
          end if;
       end loop;
@@ -2732,8 +2638,7 @@ package body Laltools.Common is
    -- Length --
    ------------
 
-   function Length (List : Assoc_List) return Natural
-   is
+   function Length (List : Assoc_List) return Natural is
       L : Natural := 0;
    begin
       for Node of List loop
@@ -2747,8 +2652,7 @@ package body Laltools.Common is
    -- Length --
    ------------
 
-   function Length (List : Compilation_Unit_List) return Natural
-   is
+   function Length (List : Compilation_Unit_List) return Natural is
       L : Natural := 0;
    begin
       for Unit of List loop
@@ -2762,8 +2666,7 @@ package body Laltools.Common is
    -- Length --
    ------------
 
-   function Length (List : Defining_Name_List) return Natural
-   is
+   function Length (List : Defining_Name_List) return Natural is
       L : Natural := 0;
    begin
       for Node of List loop
@@ -2777,8 +2680,7 @@ package body Laltools.Common is
    -- Length --
    ------------
 
-   function Length (List : Param_Spec_List) return Natural
-   is
+   function Length (List : Param_Spec_List) return Natural is
       L : Natural := 0;
    begin
       for Node of List loop
@@ -2795,8 +2697,7 @@ package body Laltools.Common is
    function List_Bodies_Of
      (Definition : Defining_Name;
       Trace      : GNATCOLL.Traces.Trace_Handle;
-      Imprecise  : in out Ref_Result_Kind)
-      return Bodies_List.List
+      Imprecise  : in out Ref_Result_Kind) return Bodies_List.List
    is
       List       : Bodies_List.List;
       Next_Part  : Defining_Name;
@@ -2807,9 +2708,14 @@ package body Laltools.Common is
       --  does not call for a body, let's consider that this *is* the
       --  implementation. Return this, and do not attempt to look
       --  for secondary implementations in this case.
-      if Parents'Length > 2 and then Parents (Parents'First + 2).Kind in
-        Libadalang.Common.Ada_Null_Subp_Decl     --  "is null" procedure?
-          | Libadalang.Common.Ada_Expr_Function  --  expression function?
+      if Parents'Length > 2
+        and then Parents (Parents'First + 2).Kind
+                 in Libadalang
+                      .Common
+                      .Ada_Null_Subp_Decl     --  "is null" procedure?
+                  | Libadalang
+                      .Common
+                      .Ada_Expr_Function  --  expression function?
       then
          List.Append (Definition);
          return List;
@@ -2817,8 +2723,9 @@ package body Laltools.Common is
 
       --  If the definition that we found is a subprogram body, add this to the
       --  list
-      if Parents'Length > 2 and then Parents (Parents'First + 2).Kind in
-        Libadalang.Common.Ada_Subp_Body
+      if Parents'Length > 2
+        and then Parents (Parents'First + 2).Kind
+                 in Libadalang.Common.Ada_Subp_Body
       then
          List.Append (Definition);
       end if;
@@ -2866,11 +2773,12 @@ package body Laltools.Common is
          Trace.Trace (Message);
       end if;
 
-      Trace.Trace (Ada.Exceptions.Exception_Name (E)
-                   & ": "
-                   & Ada.Exceptions.Exception_Message (E)
-                   & ASCII.LF
-                   & GNAT.Traceback.Symbolic.Symbolic_Traceback (E));
+      Trace.Trace
+        (Ada.Exceptions.Exception_Name (E)
+         & ": "
+         & Ada.Exceptions.Exception_Message (E)
+         & ASCII.LF
+         & GNAT.Traceback.Symbolic.Symbolic_Traceback (E));
    end Log;
 
    -----------
@@ -2923,19 +2831,22 @@ package body Laltools.Common is
       Ref_Kind := Precise;
       if Name_Node.Is_Null then
          return No_Defining_Name;
-      --  P_Failsafe_Referenced_Def_Name doesn't work on the decl itself
+         --  P_Failsafe_Referenced_Def_Name doesn't work on the decl itself
       elsif Name_Node.P_Is_Defining then
          Result := Name_Node.P_Enclosing_Defining_Name.P_Canonical_Part;
       else
-         Failsafe_Result := Name_Node.P_Failsafe_Referenced_Def_Name
-           (Imprecise_Fallback => True);
+         Failsafe_Result :=
+           Name_Node.P_Failsafe_Referenced_Def_Name
+             (Imprecise_Fallback => True);
          Ref_Kind := Kind (Failsafe_Result);
          case Kind (Failsafe_Result) is
             when Precise | Imprecise =>
                --  Nothing extra to do here
                null;
+
             when Error =>
                return No_Defining_Name;
+
             when No_Ref =>
                return No_Defining_Name;
          end case;
@@ -2970,8 +2881,10 @@ package body Laltools.Common is
       if Name_Node.P_Is_Defining then
          return Name_Node.P_Enclosing_Defining_Name.P_Canonical_Part;
       else
-         return Result : Defining_Name :=
-           Name_Node.P_Referenced_Defining_Name (Imprecise_Fallback => False)
+         return
+            Result : Defining_Name :=
+              Name_Node.P_Referenced_Defining_Name
+                (Imprecise_Fallback => False)
          do
             if Result /= No_Defining_Name then
                Result := Result.P_Canonical_Part;
@@ -2985,8 +2898,7 @@ package body Laltools.Common is
    ---------------------
 
    function Validate_Syntax
-     (Source : Ada.Strings.Unbounded.Unbounded_String;
-      Rule   : Grammar_Rule)
+     (Source : Ada.Strings.Unbounded.Unbounded_String; Rule : Grammar_Rule)
       return Boolean
    is
       Unit : constant Analysis_Unit :=
@@ -3003,8 +2915,7 @@ package body Laltools.Common is
 
    function Validate_Syntax
      (Source : Ada.Strings.Unbounded.Unbounded_String;
-      Rules  : Grammar_Rule_Vector)
-      return Boolean
+      Rules  : Grammar_Rule_Vector) return Boolean
    is ((for some Rule of Rules => Validate_Syntax (Source, Rule)));
 
 end Laltools.Common;

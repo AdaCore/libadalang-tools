@@ -26,7 +26,7 @@ with Ada.Text_IO;
 with GNATCOLL.VFS; use GNATCOLL.VFS;
 
 with Utils.Command_Lines.Common; use Utils.Command_Lines.Common;
-with Utils.String_Utilities; use Utils.String_Utilities;
+with Utils.String_Utilities;     use Utils.String_Utilities;
 with Utils.Tool_Names;
 
 package body Utils.Projects.Aggregate is
@@ -55,9 +55,9 @@ package body Utils.Projects.Aggregate is
 
       for Prj of Aggregated_Prjs.all loop
          declare
-            VF : constant Virtual_File := Prj.Project_Path;
+            VF         : constant Virtual_File := Prj.Project_Path;
             pragma Assert (VF /= No_File);
-            Prj_Name : constant Filesystem_String :=
+            Prj_Name   : constant Filesystem_String :=
               Full_Name (VF, Normalize => True);
             Prj_String : constant String_Access :=
               new String'(String (Prj_Name));
@@ -69,8 +69,7 @@ package body Utils.Projects.Aggregate is
       Unchecked_Free (Aggregated_Prjs);
 
       if Num_Of_Aggregated_Projects = 0 then
-         Cmd_Error
-           ("aggregate project does not contain anything to process");
+         Cmd_Error ("aggregate project does not contain anything to process");
       end if;
    end Collect_Aggregated_Projects;
 
@@ -78,15 +77,15 @@ package body Utils.Projects.Aggregate is
    -- Get_Aggregated_Prj_Src --
    ----------------------------
 
-   function Get_Aggregated_Prj_Src return String_Access is
-     (Element (First (Aggregated_Projects)));
+   function Get_Aggregated_Prj_Src return String_Access
+   is (Element (First (Aggregated_Projects)));
 
    --------------------------------
    -- Num_Of_Aggregated_Projects --
    --------------------------------
 
-   function Num_Of_Aggregated_Projects return Natural is
-     (Natural (Aggregated_Projects.Length));
+   function Num_Of_Aggregated_Projects return Natural
+   is (Natural (Aggregated_Projects.Length));
 
    ---------------------------------
    -- Process_Aggregated_Projects --
@@ -106,14 +105,15 @@ package body Utils.Projects.Aggregate is
       Append (Args_Vec, null); -- will be replaced with project file name below
 
       declare
-         L : constant Positive := Last_Index (Args_Vec);
-         Args : GNAT.OS_Lib.String_List renames Elems_Var (Args_Vec)(1 .. L);
+         L            : constant Positive := Last_Index (Args_Vec);
+         Args         : GNAT.OS_Lib.String_List
+           renames Elems_Var (Args_Vec) (1 .. L);
          Prj_Name_Arg : String_Access renames Args (L);
       begin
          for Prj_Name of Aggregated_Projects loop
             if Arg (Cmd, Verbose) then
-               Ada.Text_IO.Put_Line ("Processing aggregated project " &
-                     Prj_Name.all);
+               Ada.Text_IO.Put_Line
+                 ("Processing aggregated project " & Prj_Name.all);
             end if;
 
             Prj_Name_Arg := Prj_Name;

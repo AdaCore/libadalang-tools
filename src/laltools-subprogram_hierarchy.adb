@@ -29,10 +29,11 @@ with Laltools.Call_Hierarchy; use Laltools.Call_Hierarchy;
 
 package body Laltools.Subprogram_Hierarchy is
 
-   package Subp_Renaming_Decl_Vectors is new Ada.Containers.Vectors
-     (Index_Type   => Positive,
-      Element_Type => Subp_Renaming_Decl,
-      "="          => "=");
+   package Subp_Renaming_Decl_Vectors is new
+     Ada.Containers.Vectors
+       (Index_Type   => Positive,
+        Element_Type => Subp_Renaming_Decl,
+        "="          => "=");
 
    subtype Subp_Renaming_Decl_Vector is Subp_Renaming_Decl_Vectors.Vector;
 
@@ -43,8 +44,7 @@ package body Laltools.Subprogram_Hierarchy is
    function Find_Base_Subp_Declarations
      (Subp               : Basic_Decl'Class;
       Exclude_Itself     : Boolean := True;
-      Imprecise_Fallback : Boolean := False)
-      return Basic_Decl_Array
+      Imprecise_Fallback : Boolean := False) return Basic_Decl_Array
    is
       Unwinded_Subp : Basic_Decl;
 
@@ -54,8 +54,7 @@ package body Laltools.Subprogram_Hierarchy is
       end if;
 
       if Subp.Kind in Ada_Subp_Renaming_Decl_Range then
-         Unwinded_Subp :=
-           Final_Renamed_Subp (Subp.As_Subp_Renaming_Decl);
+         Unwinded_Subp := Final_Renamed_Subp (Subp.As_Subp_Renaming_Decl);
       else
          Unwinded_Subp := Subp.As_Basic_Decl;
       end if;
@@ -102,8 +101,7 @@ package body Laltools.Subprogram_Hierarchy is
    --------------------------------------
 
    function Find_Generic_Subp_Instantiations
-     (Refs : Ref_Result_Array)
-      return Generic_Subp_Instantiation_Array
+     (Refs : Ref_Result_Array) return Generic_Subp_Instantiation_Array
    is
       Instantiations : Generic_Subp_Instantiation_Array (1 .. Refs'Length) :=
         [others => No_Generic_Subp_Instantiation];
@@ -111,8 +109,8 @@ package body Laltools.Subprogram_Hierarchy is
 
    begin
       for Reference of Refs loop
-         if Ref (Reference).P_Semantic_Parent.Kind in
-           Ada_Generic_Subp_Instantiation_Range
+         if Ref (Reference).P_Semantic_Parent.Kind
+            in Ada_Generic_Subp_Instantiation_Range
          then
             True_Length := True_Length + 1;
             Instantiations (True_Length) :=
@@ -128,8 +126,7 @@ package body Laltools.Subprogram_Hierarchy is
    -------------------------------------
 
    function Find_Subp_Renaming_Declarations
-     (Refs : Ref_Result_Array)
-      return Subp_Renaming_Decl_Array
+     (Refs : Ref_Result_Array) return Subp_Renaming_Decl_Array
    is
       Subp_Renames : Subp_Renaming_Decl_Array (1 .. Refs'Length) :=
         [others => No_Subp_Renaming_Decl];
@@ -137,8 +134,8 @@ package body Laltools.Subprogram_Hierarchy is
 
    begin
       for Reference of Refs loop
-         if Ref (Reference).P_Semantic_Parent.Kind in
-           Ada_Subp_Renaming_Decl_Range
+         if Ref (Reference).P_Semantic_Parent.Kind
+            in Ada_Subp_Renaming_Decl_Range
          then
             True_Length := True_Length + 1;
             Subp_Renames (True_Length) :=
@@ -154,8 +151,7 @@ package body Laltools.Subprogram_Hierarchy is
    -----------------------------------------------
 
    function Find_Subp_Renaming_Declarations_Hierarchy
-     (Subp  : Basic_Decl'Class;
-      Units : Analysis_Unit_Array)
+     (Subp : Basic_Decl'Class; Units : Analysis_Unit_Array)
       return Subp_Renaming_Decl_Array
    is
       Unwinded_Subp : Basic_Decl;
@@ -172,8 +168,7 @@ package body Laltools.Subprogram_Hierarchy is
 
       procedure Create_Hierarchy (Target : Basic_Decl'Class) is
       begin
-         for Rename_Decl of
-           Find_Subp_Renaming_Declarations (Target, Units)
+         for Rename_Decl of Find_Subp_Renaming_Declarations (Target, Units)
          loop
             Hierarchy.Append (Rename_Decl);
             Create_Hierarchy (Rename_Decl);
@@ -186,8 +181,7 @@ package body Laltools.Subprogram_Hierarchy is
       end if;
 
       if Subp.Kind in Ada_Subp_Renaming_Decl_Range then
-         Unwinded_Subp :=
-           Final_Renamed_Subp (Subp.As_Subp_Renaming_Decl);
+         Unwinded_Subp := Final_Renamed_Subp (Subp.As_Subp_Renaming_Decl);
       else
          Unwinded_Subp := Subp.As_Basic_Decl;
       end if;
@@ -202,8 +196,9 @@ package body Laltools.Subprogram_Hierarchy is
          return [];
 
       else
-         return Hierarchy_As_Array : Subp_Renaming_Decl_Array
-           (1 .. Positive (Hierarchy.Length))
+         return
+            Hierarchy_As_Array :
+              Subp_Renaming_Decl_Array (1 .. Positive (Hierarchy.Length))
          do
             for J in 1 .. Positive (Hierarchy.Length) loop
                Hierarchy_As_Array (J) := Hierarchy.Element (J);
@@ -219,13 +214,13 @@ package body Laltools.Subprogram_Hierarchy is
    procedure Find_Subp_Relatives
      (Subp               : Basic_Decl'Class;
       Units              : Analysis_Unit_Array;
-      Decls_Callback     : access procedure
-        (Relative_Subp   : Basic_Decl'Class);
+      Decls_Callback     : access procedure (Relative_Subp : Basic_Decl'Class);
       Find_Calls         : Boolean := False;
-      Calls_Callback     : access procedure
-        (Call_Identifier : Base_Id'Class;
-         Kind            : Ref_Result_Kind;
-         Cancel          : in out Boolean) := null;
+      Calls_Callback     :
+        access procedure
+          (Call_Identifier : Base_Id'Class;
+           Kind            : Ref_Result_Kind;
+           Cancel          : in out Boolean) := null;
       Include_Base_Subps : Boolean := True;
       Include_Overrides  : Boolean := True)
    is
@@ -246,9 +241,9 @@ package body Laltools.Subprogram_Hierarchy is
       begin
          Decls_Callback (Aux_Decl);
 
-         for Instantiation of
-           Find_Generic_Subp_Instantiations
-             (Aux_Decl.As_Generic_Subp_Decl, Units)
+         for Instantiation
+           of Find_Generic_Subp_Instantiations
+                (Aux_Decl.As_Generic_Subp_Decl, Units)
          loop
             if Find_Calls then
                Find_Incoming_Calls
@@ -279,8 +274,9 @@ package body Laltools.Subprogram_Hierarchy is
 
       procedure Process_Subp is
       begin
-         for Subp_Decl of Get_Subp_Hierarchy
-           (Aux_Decl, Units, Include_Base_Subps, Include_Overrides)
+         for Subp_Decl
+           of Get_Subp_Hierarchy
+                (Aux_Decl, Units, Include_Base_Subps, Include_Overrides)
          loop
             Decls_Callback (Subp_Decl);
 
@@ -291,15 +287,16 @@ package body Laltools.Subprogram_Hierarchy is
 
             declare
                Rename_Decls : constant Subp_Renaming_Decl_Array :=
-                 Find_Subp_Renaming_Declarations_Hierarchy
-                   (Subp_Decl, Units);
+                 Find_Subp_Renaming_Declarations_Hierarchy (Subp_Decl, Units);
             begin
                for Rename_Decl of Rename_Decls loop
                   Decls_Callback (Rename_Decl);
 
                   if Find_Calls then
                      Find_Incoming_Calls
-                       (Rename_Decl.P_Defining_Name, Units, Calls_Callback,
+                       (Rename_Decl.P_Defining_Name,
+                        Units,
+                        Calls_Callback,
                         False);
                   end if;
                end loop;
@@ -314,14 +311,15 @@ package body Laltools.Subprogram_Hierarchy is
       end if;
 
       if Aux_Decl.Kind in Ada_Subp_Renaming_Decl_Range then
-         Aux_Decl :=
-           Final_Renamed_Subp (Aux_Decl.As_Subp_Renaming_Decl);
+         Aux_Decl := Final_Renamed_Subp (Aux_Decl.As_Subp_Renaming_Decl);
       end if;
 
       if Aux_Decl.Kind in Ada_Generic_Subp_Instantiation_Range then
          Aux_Decl :=
-           Aux_Decl.As_Generic_Subp_Instantiation
-           .P_Designated_Generic_Decl.As_Basic_Decl;
+           Aux_Decl
+             .As_Generic_Subp_Instantiation
+             .P_Designated_Generic_Decl
+             .As_Basic_Decl;
       end if;
 
       if Aux_Decl.Kind in Ada_Generic_Subp_Internal_Range
@@ -346,20 +344,20 @@ package body Laltools.Subprogram_Hierarchy is
      (Subp               : Basic_Decl;
       Units              : Analysis_Unit_Array;
       Include_Base_Subps : Boolean := True;
-      Include_Overrides  : Boolean := True)
-      return Basic_Decl_Array
+      Include_Overrides  : Boolean := True) return Basic_Decl_Array
    is
-      function Hash (Decl : Basic_Decl) return Ada.Containers.Hash_Type is
-        (Hash (Decl.As_Ada_Node));
+      function Hash (Decl : Basic_Decl) return Ada.Containers.Hash_Type
+      is (Hash (Decl.As_Ada_Node));
 
-      function Equivalent_Elements (L, R : Basic_Decl) return Boolean is
-        (L.Image = R.Image);
+      function Equivalent_Elements (L, R : Basic_Decl) return Boolean
+      is (L.Image = R.Image);
 
-      package Basic_Decl_Hashed_Sets is new Ada.Containers.Hashed_Sets
-        (Element_Type        => Basic_Decl,
-         Hash                => Hash,
-         Equivalent_Elements => Equivalent_Elements,
-         "="                 => "=");
+      package Basic_Decl_Hashed_Sets is new
+        Ada.Containers.Hashed_Sets
+          (Element_Type        => Basic_Decl,
+           Hash                => Hash,
+           Equivalent_Elements => Equivalent_Elements,
+           "="                 => "=");
 
       subtype Basic_Decl_Set is Basic_Decl_Hashed_Sets.Set;
 
@@ -377,8 +375,7 @@ package body Laltools.Subprogram_Hierarchy is
          Idx : Positive := 1;
 
       begin
-         return A : Basic_Decl_Array (1 .. Positive (Hierarchy.Length))
-         do
+         return A : Basic_Decl_Array (1 .. Positive (Hierarchy.Length)) do
             for Decl of Hierarchy loop
                A (Idx) := Decl;
                Idx := Idx + 1;
@@ -467,8 +464,7 @@ package body Laltools.Subprogram_Hierarchy is
    -------------------------------
 
    function Final_Renamed_Subp
-     (Subp : Subp_Renaming_Decl'Class)
-      return Basic_Decl
+     (Subp : Subp_Renaming_Decl'Class) return Basic_Decl
    is
       Aux_Subp : Basic_Decl :=
         (if Subp.Is_Null then No_Basic_Decl else Subp.As_Basic_Decl);
@@ -478,8 +474,11 @@ package body Laltools.Subprogram_Hierarchy is
         and then Aux_Subp.Kind in Ada_Subp_Renaming_Decl_Range
       loop
          Aux_Subp :=
-           Aux_Subp.As_Subp_Renaming_Decl.F_Renames.F_Renamed_Object.
-             P_Referenced_Decl;
+           Aux_Subp
+             .As_Subp_Renaming_Decl
+             .F_Renames
+             .F_Renamed_Object
+             .P_Referenced_Decl;
       end loop;
 
       return Aux_Subp;

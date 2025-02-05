@@ -33,19 +33,19 @@ package body TGen.Types.Constraints is
    -- Image --
    -----------
 
-   function Image (Self : Discrete_Constraint_Value) return String is
-     (case Self.Kind is
-      when Static => Big_Int.To_String (Self.Int_Val),
-      when Discriminant => (+Self.Disc_Name),
-      when Non_Static => +Self.Text);
+   function Image (Self : Discrete_Constraint_Value) return String
+   is (case Self.Kind is
+         when Static => Big_Int.To_String (Self.Int_Val),
+         when Discriminant => (+Self.Disc_Name),
+         when Non_Static => +Self.Text);
 
    -----------
    -- Value --
    -----------
 
    function Value
-     (Cst          : Discrete_Constraint_Value;
-      Disc_Context : Disc_Value_Map) return Big_Int.Big_Integer
+     (Cst : Discrete_Constraint_Value; Disc_Context : Disc_Value_Map)
+      return Big_Int.Big_Integer
    is
       use Disc_Value_Maps;
       Cur : Cursor;
@@ -53,15 +53,17 @@ package body TGen.Types.Constraints is
       case Cst.Kind is
          when Static =>
             return Cst.Int_Val;
+
          when Discriminant =>
             Cur := Disc_Context.Find (Cst.Disc_Name);
             if Cur = No_Element then
                raise Program_Error with "unknown discriminant value";
             end if;
             return Get (Element (Cur));
+
          when others =>
-            raise Program_Error with
-              "Can't determine value of non static constraint";
+            raise Program_Error
+              with "Can't determine value of non static constraint";
       end case;
    end Value;
 
@@ -69,32 +71,33 @@ package body TGen.Types.Constraints is
    -- Image --
    -----------
 
-   function Image (Self : Real_Constraint_Value) return String is
-     (case Self.Kind is
-      when Static => Big_Reals.To_String (Self.Real_Val),
-      when Non_Static => +Self.Text);
+   function Image (Self : Real_Constraint_Value) return String
+   is (case Self.Kind is
+         when Static => Big_Reals.To_String (Self.Real_Val),
+         when Non_Static => +Self.Text);
 
    -----------
    -- Image --
    -----------
 
-   function Image (Self : Discrete_Range_Constraint) return String is
-     ("range " & Image (Self.Low_Bound) & " .. " & Image (Self.High_Bound));
+   function Image (Self : Discrete_Range_Constraint) return String
+   is ("range " & Image (Self.Low_Bound) & " .. " & Image (Self.High_Bound));
 
    -----------
    -- Image --
    -----------
 
-   function Image (Self : Real_Range_Constraint) return String is
-     ("range " & Image (Self.Low_Bound) & " .. " & Image (Self.High_Bound));
+   function Image (Self : Real_Range_Constraint) return String
+   is ("range " & Image (Self.Low_Bound) & " .. " & Image (Self.High_Bound));
 
    -----------
    -- Image --
    -----------
 
-   function Image (Self : Digits_Constraint) return String is
-     ("digits " & Image (Self.Digits_Value)
-      & (if Self.Has_Range then Self.Range_Value.Image else ""));
+   function Image (Self : Digits_Constraint) return String
+   is ("digits "
+       & Image (Self.Digits_Value)
+       & (if Self.Has_Range then Self.Range_Value.Image else ""));
 
    -----------
    -- Image --
@@ -104,8 +107,10 @@ package body TGen.Types.Constraints is
       Res : Unbounded_String := To_Unbounded_String ("(");
    begin
       for Index in 1 .. Self.Num_Dims loop
-         Res := Res & Self.Constraint_Array (Index).Discrete_Range.Image
-                & (if Index = Self.Num_Dims then "" else ", ");
+         Res :=
+           Res
+           & Self.Constraint_Array (Index).Discrete_Range.Image
+           & (if Index = Self.Num_Dims then "" else ", ");
       end loop;
       Res := Res & ")";
       return To_String (Res);
@@ -137,8 +142,10 @@ package body TGen.Types.Constraints is
 
    function Image (Self : Anonymous_Typ) return String is
    begin
-      return Typ (Self.Named_Ancestor.Unchecked_Get.all).Image
-             & " " & Self.Subtype_Constraints.Image;
+      return
+        Typ (Self.Named_Ancestor.Unchecked_Get.all).Image
+        & " "
+        & Self.Subtype_Constraints.Image;
    end Image;
 
    ------------------
@@ -152,55 +159,51 @@ package body TGen.Types.Constraints is
       case Self.Named_Ancestor.Get.Kind is
          when Signed_Int_Kind =>
             if Cst.Static then
-               Res.Set (Signed_Int_Typ'
-                 (Is_Static   => True,
-                  Range_Value =>
-                    (Min => Discrete_Range_Constraint
-                              (Cst).Low_Bound.Int_Val,
-                     Max => Discrete_Range_Constraint
-                              (Cst).High_Bound.Int_Val),
-                  others      => <>));
+               Res.Set
+                 (Signed_Int_Typ'
+                    (Is_Static   => True,
+                     Range_Value =>
+                       (Min =>
+                          Discrete_Range_Constraint (Cst).Low_Bound.Int_Val,
+                        Max =>
+                          Discrete_Range_Constraint (Cst).High_Bound.Int_Val),
+                     others      => <>));
             else
-               Res.Set (Signed_Int_Typ'
-                 (Is_Static => False,
-                  others    => <>));
+               Res.Set (Signed_Int_Typ'(Is_Static => False, others => <>));
             end if;
+
          when Mod_Int_Kind =>
             if Cst.Static then
-               Res.Set (Mod_Int_Typ'
-                 (Is_Static => True,
-                  Range_Value =>
-                        (Discrete_Range_Constraint (Cst)
-                           .High_Bound
-                           .Int_Val,
-                         Discrete_Range_Constraint (Cst)
-                           .Low_Bound
-                           .Int_Val),
-                  Mod_Value =>
-                    Discrete_Range_Constraint
-                      (Cst).High_Bound.Int_Val,
-                  others => <>));
+               Res.Set
+                 (Mod_Int_Typ'
+                    (Is_Static   => True,
+                     Range_Value =>
+                       (Discrete_Range_Constraint (Cst).High_Bound.Int_Val,
+                        Discrete_Range_Constraint (Cst).Low_Bound.Int_Val),
+                     Mod_Value   =>
+                       Discrete_Range_Constraint (Cst).High_Bound.Int_Val,
+                     others      => <>));
             else
-               Res.Set (Mod_Int_Typ'
-                 (Is_Static => False,
-                  others    => <>));
+               Res.Set (Mod_Int_Typ'(Is_Static => False, others => <>));
             end if;
+
          when Char_Kind =>
             if Cst.Static then
                Res.Set
-                 (Char_Typ'(Is_Static   => True,
-                            Has_Range   => True,
-                            Range_Value =>
-                              Discrete_Range_Constraint (Cst),
-                            others      => <>));
+                 (Char_Typ'
+                    (Is_Static   => True,
+                     Has_Range   => True,
+                     Range_Value => Discrete_Range_Constraint (Cst),
+                     others      => <>));
             else
                Res.Set
-                 (Char_Typ'(Is_Static   => False,
-                            Has_Range   => True,
-                            Range_Value =>
-                              Discrete_Range_Constraint (Cst),
-                            others      => <>));
+                 (Char_Typ'
+                    (Is_Static   => False,
+                     Has_Range   => True,
+                     Range_Value => Discrete_Range_Constraint (Cst),
+                     others      => <>));
             end if;
+
          when Enum_Kind =>
             if Cst.Static then
                declare
@@ -222,125 +225,158 @@ package body TGen.Types.Constraints is
                           (Key (Old_Enum_Cur), Element (Old_Enum_Cur));
                      end if;
                   end loop;
-                  Res.Set (Other_Enum_Typ'(Is_Static => True,
-                                           Literals  => New_Lit_Set,
-                                           others    => <>));
+                  Res.Set
+                    (Other_Enum_Typ'
+                       (Is_Static => True,
+                        Literals  => New_Lit_Set,
+                        others    => <>));
                end;
             else
                Res.Set (Other_Enum_Typ'(Is_Static => False, others => <>));
             end if;
+
          when Float_Kind =>
             if Cst.Static then
                if Cst in Real_Range_Constraint then
-                  Res.Set (Float_Typ'
-                    (Is_Static    => True,
-                     Has_Range    => True,
-                     Digits_Value =>
-                       As_Float_Typ (Self.Named_Ancestor).Digits_Value,
-                     Range_Value  =>
-                       (Min => Real_Range_Constraint (Cst)
-                               .Low_Bound.Real_Val,
-                        Max => Real_Range_Constraint (Cst)
-                               .High_Bound.Real_Val),
-                     others       => <>));
-               else
-                  if Digits_Constraint (Cst).Has_Range
-                  then
-                     Res.Set (Float_Typ'
+                  Res.Set
+                    (Float_Typ'
                        (Is_Static    => True,
                         Has_Range    => True,
-                        Digits_Value => Big_Int.To_Integer
-                          (Digits_Constraint (Cst).Digits_Value.Int_Val),
+                        Digits_Value =>
+                          As_Float_Typ (Self.Named_Ancestor).Digits_Value,
                         Range_Value  =>
-                          (Min => Digits_Constraint (Cst).Range_Value
-                                  .Low_Bound.Real_Val,
-                           Max => Digits_Constraint (Cst).Range_Value
-                                  .High_Bound.Real_Val),
+                          (Min =>
+                             Real_Range_Constraint (Cst).Low_Bound.Real_Val,
+                           Max =>
+                             Real_Range_Constraint (Cst).High_Bound.Real_Val),
                         others       => <>));
+               else
+                  if Digits_Constraint (Cst).Has_Range then
+                     Res.Set
+                       (Float_Typ'
+                          (Is_Static    => True,
+                           Has_Range    => True,
+                           Digits_Value =>
+                             Big_Int.To_Integer
+                               (Digits_Constraint (Cst).Digits_Value.Int_Val),
+                           Range_Value  =>
+                             (Min =>
+                                Digits_Constraint (Cst)
+                                  .Range_Value
+                                  .Low_Bound
+                                  .Real_Val,
+                              Max =>
+                                Digits_Constraint (Cst)
+                                  .Range_Value
+                                  .High_Bound
+                                  .Real_Val),
+                           others       => <>));
                   else
                      if As_Float_Typ (Self.Named_Ancestor).Is_Static
                        and then As_Float_Typ (Self.Named_Ancestor).Has_Range
                      then
-                        Res.Set (Float_Typ'
-                          (Is_Static    => True,
-                           Has_Range    => True,
-                           Digits_Value => Big_Int.To_Integer
-                             (Digits_Constraint (Cst).Digits_Value.Int_Val),
-                           Range_Value  =>
-                             As_Float_Typ (Self.Named_Ancestor).Range_Value,
-                           others       => <>));
+                        Res.Set
+                          (Float_Typ'
+                             (Is_Static    => True,
+                              Has_Range    => True,
+                              Digits_Value =>
+                                Big_Int.To_Integer
+                                  (Digits_Constraint (Cst)
+                                     .Digits_Value
+                                     .Int_Val),
+                              Range_Value  =>
+                                As_Float_Typ (Self.Named_Ancestor).Range_Value,
+                              others       => <>));
                      elsif As_Float_Typ (Self.Named_Ancestor).Is_Static then
-                        Res.Set (Float_Typ'
-                          (Is_Static    => True,
-                           Has_Range    => False,
-                           Digits_Value => Big_Int.To_Integer
-                             (Digits_Constraint (Cst).Digits_Value.Int_Val),
-                           others       => <>));
+                        Res.Set
+                          (Float_Typ'
+                             (Is_Static    => True,
+                              Has_Range    => False,
+                              Digits_Value =>
+                                Big_Int.To_Integer
+                                  (Digits_Constraint (Cst)
+                                     .Digits_Value
+                                     .Int_Val),
+                              others       => <>));
                      else
                         Res := Self.Named_Ancestor;
                      end if;
                   end if;
                end if;
             else
-               Res.Set (Float_Typ'
-                 (Is_Static => False, Has_Range  => False, others => <>));
+               Res.Set
+                 (Float_Typ'
+                    (Is_Static => False, Has_Range => False, others => <>));
             end if;
+
          when Fixed_Kind =>
             if Cst.Static
               and then Cst in Real_Range_Constraint
               and then As_Ordinary_Fixed_Typ (Self.Named_Ancestor).Is_Static
             then
-               Res.Set (Ordinary_Fixed_Typ'
-                 (Is_Static   => True,
-                  Delta_Value =>
-                    As_Ordinary_Fixed_Typ (Self.Named_Ancestor).Delta_Value,
-                  Range_Value =>
-                    (Min => Real_Range_Constraint (Cst)
-                            .Low_Bound.Real_Val,
-                     Max => Real_Range_Constraint (Cst)
-                            .High_Bound.Real_Val),
-                  others => <>));
-            else
                Res.Set
-                 (Ordinary_Fixed_Typ'(Is_Static  => False, others => <>));
+                 (Ordinary_Fixed_Typ'
+                    (Is_Static   => True,
+                     Delta_Value =>
+                       As_Ordinary_Fixed_Typ (Self.Named_Ancestor).Delta_Value,
+                     Range_Value =>
+                       (Min => Real_Range_Constraint (Cst).Low_Bound.Real_Val,
+                        Max =>
+                          Real_Range_Constraint (Cst).High_Bound.Real_Val),
+                     others      => <>));
+            else
+               Res.Set (Ordinary_Fixed_Typ'(Is_Static => False, others => <>));
             end if;
+
          when Array_Typ_Range =>
-            Res.Set (Constrained_Array_Typ'
-              (Num_Dims          =>
-                 As_Unconstrained_Array_Typ (Self.Named_Ancestor).Num_Dims,
-               Static_Gen        =>
-                 (As_Unconstrained_Array_Typ (Self.Named_Ancestor).Static_Gen
-                 and then Self.Subtype_Constraints.Static),
-               Component_Type    =>
-                 As_Unconstrained_Array_Typ
-                   (Self.Named_Ancestor).Component_Type,
-               Index_Types       =>
-                 As_Unconstrained_Array_Typ (Self.Named_Ancestor).Index_Types,
-               Index_Constraints =>
-                 Index_Constraints (Cst).Constraint_Array,
-               others => <>));
+            Res.Set
+              (Constrained_Array_Typ'
+                 (Num_Dims          =>
+                    As_Unconstrained_Array_Typ (Self.Named_Ancestor).Num_Dims,
+                  Static_Gen        =>
+                    (As_Unconstrained_Array_Typ (Self.Named_Ancestor)
+                       .Static_Gen
+                     and then Self.Subtype_Constraints.Static),
+                  Component_Type    =>
+                    As_Unconstrained_Array_Typ (Self.Named_Ancestor)
+                      .Component_Type,
+                  Index_Types       =>
+                    As_Unconstrained_Array_Typ (Self.Named_Ancestor)
+                      .Index_Types,
+                  Index_Constraints =>
+                    Index_Constraints (Cst).Constraint_Array,
+                  others            => <>));
+
          when Disc_Record_Kind =>
-            Res.Set (Discriminated_Record_Typ'
-              (Constrained             => True,
-               Component_Types         =>
-                 As_Discriminated_Record_Typ (Self.Named_Ancestor)
-                 .Component_Types.Copy,
-               Mutable                 =>
-                 As_Discriminated_Record_Typ (Self.Named_Ancestor).Mutable,
-               Discriminant_Types      =>
-                 As_Discriminated_Record_Typ (Self.Named_Ancestor)
-                 .Discriminant_Types.Copy,
-               Variant                 => Clone
-                 (As_Discriminated_Record_Typ (Self.Named_Ancestor).Variant),
-               Discriminant_Constraint =>
-                 Discriminant_Constraints (Cst).Constraint_Map.Copy,
-               Static_Gen              =>
-                 As_Record_Typ (Self.Named_Ancestor).Static_Gen
-                 and then Self.Subtype_Constraints.Static,
-               others                  => <>));
+            Res.Set
+              (Discriminated_Record_Typ'
+                 (Constrained             => True,
+                  Component_Types         =>
+                    As_Discriminated_Record_Typ (Self.Named_Ancestor)
+                      .Component_Types
+                      .Copy,
+                  Mutable                 =>
+                    As_Discriminated_Record_Typ (Self.Named_Ancestor).Mutable,
+                  Discriminant_Types      =>
+                    As_Discriminated_Record_Typ (Self.Named_Ancestor)
+                      .Discriminant_Types
+                      .Copy,
+                  Variant                 =>
+                    Clone
+                      (As_Discriminated_Record_Typ (Self.Named_Ancestor)
+                         .Variant),
+                  Discriminant_Constraint =>
+                    Discriminant_Constraints (Cst).Constraint_Map.Copy,
+                  Static_Gen              =>
+                    As_Record_Typ (Self.Named_Ancestor).Static_Gen
+                    and then Self.Subtype_Constraints.Static,
+                  others                  => <>));
+
          when others =>
-            Res.Set (Unsupported_Typ'
-              (Reason => +"Unknown named ancestor type kind", others => <>));
+            Res.Set
+              (Unsupported_Typ'
+                 (Reason => +"Unknown named ancestor type kind",
+                  others => <>));
       end case;
       Res.Get.Name := Self.Named_Ancestor.Get.Name;
       Res.Get.Last_Comp_Unit_Idx := Self.Last_Comp_Unit_Idx;
@@ -352,9 +388,8 @@ package body TGen.Types.Constraints is
    -- Encode --
    ------------
 
-   function Encode
-     (Self : Anonymous_Typ; Val : JSON_Value) return JSON_Value is
-     (Self.Named_Ancestor.Get.Encode (Val));
+   function Encode (Self : Anonymous_Typ; Val : JSON_Value) return JSON_Value
+   is (Self.Named_Ancestor.Get.Encode (Val));
 
    ----------------------
    -- Default_Strategy --
@@ -366,9 +401,9 @@ package body TGen.Types.Constraints is
       return Self.As_Named_Typ.Get.Default_Strategy;
    end Default_Strategy;
 
-   overriding function Default_Enum_Strategy
-     (Self : Anonymous_Typ) return Enum_Strategy_Type'Class
-   is
+   overriding
+   function Default_Enum_Strategy
+     (Self : Anonymous_Typ) return Enum_Strategy_Type'Class is
    begin
       return Self.As_Named_Typ.Get.Default_Enum_Strategy;
    end Default_Enum_Strategy;

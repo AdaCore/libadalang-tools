@@ -30,22 +30,20 @@ package body Utils.Slow_Vectors is
    end Free;
 
    function Slice
-     (V     : Vector;
-      First : Index_Type;
-      Last  : Vectors.Extended_Index)
-      return  Elements_Array
+     (V : Vector; First : Index_Type; Last : Vectors.Extended_Index)
+      return Elements_Array
    is
 
-      Jj : Vectors.Extended_Index          := Index_Type'First;
+      Jj : Vectors.Extended_Index := Index_Type'First;
       L  : constant Vectors.Extended_Index :=
         (if Last < First then Jj - 1 else Last - First + Index_Type'First);
-   --  Handle super-null slices properly
+      --  Handle super-null slices properly
 
    begin
       return Result : Elements_Array (Index_Type'First .. L) do
          for J in First .. Last loop
             Result (Jj) := V (J);
-            Jj          := Jj + 1;
+            Jj := Jj + 1;
          end loop;
          pragma Assert (Jj = Result'Last + 1);
       end return;

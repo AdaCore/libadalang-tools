@@ -71,10 +71,8 @@ package Pp.Buffers is
    type Marker_Index is new Positive;
 
    type Marker_Array is array (Marker_Index range <>) of Marker;
-   package Marker_Vectors is new Utils.Vectors
-     (Marker_Index,
-      Marker,
-      Marker_Array);
+   package Marker_Vectors is new
+     Utils.Vectors (Marker_Index, Marker, Marker_Array);
    subtype Marker_Vector is Marker_Vectors.Vector;
 
    type Marker_Vector_Ptr is access all Marker_Vector;
@@ -99,40 +97,36 @@ package Pp.Buffers is
    function Lookback (Buf : Buffer; Offset : Positive := 1) return W_Char;
    --  Return the character at 'point' - Offset. NUL if out of range.
 
-   function To_String (Buf : Buffer) return String with
-      Post => To_String'Result'First = 1;
-   function To_W_Str (Buf : Buffer) return W_Str with
-      Post => To_W_Str'Result'First = 1;
-      --  Returns the current logical string of the buffer
+   function To_String (Buf : Buffer) return String
+   with Post => To_String'Result'First = 1;
+   function To_W_Str (Buf : Buffer) return W_Str
+   with Post => To_W_Str'Result'First = 1;
+   --  Returns the current logical string of the buffer
 
-   function To_Vector (Buf : Buffer) return WChar_Vector with
-      Pre => At_Beginning (Buf);
-      --  'point' must be at the beginning of the buffer (e.g. after Reset).
-      --  Returns the content of the buffer.
+   function To_Vector (Buf : Buffer) return WChar_Vector
+   with Pre => At_Beginning (Buf);
+   --  'point' must be at the beginning of the buffer (e.g. after Reset).
+   --  Returns the content of the buffer.
 
    function Elements
-     (Buf  : Buffer)
-      return Utils.Char_Vectors.WChar_Vectors.Big_Ptr with
-      Pre => At_Beginning (Buf);
-      --  'point' must be at the beginning of the buffer (e.g. after Reset).
-      --  Returns the content of the buffer.
+     (Buf : Buffer) return Utils.Char_Vectors.WChar_Vectors.Big_Ptr
+   with Pre => At_Beginning (Buf);
+   --  'point' must be at the beginning of the buffer (e.g. after Reset).
+   --  Returns the content of the buffer.
 
    function Char_At (Buf : Buffer; Mark : Marker) return W_Char;
    function Char_At (Buf : Buffer; Position : Positive) return W_Char;
    pragma Inline (Char_At);
    --  Return the character at the given Mark/Position
 
-   function Slice (Buf : Buffer; First, Last : Marker) return W_Str with
-      Post => Slice'Result'First = 1;
-      --  Return the string from First up to just before Last
+   function Slice (Buf : Buffer; First, Last : Marker) return W_Str
+   with Post => Slice'Result'First = 1;
+   --  Return the string from First up to just before Last
 
    function Slice
-     (Buf   : Buffer;
-      First : Positive;
-      Last  : Natural;
-      Lines : Boolean := False)
-      return  W_Str with
-      Post => Slice'Result'First = 1;
+     (Buf : Buffer; First : Positive; Last : Natural; Lines : Boolean := False)
+      return W_Str
+   with Post => Slice'Result'First = 1;
    --  Return the string from First up to and including Last.
    --  If Lines is True, we expand the slice to include whole lines.
 
@@ -166,9 +160,8 @@ package Pp.Buffers is
    --  Move 'point' forward one character position. 'point' must not be at the
    --  end. The function version returns the new current character.
 
-   procedure Delete_Char (Buf : in out Buffer) with
-     Pre => not At_End (Buf),
-     Unreferenced;
+   procedure Delete_Char (Buf : in out Buffer)
+   with Pre => not At_End (Buf), Unreferenced;
    --  Delete the character at 'point', leaving 'point' at the following one.
    --  ???This causes "duplicate marker" errors; currently not used.
 
@@ -178,21 +171,20 @@ package Pp.Buffers is
 
    function Is_Empty (Buf : Buffer) return Boolean;
 
-   procedure Reset (Buf : in out Buffer) with
-      Pre  => At_End (Buf),
-      Post => At_Beginning (Buf);
-      --  'point' must be at the end of the buffer. Move 'point' back to the
-      --  beginning. The buffer contents and markers are not changed.
+   procedure Reset (Buf : in out Buffer)
+   with Pre => At_End (Buf), Post => At_Beginning (Buf);
+   --  'point' must be at the end of the buffer. Move 'point' back to the
+   --  beginning. The buffer contents and markers are not changed.
 
    function Mark (Buf : in out Buffer; Name : W_Char) return Marker
-     with Unreferenced;
+   with Unreferenced;
    --  Return a Marker that points to the current 'point'. Name is for
    --  debugging; it is printed by debugging printouts, and may be used to keep
    --  track of different kinds of Markers. Note that if you call Mark twice at
    --  the same position, only the first Name will be used.
 
    function Mark_Previous (Buf : in out Buffer; Name : W_Char) return Marker
-     with Unreferenced;
+   with Unreferenced;
    --  Similar to Mark, but the Marker points to the character just before the
    --  current 'point'.
 
@@ -239,10 +231,10 @@ package Pp.Buffers is
 
    procedure Move (Target, Source : in out Buffer);
 
-   function To_Debug_String (Buf : Buffer) return String with
-      Post => To_Debug_String'Result'First = 1;
-      --  For debugging. Returns the current logical string of the buffer, with
-      --  the Name of each Marker interspersed.
+   function To_Debug_String (Buf : Buffer) return String
+   with Post => To_Debug_String'Result'First = 1;
+   --  For debugging. Returns the current logical string of the buffer, with
+   --  the Name of each Marker interspersed.
 
    procedure Dump_Buf (Buf : Buffer); -- less verbose
    procedure Dump_Buffer (Buf : Buffer); -- more verbose
@@ -253,8 +245,7 @@ package Pp.Buffers is
 
    procedure Validate (Buf : Buffer; Message : String);
 
-   function Fast_Match_Slice (Buf : Buffer; Target : W_Str)
-                              return Boolean;
+   function Fast_Match_Slice (Buf : Buffer; Target : W_Str) return Boolean;
    --  Returns True if the current position of 'Buf' matches 'Target'
 
 private
@@ -295,10 +286,8 @@ private
    end record;
 
    type Marker_Rec_Array is array (Marker range <>) of Marker_Rec;
-   package Marker_Rec_Vectors is new Utils.Vectors
-     (Marker,
-      Marker_Rec,
-      Marker_Rec_Array);
+   package Marker_Rec_Vectors is new
+     Utils.Vectors (Marker, Marker_Rec, Marker_Rec_Array);
    subtype Marker_Rec_Vector is Marker_Rec_Vectors.Vector;
    use Marker_Rec_Vectors;
    --  use all type Marker_Rec_Vector;
@@ -349,6 +338,7 @@ private
       Cur_Column : Positive := 1;
    end record;
 
-   overriding procedure Initialize (Buf : in out Buffer);
+   overriding
+   procedure Initialize (Buf : in out Buffer);
 
 end Pp.Buffers;

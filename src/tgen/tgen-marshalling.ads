@@ -62,15 +62,15 @@ package TGen.Marshalling is
    --  If used, this will override any value set through the TGEN_ARRAY_LIMIT
    --  environment variable.
 
-   Global_Prefix   : constant String := "TGen_Marshalling";
+   Global_Prefix : constant String := "TGen_Marshalling";
 
    type Spec_Part is (Pub, Priv);
 
 private
    Marshalling_Lib : constant String := "TGen.Marshalling_Lib";
 
-   function Prefix_For_Typ (Ty_Name : String) return String is
-     (Global_Prefix & "_" & Ty_Name);
+   function Prefix_For_Typ (Ty_Name : String) return String
+   is (Global_Prefix & "_" & Ty_Name);
    --  Construct a prefix that will be shared by all entities generated for a
    --  given type.
 
@@ -79,33 +79,40 @@ private
       --  Whether we should use differentiated marshalling function for the
       --  various discrete type kinds, or a single one.
 
-      with function Component_Read
-        (Assocs : Translate_Table) return Unbounded_String;
+      with
+        function Component_Read
+          (Assocs : Translate_Table) return Unbounded_String;
       --  Generate a call to read a record / array component
 
-      with function Component_Write
-        (Assocs : Translate_Table) return Unbounded_String;
+      with
+        function Component_Write
+          (Assocs : Translate_Table) return Unbounded_String;
       --  Generate a call to write a record / array component
 
-      with function Component_Size
-        (Assocs : Translate_Table) return Unbounded_String;
+      with
+        function Component_Size
+          (Assocs : Translate_Table) return Unbounded_String;
       --  Generate a call to get the size of a record / array component
 
-      with function Component_Size_Max
-        (Assocs : Translate_Table) return Unbounded_String;
+      with
+        function Component_Size_Max
+          (Assocs : Translate_Table) return Unbounded_String;
       --  Generate a call to get the maximal size of a record / array
       --  component.
 
-      with function Variant_Read_Write
-        (Assocs : Translate_Table) return Unbounded_String;
+      with
+        function Variant_Read_Write
+          (Assocs : Translate_Table) return Unbounded_String;
       --  Generate a variant part as part of a read / write action procedure
 
-      with function Variant_Size
-        (Assocs : Translate_Table) return Unbounded_String;
+      with
+        function Variant_Size
+          (Assocs : Translate_Table) return Unbounded_String;
       --  Generate a variant part as part of a size procedure
 
-      with function Variant_Size_Max
-        (Assocs : Translate_Table) return Unbounded_String;
+      with
+        function Variant_Size_Max
+          (Assocs : Translate_Table) return Unbounded_String;
       --  Generate a variant part as part of a maximal size procedure
 
       with procedure Print_Header (Assocs : Translate_Table);
@@ -115,8 +122,8 @@ private
       --  Output a default header type for constrained types that do not
       --  normally require a header.
 
-      with procedure Print_Scalar
-        (Assocs : Translate_Table; For_Base : Boolean);
+      with
+        procedure Print_Scalar (Assocs : Translate_Table; For_Base : Boolean);
       --  Output a scalar (un)marshallers
 
       with procedure Print_Array (Assocs : Translate_Table);
@@ -129,12 +136,13 @@ private
       --  Output an unconstrained type (un)marshallers, (un)marshalling both
       --  the type's header and the type's component(s).
 
-   procedure Generate_Base_Functions_For_Typ
-     (Typ      : TGen.Types.Typ'Class;
-      For_Base : Boolean := False)
-   with Pre => (if For_Base then Typ in Scalar_Typ'Class)
-     and then Typ not in Anonymous_Typ'Class
-     and then Typ not in Instance_Typ'Class;
+     procedure Generate_Base_Functions_For_Typ
+     (Typ : TGen.Types.Typ'Class; For_Base : Boolean := False)
+   with
+     Pre =>
+       (if For_Base then Typ in Scalar_Typ'Class)
+       and then Typ not in Anonymous_Typ'Class
+       and then Typ not in Instance_Typ'Class;
    --  Generate base marshalling and unmarshalling functions for Typ. Note that
    --  this function will not operate recursively. It will thus have to be
    --  called for each of the component type of a record for instance.

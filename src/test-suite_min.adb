@@ -29,11 +29,11 @@ with GNAT.Regpat;
 with GNAT.Strings;
 
 with Test.Command_Lines;
-with Test.Mapping;           use Test.Mapping;
-with Test.Subprocess;        use Test.Subprocess;
-with Utils_Debug;            use Utils_Debug;
-with Utils.Environment;      use Utils.Environment;
-with Utils.Strings;          use Utils.Strings;
+with Test.Mapping;      use Test.Mapping;
+with Test.Subprocess;   use Test.Subprocess;
+with Utils_Debug;       use Utils_Debug;
+with Utils.Environment; use Utils.Environment;
+with Utils.Strings;     use Utils.Strings;
 with Utils.String_Utilities;
 
 with TGen.JSON;    use TGen.JSON;
@@ -42,15 +42,14 @@ with TGen.Strings; use TGen.Strings;
 with GNATCOLL.OS.FS;
 with GNATCOLL.OS.Process;
 with GNATCOLL.Projects;
-with GNATCOLL.VFS;        use GNATCOLL.VFS;
+with GNATCOLL.VFS; use GNATCOLL.VFS;
 
 package body Test.Suite_Min is
 
-   Dir_Sep : Character renames
-     GNAT.OS_Lib.Directory_Separator;
+   Dir_Sep : Character renames GNAT.OS_Lib.Directory_Separator;
 
-   function Image (X : Integer) return String renames
-     Utils.String_Utilities.Image;
+   function Image (X : Integer) return String
+   renames Utils.String_Utilities.Image;
    --  Return the image of X, without the leading space for positive numbers.
    --
    --  Renaming to avoid pulling in visibility all other functions from
@@ -130,10 +129,14 @@ package body Test.Suite_Min is
       Trace_Dir   : constant String :=
         Tool_Temp_Dir.all & Dir_Sep & "harness_traces" & Dir_Sep;
       Trace_Arr   : aliased File_Array_Access;
-      GCVRT_Dir   : constant String :=
-        Tool_Temp_Dir.all & Dir_Sep & "gcvrt";
+      GCVRT_Dir   : constant String := Tool_Temp_Dir.all & Dir_Sep & "gcvrt";
       GCVRT_Prj   : constant String :=
-        GCVRT_Dir & Dir_Sep & "share" & Dir_Sep & "gpr" & Dir_Sep
+        GCVRT_Dir
+        & Dir_Sep
+        & "share"
+        & Dir_Sep
+        & "gpr"
+        & Dir_Sep
         & "gnatcov_rts.gpr";
       Ext_Acc     : GNAT.OS_Lib.String_Access :=
         GNAT.OS_Lib.Get_Executable_Suffix;
@@ -246,8 +249,7 @@ package body Test.Suite_Min is
 
       Report_Std ("Execute testsuite");
 
-      Run_Cmd.Append
-        (Harness_Dir_Str.all & Dir_Sep & "test_runner" & Ext);
+      Run_Cmd.Append (Harness_Dir_Str.all & Dir_Sep & "test_runner" & Ext);
       if Present (Subp_Filter) then
          Run_Cmd.Append ("--routines=" & Subp_Filter.all);
       end if;
@@ -256,17 +258,16 @@ package body Test.Suite_Min is
          PP_Cmd (Run_Cmd, "Running");
       end if;
 
-      Ret_Status := Run
-        (Run_Cmd,
-         Stdout      =>
-           (if Real_Verbose
-            then GNATCOLL.OS.FS.Standout
-            else GNATCOLL.OS.FS.Null_FD),
-         Env         => Env,
-         Inherit_Env => True);
+      Ret_Status :=
+        Run
+          (Run_Cmd,
+           Stdout      =>
+             (if Real_Verbose then GNATCOLL.OS.FS.Standout
+              else GNATCOLL.OS.FS.Null_FD),
+           Env         => Env,
+           Inherit_Env => True);
       if Ret_Status /= 0 then
-         Report_Err
-           ("Harness execution failed.");
+         Report_Err ("Harness execution failed.");
          PP_Cmd (Run_Cmd, "Command was");
          Utils.Environment.Clean_Up;
          GNAT.OS_Lib.OS_Exit (1);
@@ -302,7 +303,7 @@ package body Test.Suite_Min is
                   Minimize_Unit
                     (Unit_Mapping, Cov_Cmd, Unit_Cov, Unit_Tot, Subp_Filter);
                   Covered := Covered + Unit_Cov;
-                  Total   := Total + Unit_Tot;
+                  Total := Total + Unit_Tot;
                end if;
             end;
          end loop;
@@ -310,7 +311,10 @@ package body Test.Suite_Min is
 
       if not Test.Common.Quiet then
          Report_Std
-           ("Covered" & Covered'Image & " out of" & Total'Image
+           ("Covered"
+            & Covered'Image
+            & " out of"
+            & Total'Image
             & " obligation"
             & (if Total /= 0
                then "s (" & Image (Integer'(Covered * 100 / Total)) & "%)"
@@ -365,7 +369,7 @@ package body Test.Suite_Min is
 
    begin
       Covered := 0;
-      Total   := 0;
+      Total := 0;
 
       --  No JSON tests found for this unit, skip it
 
@@ -410,7 +414,7 @@ package body Test.Suite_Min is
                Minimize_Subp
                  (TR_Mapping, Subp_JSON, Unit_Cmd, Subp_Cov, Subp_Tot);
                Covered := Covered + Subp_Cov;
-               Total   := Total + Subp_Tot;
+               Total := Total + Subp_Tot;
             end if;
          end;
       end loop;
@@ -419,8 +423,10 @@ package body Test.Suite_Min is
 
       Unit_Write_F := Write_File (Unit_Test_VF);
       if Unit_Write_F = Invalid_File then
-         Report_Err ("Warning: could not write to " & (+Unit_Test_VF.Full_Name)
-                     & ". Tests were not minimized.");
+         Report_Err
+           ("Warning: could not write to "
+            & (+Unit_Test_VF.Full_Name)
+            & ". Tests were not minimized.");
          return;
       end if;
       begin
@@ -430,7 +436,9 @@ package body Test.Suite_Min is
          when Ada.Text_IO.Use_Error =>
             Report_Err
               ("Error while writing the minimized tests in "
-               & (+Unit_Test_VF.Full_Name) & ":" & ASCII.LF
+               & (+Unit_Test_VF.Full_Name)
+               & ":"
+               & ASCII.LF
                & (+Error_String (Unit_Write_F)));
       end;
    end Minimize_Unit;
@@ -495,16 +503,23 @@ package body Test.Suite_Min is
       while Current_Trace_Idx < Length (Origin_Test_Vec) loop
          declare
             Trace_Name  : constant Virtual_File :=
-              Create (+(Trace_Dir & Dir_Sep & Subp_UID & "-gen-"
-                        & Image (Current_Trace_Idx) & ".srctrace"));
+              Create
+                (+(Trace_Dir
+                   & Dir_Sep
+                   & Subp_UID
+                   & "-gen-"
+                   & Image (Current_Trace_Idx)
+                   & ".srctrace"));
             Old_Covered : constant Natural := Covered;
          begin
             if not Is_Regular_File (Trace_Name) then
                Report_Err
-                 (Subp_Mapping.TR_Name.all & " found"
-                  & Integer'Image (Current_Trace_Idx) & " traces but there are"
-                  & Integer'Image (Length (Origin_Test_Vec)) &
-                  " tests. Remaining tests will not be reduced.");
+                 (Subp_Mapping.TR_Name.all
+                  & " found"
+                  & Integer'Image (Current_Trace_Idx)
+                  & " traces but there are"
+                  & Integer'Image (Length (Origin_Test_Vec))
+                  & " tests. Remaining tests will not be reduced.");
                exit;
             end if;
             Get_Cov_For_Trace
@@ -523,7 +538,8 @@ package body Test.Suite_Min is
                   Get (Origin_Test_Vec, Current_Trace_Idx + 1));
             elsif Test.Common.Verbose or else Debug_Flag_1 then
                Report_Std
-                 (Subp_Mapping.TR_Name.all & ": Removing test"
+                 (Subp_Mapping.TR_Name.all
+                  & ": Removing test"
                   & Current_Trace_Idx'Image);
             end if;
          end;
@@ -589,20 +605,26 @@ package body Test.Suite_Min is
             if Matches (0) /= No_Match then
                if Line (1 .. 2) /= "No" then
                   Covered :=
-                    Covered + Natural'Value
-                                (Line (Matches (1).First .. Matches (1).Last));
+                    Covered
+                    + Natural'Value
+                        (Line (Matches (1).First .. Matches (1).Last));
                end if;
                Total :=
-                 Total + Natural'Value
-                           (Line (Matches (2).First .. Matches (2).Last));
+                 Total
+                 + Natural'Value
+                     (Line (Matches (2).First .. Matches (2).Last));
             end if;
          end;
       end loop;
       Close (Output_File);
       if not Suppress_Out then
          Report_Std
-           ("Trace " & Trace & " covered " & Image (Covered)
-            & " obligation" & (if Covered > 1 then "s" else ""));
+           ("Trace "
+            & Trace
+            & " covered "
+            & Image (Covered)
+            & " obligation"
+            & (if Covered > 1 then "s" else ""));
       end if;
    end Get_Cov_For_Trace;
 
@@ -611,12 +633,11 @@ package body Test.Suite_Min is
    -------------------
 
    function Unit_Has_Subp
-     (Unit_Mapping : TP_Mapping; Subp_Sloc : String_Ref) return Boolean
-   is
+     (Unit_Mapping : TP_Mapping; Subp_Sloc : String_Ref) return Boolean is
    begin
       for Subp_Mapping of Unit_Mapping.TR_List loop
-         if Subp_Mapping.Decl_File.all & ":"
-            & Image (Subp_Mapping.Decl_Line) = Subp_Sloc.all
+         if Subp_Mapping.Decl_File.all & ":" & Image (Subp_Mapping.Decl_Line)
+           = Subp_Sloc.all
          then
             return True;
          end if;

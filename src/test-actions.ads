@@ -35,30 +35,34 @@ package Test.Actions is
 
 private
 
-   overriding procedure Init
-     (Tool : in out Test_Tool; Cmd : in out Command_Line);
-   overriding procedure First_Per_File_Action
-     (Tool : in out Test_Tool;
-      Cmd : Command_Line;
-      File_Name : String;
-      Input : String;
-      BOM_Seen : Boolean;
-      Unit : Analysis_Unit);
-   overriding procedure First_Pass_Post_Process
-     (Tool : in out Test_Tool; Cmd : in out Command_Line);
-   overriding procedure Second_Per_File_Action
-     (Tool : in out Test_Tool;
-      Cmd : Command_Line;
-      File_Name : String;
-      Input : String;
-      BOM_Seen : Boolean;
-      Unit : Analysis_Unit);
-   overriding procedure Final (Tool : in out Test_Tool; Cmd : Command_Line);
-   overriding procedure Tool_Help (Tool : Test_Tool);
-   overriding procedure Second_Per_Invalid_File_Action
+   overriding
+   procedure Init (Tool : in out Test_Tool; Cmd : in out Command_Line);
+   overriding
+   procedure First_Per_File_Action
      (Tool      : in out Test_Tool;
-      Cmd       :        Command_Line;
-      File_Name :        String);
+      Cmd       : Command_Line;
+      File_Name : String;
+      Input     : String;
+      BOM_Seen  : Boolean;
+      Unit      : Analysis_Unit);
+   overriding
+   procedure First_Pass_Post_Process
+     (Tool : in out Test_Tool; Cmd : in out Command_Line);
+   overriding
+   procedure Second_Per_File_Action
+     (Tool      : in out Test_Tool;
+      Cmd       : Command_Line;
+      File_Name : String;
+      Input     : String;
+      BOM_Seen  : Boolean;
+      Unit      : Analysis_Unit);
+   overriding
+   procedure Final (Tool : in out Test_Tool; Cmd : Command_Line);
+   overriding
+   procedure Tool_Help (Tool : Test_Tool);
+   overriding
+   procedure Second_Per_Invalid_File_Action
+     (Tool : in out Test_Tool; Cmd : Command_Line; File_Name : String);
 
    type Test_Tool is new Tool_State with null record;
 

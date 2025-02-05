@@ -24,8 +24,10 @@
 with Utils.Generic_Formatted_Output;
 with Utils.String_Utilities; use Utils.String_Utilities;
 
-package Utils.Formatted_Stderr is new Utils.Generic_Formatted_Output
-  (Char_Type      => Character,
-   Str_Type       => String,
-   Basic_Put_Char => Std_Err_Put_Char);
+package Utils.Formatted_Stderr is new
+  Utils.Generic_Formatted_Output
+    (Char_Type      => Character,
+     Str_Type       => String,
+     Basic_Put_Char => Std_Err_Put_Char);
+
 --  All data is sent to Text_IO.Standard_Error.

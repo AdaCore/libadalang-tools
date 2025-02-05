@@ -33,70 +33,76 @@ package TGen.Types.Real_Types is
 
    type Real_Typ is new Scalar_Typ with null record;
 
-   function Low_Bound_Or_Default (Self : Real_Typ) return Big_Real is
-     (To_Real (0));
+   function Low_Bound_Or_Default (Self : Real_Typ) return Big_Real
+   is (To_Real (0));
 
-   function High_Bound_Or_Default
-     (Self : Real_Typ) return Big_Real is (To_Real (0));
+   function High_Bound_Or_Default (Self : Real_Typ) return Big_Real
+   is (To_Real (0));
 
-   type Real_Range_Strategy is new Enum_Strategy_Type with
-      record
-         T             : SP.Ref;
-         --  Reference to the type we are generating values for
+   type Real_Range_Strategy is new Enum_Strategy_Type with record
+      T : SP.Ref;
+      --  Reference to the type we are generating values for
 
-         Pitch         : Big_Real;
-         --  Spacing between each value to be generated
+      Pitch : Big_Real;
+      --  Spacing between each value to be generated
 
-         Current_Val   : Big_Real;
-         --  Last generated value
+      Current_Val : Big_Real;
+      --  Last generated value
 
-         Num_Generated : Natural;
-         --  Number of values that have already been generated
+      Num_Generated : Natural;
+      --  Number of values that have already been generated
 
-         Total_Values  : Positive;
-         --  Total number of values to be generated
-      end record;
+      Total_Values : Positive;
+      --  Total number of values to be generated
+   end record;
 
-   overriding procedure Init (S : in out Real_Range_Strategy);
+   overriding
+   procedure Init (S : in out Real_Range_Strategy);
 
-   overriding function Has_Next
-     (S : Real_Range_Strategy) return Boolean is
-     (S.Num_Generated < S.Total_Values);
+   overriding
+   function Has_Next (S : Real_Range_Strategy) return Boolean
+   is (S.Num_Generated < S.Total_Values);
 
-   overriding function Generate
-     (S            : in out Real_Range_Strategy;
-      Disc_Context : Disc_Value_Map) return JSON_Value;
+   overriding
+   function Generate
+     (S : in out Real_Range_Strategy; Disc_Context : Disc_Value_Map)
+      return JSON_Value;
 
    function Make_Real_Range_Strategy
      (Self : Real_Typ; Num_Values : Positive) return Enum_Strategy_Type'Class
-     with Pre => Num_Values >= 2;
+   with Pre => Num_Values >= 2;
 
-   overriding function Default_Enum_Strategy
+   overriding
+   function Default_Enum_Strategy
      (Self : Real_Typ) return Enum_Strategy_Type'Class;
 
-   type Float_Typ (Is_Static, Has_Range : Boolean) is new
-     Real_Typ (Is_Static => Is_Static) with record
+   type Float_Typ (Is_Static, Has_Range : Boolean) is
+     new Real_Typ (Is_Static => Is_Static)
+   with record
       case Is_Static is
          when True =>
             Digits_Value : Natural;
             case Has_Range is
                when True =>
                   Range_Value : Float_Range;
+
                when False =>
                   null;
             end case;
+
          when others =>
             null;
       end case;
    end record;
 
-   function Supports_Static_Gen (Self : Float_Typ) return Boolean is
-     (Self.Is_Static);
+   function Supports_Static_Gen (Self : Float_Typ) return Boolean
+   is (Self.Is_Static);
    --  Whether values for this Typ can be statically generated
 
    function Image (Self : Float_Typ) return String;
 
-   function Kind (Self : Float_Typ) return Typ_Kind is (Float_Kind);
+   function Kind (Self : Float_Typ) return Typ_Kind
+   is (Float_Kind);
 
    function Low_Bound_Or_Default (Self : Float_Typ) return Big_Real
    with Pre => Self.Is_Static;
@@ -106,32 +112,34 @@ package TGen.Types.Real_Types is
    function High_Bound_Or_Default (Self : Float_Typ) return Big_Real
    with Pre => Self.Is_Static;
 
-   overriding function Default_Strategy
-     (Self : Float_Typ) return Strategy_Type'Class;
+   overriding
+   function Default_Strategy (Self : Float_Typ) return Strategy_Type'Class;
    --  Generate a strategy to statically generate (in one pass) values for Self
 
-   function As_Float_Typ (Self : SP.Ref) return Float_Typ'Class is
-     (Float_Typ'Class (Self.Unchecked_Get.all)) with
-     Pre => not SP.Is_Null (Self)
-            and then Self.Get.Kind in Float_Kind;
+   function As_Float_Typ (Self : SP.Ref) return Float_Typ'Class
+   is (Float_Typ'Class (Self.Unchecked_Get.all))
+   with Pre => not SP.Is_Null (Self) and then Self.Get.Kind in Float_Kind;
    pragma Inline (As_Float_Typ);
 
-   type Ordinary_Fixed_Typ (Is_Static : Boolean) is new
-     Real_Typ (Is_Static => Is_Static) with record
+   type Ordinary_Fixed_Typ (Is_Static : Boolean) is
+     new Real_Typ (Is_Static => Is_Static)
+   with record
       case Is_Static is
          when True =>
             Delta_Value : Big_Real;
             Range_Value : Float_Range;
+
          when others =>
             null;
       end case;
    end record;
 
-   function Supports_Static_Gen (Self : Ordinary_Fixed_Typ) return Boolean is
-     (Self.Is_Static);
+   function Supports_Static_Gen (Self : Ordinary_Fixed_Typ) return Boolean
+   is (Self.Is_Static);
    --  Whether values for this Typ can be statically generated
 
-   overriding function Default_Strategy
+   overriding
+   function Default_Strategy
      (Self : Ordinary_Fixed_Typ) return Strategy_Type'Class;
    --  Generate a strategy to statically generate (in one pass) values for Self
 
@@ -147,17 +155,18 @@ package TGen.Types.Real_Types is
 
    function Image (Self : Ordinary_Fixed_Typ) return String;
 
-   function Kind (Self : Ordinary_Fixed_Typ) return Typ_Kind is (Fixed_Kind);
+   function Kind (Self : Ordinary_Fixed_Typ) return Typ_Kind
+   is (Fixed_Kind);
 
-   function As_Ordinary_Fixed_Typ (Self : SP.Ref)
-     return Ordinary_Fixed_Typ'Class is
-     (Ordinary_Fixed_Typ'Class (Self.Unchecked_Get.all)) with
-     Pre => not SP.Is_Null (Self)
-            and then Self.Get.Kind in Fixed_Kind;
+   function As_Ordinary_Fixed_Typ
+     (Self : SP.Ref) return Ordinary_Fixed_Typ'Class
+   is (Ordinary_Fixed_Typ'Class (Self.Unchecked_Get.all))
+   with Pre => not SP.Is_Null (Self) and then Self.Get.Kind in Fixed_Kind;
    pragma Inline (As_Ordinary_Fixed_Typ);
 
-   type Decimal_Fixed_Typ (Is_Static, Has_Range : Boolean) is new
-     Real_Typ (Is_Static => Is_Static) with record
+   type Decimal_Fixed_Typ (Is_Static, Has_Range : Boolean) is
+     new Real_Typ (Is_Static => Is_Static)
+   with record
       case Is_Static is
          when True =>
             Delta_Value  : Big_Real;
@@ -165,24 +174,28 @@ package TGen.Types.Real_Types is
             case Has_Range is
                when True =>
                   Range_Value : Float_Range;
+
                when others =>
                   null;
             end case;
+
          when others =>
             null;
       end case;
    end record;
 
-   function Supports_Static_Gen (Self : Decimal_Fixed_Typ) return Boolean is
-     (Self.Is_Static);
+   function Supports_Static_Gen (Self : Decimal_Fixed_Typ) return Boolean
+   is (Self.Is_Static);
    --  Whether values for this Typ can be statically generated
 
-   overriding function Default_Strategy
+   overriding
+   function Default_Strategy
      (Self : Decimal_Fixed_Typ) return Strategy_Type'Class;
 
    function Image (Self : Decimal_Fixed_Typ) return String;
 
-   function Kind (Self : Decimal_Fixed_Typ) return Typ_Kind is (Decimal_Kind);
+   function Kind (Self : Decimal_Fixed_Typ) return Typ_Kind
+   is (Decimal_Kind);
 
    function Low_Bound_Or_Default (Self : Decimal_Fixed_Typ) return Big_Real
    with Pre => Self.Is_Static;
@@ -194,11 +207,9 @@ package TGen.Types.Real_Types is
    --  Return the high bound for Self if it has one explicitly defined, or
    --  Long_Float'Last otherwise.
 
-   function As_Decimal_Fixed_Typ (Self : SP.Ref)
-     return Decimal_Fixed_Typ'Class is
-     (Decimal_Fixed_Typ'Class (Self.Unchecked_Get.all)) with
-     Pre => not SP.Is_Null (Self)
-            and then Self.Get.Kind in Decimal_Kind;
+   function As_Decimal_Fixed_Typ (Self : SP.Ref) return Decimal_Fixed_Typ'Class
+   is (Decimal_Fixed_Typ'Class (Self.Unchecked_Get.all))
+   with Pre => not SP.Is_Null (Self) and then Self.Get.Kind in Decimal_Kind;
    pragma Inline (As_Decimal_Fixed_Typ);
 
    generic

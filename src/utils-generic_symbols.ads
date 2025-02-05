@@ -21,8 +21,9 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Containers; use Ada.Containers;
+with Ada.Containers;         use Ada.Containers;
 with Utils.String_Utilities; use Utils.String_Utilities;
+
 generic
    --  Each instance has a separate table of strings
 package Utils.Generic_Symbols is
@@ -56,8 +57,10 @@ package Utils.Generic_Symbols is
    --  vectors indexed by it. Other arithmetic operations on Symbols don't make
    --  much sense.
 
-   function No (S : Opt_Symbol) return Boolean is (S = No_Symbol);
-   function Present (S : Opt_Symbol) return Boolean is (not No (S));
+   function No (S : Opt_Symbol) return Boolean
+   is (S = No_Symbol);
+   function Present (S : Opt_Symbol) return Boolean
+   is (not No (S));
    pragma Inline (No, Present);
 
    function Intern (S : String) return Symbol;
@@ -74,10 +77,10 @@ package Utils.Generic_Symbols is
    --  so it can be used instead of Intern in cases where we want to avoid
    --  eating up memory.
 
-   type String_Rec (Length : Natural) is -- String with 'First constrained to 1
-   record
+   type String_Rec (Length : Natural) is record
       S : String (1 .. Length);
    end record;
+   --  String with 'First constrained to 1
 
    type Access_Constant_String_Rec is access constant String_Rec;
    for Access_Constant_String_Rec'Storage_Size use 0;
@@ -95,8 +98,7 @@ package Utils.Generic_Symbols is
    function Case_Insensitive_Equal (S1, S2 : Symbol) return Boolean;
 
    function Symbols_Equal
-     (S1, S2    : Symbol;
-      Fold_Case : Boolean) return Boolean;
+     (S1, S2 : Symbol; Fold_Case : Boolean) return Boolean;
 
    --  Rationale: Even though some languages are case insensitive, we want
    --  to preserve case for printing civilized error messages.
@@ -118,8 +120,9 @@ package Utils.Generic_Symbols is
 
    --  Wide_Strings:
 
-   function W_Intern (S : Wide_String) return Symbol is (Intern (To_UTF8 (S)));
-   function To_W_Str (S : Symbol) return Wide_String is
-     (From_UTF8 (Str (S).S));
+   function W_Intern (S : Wide_String) return Symbol
+   is (Intern (To_UTF8 (S)));
+   function To_W_Str (S : Symbol) return Wide_String
+   is (From_UTF8 (Str (S).S));
 
 end Utils.Generic_Symbols;

@@ -25,20 +25,19 @@
 
 with Ada.Directories;
 
-with TGen.Context;   use TGen.Context;
-with TGen.Strings;   use TGen.Strings;
+with TGen.Context; use TGen.Context;
+with TGen.Strings; use TGen.Strings;
 
 with GNATCOLL.VFS;      use GNATCOLL.VFS;
 with GNATCOLL.Projects; use GNATCOLL.Projects;
 
 package TGen.Files is
 
-   function Get_Output_Dir
-     (Context : Generation_Context) return Virtual_File
+   function Get_Output_Dir (Context : Generation_Context) return Virtual_File
    is (GNATCOLL.VFS.Create (Filesystem_String (+Context.Output_Dir)));
 
-   function "/" (Dir, Name : String) return String is
-     (Ada.Directories.Compose (Dir, Name));
+   function "/" (Dir, Name : String) return String
+   is (Ada.Directories.Compose (Dir, Name));
    --  Likewise, without the "dir shouldn't be empty" constraint but
    --  checking that the path components are valid when not empty.
 
@@ -49,7 +48,7 @@ package TGen.Files is
    --  Return the path to the output dir of Project
 
    function Gen_File
-     (Ctx : Generation_Context; File : String) return Virtual_File is
-     (Get_Output_Dir (Ctx) / Filesystem_String (File));
+     (Ctx : Generation_Context; File : String) return Virtual_File
+   is (Get_Output_Dir (Ctx) / Filesystem_String (File));
 
 end TGen.Files;

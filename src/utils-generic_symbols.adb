@@ -52,15 +52,16 @@ package body Utils.Generic_Symbols is
       --  these to do case-insensitive equality comparisons.
       --  One of them (presumably the first one created) will point to
       --  itself.
-      Chars : aliased String_Rec (Length);
+      Chars              : aliased String_Rec (Length);
    end record;
 
    type Symbol_Ptr is access Symbol_Rec;
    type Symbol_Ptr_Array is array (Symbol range <>) of Symbol_Ptr;
-   package Symbol_Ptr_Vectors is new Vectors
-     (Index_Type => Symbol,
-      Element_Type => Symbol_Ptr,
-      Elements_Array => Symbol_Ptr_Array);
+   package Symbol_Ptr_Vectors is new
+     Vectors
+       (Index_Type     => Symbol,
+        Element_Type   => Symbol_Ptr,
+        Elements_Array => Symbol_Ptr_Array);
    use Symbol_Ptr_Vectors;
 
    All_Ptrs : Symbol_Ptr_Vectors.Vector;
@@ -80,8 +81,8 @@ package body Utils.Generic_Symbols is
       Word_Count : Natural := 0; -- number of words allocated for them
    end record;
 
-   function Hash_String is new System.String_Hash.Hash
-     (Character, String, Hash_Type);
+   function Hash_String is new
+     System.String_Hash.Hash (Character, String, Hash_Type);
 
    --  Note that there are two kinds of hashing going on here.
    --  The Hash_String function is used in the creation of Symbols
@@ -92,8 +93,9 @@ package body Utils.Generic_Symbols is
    Lg_Hash_Table_Size : constant := 16;
    Hash_Table_Size    : constant := 2**Lg_Hash_Table_Size;
 
-   Hash_Table : array (Hash_Type range 0 .. Hash_Table_Size - 1) of
-     Opt_Symbol := [others => No_Symbol];
+   Hash_Table :
+     array (Hash_Type range 0 .. Hash_Table_Size - 1) of Opt_Symbol :=
+       [others => No_Symbol];
    --  Each component is the head of a null-terminated linear chain of
    --  Symbol_Recs, linked through Same_Hash_Link.
    --  New Symbol_Recs are linked in at the head.
@@ -105,8 +107,8 @@ package body Utils.Generic_Symbols is
 
    pragma Atomic_Components (Hash_Table);
 
-   function To_Lower_UTF8 (S : String) return String is
-     (To_UTF8 (Ada.Wide_Characters.Handling.To_Lower (From_UTF8 (S))));
+   function To_Lower_UTF8 (S : String) return String
+   is (To_UTF8 (Ada.Wide_Characters.Handling.To_Lower (From_UTF8 (S))));
 
    function Match_Same (Chain : Opt_Symbol; S : String) return Opt_Symbol;
    --  Chain points to the beginning of a hash chain (a component of
@@ -130,8 +132,7 @@ package body Utils.Generic_Symbols is
    is
       Temp : Opt_Symbol := Chain;
    begin
-      while Present (Temp)
-        and then To_Lower_UTF8 (Ptr (Temp).Chars.S) /= Lower
+      while Present (Temp) and then To_Lower_UTF8 (Ptr (Temp).Chars.S) /= Lower
       loop
          Temp := Ptr (Temp).Same_Hash_Link;
       end loop;
@@ -141,9 +142,9 @@ package body Utils.Generic_Symbols is
    protected Protector is
 
       procedure Protected_Intern
-        (S, Lower :     String;
-         H        :     Hash_Type;
-         Chain    :     Opt_Symbol;
+        (S, Lower : String;
+         H        : Hash_Type;
+         Chain    : Opt_Symbol;
          Result   : out Symbol);
       --  This interns the string S in the table; called from Intern.
       --  Lower must be the lower-case equivalent of S.
@@ -178,9 +179,9 @@ package body Utils.Generic_Symbols is
       --  Link it in at the start of the hash chain.
 
       procedure Protected_Intern
-        (S, Lower :     String;
-         H        :     Hash_Type;
-         Chain    :     Opt_Symbol;
+        (S, Lower : String;
+         H        : Hash_Type;
+         Chain    : Opt_Symbol;
          Result   : out Symbol)
       is
          Try : constant Opt_Symbol := Match_Same (Chain, S);
@@ -191,9 +192,10 @@ package body Utils.Generic_Symbols is
             return;
          end if;
 
-         declare -- Here if we need to create a new Symbol_Rec.
-            Temp : constant Opt_Symbol := Match_Lower (Chain, Lower);
-            SIG : Symbol;
+         declare
+            --  Here if we need to create a new Symbol_Rec.
+            Temp    : constant Opt_Symbol := Match_Lower (Chain, Lower);
+            SIG     : Symbol;
             New_Ptr : Symbol_Ptr;
          begin
             if Present (Temp) then
@@ -211,14 +213,15 @@ package body Utils.Generic_Symbols is
             Result := Last_Index (All_Ptrs);
             Hash_Table (H) := Result; -- link it in (atomic write)
 
-            pragma Assert
-              (if Present (Temp)
-                 then Result /= New_Ptr.Same_Ignoring_Case
-                 else Result = New_Ptr.Same_Ignoring_Case);
+            pragma
+              Assert
+                (if Present (Temp) then Result /= New_Ptr.Same_Ignoring_Case
+                   else Result = New_Ptr.Same_Ignoring_Case);
 
             --  Gather statistics:
-            if True then -- ???
-               Stats.Count      := Stats.Count + 1;
+            if True then
+               --  ???
+               Stats.Count := Stats.Count + 1;
                Stats.Char_Count := Stats.Char_Count + S'Length;
                Stats.Byte_Count :=
                  Stats.Byte_Count + New_Ptr.all'Size / System.Storage_Unit;
@@ -241,11 +244,10 @@ package body Utils.Generic_Symbols is
    end Hash_Symbol;
 
    function Intern (S : String) return Symbol is
-      Lower  : constant String     := To_Lower_UTF8 (S); -- case folded
-      H      : constant Hash_Type  :=
-        Hash_String (Lower) mod Hash_Table'Length;
+      Lower  : constant String := To_Lower_UTF8 (S); -- case folded
+      H      : constant Hash_Type := Hash_String (Lower) mod Hash_Table'Length;
       Chain  : constant Opt_Symbol := Hash_Table (H); -- atomic read
-      Result : Opt_Symbol          := Match_Same (Chain, S);
+      Result : Opt_Symbol := Match_Same (Chain, S);
    begin
       if not Present (Result) then
          Protector.Protected_Intern (S, Lower, H, Chain, Result);
@@ -280,9 +282,9 @@ package body Utils.Generic_Symbols is
    end Intern;
 
    function Lookup (S : String; Fold_Case : Boolean) return Opt_Symbol is
-      Lower : constant String    := To_Lower_UTF8 (S); -- case folded
+      Lower : constant String := To_Lower_UTF8 (S); -- case folded
       H     : constant Hash_Type := Hash_String (Lower) mod Hash_Table'Length;
-      Chain : constant Opt_Symbol    := Hash_Table (H); -- atomic read
+      Chain : constant Opt_Symbol := Hash_Table (H); -- atomic read
    begin
       if Fold_Case then
          return Match_Lower (Chain, Lower);
@@ -353,17 +355,18 @@ package body Utils.Generic_Symbols is
 
    function Case_Insensitive_Equal (S1, S2 : Symbol) return Boolean is
    begin
-      return Result : constant Boolean :=
-        Same_Ignoring_Case (S1) = Same_Ignoring_Case (S2)
+      return
+         Result : constant Boolean :=
+           Same_Ignoring_Case (S1) = Same_Ignoring_Case (S2)
       do
-         pragma Assert
-          (Result = (To_Lower_UTF8 (Str (S1).S) = To_Lower_UTF8 (Str (S2).S)));
+         pragma
+           Assert
+             (Result
+                = (To_Lower_UTF8 (Str (S1).S) = To_Lower_UTF8 (Str (S2).S)));
       end return;
    end Case_Insensitive_Equal;
 
-   function Symbols_Equal
-     (S1, S2    : Symbol;
-      Fold_Case : Boolean) return Boolean
+   function Symbols_Equal (S1, S2 : Symbol; Fold_Case : Boolean) return Boolean
    is
    begin
       if Fold_Case then

@@ -36,12 +36,12 @@ package body Utils.Environment is
    --  the current directory.
 
    function Get_Temp_Dir_Parent return String is
-      Tmpdir    : constant String := "TMPDIR";
-      Dir : String_Access := Getenv (Tmpdir);
+      Tmpdir : constant String := "TMPDIR";
+      Dir    : String_Access := Getenv (Tmpdir);
    begin
-      if Dir.all /= "" and then
-        Is_Absolute_Path (Dir.all) and then
-        Is_Directory (Dir.all)
+      if Dir.all /= ""
+        and then Is_Absolute_Path (Dir.all)
+        and then Is_Directory (Dir.all)
       then
          declare
             Result : constant String := Normalize_Pathname (Dir.all);
@@ -58,13 +58,13 @@ package body Utils.Environment is
 
    Temp_Dir_Parent : constant String := Get_Temp_Dir_Parent;
 
-   function Temp_Dir_Exists return Boolean is
-      (Tool_Temp_Dir /= null);
+   function Temp_Dir_Exists return Boolean
+   is (Tool_Temp_Dir /= null);
    --  True if the Tool_Temp_Dir has been created, but not yet deleted by
    --  Clean_Up. Note that we create and delete the Tool_Temp_Dir multiple
    --  times per run.
 
---   Tmpdir_Displayed : Boolean := False;
+   --   Tmpdir_Displayed : Boolean := False;
    --  True if the value of the TMPDIR environment variable has been displayed;
    --  we don't want to display it more than once per run.
 
@@ -79,9 +79,10 @@ package body Utils.Environment is
 
       if not Debug_Flag_N and then Temp_Dir_Exists then
 
-         pragma Assert
-           (Get_Current_Dir = Tool_Temp_Dir.all & Directory_Separator
-            or else Get_Current_Dir = Initial_Dir & Directory_Separator);
+         pragma
+           Assert
+             (Get_Current_Dir = Tool_Temp_Dir.all & Directory_Separator
+                or else Get_Current_Dir = Initial_Dir & Directory_Separator);
          --  It can be Initial_Dir if we fail early
          Change_Dir (Initial_Dir);
          --  to avoid being in the Tool_Temp_Dir when we delete it
@@ -162,9 +163,10 @@ package body Utils.Environment is
          Cmd_Error ("cannot delete temp file " & Temp_Name);
       end if;
 
-      Tool_Temp_Dir := new String' -- Remove NUL
-        (Normalize_Pathname
-           (Temp_Name (Temp_Name'First .. Temp_Name'Last - 1)));
+      Tool_Temp_Dir :=
+        new String' -- Remove NUL
+          (Normalize_Pathname
+             (Temp_Name (Temp_Name'First .. Temp_Name'Last - 1)));
 
       Parallel_Make_Dir (Tool_Temp_Dir.all);
 
@@ -183,10 +185,9 @@ package body Utils.Environment is
    begin
       if Is_Regular_File ("gnat.adc") then
          Copy_File
-           (Name     => Tool_Current_Dir.all & Directory_Separator &
-                        "gnat.adc",
-            Pathname => Tool_Temp_Dir.all & Directory_Separator &
-                        "gnat.adc",
+           (Name     =>
+              Tool_Current_Dir.all & Directory_Separator & "gnat.adc",
+            Pathname => Tool_Temp_Dir.all & Directory_Separator & "gnat.adc",
             Success  => Success,
             Mode     => Copy);
       end if;

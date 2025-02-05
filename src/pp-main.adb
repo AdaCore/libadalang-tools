@@ -35,8 +35,8 @@ with Pp.Command_Lines;
 procedure Pp.Main is
 
    Tool : Actions.Pp_Tool;
-   Cmd  : Utils.Command_Lines.Command_Line
-     (Pp.Command_Lines.Descriptor'Access);
+   Cmd  :
+     Utils.Command_Lines.Command_Line (Pp.Command_Lines.Descriptor'Access);
 
 begin
    --  By default, send errors to stdout

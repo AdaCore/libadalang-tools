@@ -34,7 +34,8 @@ package body Utils.Var_Length_Ints is
 
    Radix : constant := 2**7;
 
-   function Is_First (X : Octet) return Boolean is (X mod 2 = 0);
+   function Is_First (X : Octet) return Boolean
+   is (X mod 2 = 0);
    --  True if X is the first one in a sequence. Distinguishing
    --  first-versus-other allows us to move both forward and backward through a
    --  sequence of encoded integers.
@@ -45,18 +46,19 @@ package body Utils.Var_Length_Ints is
       --  We need to store various intermediate results in the base subtype in
       --  case Int is more constrained.
 
-      function Val (X : Octet) return Base is (Base (X / 2));
+      function Val (X : Octet) return Base
+      is (Base (X / 2));
       --  The value represented by X, as a "digit" in a base-2**7 number.
       --  Shift right one bit to get the value.
 
-      function To_Octet (X : Base; First_Octet : Boolean) return Octet is
-         (if First_Octet then Octet (X * 2) else Octet ((X * 2) + 1)) with
-           Pre => X < Radix;
+      function To_Octet (X : Base; First_Octet : Boolean) return Octet
+      is (if First_Octet then Octet (X * 2) else Octet ((X * 2) + 1))
+      with Pre => X < Radix;
       --  Turn X into the relevant Octet by shifting left one bit, then setting
       --  the low bit according to First_Octet.
 
       procedure Encode (V : in out Octet_Vector; X : Int) is
-         Temp : Base := X;
+         Temp        : Base := X;
          First_Octet : Boolean := True;
       begin
          --  Note that a 0 Int is represented as 1 Octet equal to 0,
@@ -79,7 +81,7 @@ package body Utils.Var_Length_Ints is
       function Decode (A : Octet_Array; Index : Octet_Index) return Int is
          pragma Assert (Is_First (A (Index)));
          Temp_Index : Octet_Index := Index;
-         Result : Base := 0;
+         Result     : Base := 0;
       begin
          --  It's little endian, so we need to loop through the Octets
          --  backwards:

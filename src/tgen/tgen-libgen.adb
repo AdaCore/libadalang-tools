@@ -59,8 +59,8 @@ package body TGen.Libgen is
    procedure Generate_Support_Library
      (Ctx                          : Libgen_Context;
       Pkg_Name                     : Ada_Qualified_Name;
-      Is_Top_Level_Generic_Package : Boolean := False) with
-     Pre => Ctx.Types_Per_Package.Contains (Pkg_Name);
+      Is_Top_Level_Generic_Package : Boolean := False)
+   with Pre => Ctx.Types_Per_Package.Contains (Pkg_Name);
    --  Generate the support library files (spec and body) for the types that
    --  are declared in Pack_Name.
    --  `Is_Top_Level_Generic_Package` is used to specify if `Pkg_Name` is
@@ -70,14 +70,13 @@ package body TGen.Libgen is
    procedure Generate_Value_Gen_Library
      (Ctx                : Libgen_Context;
       Pkg_Name           : Ada_Qualified_Name;
-      Is_Generic_Package : Boolean := False) with
-     Pre => Ctx.Strat_Types_Per_Package.Contains (Pkg_Name);
+      Is_Generic_Package : Boolean := False)
+   with Pre => Ctx.Strat_Types_Per_Package.Contains (Pkg_Name);
    --  Generate the type representation library files (spec and body) for the
    --  types that are declared in Pack_Name.
 
    procedure Generate_Wrappers_Library
-     (Ctx       : Libgen_Context;
-      Pack_Name : Ada_Qualified_Name);
+     (Ctx : Libgen_Context; Pack_Name : Ada_Qualified_Name);
    --  Generate the function wrappers
 
    procedure Generate_Harness_Unit
@@ -88,8 +87,8 @@ package body TGen.Libgen is
       Default_Strat            : Default_Strat_Kind;
       Default_Test_Num         : Natural;
       Bin_Tests                : Boolean;
-      Is_Generic_Instantiation : Boolean := False) with
-     Pre => Ctx.Generation_Map.Contains (Pack_Name);
+      Is_Generic_Instantiation : Boolean := False)
+   with Pre => Ctx.Generation_Map.Contains (Pack_Name);
    --  Generate one harness unit (spec and body) for the subprograms registered
    --  in Pack_Name.
 
@@ -98,8 +97,8 @@ package body TGen.Libgen is
    --  owns (tgen).
 
    function Library_Package
-     (Pack_Name         : Ada_Qualified_Name;
-      TGen_Library_Name : String) return Ada_Qualified_Name;
+     (Pack_Name : Ada_Qualified_Name; TGen_Library_Name : String)
+      return Ada_Qualified_Name;
    function Support_Library_Package
      (Pack_Name : Ada_Qualified_Name) return Ada_Qualified_Name
    is (Library_Package (Pack_Name, "TGen_Support"));
@@ -107,7 +106,7 @@ package body TGen.Libgen is
      (Pack_Name : Ada_Qualified_Name) return Ada_Qualified_Name
    is (Library_Package (Pack_Name, "TGen_Values"));
    function Wrapper_Library_Package
-      (Pack_Name : Ada_Qualified_Name) return Ada_Qualified_Name
+     (Pack_Name : Ada_Qualified_Name) return Ada_Qualified_Name
    is (Library_Package (Pack_Name, "TGen_Wrappers"));
    function Generation_Harness_Package
      (Pack_Name : Ada_Qualified_Name) return Ada_Qualified_Name
@@ -118,16 +117,16 @@ package body TGen.Libgen is
    --   Name of the support library package
 
    function Generic_Package_Name
-      (Pack_Name : Ada_Qualified_Name; Replace_First : Boolean := False)
-      return Ada_Qualified_Name is
-      Prefix : constant Ada_Identifier := Ada_Identifier
-         (+"TGen_Generic_Instantiation_");
-      Replace_Element : constant Ada_Identifier :=
-         (if Replace_First
-          then Pack_Name.First_Element
-          else Pack_Name.Last_Element);
+     (Pack_Name : Ada_Qualified_Name; Replace_First : Boolean := False)
+      return Ada_Qualified_Name
+   is
+      Prefix             : constant Ada_Identifier :=
+        Ada_Identifier (+"TGen_Generic_Instantiation_");
+      Replace_Element    : constant Ada_Identifier :=
+        (if Replace_First then Pack_Name.First_Element
+         else Pack_Name.Last_Element);
       First_Element_Name : constant Ada_Identifier := Prefix & Replace_Element;
-      Result : Ada_Qualified_Name;
+      Result             : Ada_Qualified_Name;
    begin
       Result.Append (First_Element_Name);
       for i in 2 .. Positive (Pack_Name.Length) loop
@@ -138,16 +137,16 @@ package body TGen.Libgen is
    end Generic_Package_Name;
 
    procedure Append_Types
-     (Source           : Typ_Set;
-      Dest             : in out Types_Per_Package_Map;
-      Pack_Name_Fct    : access function (A : Ada_Qualified_Name)
-                            return Ada_Qualified_Name);
+     (Source        : Typ_Set;
+      Dest          : in out Types_Per_Package_Map;
+      Pack_Name_Fct :
+        access function (A : Ada_Qualified_Name) return Ada_Qualified_Name);
    --  Include all the types in Source in the correct package key in Dest. All
    --  anonymous types are ignored.
 
    function Depends_On_Top_Level_Inst
-      (Ctx : Libgen_Context; FQN : Ada_Qualified_Name)
-      return Boolean with Pre => (not FQN.Is_Empty);
+     (Ctx : Libgen_Context; FQN : Ada_Qualified_Name) return Boolean
+   with Pre => (not FQN.Is_Empty);
    --  Does the fully qualified name relies on a top level generic
    --  instantiation.
 
@@ -162,8 +161,7 @@ package body TGen.Libgen is
    -------------------------------
 
    function Depends_On_Top_Level_Inst
-      (Ctx : Libgen_Context; FQN : Ada_Qualified_Name)
-      return Boolean
+     (Ctx : Libgen_Context; FQN : Ada_Qualified_Name) return Boolean
    is
       First_Package : Ada_Qualified_Name;
    begin
@@ -180,8 +178,7 @@ package body TGen.Libgen is
    begin
       --  TODO: add particular cases for all reserved namespaces
 
-      if FQN.Length = 1
-         and then To_String (FQN.First_Element) = "standard"
+      if FQN.Length = 1 and then To_String (FQN.First_Element) = "standard"
       then
          FQN.Replace_Element (1, To_Unbounded_String ("TGen"));
       end if;
@@ -192,8 +189,8 @@ package body TGen.Libgen is
    ---------------------
 
    function Library_Package
-     (Pack_Name         : Ada_Qualified_Name;
-      TGen_Library_Name : String) return Ada_Qualified_Name
+     (Pack_Name : Ada_Qualified_Name; TGen_Library_Name : String)
+      return Ada_Qualified_Name
    is
       Result : Ada_Qualified_Name := Pack_Name.Copy;
    begin
@@ -207,19 +204,20 @@ package body TGen.Libgen is
    ------------------------------
 
    procedure Generate_Support_Library
-     (Ctx                : Libgen_Context;
-      Pkg_Name           : Ada_Qualified_Name;
+     (Ctx                          : Libgen_Context;
+      Pkg_Name                     : Ada_Qualified_Name;
       Is_Top_Level_Generic_Package : Boolean := False)
    is
       use Ada_Identifier_Vectors;
 
-      Pack_Name                : constant Ada_Qualified_Name :=
-         (if Is_Top_Level_Generic_Package
-          then Support_Library_Package
+      Pack_Name        : constant Ada_Qualified_Name :=
+        (if Is_Top_Level_Generic_Package
+         then
+           Support_Library_Package
              (Generic_Package_Name (Copy_Delete_Last (Pkg_Name)))
-          else Pkg_Name);
-      F_Spec                   : File_Type;
-      F_Body                   : File_Type;
+         else Pkg_Name);
+      F_Spec           : File_Type;
+      F_Body           : File_Type;
       Ada_Pack_Name    : constant String := To_Ada (Pack_Name);
       Origin_Unit      : Ada_Qualified_Name := Pack_Name.Copy;
       Typ_Dependencies : Typ_Set;
@@ -256,7 +254,7 @@ package body TGen.Libgen is
       if Ctx.Imports_Per_Unit.Contains (Origin_Unit) then
          for Dep of Ctx.Imports_Per_Unit.Constant_Reference (Origin_Unit) loop
             if To_Ada (Dep) /= To_Ada (Pack_Name)
-               and To_Ada (Generic_Package_Name (Dep, True))
+              and To_Ada (Generic_Package_Name (Dep, True))
                   /= To_Ada (Pack_Name)
             then
                Put_Line (F_Spec, "with " & To_Ada (Dep) & ";");
@@ -268,15 +266,15 @@ package body TGen.Libgen is
       --  subprograms declared in this package
 
       if Ctx.Support_Packs_Per_Unit.Contains (Origin_Unit) then
-         for Dep of Ctx.Support_Packs_Per_Unit
-                      .Constant_Reference (Origin_Unit)
+         for Dep of Ctx.Support_Packs_Per_Unit.Constant_Reference (Origin_Unit)
          loop
             if To_Ada (Dep) /= To_Ada (Pack_Name)
-               and To_Ada (Generic_Package_Name (Dep, True))
+              and To_Ada (Generic_Package_Name (Dep, True))
                   /= To_Ada (Pack_Name)
             then
-               Put_Line (F_Spec, "with " & To_Ada (Dep) & "; use "
-                                 & To_Ada (Dep) & ";");
+               Put_Line
+                 (F_Spec,
+                  "with " & To_Ada (Dep) & "; use " & To_Ada (Dep) & ";");
             end if;
          end loop;
       end if;
@@ -312,8 +310,11 @@ package body TGen.Libgen is
             Package_Dependency :=
               Support_Library_Package
                 (if T.Get.Kind in Anonymous_Kind
-                 then TGen.Types.Constraints.As_Anonymous_Typ (T)
-                        .Named_Ancestor.Get.Compilation_Unit_Name
+                 then
+                   TGen.Types.Constraints.As_Anonymous_Typ (T)
+                     .Named_Ancestor
+                     .Get
+                     .Compilation_Unit_Name
                  else T.Get.Compilation_Unit_Name);
             if Package_Dependency /= Pack_Name then
                Package_Dependencies.Include (Package_Dependency);
@@ -322,7 +323,7 @@ package body TGen.Libgen is
 
          for Dep of Package_Dependencies loop
             if To_Ada (Dep) /= To_Ada (Pack_Name)
-               and To_Ada (Generic_Package_Name (Dep, True))
+              and To_Ada (Generic_Package_Name (Dep, True))
                   /= To_Ada (Pack_Name)
             then
                Put_Line
@@ -332,8 +333,7 @@ package body TGen.Libgen is
          end loop;
       end;
 
-      Put_Line
-        (F_Body, "package body " & Ada_Pack_Name & " is");
+      Put_Line (F_Body, "package body " & Ada_Pack_Name & " is");
       New_Line (F_Body);
 
       --  Put the `use` clauses under the package body to prevent compiler
@@ -353,8 +353,7 @@ package body TGen.Libgen is
       --  Disable predicate checks in the marshalling and unmarshalling
       --  functions.
 
-      Put_Line
-        (F_Body, "   pragma Assertion_Policy (Predicate => Ignore);");
+      Put_Line (F_Body, "   pragma Assertion_Policy (Predicate => Ignore);");
       New_Line (F_Body);
 
       --  Generate the marshalling support lib. Make sure to sort the types
@@ -397,35 +396,40 @@ package body TGen.Libgen is
               and then T.Get not in Instance_Typ'Class
             then
                Spec_Part_Acc :=
-                 (if T.Get.Fully_Private
-                  then Private_Part'Unrestricted_Access
+                 (if T.Get.Fully_Private then Private_Part'Unrestricted_Access
                   else Spec_Part'Unrestricted_Access);
                if T.Get.Kind in Function_Kind then
-                  TGen.Marshalling.JSON_Marshallers
+                  TGen
+                    .Marshalling
+                    .JSON_Marshallers
                     .Generate_TC_Serializers_For_Subp
-                      (Spec_Part_Acc,
-                       Private_Part'Unrestricted_Access,
-                       Body_Part'Unrestricted_Access,
-                       As_Function_Typ (T),
-                       TRD);
+                       (Spec_Part_Acc,
+                        Private_Part'Unrestricted_Access,
+                        Body_Part'Unrestricted_Access,
+                        As_Function_Typ (T),
+                        TRD);
                else
-                  TGen.Marshalling.Binary_Marshallers
+                  TGen
+                    .Marshalling
+                    .Binary_Marshallers
                     .Generate_Marshalling_Functions_For_Typ
-                      (Spec_Part_Acc,
-                       Private_Part'Unrestricted_Access,
-                       Body_Part'Unrestricted_Access,
-                       T.Get,
-                       T.Get.Kind in Discrete_Typ_Range
-                         and then Ctx.Array_Index_Types.Contains (T),
-                       TRD);
-                  TGen.Marshalling.JSON_Marshallers
+                       (Spec_Part_Acc,
+                        Private_Part'Unrestricted_Access,
+                        Body_Part'Unrestricted_Access,
+                        T.Get,
+                        T.Get.Kind in Discrete_Typ_Range
+                        and then Ctx.Array_Index_Types.Contains (T),
+                        TRD);
+                  TGen
+                    .Marshalling
+                    .JSON_Marshallers
                     .Generate_Marshalling_Functions_For_Typ
-                      (Spec_Part_Acc,
-                       Private_Part'Unrestricted_Access,
-                       Body_Part'Unrestricted_Access,
-                       T.Get,
-                       Ctx.Array_Index_Types.Contains (T),
-                       TRD);
+                       (Spec_Part_Acc,
+                        Private_Part'Unrestricted_Access,
+                        Body_Part'Unrestricted_Access,
+                        T.Get,
+                        Ctx.Array_Index_Types.Contains (T),
+                        TRD);
                end if;
             end if;
          end loop;
@@ -451,16 +455,17 @@ package body TGen.Libgen is
       Is_Generic_Package : Boolean := False)
    is
       use Templates_Parser;
-      F_Spec                   : File_Type;
-      F_Body                   : File_Type;
-      Resolved_Pkg_Name        : constant Ada_Qualified_Name :=
-         (if Is_Generic_Package
-          then Value_Library_Package
+      F_Spec            : File_Type;
+      F_Body            : File_Type;
+      Resolved_Pkg_Name : constant Ada_Qualified_Name :=
+        (if Is_Generic_Package
+         then
+           Value_Library_Package
              (Generic_Package_Name (Copy_Delete_Last (Pkg_Name)))
-          else Pkg_Name);
-      Ada_Pack_Name    : constant String := To_Ada (Resolved_Pkg_Name);
-      Typ_Dependencies : Typ_Set;
-      File_Name        : constant String :=
+         else Pkg_Name);
+      Ada_Pack_Name     : constant String := To_Ada (Resolved_Pkg_Name);
+      Typ_Dependencies  : Typ_Set;
+      File_Name         : constant String :=
         Ada.Directories.Compose
           (Containing_Directory => To_String (Ctx.Output_Dir),
            Name                 => To_Filename (Resolved_Pkg_Name));
@@ -477,35 +482,34 @@ package body TGen.Libgen is
 
       procedure Put_Deps (F : File_Type; Pack_Name : Ada_Qualified_Name) is
          Generic_Pack_Name : constant Ada_Qualified_Name :=
-            Generic_Package_Name (Copy_Delete_Last (Pack_Name));
-         Info_Cursor : constant Subp_Info_Vectors_Maps.Cursor :=
-            Ctx.Included_Subps.Find (Generic_Pack_Name);
+           Generic_Package_Name (Copy_Delete_Last (Pack_Name));
+         Info_Cursor       : constant Subp_Info_Vectors_Maps.Cursor :=
+           Ctx.Included_Subps.Find (Generic_Pack_Name);
       begin
          if Info_Cursor.Has_Element
-            and then Info_Cursor.Element
-               .First_Element.Is_Generic_Instantiation
+           and then Info_Cursor.Element.First_Element.Is_Generic_Instantiation
          then
             Put_Line
-               (F,
-                "with "
-                & To_Ada
+              (F,
+               "with "
+               & To_Ada
                    (Copy_Delete_Last
                       (Generic_Package_Name
                          (Pack_Name, Replace_First => True)))
-                & "; use "
-                & To_Ada
+               & "; use "
+               & To_Ada
                    (Copy_Delete_Last
                       (Generic_Package_Name
                          (Pack_Name, Replace_First => True)))
-                & ";");
+               & ";");
          else
             Put_Line
-               (F,
-                "with "
-                & To_Ada (Pack_Name)
-                & "; use "
-                & To_Ada (Pack_Name)
-                & ";");
+              (F,
+               "with "
+               & To_Ada (Pack_Name)
+               & "; use "
+               & To_Ada (Pack_Name)
+               & ";");
          end if;
       end Put_Deps;
 
@@ -558,13 +562,16 @@ package body TGen.Libgen is
                Package_Dependency :=
                  Support_Library_Package
                    (if T.Get.Kind in Anonymous_Kind
-                    then TGen.Types.Constraints.As_Anonymous_Typ (T)
-                    .Named_Ancestor.Get.Compilation_Unit_Name
+                    then
+                      TGen.Types.Constraints.As_Anonymous_Typ (T)
+                        .Named_Ancestor
+                        .Get
+                        .Compilation_Unit_Name
                     else T.Get.Compilation_Unit_Name);
                if Package_Dependency /= Resolved_Pkg_Name
-                  and then Generic_Package_Name
-                     (Copy_Delete_Last (Package_Dependency))
-                  /= Resolved_Pkg_Name
+                 and then Generic_Package_Name
+                            (Copy_Delete_Last (Package_Dependency))
+                          /= Resolved_Pkg_Name
                then
                   Lib_Marshalling_Dependencies.Include (Package_Dependency);
                end if;
@@ -575,13 +582,16 @@ package body TGen.Libgen is
             Package_Dependency :=
               Value_Library_Package
                 (if T.Get.Kind in Anonymous_Kind
-                 then TGen.Types.Constraints.As_Anonymous_Typ (T)
-                        .Named_Ancestor.Get.Compilation_Unit_Name
+                 then
+                   TGen.Types.Constraints.As_Anonymous_Typ (T)
+                     .Named_Ancestor
+                     .Get
+                     .Compilation_Unit_Name
                  else T.Get.Compilation_Unit_Name);
             if Package_Dependency /= Resolved_Pkg_Name
-                  and then Generic_Package_Name
-                     (Copy_Delete_Last (Package_Dependency))
-                  /= Resolved_Pkg_Name
+              and then Generic_Package_Name
+                         (Copy_Delete_Last (Package_Dependency))
+                       /= Resolved_Pkg_Name
             then
                Lib_Type_Dependencies.Include (Package_Dependency);
             end if;
@@ -618,11 +628,12 @@ package body TGen.Libgen is
 
       for T of Sort (Types) loop
          declare
-            function Extract_Package_Name (Name : Ada_Qualified_Name)
-               return Ada_Qualified_Name with Pre => not Name.Is_Empty;
+            function Extract_Package_Name
+              (Name : Ada_Qualified_Name) return Ada_Qualified_Name
+            with Pre => not Name.Is_Empty;
 
-            function Extract_Package_Name (Name : Ada_Qualified_Name)
-               return Ada_Qualified_Name
+            function Extract_Package_Name
+              (Name : Ada_Qualified_Name) return Ada_Qualified_Name
             is
                Result : Ada_Qualified_Name;
             begin
@@ -630,16 +641,21 @@ package body TGen.Libgen is
                return Generic_Package_Name (Result, Replace_First => True);
             end Extract_Package_Name;
 
-            Generic_Pack_Cursor : constant Subp_Info_Vectors_Maps.Cursor :=
-               Ctx.Included_Subps.Find
-                  (Extract_Package_Name (T.Get.Package_Name));
+            Generic_Pack_Cursor  : constant Subp_Info_Vectors_Maps.Cursor :=
+              Ctx.Included_Subps.Find
+                (Extract_Package_Name (T.Get.Package_Name));
             Is_Top_Level_Generic : constant Boolean :=
-               Generic_Pack_Cursor.Has_Element
-               and then Generic_Pack_Cursor.Element
-                  .First_Element.Is_Generic_Instantiation;
+              Generic_Pack_Cursor.Has_Element
+              and then Generic_Pack_Cursor
+                         .Element
+                         .First_Element
+                         .Is_Generic_Instantiation;
          begin
             TGen.Type_Representation.Generate_Type_Representation_For_Typ
-               (F_Spec, F_Body, Ctx, T.Get,
+              (F_Spec,
+               F_Body,
+               Ctx,
+               T.Get,
                To_String (Ctx.Root_Templates_Dir),
                Ctx.Strategy_Map,
                Initialization_Code,
@@ -667,19 +683,18 @@ package body TGen.Libgen is
    -------------------------------
 
    procedure Generate_Wrappers_Library
-     (Ctx       : Libgen_Context;
-      Pack_Name : Ada_Qualified_Name)
+     (Ctx : Libgen_Context; Pack_Name : Ada_Qualified_Name)
    is
-      F_Spec           : File_Type;
-      F_Body           : File_Type;
+      F_Spec              : File_Type;
+      F_Body              : File_Type;
       Generated_Pack_Name : constant Ada_Qualified_Name :=
-         Wrapper_Library_Package (Pack_Name);
-      Ada_Pack_Name    : constant String := To_Ada (Generated_Pack_Name);
-      File_Name        : constant String :=
+        Wrapper_Library_Package (Pack_Name);
+      Ada_Pack_Name       : constant String := To_Ada (Generated_Pack_Name);
+      File_Name           : constant String :=
         Ada.Directories.Compose
           (Containing_Directory => To_String (Ctx.Output_Dir),
            Name                 => To_Filename (Generated_Pack_Name));
-      Origin_Package   : constant Ada_Qualified_Name := Pack_Name;
+      Origin_Package      : constant Ada_Qualified_Name := Pack_Name;
    begin
       Create (F_Spec, Out_File, File_Name & ".ads");
       Create (F_Body, Out_File, File_Name & ".adb");
@@ -695,8 +710,13 @@ package body TGen.Libgen is
       --  references to its entities when a parameter name or subprogram name
       --  shadows the package.
 
-      Put_Line (F_Body, "package " & Source_Package_Renaming & " renames "
-                        & To_Ada (Origin_Package) & ";");
+      Put_Line
+        (F_Body,
+         "package "
+         & Source_Package_Renaming
+         & " renames "
+         & To_Ada (Origin_Package)
+         & ";");
       New_Line (F_Body);
 
       for Subp of Ctx.Included_Subps.Element (Pack_Name) loop
@@ -705,11 +725,12 @@ package body TGen.Libgen is
               Create_Context;
             Unit        : Libadalang.Analysis.Analysis_Unit;
          begin
-            Unit := Libadalang.Analysis.Get_From_Buffer
-              (LAL_Context,
-               Filename => "Dummy",
-               Buffer   => +Subp.Pre,
-               Rule     => Libadalang.Common.Expr_Rule);
+            Unit :=
+              Libadalang.Analysis.Get_From_Buffer
+                (LAL_Context,
+                 Filename => "Dummy",
+                 Buffer   => +Subp.Pre,
+                 Rule     => Libadalang.Common.Expr_Rule);
             Generate_Wrapper_For_Subprogram
               (F_Spec             => F_Spec,
                F_Body             => F_Body,
@@ -730,15 +751,13 @@ package body TGen.Libgen is
    ------------------
 
    procedure Append_Types
-     (Source           : Typ_Set;
-      Dest             : in out Types_Per_Package_Map;
-      Pack_Name_Fct    : access function (A : Ada_Qualified_Name)
-                            return Ada_Qualified_Name)
-   is
+     (Source        : Typ_Set;
+      Dest          : in out Types_Per_Package_Map;
+      Pack_Name_Fct :
+        access function (A : Ada_Qualified_Name) return Ada_Qualified_Name) is
    begin
       for T of Source loop
-         if not (T.Get.Kind in Anonymous_Kind)
-         then
+         if not (T.Get.Kind in Anonymous_Kind) then
             declare
                use Types_Per_Package_Maps;
                Pack_Name      : constant Ada_Qualified_Name :=
@@ -767,24 +786,23 @@ package body TGen.Libgen is
    is
       Actual_Templates_Dir : constant String :=
         (if Root_Templates_Dir = ""
-         then Ada.Directories.Containing_Directory
-                (GNAT.OS_Lib.Locate_Exec_On_Path
-                               (Ada.Command_Line.Command_Name).all
+         then
+           Ada.Directories.Containing_Directory
+             (GNAT.OS_Lib.Locate_Exec_On_Path
+                (Ada.Command_Line.Command_Name).all
               & "/../share/tgen/templates")
          else Root_Templates_Dir);
       --  Try to find the templates in the canonical installation path if not
       --  supplied.
 
    begin
-      return (Output_Dir            =>
-                To_Unbounded_String (Output_Dir),
-              Root_Templates_Dir    =>
-                To_Unbounded_String (Actual_Templates_Dir),
-              User_Project_Path     =>
-                To_Unbounded_String (User_Project_Path),
-              Lib_Support_Generated => False,
-              Has_Preprocessor_Config => False,
-              others                => <>);
+      return
+        (Output_Dir              => To_Unbounded_String (Output_Dir),
+         Root_Templates_Dir      => To_Unbounded_String (Actual_Templates_Dir),
+         User_Project_Path       => To_Unbounded_String (User_Project_Path),
+         Lib_Support_Generated   => False,
+         Has_Preprocessor_Config => False,
+         others                  => <>);
    end Create;
 
    function Create
@@ -794,17 +812,18 @@ package body TGen.Libgen is
    is
       use GNATCOLL.VFS;
    begin
-      return Create (Output_Dir         => +Output_Dir.Full_Name,
-                     Root_Templates_Dir => +Root_Templates_Dir.Full_Name,
-                     User_Project_Path  => +User_Project_Path.Full_Name);
+      return
+        Create
+          (Output_Dir         => +Output_Dir.Full_Name,
+           Root_Templates_Dir => +Root_Templates_Dir.Full_Name,
+           User_Project_Path  => +User_Project_Path.Full_Name);
    end Create;
 
    --------------------------
    -- Supported_Subprogram --
    --------------------------
 
-   function Supported_Subprogram (Subp : LAL.Basic_Decl'Class) return SP.Ref
-   is
+   function Supported_Subprogram (Subp : LAL.Basic_Decl'Class) return SP.Ref is
       Diags     : String_Vectors.Vector;
       Trans_Res : constant Translation_Result :=
         Translate (Subp.As_Basic_Decl);
@@ -833,9 +852,9 @@ package body TGen.Libgen is
    ------------------
 
    function Include_Subp
-     (Ctx   : in out Libgen_Context;
-      Subp  : Basic_Decl'Class;
-      Diags : out String_Vectors.Vector;
+     (Ctx                                : in out Libgen_Context;
+      Subp                               : Basic_Decl'Class;
+      Diags                              : out String_Vectors.Vector;
       Is_Top_Level_Generic_Instantiation : Boolean := False) return Boolean
    is
       use Ada_Qualified_Name_Sets_Maps;
@@ -847,7 +866,7 @@ package body TGen.Libgen is
       Unit_Name : Ada_Qualified_Name :=
         TGen.LAL_Utils.Convert_Qualified_Name
           (TGen.LAL_Utils.Ultimate_Enclosing_Compilation_Unit (Subp)
-           .P_Fully_Qualified_Name_Array);
+             .P_Fully_Qualified_Name_Array);
       --  Name of the compilation unit this subprogram belongs to.
 
       Support_Packs : Cursor := Ctx.Support_Packs_Per_Unit.Find (Unit_Name);
@@ -872,22 +891,18 @@ package body TGen.Libgen is
          --  If it has a private part, we can't generate tests from it because
          --  there's no way to access private elements of a generic package.
          declare
-            Package_Internal : constant Generic_Package_Internal := Subp
-               .Parent
-               .Parent
-               .Parent
-               .As_Generic_Package_Internal;
+            Package_Internal : constant Generic_Package_Internal :=
+              Subp.Parent.Parent.Parent.As_Generic_Package_Internal;
          begin
             if not Package_Internal.F_Private_Part.Is_Null
-               and then Package_Internal
-                  .F_Private_Part
-                  .F_Decls.First_Child /= No_Ada_Node
+              and then Package_Internal.F_Private_Part.F_Decls.First_Child
+                       /= No_Ada_Node
             then
                Put_Line
-                  ("warning (TGen): generic package "
-                   & Image (Package_Internal.P_Fully_Qualified_Name)
-                   & " with private declarations"
-                   & " is not supported.");
+                 ("warning (TGen): generic package "
+                  & Image (Package_Internal.P_Fully_Qualified_Name)
+                  & " with private declarations"
+                  & " is not supported.");
             end if;
          end;
 
@@ -919,10 +934,9 @@ package body TGen.Libgen is
             Imports,
             Dummy_Inserted);
          for Unit of Subp.P_Enclosing_Compilation_Unit.P_Withed_Units loop
-            if not Ctx.Imports_Per_Unit
-               .Constant_Reference (Imports)
-               .Contains (TGen.LAL_Utils.Convert_Qualified_Name
-                  (Unit.P_Syntactic_Fully_Qualified_Name))
+            if not Ctx.Imports_Per_Unit.Constant_Reference (Imports).Contains
+                     (TGen.LAL_Utils.Convert_Qualified_Name
+                        (Unit.P_Syntactic_Fully_Qualified_Name))
             then
                Ctx.Imports_Per_Unit.Reference (Imports).Insert
                  (TGen.LAL_Utils.Convert_Qualified_Name
@@ -943,8 +957,7 @@ package body TGen.Libgen is
          --  Check strategies. TODO???: integrate it into the type translation
          --  when this is more than a proof of concept.
 
-         if Subp.P_Has_Aspect (To_Unbounded_Text (To_Text ("Generation")))
-         then
+         if Subp.P_Has_Aspect (To_Unbounded_Text (To_Text ("Generation"))) then
             Parse_Strategy.Parse_Strategy
               (Fct_Typ,
                Subp.P_Get_Aspect_Assoc
@@ -991,9 +1004,7 @@ package body TGen.Libgen is
          --  regular map will only contain the base Function_Typ.
 
          Append_Types
-           (Subp_Types,
-            Ctx.Types_Per_Package,
-            Support_Library_Package'Access);
+           (Subp_Types, Ctx.Types_Per_Package, Support_Library_Package'Access);
 
          --  Add the "vanilla" function type to the set of types for which we
          --  want to generate a support library; this enables the generation
@@ -1019,17 +1030,17 @@ package body TGen.Libgen is
 
          if not Fct_Ref.Get.Supports_Gen then
             Put_Line
-               ("Warning (TGen): subprogram "
-                & Image (Subp.P_Unique_Identifying_Name) & " does not support"
-                & " value generation.");
+              ("Warning (TGen): subprogram "
+               & Image (Subp.P_Unique_Identifying_Name)
+               & " does not support"
+               & " value generation.");
          else
             Append_Types
               (Typ_Sets.To_Set (Fct_Ref),
                Ctx.Generation_Map,
-               (if Is_Top_Level_Generic_Instantiation then
-                  Generation_Harness_Package_Generic'Access
-               else
-                  Generation_Harness_Package'Access));
+               (if Is_Top_Level_Generic_Instantiation
+                then Generation_Harness_Package_Generic'Access
+                else Generation_Harness_Package'Access));
          end if;
 
          --  Add it to the list of included subprograms in the context
@@ -1042,7 +1053,7 @@ package body TGen.Libgen is
             Subp_Info      : Subp_Information;
          begin
             Subp_Info.Is_Generic_Instantiation :=
-               Is_Top_Level_Generic_Instantiation;
+              Is_Top_Level_Generic_Instantiation;
 
             if Subp.P_Has_Aspect (Pre_Aspect) then
                Subp_Info.Pre :=
@@ -1050,9 +1061,9 @@ package body TGen.Libgen is
             end if;
             Subp_Info.T := Fct_Ref;
             Ctx.Included_Subps.Insert
-               ((if Is_Top_Level_Generic_Instantiation
-                 then Generic_Package_Name (Fct_Ref.Get.Compilation_Unit_Name)
-                 else Fct_Ref.Get.Compilation_Unit_Name),
+              ((if Is_Top_Level_Generic_Instantiation
+                then Generic_Package_Name (Fct_Ref.Get.Compilation_Unit_Name)
+                else Fct_Ref.Get.Compilation_Unit_Name),
                [],
                Cur,
                Dummy_Inserted);
@@ -1085,18 +1096,18 @@ package body TGen.Libgen is
       --  Generate the project file
 
       declare
-         Prj_File : File_Type;
-         Cwd : constant Virtual_File :=
+         Prj_File    : File_Type;
+         Cwd         : constant Virtual_File :=
            Create (+Ada.Directories.Current_Directory);
-         User_Prj : constant Virtual_File :=
+         User_Prj    : constant Virtual_File :=
            Create (+To_String (Ctx.User_Project_Path));
          Support_Prj : constant Virtual_File := Create (+Output_Dir);
 
-         Rel_Path : constant Filesystem_String := Relative_Path
-           ((if User_Prj.Is_Absolute_Path then User_Prj else Cwd / User_Prj),
-            (if Support_Prj.Is_Absolute_Path
-             then Support_Prj
-             else Cwd / Support_Prj));
+         Rel_Path : constant Filesystem_String :=
+           Relative_Path
+             ((if User_Prj.Is_Absolute_Path then User_Prj else Cwd / User_Prj),
+              (if Support_Prj.Is_Absolute_Path then Support_Prj
+               else Cwd / Support_Prj));
       begin
          Create
            (Prj_File,
@@ -1109,35 +1120,51 @@ package body TGen.Libgen is
          New_Line (Prj_File);
          Put_Line (Prj_File, "   Lib_Name := ""tgen_support"";");
          New_Line (Prj_File);
-         Put_Line (Prj_File, "   type Any_Library_Type is (""static"","
-                             & " ""relocatable"", ""static-pic"");");
-         Put_Line (Prj_File, "   Library_Type : Any_Library_Type := external"
-                   & " (""LIBRARY_TYPE"", ""static"");");
-         Put_Line (Prj_File, "   type Build_Mode_Type is (""dev"","
-                             & " ""prod"");");
-         Put_Line (Prj_File, "   Build_Mode : Build_Mode_Type := external"
-                             & " (""BUILD_MODE"", ""dev"");");
+         Put_Line
+           (Prj_File,
+            "   type Any_Library_Type is (""static"","
+            & " ""relocatable"", ""static-pic"");");
+         Put_Line
+           (Prj_File,
+            "   Library_Type : Any_Library_Type := external"
+            & " (""LIBRARY_TYPE"", ""static"");");
+         Put_Line
+           (Prj_File, "   type Build_Mode_Type is (""dev""," & " ""prod"");");
+         Put_Line
+           (Prj_File,
+            "   Build_Mode : Build_Mode_Type := external"
+            & " (""BUILD_MODE"", ""dev"");");
          Put_Line (Prj_File, "   for Library_Name use Lib_Name;");
          Put_Line (Prj_File, "   for Library_Kind use Library_Type;");
-         Put_Line (Prj_File, "   for Object_Dir use ""obj-"" & Lib_Name & "
-                             & """-""" & " & Library_Type;");
-         Put_Line (Prj_File, "   for Library_Dir use ""lib-"" & Lib_Name & "
-                             & """-""" & " & Library_Type;");
+         Put_Line
+           (Prj_File,
+            "   for Object_Dir use ""obj-"" & Lib_Name & "
+            & """-"""
+            & " & Library_Type;");
+         Put_Line
+           (Prj_File,
+            "   for Library_Dir use ""lib-"" & Lib_Name & "
+            & """-"""
+            & " & Library_Type;");
          New_Line (Prj_File);
          Put_Line (Prj_File, "   for Source_Dirs use (""."");");
          New_Line (Prj_File);
          Put_Line (Prj_File, "   package Compiler is");
          Put_Line (Prj_File, "      case Build_Mode is");
          Put_Line (Prj_File, "         when ""dev"" =>");
-         Put (Prj_File, "            for Default_Switches (""Ada"") use"
-                   & " (""-g"", ""-gnatg"", ""-gnatyN"", ""-gnatws""");
+         Put
+           (Prj_File,
+            "            for Default_Switches (""Ada"") use"
+            & " (""-g"", ""-gnatg"", ""-gnatyN"", ""-gnatws""");
          if Ctx.Lang_Version /= Unspecified then
             Put (Prj_File, ", " & Lang_Version_To_Attr (Ctx.Lang_Version));
          end if;
          Write_Preprocessor_Config (Ctx, Prj_File);
          Put_Line (Prj_File, "         when ""prod"" =>");
-         Put_Line (Prj_File, "            for Default_Switches (""Ada"") use"
-                   & " (""-gnatg"", ""-gnatyN"", ""-gnatws""");
+         Put_Line
+           (Prj_File,
+            "            for Default_Switches (""Ada"") use"
+            & " (""-gnatg"", ""-gnatyN"", ""-gnatws""");
          if Ctx.Lang_Version /= Unspecified then
             Put (Prj_File, ", " & Lang_Version_To_Attr (Ctx.Lang_Version));
          end if;
@@ -1161,31 +1188,36 @@ package body TGen.Libgen is
       if Part (Marshalling_Part) then
          for Cur in Ctx.Types_Per_Package.Iterate loop
             declare
-               Pkg_Info : constant TGen.Libgen.Subp_Info_Vectors_Maps.Cursor :=
-                  Ctx.Included_Subps.Find
+               Pkg_Info         :
+                 constant TGen.Libgen.Subp_Info_Vectors_Maps.Cursor :=
+                   Ctx.Included_Subps.Find
                      (Generic_Package_Name (Copy_Delete_Last (Key (Cur))));
                Support_Lib_Name : constant Ada_Qualified_Name :=
-                      Support_Library_Package (Copy_Delete_Last (Key (Cur)));
+                 Support_Library_Package (Copy_Delete_Last (Key (Cur)));
             begin
                --  If all types are not supported, do not generate a support
                --  library.
-               if not (for all T of Element (Cur) =>
-                         not Is_Supported_Type (T.Get))
+               if not (for all T of Element (Cur)
+                       => not Is_Supported_Type (T.Get))
                then
                   if Pkg_Info.Has_Element then
                      if Pkg_Info.Element.Last_Element.Is_Generic_Instantiation
                      then
                         Create_Generic_Wrapper_Package_If_Not_Exists
-                           (To_Ada (Generic_Package_Name
-                              (Copy_Delete_Last (Key (Cur)))),
-                            To_Ada (Copy_Delete_Last (Key (Cur))),
-                            Output_Dir);
+                          (To_Ada
+                             (Generic_Package_Name
+                                (Copy_Delete_Last (Key (Cur)))),
+                           To_Ada (Copy_Delete_Last (Key (Cur))),
+                           Output_Dir);
                      end if;
                      Generate_Support_Library
-                        (Ctx,
-                         Support_Lib_Name,
-                         Pkg_Info.Element.Last.Element
-                            .Is_Generic_Instantiation);
+                       (Ctx,
+                        Support_Lib_Name,
+                        Pkg_Info
+                          .Element
+                          .Last
+                          .Element
+                          .Is_Generic_Instantiation);
                   else
                      Generate_Support_Library (Ctx, Support_Lib_Name);
                   end if;
@@ -1197,16 +1229,17 @@ package body TGen.Libgen is
          for Cur in Ctx.Strat_Types_Per_Package.Iterate loop
             declare
                Pkg_Name : constant TGen.Libgen.Subp_Info_Vectors_Maps.Cursor :=
-                  Ctx.Included_Subps.Find (Generic_Package_Name
-                        (Copy_Delete_Last (Key (Cur))));
+                 Ctx.Included_Subps.Find
+                   (Generic_Package_Name (Copy_Delete_Last (Key (Cur))));
             begin
                --  If all types are not supported, do not generate a support
                --  library.
 
-               if not (for all T of Element (Cur) =>
-                         not Is_Supported_Type (T.Get))
+               if not (for all T of Element (Cur)
+                       => not Is_Supported_Type (T.Get))
                then
-                  Generate_Value_Gen_Library (Ctx,
+                  Generate_Value_Gen_Library
+                    (Ctx,
                      Key (Cur),
                      (if Pkg_Name.Has_Element
                       then
@@ -1232,8 +1265,7 @@ package body TGen.Libgen is
      (Ctx   : in out Libgen_Context;
       Subp  : LAL.Basic_Decl'Class;
       Diags : out String_Vectors.Vector;
-      Part  : Any_Library_Part := All_Parts) return Boolean
-   is
+      Part  : Any_Library_Part := All_Parts) return Boolean is
    begin
       if Include_Subp (Ctx, Subp, Diags) then
          Generate (Ctx, Part);
@@ -1248,8 +1280,7 @@ package body TGen.Libgen is
    -------------------------------
 
    function Required_Support_Packages
-     (Ctx       : Libgen_Context;
-      Unit_Name : TGen.Strings.Ada_Qualified_Name)
+     (Ctx : Libgen_Context; Unit_Name : TGen.Strings.Ada_Qualified_Name)
       return Ada_Qualified_Name_Set
    is
       Result : Ada_Qualified_Name_Set;
@@ -1270,8 +1301,7 @@ package body TGen.Libgen is
    -- Is_Generation_Required --
    ----------------------------
 
-   function Is_Generation_Required
-     (Ctx : Libgen_Context) return Boolean is
+   function Is_Generation_Required (Ctx : Libgen_Context) return Boolean is
    begin
       return not Ctx.Generation_Map.Is_Empty;
    end Is_Generation_Required;
@@ -1303,7 +1333,7 @@ package body TGen.Libgen is
         / (+"generation_routine.tmplt");
 
       Original_Unit          : constant Ada_Qualified_Name :=
-             Copy_Delete_Last (Pack_Name);
+        Copy_Delete_Last (Pack_Name);
       Orig_Unit_Support_Pack : constant Ada_Qualified_Name :=
         Support_Library_Package (Original_Unit);
       Value_Lib_Pack         : constant Ada_Qualified_Name :=
@@ -1312,9 +1342,9 @@ package body TGen.Libgen is
       Subps : constant Types_Per_Package_Maps.Constant_Reference_Type :=
         Ctx.Generation_Map.Constant_Reference (Pack_Name);
 
-      Support_Packs : constant Ada_Qualified_Name_Sets_Maps
-                               .Constant_Reference_Type :=
-        Ctx.Support_Packs_Per_Unit.Constant_Reference (Original_Unit);
+      Support_Packs :
+        constant Ada_Qualified_Name_Sets_Maps.Constant_Reference_Type :=
+          Ctx.Support_Packs_Per_Unit.Constant_Reference (Original_Unit);
       --  Support packages that apply to the types used in Original_Unit
    begin
       Create
@@ -1324,9 +1354,12 @@ package body TGen.Libgen is
 
       Put_Line (F_Spec, "package " & To_Ada (Pack_Name) & " is");
       Put_Line (F_Spec, "   procedure Generate;");
-      Put_Line (F_Spec, "   --  Generate test vectors for subprograms defined"
-                        & " in " & To_Ada (Original_Unit));
-      Put_Line (F_Spec, "end " &  To_Ada (Pack_Name) & ";");
+      Put_Line
+        (F_Spec,
+         "   --  Generate test vectors for subprograms defined"
+         & " in "
+         & To_Ada (Original_Unit));
+      Put_Line (F_Spec, "end " & To_Ada (Pack_Name) & ";");
 
       Close (F_Spec);
 
@@ -1349,25 +1382,23 @@ package body TGen.Libgen is
       for Dep of Support_Packs loop
          if Ctx.Pack_Is_Top_Level_Instantiation (Copy_Delete_Last (Dep)) then
             Put_Line
-               (F_Body,
-                "with "
-                & To_Ada (Generic_Package_Name (Dep, True))
-                & "; use "
-                & To_Ada (Generic_Package_Name (Dep, True))
-                & ";");
+              (F_Body,
+               "with "
+               & To_Ada (Generic_Package_Name (Dep, True))
+               & "; use "
+               & To_Ada (Generic_Package_Name (Dep, True))
+               & ";");
          else
             Put_Line
-               (F_Body,
-               "with " & To_Ada (Dep) & "; use " & To_Ada (Dep) & ";");
+              (F_Body, "with " & To_Ada (Dep) & "; use " & To_Ada (Dep) & ";");
          end if;
       end loop;
-      if not Support_Packs.Contains (Orig_Unit_Support_Pack)
-      then
+      if not Support_Packs.Contains (Orig_Unit_Support_Pack) then
          if Ctx.Pack_Is_Top_Level_Instantiation
-            (Copy_Delete_Last (Orig_Unit_Support_Pack))
+              (Copy_Delete_Last (Orig_Unit_Support_Pack))
          then
             Put_Line
-               (To_Ada (Generic_Package_Name (Orig_Unit_Support_Pack))'Image);
+              (To_Ada (Generic_Package_Name (Orig_Unit_Support_Pack))'Image);
             Put_Line
               (F_Body,
                "with "
@@ -1378,14 +1409,17 @@ package body TGen.Libgen is
          else
             Put_Line
               (F_Body,
-               "with " & To_Ada (Orig_Unit_Support_Pack) & "; use "
-               & To_Ada (Orig_Unit_Support_Pack) & ";");
+               "with "
+               & To_Ada (Orig_Unit_Support_Pack)
+               & "; use "
+               & To_Ada (Orig_Unit_Support_Pack)
+               & ";");
          end if;
       end if;
       New_Line (F_Body);
 
       if Ctx.Pack_Is_Top_Level_Instantiation
-         (Copy_Delete_Last (Value_Lib_Pack))
+           (Copy_Delete_Last (Value_Lib_Pack))
       then
          Put_Line
            (F_Body,
@@ -1397,8 +1431,11 @@ package body TGen.Libgen is
       else
          Put_Line
            (F_Body,
-            "with " & To_Ada (Value_Lib_Pack) & "; use "
-            & To_Ada (Value_Lib_Pack) & ";");
+            "with "
+            & To_Ada (Value_Lib_Pack)
+            & "; use "
+            & To_Ada (Value_Lib_Pack)
+            & ";");
       end if;
       New_Line (F_Body);
 
@@ -1427,13 +1464,13 @@ package body TGen.Libgen is
             Concrete_Typ : SP.Ref;
             --  Shortcut to hold the concrete type of a parameter
 
-            Params         : Component_Map renames
-              As_Function_Typ (Subp).Component_Types;
+            Params         : Component_Map
+              renames As_Function_Typ (Subp).Component_Types;
             Param_Cur      : Component_Maps.Cursor;
-            Ordered_Params : String_Vectors.Vector renames
-              As_Function_Typ (Subp).Param_Order;
-            Globals        : Component_Map renames
-              As_Function_Typ (Subp).Globals;
+            Ordered_Params : String_Vectors.Vector
+              renames As_Function_Typ (Subp).Param_Order;
+            Globals        : Component_Map
+              renames As_Function_Typ (Subp).Globals;
          begin
             Assocs.Insert (Assoc ("GLOBAL_PREFIX", Global_Prefix));
             Assocs.Insert (Assoc ("NUM_TESTS", Default_Test_Num));
@@ -1444,8 +1481,9 @@ package body TGen.Libgen is
             Assocs.Insert
               (Assoc
                  ("FN_TYP_REF",
-                  Subp.Get.Slug (Top_Level_Generic =>
-                        Depends_On_Top_Level_Inst (Ctx, Subp.Get.Name))
+                  Subp.Get.Slug
+                    (Top_Level_Generic =>
+                       Depends_On_Top_Level_Inst (Ctx, Subp.Get.Name))
                   & "_Typ_Ref"));
 
             --  Deal with parameters
@@ -1476,8 +1514,7 @@ package body TGen.Libgen is
                Global_Names.Append (Key (Global_Cur));
                Global_Slugs.Append
                  (To_Symbol
-                    (To_Qualified_Name (+Key (Global_Cur)),
-                     Sep => '_'));
+                    (To_Qualified_Name (+Key (Global_Cur)), Sep => '_'));
                if Element (Global_Cur).Get.Kind in Anonymous_Kind then
                   Concrete_Typ :=
                     As_Anonymous_Typ (Element (Global_Cur)).Named_Ancestor;
@@ -1503,8 +1540,10 @@ package body TGen.Libgen is
               (Assoc
                  ("TC_NAME",
                   Unbounded_String'
-                    (Test_Output_Dir & GNAT.OS_Lib.Directory_Separator
-                     & (+Subp_Name) & "-"
+                    (Test_Output_Dir
+                     & GNAT.OS_Lib.Directory_Separator
+                     & (+Subp_Name)
+                     & "-"
                      & (+As_Function_Typ (Subp).Long_UID))));
             Assocs.Insert
               (Assoc
@@ -1518,37 +1557,49 @@ package body TGen.Libgen is
 
       Put_Line (F_Body, "   procedure Generate is");
       if not Bin_Tests then
-         Put_Line (F_Body, "      Dumper : constant TGen.JSON.Utils"
-                           & ".JSON_Auto_IO :=");
+         Put_Line
+           (F_Body,
+            "      Dumper : constant TGen.JSON.Utils" & ".JSON_Auto_IO :=");
          declare
             C : constant Subp_Info_Vectors_Maps.Cursor :=
-               Ctx.Included_Subps.Find (Original_Unit);
+              Ctx.Included_Subps.Find (Original_Unit);
          begin
             if C.Has_Element
-               and C.Element.First.Element.Is_Generic_Instantiation
+              and C.Element.First.Element.Is_Generic_Instantiation
             then
-               Put_Line (F_Body, "        TGen.JSON.Utils.Create ("""
-               & Test_Output_Dir & GNAT.OS_Lib.Directory_Separator
-               & Ada.Characters.Handling.To_Lower
-                  (To_Symbol (Copy_Delete_Last (Pack_Name), Sep => '_'))
-               & ".json"");");
+               Put_Line
+                 (F_Body,
+                  "        TGen.JSON.Utils.Create ("""
+                  & Test_Output_Dir
+                  & GNAT.OS_Lib.Directory_Separator
+                  & Ada.Characters.Handling.To_Lower
+                      (To_Symbol (Copy_Delete_Last (Pack_Name), Sep => '_'))
+                  & ".json"");");
             else
-               Put_Line (F_Body, "        TGen.JSON.Utils.Create ("""
-               & Test_Output_Dir & GNAT.OS_Lib.Directory_Separator
-               & To_Filename (Original_Unit) & ".json"");");
+               Put_Line
+                 (F_Body,
+                  "        TGen.JSON.Utils.Create ("""
+                  & Test_Output_Dir
+                  & GNAT.OS_Lib.Directory_Separator
+                  & To_Filename (Original_Unit)
+                  & ".json"");");
             end if;
          end;
-         Put_Line (F_Body, "      Unit_JSON : TGen.JSON.JSON_Value := Dumper"
-                           & ".Get_JSON_Ref;");
+         Put_Line
+           (F_Body,
+            "      Unit_JSON : TGen.JSON.JSON_Value := Dumper"
+            & ".Get_JSON_Ref;");
       end if;
       Put_Line (F_Body, "   begin");
       for Subp of Subps loop
          declare
-            Subp_Name   : constant String := As_Function_Typ (Subp).Slug;
+            Subp_Name : constant String := As_Function_Typ (Subp).Slug;
          begin
             Put_Line
               (F_Body,
-               "      Gen_" & Subp_Name & '_'
+               "      Gen_"
+               & Subp_Name
+               & '_'
                & To_String (As_Function_Typ (Subp).Subp_UID)
                & (if Bin_Tests then ";" else " (Unit_JSON);"));
          end;
@@ -1561,15 +1612,15 @@ package body TGen.Libgen is
       Put_Line (F_Body, "end " & To_Ada (Pack_Name) & ";");
 
       Close (F_Body);
-      exception
-         when others =>
-            if Is_Open (F_Spec) then
-               Close (F_Spec);
-            end if;
-            if Is_Open (F_Body) then
-               Close (F_Body);
-            end if;
-            raise;
+   exception
+      when others =>
+         if Is_Open (F_Spec) then
+            Close (F_Spec);
+         end if;
+         if Is_Open (F_Body) then
+            Close (F_Body);
+         end if;
+         raise;
    end Generate_Harness_Unit;
 
    -------------------------------
@@ -1577,13 +1628,14 @@ package body TGen.Libgen is
    -------------------------------
 
    procedure Write_Preprocessor_Config
-      (Ctx : Libgen_Context;
-       Prj_File : Ada.Text_IO.File_Type;
-       Append_Flags : Boolean := True)
+     (Ctx          : Libgen_Context;
+      Prj_File     : Ada.Text_IO.File_Type;
+      Append_Flags : Boolean := True)
    is
-      Preprocessor_File : constant String := To_String (Ctx.Output_Dir)
-         & GNAT.OS_Lib.Directory_Separator
-         & "preprocessor.def";
+      Preprocessor_File : constant String :=
+        To_String (Ctx.Output_Dir)
+        & GNAT.OS_Lib.Directory_Separator
+        & "preprocessor.def";
    begin
       if not Ctx.Has_Preprocessor_Config then
          Put_Line (Prj_File, ");");
@@ -1591,9 +1643,9 @@ package body TGen.Libgen is
       end if;
 
       Libadalang.Preprocessing.Write_Preprocessor_Data_File
-         (Ctx.Preprocessor_Definitions,
-          Preprocessor_File,
-          To_String (Ctx.Output_Dir));
+        (Ctx.Preprocessor_Definitions,
+         Preprocessor_File,
+         To_String (Ctx.Output_Dir));
 
       if Append_Flags then
          Put (Prj_File, ", ");
@@ -1624,20 +1676,19 @@ package body TGen.Libgen is
         Create (+To_String (Ctx.Output_Dir)) / (+"tgen_support.gpr");
       Cwd          : constant Virtual_File := Get_Current_Dir;
 
-      Rel_User_Path : constant Filesystem_String := Relative_Path
-        ((if User_Prj.Is_Absolute_Path then User_Prj else Cwd / User_Prj),
-         (if VHarness_Dir.Is_Absolute_Path
-          then VHarness_Dir
-          else Cwd / VHarness_Dir));
-      Rel_Support_Path : constant Filesystem_String := Relative_Path
-        ((if Support_Prj.Is_Absolute_Path
-          then Support_Prj
-          else Cwd / Support_Prj),
-         (if VHarness_Dir.Is_Absolute_Path
-          then VHarness_Dir
-          else Cwd / VHarness_Dir));
-      Prj_File  : File_Type;
-      Main_File : File_Type;
+      Rel_User_Path    : constant Filesystem_String :=
+        Relative_Path
+          ((if User_Prj.Is_Absolute_Path then User_Prj else Cwd / User_Prj),
+           (if VHarness_Dir.Is_Absolute_Path then VHarness_Dir
+            else Cwd / VHarness_Dir));
+      Rel_Support_Path : constant Filesystem_String :=
+        Relative_Path
+          ((if Support_Prj.Is_Absolute_Path then Support_Prj
+            else Cwd / Support_Prj),
+           (if VHarness_Dir.Is_Absolute_Path then VHarness_Dir
+            else Cwd / VHarness_Dir));
+      Prj_File         : File_Type;
+      Main_File        : File_Type;
    begin
       if not VHarness_Dir.Is_Directory then
          Ada.Directories.Create_Path (Harness_Dir);
@@ -1662,9 +1713,7 @@ package body TGen.Libgen is
       Put (Prj_File, "   for Default_Switches (""Ada"") use (");
       Put (Prj_File, Lang_Version_To_Attr (Ctx.Lang_Version));
       Write_Preprocessor_Config
-        (Ctx,
-         Prj_File,
-         Append_Flags => Ctx.Lang_Version /= Unspecified);
+        (Ctx, Prj_File, Append_Flags => Ctx.Lang_Version /= Unspecified);
       Ada.Text_IO.Put_Line (Prj_File, "end Compiler;");
 
       Put_Line (Prj_File, "end TGen_Generation_Harness;");
@@ -1684,40 +1733,39 @@ package body TGen.Libgen is
       for Unit_Cur in Ctx.Generation_Map.Iterate loop
          declare
             Fully_Qualified_Name : constant Ada_Qualified_Name :=
-               Key (Unit_Cur);
-            Pkg_Infos : constant Subp_Info_Vectors_Maps.Cursor :=
-               Ctx.Included_Subps.Find
-                  (Copy_Delete_Last (Fully_Qualified_Name));
+              Key (Unit_Cur);
+            Pkg_Infos            : constant Subp_Info_Vectors_Maps.Cursor :=
+              Ctx.Included_Subps.Find
+                (Copy_Delete_Last (Fully_Qualified_Name));
          begin
-            Put_Line (Main_File, "   "
-                  & To_Ada (Fully_Qualified_Name)
-                  & ".Generate;");
+            Put_Line
+              (Main_File,
+               "   " & To_Ada (Fully_Qualified_Name) & ".Generate;");
             if Pkg_Infos.Has_Element
-               and then Pkg_Infos.Element.Last.Element
-               .Is_Generic_Instantiation
+              and then Pkg_Infos.Element.Last.Element.Is_Generic_Instantiation
             then
                Generate_Harness_Unit
-                  (Ctx,
-                   Fully_Qualified_Name,
-                   Harness_Dir,
-                   Test_Output_Dir,
-                   Default_Strat,
-                   Default_Test_Num,
-                   Bin_Tests,
-                   Pkg_Infos.Element.First.Element.Is_Generic_Instantiation);
+                 (Ctx,
+                  Fully_Qualified_Name,
+                  Harness_Dir,
+                  Test_Output_Dir,
+                  Default_Strat,
+                  Default_Test_Num,
+                  Bin_Tests,
+                  Pkg_Infos.Element.First.Element.Is_Generic_Instantiation);
                Create_Generic_Wrapper_Package_If_Not_Exists
-                  (To_Ada (Copy_Delete_Last (Fully_Qualified_Name)),
-                   "Bar",
-                   Ctx.Get_Output_Dir);
+                 (To_Ada (Copy_Delete_Last (Fully_Qualified_Name)),
+                  "Bar",
+                  Ctx.Get_Output_Dir);
             else
                Generate_Harness_Unit
-                  (Ctx,
-                   Fully_Qualified_Name,
-                   Harness_Dir,
-                   Test_Output_Dir,
-                   Default_Strat,
-                   Default_Test_Num,
-                   Bin_Tests);
+                 (Ctx,
+                  Fully_Qualified_Name,
+                  Harness_Dir,
+                  Test_Output_Dir,
+                  Default_Strat,
+                  Default_Test_Num,
+                  Bin_Tests);
             end if;
          end;
       end loop;
@@ -1741,8 +1789,9 @@ package body TGen.Libgen is
    procedure Set_Array_Size_Limit (Limit : Positive) is
    begin
       if Array_Limit_Frozen then
-         raise Constraint_Error with
-           "Attempting to modify array size limit after it has been frozen.";
+         raise Constraint_Error
+           with
+             "Attempting to modify array size limit after it has been frozen.";
       end if;
       TGen.Marshalling.Set_Array_Size_Limit (Limit);
    end Set_Array_Size_Limit;
@@ -1752,11 +1801,11 @@ package body TGen.Libgen is
    -----------------------------------
 
    procedure Set_Preprocessing_Definitions
-      (Ctx : out Libgen_Context;
-       Data : Libadalang.Preprocessing.Preprocessor_Data) is
+     (Ctx  : out Libgen_Context;
+      Data : Libadalang.Preprocessing.Preprocessor_Data) is
    begin
-      Ctx.Has_Preprocessor_Config := Data.Default_Config.Enabled
-                                  or not Data.File_Configs.Is_Empty;
+      Ctx.Has_Preprocessor_Config :=
+        Data.Default_Config.Enabled or not Data.File_Configs.Is_Empty;
       Ctx.Preprocessor_Definitions := Data;
    end Set_Preprocessing_Definitions;
 
@@ -1770,12 +1819,14 @@ package body TGen.Libgen is
    end Get_Output_Dir;
 
    function Pack_Is_Top_Level_Instantiation
-      (Ctx : Libgen_Context; Pack_Name : Ada_Qualified_Name) return Boolean is
+     (Ctx : Libgen_Context; Pack_Name : Ada_Qualified_Name) return Boolean
+   is
       C : constant Subp_Info_Vectors_Maps.Cursor :=
-         Ctx.Included_Subps.Find (Generic_Package_Name (Pack_Name));
+        Ctx.Included_Subps.Find (Generic_Package_Name (Pack_Name));
    begin
-      return C.Has_Element
-         and then C.Element.First_Element.Is_Generic_Instantiation;
+      return
+        C.Has_Element
+        and then C.Element.First_Element.Is_Generic_Instantiation;
    end Pack_Is_Top_Level_Instantiation;
 
    --------------------------------------------------
@@ -1783,23 +1834,22 @@ package body TGen.Libgen is
    --------------------------------------------------
 
    procedure Create_Generic_Wrapper_Package_If_Not_Exists
-      (Unit_Name  : String;
-       Base_Name  : String;
-       Output_Dir : String)
+     (Unit_Name : String; Base_Name : String; Output_Dir : String)
    is
       use Test.Common;
       use GNATCOLL.VFS;
-      File_Name      : constant String :=
-         +(GNATCOLL.VFS.Create (+Unit_To_File_Name (Unit_Name)).Base_Name
-            & ".ads");
-      Dir_Sep        : constant Character := GNAT.OS_Lib.Directory_Separator;
-      TGen_File_Name : constant String :=
-         TGen_Libgen_Ctx.Get_Output_Dir & Dir_Sep & File_Name;
+      File_Name          : constant String :=
+        +(GNATCOLL.VFS.Create (+Unit_To_File_Name (Unit_Name)).Base_Name
+          & ".ads");
+      Dir_Sep            : constant Character :=
+        GNAT.OS_Lib.Directory_Separator;
+      TGen_File_Name     : constant String :=
+        TGen_Libgen_Ctx.Get_Output_Dir & Dir_Sep & File_Name;
       Gnattest_File_Name : constant String := Output_Dir & Dir_Sep & File_Name;
       F_Type             : File_Type;
    begin
       if Create (+Gnattest_File_Name).Is_Readable
-         or else Create (+TGen_File_Name).Is_Readable
+        or else Create (+TGen_File_Name).Is_Readable
       then
          return;
       end if;
@@ -1817,16 +1867,15 @@ package body TGen.Libgen is
    ---------------------------------------
 
    function Get_Test_Case_Dump_Procedure_Name
-      (Ctx              : Libgen_Context;
-       Parent_Pack_Name : TGen.Strings.Ada_Qualified_Name;
-       Subp_FQN         : Unbounded_String)
-   return Unbounded_String
+     (Ctx              : Libgen_Context;
+      Parent_Pack_Name : TGen.Strings.Ada_Qualified_Name;
+      Subp_FQN         : Unbounded_String) return Unbounded_String
    is
-      Typ_Set_Cursor : constant Types_Per_Package_Maps.Cursor :=
-         Ctx.Generation_Map.Find
-            (Generation_Harness_Package (Parent_Pack_Name));
+      Typ_Set_Cursor       : constant Types_Per_Package_Maps.Cursor :=
+        Ctx.Generation_Map.Find
+          (Generation_Harness_Package (Parent_Pack_Name));
       Is_Top_Level_Generic : constant Boolean :=
-         Ctx.Depends_On_Top_Level_Inst (Parent_Pack_Name);
+        Ctx.Depends_On_Top_Level_Inst (Parent_Pack_Name);
    begin
       if not Typ_Set_Cursor.Has_Element then
          raise Program_Error with "Sub program isn't present";
@@ -1835,14 +1884,17 @@ package body TGen.Libgen is
       for Ty of Typ_Set_Cursor.Element loop
          declare
             Ty_FQN : constant Unbounded_String :=
-               To_Unbounded_String (Ty.Get.FQN
-                  (No_Std => True, Top_Level_Generic => Is_Top_Level_Generic));
+              To_Unbounded_String
+                (Ty.Get.FQN
+                   (No_Std            => True,
+                    Top_Level_Generic => Is_Top_Level_Generic));
          begin
             if Ada.Strings.Unbounded.Equal_Case_Insensitive (Ty_FQN, Subp_FQN)
             then
-               return To_Unbounded_String
-                  (Ty.Get.Slug (Top_Level_Generic => Is_Top_Level_Generic)
-                   & "_Dump_TC");
+               return
+                 To_Unbounded_String
+                   (Ty.Get.Slug (Top_Level_Generic => Is_Top_Level_Generic)
+                    & "_Dump_TC");
             end if;
          end;
       end loop;
@@ -1863,11 +1915,10 @@ package body TGen.Libgen is
    -- Lang_Version_To_Attr --
    --------------------------
 
-   function Lang_Version_To_Attr
-     (Version : Ada_Language_Version) return String is
-     (case Version is
+   function Lang_Version_To_Attr (Version : Ada_Language_Version) return String
+   is (case Version is
          when Unspecified => "",
-         when Ada_12      => """-gnat2012""",
-         when Ada_22      => """-gnat2022""");
+         when Ada_12 => """-gnat2012""",
+         when Ada_22 => """-gnat2022""");
 
 end TGen.Libgen;

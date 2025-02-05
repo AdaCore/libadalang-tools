@@ -39,12 +39,13 @@ package TGen.Strategies is
    type Strategy_Kind is
      (Random_Kind, State_Kind, Dispatching_Kind, Wrapping_Kind);
 
-   package Disc_Value_Maps is new Ada.Containers.Indefinite_Hashed_Maps
-     (Key_Type        => Unbounded_String,
-      Element_Type    => JSON_Value,
-      Hash            => Ada.Strings.Unbounded.Hash,
-      Equivalent_Keys => "=",
-      "="             => TGen.JSON."=");
+   package Disc_Value_Maps is new
+     Ada.Containers.Indefinite_Hashed_Maps
+       (Key_Type        => Unbounded_String,
+        Element_Type    => JSON_Value,
+        Hash            => Ada.Strings.Unbounded.Hash,
+        Equivalent_Keys => "=",
+        "="             => TGen.JSON."=");
    subtype Disc_Value_Map is Disc_Value_Maps.Map;
 
    type Strategy_Type is abstract tagged null record;
@@ -55,9 +56,9 @@ package TGen.Strategies is
    --  Whether this strategy can generate a value
 
    function Generate
-     (S            : in out Strategy_Type;
-      Disc_Context : Disc_Value_Map) return JSON_Value
-      is abstract;
+     (S : in out Strategy_Type; Disc_Context : Disc_Value_Map)
+      return JSON_Value
+   is abstract;
    --  Requires S.Has_Next. Yields a new element, using stateful information
    --  contained in S if needed. Disc_Context contains the values for the
    --  discriminants if this is in a discriminated record generation context.
@@ -71,36 +72,36 @@ package TGen.Strategies is
 
    type Random_Strategy_Type is abstract new Strategy_Type with null record;
 
-   function Has_Next (S : Random_Strategy_Type) return Boolean is (True);
+   function Has_Next (S : Random_Strategy_Type) return Boolean
+   is (True);
    --  A random strategy can always generate values
 
    type Strategy_Acc is access all Strategy_Type'Class;
 
-   type Unimplemented_Strategy_Type is new Strategy_Type with
-     null record;
+   type Unimplemented_Strategy_Type is new Strategy_Type with null record;
 
-   overriding function Generate
-     (S            : in out Unimplemented_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return JSON_Value
-   is
-     (raise Program_Error with "Unimplemented static strategy");
+   overriding
+   function Generate
+     (S : in out Unimplemented_Strategy_Type; Disc_Context : Disc_Value_Map)
+      return JSON_Value
+   is (raise Program_Error with "Unimplemented static strategy");
 
-   overriding function Has_Next
-     (S : Unimplemented_Strategy_Type) return Boolean
+   overriding
+   function Has_Next (S : Unimplemented_Strategy_Type) return Boolean
    is (False);
 
-   type Commented_Out_Strategy_Type is new Strategy_Type with
-     null record;
+   type Commented_Out_Strategy_Type is new Strategy_Type with null record;
    --  Strategy that generates comments stating that the user should fill in
    --  a valid value.
 
-   overriding function Generate
-     (S            : in out Commented_Out_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return JSON_Value;
+   overriding
+   function Generate
+     (S : in out Commented_Out_Strategy_Type; Disc_Context : Disc_Value_Map)
+      return JSON_Value;
 
-   overriding function Has_Next
-     (S : Commented_Out_Strategy_Type) return Boolean
-     is (True);
+   overriding
+   function Has_Next (S : Commented_Out_Strategy_Type) return Boolean
+   is (True);
 
    type Basic_Strategy_Type is new Random_Strategy_Type with record
       T : SP.Ref;
@@ -113,52 +114,54 @@ package TGen.Strategies is
       --  Generate function.
    end record;
 
-   overriding function Generate
-     (S            : in out Basic_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return JSON_Value
-   is
-     (S.F (S.T.Get));
+   overriding
+   function Generate
+     (S : in out Basic_Strategy_Type; Disc_Context : Disc_Value_Map)
+      return JSON_Value
+   is (S.F (S.T.Get));
 
-   type Dispatching_Strategy_Type is new Random_Strategy_Type with
-      record
-         Bias   : Float;
-         S1, S2 : Strategy_Acc;
-      end record;
+   type Dispatching_Strategy_Type is new Random_Strategy_Type with record
+      Bias   : Float;
+      S1, S2 : Strategy_Acc;
+   end record;
    --  This strategy dispatches the generation to two strategies, according
    --  to a certain bias. This is useful when mixing two strategies.
 
-   overriding function Generate
-     (S            : in out Dispatching_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return JSON_Value;
+   overriding
+   function Generate
+     (S : in out Dispatching_Strategy_Type; Disc_Context : Disc_Value_Map)
+      return JSON_Value;
 
-   overriding function Has_Next
-     (S : Dispatching_Strategy_Type) return Boolean
-     is (S.S1.Has_Next or else S.S2.Has_Next);
+   overriding
+   function Has_Next (S : Dispatching_Strategy_Type) return Boolean
+   is (S.S1.Has_Next or else S.S2.Has_Next);
 
    function Make_Dispatching_Strat
-     (S1, S2 : Strategy_Type'Class;
-      Bias   : Float := 0.5) return Dispatching_Strategy_Type;
+     (S1, S2 : Strategy_Type'Class; Bias : Float := 0.5)
+      return Dispatching_Strategy_Type;
 
    generic
       type Equivalence_Class_Type is private;
-      with package Equivalence_Classes_Vectors is
-        new Ada.Containers.Vectors
-          (Index_Type => Positive, Element_Type => Equivalence_Class_Type);
+      with package Equivalence_Classes_Vectors is new
+        Ada.Containers.Vectors
+          (Index_Type   => Positive,
+           Element_Type => Equivalence_Class_Type);
    package Equivalence_Classes_Strategy_Package is
-      type Equivalence_Class_Strategy_Type is new Random_Strategy_Type with
-         record
-            T       : SP.Ref;
-            Classes : Equivalence_Classes_Vectors.Vector;
-            Draw : access function
-              (T     : SP.Ref;
-               Class : Equivalence_Class_Type) return JSON_Value;
-         end record;
+      type Equivalence_Class_Strategy_Type is new Random_Strategy_Type
+      with record
+         T       : SP.Ref;
+         Classes : Equivalence_Classes_Vectors.Vector;
+         Draw    :
+           access function
+             (T : SP.Ref; Class : Equivalence_Class_Type) return JSON_Value;
+      end record;
       --  This strategy implements equivalence classes strategy, i.e.
       --  strategies where we will pick in an equivalence class each time
       --  we are generating a value. Note that we can pick several time a value
       --  from the same equivalence class. TODO: fix this?
 
-      overriding function Generate
+      overriding
+      function Generate
         (S            : in out Equivalence_Class_Strategy_Type;
          Disc_Context : Disc_Value_Map) return JSON_Value;
    end Equivalence_Classes_Strategy_Package;
@@ -179,9 +182,10 @@ package TGen.Strategies is
    --  Whether another element can be produced by this strategy
 
    function Generate
-     (S            : in out Enum_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return JSON_Value is abstract with
-      Pre'Class => S.Has_Next;
+     (S : in out Enum_Strategy_Type; Disc_Context : Disc_Value_Map)
+      return JSON_Value
+   is abstract
+   with Pre'Class => S.Has_Next;
    --  Yields a new element, using stateful information contained in S
 
 end TGen.Strategies;

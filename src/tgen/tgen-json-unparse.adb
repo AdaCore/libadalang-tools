@@ -27,12 +27,10 @@ with Ada.Strings.Maps;      use Ada.Strings.Maps;
 
 package body TGen.JSON.Unparse is
 
-   procedure Remove_Trailing_Comma_And_Spaces
-     (Text : in out Unbounded_String);
+   procedure Remove_Trailing_Comma_And_Spaces (Text : in out Unbounded_String);
 
    function Unparse_Array
-     (Sizes : JSON_Array;
-      Val   : JSON_Array) return Unbounded_String;
+     (Sizes : JSON_Array; Val : JSON_Array) return Unbounded_String;
 
    function Unparse_Unconstrained_Array (Val : JSON_Value) return JSON_Value;
 
@@ -63,14 +61,13 @@ package body TGen.JSON.Unparse is
    -------------------
 
    function Unparse_Array
-     (Sizes : JSON_Array;
-      Val   : JSON_Array) return Unbounded_String
+     (Sizes : JSON_Array; Val : JSON_Array) return Unbounded_String
    is
       type Nat_Array is array (Natural range <>) of Natural;
 
       function Pp_Arr
-        (Current_Index : in out Positive;
-         Sizes         : Nat_Array) return Unbounded_String;
+        (Current_Index : in out Positive; Sizes : Nat_Array)
+         return Unbounded_String;
       --  Unflatten the generated array
 
       ------------
@@ -78,8 +75,8 @@ package body TGen.JSON.Unparse is
       ------------
 
       function Pp_Arr
-        (Current_Index : in out Positive;
-         Sizes         : Nat_Array) return Unbounded_String
+        (Current_Index : in out Positive; Sizes : Nat_Array)
+         return Unbounded_String
       is
          Unparsed_Value   : Unbounded_String;
          Current_Arr_Size : constant Natural := Sizes (Sizes'First);
@@ -123,8 +120,7 @@ package body TGen.JSON.Unparse is
                Append
                  (Unparsed_Value,
                   Pp_Arr
-                    (Current_Index,
-                     Sizes (Sizes'First + 1 .. Sizes'Last)));
+                    (Current_Index, Sizes (Sizes'First + 1 .. Sizes'Last)));
             end if;
             Append (Unparsed_Value, ", ");
          end loop;
@@ -151,11 +147,10 @@ package body TGen.JSON.Unparse is
    -- Unparse_Unconstrained_Array --
    ---------------------------------
 
-   function Unparse_Unconstrained_Array (Val : JSON_Value) return JSON_Value
-   is
-      Result : constant JSON_Value := Create_Object;
+   function Unparse_Unconstrained_Array (Val : JSON_Value) return JSON_Value is
+      Result      : constant JSON_Value := Create_Object;
       Constraints : Unbounded_String;
-      Dimensions : constant JSON_Array := Val.Get ("dimensions");
+      Dimensions  : constant JSON_Array := Val.Get ("dimensions");
    begin
       for Dimension of Dimensions loop
          Append (Constraints, "(");
@@ -178,8 +173,7 @@ package body TGen.JSON.Unparse is
    -- Unparse_Constrained_Array --
    -------------------------------
 
-   function Unparse_Constrained_Array (Val : JSON_Value) return JSON_Value
-   is
+   function Unparse_Constrained_Array (Val : JSON_Value) return JSON_Value is
       Result : constant JSON_Value := Create_Object;
    begin
       Set_Field
@@ -193,22 +187,19 @@ package body TGen.JSON.Unparse is
    -- Unparse_Record --
    --------------------
 
-   function Unparse_Record (Val : JSON_Value) return Unbounded_String
-   is
+   function Unparse_Record (Val : JSON_Value) return Unbounded_String is
       Unparsed_Value : Unbounded_String;
 
       procedure Process_Component (Name : UTF8_String; Value : JSON_Value);
 
-      procedure Process_Component
-        (Name  : UTF8_String; Value : JSON_Value) is
+      procedure Process_Component (Name : UTF8_String; Value : JSON_Value) is
       begin
          Append (Unparsed_Value, Name);
          Append (Unparsed_Value, " => ");
 
          --  A record component can't be of an unconstrained type
 
-         Append (Unparsed_Value,
-                 UTF8_String'(Get (Unparse (Value), "value")));
+         Append (Unparsed_Value, UTF8_String'(Get (Unparse (Value), "value")));
          Append (Unparsed_Value, ", ");
       end Process_Component;
 
@@ -284,7 +275,8 @@ package body TGen.JSON.Unparse is
       --  aggregate expression.
 
       Set_Field
-        (Result, "value",
+        (Result,
+         "value",
          Slice (Constraints, 1, Length (Constraints) - 1)
          & ", "
          & Slice (Components, 2, Length (Components)));
@@ -295,8 +287,7 @@ package body TGen.JSON.Unparse is
    -- Unparse_Quotient --
    ----------------------
 
-   function Unparse_Quotient (Val : JSON_Value) return JSON_Value
-   is
+   function Unparse_Quotient (Val : JSON_Value) return JSON_Value is
       Result          : constant JSON_Value := Create_Object;
       Quotient_String : constant Unbounded_String := Get (Val, "value");
       Div_Index       : constant Natural :=
@@ -307,7 +298,8 @@ package body TGen.JSON.Unparse is
       Set_Field
         (Result,
          "value",
-         Slice (Quotient_String, 1, Div_Index - 2) & ".0 "
+         Slice (Quotient_String, 1, Div_Index - 2)
+         & ".0 "
          & Slice (Quotient_String, Div_Index, Length (Quotient_String))
          & ".0");
       return Result;
@@ -317,9 +309,8 @@ package body TGen.JSON.Unparse is
    -- Unparse --
    -------------
 
-   function Unparse (Val : JSON_Value) return JSON_Value
-   is
-      Result : constant JSON_Value := Create_Object;
+   function Unparse (Val : JSON_Value) return JSON_Value is
+      Result  : constant JSON_Value := Create_Object;
       Val_Str : constant String := Val.Write;
       pragma Unreferenced (Val_Str);
    begin
@@ -327,48 +318,48 @@ package body TGen.JSON.Unparse is
 
       case Kind (Val) is
 
-      when JSON_Object_Type =>
+         when JSON_Object_Type =>
 
-         if Has_Field (Val, "discriminants") then
+            if Has_Field (Val, "discriminants") then
 
-            --  Discriminated record case
+               --  Discriminated record case
 
-            return Unparse_Discriminated_Record (Val);
+               return Unparse_Discriminated_Record (Val);
 
-         elsif Has_Field (Val, "components") then
+            elsif Has_Field (Val, "components") then
 
-            --  Non discriminated record case
+               --  Non discriminated record case
 
-            return Unparse_Non_Discriminated_Record (Val);
+               return Unparse_Non_Discriminated_Record (Val);
 
-         elsif Has_Field (Val, "dimensions") then
+            elsif Has_Field (Val, "dimensions") then
 
-            --  Unconstrained array case
+               --  Unconstrained array case
 
-            return Unparse_Unconstrained_Array (Val);
+               return Unparse_Unconstrained_Array (Val);
 
-         elsif Has_Field (Val, "array") then
+            elsif Has_Field (Val, "array") then
 
-            --  Constrained array case
+               --  Constrained array case
 
-            return Unparse_Constrained_Array (Val);
+               return Unparse_Constrained_Array (Val);
 
-         elsif Has_Field (Val, "quotient") then
+            elsif Has_Field (Val, "quotient") then
 
-            --  Unparse floating point / fixed point value stored in a
-            --  quotient string.
+               --  Unparse floating point / fixed point value stored in a
+               --  quotient string.
 
-            return Unparse_Quotient (Val);
+               return Unparse_Quotient (Val);
 
-         else
-            --  Defensive code
+            else
+               --  Defensive code
 
-            raise Program_Error with "Unknown value representation";
-         end if;
+               raise Program_Error with "Unknown value representation";
+            end if;
 
-      when others =>
-         Set_Field (Result, "value", Val);
-         return Result;
+         when others =>
+            Set_Field (Result, "value", Val);
+            return Result;
       end case;
    end Unparse;
 

@@ -26,13 +26,13 @@
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-with Test.Common; use Test.Common;
+with Test.Common;         use Test.Common;
 with Utils.Command_Lines; use Utils.Command_Lines;
 
 package Test.Suite_Min is
 
-   procedure Minimize_Suite (Cmd : Command_Line) with
-   Pre => Test.Common.Harness_Has_Gen_Tests;
+   procedure Minimize_Suite (Cmd : Command_Line)
+   with Pre => Test.Common.Harness_Has_Gen_Tests;
    --  Instrument, build and run the gnattest harness, in order to produce
    --  coverage traces for all the subprograms which have at least one
    --  generated test.

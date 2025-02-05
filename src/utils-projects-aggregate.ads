@@ -55,21 +55,21 @@ package Utils.Projects.Aggregate is
    function Num_Of_Aggregated_Projects return Natural;
    --  Returns the number of (non-aggregate) projects being aggregated
 
-   function Use_Subprocesses_For_Aggregated_Projects return Boolean is
-     (Num_Of_Aggregated_Projects > 1);
+   function Use_Subprocesses_For_Aggregated_Projects return Boolean
+   is (Num_Of_Aggregated_Projects > 1);
    --  True if we should spawn a subprocess for each aggregated project
    --  belonging to the aggregate project. The case when an aggregate project
    --  aggregates only one project is treated specially. That is, False for the
    --  "Simple case", and True for the "Complex case".
 
-   function Get_Aggregated_Prj_Src return String_Access with
-      Pre => Num_Of_Aggregated_Projects = 1;
+   function Get_Aggregated_Prj_Src return String_Access
+   with Pre => Num_Of_Aggregated_Projects = 1;
    --  Returns the (single!) aggregate project source file. This is called when
    --  we are not going to spawn any subprocesses.
 
    procedure Process_Aggregated_Projects
-     (Cmd : Command_Line; Tool_Package_Name : String) with
-       Pre => Num_Of_Aggregated_Projects > 1;
+     (Cmd : Command_Line; Tool_Package_Name : String)
+   with Pre => Num_Of_Aggregated_Projects > 1;
    --  Iterates through the projects being aggregated and spawns the tool
    --  for each of them.
 

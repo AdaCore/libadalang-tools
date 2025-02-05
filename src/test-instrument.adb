@@ -52,12 +52,12 @@ package body Test.Instrument is
 
    Me : constant Trace_Handle := Create ("Instrument", Default => Off);
 
-   function Padding (N : Ada_Node'Class) return Natural is
-     (Natural (First_Column_Number (N)) - 1);
+   function Padding (N : Ada_Node'Class) return Natural
+   is (Natural (First_Column_Number (N)) - 1);
    --  Necessary padding for current element
 
-   function Image (L, R : Token_Reference; Charset : String) return String is
-     (Encode (Text (L, R), Charset));
+   function Image (L, R : Token_Reference; Charset : String) return String
+   is (Encode (Text (L, R), Charset));
    --  Returns Image of given slice
 
    function Inspect_Spec (Node : Ada_Node'Class) return Visit_Status;
@@ -66,8 +66,7 @@ package body Test.Instrument is
    procedure Process_Package_Body (Decl : Basic_Decl);
    --  Generates instrumented package body
 
-   procedure Generate_Package_Body
-     (Name : Wide_Wide_String);
+   procedure Generate_Package_Body (Name : Wide_Wide_String);
    --  Generates body for package that originally did not require it,
    --  but does so after spec instrumentation.
 
@@ -81,9 +80,11 @@ package body Test.Instrument is
      (N1, N2 : Langkit_Support.Text.Text_Type);
    --  Puts beginnings and ends of declarations expected between N1 and N2
 
-   function From_Same_Unit (L, R : Ada_Node'Class) return Boolean is
-     (not L.Is_Null and then not R.Is_Null and then
-      L.P_Enclosing_Compilation_Unit = R.P_Enclosing_Compilation_Unit);
+   function From_Same_Unit (L, R : Ada_Node'Class) return Boolean
+   is (not L.Is_Null
+       and then not R.Is_Null
+       and then L.P_Enclosing_Compilation_Unit
+                = R.P_Enclosing_Compilation_Unit);
 
    Included_Subps : String_Ordered_Set;
 
@@ -105,8 +106,8 @@ package body Test.Instrument is
    --  and do not require a body in the original source. Only "leaf" specs
    --  are stored.
 
-   package Nesting_Cursors is new Ada.Containers.Indefinite_Holders
-     (Langkit_Support.Text.Text_Type);
+   package Nesting_Cursors is new
+     Ada.Containers.Indefinite_Holders (Langkit_Support.Text.Text_Type);
    subtype Nesting_Cursor is Nesting_Cursors.Holder;
 
    ------------------
@@ -118,10 +119,11 @@ package body Test.Instrument is
    begin
       if Kind (Node) = Ada_Package_Decl then
          return Into;
-      elsif Kind (Node) in Ada_Single_Protected_Decl |
-                           Ada_Protected_Type_Decl   |
-                           Ada_Single_Task_Decl      |
-                           Ada_Task_Type_Decl
+      elsif Kind (Node)
+            in Ada_Single_Protected_Decl
+             | Ada_Protected_Type_Decl
+             | Ada_Single_Task_Decl
+             | Ada_Task_Type_Decl
       then
          return Over;
       end if;
@@ -139,7 +141,7 @@ package body Test.Instrument is
          end if;
 
          if not TGen.Libgen.Include_Subp
-           (TGen_Libgen_Ctx, Node.As_Basic_Decl, Diags)
+                  (TGen_Libgen_Ctx, Node.As_Basic_Decl, Diags)
          then
             Report_Std (Join (Diags) & ASCII.LF);
             return Over;
@@ -214,10 +216,11 @@ package body Test.Instrument is
 
       Trace (Me, "inspecting " & F_Name);
 
-      Instr_File_Name := Ada.Strings.Unbounded.To_Unbounded_String
-           (Get_Source_Instr_Dir (CU.Unit.Get_Filename)
-            & GNAT.OS_Lib.Directory_Separator
-            & Simple_Name (CU.Unit.Get_Filename));
+      Instr_File_Name :=
+        Ada.Strings.Unbounded.To_Unbounded_String
+          (Get_Source_Instr_Dir (CU.Unit.Get_Filename)
+           & GNAT.OS_Lib.Directory_Separator
+           & Simple_Name (CU.Unit.Get_Filename));
 
       Unit := CU.F_Body.As_Library_Item.F_Item;
       Included_Subps.Clear;
@@ -293,15 +296,17 @@ package body Test.Instrument is
          Prev_Instr_File := Instr_File_Name;
 
          if Get_Source_Body (F_Name) = "" then
-            Instr_File_Name := Ada.Strings.Unbounded.To_Unbounded_String
-              (Get_Source_Instr_Dir (CU.Unit.Get_Filename)
-               & GNAT.OS_Lib.Directory_Separator
-               & Simple_Name (Get_Source_Instr_Body (F_Name)));
+            Instr_File_Name :=
+              Ada.Strings.Unbounded.To_Unbounded_String
+                (Get_Source_Instr_Dir (CU.Unit.Get_Filename)
+                 & GNAT.OS_Lib.Directory_Separator
+                 & Simple_Name (Get_Source_Instr_Body (F_Name)));
          else
-            Instr_File_Name := Ada.Strings.Unbounded.To_Unbounded_String
-              (Get_Source_Instr_Dir (CU.Unit.Get_Filename)
-               & GNAT.OS_Lib.Directory_Separator
-               & Simple_Name (CU.Unit.Get_Filename));
+            Instr_File_Name :=
+              Ada.Strings.Unbounded.To_Unbounded_String
+                (Get_Source_Instr_Dir (CU.Unit.Get_Filename)
+                 & GNAT.OS_Lib.Directory_Separator
+                 & Simple_Name (CU.Unit.Get_Filename));
          end if;
          Create (Ada.Strings.Unbounded.To_String (Instr_File_Name));
 
@@ -327,10 +332,11 @@ package body Test.Instrument is
          S_Put (0, "with TGen.Instr_Support;");
          Put_New_Line;
 
-         for U of TGen.Libgen.Required_Support_Packages
-           (TGen_Libgen_Ctx,
-            TGen.LAL_Utils.Convert_Qualified_Name
-              (CU.P_Syntactic_Fully_Qualified_Name))
+         for U
+           of TGen.Libgen.Required_Support_Packages
+                (TGen_Libgen_Ctx,
+                 TGen.LAL_Utils.Convert_Qualified_Name
+                   (CU.P_Syntactic_Fully_Qualified_Name))
          loop
             S_Put (0, "with " & To_Ada (U) & ";");
             Put_New_Line;
@@ -409,16 +415,15 @@ package body Test.Instrument is
         (Padding (Decl),
          Image
            (Decl.Token_Start,
-            Previous
-              (Decl.As_Package_Body.F_Decls.First_Child.Token_Start),
+            Previous (Decl.As_Package_Body.F_Decls.First_Child.Token_Start),
             Decl.Unit.Get_Charset));
       Put_New_Line;
 
       --  Insert artificial bodies for expression functions
 
       for D of Subprograms_To_Body loop
-         if D.P_Parent_Basic_Decl.P_Unique_Identifying_Name =
-           Decl.P_Unique_Identifying_Name
+         if D.P_Parent_Basic_Decl.P_Unique_Identifying_Name
+           = Decl.P_Unique_Identifying_Name
          then
             Process_Subprogram_Body (D.As_Base_Subp_Body);
          end if;
@@ -428,18 +433,17 @@ package body Test.Instrument is
       N_Cursor.Replace_Element (Decl.P_Unique_Identifying_Name);
 
       for BDS of Bodyless_Specs loop
-         if First_Parent_With_Body (BDS).P_Unique_Identifying_Name =
-           Decl.P_Unique_Identifying_Name
+         if First_Parent_With_Body (BDS).P_Unique_Identifying_Name
+           = Decl.P_Unique_Identifying_Name
          then
             Artificial_Body_Created := True;
 
             Process_Nesting_Difference
-              (N_Cursor.Element,
-               BDS.As_Basic_Decl.P_Unique_Identifying_Name);
+              (N_Cursor.Element, BDS.As_Basic_Decl.P_Unique_Identifying_Name);
 
             for D of Subprograms_To_Body loop
-               if D.P_Parent_Basic_Decl.P_Unique_Identifying_Name =
-                 BDS.As_Basic_Decl.P_Unique_Identifying_Name
+               if D.P_Parent_Basic_Decl.P_Unique_Identifying_Name
+                 = BDS.As_Basic_Decl.P_Unique_Identifying_Name
                then
                   Process_Subprogram_Body (D.As_Base_Subp_Body);
                end if;
@@ -453,8 +457,7 @@ package body Test.Instrument is
 
       if Artificial_Body_Created then
          Process_Nesting_Difference
-           (N_Cursor.Element,
-            Decl.P_Unique_Identifying_Name);
+           (N_Cursor.Element, Decl.P_Unique_Identifying_Name);
       end if;
 
       for D of Decl.As_Package_Body.F_Decls.F_Decls loop
@@ -478,8 +481,8 @@ package body Test.Instrument is
             --  Everything else is ignored.
          elsif D.Kind in Ada_Subp_Body then
 
-            if not From_Same_Unit (D.As_Subp_Body.P_Decl_Part, D) and then
-              D.As_Subp_Body.F_Subp_Spec.P_Params'Length > 0
+            if not From_Same_Unit (D.As_Subp_Body.P_Decl_Part, D)
+              and then D.As_Subp_Body.F_Subp_Spec.P_Params'Length > 0
               and then Included_Subps.Contains
                          (Image (D.As_Subp_Body.P_Unique_Identifying_Name))
             then
@@ -491,8 +494,8 @@ package body Test.Instrument is
 
          elsif D.Kind in Ada_Expr_Function then
 
-            if not From_Same_Unit (D.As_Expr_Function.P_Decl_Part, D) and then
-              D.As_Expr_Function.F_Subp_Spec.P_Params'Length > 0
+            if not From_Same_Unit (D.As_Expr_Function.P_Decl_Part, D)
+              and then D.As_Expr_Function.F_Subp_Spec.P_Params'Length > 0
               and then Included_Subps.Contains
                          (Image (D.As_Expr_Function.P_Unique_Identifying_Name))
             then
@@ -504,10 +507,11 @@ package body Test.Instrument is
 
          elsif D.Kind in Ada_Null_Subp_Decl then
 
-            if not From_Same_Unit (D.As_Null_Subp_Decl.P_Decl_Part, D) and then
-              D.As_Null_Subp_Decl.F_Subp_Spec.P_Params'Length > 0
+            if not From_Same_Unit (D.As_Null_Subp_Decl.P_Decl_Part, D)
+              and then D.As_Null_Subp_Decl.F_Subp_Spec.P_Params'Length > 0
               and then Included_Subps.Contains
-                (Image (D.As_Null_Subp_Decl.P_Unique_Identifying_Name))
+                         (Image
+                            (D.As_Null_Subp_Decl.P_Unique_Identifying_Name))
             then
                Process_Subprogram_Body (D.As_Base_Subp_Body);
             else
@@ -520,7 +524,10 @@ package body Test.Instrument is
             if not From_Same_Unit (D.As_Subp_Renaming_Decl.P_Decl_Part, D)
               and then D.As_Subp_Renaming_Decl.F_Subp_Spec.P_Params'Length > 0
               and then Included_Subps.Contains
-                (Image (D.As_Subp_Renaming_Decl.P_Unique_Identifying_Name))
+                         (Image
+                            (D
+                               .As_Subp_Renaming_Decl
+                               .P_Unique_Identifying_Name))
             then
                Process_Subprogram_Body (D.As_Base_Subp_Body);
             else
@@ -540,8 +547,7 @@ package body Test.Instrument is
       S_Put
         (Padding (Decl),
          Image
-           (Next
-              (Decl.As_Package_Body.F_Decls.Last_Child.Token_End),
+           (Next (Decl.As_Package_Body.F_Decls.Last_Child.Token_End),
             Decl.Token_End,
             Decl.Unit.Get_Charset));
       Put_New_Line;
@@ -551,9 +557,7 @@ package body Test.Instrument is
    -- Generate_Package_Body --
    ---------------------------
 
-   procedure Generate_Package_Body
-     (Name : Wide_Wide_String)
-   is
+   procedure Generate_Package_Body (Name : Wide_Wide_String) is
       use Ada.Characters.Conversions;
 
       N_Cursor : Nesting_Cursor;
@@ -571,12 +575,11 @@ package body Test.Instrument is
          Artificial_Body_Created := True;
 
          Process_Nesting_Difference
-           (N_Cursor.Element,
-            BDS.As_Basic_Decl.P_Unique_Identifying_Name);
+           (N_Cursor.Element, BDS.As_Basic_Decl.P_Unique_Identifying_Name);
 
          for D of Subprograms_To_Body loop
-            if D.P_Parent_Basic_Decl.P_Unique_Identifying_Name =
-              BDS.As_Basic_Decl.P_Unique_Identifying_Name
+            if D.P_Parent_Basic_Decl.P_Unique_Identifying_Name
+              = BDS.As_Basic_Decl.P_Unique_Identifying_Name
             then
                Process_Subprogram_Body (D.As_Base_Subp_Body);
             end if;
@@ -614,16 +617,16 @@ package body Test.Instrument is
             if D.Kind = Ada_Package_Decl then
                Process_Package_Spec (D.As_Basic_Decl);
 
-            elsif not Remove_Declarations.Contains (D.Image)
-            then
+            elsif not Remove_Declarations.Contains (D.Image) then
                if D.Kind = Ada_Expr_Function then
                   S_Put
                     (Padding (D),
                      Node_Image (D.As_Expr_Function.F_Subp_Spec)
                      & (if D.As_Expr_Function.F_Aspects.Is_Null then ";"
-                       else
+                        else
                           " "
-                       & Node_Image (D.As_Expr_Function.F_Aspects) & ";"));
+                          & Node_Image (D.As_Expr_Function.F_Aspects)
+                          & ";"));
 
                   Subprograms_To_Body.Append (D.As_Ada_Node);
 
@@ -649,8 +652,12 @@ package body Test.Instrument is
          Image
            (Decl.Token_Start,
             Previous
-              (Decl.As_Package_Decl.F_Public_Part.F_Decls.
-                   First_Child.Token_Start),
+              (Decl
+                 .As_Package_Decl
+                 .F_Public_Part
+                 .F_Decls
+                 .First_Child
+                 .Token_Start),
             Decl.Unit.Get_Charset));
       Put_New_Line;
 
@@ -723,8 +730,8 @@ package body Test.Instrument is
                Decl.Unit.Get_Charset)
             & " is");
       else
-         raise Instrumentation_Error with
-           "unsupported body kind: " & Decl.Image;
+         raise Instrumentation_Error
+           with "unsupported body kind: " & Decl.Image;
       end if;
       Put_New_Line;
 
@@ -763,9 +770,7 @@ package body Test.Instrument is
          "TGen.Instr_Support.Recursion_Depth := "
          & "TGen.Instr_Support.Recursion_Depth + 1;");
       Put_New_Line;
-      S_Put
-        (Pad + 6,
-         "if TGen.Instr_Support.Recursion_Depth > 1 then");
+      S_Put (Pad + 6, "if TGen.Instr_Support.Recursion_Depth > 1 then");
       Put_New_Line;
       S_Put (Pad + 9, "return True;");
       Put_New_Line;
@@ -776,7 +781,8 @@ package body Test.Instrument is
       S_Put
         (Pad + 6,
          "Create (GNATTEST_F, Out_File, TGen.Instr_Support.Output_Dir"
-         & " & """ & TGen.LAL_Utils.Default_Blob_Test_Filename (Decl_Decl)
+         & " & """
+         & TGen.LAL_Utils.Default_Blob_Test_Filename (Decl_Decl)
          & "-"" & TGen.Instr_Support.Test_Input_Number);");
       Put_New_Line;
       S_Put
@@ -798,7 +804,7 @@ package body Test.Instrument is
                for Name of Param.F_Ids loop
                   S_Put
                     (Pad + 6,
-                      "TGen.TGen_Support."
+                     "TGen.TGen_Support."
                      & TGen.Marshalling.Output_Fname_For_Typ
                          (Param_Typ.Get.Name)
                      & " (GNATTEST_S, "
@@ -845,9 +851,9 @@ package body Test.Instrument is
             Decl.Unit.Get_Charset)
          & "_GNATTEST "
          & Image
-           (Next (Decl.F_Subp_Spec.F_Subp_Name.Token_End),
-            Decl.F_Subp_Spec.Token_End,
-            Decl.Unit.Get_Charset));
+             (Next (Decl.F_Subp_Spec.F_Subp_Name.Token_End),
+              Decl.F_Subp_Spec.Token_End,
+              Decl.Unit.Get_Charset));
 
       if Decl.Kind = Ada_Subp_Body then
          Put_New_Line;
@@ -867,31 +873,24 @@ package body Test.Instrument is
          Put_New_Line;
          S_Put
            (Pad + 3,
-            "return "
-            & Node_Image (Decl.As_Expr_Function.F_Expr)
-            & ";");
+            "return " & Node_Image (Decl.As_Expr_Function.F_Expr) & ";");
          Put_New_Line;
       elsif Decl.Kind = Ada_Subp_Renaming_Decl then
-         S_Put
-           (1,
-            Node_Image (Decl.As_Subp_Renaming_Decl.F_Renames)
-            & ";");
+         S_Put (1, Node_Image (Decl.As_Subp_Renaming_Decl.F_Renames) & ";");
          Put_New_Line;
       elsif Decl.Kind = Ada_Null_Subp_Decl then
          S_Put (1, "is null;");
          Put_New_Line;
       else
-         raise Instrumentation_Error with
-           "unsupported body kind: " & Decl.Image;
+         raise Instrumentation_Error
+           with "unsupported body kind: " & Decl.Image;
       end if;
 
       if Decl.Kind not in Ada_Subp_Renaming_Decl | Ada_Null_Subp_Decl then
          Put_New_Line;
          S_Put
            (Pad + 3,
-            "end "
-            & Node_Image (Decl.F_Subp_Spec.F_Subp_Name)
-            & "_GNATTEST;");
+            "end " & Node_Image (Decl.F_Subp_Spec.F_Subp_Name) & "_GNATTEST;");
          Put_New_Line;
          Put_New_Line;
       end if;
@@ -906,7 +905,8 @@ package body Test.Instrument is
             "return GNATTEST_Result : "
             & Node_Image (Decl.F_Subp_Spec.F_Subp_Returns)
             & " := "
-            & Node_Image (Decl.F_Subp_Spec.F_Subp_Name) & "_GNATTEST (");
+            & Node_Image (Decl.F_Subp_Spec.F_Subp_Name)
+            & "_GNATTEST (");
       else
          S_Put
            (Pad + 3,
@@ -999,11 +999,7 @@ package body Test.Instrument is
       S_Put (Pad + 6, "raise;");
       Put_New_Line;
 
-      S_Put
-        (Pad,
-         "end "
-         & Node_Image (Decl.F_Subp_Spec.F_Subp_Name)
-         & ";");
+      S_Put (Pad, "end " & Node_Image (Decl.F_Subp_Spec.F_Subp_Name) & ";");
       Put_New_Line;
       Put_New_Line;
 
@@ -1019,14 +1015,15 @@ package body Test.Instrument is
       use Ada.Characters.Conversions;
       use Ada.Strings.Wide_Wide_Fixed;
 
-      Idx      : Natural := 0;
+      Idx : Natural := 0;
 
       Pad      : Natural;
       Pad_Step : Integer := 0;
       --  Strictly speaking padding is not needed but helps
       --  inspecting generated code and doesn't cost much.
 
-      function Add_Pad return Natural is (Pad + Pad_Step * 3);
+      function Add_Pad return Natural
+      is (Pad + Pad_Step * 3);
       --  Padding for nested declarations
 
       procedure Open_Decls (N1, N2 : Langkit_Support.Text.Text_Type);
@@ -1058,18 +1055,14 @@ package body Test.Instrument is
                   Pad_Step := Pad_Step + 1;
                   S_Put
                     (Add_Pad,
-                     "package body "
-                     & To_String (Dif (Idx .. J - 1))
-                     & " is");
+                     "package body " & To_String (Dif (Idx .. J - 1)) & " is");
                   Put_New_Line;
                   Idx := J + 1;
                elsif J = Dif'Last then
                   Pad_Step := Pad_Step + 1;
                   S_Put
                     (Add_Pad,
-                     "package body "
-                     & To_String (Dif (Idx .. J))
-                     & " is");
+                     "package body " & To_String (Dif (Idx .. J)) & " is");
                   Put_New_Line;
                end if;
             end loop;
@@ -1097,19 +1090,12 @@ package body Test.Instrument is
             for J in reverse Dif'First + 1 .. Dif'Last loop
                if Dif (J) = '.' then
                   S_Put
-                    (Add_Pad,
-                     "end "
-                     & To_String (Dif (J + 1 .. Idx))
-                     & ";");
+                    (Add_Pad, "end " & To_String (Dif (J + 1 .. Idx)) & ";");
                   Put_New_Line;
                   Pad_Step := Pad_Step - 1;
                   Idx := J - 1;
                elsif J = Dif'First + 1 then
-                  S_Put
-                    (Add_Pad,
-                     "end "
-                     & To_String (Dif (J .. Idx))
-                     & ";");
+                  S_Put (Add_Pad, "end " & To_String (Dif (J .. Idx)) & ";");
                   Put_New_Line;
                end if;
             end loop;
@@ -1144,11 +1130,10 @@ package body Test.Instrument is
 
             declare
                N_Common : constant Wide_Wide_String :=
-                  (if Has_Dot
-                   then N1 (N1'First .. N1'First + Idx)
-                   --  N1 and N2 are the same at this point. We reached the
-                   --  end of the string without encountering a dot.
-                   else N1);
+                 (if Has_Dot then N1 (N1'First .. N1'First + Idx)
+                  --  N1 and N2 are the same at this point. We reached the
+                  --  end of the string without encountering a dot.
+                  else N1);
             begin
                if not Has_Dot then
                   pragma Assert (N1 = N2);

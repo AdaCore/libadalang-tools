@@ -30,76 +30,80 @@ package TGen.Types.Int_Types is
 
    type Int_Typ is new Discrete_Typ with null record;
 
-   function Encode (Self : Int_Typ; Val : JSON_Value) return JSON_Value is
-     (Create (Self.Lit_Image (Val.Get)));
+   function Encode (Self : Int_Typ; Val : JSON_Value) return JSON_Value
+   is (Create (Self.Lit_Image (Val.Get)));
 
-   type Signed_Int_Typ (Is_Static : Boolean) is new
-     Int_Typ (Is_Static => Is_Static) with record
+   type Signed_Int_Typ (Is_Static : Boolean) is
+     new Int_Typ (Is_Static => Is_Static)
+   with record
       case Is_Static is
          when True =>
             Range_Value : Int_Range;
+
          when others =>
             null;
       end case;
    end record;
 
-   function Supports_Static_Gen (Self : Signed_Int_Typ) return Boolean is
-     (Self.Is_Static);
+   function Supports_Static_Gen (Self : Signed_Int_Typ) return Boolean
+   is (Self.Is_Static);
    --  Whether values for this Typ can be statically generated
 
-   function Low_Bound (Self : Signed_Int_Typ) return Big_Integer with
-     Pre => Self.Is_Static;
+   function Low_Bound (Self : Signed_Int_Typ) return Big_Integer
+   with Pre => Self.Is_Static;
 
-   function High_Bound (Self : Signed_Int_Typ) return Big_Integer with
-     Pre => Self.Is_Static;
+   function High_Bound (Self : Signed_Int_Typ) return Big_Integer
+   with Pre => Self.Is_Static;
 
    function Image (Self : Signed_Int_Typ) return String;
 
-   function Kind (Self : Signed_Int_Typ) return Typ_Kind is (Signed_Int_Kind);
+   function Kind (Self : Signed_Int_Typ) return Typ_Kind
+   is (Signed_Int_Kind);
 
-   function As_Signed_Int_Typ (Self : SP.Ref)
-     return Signed_Int_Typ'Class is
-     (Signed_Int_Typ'Class (Self.Unchecked_Get.all)) with
-     Pre => not SP.Is_Null (Self)
-            and then Self.Get.Kind in Signed_Int_Kind;
+   function As_Signed_Int_Typ (Self : SP.Ref) return Signed_Int_Typ'Class
+   is (Signed_Int_Typ'Class (Self.Unchecked_Get.all))
+   with Pre => not SP.Is_Null (Self) and then Self.Get.Kind in Signed_Int_Kind;
    pragma Inline (As_Signed_Int_Typ);
 
-   type Mod_Int_Typ (Is_Static : Boolean) is new
-     Int_Typ (Is_Static => Is_Static) with record
+   type Mod_Int_Typ (Is_Static : Boolean) is
+     new Int_Typ (Is_Static => Is_Static)
+   with record
       case Is_Static is
          when True =>
             Range_Value : Int_Range := (0, 0);
-            Mod_Value : Big_Integer;
+            Mod_Value   : Big_Integer;
+
          when others =>
             null;
       end case;
    end record;
 
-   function Supports_Static_Gen (Self : Mod_Int_Typ) return Boolean is
-     (Self.Is_Static);
+   function Supports_Static_Gen (Self : Mod_Int_Typ) return Boolean
+   is (Self.Is_Static);
    --  Whether values for this Typ can be statically generated
 
    function Image (Self : Mod_Int_Typ) return String;
 
-   function Low_Bound (Self : Mod_Int_Typ) return Big_Integer with
-     Pre => Self.Is_Static;
+   function Low_Bound (Self : Mod_Int_Typ) return Big_Integer
+   with Pre => Self.Is_Static;
 
-   function High_Bound (Self : Mod_Int_Typ) return Big_Integer with
-     Pre => Self.Is_Static;
+   function High_Bound (Self : Mod_Int_Typ) return Big_Integer
+   with Pre => Self.Is_Static;
 
-   function Kind (Self : Mod_Int_Typ) return Typ_Kind is (Mod_Int_Kind);
+   function Kind (Self : Mod_Int_Typ) return Typ_Kind
+   is (Mod_Int_Kind);
 
-   function As_Mod_Int_Typ (Self : SP.Ref) return Mod_Int_Typ'Class is
-     (Mod_Int_Typ'Class (Self.Unchecked_Get.all)) with
-     Pre => not SP.Is_Null (Self)
-            and then Self.Get.Kind in Mod_Int_Kind;
+   function As_Mod_Int_Typ (Self : SP.Ref) return Mod_Int_Typ'Class
+   is (Mod_Int_Typ'Class (Self.Unchecked_Get.all))
+   with Pre => not SP.Is_Null (Self) and then Self.Get.Kind in Mod_Int_Kind;
    pragma Inline (As_Mod_Int_Typ);
 
    generic
       type T is (<>);
    function Gen return T;
 
-   overriding function Default_Strategy
+   overriding
+   function Default_Strategy
      (Self : Signed_Int_Typ) return Strategy_Type'Class;
    --  Generate a strategy to statically generate (in one pass) values for Self
 

@@ -40,17 +40,20 @@ package METRICS.Actions is
 
 private
 
-   overriding procedure Init
-     (Tool : in out Metrics_Tool; Cmd : in out Command_Line);
-   overriding procedure Second_Per_File_Action
-     (Tool : in out Metrics_Tool;
-      Cmd : Command_Line;
+   overriding
+   procedure Init (Tool : in out Metrics_Tool; Cmd : in out Command_Line);
+   overriding
+   procedure Second_Per_File_Action
+     (Tool      : in out Metrics_Tool;
+      Cmd       : Command_Line;
       File_Name : String;
-      Input : String;
-      BOM_Seen : Boolean;
-      Unit : Analysis_Unit);
-   overriding procedure Final (Tool : in out Metrics_Tool; Cmd : Command_Line);
-   overriding procedure Tool_Help (Tool : Metrics_Tool);
+      Input     : String;
+      BOM_Seen  : Boolean;
+      Unit      : Analysis_Unit);
+   overriding
+   procedure Final (Tool : in out Metrics_Tool; Cmd : Command_Line);
+   overriding
+   procedure Tool_Help (Tool : Metrics_Tool);
 
    use Langkit_Support;
    use type Slocs.Source_Location_Range;
@@ -67,25 +70,28 @@ private
 
    Empty_CU_Sym : constant CU_Symbol := Intern ("");
 
-   package CU_Symbol_Sets is new Ada.Containers.Hashed_Sets
-     (CU_Symbol, Hash_Symbol, Equivalent_Elements => Case_Insensitive_Equal);
+   package CU_Symbol_Sets is new
+     Ada.Containers.Hashed_Sets
+       (CU_Symbol,
+        Hash_Symbol,
+        Equivalent_Elements => Case_Insensitive_Equal);
    use CU_Symbol_Sets;
 
    type Metrics_Values is array (Metrics_Enum) of Metric_Nat;
    Initial_Metrics_Values : constant Metrics_Values :=
-     [Complexity_Statement |
-        Complexity_Cyclomatic |
-        Complexity_Essential |
-        Contract_Complexity => 1,
-      others => 0];
+     [Complexity_Statement
+      | Complexity_Cyclomatic
+      | Complexity_Essential
+      | Contract_Complexity => 1,
+      others                => 0];
 
    type Metrix;
    type Metrix_Ref is access all Metrix;
 
    type Metrix_Index is new Positive;
    type Metrix_Array is array (Metrix_Index range <>) of Metrix_Ref;
-   package Metrix_Vectors is
-      new Utils.Vectors (Metrix_Index, Metrix_Ref, Metrix_Array);
+   package Metrix_Vectors is new
+     Utils.Vectors (Metrix_Index, Metrix_Ref, Metrix_Array);
    use Metrix_Vectors;
 
    Null_Kind : constant Ada_Node_Kind_Type := Ada_Abort_Absent;
@@ -183,9 +189,9 @@ private
 
       Text_Name : Symbol;
       --  Name of the unit, as printed in text output
-      XML_Name : Symbol;
+      XML_Name  : Symbol;
       --  Name of the unit, as printed in XML output
-      LI_Sub : Symbol;
+      LI_Sub    : Symbol;
       --  For the outermost unit, this is a string indicating whether the unit
       --  is a subunit or a library unit. For other units, this is the empty
       --  string.
@@ -223,7 +229,7 @@ private
                   --  Perhaps we should compute these together, in
                   --  Push_New_Metrix.
 
-                  Depends_On : CU_Symbol_Sets.Set;
+                  Depends_On                    : CU_Symbol_Sets.Set;
                   Indirect_Dependences_Computed : Boolean := False;
                   --  Depends_On is the set of compilation units this one
                   --  depends upon. It is computed in 3 steps:
@@ -332,8 +338,6 @@ private
 
    procedure Dump_Metrix (M : Metrix);
    procedure Dump
-     (Tool : in out Metrics_Tool;
-      Global_M : Metrix;
-      Message : String := "");
+     (Tool : in out Metrics_Tool; Global_M : Metrix; Message : String := "");
 
 end METRICS.Actions;

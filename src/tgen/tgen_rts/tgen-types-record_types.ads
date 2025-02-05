@@ -40,12 +40,13 @@ package TGen.Types.Record_Types is
    --  either because it is outside the bounds of the type of the discriminant
    --  or because it does not respect the discriminant constraints of a record.
 
-   package Component_Maps is new Ada.Containers.Hashed_Maps
-     (Key_Type        => Unbounded_String,
-      Element_Type    => SP.Ref,
-      Hash            => Ada.Strings.Unbounded.Hash,
-      Equivalent_Keys => Ada.Strings.Unbounded.Equal_Case_Insensitive,
-      "="             => SP."=");
+   package Component_Maps is new
+     Ada.Containers.Hashed_Maps
+       (Key_Type        => Unbounded_String,
+        Element_Type    => SP.Ref,
+        Hash            => Ada.Strings.Unbounded.Hash,
+        Equivalent_Keys => Ada.Strings.Unbounded.Equal_Case_Insensitive,
+        "="             => SP."=");
    subtype Component_Map is Component_Maps.Map;
    --  Maps for discriminants and components, from their defining name to
    --  their type translation. Since the order of the elements in these maps is
@@ -58,61 +59,59 @@ package TGen.Types.Record_Types is
       Static_Gen      : Boolean := False;
    end record;
 
-   function Supports_Static_Gen (Self : Record_Typ) return Boolean is
-     (Self.Static_Gen);
+   function Supports_Static_Gen (Self : Record_Typ) return Boolean
+   is (Self.Static_Gen);
    --  Whether values for this Typ can be statically generated
 
    function Image (Self : Record_Typ) return String;
 
    function Get_Diagnostics
-     (Self   : Record_Typ;
-      Prefix : String := "") return String_Vector;
+     (Self : Record_Typ; Prefix : String := "") return String_Vector;
 
    function Image_Internal
-     (Self    : Record_Typ;
-      Padding : Natural := 0) return String;
+     (Self : Record_Typ; Padding : Natural := 0) return String;
    --  Image of Self but allows to specify an optional indentation
 
-   function Encode
-     (Self : Record_Typ; Val : JSON_Value) return JSON_Value;
+   function Encode (Self : Record_Typ; Val : JSON_Value) return JSON_Value;
 
-   function Supports_Gen (Self : Record_Typ) return Boolean is
-     (for all Comp of Self.Component_Types => Comp.Get.Supports_Gen);
+   function Supports_Gen (Self : Record_Typ) return Boolean
+   is (for all Comp of Self.Component_Types => Comp.Get.Supports_Gen);
 
-   package Strategy_Maps is new Ada.Containers.Hashed_Maps
-     (Key_Type        => Unbounded_String,
-      Element_Type    => Strategy_Acc,
-      Hash            => Ada.Strings.Unbounded.Hash,
-      Equivalent_Keys => "=",
-      "="             => "=");
+   package Strategy_Maps is new
+     Ada.Containers.Hashed_Maps
+       (Key_Type        => Unbounded_String,
+        Element_Type    => Strategy_Acc,
+        Hash            => Ada.Strings.Unbounded.Hash,
+        Equivalent_Keys => "=",
+        "="             => "=");
    subtype Strategy_Map is Strategy_Maps.Map;
 
-   type Record_Strategy_Type is new Random_Strategy_Type with
-      record
-         T                : SP.Ref;
-         Component_Strats : Strategy_Map;
-      end record;
+   type Record_Strategy_Type is new Random_Strategy_Type with record
+      T                : SP.Ref;
+      Component_Strats : Strategy_Map;
+   end record;
    --  Strategy to generate record / discriminated record types
 
-   overriding function Generate
-     (S           : in out Record_Strategy_Type;
-      Disc_Values : Disc_Value_Map) return JSON_Value;
+   overriding
+   function Generate
+     (S : in out Record_Strategy_Type; Disc_Values : Disc_Value_Map)
+      return JSON_Value;
 
-   overriding function Default_Strategy
-     (Self : Record_Typ) return Strategy_Type'Class;
+   overriding
+   function Default_Strategy (Self : Record_Typ) return Strategy_Type'Class;
 
-   overriding function Default_Enum_Strategy
+   overriding
+   function Default_Enum_Strategy
      (Self : Record_Typ) return Enum_Strategy_Type'Class;
    --  Return an enumerative strategy for a record type (with discriminant
    --  constraints, if they exist, set). This exhaustively enumerates the
    --  record values, using the component types' default enumerative strategy
    --  to generate component values.
 
-   function As_Record_Typ (Self : SP.Ref)
-     return Record_Typ'Class is
-     (Record_Typ'Class (Self.Unchecked_Get.all)) with
-     Pre => not SP.Is_Null (Self)
-            and then Self.Get.Kind in Record_Typ_Range;
+   function As_Record_Typ (Self : SP.Ref) return Record_Typ'Class
+   is (Record_Typ'Class (Self.Unchecked_Get.all))
+   with
+     Pre => not SP.Is_Null (Self) and then Self.Get.Kind in Record_Typ_Range;
    pragma Inline (As_Record_Typ);
 
    type Enum_Strat_Component_Info is record
@@ -131,38 +130,43 @@ package TGen.Types.Record_Types is
 
    end record;
 
-   package Component_Info_Vectors is new Ada.Containers.Vectors
-     (Index_Type => Positive, Element_Type => Enum_Strat_Component_Info);
+   package Component_Info_Vectors is new
+     Ada.Containers.Vectors
+       (Index_Type   => Positive,
+        Element_Type => Enum_Strat_Component_Info);
    subtype Component_Info_Vector is Component_Info_Vectors.Vector;
 
-   type Enum_Record_Strategy_Type is new Enum_Strategy_Type with
-      record
-         Component_Strats : Component_Info_Vector;
-         --  Record type and strategy for each of its component
+   type Enum_Record_Strategy_Type is new Enum_Strategy_Type with record
+      Component_Strats : Component_Info_Vector;
+      --  Record type and strategy for each of its component
 
-         Varying_Index : Positive;
-         --  Index of the component which will change for the generation of the
-         --  next element.
-      end record;
+      Varying_Index : Positive;
+      --  Index of the component which will change for the generation of the
+      --  next element.
+   end record;
 
-   overriding procedure Init (S : in out Enum_Record_Strategy_Type);
+   overriding
+   procedure Init (S : in out Enum_Record_Strategy_Type);
 
-   overriding function Has_Next (S : Enum_Record_Strategy_Type) return Boolean;
+   overriding
+   function Has_Next (S : Enum_Record_Strategy_Type) return Boolean;
 
-   overriding function Generate
-     (S            : in out Enum_Record_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return JSON_Value;
+   overriding
+   function Generate
+     (S : in out Enum_Record_Strategy_Type; Disc_Context : Disc_Value_Map)
+      return JSON_Value;
 
    type Nondiscriminated_Record_Typ is new Record_Typ with null record;
 
-   function Kind (Self : Nondiscriminated_Record_Typ) return Typ_Kind is
-     (Non_Disc_Record_Kind);
+   function Kind (Self : Nondiscriminated_Record_Typ) return Typ_Kind
+   is (Non_Disc_Record_Kind);
 
-   function As_Nondiscriminated_Record_Typ (Self : SP.Ref)
-     return Nondiscriminated_Record_Typ'Class is
-     (Nondiscriminated_Record_Typ'Class (Self.Unchecked_Get.all)) with
-     Pre => not SP.Is_Null (Self)
-            and then Self.Get.Kind in Non_Disc_Record_Kind;
+   function As_Nondiscriminated_Record_Typ
+     (Self : SP.Ref) return Nondiscriminated_Record_Typ'Class
+   is (Nondiscriminated_Record_Typ'Class (Self.Unchecked_Get.all))
+   with
+     Pre =>
+       not SP.Is_Null (Self) and then Self.Get.Kind in Non_Disc_Record_Kind;
    pragma Inline (As_Nondiscriminated_Record_Typ);
 
    type Variant_Part;
@@ -185,17 +189,16 @@ package TGen.Types.Record_Types is
    --  Duplicate Var, allocating new memory for the clones of Var and its
    --  nested variant parts.
 
-   package Variant_Choice_Lists is new Ada.Containers.Doubly_Linked_Lists
-     (Element_Type => Variant_Choice);
+   package Variant_Choice_Lists is new
+     Ada.Containers.Doubly_Linked_Lists (Element_Type => Variant_Choice);
 
    type Variant_Part is record
       Discr_Name      : Unbounded_String;
       Variant_Choices : Variant_Choice_Lists.List;
    end record;
 
-   type Discriminated_Record_Typ (Constrained : Boolean)
-   is
-     new Record_Typ with record
+   type Discriminated_Record_Typ (Constrained : Boolean) is new Record_Typ
+   with record
 
       Mutable : Boolean := False;
       --  Whether this is a mutable type or not.
@@ -226,8 +229,7 @@ package TGen.Types.Record_Types is
    --  discriminants (excluding discriminants which have their own map)
 
    function Constraints_Respected
-     (Self                : Discriminated_Record_Typ;
-      Discriminant_Values : Disc_Value_Map)
+     (Self : Discriminated_Record_Typ; Discriminant_Values : Disc_Value_Map)
       return Boolean;
    --  Check whether the values given for the discriminants in
    --  Discriminant_Values respect the constraints that may already exist for
@@ -236,8 +238,7 @@ package TGen.Types.Record_Types is
    --  be satisfied.
 
    function Components
-     (Self                : Discriminated_Record_Typ;
-      Discriminant_Values : Disc_Value_Map)
+     (Self : Discriminated_Record_Typ; Discriminant_Values : Disc_Value_Map)
       return Component_Maps.Map;
    --  Given a set of Discriminant_Values for the discriminants of Self, return
    --  the set of components that are actually present in the record.
@@ -247,10 +248,11 @@ package TGen.Types.Record_Types is
    function Image (Self : Discriminated_Record_Typ) return String;
 
    function Get_Diagnostics
-     (Self   : Discriminated_Record_Typ;
-      Prefix : String := "") return String_Vector;
+     (Self : Discriminated_Record_Typ; Prefix : String := "")
+      return String_Vector;
 
-   overriding function Default_Strategy
+   overriding
+   function Default_Strategy
      (Self : Discriminated_Record_Typ) return Strategy_Type'Class;
    --  Generate a strategy to statically generate (in one pass) values for Self
 
@@ -263,15 +265,15 @@ package TGen.Types.Record_Types is
    function Image_Internal
      (Self : Discriminated_Record_Typ; Padding : Natural := 0) return String;
 
-   function Kind (Self : Discriminated_Record_Typ) return Typ_Kind is
-     (Disc_Record_Kind);
+   function Kind (Self : Discriminated_Record_Typ) return Typ_Kind
+   is (Disc_Record_Kind);
 
    procedure Free_Content (Self : in out Discriminated_Record_Typ);
    --  Helper for shared pointers
 
-   overriding function Is_Constrained
-     (Self : Discriminated_Record_Typ) return Boolean
-     is (True);
+   overriding
+   function Is_Constrained (Self : Discriminated_Record_Typ) return Boolean
+   is (True);
    --  Whether Self has discriminants constraints
 
    procedure Disc_Constrains_Array
@@ -287,15 +289,14 @@ package TGen.Types.Record_Types is
 
    function Supports_Gen (Self : Discriminated_Record_Typ) return Boolean;
 
-   type Disc_Record_Strategy_Type is
-     new Record_Strategy_Type with
-      record
-         Disc_Strats : Strategy_Map;
-      end record;
+   type Disc_Record_Strategy_Type is new Record_Strategy_Type with record
+      Disc_Strats : Strategy_Map;
+   end record;
 
-   overriding function Generate
-     (S            : in out Disc_Record_Strategy_Type;
-      Disc_Context : Disc_Value_Map) return JSON_Value;
+   overriding
+   function Generate
+     (S : in out Disc_Record_Strategy_Type; Disc_Context : Disc_Value_Map)
+      return JSON_Value;
 
    type Disc_Record_Enum_Strat_Type is new Enum_Strategy_Type with record
       T : SP.Ref;
@@ -329,14 +330,16 @@ package TGen.Types.Record_Types is
    --  next set of discriminant values, and repeat until there is no
    --  discriminants to generate.
 
-   overriding procedure Init (S : in out Disc_Record_Enum_Strat_Type);
+   overriding
+   procedure Init (S : in out Disc_Record_Enum_Strat_Type);
 
-   overriding function Has_Next
-     (S : Disc_Record_Enum_Strat_Type) return Boolean;
+   overriding
+   function Has_Next (S : Disc_Record_Enum_Strat_Type) return Boolean;
 
-   overriding function Generate
-     (S            : in out Disc_Record_Enum_Strat_Type;
-      Disc_Context : Disc_Value_Map) return JSON_Value;
+   overriding
+   function Generate
+     (S : in out Disc_Record_Enum_Strat_Type; Disc_Context : Disc_Value_Map)
+      return JSON_Value;
 
    function Default_Enum_Strategy
      (Self : Discriminated_Record_Typ) return Enum_Strategy_Type'Class;
@@ -345,25 +348,26 @@ package TGen.Types.Record_Types is
    --  information.
 
    function As_Discriminated_Record_Typ
-     (Self : SP.Ref) return Discriminated_Record_Typ'Class is
-     (Discriminated_Record_Typ'Class (Self.Unchecked_Get.all)) with
-     Pre => not SP.Is_Null (Self)
-            and then Self.Get.Kind in Disc_Record_Kind;
+     (Self : SP.Ref) return Discriminated_Record_Typ'Class
+   is (Discriminated_Record_Typ'Class (Self.Unchecked_Get.all))
+   with
+     Pre => not SP.Is_Null (Self) and then Self.Get.Kind in Disc_Record_Kind;
    pragma Inline (As_Discriminated_Record_Typ);
 
    type Parameter_Mode is (In_Mode, In_Out_Mode, Out_Mode);
 
-   function Image (P_Mode : Parameter_Mode) return String is
-     (case P_Mode is
-         when In_Mode     => "in",
-         when Out_Mode    => "out",
+   function Image (P_Mode : Parameter_Mode) return String
+   is (case P_Mode is
+         when In_Mode => "in",
+         when Out_Mode => "out",
          when In_Out_Mode => "in out");
 
-   package Parameter_Mode_Maps is new Ada.Containers.Hashed_Maps
-     (Key_Type        => Unbounded_String,
-      Element_Type    => Parameter_Mode,
-      Hash            => Ada.Strings.Unbounded.Hash,
-      Equivalent_Keys => "=");
+   package Parameter_Mode_Maps is new
+     Ada.Containers.Hashed_Maps
+       (Key_Type        => Unbounded_String,
+        Element_Type    => Parameter_Mode,
+        Hash            => Ada.Strings.Unbounded.Hash,
+        Equivalent_Keys => "=");
 
    subtype Param_Mode_Map is Parameter_Mode_Maps.Map;
 
@@ -388,13 +392,14 @@ package TGen.Types.Record_Types is
 
    end record;
 
-   function Kind (Self : Function_Typ) return Typ_Kind is
-     (Function_Kind);
+   function Kind (Self : Function_Typ) return Typ_Kind
+   is (Function_Kind);
 
-   overriding function FQN
-      (Self : Function_Typ;
-       No_Std : Boolean := False;
-       Top_Level_Generic : Boolean := False) return String;
+   overriding
+   function FQN
+     (Self              : Function_Typ;
+      No_Std            : Boolean := False;
+      Top_Level_Generic : Boolean := False) return String;
    --  Return the fully qualified name associated with this subprogram,
    --  removing the trailing hash.
    --  If No_Std is True, remove the Standard prefix for entities from the
@@ -403,9 +408,8 @@ package TGen.Types.Record_Types is
    --  package name instead of the package instantiation one.
 
    function Slug
-      (Self : Function_Typ;
-       Is_Top_Level_Generic_Instantiation : Boolean := False)
-      return String;
+     (Self                               : Function_Typ;
+      Is_Top_Level_Generic_Instantiation : Boolean := False) return String;
    --  Return a unique identifier for Typ. This transforms the names of
    --  operators.
    --  If the environment variable `TGEN_DEBUG_NAMES` is set, the function
@@ -413,33 +417,30 @@ package TGen.Types.Record_Types is
    --  returned names may not be unique if this variable is set. Only use
    --  this for debugging purposes.
 
-   function Simple_Name (Self : Function_Typ) return String is
-      (+Unbounded_String (Self.Name.Element (Self.Name.Last_Index - 1)));
-  --  Return the simple name associated with this subprogram,
-  --  removing unit name prefix and the trailing hash.
+   function Simple_Name (Self : Function_Typ) return String
+   is (+Unbounded_String (Self.Name.Element (Self.Name.Last_Index - 1)));
+   --  Return the simple name associated with this subprogram,
+   --  removing unit name prefix and the trailing hash.
 
    function JSON_Test_Filename (Self : Function_Typ) return String;
    --  Return the simple name of the file in which tests for Self should be
    --  stored.
 
-   overriding function Default_Strategy
-     (Self : Function_Typ) return Strategy_Type'Class;
+   overriding
+   function Default_Strategy (Self : Function_Typ) return Strategy_Type'Class;
 
-   overriding function Default_Enum_Strategy
+   overriding
+   function Default_Enum_Strategy
      (Self : Function_Typ) return Enum_Strategy_Type'Class;
 
-   function Encode
-     (Self : Function_Typ; Val : JSON_Value) return JSON_Value;
+   function Encode (Self : Function_Typ; Val : JSON_Value) return JSON_Value;
 
    function Get_Diagnostics
-     (Self   : Function_Typ;
-      Prefix : String := "") return String_Vector;
+     (Self : Function_Typ; Prefix : String := "") return String_Vector;
 
-   function As_Function_Typ
-     (Self : SP.Ref) return Function_Typ'Class is
-     (Function_Typ'Class (Self.Unchecked_Get.all)) with
-     Pre => not SP.Is_Null (Self)
-            and then Self.Get.Kind in Function_Kind;
+   function As_Function_Typ (Self : SP.Ref) return Function_Typ'Class
+   is (Function_Typ'Class (Self.Unchecked_Get.all))
+   with Pre => not SP.Is_Null (Self) and then Self.Get.Kind in Function_Kind;
    pragma Inline (As_Function_Typ);
 
 end TGen.Types.Record_Types;

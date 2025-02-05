@@ -31,9 +31,9 @@ with Libadalang.Iterators;        use Libadalang.Iterators;
 with Libadalang.Preprocessing;    use Libadalang.Preprocessing;
 with Libadalang.Project_Provider; use Libadalang.Project_Provider;
 
-with Utils.Command_Lines.Common;   use Utils.Command_Lines.Common;
+with Utils.Command_Lines.Common; use Utils.Command_Lines.Common;
 with Utils.Err_Out;
-with Utils.String_Utilities; use Utils.String_Utilities;
+with Utils.String_Utilities;     use Utils.String_Utilities;
 
 package body Utils.Tools is
 
@@ -58,11 +58,11 @@ package body Utils.Tools is
       --  does.
 
       Input : String_Access := Read_File (File_Name);
-      First : Natural       := 1;
+      First : Natural := 1;
       --  First character of Input, skipping the BOM, if any
 
-      BOM     : BOM_Kind;
-      BOM_Len : Natural;
+      BOM      : BOM_Kind;
+      BOM_Len  : Natural;
       BOM_Seen : Boolean := False;
    begin
 
@@ -82,36 +82,35 @@ package body Utils.Tools is
             Provider : constant Unit_Provider_Reference :=
               (if Status (Tool.Project_Tree.all) = Empty
                then No_Unit_Provider_Reference
-               else Create_Project_Unit_Provider
-                      (Tree             => Tool.Project_Tree,
-                       Env              => Tool.Project_Env,
-                       Is_Project_Owner => False));
+               else
+                 Create_Project_Unit_Provider
+                   (Tree             => Tool.Project_Tree,
+                    Env              => Tool.Project_Env,
+                    Is_Project_Owner => False));
 
          begin
             --  Check if there are preprocessing directives and if so, update
             --  the File_Reader.
 
             if Preprocessing_Allowed then
-               Libadalang
-                 .Preprocessing
-                 .Extract_Preprocessor_Data_From_Project
-                    (Tree           => Tool.Project_Tree.all,
-                     Project        => No_Project,
-                     Default_Config => Default_Config,
-                     File_Configs   => File_Configs);
+               Libadalang.Preprocessing.Extract_Preprocessor_Data_From_Project
+                 (Tree           => Tool.Project_Tree.all,
+                  Project        => No_Project,
+                  Default_Config => Default_Config,
+                  File_Configs   => File_Configs);
 
                if Default_Config.Enabled or not File_Configs.Is_Empty then
                   File_Reader :=
                     Libadalang.Preprocessing.Create_Preprocessor
-                      (Default_Config,
-                       File_Configs);
+                      (Default_Config, File_Configs);
                end if;
             end if;
 
-            Tool.Context := Create_Context
-              (Charset       => Wide_Character_Encoding (Cmd),
-               File_Reader   => File_Reader,
-               Unit_Provider => Provider);
+            Tool.Context :=
+              Create_Context
+                (Charset       => Wide_Character_Encoding (Cmd),
+                 File_Reader   => File_Reader,
+                 Unit_Provider => Provider);
 
             --  If preprocessing is not allowed, ignore related diagnostics
 

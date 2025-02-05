@@ -35,9 +35,7 @@ package Utils.Generic_Formatted_Output is
    --  characters go.
 
    type Template is new String;
-   procedure Put
-     (T                      : Template;
-      X1, X2, X3, X4, X5, X6 : Str_Type := []);
+   procedure Put (T : Template; X1, X2, X3, X4, X5, X6 : Str_Type := []);
    --  Prints the template as is, except for the following escape characters:
    --    "\n" is end of line.
    --    "\r" is ASCII.CR (carriage return).

@@ -22,6 +22,7 @@
 ------------------------------------------------------------------------------
 
 with GNATCOLL.Iconv;
+
 package body Utils.Command_Lines.Common is
 
    Saved_WCEM : Character := ASCII.NUL;
@@ -48,8 +49,8 @@ package body Utils.Command_Lines.Common is
    procedure Restore_WCEM (Cmd : in out Command_Line) is
    begin
       if Saved_WCEM = ASCII.NUL then
-         raise Program_Error with
-           "attempting to restore unset wide character encoding method";
+         raise Program_Error
+           with "attempting to restore unset wide character encoding method";
       end if;
       Set_Arg (Cmd, Wide_Character_Encoding, [1 => Saved_WCEM]);
       Saved_WCEM := ASCII.NUL;
@@ -61,10 +62,9 @@ package body Utils.Command_Lines.Common is
 
    function WCEM (Cmd : Command_Line) return Character is
       WCEM : constant String :=
-        (if Arg (Cmd, Wide_Character_Encoding) = null
-           then "b"
-           else Arg (Cmd, Wide_Character_Encoding).all);
-      C : constant Character := WCEM (1);
+        (if Arg (Cmd, Wide_Character_Encoding) = null then "b"
+         else Arg (Cmd, Wide_Character_Encoding).all);
+      C    : constant Character := WCEM (1);
    begin
       --  We actually only support -Ws, -W8, and -Wb.
 
@@ -83,12 +83,12 @@ package body Utils.Command_Lines.Common is
    begin
       return
         (case WCEM (Cmd) is
-           when 'h'    => "Hex", -- not supported by GNATCOLL.Iconv
-           when 'u'    => "Upper", -- not supported by GNATCOLL.Iconv
-           when 's'    => GNATCOLL.Iconv.SHIFT_JIS,
-           when 'E'    => "EUC", -- not supported by GNATCOLL.Iconv
-           when '8'    => GNATCOLL.Iconv.UTF8,
-           when 'b'    => GNATCOLL.Iconv.ISO_8859_1, -- BRACKETS
+           when 'h' => "Hex", -- not supported by GNATCOLL.Iconv
+           when 'u' => "Upper", -- not supported by GNATCOLL.Iconv
+           when 's' => GNATCOLL.Iconv.SHIFT_JIS,
+           when 'E' => "EUC", -- not supported by GNATCOLL.Iconv
+           when '8' => GNATCOLL.Iconv.UTF8,
+           when 'b' => GNATCOLL.Iconv.ISO_8859_1, -- BRACKETS
            when others => raise Program_Error);
    end Wide_Character_Encoding;
 
@@ -99,12 +99,12 @@ package body Utils.Command_Lines.Common is
    begin
       return
         (case WCEM (Cmd) is
-           when 'h'    => WCEM_Hex,
-           when 'u'    => WCEM_Upper,
-           when 's'    => WCEM_Shift_JIS,
-           when 'e'    => WCEM_EUC,
-           when '8'    => WCEM_UTF8,
-           when 'b'    => WCEM_Brackets,
+           when 'h' => WCEM_Hex,
+           when 'u' => WCEM_Upper,
+           when 's' => WCEM_Shift_JIS,
+           when 'e' => WCEM_EUC,
+           when '8' => WCEM_UTF8,
+           when 'b' => WCEM_Brackets,
            when others => raise Program_Error);
    end Wide_Character_Encoding;
 

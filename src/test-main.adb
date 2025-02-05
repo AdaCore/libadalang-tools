@@ -46,7 +46,7 @@ procedure Test.Main is
    end Callback;
 
    Tool : Actions.Test_Tool;
-   Cmd : Command_Line (Test.Command_Lines.Descriptor'Access);
+   Cmd  : Command_Line (Test.Command_Lines.Descriptor'Access);
 
 begin
    --  By default, send errors to stdout
@@ -57,6 +57,6 @@ begin
    Utils.Drivers.Driver
      (Cmd,
       Tool,
-      Tool_Package_Name     => Test.Common.GT_Package,
-      Callback              => Callback'Unrestricted_Access);
+      Tool_Package_Name => Test.Common.GT_Package,
+      Callback          => Callback'Unrestricted_Access);
 end Test.Main;

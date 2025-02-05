@@ -24,7 +24,7 @@
 --  This package contains some general-purpose entities that are used by many
 --  GNATtest components
 
-with Libadalang.Analysis; use Libadalang.Analysis;
+with Libadalang.Analysis;  use Libadalang.Analysis;
 with Libadalang.Preprocessing;
 with Langkit_Support.Text; use Langkit_Support.Text;
 
@@ -38,7 +38,7 @@ with Ada.Containers.Indefinite_Doubly_Linked_Lists;
 with Ada.Containers.Vectors;
 
 with GNAT.OS_Lib;
-with GNATCOLL.VFS;                use GNATCOLL.VFS;
+with GNATCOLL.VFS; use GNATCOLL.VFS;
 with GNATCOLL.Projects;
 
 with Ada.Sequential_IO;
@@ -50,8 +50,7 @@ with Utils.Command_Lines.Common; use Utils.Command_Lines.Common;
 
 package Test.Common is
 
-   package String_Set is new
-     Ada.Containers.Indefinite_Ordered_Sets (String);
+   package String_Set is new Ada.Containers.Indefinite_Ordered_Sets (String);
    use String_Set;
 
    Excluded_Test_Package_Bodies : String_Set.Set;
@@ -64,8 +63,9 @@ package Test.Common is
      Ada.Containers.Indefinite_Doubly_Linked_Lists (Ada_Node);
 
    package Unbounded_String_Vectors is new
-      Ada.Containers.Vectors (Index_Type => Positive,
-                              Element_Type => Unbounded_String);
+     Ada.Containers.Vectors
+       (Index_Type   => Positive,
+        Element_Type => Unbounded_String);
 
    subtype Unbounded_String_Vector is Unbounded_String_Vectors.Vector;
 
@@ -84,18 +84,18 @@ package Test.Common is
    --  Returns 16 first characters of a hash for given subprogram
 
    function Mangle_Hash
-     (Subp               : Ada_Node'Class;
-      Unwind_Controlling : Boolean := True) return String;
+     (Subp : Ada_Node'Class; Unwind_Controlling : Boolean := True)
+      return String;
    --  Returns the name of a given procedure or function with a hash code made
    --  of full ada names of all its parameters and result profile in case of
    --  a function.
    --  Unwind_Controlling defines wether name of controlling parameter type
    --  should be replaced with corresponding root type name or not.
 
-   function Substring_16 (S : String) return String is
-     (S (S'First .. S'First + 15));
-   function Substring_6 (S : String) return String is
-     (S (S'First .. S'First + 5));
+   function Substring_16 (S : String) return String
+   is (S (S'First .. S'First + 15));
+   function Substring_6 (S : String) return String
+   is (S (S'First .. S'First + 5));
 
    function Get_Nesting (Elem : Ada_Node'Class) return String;
    --  Returns the full package & protected prefix of the element
@@ -104,28 +104,27 @@ package Test.Common is
      (Nesting_1, Nesting_2 : String) return String;
    --  Returns the common prefix of two nestings
 
-   function Skip_Prefix (Identifier : String; Prefix : String)
-      return String with Pre => Identifier'Last >= Prefix'Last;
+   function Skip_Prefix (Identifier : String; Prefix : String) return String
+   with Pre => Identifier'Last >= Prefix'Last;
 
-   function Nesting_Difference
-     (Nesting_1, Nesting_2 : String) return String;
+   function Nesting_Difference (Nesting_1, Nesting_2 : String) return String;
    --  Returns difference in ending of two nestings without the first dot
    --  of the deeper nesting.
 
-   function Node_Image (Node : Ada_Node'Class) return String is
-     (Encode (Text (Node), Node.Unit.Get_Charset));
+   function Node_Image (Node : Ada_Node'Class) return String
+   is (Encode (Text (Node), Node.Unit.Get_Charset));
    --  Textual image of the node
 
    function Get_Subp_Name (Node : Ada_Node'Class) return String;
    --  if Subp is a subprigram declaration it will return subprogram's name;
    --  if Subp is an overloaded operator - it's text name
 
-   function Get_Subp_FQN (Node : Basic_Decl'Class) return String is
-    (Image (Node.As_Basic_Decl.P_Fully_Qualified_Name));
+   function Get_Subp_FQN (Node : Basic_Decl'Class) return String
+   is (Image (Node.As_Basic_Decl.P_Fully_Qualified_Name));
    --  Return the fully qualified name of Node
 
-   function Enclosing_Unit_Name (Node : Ada_Node'Class) return String is
-      (Node_Image (P_Top_Level_Decl (Node, Node.Unit).P_Defining_Name));
+   function Enclosing_Unit_Name (Node : Ada_Node'Class) return String
+   is (Node_Image (P_Top_Level_Decl (Node, Node.Unit).P_Defining_Name));
    --  Returns name of the compilation unit enclosing given node
 
    function Parent_Type_Declaration
@@ -135,8 +134,7 @@ package Test.Common is
 
    function Inheritance_Depth
      (Inheritance_Root_Type  : Base_Type_Decl;
-      Inheritance_Final_Type : Base_Type_Decl)
-      return Natural;
+      Inheritance_Final_Type : Base_Type_Decl) return Natural;
    --  Returns the number of derivations that lead from root type to final type
 
    function Root_Type_Declaration
@@ -199,9 +197,9 @@ package Test.Common is
    procedure Put_Harness_Header;
 
    function First_Line_Number (Element : Ada_Node'Class) return Line_Number
-     is (Element.Sloc_Range.Start_Line);
+   is (Element.Sloc_Range.Start_Line);
    function First_Column_Number (Element : Ada_Node'Class) return Column_Number
-     is (Element.Sloc_Range.Start_Column);
+   is (Element.Sloc_Range.Start_Column);
    --  Returns the number on the first line/column of the element
 
    function Common_Subp_Node_Filter (Node : Ada_Node'Class) return Boolean;
@@ -220,12 +218,11 @@ package Test.Common is
    -- Stub exclusion --
    --------------------
 
-   Default_Stub_Exclusion_List : String_Set.Set :=
-     String_Set.Empty_Set;
+   Default_Stub_Exclusion_List : String_Set.Set := String_Set.Empty_Set;
    package String_To_String_Set is new
      Ada.Containers.Indefinite_Ordered_Maps (String, String_Set.Set);
    use String_To_String_Set;
-   Stub_Exclusion_Lists : String_To_String_Set.Map    :=
+   Stub_Exclusion_Lists        : String_To_String_Set.Map :=
      String_To_String_Set.Empty_Map;
 
    procedure Store_Default_Excluded_Stub (Excluded : String);
@@ -240,69 +237,69 @@ package Test.Common is
    GT_Package : constant String := "gnattest";
    --  Name of tool specific package in the project file.
 
-   Test_Routine_Prefix      : constant String := "Test_";
+   Test_Routine_Prefix : constant String := "Test_";
    --  Prefix to each test routine
 
-   Wrapper_Prefix           : constant String := "Wrap_";
+   Wrapper_Prefix : constant String := "Wrap_";
 
-   Stub_Type_Prefix         : constant String := "Stub_Data_Type_";
+   Stub_Type_Prefix : constant String := "Stub_Data_Type_";
 
-   Stub_Object_Prefix       : constant String := "Stub_Data_";
+   Stub_Object_Prefix : constant String := "Stub_Data_";
 
-   Setter_Prefix            : constant String := "Set_Stub_";
+   Setter_Prefix : constant String := "Set_Stub_";
 
-   Stub_Result_Suffix       : constant String := "_Result";
+   Stub_Result_Suffix : constant String := "_Result";
 
-   Stub_Counter_Var         : constant String := "Stub_Counter";
+   Stub_Counter_Var : constant String := "Stub_Counter";
 
-   Test_Unit_Name           : constant String := "Tests";
+   Test_Unit_Name : constant String := "Tests";
    --  Name of test child package for non-primitive tests
 
-   Test_Unit_Name_Suff      : constant String := "_Tests";
+   Test_Unit_Name_Suff : constant String := "_Tests";
    --  Suffix for test packages that correspond to tagged record types
 
-   Gen_Test_Unit_Name       : constant String := "Gen_Tests";
+   Gen_Test_Unit_Name : constant String := "Gen_Tests";
    --  Name of generic test child package for non-primitive tests
 
-   Gen_Test_Unit_Name_Suff  : constant String := "_Gen_Tests";
+   Gen_Test_Unit_Name_Suff : constant String := "_Gen_Tests";
    --  Suffix for generic test packages that correspond to tagged record types
 
-   Inst_Test_Unit_Name      : constant String := "Inst_Tests";
+   Inst_Test_Unit_Name : constant String := "Inst_Tests";
    --  Name of instatiation test child package
 
-   Test_Prj_Prefix          : constant String := "test_";
+   Test_Prj_Prefix : constant String := "test_";
    --  Prefix of the output project file name
 
-   Test_Data_Unit_Name      : constant String := "Test_Data";
+   Test_Data_Unit_Name : constant String := "Test_Data";
 
    Test_Data_Unit_Name_Suff : constant String := "_Test_Data";
 
-   Stub_Data_Unit_Name      : constant String := "Stub_Data";
+   Stub_Data_Unit_Name : constant String := "Stub_Data";
 
-   Stub_Project_Prefix      : constant String := "Stub_";
+   Stub_Project_Prefix : constant String := "Stub_";
 
-   TD_Prefix                : constant String := "Driver_";
-   TD_Prefix_Overriden      : constant String := "VTE_Driver_";
+   TD_Prefix           : constant String := "Driver_";
+   TD_Prefix_Overriden : constant String := "VTE_Driver_";
 
-   Hash_Version             : constant String := "2.2";
+   Hash_Version : constant String := "2.2";
 
-   Closure_Subdir_Name      : constant String := "tmp_gnattest_closure";
+   Closure_Subdir_Name : constant String := "tmp_gnattest_closure";
 
-   GT_Marker_Begin   : constant String := "--  begin read only";
-   GT_Marker_End     : constant String := "--  end read only";
+   GT_Marker_Begin : constant String := "--  begin read only";
+   GT_Marker_End   : constant String := "--  end read only";
 
-   Stub_Dir_Name     : GNAT.OS_Lib.String_Access := new String'
-     ("gnattest" & GNAT.OS_Lib.Directory_Separator & "stubs");
+   Stub_Dir_Name : GNAT.OS_Lib.String_Access :=
+     new String'("gnattest" & GNAT.OS_Lib.Directory_Separator & "stubs");
 
-   Test_Subdir_Name  : String_Access;
+   Test_Subdir_Name : String_Access;
    --  Name of subdirectory to place test files in case of --subdir option
 
    Separate_Root_Dir : String_Access;
    --  The root directory to place the test file hierarchy in case of
    --  --separate-root option.
 
-   Test_Dir_Name     : GNAT.OS_Lib.String_Access := new String'
-     ("gnattest" & GNAT.OS_Lib.Directory_Separator & "tests");
+   Test_Dir_Name : GNAT.OS_Lib.String_Access :=
+     new String'("gnattest" & GNAT.OS_Lib.Directory_Separator & "tests");
    --  Name of default directory to place test files
 
    Source_Project_Tree : GNATCOLL.Projects.Project_Tree;
@@ -317,12 +314,12 @@ package Test.Common is
 
    Omit_Sloc : Boolean := False;
 
-   Harness_Dir_Str : GNAT.OS_Lib.String_Access := new String'
-     ("gnattest" & GNAT.OS_Lib.Directory_Separator & "harness");
+   Harness_Dir_Str : GNAT.OS_Lib.String_Access :=
+     new String'("gnattest" & GNAT.OS_Lib.Directory_Separator & "harness");
 
    Skeletons_Fail : Boolean := True;
 
-   IDE_Package_Present : Boolean := False;
+   IDE_Package_Present  : Boolean := False;
    Make_Package_Present : Boolean := False;
 
    Tmp_Test_Prj : GNAT.OS_Lib.String_Access := null;
@@ -349,10 +346,10 @@ package Test.Common is
    Show_Test_Duration : Boolean := False;
    --  When true, AUnit_Options.Test_Case_Timer is set to True in test runner
 
-   RTS_Path : GNAT.OS_Lib.String_Access := new String'("");
+   RTS_Path          : GNAT.OS_Lib.String_Access := new String'("");
    RTS_Attribute_Val : GNAT.OS_Lib.String_Access;
 
-   Target_Val  : GNAT.OS_Lib.String_Access;
+   Target_Val : GNAT.OS_Lib.String_Access;
 
    Has_Test_Cases : Boolean := False;
 
@@ -373,7 +370,7 @@ package Test.Common is
    --  Whether or not to add inherited tests that correspond to inherited
    --  primitives to the test suite for descendant type.
 
-   Substitution_Suite   : Boolean := False;
+   Substitution_Suite : Boolean := False;
    --  Whenever or not to genretate suites for overrden tests applying them
    --  to fixture containing object of descendant type.
 
@@ -445,14 +442,14 @@ package Test.Common is
    --  Return whether the harness contains any generated tests
 
    procedure Extract_Preprocessor_Config
-      (Tree : GNATCOLL.Projects.Project_Tree'Class);
+     (Tree : GNATCOLL.Projects.Project_Tree'Class);
    --  Extract the preprocessor configuration from a project tree.
    --  It is possible to check if preprocessing is being used with
    --  `Has_Preprocessor` and retrieve the configuration using
    --  `Preprocessor_Config` field if possible.
 
    procedure Write_Additional_Compiler_Flags
-      (Preprocessor_Config_Dir : String);
+     (Preprocessor_Config_Dir : String);
    --  Write additional compiler flags if needed such as preprocessing flags
    --  and language version. This function only appends flags to the existing
    --  one in `gnattest_common.gpr`.
@@ -474,7 +471,7 @@ package Test.Common is
    --  Might be null if the project isn't using preprocessing. The
    --  `Has_Preprocessor` switch can be used to check if preprocessing is used.
 
-   Has_Preprocessor    : Boolean := False;
+   Has_Preprocessor : Boolean := False;
    --  True if the loaded project uses preprocessing, false otherwise.
 
    Preprocessor_File_Name : constant String := "preprocessor.def";
@@ -484,7 +481,7 @@ package Test.Common is
    --  Number of tests to be generated for each procedure (or upper limit if
    --  using enumerative strategies).
 
-   Common_Package_Name     : constant String := "Gnattest_Generated";
+   Common_Package_Name : constant String := "Gnattest_Generated";
    --  Root package name for common generated files
 
    Subp_UT_Counter : Natural := 0;
@@ -502,7 +499,7 @@ package Test.Common is
    Instrument : Boolean := False;
    --  Whether we should instrument sources
 
-   Minimize   : Boolean := False;
+   Minimize : Boolean := False;
    --  Whether we should run the minimization pass for generated test cases
 
    Instr_Suffix : constant String := "-gnattest-instr";

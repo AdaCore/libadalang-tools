@@ -27,6 +27,7 @@ with Utils.Slow_Vectors;
 pragma Warnings (On);
 
 generic package Utils.Vectors renames Utils.Fast_Vectors;
+
 --  Utils.Slow_Vectors;
 
 --  This renaming is so that we can easily switch back to Slow_Vectors for

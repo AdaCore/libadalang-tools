@@ -42,21 +42,20 @@ with Utils.Command_Lines;
 package body Laltools.Partial_GNATPP is
 
    function Copy_Slice
-     (Source : Utils.Char_Vectors.Char_Vector;
-      Offset : Natural := 0)
+     (Source : Utils.Char_Vectors.Char_Vector; Offset : Natural := 0)
       return Ada.Strings.Unbounded.Unbounded_String
    is (Ada.Strings.Unbounded.To_Unbounded_String
          (Utils.Char_Vectors.Char_Vectors.Elems (Source)
-            (1 + Offset
+            (1
+             + Offset
              .. Utils.Char_Vectors.Char_Vectors.Last_Index (Source))));
    --  Converts a Char_Vector into an Unbounded_String
 
-   type Partial_Select_Edits is
-      record
-         Unit : Analysis_Unit;
-         Node : Ada_Node;
-         Edit : Text_Edit;
-      end record;
+   type Partial_Select_Edits is record
+      Unit : Analysis_Unit;
+      Node : Ada_Node;
+      Edit : Text_Edit;
+   end record;
    --  Stores the selected region related information
 
    procedure Print (E : Partial_Select_Edits);
@@ -64,7 +63,7 @@ package body Laltools.Partial_GNATPP is
    --  Print an E in an human readable format to the standard output
 
    procedure Get_Selected_Region_Enclosing_Node
-     (Unit             :     Analysis_Unit;
+     (Unit             : Analysis_Unit;
       SL_Range         : Source_Location_Range;
       Start_Node       : out Ada_Node;
       End_Node         : out Ada_Node;
@@ -87,26 +86,22 @@ package body Laltools.Partial_GNATPP is
    --  Returns the node's next sibling or No_Ada_Node if no sibling found
 
    function Get_Initial_Indentation
-     (Node           : Ada_Node;
-      PP_Indentation : Natural)
-      return Natural;
+     (Node : Ada_Node; PP_Indentation : Natural) return Natural;
    --  Returns the initial indentation that needs to be used for the selected
    --  Node formatting
 
-   function Get_First_Line_Offset
-     (Node : Ada_Node)
-      return Natural;
+   function Get_First_Line_Offset (Node : Ada_Node) return Natural;
    --  Returns an offset that needs to be applied to the first line.
    --  This is for cases like 'overriding procedure', where 'overriding' is
    --  not in the same node as 'procedure'.
 
    procedure Filter_Initially_Selected_Lines_From_Output
-     (Unit              : Analysis_Unit;
-      Initial_SL_Range  : Source_Location_Range;
-      Output            : Utils.Char_Vectors.Char_Vector;
-      Output_SL_Range   : Source_Location_Range;
-      New_Output        : out Utils.Char_Vectors.Char_Vector;
-      New_SL_Range      : out Source_Location_Range);
+     (Unit             : Analysis_Unit;
+      Initial_SL_Range : Source_Location_Range;
+      Output           : Utils.Char_Vectors.Char_Vector;
+      Output_SL_Range  : Source_Location_Range;
+      New_Output       : out Utils.Char_Vectors.Char_Vector;
+      New_SL_Range     : out Source_Location_Range);
    --  Retrieves the initial selected line(s) from the Output and returns
    --  the related Char_Vector with the associated new selection range.
    --  This will be used only for the case when the initial sourece line breaks
@@ -128,8 +123,11 @@ package body Laltools.Partial_GNATPP is
    begin
       Ada.Text_IO.Put_Line ("*************************************");
       Ada.Text_IO.Put_Line
-        (Simple_Name (E.Unit.Get_Filename) & "(" & E.Node.Image & ") - " &
-         Image (E.Edit.Location));
+        (Simple_Name (E.Unit.Get_Filename)
+         & "("
+         & E.Node.Image
+         & ") - "
+         & Image (E.Edit.Location));
       Ada.Text_IO.Put_Line (Ada.Strings.Unbounded.To_String (E.Edit.Text));
       Ada.Text_IO.Put_Line ("*************************************");
    end Print;
@@ -139,23 +137,22 @@ package body Laltools.Partial_GNATPP is
    function Lookup
      (Unit  : Analysis_Unit;
       Token : Libadalang.Common.Token_Reference;
-      Look  : Search_Direction)
-      return Ada_Node;
+      Look  : Search_Direction) return Ada_Node;
    --  Finds the next Ada_Node relative to Token. Look param controls the
    --  search direction. If Token already belongs to an Ada_Node, that node is
    --  returned. Returns No_Ada_Node if no node is found or if
    --  Token = No_Token.
 
    function Next_Non_Whitespace
-     (Token  : Libadalang.Common.Token_Reference;
-      Search : Search_Direction)
+     (Token : Libadalang.Common.Token_Reference; Search : Search_Direction)
       return Libadalang.Common.Token_Reference;
    --  Finds the next non white Token_Reference relative to Token. Search
    --  controls the lookup direction. Returns No_Token if no whitespace
    --  is found or if Token = No_Token.
 
    function Get_Selection_Text
-     (Unit : Analysis_Unit; Node : Ada_Node;
+     (Unit               : Analysis_Unit;
+      Node               : Ada_Node;
       Start_Tok, End_Tok : Token_Reference)
       return Utils.Char_Vectors.Char_Vector;
    --  The returned value represents the text selection that will be passed
@@ -172,8 +169,8 @@ package body Laltools.Partial_GNATPP is
    function Get_Common_Enclosing_Parent_Node
      (Start_Node : Ada_Node; End_Node : Ada_Node) return Ada_Node
    is
-      pragma Assert
-        (Start_Node /= No_Ada_Node and then End_Node /= No_Ada_Node);
+      pragma
+        Assert (Start_Node /= No_Ada_Node and then End_Node /= No_Ada_Node);
 
       --  Start of Get_Common_Enclosing_Parent_Node
    begin
@@ -205,10 +202,9 @@ package body Laltools.Partial_GNATPP is
    function Lookup
      (Unit  : Analysis_Unit;
       Token : Libadalang.Common.Token_Reference;
-      Look  : Search_Direction)
-      return Ada_Node
+      Look  : Search_Direction) return Ada_Node
    is
-      Crt_Token      : Token_Reference              := Token;
+      Crt_Token      : Token_Reference := Token;
       Crt_Token_Kind : Libadalang.Common.Token_Kind :=
         Kind (Libadalang.Common.Data (Crt_Token));
    begin
@@ -231,8 +227,9 @@ package body Laltools.Partial_GNATPP is
          return No_Ada_Node;
       end if;
 
-      return  Unit.Root.Lookup
-        (Start_Sloc (Sloc_Range (Data (Crt_Token)))).As_Ada_Node;
+      return
+        Unit.Root.Lookup (Start_Sloc (Sloc_Range (Data (Crt_Token))))
+          .As_Ada_Node;
    end Lookup;
 
    -------------------------
@@ -240,16 +237,18 @@ package body Laltools.Partial_GNATPP is
    -------------------------
 
    function Next_Non_Whitespace
-     (Token  : Token_Reference;
-      Search : Search_Direction)
+     (Token : Token_Reference; Search : Search_Direction)
       return Token_Reference
    is
       Crt_Tok : Token_Reference := Token;
    begin
       while Crt_Tok /= No_Token loop
          case Search is
-            when Forward  => Crt_Tok := Next (Crt_Tok);
-            when Backward => Crt_Tok := Previous (Crt_Tok);
+            when Forward =>
+               Crt_Tok := Next (Crt_Tok);
+
+            when Backward =>
+               Crt_Tok := Previous (Crt_Tok);
          end case;
          exit when Kind (Data (Crt_Tok)) /= Ada_Whitespace;
       end loop;
@@ -278,8 +277,7 @@ package body Laltools.Partial_GNATPP is
       function Get_Minimum_Indentation_Level
         (Unit       : Analysis_Unit;
          Start_Line : Line_Number;
-         Start_Tok  : Token_Reference)
-         return Natural;
+         Start_Tok  : Token_Reference) return Natural;
       --  Computes the indentation level of the least indented node or comment
       --  that will be used as an offset to format the selection
 
@@ -290,19 +288,18 @@ package body Laltools.Partial_GNATPP is
       function Get_Minimum_Indentation_Level
         (Unit       : Analysis_Unit;
          Start_Line : Line_Number;
-         Start_Tok  : Token_Reference)
-         return Natural
+         Start_Tok  : Token_Reference) return Natural
       is
          SL_First_Non_Blank : constant Positive :=
            Index_Non_Blank (Unit.Get_Line (Positive (Start_Line)));
-         Include_SL : constant Boolean :=
+         Include_SL         : constant Boolean :=
            (SL_First_Non_Blank = Text (Start_Tok)'First);
-         Crt_Indent : Natural := 0;
-         Min_Indent : Natural := Natural'Last;
+         Crt_Indent         : Natural := 0;
+         Min_Indent         : Natural := Natural'Last;
       begin
-         for Line_Nb in
-           (if Include_SL then Start_Line else Start_Line + 1)
-           .. Node.Sloc_Range.End_Line
+         for Line_Nb
+           in (if Include_SL then Start_Line else Start_Line + 1)
+              .. Node.Sloc_Range.End_Line
          loop
             declare
                L : constant Text_Type := Unit.Get_Line (Positive (Line_Nb));
@@ -321,7 +318,7 @@ package body Laltools.Partial_GNATPP is
          return Min_Indent;
       end Get_Minimum_Indentation_Level;
 
-      Selection  : Utils.Char_Vectors.Char_Vector;
+      Selection : Utils.Char_Vectors.Char_Vector;
       --  variable to store the initial selected text as Char_Vector
 
       Start_Line : constant Line_Number :=
@@ -358,7 +355,7 @@ package body Laltools.Partial_GNATPP is
         [others => 0];
       --  For each line stores the corresponding end index of the line
 
-      Indent       : Natural := 0;
+      Indent : Natural := 0;
       --  Indentation value that is computed in order to be used in the
       --  selection formatting, being considered as an offset for the returned
       --  selection formatting.
@@ -372,8 +369,7 @@ package body Laltools.Partial_GNATPP is
       else
          --  If multiple line selection then compute the indentation offset
          --  and fill the start/end selection index arrays
-         Indent := Get_Minimum_Indentation_Level
-           (Unit, Start_Line, Start_Tok);
+         Indent := Get_Minimum_Indentation_Level (Unit, Start_Line, Start_Tok);
 
          --  Handle selection first line
          if Include_SL then
@@ -399,7 +395,7 @@ package body Laltools.Partial_GNATPP is
 
          --  Handle selection end line
          Sel_Strt_Idx (End_Line) :=
-              Unit.Get_Line (Integer (End_Line))'First + Indent;
+           Unit.Get_Line (Integer (End_Line))'First + Indent;
          Sel_End_Idx (End_Line) :=
            (if Include_EL then Text (End_Tok)'Last
             else Unit.Get_Line (Integer (End_Line))'Last);
@@ -411,10 +407,10 @@ package body Laltools.Partial_GNATPP is
 
          declare
             Crt_Line : constant Text_Type := Unit.Get_Line (Integer (L_Nb));
-            S : GNAT.Strings.String_Access :=
-              new String'(To_UTF8
-                          (Crt_Line
-                             (Sel_Strt_Idx (L_Nb) .. Sel_End_Idx (L_Nb))));
+            S        : GNAT.Strings.String_Access :=
+              new String'
+                (To_UTF8
+                   (Crt_Line (Sel_Strt_Idx (L_Nb) .. Sel_End_Idx (L_Nb))));
          begin
             --  Add a LF for each line of the selection except for the last one
             if L_Nb /= End_Line then
@@ -435,9 +431,10 @@ package body Laltools.Partial_GNATPP is
    ------------------------------------------
 
    procedure Get_Selected_Region_Enclosing_Node
-     (Unit             :     Analysis_Unit;
+     (Unit             : Analysis_Unit;
       SL_Range         : Source_Location_Range;
-      Start_Node       : out Ada_Node; End_Node : out Ada_Node;
+      Start_Node       : out Ada_Node;
+      End_Node         : out Ada_Node;
       Enclosing_Node   : out Ada_Node;
       Input_Sel        : out Utils.Char_Vectors.Char_Vector;
       Output_Sel_Range : out Source_Location_Range)
@@ -446,27 +443,30 @@ package body Laltools.Partial_GNATPP is
       Crt_Start_Tok : constant Token_Reference :=
         Unit.Lookup_Token
           (Source_Location'(SL_Range.Start_Line, SL_Range.Start_Column));
-      Crt_End_Tok : constant Token_Reference :=
+      Crt_End_Tok   : constant Token_Reference :=
         Unit.Lookup_Token
           (Source_Location'(SL_Range.End_Line, SL_Range.End_Column));
 
       Crt_Start_Node : constant Ada_Node :=
         Lookup (Unit, Crt_Start_Tok, Forward);
-      Crt_End_Node : constant Ada_Node := Lookup (Unit, Crt_End_Tok, Backward);
+      Crt_End_Node   : constant Ada_Node :=
+        Lookup (Unit, Crt_End_Tok, Backward);
 
       --  This is a variable used to find the first relevant parent of
       --  Crt_Start_Node and Crt_End_Node
       Parent_Node : Ada_Node := No_Ada_Node;
 
-      function Is_Relevant_Parent_Kind (Kind : Ada_Node_Kind_Type)
-                                        return Boolean
-      is
-        (Kind in Ada_Decl_Block | Ada_Type_Decl | Ada_Compilation_Unit
-           | Ada_Stmt | Ada_Basic_Decl);
+      function Is_Relevant_Parent_Kind
+        (Kind : Ada_Node_Kind_Type) return Boolean
+      is (Kind
+          in Ada_Decl_Block
+           | Ada_Type_Decl
+           | Ada_Compilation_Unit
+           | Ada_Stmt
+           | Ada_Basic_Decl);
 
-      function Is_Relevant_Parent_Node
-        (Node : Ada_Node'Class) return Boolean is
-        (not Node.Is_Null and then Is_Relevant_Parent_Kind (Node.Kind));
+      function Is_Relevant_Parent_Node (Node : Ada_Node'Class) return Boolean
+      is (not Node.Is_Null and then Is_Relevant_Parent_Kind (Node.Kind));
 
       procedure Is_Relevant_Parent_Node_Callback
         (Parent : Ada_Node; Stop : in out Boolean);
@@ -485,10 +485,9 @@ package body Laltools.Partial_GNATPP is
       --------------------------------------
 
       procedure Is_Relevant_Parent_Node_Callback
-        (Parent : Ada_Node; Stop : in out Boolean)
-      is
+        (Parent : Ada_Node; Stop : in out Boolean) is
       begin
-         Stop        := True;
+         Stop := True;
          Parent_Node := Parent;
       end Is_Relevant_Parent_Node_Callback;
 
@@ -497,19 +496,18 @@ package body Laltools.Partial_GNATPP is
       -------------------------------
 
       function Are_Overlapping_Nodes
-        (Start_Node : Ada_Node; End_Node : Ada_Node) return Boolean
-      is
+        (Start_Node : Ada_Node; End_Node : Ada_Node) return Boolean is
       begin
          pragma Assert (Start_Node /= End_Node);
 
          return
            (Start_Node.Sloc_Range.Start_Line > End_Node.Sloc_Range.Start_Line
-            and then
-            Start_Node.Sloc_Range.End_Line < End_Node.Sloc_Range.End_Line)
-           or else
-             (Start_Node.Sloc_Range.Start_Line < End_Node.Sloc_Range.Start_Line
-              and then
-              Start_Node.Sloc_Range.End_Line > End_Node.Sloc_Range.End_Line);
+            and then Start_Node.Sloc_Range.End_Line
+                     < End_Node.Sloc_Range.End_Line)
+           or else (Start_Node.Sloc_Range.Start_Line
+                    < End_Node.Sloc_Range.Start_Line
+                    and then Start_Node.Sloc_Range.End_Line
+                             > End_Node.Sloc_Range.End_Line);
       end Are_Overlapping_Nodes;
 
       --------------------------
@@ -517,22 +515,23 @@ package body Laltools.Partial_GNATPP is
       --------------------------
 
       function Get_Overlapping_Node
-        (Start_Node : Ada_Node; End_Node : Ada_Node) return Ada_Node
-      is
+        (Start_Node : Ada_Node; End_Node : Ada_Node) return Ada_Node is
       begin
-         pragma Assert (Start_Node /= End_Node
-                        and then Are_Overlapping_Nodes (Start_Node, End_Node));
+         pragma
+           Assert
+             (Start_Node /= End_Node
+                and then Are_Overlapping_Nodes (Start_Node, End_Node));
 
          if Start_Node.Sloc_Range.Start_Line > End_Node.Sloc_Range.Start_Line
-            and then
-             Start_Node.Sloc_Range.End_Line < End_Node.Sloc_Range.End_Line
+           and then Start_Node.Sloc_Range.End_Line
+                    < End_Node.Sloc_Range.End_Line
          then
             return End_Node;
 
-         elsif
-           Start_Node.Sloc_Range.Start_Line < End_Node.Sloc_Range.Start_Line
-           and then
-             Start_Node.Sloc_Range.End_Line > End_Node.Sloc_Range.End_Line
+         elsif Start_Node.Sloc_Range.Start_Line
+           < End_Node.Sloc_Range.Start_Line
+           and then Start_Node.Sloc_Range.End_Line
+                    > End_Node.Sloc_Range.End_Line
          then
             return Start_Node;
          end if;
@@ -543,12 +542,13 @@ package body Laltools.Partial_GNATPP is
       --  Start of Get_Selected_Region_Enclosing_Node
    begin
       Enclosing_Node := No_Ada_Node;
-      Parent_Node    := Crt_Start_Node;
+      Parent_Node := Crt_Start_Node;
 
       --  Find the first relevant parent of Crt_Start_Node
       if not Is_Relevant_Parent_Kind (Kind (Crt_Start_Node)) then
          Find_Matching_Parents
-           (Crt_Start_Node, Is_Relevant_Parent_Node'Access,
+           (Crt_Start_Node,
+            Is_Relevant_Parent_Node'Access,
             Is_Relevant_Parent_Node_Callback'Access);
       end if;
       Start_Node := Parent_Node.As_Ada_Node;
@@ -558,7 +558,8 @@ package body Laltools.Partial_GNATPP is
 
       if not Is_Relevant_Parent_Kind (Kind (Crt_End_Node)) then
          Find_Matching_Parents
-           (Crt_End_Node, Is_Relevant_Parent_Node'Access,
+           (Crt_End_Node,
+            Is_Relevant_Parent_Node'Access,
             Is_Relevant_Parent_Node_Callback'Access);
       end if;
       End_Node := Parent_Node.As_Ada_Node;
@@ -579,7 +580,8 @@ package body Laltools.Partial_GNATPP is
               and then not Is_Relevant_Parent_Kind (Kind (Enclosing_Node))
             then
                Find_Matching_Parents
-                 (Enclosing_Node, Is_Relevant_Parent_Node'Access,
+                 (Enclosing_Node,
+                  Is_Relevant_Parent_Node'Access,
                   Is_Relevant_Parent_Node_Callback'Access);
                Enclosing_Node := Parent_Node.As_Ada_Node;
             end if;
@@ -604,13 +606,13 @@ package body Laltools.Partial_GNATPP is
          --  True_Start_Token.
          --  Same fo Crt_End_Token
          True_Start_Tok : Token_Reference :=
-           (if Kind (Data (Crt_Start_Tok)) = Ada_Whitespace then
-               Next_Non_Whitespace (Crt_Start_Tok, Forward)
+           (if Kind (Data (Crt_Start_Tok)) = Ada_Whitespace
+            then Next_Non_Whitespace (Crt_Start_Tok, Forward)
             else Crt_Start_Tok);
 
          True_End_Tok : Token_Reference :=
-           (if Kind (Data (Crt_End_Tok)) = Ada_Whitespace then
-               Next_Non_Whitespace (Crt_End_Tok, Backward)
+           (if Kind (Data (Crt_End_Tok)) = Ada_Whitespace
+            then Next_Non_Whitespace (Crt_End_Tok, Backward)
             else Crt_End_Tok);
 
          Start_Line, End_Line : Line_Number;
@@ -621,10 +623,12 @@ package body Laltools.Partial_GNATPP is
          --  then update it.
          True_Start_Tok :=
            (if Enclosing_Node.Compare
-              (Start_Sloc (Sloc_Range (Data (True_Start_Tok)))) = Before
+                 (Start_Sloc (Sloc_Range (Data (True_Start_Tok))))
+              = Before
             then True_Start_Tok
-            else Unit.Lookup_Token
-              (Source_Location'
+            else
+              Unit.Lookup_Token
+                (Source_Location'
                    (Enclosing_Node.Sloc_Range.Start_Line,
                     Enclosing_Node.Sloc_Range.Start_Column)));
 
@@ -632,16 +636,18 @@ package body Laltools.Partial_GNATPP is
          --  then update it.
          True_End_Tok :=
            (if Enclosing_Node.Compare
-              (End_Sloc (Sloc_Range (Data (True_End_Tok)))) = After
+                 (End_Sloc (Sloc_Range (Data (True_End_Tok))))
+              = After
             then True_End_Tok
-            else Unit.Lookup_Token
-              (Source_Location'
+            else
+              Unit.Lookup_Token
+                (Source_Location'
                    (Enclosing_Node.Sloc_Range.End_Line,
                     Enclosing_Node.Sloc_Range.End_Column - 1)));
 
-         Input_Sel := Get_Selection_Text (Unit,
-                                          Enclosing_Node,
-                                          True_Start_Tok, True_End_Tok);
+         Input_Sel :=
+           Get_Selection_Text
+             (Unit, Enclosing_Node, True_Start_Tok, True_End_Tok);
 
          --  Start_Line/Start_Col stores the starting line/column information
          --  for the current selection.
@@ -652,26 +658,22 @@ package body Laltools.Partial_GNATPP is
          declare
             use Ada.Strings.Wide_Wide_Fixed;
 
-            Line : constant Text_Type :=
+            Line                   : constant Text_Type :=
               Unit.Get_Line (Positive (Start_Line));
             First_Non_Blank_Index  : constant Natural :=
               Index_Non_Blank (Line);
             First_Non_Blank_Column : constant Natural :=
-              (if First_Non_Blank_Index = 0 then
-                 0
-               else
-                 Index_Non_Blank (Line) - Line'First + 1);
+              (if First_Non_Blank_Index = 0 then 0
+               else Index_Non_Blank (Line) - Line'First + 1);
 
          begin
             Start_Col :=
               (if First_Non_Blank_Column /= 0
-                 and then First_Non_Blank_Column =
-                            Integer
+                 and then First_Non_Blank_Column
+                          = Integer
                               (Sloc_Range (Data (True_Start_Tok)).Start_Column)
-               then
-                 1
-               else
-                 Sloc_Range (Data (True_Start_Tok)).Start_Column);
+               then 1
+               else Sloc_Range (Data (True_Start_Tok)).Start_Column);
          end;
 
          --  End_Line/End_Col stores the ending line/column information for
@@ -680,8 +682,8 @@ package body Laltools.Partial_GNATPP is
          End_Col := Sloc_Range (Data (True_End_Tok)).End_Column;
 
          --  The selection real margins to be rewritten
-         Output_Sel_Range := Source_Location_Range'
-           (Start_Line, End_Line, Start_Col, End_Col);
+         Output_Sel_Range :=
+           Source_Location_Range'(Start_Line, End_Line, Start_Col, End_Col);
       end;
 
    end Get_Selected_Region_Enclosing_Node;
@@ -690,22 +692,22 @@ package body Laltools.Partial_GNATPP is
    --  Get_Previous_Sibling  --
    ----------------------------
 
-   function Get_Previous_Sibling (Node : Ada_Node) return Ada_Node
-   is
+   function Get_Previous_Sibling (Node : Ada_Node) return Ada_Node is
    begin
-      return (if Node /= No_Ada_Node then Node.Previous_Sibling.As_Ada_Node
-              else No_Ada_Node);
+      return
+        (if Node /= No_Ada_Node then Node.Previous_Sibling.As_Ada_Node
+         else No_Ada_Node);
    end Get_Previous_Sibling;
 
    ------------------------
    --  Get_Next_Sibling  --
    ------------------------
 
-   function Get_Next_Sibling (Node : Ada_Node) return Ada_Node
-   is
+   function Get_Next_Sibling (Node : Ada_Node) return Ada_Node is
    begin
-      return (if Node /= No_Ada_Node then Node.Next_Sibling.As_Ada_Node
-              else No_Ada_Node);
+      return
+        (if Node /= No_Ada_Node then Node.Next_Sibling.As_Ada_Node
+         else No_Ada_Node);
    end Get_Next_Sibling;
 
    -------------------------------
@@ -713,27 +715,31 @@ package body Laltools.Partial_GNATPP is
    -------------------------------
 
    function Get_Initial_Indentation
-     (Node           : Ada_Node;
-      PP_Indentation : Natural)
-      return Natural
+     (Node : Ada_Node; PP_Indentation : Natural) return Natural
    is
       Parent_Node : Ada_Node := No_Ada_Node;
 
       function Get_Parent_Indentation (Node : Ada_Node) return Natural;
       --  Returns the Node's parent indentation
 
-      function Is_Expected_Parent_Kind (Kind : Ada_Node_Kind_Type)
-                                        return Boolean
-      is
-        (Kind in Ada_Package_Body | Ada_Package_Decl |
-         Ada_Library_Item | Ada_Subp_Body | Ada_Task_Body | Ada_Decl_Block |
-         Ada_For_Loop_Stmt | Ada_Loop_Stmt | Ada_While_Loop_Stmt |
-         Ada_If_Stmt_Range | Ada_Case_Stmt_Range |
-         Ada_Case_Stmt_Alternative_Range);
+      function Is_Expected_Parent_Kind
+        (Kind : Ada_Node_Kind_Type) return Boolean
+      is (Kind
+          in Ada_Package_Body
+           | Ada_Package_Decl
+           | Ada_Library_Item
+           | Ada_Subp_Body
+           | Ada_Task_Body
+           | Ada_Decl_Block
+           | Ada_For_Loop_Stmt
+           | Ada_Loop_Stmt
+           | Ada_While_Loop_Stmt
+           | Ada_If_Stmt_Range
+           | Ada_Case_Stmt_Range
+           | Ada_Case_Stmt_Alternative_Range);
 
-      function Is_Expected_Parent_Node
-        (Node : Ada_Node'Class) return Boolean is
-        (not Node.Is_Null and then Is_Expected_Parent_Kind (Node.Kind));
+      function Is_Expected_Parent_Node (Node : Ada_Node'Class) return Boolean
+      is (not Node.Is_Null and then Is_Expected_Parent_Kind (Node.Kind));
 
       procedure Is_Expected_Parent_Node_Callback
         (Parent : Ada_Node; Stop : in out Boolean);
@@ -744,10 +750,9 @@ package body Laltools.Partial_GNATPP is
       --------------------------------------
 
       procedure Is_Expected_Parent_Node_Callback
-        (Parent : Ada_Node; Stop : in out Boolean)
-      is
+        (Parent : Ada_Node; Stop : in out Boolean) is
       begin
-         Stop        := True;
+         Stop := True;
          Parent_Node := Parent;
       end Is_Expected_Parent_Node_Callback;
 
@@ -755,14 +760,14 @@ package body Laltools.Partial_GNATPP is
       -- Get_Parent_Indenation --
       ---------------------------
 
-      function Get_Parent_Indentation (Node : Ada_Node) return Natural
-      is
+      function Get_Parent_Indentation (Node : Ada_Node) return Natural is
          Offset : Natural := 0;
 
       begin
          Parent_Node := Node;
          Find_Matching_Parents
-           (Node, Is_Expected_Parent_Node'Access,
+           (Node,
+            Is_Expected_Parent_Node'Access,
             Is_Expected_Parent_Node_Callback'Access);
 
          if Kind (Parent_Node) = Ada_Library_Item
@@ -775,14 +780,22 @@ package body Laltools.Partial_GNATPP is
          end if;
 
          case Kind (Parent_Node) is
-            when Ada_Package_Body | Ada_Package_Decl
-               | Ada_Task_Body | Ada_Subp_Body | Ada_Decl_Block
-               | Ada_For_Loop_Stmt | Ada_Loop_Stmt | Ada_While_Loop_Stmt
-               | Ada_If_Stmt_Range | Ada_Case_Stmt_Range
+            when Ada_Package_Body
+               | Ada_Package_Decl
+               | Ada_Task_Body
+               | Ada_Subp_Body
+               | Ada_Decl_Block
+               | Ada_For_Loop_Stmt
+               | Ada_Loop_Stmt
+               | Ada_While_Loop_Stmt
+               | Ada_If_Stmt_Range
+               | Ada_Case_Stmt_Range
                | Ada_Case_Stmt_Alternative_Range
-               => Offset := Offset + PP_Indentation;
+            =>
+               Offset := Offset + PP_Indentation;
 
-            when others => null;
+            when others =>
+               null;
          end case;
 
          return Offset;
@@ -807,17 +820,19 @@ package body Laltools.Partial_GNATPP is
              (Node.P_Parent_Basic_Decl.As_Ada_Node, PP_Indentation);
 
       elsif (not Prev_Sibling.Is_Null and not Next_Sibling.Is_Null)
-        and then Prev_Sibling.Sloc_Range.Start_Column =
-                   Next_Sibling.Sloc_Range.Start_Column
+        and then Prev_Sibling.Sloc_Range.Start_Column
+                 = Next_Sibling.Sloc_Range.Start_Column
       then
          Offset :=
            (if Prev_Sibling.Sloc_Range.Start_Column = 0 then 0
             else Natural (Prev_Sibling.Sloc_Range.Start_Column) - 1);
 
       elsif not Prev_Sibling.Is_Null then
-         if Node.Kind in
-              Ada_Subp_Body | Ada_Package_Body | Ada_Package_Decl
-              | Ada_Generic_Package_Renaming_Decl
+         if Node.Kind
+            in Ada_Subp_Body
+             | Ada_Package_Body
+             | Ada_Package_Decl
+             | Ada_Generic_Package_Renaming_Decl
          then
             if Prev_Sibling.Kind = Ada_Private_Absent
               and then Next_Sibling.Is_Null
@@ -860,24 +875,21 @@ package body Laltools.Partial_GNATPP is
    -- Get_First_Line_Offset --
    ---------------------------
 
-   function Get_First_Line_Offset
-     (Node : Ada_Node)
-      return Natural
-   is
-      Overriding_Text : constant String := "overriding";
+   function Get_First_Line_Offset (Node : Ada_Node) return Natural is
+      Overriding_Text     : constant String := "overriding";
       Not_Overriding_Text : constant String := "not overriding";
 
    begin
       if Node.Kind in Ada_Subp_Spec_Range then
          if Node.Previous_Sibling.Kind in Ada_Overriding_Overriding_Range
-           and then Node.Previous_Sibling.Sloc_Range.Start_Line =
-                      Node.Sloc_Range.Start_Line
+           and then Node.Previous_Sibling.Sloc_Range.Start_Line
+                    = Node.Sloc_Range.Start_Line
          then
             return Overriding_Text'Length;
-         elsif Node.Previous_Sibling.Kind in
-                 Ada_Overriding_Not_Overriding_Range
-           and then Node.Previous_Sibling.Sloc_Range.Start_Line =
-                      Node.Sloc_Range.Start_Line
+         elsif Node.Previous_Sibling.Kind
+               in Ada_Overriding_Not_Overriding_Range
+           and then Node.Previous_Sibling.Sloc_Range.Start_Line
+                    = Node.Sloc_Range.Start_Line
          then
             return Not_Overriding_Text'Length;
          else
@@ -894,40 +906,40 @@ package body Laltools.Partial_GNATPP is
    ---------------------------------------------------
 
    procedure Filter_Initially_Selected_Lines_From_Output
-     (Unit              : Analysis_Unit;
-      Initial_SL_Range  : Source_Location_Range;
-      Output            : Utils.Char_Vectors.Char_Vector;
-      Output_SL_Range   : Source_Location_Range;
-      New_Output        : out Utils.Char_Vectors.Char_Vector;
-      New_SL_Range      : out Source_Location_Range)
+     (Unit             : Analysis_Unit;
+      Initial_SL_Range : Source_Location_Range;
+      Output           : Utils.Char_Vectors.Char_Vector;
+      Output_SL_Range  : Source_Location_Range;
+      New_Output       : out Utils.Char_Vectors.Char_Vector;
+      New_SL_Range     : out Source_Location_Range)
    is
       use Utils.Char_Vectors;
       use Ada.Characters.Latin_1;
 
-      type Selected_Line_Record is
-         record
-            Line_Nb : Line_Number;
-            Line    : Ada.Strings.Unbounded.Unbounded_String;
-            SLOC    : Source_Location_Range;
-         end record;
-      No_Line : constant Selected_Line_Record := Selected_Line_Record'
-        (Line_Nb => 0,
-         Line =>  Ada.Strings.Unbounded.Null_Unbounded_String,
-         SLOC => No_Source_Location_Range);
+      type Selected_Line_Record is record
+         Line_Nb : Line_Number;
+         Line    : Ada.Strings.Unbounded.Unbounded_String;
+         SLOC    : Source_Location_Range;
+      end record;
+      No_Line : constant Selected_Line_Record :=
+        Selected_Line_Record'
+          (Line_Nb => 0,
+           Line    => Ada.Strings.Unbounded.Null_Unbounded_String,
+           SLOC    => No_Source_Location_Range);
       type Selected_Lines_Arr is
         array (Natural range <>) of Selected_Line_Record;
 
       function Get_Initial_Selection
-        (Unit     : Analysis_Unit;
-         SL_Range : Source_Location_Range)
-      return Utils.Char_Vectors.Char_Vector;
+        (Unit : Analysis_Unit; SL_Range : Source_Location_Range)
+         return Utils.Char_Vectors.Char_Vector;
       --  The returned value is the initial text selection corresponding
       --  to the given SL_Range in the given Unit.
 
-      procedure Split_Lines (Buffer        : Utils.Char_Vectors.Char_Vector;
-                             SL_Range      : Source_Location_Range;
-                             Split_Char    : Character;
-                             Sel_Lines_Arr : out Selected_Lines_Arr);
+      procedure Split_Lines
+        (Buffer        : Utils.Char_Vectors.Char_Vector;
+         SL_Range      : Source_Location_Range;
+         Split_Char    : Character;
+         Sel_Lines_Arr : out Selected_Lines_Arr);
       --  Split a selection buffer based on the split character that is passed
       --  into lines and return them as an array of lines.
 
@@ -938,8 +950,9 @@ package body Laltools.Partial_GNATPP is
       --  Given the original and the formatted arrays retrieves the reformatted
       --  original lines and returns them as filtered array elements
 
-      function Create_Filtered_Output (Filtered_Arr : Selected_Lines_Arr)
-                                       return Utils.Char_Vectors.Char_Vector;
+      function Create_Filtered_Output
+        (Filtered_Arr : Selected_Lines_Arr)
+         return Utils.Char_Vectors.Char_Vector;
       --  Creates the regenerated and filtred output selection
 
       -----------------------------
@@ -947,9 +960,8 @@ package body Laltools.Partial_GNATPP is
       -----------------------------
 
       function Get_Initial_Selection
-        (Unit     : Analysis_Unit;
-         SL_Range : Source_Location_Range)
-      return Utils.Char_Vectors.Char_Vector
+        (Unit : Analysis_Unit; SL_Range : Source_Location_Range)
+         return Utils.Char_Vectors.Char_Vector
       is
          Sel : Utils.Char_Vectors.Char_Vector;
 
@@ -973,20 +985,20 @@ package body Laltools.Partial_GNATPP is
       --  Split_Lines --
       ------------------
 
-      procedure Split_Lines (Buffer        : Utils.Char_Vectors.Char_Vector;
-                             SL_Range      : Source_Location_Range;
-                             Split_Char    : Character;
-                             Sel_Lines_Arr : out Selected_Lines_Arr)
+      procedure Split_Lines
+        (Buffer        : Utils.Char_Vectors.Char_Vector;
+         SL_Range      : Source_Location_Range;
+         Split_Char    : Character;
+         Sel_Lines_Arr : out Selected_Lines_Arr)
       is
-         Str : constant String :=
-           Char_Vectors.Elems (Buffer)
-           (1 .. Char_Vectors.Last_Index (Buffer));
+         Str      : constant String :=
+           Char_Vectors.Elems (Buffer) (1 .. Char_Vectors.Last_Index (Buffer));
          Crt_Line : Ada.Strings.Unbounded.Unbounded_String :=
            Ada.Strings.Unbounded.Null_Unbounded_String;
 
-         Start_Line   : constant Line_Number := SL_Range.Start_Line;
-         Line_Nb      : Natural := 0;
-         Crt_Line_Nb  : Line_Number := 0;
+         Start_Line  : constant Line_Number := SL_Range.Start_Line;
+         Line_Nb     : Natural := 0;
+         Crt_Line_Nb : Line_Number := 0;
 
          Last_Was_Split_Char : Boolean := False;
 
@@ -998,16 +1010,18 @@ package body Laltools.Partial_GNATPP is
                Last_Was_Split_Char := True;
                Line_Nb := Line_Nb + 1;
                Crt_Line_Nb := Line_Number (Line_Nb + Natural (Start_Line) - 1);
-               Sel_Lines_Arr (Line_Nb) := Selected_Line_Record'
-                 (Line_Nb => Crt_Line_Nb,
-                  Line    => Crt_Line,
-                  SLOC    => Source_Location_Range'
-                    (Start_Line   => Crt_Line_Nb,
-                     End_Line     => Crt_Line_Nb,
-                     Start_Column => 1,
-                     End_Column   =>
-                       Column_Number
-                         (Ada.Strings.Unbounded.Length (Crt_Line) - 1)));
+               Sel_Lines_Arr (Line_Nb) :=
+                 Selected_Line_Record'
+                   (Line_Nb => Crt_Line_Nb,
+                    Line    => Crt_Line,
+                    SLOC    =>
+                      Source_Location_Range'
+                        (Start_Line   => Crt_Line_Nb,
+                         End_Line     => Crt_Line_Nb,
+                         Start_Column => 1,
+                         End_Column   =>
+                           Column_Number
+                             (Ada.Strings.Unbounded.Length (Crt_Line) - 1)));
                Crt_Line := Ada.Strings.Unbounded.Null_Unbounded_String;
             end if;
          end loop;
@@ -1015,16 +1029,18 @@ package body Laltools.Partial_GNATPP is
          if not Last_Was_Split_Char then
             Line_Nb := Line_Nb + 1;
             Crt_Line_Nb := Line_Number (Line_Nb + Natural (Start_Line) - 1);
-            Sel_Lines_Arr (Line_Nb) := Selected_Line_Record'
-              (Line_Nb => Crt_Line_Nb,
-               Line    => Crt_Line,
-               SLOC    => Source_Location_Range'
-                 (Start_Line   => Crt_Line_Nb,
-                  End_Line     => Crt_Line_Nb,
-                  Start_Column => 1,
-                  End_Column   =>
-                    Column_Number
-                      (Ada.Strings.Unbounded.Length (Crt_Line) - 1)));
+            Sel_Lines_Arr (Line_Nb) :=
+              Selected_Line_Record'
+                (Line_Nb => Crt_Line_Nb,
+                 Line    => Crt_Line,
+                 SLOC    =>
+                   Source_Location_Range'
+                     (Start_Line   => Crt_Line_Nb,
+                      End_Line     => Crt_Line_Nb,
+                      Start_Column => 1,
+                      End_Column   =>
+                        Column_Number
+                          (Ada.Strings.Unbounded.Length (Crt_Line) - 1)));
          end if;
       end Split_Lines;
 
@@ -1037,12 +1053,14 @@ package body Laltools.Partial_GNATPP is
          Formatted_Arr : Selected_Lines_Arr;
          Filtered_Arr  : out Selected_Lines_Arr)
       is
-         pragma Assert (Original_Arr'Size > 0
-                        and then Formatted_Arr'Size > 0
-                        and then Original_Arr'Size <= Formatted_Arr'Size);
+         pragma
+           Assert
+             (Original_Arr'Size > 0
+                and then Formatted_Arr'Size > 0
+                and then Original_Arr'Size <= Formatted_Arr'Size);
 
-         Orig_Line_Nb  : constant Line_Number := Original_Arr (1).Line_Nb;
-         Count         : Natural              := 0;
+         Orig_Line_Nb : constant Line_Number := Original_Arr (1).Line_Nb;
+         Count        : Natural := 0;
       begin
          for Idx in Formatted_Arr'Range loop
             if Formatted_Arr (Idx).Line_Nb >= Orig_Line_Nb then
@@ -1060,8 +1078,9 @@ package body Laltools.Partial_GNATPP is
       --  Create_Filtered_Output  --
       ------------------------------
 
-      function Create_Filtered_Output (Filtered_Arr : Selected_Lines_Arr)
-                                       return Utils.Char_Vectors.Char_Vector
+      function Create_Filtered_Output
+        (Filtered_Arr : Selected_Lines_Arr)
+         return Utils.Char_Vectors.Char_Vector
       is
          Sel      : Utils.Char_Vectors.Char_Vector;
          Crt_Line : Ada.Strings.Unbounded.Unbounded_String :=
@@ -1094,15 +1113,12 @@ package body Laltools.Partial_GNATPP is
 
       function Create_Filtered_Selection_Range
         (Filtered_Arr : Selected_Lines_Arr) return Source_Location_Range
-      is
-        (Source_Location_Range'
-           (Start_Line =>
-                 Filtered_Arr (Filtered_Arr'First).SLOC.Start_Line,
-            Start_Column =>
+      is (Source_Location_Range'
+            (Start_Line   => Filtered_Arr (Filtered_Arr'First).SLOC.Start_Line,
+             Start_Column =>
                Filtered_Arr (Filtered_Arr'First).SLOC.Start_Column,
-            End_Line =>
-               Filtered_Arr (Filtered_Arr'Last).SLOC.Start_Line,
-            End_Column =>
+             End_Line     => Filtered_Arr (Filtered_Arr'Last).SLOC.Start_Line,
+             End_Column   =>
                Filtered_Arr (Filtered_Arr'Last).SLOC.End_Column + 1));
       --  Creates the new filtered and reformatted text source location range
 
@@ -1241,13 +1257,14 @@ package body Laltools.Partial_GNATPP is
       --  Find the corresponding Start_Node and End_Node given the initial
 
       --  selection range
-      Get_Selected_Region_Enclosing_Node (Main_Unit,
-                                          Input_Selection_Range,
-                                          Start_Node,
-                                          End_Node,
-                                          Formatted_Node,
-                                          Input_Sel,
-                                          Output_Selection_Range);
+      Get_Selected_Region_Enclosing_Node
+        (Main_Unit,
+         Input_Selection_Range,
+         Start_Node,
+         End_Node,
+         Formatted_Node,
+         Input_Sel,
+         Output_Selection_Range);
       pragma Assert (Formatted_Node /= No_Ada_Node);
 
       --  Determine the offset for the indentation of the enclosing node
@@ -1322,43 +1339,42 @@ package body Laltools.Partial_GNATPP is
         & "*************************************";
    end Image;
 
-   subtype Relevant_Parent is Ada_Node_Kind_Type with
-     Predicate => Relevant_Parent in
-       Ada_Compilation_Unit
-       | Ada_Declarative_Part_Range
-       | Ada_Handled_Stmts_Range
-       | Ada_Stmt_List
-       | Ada_Stmt
-       | Ada_Decl_Block_Range
-       | Ada_Package_Decl_Range
-       | Ada_Package_Body_Range
-       | Ada_Subp_Decl_Range
-       | Ada_Subp_Body_Range
-       | Ada_Type_Decl
-       | Ada_Object_Decl_Range
-       | Ada_Entry_Decl_Range
-       | Ada_Entry_Body_Range
-       | Ada_Task_Body_Range
-       | Ada_Single_Task_Decl_Range
-       | Ada_Generic_Package_Decl_Range
-       | Ada_Generic_Package_Renaming_Decl_Range
-       | Ada_Package_Renaming_Decl_Range
-       | Ada_Exception_Decl_Range
-       | Ada_Null_Subp_Decl_Range
-       | Ada_Subp_Spec_Range;
+   subtype Relevant_Parent is Ada_Node_Kind_Type
+   with
+     Predicate =>
+       Relevant_Parent
+       in Ada_Compilation_Unit
+        | Ada_Declarative_Part_Range
+        | Ada_Handled_Stmts_Range
+        | Ada_Stmt_List
+        | Ada_Stmt
+        | Ada_Decl_Block_Range
+        | Ada_Package_Decl_Range
+        | Ada_Package_Body_Range
+        | Ada_Subp_Decl_Range
+        | Ada_Subp_Body_Range
+        | Ada_Type_Decl
+        | Ada_Object_Decl_Range
+        | Ada_Entry_Decl_Range
+        | Ada_Entry_Body_Range
+        | Ada_Task_Body_Range
+        | Ada_Single_Task_Decl_Range
+        | Ada_Generic_Package_Decl_Range
+        | Ada_Generic_Package_Renaming_Decl_Range
+        | Ada_Package_Renaming_Decl_Range
+        | Ada_Exception_Decl_Range
+        | Ada_Null_Subp_Decl_Range
+        | Ada_Subp_Spec_Range;
 
    ---------------------------
    -- Get_Formatting_Region --
    ---------------------------
 
    function Get_Formatting_Region
-     (Unit        : Analysis_Unit;
-      Input_Range : Source_Location_Range)
+     (Unit : Analysis_Unit; Input_Range : Source_Location_Range)
       return Formatting_Region_Type
    is
-      function Is_Relevant_Parent_Node
-        (Node : Ada_Node'Class)
-         return Boolean
+      function Is_Relevant_Parent_Node (Node : Ada_Node'Class) return Boolean
       is (not Node.Is_Null and then Node.Kind in Relevant_Parent);
       --  Checks if Node is not null and if its Kind is in Relevant_Parent
 
@@ -1367,7 +1383,7 @@ package body Laltools.Partial_GNATPP is
          Parents_B : Ada_Node_Array;
          Parent    : out Ada_Node;
          Index     : out Natural)
-        with Post => (if Parent.Is_Null then Index = 0);
+      with Post => (if Parent.Is_Null then Index = 0);
       --  Given Parents_A and Parents_B, sets Parent to the first common parent
       --  which has Is_Relevant_Parent_Node as True. Also sets Index to the
       --  array index which is the same in both Parents_A and Parents_B.
@@ -1415,30 +1431,27 @@ package body Laltools.Partial_GNATPP is
       Start_Token_First_Estimate  : constant Token_Reference :=
         Unit.Lookup_Token
           (Source_Location'
-             (Line => Input_Range.Start_Line,
+             (Line   => Input_Range.Start_Line,
               Column => Input_Range.Start_Column));
       Start_Token_Second_Estimate : constant Token_Reference :=
-        (if Kind (Data (Start_Token_First_Estimate)) = Ada_Whitespace then
-            Next_Non_Whitespace (Start_Token_First_Estimate, Forward)
-         else
-            Start_Token_First_Estimate);
+        (if Kind (Data (Start_Token_First_Estimate)) = Ada_Whitespace
+         then Next_Non_Whitespace (Start_Token_First_Estimate, Forward)
+         else Start_Token_First_Estimate);
 
       End_Token_First_Estimate  : constant Token_Reference :=
         Unit.Lookup_Token
           (Sloc =>
              Source_Location'
-               (Line => Input_Range.End_Line,
+               (Line   => Input_Range.End_Line,
                 Column => Input_Range.End_Column));
       End_Token_Second_Estimate : constant Token_Reference :=
         (if Input_Range.Start_Line = Input_Range.End_Line
            and Input_Range.Start_Column = Input_Range.End_Column
-         then
-            Start_Token_Second_Estimate
+         then Start_Token_Second_Estimate
          else
-            (if Kind (Data (End_Token_First_Estimate)) = Ada_Whitespace then
-                Next_Non_Whitespace (End_Token_First_Estimate, Backward)
-             else
-                End_Token_First_Estimate));
+           (if Kind (Data (End_Token_First_Estimate)) = Ada_Whitespace
+            then Next_Non_Whitespace (End_Token_First_Estimate, Backward)
+            else End_Token_First_Estimate));
 
       Start_Node_Estimate         : constant Ada_Node :=
         Lookup (Unit, Start_Token_Second_Estimate, Forward);
@@ -1479,9 +1492,7 @@ package body Laltools.Partial_GNATPP is
             Start_Node_Index : constant Positive := Start_Node.Child_Index + 1;
             End_Node         : constant Ada_Node :=
               End_Node_Estimate_Parents
-                (End_Node_Estimate_Parents'Last
-                 - Enclosing_Parent_Index
-                 - 2);
+                (End_Node_Estimate_Parents'Last - Enclosing_Parent_Index - 2);
             End_Node_Index   : constant Positive := End_Node.Child_Index + 1;
 
             Is_Slice : constant Boolean :=
@@ -1497,41 +1508,39 @@ package body Laltools.Partial_GNATPP is
               (if Start_Node.Compare
                     (Start_Sloc
                        (Sloc_Range (Data (Start_Token_Second_Estimate))))
-                  = Before
-               then
-                  Start_Token_Second_Estimate
-               else
-                  Start_Node.Token_Start);
+                 = Before
+               then Start_Token_Second_Estimate
+               else Start_Node.Token_Start);
             End_Token :=
               (if End_Node.Compare
                     (Start_Sloc
                        (Sloc_Range (Data (End_Token_Second_Estimate))))
-                  = After
-               then
-                  End_Token_Second_Estimate
+                 = After
+               then End_Token_Second_Estimate
                else
-                  Unit.Lookup_Token
-                    (Source_Location'
-                       (End_Node.Sloc_Range.End_Line,
-                        End_Node.Sloc_Range.End_Column - 1)));
+                 Unit.Lookup_Token
+                   (Source_Location'
+                      (End_Node.Sloc_Range.End_Line,
+                       End_Node.Sloc_Range.End_Column - 1)));
             return
-              (if Is_Slice or else
-                 (Start_Node_Index = 1
-                   and then End_Node_Index = End_Node.Parent.Last_Child_Index)
+              (if Is_Slice
+                 or else (Start_Node_Index = 1
+                          and then End_Node_Index
+                                   = End_Node.Parent.Last_Child_Index)
                then
-                  Formatting_Region_Type'
-                    (Start_Token       => Start_Token,
-                     End_Token         => End_Token,
-                     Enclosing_Node    => Start_Node.Parent,
-                     List_Slice        => True,
-                     Start_Child_Index => Start_Node_Index,
-                     End_Child_Index   => End_Node_Index)
+                 Formatting_Region_Type'
+                   (Start_Token       => Start_Token,
+                    End_Token         => End_Token,
+                    Enclosing_Node    => Start_Node.Parent,
+                    List_Slice        => True,
+                    Start_Child_Index => Start_Node_Index,
+                    End_Child_Index   => End_Node_Index)
                else
-                  Formatting_Region_Type'
-                    (Start_Token       => Start_Token,
-                     End_Token         => End_Token,
-                     Enclosing_Node    => Start_Node,
-                     List_Slice        => False));
+                 Formatting_Region_Type'
+                   (Start_Token    => Start_Token,
+                    End_Token      => End_Token,
+                    Enclosing_Node => Start_Node,
+                    List_Slice     => False));
          end;
 
       elsif Enclosing_Parent.Kind in Ada_Stmt_List then
@@ -1544,16 +1553,13 @@ package body Laltools.Partial_GNATPP is
             Start_Node_Index : constant Positive := Start_Node.Child_Index + 1;
             End_Node         : constant Ada_Node :=
               End_Node_Estimate_Parents
-                (End_Node_Estimate_Parents'Last
-                 - Enclosing_Parent_Index
-                 - 1);
+                (End_Node_Estimate_Parents'Last - Enclosing_Parent_Index - 1);
             End_Node_Index   : constant Positive := End_Node.Child_Index + 1;
 
             Is_Slice : constant Boolean :=
-               Start_Node_Index /= End_Node_Index
-               and then (Start_Node_Index /= 1
-                         or End_Node_Index /=
-                              End_Node.Parent.Last_Child_Index);
+              Start_Node_Index /= End_Node_Index
+              and then (Start_Node_Index /= 1
+                        or End_Node_Index /= End_Node.Parent.Last_Child_Index);
 
          begin
             Ada.Assertions.Assert (Start_Node.Parent = End_Node.Parent);
@@ -1563,59 +1569,53 @@ package body Laltools.Partial_GNATPP is
               (if Start_Node.Compare
                     (Start_Sloc
                        (Sloc_Range (Data (Start_Token_Second_Estimate))))
-                  = Before
-               then
-                  Start_Token_Second_Estimate
-               else
-                  Start_Node.Token_Start);
+                 = Before
+               then Start_Token_Second_Estimate
+               else Start_Node.Token_Start);
             End_Token :=
               (if End_Node.Compare
                     (Start_Sloc
                        (Sloc_Range (Data (End_Token_Second_Estimate))))
-                  = After
-               then
-                  End_Token_Second_Estimate
+                 = After
+               then End_Token_Second_Estimate
                else
-                  Unit.Lookup_Token
-                    (Source_Location'
-                       (End_Node.Sloc_Range.End_Line,
-                        End_Node.Sloc_Range.End_Column - 1)));
+                 Unit.Lookup_Token
+                   (Source_Location'
+                      (End_Node.Sloc_Range.End_Line,
+                       End_Node.Sloc_Range.End_Column - 1)));
             return
-              (if Is_Slice or else
-                 (Start_Node_Index = 1
-                   and then End_Node_Index = End_Node.Parent.Last_Child_Index)
+              (if Is_Slice
+                 or else (Start_Node_Index = 1
+                          and then End_Node_Index
+                                   = End_Node.Parent.Last_Child_Index)
                then
-                  Formatting_Region_Type'
-                    (Start_Token       => Start_Token,
-                     End_Token         => End_Token,
-                     Enclosing_Node    => Start_Node.Parent,
-                     List_Slice        => True,
-                     Start_Child_Index => Start_Node_Index,
-                     End_Child_Index   => End_Node_Index)
+                 Formatting_Region_Type'
+                   (Start_Token       => Start_Token,
+                    End_Token         => End_Token,
+                    Enclosing_Node    => Start_Node.Parent,
+                    List_Slice        => True,
+                    Start_Child_Index => Start_Node_Index,
+                    End_Child_Index   => End_Node_Index)
                else
-                  Formatting_Region_Type'
-                    (Start_Token       => Start_Token,
-                     End_Token         => End_Token,
-                     Enclosing_Node    => Start_Node,
-                     List_Slice        => False));
+                 Formatting_Region_Type'
+                   (Start_Token    => Start_Token,
+                    End_Token      => End_Token,
+                    Enclosing_Node => Start_Node,
+                    List_Slice     => False));
          end;
       else
          Start_Token :=
            (if Enclosing_Parent.Compare
                  (Start_Sloc (Sloc_Range (Data (Start_Token_Second_Estimate))))
-               = Before
-            then
-               Start_Token_Second_Estimate
-            else
-               Enclosing_Parent.Token_Start);
+              = Before
+            then Start_Token_Second_Estimate
+            else Enclosing_Parent.Token_Start);
          End_Token :=
            (if Enclosing_Parent.Compare
                  (Start_Sloc (Sloc_Range (Data (End_Token_Second_Estimate))))
-               = After
-            then
-               End_Token_Second_Estimate
-            else
-               Enclosing_Parent.Token_End);
+              = After
+            then End_Token_Second_Estimate
+            else Enclosing_Parent.Token_End);
 
          return
            Formatting_Region_Type'
@@ -1650,8 +1650,9 @@ package body Laltools.Partial_GNATPP is
           (Formatting_Region.Enclosing_Node.Token_Start);
       Previous_Token_Node : constant Ada_Node :=
         (if Previous_Token = No_Token then No_Ada_Node
-         else Formatting_Region.Enclosing_Node.Unit.Root.Lookup
-                (Start_Sloc (Sloc_Range (Data (Previous_Token)))));
+         else
+           Formatting_Region.Enclosing_Node.Unit.Root.Lookup
+             (Start_Sloc (Sloc_Range (Data (Previous_Token)))));
       Indentation_Guess   : constant Natural :=
         (if Previous_Token_Node.Is_Null then 0
          else Estimate_Indentation (Formatting_Region.Enclosing_Node));
@@ -1666,14 +1667,14 @@ package body Laltools.Partial_GNATPP is
       end if;
 
       declare
-         Input_Text      : constant Utils.Char_Vectors.Char_Vector :=
+         Input_Text     : constant Utils.Char_Vectors.Char_Vector :=
            Get_Selection_Text
              (Formatting_Region.Enclosing_Node.Unit,
               Formatting_Region.Enclosing_Node,
               Formatting_Region.Start_Token,
               Formatting_Region.End_Token);
-         Formatted_Text  : Utils.Char_Vectors.Char_Vector;
-         Diagnostics     : Pp.Scanner.Source_Message_Vector;
+         Formatted_Text : Utils.Char_Vectors.Char_Vector;
+         Diagnostics    : Pp.Scanner.Source_Message_Vector;
 
       begin
          if Formatting_Region.List_Slice then
@@ -1717,24 +1718,21 @@ package body Laltools.Partial_GNATPP is
                First_Non_Blank_Index  : constant Natural :=
                  Index_Non_Blank (Line);
                First_Non_Blank_Column : constant Natural :=
-                 (if First_Non_Blank_Index = 0 then
-                     0
-                  else
-                     Index_Non_Blank (Line) - Line'First + 1);
+                 (if First_Non_Blank_Index = 0 then 0
+                  else Index_Non_Blank (Line) - Line'First + 1);
 
             begin
                Start_Col :=
                  (if First_Non_Blank_Column /= 0
-                  and then First_Non_Blank_Column =
-                    Integer
-                      (Sloc_Range
-                           (Data
-                              (Formatting_Region.Start_Token)).Start_Column)
-                  then
-                     1
+                    and then First_Non_Blank_Column
+                             = Integer
+                                 (Sloc_Range
+                                    (Data (Formatting_Region.Start_Token))
+                                    .Start_Column)
+                  then 1
                   else
-                     Sloc_Range
-                       (Data (Formatting_Region.Start_Token)).Start_Column);
+                    Sloc_Range (Data (Formatting_Region.Start_Token))
+                      .Start_Column);
 
                if Start_Col /= 1 then
                   --  The formatted text has an Initial_Indentation in all
@@ -1752,8 +1750,7 @@ package body Laltools.Partial_GNATPP is
               Sloc_Range (Data (Formatting_Region.End_Token)).End_Column;
 
             Formatted_Range :=
-              Source_Location_Range'
-                (Start_Line, End_Line, Start_Col, End_Col);
+              Source_Location_Range'(Start_Line, End_Line, Start_Col, End_Col);
 
             return
               Partial_Formatting_Edit'
@@ -1773,16 +1770,13 @@ package body Laltools.Partial_GNATPP is
    -----------------------------------------------
 
    function Previous_Non_Whitespace_Non_Comment_Token
-     (Token : Token_Reference)
-      return Token_Reference is
+     (Token : Token_Reference) return Token_Reference is
    begin
-      return Result : Token_Reference :=
-               (if Token = No_Token
-                then No_Token
-                else Previous (Token))
+      return
+         Result : Token_Reference :=
+           (if Token = No_Token then No_Token else Previous (Token))
       do
-         while
-           Result /= No_Token
+         while Result /= No_Token
            and then Kind (Data (Result)) in Ada_Whitespace | Ada_Comment
          loop
             Result := Previous (Result);
@@ -1793,8 +1787,7 @@ package body Laltools.Partial_GNATPP is
    function Parent_Based_Indentation
      (Parents            : Ada_Node_Array;
       Indentation        : Positive := 3;
-      Inline_Indentation : Positive := 2)
-      return Natural;
+      Inline_Indentation : Positive := 2) return Natural;
    --  Computes Indentation starting at zero and incrementing based on the
    --  Parents kind or returning earlier if finds a parent that always sets
    --  indentation, for instance, a parameter list.
@@ -1806,8 +1799,7 @@ package body Laltools.Partial_GNATPP is
    function Parent_Based_Indentation
      (Parents            : Ada_Node_Array;
       Indentation        : Positive := 3;
-      Inline_Indentation : Positive := 2)
-      return Natural
+      Inline_Indentation : Positive := 2) return Natural
    is
       Current_Indentation : Natural := 0;
 
@@ -1823,7 +1815,8 @@ package body Laltools.Partial_GNATPP is
                | Ada_Record_Type_Def_Range
                | Ada_Generic_Formal_Part_Range
                | Ada_Begin_Block_Range
-               | Ada_Decl_Block_Range =>
+               | Ada_Decl_Block_Range
+            =>
                Current_Indentation := @ + Indentation;
 
             when Ada_Declarative_Part_Range =>
@@ -1842,8 +1835,8 @@ package body Laltools.Partial_GNATPP is
                --  HandledStmts can be children of DeclBlock and BeginBlock.
                --  These two add indentation, so HandledStmts should not
                --  double add if its their child.
-               if Parent.Parent.Kind not in
-                 Ada_Begin_Block_Range | Ada_Decl_Block_Range
+               if Parent.Parent.Kind
+                  not in Ada_Begin_Block_Range | Ada_Decl_Block_Range
                then
                   Current_Indentation := @ + Indentation;
                end if;
@@ -1853,7 +1846,8 @@ package body Laltools.Partial_GNATPP is
 
             when Ada_Dotted_Name_Range =>
                Current_Indentation :=
-                 Natural (Parent.Sloc_Range.Start_Column) - 1
+                 Natural (Parent.Sloc_Range.Start_Column)
+                 - 1
                  + Inline_Indentation;
                exit;
 
@@ -1880,11 +1874,10 @@ package body Laltools.Partial_GNATPP is
    --------------------------
 
    function Estimate_Indentation
-     (Unit : Analysis_Unit;
-      Line_Number : Langkit_Support.Slocs.Line_Number)
+     (Unit : Analysis_Unit; Line_Number : Langkit_Support.Slocs.Line_Number)
       return Natural
    is
-      Token    : constant Token_Reference :=
+      Token : constant Token_Reference :=
         Unit.Lookup_Token (Source_Location'(Line_Number, 1));
 
       function Get_Relevant_Parents return Ada_Node_Array;
@@ -1901,8 +1894,7 @@ package body Laltools.Partial_GNATPP is
          end if;
 
          if Kind (Data (Previous)) in Ada_Comma | Ada_Dot then
-            Previous :=
-              Previous_Non_Whitespace_Non_Comment_Token (Previous);
+            Previous := Previous_Non_Whitespace_Non_Comment_Token (Previous);
          end if;
 
          declare
@@ -1936,12 +1928,12 @@ package body Laltools.Partial_GNATPP is
 
             elsif Node.Kind in Ada_Generic_Package_Internal_Range then
                if Kind (Data (Previous)) in Ada_Is then
-                  return Node.As_Generic_Package_Internal.F_Public_Part.
-                           Parents;
+                  return
+                    Node.As_Generic_Package_Internal.F_Public_Part.Parents;
 
                elsif Kind (Data (Previous)) in Ada_Private then
-                  return Node.As_Generic_Package_Internal.F_Private_Part.
-                           Parents;
+                  return
+                    Node.As_Generic_Package_Internal.F_Private_Part.Parents;
                end if;
 
             elsif Node.Kind in Ada_Generic_Formal_Part_Range then
@@ -1966,11 +1958,10 @@ package body Laltools.Partial_GNATPP is
    function Estimate_Indentation
      (Node               : Ada_Node;
       Indentation        : Positive := 3;
-      Inline_Indentation : Positive := 2)
-      return Natural
+      Inline_Indentation : Positive := 2) return Natural
    is
-      Parents    : constant Ada_Node_Array :=
-        (if Node.Is_Null then [] else  Node.Parents (False));
+      Parents : constant Ada_Node_Array :=
+        (if Node.Is_Null then [] else Node.Parents (False));
 
    begin
       return

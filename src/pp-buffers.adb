@@ -84,9 +84,10 @@ package body Pp.Buffers is
    function At_Point (Buf : Buffer; Mark : Marker) return Boolean is
       Rec : constant Marker_Rec := Buf.Markers (Mark);
    begin
-      return Result : constant Boolean :=
-        Rec.Position = Last_Index (Buf.To) + 1
-        and then Rec.Flag = Buf.To_Flag
+      return
+         Result : constant Boolean :=
+           Rec.Position = Last_Index (Buf.To) + 1
+           and then Rec.Flag = Buf.To_Flag
       do
          pragma Assert (Result = At_Point (Buf, Position (Buf, Mark)));
       end return;
@@ -140,9 +141,10 @@ package body Pp.Buffers is
    function Cur (Buf : Buffer) return W_Char is
    begin
       return Result : constant W_Char := Buf.Cur_Char do
-         pragma Assert
-           (if Buf.From_First > Last_Index (Buf.From) then Result = W_NUL
-            else Result = Buf.From (Buf.From_First));
+         pragma
+           Assert
+             (if Buf.From_First > Last_Index (Buf.From) then Result = W_NUL
+                else Result = Buf.From (Buf.From_First));
       end return;
    end Cur;
 
@@ -265,7 +267,7 @@ package body Pp.Buffers is
 
    procedure Move_Marker (Buf : in out Buffer) is
       Mark : constant Marker := Buf.From_Markers (Buf.From_Markers_First);
-      Rec : Marker_Rec renames Buf.Markers (Mark);
+      Rec  : Marker_Rec renames Buf.Markers (Mark);
    begin
       pragma Assert (Rec.Position >= Buf.From_First);
       if Rec.Position = Buf.From_First then
@@ -291,21 +293,23 @@ package body Pp.Buffers is
             declare
                Mark : constant Marker :=
                  Buf.From_Markers (Buf.From_Markers_First);
-               Rec : Marker_Rec renames Buf.Markers (Mark);
+               Rec  : Marker_Rec renames Buf.Markers (Mark);
 
             begin
-               pragma Assert
-                 (Rec.Position in
-                    Buf.From_First + 1 .. Last_Index (Buf.From) + 1);
+               pragma
+                 Assert
+                   (Rec.Position
+                    in Buf.From_First + 1 .. Last_Index (Buf.From) + 1);
             end;
 
          else
-            pragma Assert
-              (Buf.From_Markers_First = Last_Index (Buf.From_Markers) + 1);
+            pragma
+              Assert
+                (Buf.From_Markers_First = Last_Index (Buf.From_Markers) + 1);
          end if;
       end Assert;
 
-   --  Start of processing for Maybe_Move_Marker
+      --  Start of processing for Maybe_Move_Marker
 
    begin
       --  We can't have two different Markers pointing to the same character
@@ -331,7 +335,7 @@ package body Pp.Buffers is
    end Move_Forward;
 
    function Move_Forward (Buf : in out Buffer) return W_Char is
-      Result : W_Char;
+      Result     : W_Char;
       pragma Assert (not At_End (Buf));
       From_First : constant Positive := Buf.From_First + 1;
    begin
@@ -347,14 +351,14 @@ package body Pp.Buffers is
 
    procedure Initialize_Buffer (Buf : in out Buffer) is
    begin
-      Buf.From_First         := 1;
+      Buf.From_First := 1;
       Buf.From_Markers_First := 1;
-      Buf.Cur_Char           := W_NUL;
-      Buf.Cur_Column         := 1;
+      Buf.Cur_Char := W_NUL;
+      Buf.Cur_Column := 1;
    end Initialize_Buffer;
 
-   overriding procedure Initialize (Buf : in out Buffer)
-     renames Initialize_Buffer;
+   overriding
+   procedure Initialize (Buf : in out Buffer) renames Initialize_Buffer;
 
    procedure Maybe_Adjust_Marker (Buf : in out Buffer) is
    begin
@@ -442,8 +446,8 @@ package body Pp.Buffers is
    function Is_Empty (Buf : Buffer) return Boolean is
    begin
       return
-        Result : constant Boolean :=
-          Is_Empty (Buf.From) and then Is_Empty (Buf.To)
+         Result : constant Boolean :=
+           Is_Empty (Buf.From) and then Is_Empty (Buf.To)
       do
          pragma Assert (if Result then Is_Empty (Buf.Markers));
          pragma Assert (if Result then Is_Empty (Buf.From_Markers));
@@ -453,8 +457,8 @@ package body Pp.Buffers is
 
    function Last_Position (Buf : Buffer) return Natural is
    begin
-      return Last_Index (Buf.To) +
-        (Last_Index (Buf.From) - Buf.From_First + 1);
+      return
+        Last_Index (Buf.To) + (Last_Index (Buf.From) - Buf.From_First + 1);
    end Last_Position;
 
    function Lookahead (Buf : Buffer; Offset : Positive := 1) return W_Char is
@@ -482,7 +486,7 @@ package body Pp.Buffers is
       if Is_Empty (Buf.To_Markers) then
          Append_New_Marker (Buf, Name); -- Create a new one
 
-      --  Avoid creating a new Marker if we already have one at 'point'
+         --  Avoid creating a new Marker if we already have one at 'point'
 
       elsif not At_Point (Buf, Last_Element (Buf.To_Markers)) then
          Append_New_Marker (Buf, Name); -- Create a new one
@@ -558,8 +562,9 @@ package body Pp.Buffers is
       pragma Assert (C /= W_HT);
    begin
       pragma Assert (At_End (Buf));
-      pragma Assert
-        (Is_Empty (Buf.To_Markers) and then Is_Empty (Buf.From_Markers));
+      pragma
+        Assert
+          (Is_Empty (Buf.To_Markers) and then Is_Empty (Buf.From_Markers));
 
       if Include_Trailing_Spaces then
          Buf.Cur_Column := Buf.Cur_Column + 1;
@@ -596,49 +601,49 @@ package body Pp.Buffers is
 
       use type System.WCh_Con.WC_Encoding_Method;
 
-      package Decoder is new GNAT.Decode_String
-        (Encoding_Method => Wide_Character_Encoding);
-      package Brackets_Decoder is new GNAT.Decode_String
-        (Encoding_Method => System.WCh_Con.WCEM_Brackets);
-      Ptr        : Natural  := Input'First;
+      package Decoder is new
+        GNAT.Decode_String (Encoding_Method => Wide_Character_Encoding);
+      package Brackets_Decoder is new
+        GNAT.Decode_String (Encoding_Method => System.WCh_Con.WCEM_Brackets);
+      Ptr        : Natural := Input'First;
       C          : W_Char;
       Tab_Length : constant Natural := (if Tab_Len /= 0 then Tab_Len else 8);
       --  The Tab_Len parameter value will be used if not null otherwise the
       --  default is set to 8.
 
-      function At_Brackets_Start return Boolean with
-         Pre => Input (Ptr) = '[';
-         --  True if we're pointing to the start of a valid brackets sequence
-         --  to be interpreted as a wide character.
+      function At_Brackets_Start return Boolean
+      with Pre => Input (Ptr) = '[';
+      --  True if we're pointing to the start of a valid brackets sequence
+      --  to be interpreted as a wide character.
 
-      function At_Brackets_Start
-        return Boolean is
-        (Ptr + 2 <= Input'Last
-         and then Input (Ptr + 1) = '"'
-         and then Input (Ptr + 2) in '0' .. '9' | 'a' .. 'f' | 'A' .. 'F');
+      function At_Brackets_Start return Boolean
+      is (Ptr + 2 <= Input'Last
+          and then Input (Ptr + 1) = '"'
+          and then Input (Ptr + 2) in '0' .. '9' | 'a' .. 'f' | 'A' .. 'F');
 
       type State_Enum is
         (In_Comment, In_String_Literal, In_Obsolescent_String_Literal, Other);
       State : State_Enum := Other;
-   --  We need to keep track of whether we're inside a comment, because
-   --  brackets encoding is disabled in that case. We need to keep track of
-   --  whether we're inside a string literal in order to keep track of whether
-   --  we're inside a comment ('--' doesn't start a comment inside a string
-   --  literal).
-   --
-   --  In_String_Literal is for normal string literals surrounded by double
-   --  quotes. In_Obsolescent_String_Literal is for string literals surrounded
-   --  by percent signs, as allowed by J.2(4). It is necessary to distinguish
-   --  these, because the surrounding characters have to match. That is, if we
-   --  see:
-   --
-   --     "Hello%world"
-   --
-   --  the percent doesn't end the string literal.
+      --  We need to keep track of whether we're inside a comment, because
+      --  brackets encoding is disabled in that case. We need to keep track of
+      --  whether we're inside a string literal in order to keep track of
+      --  whether we're inside a comment ('--' doesn't start a comment inside a
+      --  string literal).
+      --
+      --  In_String_Literal is for normal string literals surrounded by double
+      --  quotes. In_Obsolescent_String_Literal is for string literals
+      --  surrounded by percent signs, as allowed by J.2(4). It is necessary to
+      --  distinguish these, because the surrounding characters have to match.
+      --  That is, if we see:
+      --
+      --     "Hello%world"
+      --
+      --  the percent doesn't end the string literal.
 
    begin
       if Input = "" then
          return; -- leave Buf empty
+
       end if;
 
       while Ptr <= Input'Last loop
@@ -674,9 +679,7 @@ package body Pp.Buffers is
                end if;
 
             when Other =>
-               if C = '-'
-                 and then Ptr <= Input'Last
-                 and then Input (Ptr) = '-'
+               if C = '-' and then Ptr <= Input'Last and then Input (Ptr) = '-'
                then
                   State := In_Comment;
                elsif C = '"' then
@@ -725,7 +728,7 @@ package body Pp.Buffers is
       --  These behaviors are intended to match what the compiler does.
 
       Input : String_Access := Read_File (File_Name);
-      First : Natural       := 1;
+      First : Natural := 1;
 
       use GNAT.Byte_Order_Mark;
       BOM     : BOM_Kind;
@@ -764,12 +767,11 @@ package body Pp.Buffers is
    begin
       pragma Assert (not At_End (Buf));
       Buf.From (Buf.From_First) := C;
-      Buf.Cur_Char              := C;
-      pragma Assert -- no trailing blanks
-        (if
-           C = NL
-         then
-           (Is_Empty (Buf.To) or else Last_Element (Buf.To) /= ' '));
+      Buf.Cur_Char := C;
+      pragma
+        Assert -- no trailing blanks
+          (if C = NL
+             then (Is_Empty (Buf.To) or else Last_Element (Buf.To) /= ' '));
 
       --  No need to adjust Buf.Cur_Column
    end Replace_Cur;
@@ -777,10 +779,12 @@ package body Pp.Buffers is
    procedure Replace_Previous (Buf : in out Buffer; C : W_Char) is
    begin
       Buf.To (Last_Index (Buf.To)) := C;
-      pragma Assert -- no trailing blanks
-        (if C = NL then
-          (Last_Index (Buf.To) = 1
-            or else Buf.To (Last_Index (Buf.To) - 1) /= ' '));
+      pragma
+        Assert -- no trailing blanks
+          (if C = NL
+             then
+               (Last_Index (Buf.To) = 1
+                or else Buf.To (Last_Index (Buf.To) - 1) /= ' '));
    end Replace_Previous;
 
    procedure Reset (Buf : in out Buffer) is
@@ -791,8 +795,8 @@ package body Pp.Buffers is
       if Buf.From_Markers_First = Last_Index (Buf.From_Markers) then
          Move_Forward (Buf);
       end if;
-      pragma Assert
-        (Buf.From_Markers_First = Last_Index (Buf.From_Markers) + 1);
+      pragma
+        Assert (Buf.From_Markers_First = Last_Index (Buf.From_Markers) + 1);
 
       Move (Target => Buf.From, Source => Buf.To);
       pragma Assert (Is_Empty (Buf.To));
@@ -800,10 +804,10 @@ package body Pp.Buffers is
       Move (Target => Buf.From_Markers, Source => Buf.To_Markers);
       pragma Assert (Is_Empty (Buf.To_Markers));
 
-      Buf.From_First         := 1;
+      Buf.From_First := 1;
       Buf.From_Markers_First := 1;
-      Buf.To_Flag            := not Buf.To_Flag;
-      Buf.Cur_Char           :=
+      Buf.To_Flag := not Buf.To_Flag;
+      Buf.Cur_Char :=
         (if Buf.From_First > Last_Index (Buf.From) then W_NUL
          else Buf.From (Buf.From_First));
       Buf.Cur_Column := 1;
@@ -821,17 +825,17 @@ package body Pp.Buffers is
       To_F, To_L, From_F, From_L : Natural;
    begin
       if F.Flag = Buf.To_Flag then
-         To_F   := F.Position;
+         To_F := F.Position;
          From_F := 1;
       else
-         To_F   := Last_Index (Buf.To) + 1;
+         To_F := Last_Index (Buf.To) + 1;
          From_F := F.Position;
       end if;
       if L.Flag = Buf.To_Flag then
-         To_L   := L.Position - 1;
+         To_L := L.Position - 1;
          From_L := 0;
       else
-         To_L   := Last_Index (Buf.To);
+         To_L := Last_Index (Buf.To);
          From_L := L.Position - 1;
       end if;
 
@@ -840,25 +844,24 @@ package body Pp.Buffers is
            Slice (Buf.To, To_F, To_L) & Slice (Buf.From, From_F, From_L);
          pragma Assert (Result'First = 1); -- Ensured by Slice
       begin
-         if False then -- Too slow, but we keep it for documentation
-            pragma Assert
-              (Result =
-               To_W_Str (Buf)
-                 (Position (Buf, First) .. Position (Buf, Last) - 1));
+         if False then
+            --  Too slow, but we keep it for documentation
+            pragma
+              Assert
+                (Result
+                   = To_W_Str (Buf)
+                       (Position (Buf, First) .. Position (Buf, Last) - 1));
          end if;
          return Result;
       end;
    end Slice;
 
    function Slice
-     (Buf   : Buffer;
-      First : Positive;
-      Last  : Natural;
-      Lines : Boolean := False)
-      return  W_Str
+     (Buf : Buffer; First : Positive; Last : Natural; Lines : Boolean := False)
+      return W_Str
    is
       F : Positive := First;
-      L : Natural  := Last;
+      L : Natural := Last;
    begin
       if Lines then
          while F > 1 and then Char_At (Buf, F) /= NL loop
@@ -873,7 +876,8 @@ package body Pp.Buffers is
          for J in Result'Range loop
             Result (J) := Char_At (Buf, F + J - 1);
          end loop;
-         if False then -- Slow
+         if False then
+            --  Slow
             pragma Assert (Result = To_W_Str (Buf) (F .. L));
          end if;
       end return;
@@ -909,18 +913,18 @@ package body Pp.Buffers is
    end Move;
 
    function To_Debug_String (Buf : Buffer) return String is
-      S     : constant W_Str        := To_W_Str (Buf);
-      Marks : constant Marker_Array :=
-        To_Array (Buf.To_Markers) &
-        Slice
-          (Buf.From_Markers,
-           Buf.From_Markers_First,
-           Last_Index (Buf.From_Markers));
+      S       : constant W_Str := To_W_Str (Buf);
+      Marks   : constant Marker_Array :=
+        To_Array (Buf.To_Markers)
+        & Slice
+            (Buf.From_Markers,
+             Buf.From_Markers_First,
+             Last_Index (Buf.From_Markers));
       pragma Assert (Marks'First = 1);
       M_Index : Marker_Index := 1;
       Result  : WChar_Vector;
 
-   --  Start of processing for To_Debug_String
+      --  Start of processing for To_Debug_String
 
    begin
       for X in S'Range loop
@@ -972,9 +976,7 @@ package body Pp.Buffers is
    end To_Vector;
 
    function Elements
-     (Buf  : Buffer)
-      return Utils.Char_Vectors.WChar_Vectors.Big_Ptr
-   is
+     (Buf : Buffer) return Utils.Char_Vectors.WChar_Vectors.Big_Ptr is
    begin
       pragma Assert (Is_Empty (Buf.To) and then Buf.From_First = 1);
       return Elems (Buf.From);
@@ -1006,10 +1008,10 @@ package body Pp.Buffers is
          return Position (Buf, X) < Position (Buf, Y);
       end Marker_Less;
 
-      package Sorting is new Marker_Vectors.Generic_Sorting
-        ("<" => Marker_Less);
+      package Sorting is new
+        Marker_Vectors.Generic_Sorting ("<" => Marker_Less);
 
-   --  Start of processing for Validate
+      --  Start of processing for Validate
 
    begin
       if False then
@@ -1027,7 +1029,7 @@ package body Pp.Buffers is
 
       for M in 1 .. Last_Index (Buf.To_Markers) loop
          declare
-            Mark : constant Marker     := Buf.To_Markers (M);
+            Mark : constant Marker := Buf.To_Markers (M);
             Rec  : constant Marker_Rec := Buf.Markers (Mark);
 
          begin
@@ -1045,15 +1047,15 @@ package body Pp.Buffers is
 
       for M in Buf.From_Markers_First .. Last_Index (Buf.From_Markers) loop
          declare
-            Mark : constant Marker     := Buf.From_Markers (M);
+            Mark : constant Marker := Buf.From_Markers (M);
             Rec  : constant Marker_Rec := Buf.Markers (Mark);
 
          begin
             if Rec.Flag /= not Buf.To_Flag then
                Fail ("Bad From_Marker flag");
             end if;
-            if Rec.Position not in
-                Buf.From_First + 1 .. Last_Index (Buf.From) + 1
+            if Rec.Position
+               not in Buf.From_First + 1 .. Last_Index (Buf.From) + 1
             then
                Fail ("Bad From_Marker position");
             end if;
@@ -1065,16 +1067,15 @@ package body Pp.Buffers is
       then
          declare
             Marks : constant Marker_Array :=
-              To_Array (Buf.To_Markers) &
-              Slice
-              (Buf.From_Markers,
-               Buf.From_Markers_First,
-               Last_Index (Buf.From_Markers));
+              To_Array (Buf.To_Markers)
+              & Slice
+                  (Buf.From_Markers,
+                   Buf.From_Markers_First,
+                   Last_Index (Buf.From_Markers));
             pragma Assert (Marks'First = 1);
          begin
             for J in 2 .. Marks'Last loop
-               if Position (Buf, Marks (J - 1))
-                 = Position (Buf, Marks (J))
+               if Position (Buf, Marks (J - 1)) = Position (Buf, Marks (J))
                then
                   Fail ("Duplicate marks");
                end if;
@@ -1089,8 +1090,7 @@ package body Pp.Buffers is
    -- Fast_Match_Slice --
    ----------------------------
 
-   function Fast_Match_Slice (Buf : Buffer; Target : W_Str)
-                              return Boolean is
+   function Fast_Match_Slice (Buf : Buffer; Target : W_Str) return Boolean is
    begin
       return Match : Boolean := Cur (Buf) = Target (Target'First) do
          --  The function Slices is intentionally not used:

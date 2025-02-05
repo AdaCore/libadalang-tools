@@ -30,19 +30,20 @@ package body Laltools.Call_Hierarchy is
    procedure Find_Incoming_Calls
      (Definition         : Defining_Name'Class;
       Units              : Analysis_Unit_Array;
-      Visit              : not null access procedure
-        (Call_Identifier : Base_Id'Class;
-         Kind            : Ref_Result_Kind;
-         Cancel          : in out Boolean);
+      Visit              :
+        not null access procedure
+          (Call_Identifier : Base_Id'Class;
+           Kind            : Ref_Result_Kind;
+           Cancel          : in out Boolean);
       Follow_Renamings   : Boolean := True;
       Imprecise_Fallback : Boolean := False)
    is
       Cancel : Boolean := False;
 
    begin
-      for Reference of
-        Definition.P_Find_All_Calls
-          (Units, Follow_Renamings, Imprecise_Fallback)
+      for Reference
+        of Definition.P_Find_All_Calls
+             (Units, Follow_Renamings, Imprecise_Fallback)
       loop
          Visit (Ref (Reference), Kind (Reference), Cancel);
 
@@ -56,33 +57,31 @@ package body Laltools.Call_Hierarchy is
 
    procedure Find_Outgoing_Calls
      (Definition : Defining_Name;
-      Callback   : not null access procedure
-        (Subp_Call : Ada_Node'Class);
+      Callback   : not null access procedure (Subp_Call : Ada_Node'Class);
       Trace      : GNATCOLL.Traces.Trace_Handle;
       Imprecise  : in out Ref_Result_Kind)
    is
 
-      function Process_Body_Children (N : Ada_Node'Class)
-                                      return Visit_Status;
+      function Process_Body_Children (N : Ada_Node'Class) return Visit_Status;
       --  Check if N is a subprogram call and if so call callback.
 
       ----------------------------
       -- Process_Body_Childreen --
       ----------------------------
 
-      function Process_Body_Children (N : Ada_Node'Class)
-                                      return Visit_Status is
+      function Process_Body_Children (N : Ada_Node'Class) return Visit_Status
+      is
       begin
          --  Do not consider calls made by nested subprograms, expression
          --  functions or tasks.
 
-         if N.Kind in
-           Ada_Subp_Body
+         if N.Kind
+            in Ada_Subp_Body
              | Ada_Subp_Spec
-               | Ada_Expr_Function
-                 | Ada_Task_Body
-                   | Ada_Single_Task_Decl
-                     | Ada_Task_Type_Decl
+             | Ada_Expr_Function
+             | Ada_Task_Body
+             | Ada_Single_Task_Decl
+             | Ada_Task_Type_Decl
          then
             return Over;
          end if;

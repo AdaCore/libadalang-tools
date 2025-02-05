@@ -87,11 +87,12 @@ package TGen.Parse_Strategy is
    Strategy_Parsing_Error : exception;
    --  Exception raised when a strategy expression is malformed
 
-   package FQN_To_Parsed_Strat_Maps is new Ada.Containers.Hashed_Maps
-     (Key_Type        => Unbounded_String,
-      Element_Type    => Parsed_Strategy,
-      Hash            => Ada.Strings.Unbounded.Hash_Case_Insensitive,
-      Equivalent_Keys => Ada.Strings.Unbounded.Equal_Case_Insensitive);
+   package FQN_To_Parsed_Strat_Maps is new
+     Ada.Containers.Hashed_Maps
+       (Key_Type        => Unbounded_String,
+        Element_Type    => Parsed_Strategy,
+        Hash            => Ada.Strings.Unbounded.Hash_Case_Insensitive,
+        Equivalent_Keys => Ada.Strings.Unbounded.Equal_Case_Insensitive);
    subtype FQN_To_Parsed_Strat_Map is FQN_To_Parsed_Strat_Maps.Map;
 
    procedure Parse_Strategy

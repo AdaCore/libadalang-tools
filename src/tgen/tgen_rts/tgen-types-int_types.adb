@@ -34,25 +34,29 @@ package body TGen.Types.Int_Types is
    function Image (Self : Signed_Int_Typ) return String is
    begin
       return
-        (Typ (Self).Image & ": Signed Integer"
+        (Typ (Self).Image
+         & ": Signed Integer"
          & (if Self.Is_Static
-            then " range " & Big_Int.To_String (Self.Range_Value.Min) & " .."
-                 & Big_Int.To_String (Self.Range_Value.Max)
+            then
+              " range "
+              & Big_Int.To_String (Self.Range_Value.Min)
+              & " .."
+              & Big_Int.To_String (Self.Range_Value.Max)
             else " (non static)"));
    end Image;
 
-   function Low_Bound (Self : Signed_Int_Typ) return Big_Integer is
-     (Self.Range_Value.Min);
+   function Low_Bound (Self : Signed_Int_Typ) return Big_Integer
+   is (Self.Range_Value.Min);
 
-   function High_Bound (Self : Signed_Int_Typ) return Big_Integer is
-     (Self.Range_Value.Max);
+   function High_Bound (Self : Signed_Int_Typ) return Big_Integer
+   is (Self.Range_Value.Max);
 
    function Image (Self : Mod_Int_Typ) return String is
    begin
       return
-        (Typ (Self).Image & ": Modular Integer"
-         & (if Self.Is_Static
-            then " mod" & Big_Int.To_String (Self.Mod_Value)
+        (Typ (Self).Image
+         & ": Modular Integer"
+         & (if Self.Is_Static then " mod" & Big_Int.To_String (Self.Mod_Value)
             else "(non static)"));
    end Image;
 
@@ -67,14 +71,15 @@ package body TGen.Types.Int_Types is
    end High_Bound;
 
    function Gen return T is
-      function Rand is new
-        GNAT.Random_Numbers.Random_Discrete (T, T'First);
+      function Rand is new GNAT.Random_Numbers.Random_Discrete (T, T'First);
    begin
       return Rand (Generator_Instance);
    end Gen;
 
-   package Interval_Vectors is new Ada.Containers.Vectors
-     (Index_Type => Positive, Element_Type => Int_Range);
+   package Interval_Vectors is new
+     Ada.Containers.Vectors
+       (Index_Type   => Positive,
+        Element_Type => Int_Range);
    subtype Interval_Vector is Interval_Vectors.Vector;
 
    function Get_Digits_Equivalence_Classes
@@ -92,7 +97,7 @@ package body TGen.Types.Int_Types is
 
       Result : Interval_Vector;
 
-      LLI_Last : constant Big_Integer :=
+      LLI_Last  : constant Big_Integer :=
         LLLI_Conversions.To_Big_Integer
           (Long_Long_Long_Integer (Long_Long_Integer'Last - 1));
       LLI_First : constant Big_Integer :=
@@ -108,8 +113,7 @@ package body TGen.Types.Int_Types is
          Number_Of_Digits : Integer :=
            (if Low_Bound = 0 then 1 else Log (Low_Bound, 10.0) + 1);
          High_Bound       : Big_Integer :=
-           Big_Int.Min
-             (10 ** Number_Of_Digits - 1, R.Max);
+           Big_Int.Min (10**Number_Of_Digits - 1, R.Max);
       begin
 
          --  While LLLI_Conversions do not actually support values outside of
@@ -121,8 +125,7 @@ package body TGen.Types.Int_Types is
             Result.Append (Int_Range'(Min => Low_Bound, Max => High_Bound));
             Low_Bound := High_Bound + 1;
             Number_Of_Digits := Number_Of_Digits + 1;
-            High_Bound :=
-              Big_Int.Min (10 ** Number_Of_Digits - 1, R.Max);
+            High_Bound := Big_Int.Min (10**Number_Of_Digits - 1, R.Max);
          end loop;
       end;
 
@@ -132,14 +135,13 @@ package body TGen.Types.Int_Types is
          High_Bound       : Big_Integer := Big_Int.Min (R.Max, -1);
          Number_Of_Digits : Integer := Log (-High_Bound, 10.0) + 1;
          Low_Bound        : Big_Integer :=
-           Big_Int.Max (-10 ** Number_Of_Digits + 1, R.Min);
+           Big_Int.Max (-10**Number_Of_Digits + 1, R.Min);
       begin
          while High_Bound > LLI_First and then High_Bound >= R.Min loop
             Result.Append (Int_Range'(Min => Low_Bound, Max => High_Bound));
             High_Bound := Low_Bound - 1;
             Number_Of_Digits := Number_Of_Digits + 1;
-            Low_Bound :=
-              Big_Int.Max (-10 ** Number_Of_Digits + 1, R.Min);
+            Low_Bound := Big_Int.Max (-10**Number_Of_Digits + 1, R.Min);
          end loop;
       end;
       return Result;
@@ -147,8 +149,8 @@ package body TGen.Types.Int_Types is
 
    package Equivalence_Classes_Strategy_Int_Typ is
 
-      package Equivalence_Classes_Strategy_Internal is
-        new Equivalence_Classes_Strategy_Package
+      package Equivalence_Classes_Strategy_Internal is new
+        Equivalence_Classes_Strategy_Package
           (Equivalence_Class_Type      => Int_Range,
            Equivalence_Classes_Vectors => Interval_Vectors);
 
@@ -163,8 +165,8 @@ package body TGen.Types.Int_Types is
 
    package body Equivalence_Classes_Strategy_Int_Typ is
       function Draw
-        (T : SP.Ref with Unreferenced;
-         R : Int_Range) return JSON_Value is
+        (T : SP.Ref with Unreferenced; R : Int_Range) return JSON_Value
+      is
 
          --  Constrain the range of possible values to
          --  LLI'First + 1 .. LLI'Last - 1 until V307-012 is fixed.
@@ -176,17 +178,14 @@ package body TGen.Types.Int_Types is
            LLLI_Conversions.To_Big_Integer
              (Long_Long_Long_Integer (Long_Long_Integer'Last - 1));
       begin
-         return (Create
-                 (LLLI_Conversions.To_Big_Integer
-                    (Rand_LLLI
-                       (From_Big_Integer
-                          (if R.Min <= First_LLI
-                             then First_LLI
-                             else R.Min),
-                          From_Big_Integer
-                            (if R.Max >= Last_LLI
-                             then Last_LLI
-                             else R.Max)))));
+         return
+           (Create
+              (LLLI_Conversions.To_Big_Integer
+                 (Rand_LLLI
+                    (From_Big_Integer
+                       (if R.Min <= First_LLI then First_LLI else R.Min),
+                     From_Big_Integer
+                       (if R.Max >= Last_LLI then Last_LLI else R.Max)))));
       end Draw;
 
    end Equivalence_Classes_Strategy_Int_Typ;
@@ -199,7 +198,8 @@ package body TGen.Types.Int_Types is
    -----------------------------------------------
 
    function Generate_Equivalence_Class_Digit_Strategy
-     (T : Signed_Int_Typ'Class) return Strategy_Type'Class is
+     (T : Signed_Int_Typ'Class) return Strategy_Type'Class
+   is
       Strat : Equivalence_Classes_Strategy_Int_Typ.Strategy;
    begin
       SP.From_Element (Strat.T, T'Unrestricted_Access);
@@ -220,8 +220,8 @@ package body TGen.Types.Int_Types is
       Strat_Equivalence_Classes : constant Strategy_Type'Class :=
         Generate_Equivalence_Class_Digit_Strategy (Self);
    begin
-      return Make_Dispatching_Strat
-        (Strat_Random, Strat_Equivalence_Classes, 0.5);
+      return
+        Make_Dispatching_Strat (Strat_Random, Strat_Equivalence_Classes, 0.5);
    end Default_Strategy;
 
 end TGen.Types.Int_Types;

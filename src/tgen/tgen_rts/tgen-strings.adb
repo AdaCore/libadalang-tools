@@ -30,8 +30,8 @@ package body TGen.Strings is
    ----------
 
    function Join
-     (V   : String_Vector;
-      Sep : Character := Ada.Characters.Latin_1.LF) return String
+     (V : String_Vector; Sep : Character := Ada.Characters.Latin_1.LF)
+      return String
    is
       Result : Unbounded_String;
    begin
@@ -58,10 +58,7 @@ package body TGen.Strings is
    ----------------
 
    procedure Write_Line
-     (Str  : in out Unbounded_String;
-      Add  : String;
-      Span : Natural)
-   is
+     (Str : in out Unbounded_String; Add : String; Span : Natural) is
    begin
       Append (Str, [for I in 1 .. Span => ' ']);
       Append (Str, Add);
@@ -73,10 +70,7 @@ package body TGen.Strings is
    -------------
 
    procedure S_Write
-     (Str  : in out Unbounded_String;
-      Add  : String;
-      Span : Natural)
-   is
+     (Str : in out Unbounded_String; Add : String; Span : Natural) is
    begin
       Append (Str, [for I in 1 .. Span => ' ']);
       Append (Str, Add);
@@ -86,10 +80,7 @@ package body TGen.Strings is
    -- Write --
    -----------
 
-   procedure Write
-     (Str : in out Unbounded_String;
-      Add : String)
-   is
+   procedure Write (Str : in out Unbounded_String; Add : String) is
    begin
       Append (Str, Add);
    end Write;
@@ -98,12 +89,9 @@ package body TGen.Strings is
    -- Indent_String --
    -------------------
 
-   procedure Indent_String
-     (Str  : in out Unbounded_String;
-      Span : Natural)
-   is
+   procedure Indent_String (Str : in out Unbounded_String; Span : Natural) is
       Indent_Str : constant String (1 .. Span) := [others => ' '];
-      Index : Natural := 1;
+      Index      : Natural := 1;
    begin
       if Length (Str) = 0 then
          return;
@@ -113,9 +101,7 @@ package body TGen.Strings is
       while Index <= Length (Str) loop
          Index :=
            Ada.Strings.Unbounded.Index
-             (Str,
-              To_Set (Ada.Characters.Latin_1.LF),
-              Index);
+             (Str, To_Set (Ada.Characters.Latin_1.LF), Index);
          if Index = 0 then
             return;
          end if;
@@ -171,8 +157,7 @@ package body TGen.Strings is
    -- To_Qualified_Name --
    -----------------------
 
-   function To_Qualified_Name (Name : String) return Ada_Qualified_Name
-   is
+   function To_Qualified_Name (Name : String) return Ada_Qualified_Name is
       use Ada.Characters.Handling;
       I      : Positive := 1;
       Result : Ada_Qualified_Name;
@@ -193,8 +178,8 @@ package body TGen.Strings is
    -- Is_Operator --
    -----------------
 
-   function Is_Operator (Op_Name : String) return Boolean is
-     (Op_Name'Length >= 1 and then Op_Name (Op_Name'First) = '"');
+   function Is_Operator (Op_Name : String) return Boolean
+   is (Op_Name'Length >= 1 and then Op_Name (Op_Name'First) = '"');
 
    -----------------------
    -- Map_Operator_Name --
