@@ -1,7 +1,9 @@
 package Pkg is
 
    procedure Simple (X : Integer);
-   procedure With_TC (X : Integer);
+   procedure With_TC (X : Integer) with
+     Test_Case => (Name => "Trivial_TC",
+                   Mode => Nominal);
 
    type Pkg_T is tagged null record;
 

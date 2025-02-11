@@ -2,8 +2,8 @@ simple case
 simple.ads:3:4: info: corresponding test PASSED
 1 tests run: 1 passed; 0 failed; 0 crashed.
 generics
-sorting_algorithms.ads:9:4 instance at instantiations.ads:4:4: info: corresponding test PASSED
-sorting_algorithms.ads:9:4 instance at instantiations.ads:8:4: info: corresponding test PASSED
+sorting_algorithms.ads:9:4: instance at instantiations.ads:4:4: info: corresponding test PASSED
+sorting_algorithms.ads:9:4: instance at instantiations.ads:8:4: info: corresponding test PASSED
 2 tests run: 2 passed; 0 failed; 0 crashed.
 oop (inheritance)
 speed1.ads:6:4: info: corresponding test PASSED
