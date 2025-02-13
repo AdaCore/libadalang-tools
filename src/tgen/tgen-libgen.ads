@@ -236,6 +236,12 @@ package TGen.Libgen is
    --  has not been performed yet, the requested subprogram does not exist, or
    --  it is not supported for test case generation.
 
+   function JSON_Marshalling_Enabled return Boolean;
+   --  Returns whether JSON marshalling code should be emitted in generated
+   --  harness. Some platform with limited Ada runtime support are not suitable
+   --  for JSON serialization. This switch can be enabled by setting the
+   --  `TGEN_NO_JSON_MARSHALLING` environment variable.
+
 private
    use TGen.Strings;
    use TGen.Context;

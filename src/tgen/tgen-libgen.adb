@@ -25,6 +25,7 @@ with Ada.Characters.Handling;
 with Ada.Command_Line;
 with Ada.Containers;
 with Ada.Directories;
+with Ada.Environment_Variables;
 with Ada.Strings.Unbounded.Equal_Case_Insensitive;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -236,14 +237,19 @@ package body TGen.Libgen is
    begin
       Create (F_Spec, Out_File, File_Name & ".ads");
       Put_Line (F_Spec, "with TGen.Marshalling_Lib;");
-      Put_Line (F_Spec, "with TGen.JSON;");
       Put_Line (F_Spec, "with Interfaces;");
       Put_Line (F_Spec, "with Ada.Streams;");
-      Put_Line (F_Spec, "with TGen.Strings;");
       Put_Line (F_Spec, "with TGen.Big_Int;");
-      Put_Line (F_Spec, "with TGen.Types;");
-      Put_Line (F_Spec, "with TGen.Types.Discrete_Types;");
-      Put_Line (F_Spec, "with TGen.Types.Int_Types;");
+      Put_Line (F_Spec, "with TGen.Strings;");
+
+      if JSON_Marshalling_Enabled then
+         Put_Line (F_Spec, "with TGen.Types;");
+         Put_Line (F_Spec, "with TGen.Types.Discrete_Types;");
+         Put_Line (F_Spec, "with TGen.Types.Int_Types;");
+         Put_Line (F_Spec, "with TGen.JSON;");
+         Put_Line (F_Spec, "with TGen.Marshalling_Lib.JSON;");
+      end if;
+
       New_Line (F_Spec);
 
       --  Add the import of the original unit, to be able to declare
@@ -387,27 +393,29 @@ package body TGen.Libgen is
       begin
          for T of Sorted_Types loop
 
-            if Is_Supported_Type (T.Get)
+            if Is_Supported_Type (T.all)
 
               --  We ignore instance types when generating marshallers as they
               --  are not types per-se, but a convenient way of binding a type
               --  to its strategy context.
 
-              and then T.Get not in Instance_Typ'Class
+              and then T.all not in Instance_Typ'Class
             then
                Spec_Part_Acc :=
-                 (if T.Get.Fully_Private then Private_Part'Unrestricted_Access
+                 (if T.all.Fully_Private then Private_Part'Unrestricted_Access
                   else Spec_Part'Unrestricted_Access);
-               if T.Get.Kind in Function_Kind then
-                  TGen
-                    .Marshalling
-                    .JSON_Marshallers
-                    .Generate_TC_Serializers_For_Subp
-                       (Spec_Part_Acc,
-                        Private_Part'Unrestricted_Access,
-                        Body_Part'Unrestricted_Access,
-                        As_Function_Typ (T),
-                        TRD);
+               if T.all.Kind in Function_Kind then
+                  if JSON_Marshalling_Enabled then
+                     TGen
+                       .Marshalling
+                       .JSON_Marshallers
+                       .Generate_TC_Serializers_For_Subp
+                          (Spec_Part_Acc,
+                           Private_Part'Unrestricted_Access,
+                           Body_Part'Unrestricted_Access,
+                           As_Function_Typ (T),
+                           TRD);
+                  end if;
                else
                   TGen
                     .Marshalling
@@ -416,20 +424,23 @@ package body TGen.Libgen is
                        (Spec_Part_Acc,
                         Private_Part'Unrestricted_Access,
                         Body_Part'Unrestricted_Access,
-                        T.Get,
-                        T.Get.Kind in Discrete_Typ_Range
+                        T.all,
+                        T.all.Kind in Discrete_Typ_Range
                         and then Ctx.Array_Index_Types.Contains (T),
                         TRD);
-                  TGen
-                    .Marshalling
-                    .JSON_Marshallers
-                    .Generate_Marshalling_Functions_For_Typ
-                       (Spec_Part_Acc,
-                        Private_Part'Unrestricted_Access,
-                        Body_Part'Unrestricted_Access,
-                        T.Get,
-                        Ctx.Array_Index_Types.Contains (T),
-                        TRD);
+
+                  if JSON_Marshalling_Enabled then
+                     TGen
+                       .Marshalling
+                       .JSON_Marshallers
+                       .Generate_Marshalling_Functions_For_Typ
+                          (Spec_Part_Acc,
+                           Private_Part'Unrestricted_Access,
+                           Body_Part'Unrestricted_Access,
+                           T.all,
+                           Ctx.Array_Index_Types.Contains (T),
+                           TRD);
+                  end if;
                end if;
             end if;
          end loop;

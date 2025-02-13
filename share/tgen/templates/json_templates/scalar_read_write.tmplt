@@ -13,7 +13,7 @@
    --  Read and Write functions for @_TY_NAME_@
 
    package @_TY_PREFIX_@_Funs@_BASE_SUFFIX()_@_JSON is new
-     @_MARSHALLING_LIB_@.@_GENERIC_NAME_@_JSON (TGen.TGen_Std.@_TY_NAME_@);
+     @_MARSHALLING_LIB_@.JSON.@_GENERIC_NAME_@_JSON (TGen.TGen_Std.@_TY_NAME_@);
 
    procedure @_TY_PREFIX_@_Write@_BASE_SUFFIX()_@
      (@_GLOBAL_PREFIX_@_JSON : in out TGen.JSON.JSON_Value;
