@@ -63,7 +63,8 @@ package body TGen.Marshalling.Binary_Marshallers is
          4 => Assoc ("GENERIC_NAME", Generic_Name),
          5 => Assoc ("GLOBAL_PREFIX", Global_Prefix),
          6 => Assoc ("NEEDS_HEADER", Needs_Header (Typ)),
-         7 => Assoc ("IS_SCALAR", Typ in Scalar_Typ'Class)];
+         7 => Assoc ("IS_SCALAR", Typ in Scalar_Typ'Class),
+         8 => Assoc ("HAS_STATIC_PREDICATE", Typ.Has_Static_Predicate)];
 
       function Component_Read
         (Assocs : Translate_Table) return Unbounded_String;

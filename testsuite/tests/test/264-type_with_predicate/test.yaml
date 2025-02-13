@@ -1,0 +1,5 @@
+description: |
+  Checks that types with Static_Predicates can be used to generate test cases
+
+default-gpr: true
+driver: gnattest_tgen

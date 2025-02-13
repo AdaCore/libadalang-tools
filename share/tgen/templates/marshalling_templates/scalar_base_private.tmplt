@@ -10,7 +10,15 @@
 
    function @_TY_PREFIX_@_First@_BASE_SUFFIX()_@
      return TGen.TGen_Std.@_TY_NAME_@ is
+     @@IF@@ @_HAS_STATIC_PREDICATE_@
+     (TGen.TGen_Std.@_TY_NAME_@'First_Valid);
+     @@ELSE@@
      (TGen.TGen_Std.@_TY_NAME_@'First);
+     @@END_IF@@
    function @_TY_PREFIX_@_Last@_BASE_SUFFIX()_@
      return TGen.TGen_Std.@_TY_NAME_@ is
+     @@IF@@ @_HAS_STATIC_PREDICATE_@
+     (TGen.TGen_Std.@_TY_NAME_@'Last_Valid);
+     @@ELSE@@
      (TGen.TGen_Std.@_TY_NAME_@'Last);
+     @@END_IF@@

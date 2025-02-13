@@ -1718,12 +1718,7 @@ package body TGen.JSON is
                     .. Left.Data.Arr_Value.Arr.Vals.Last_Index
                loop
                   if not (Left.Data.Arr_Value.Arr.Vals (J)
-                          =  --  recursive
-                                             Right
-                                             .Data
-                                             .Arr_Value
-                                             .Arr
-                                             .Vals (J))
+                          = Right.Data.Arr_Value.Arr.Vals (J))
                   then
                      return False;
                   end if;

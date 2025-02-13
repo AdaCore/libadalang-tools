@@ -3564,6 +3564,11 @@ package body TGen.Types.Translation is
            Basic_Decl'(N.P_All_Parts (1)).As_Base_Type_Decl.P_Is_Private;
          Specialized_Res.Res.all.Is_Class_Wide :=
            not N.P_Classwide_Type.Is_Null;
+
+         --  Checks if the type has a static predicate aspect.
+         Specialized_Res.Res.all.Has_Static_Predicate :=
+           N.As_Basic_Decl.P_Has_Aspect
+             (Langkit_Support.Text.To_Unbounded_Text ("Static_Predicate"));
       end if;
 
       return Specialized_Res;

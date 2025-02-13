@@ -67,6 +67,9 @@ package TGen.Types is
       Is_Class_Wide : Boolean := False;
       --  Whether the type is class wide (has `'Class` attribute)
 
+      Has_Static_Predicate : Boolean := False;
+      --  Whether the type has a static predicate (`with Static_Predicate`)
+
    end record
    with
      Dynamic_Predicate =>
