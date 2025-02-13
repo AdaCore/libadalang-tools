@@ -44,9 +44,9 @@ package TGen.Context is
    package Fully_Qualified_Name_To_Type_Maps is new
      Ada.Containers.Ordered_Maps
        (Key_Type     => Unbounded_Text_Type,
-        Element_Type => SP.Ref,
+        Element_Type => Typ_Access,
         "<"          => Ada.Strings.Wide_Wide_Unbounded."<",
-        "="          => SP."=");
+        "="          => TGen.Types."=");
    subtype Fully_Qualified_Name_To_Type_Map is
      Fully_Qualified_Name_To_Type_Maps.Map;
 
@@ -58,11 +58,13 @@ package TGen.Context is
    subtype Unit_To_JSON_Map is Unit_To_JSON_Maps.Map;
 
    package Typ_Sets is new
-     Ada.Containers.Ordered_Sets (Element_Type => SP.Ref, "=" => SP."=");
+     Ada.Containers.Ordered_Sets
+       (Element_Type => Typ_Access,
+        "="          => TGen.Types."=");
    subtype Typ_Set is Typ_Sets.Set;
 
    package Typ_Lists is new
-     Ada.Containers.Doubly_Linked_Lists (Element_Type => SP.Ref);
+     Ada.Containers.Doubly_Linked_Lists (Element_Type => Typ_Access);
    subtype Typ_List is Typ_Lists.List;
 
    package Type_Vectors_Maps is new

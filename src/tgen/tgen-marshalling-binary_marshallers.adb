@@ -216,7 +216,7 @@ package body TGen.Marshalling.Binary_Marshallers is
 
          Size_Max_Pub : constant Boolean :=
            not (for some Idx_Typ of Array_Typ'Class (Typ).Index_Types
-                => Idx_Typ.Get.Fully_Private);
+                => Idx_Typ.all.Fully_Private);
       begin
          Put_Line (Spec_Part, Parse (Composite_Base_Spec_Template, Assocs));
          New_Line (Spec_Part);
@@ -252,7 +252,7 @@ package body TGen.Marshalling.Binary_Marshallers is
            or else not (for some Disc_Typ
                           of Discriminated_Record_Typ'Class (Typ)
                                .Discriminant_Types
-                        => Disc_Typ.Get.Fully_Private);
+                        => Disc_Typ.all.Fully_Private);
          pragma Style_Checks (On);
       begin
          Put_Line (Spec_Part, Parse (Composite_Base_Spec_Template, Assocs));

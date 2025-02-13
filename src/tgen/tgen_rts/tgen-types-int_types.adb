@@ -159,13 +159,13 @@ package body TGen.Types.Int_Types is
 
       use LLLI_Conversions;
 
-      function Draw (T : SP.Ref; R : Int_Range) return JSON_Value;
+      function Draw (T : Typ_Access; R : Int_Range) return JSON_Value;
 
    end Equivalence_Classes_Strategy_Int_Typ;
 
    package body Equivalence_Classes_Strategy_Int_Typ is
       function Draw
-        (T : SP.Ref with Unreferenced; R : Int_Range) return JSON_Value
+        (T : Typ_Access with Unreferenced; R : Int_Range) return JSON_Value
       is
 
          --  Constrain the range of possible values to
@@ -202,7 +202,7 @@ package body TGen.Types.Int_Types is
    is
       Strat : Equivalence_Classes_Strategy_Int_Typ.Strategy;
    begin
-      SP.From_Element (Strat.T, T'Unrestricted_Access);
+      Strat.T := T'Unrestricted_Access;
       Strat.Classes := Get_Digits_Equivalence_Classes (T.Range_Value);
       Strat.Draw := Equivalence_Classes_Strategy_Int_Typ.Draw'Access;
       return Strat;

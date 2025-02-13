@@ -35,7 +35,7 @@ package TGen.Types.Translation is
    type Translation_Result (Success : Boolean := False) is record
       case Success is
          when True =>
-            Res : SP.Ref;
+            Res : Typ_Access;
 
          when False =>
             Diagnostics : Unbounded_String :=
@@ -59,10 +59,10 @@ package TGen.Types.Translation is
    package Translation_Maps is new
      Ada.Containers.Hashed_Maps
        (Key_Type        => Ada_Qualified_Name,
-        Element_Type    => TGen.Types.SP.Ref,
+        Element_Type    => TGen.Types.Typ_Access,
         Hash            => TGen.Strings.Hash2,
         Equivalent_Keys => TGen.Strings.Ada_Identifier_Vectors."=",
-        "="             => TGen.Types.SP."=");
+        "="             => TGen.Types."=");
 
    Translation_Cache : Translation_Maps.Map;
    --  Cache used for the memoization of Translate.

@@ -142,7 +142,7 @@ package body TGen.Types.Enum_Types is
    function Default_Strategy (Self : Char_Typ) return Strategy_Type'Class is
       Strat : Basic_Strategy_Type;
    begin
-      SP.From_Element (Strat.T, Self'Unrestricted_Access);
+      Strat.T := Self'Unrestricted_Access;
       Strat.F := Generate_Value_Char_Typ'Access;
       return Strat;
    end Default_Strategy;

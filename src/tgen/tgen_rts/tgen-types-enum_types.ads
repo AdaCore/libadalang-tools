@@ -69,9 +69,9 @@ package TGen.Types.Enum_Types is
    function Default_Strategy (Self : Char_Typ) return Strategy_Type'Class;
    --  Generate a strategy to statically generate (in one pass) values for Self
 
-   function As_Char_Typ (Self : SP.Ref) return Char_Typ'Class
-   is (Char_Typ'Class (Self.Unchecked_Get.all))
-   with Pre => not SP.Is_Null (Self) and then Self.Get.Kind in Char_Kind;
+   function As_Char_Typ (Self : Typ_Access) return Char_Typ'Class
+   is (Char_Typ'Class (Self.all))
+   with Pre => Self /= null and then Self.all.Kind in Char_Kind;
    pragma Inline (As_Char_Typ);
 
    type Bool_Typ is new Enum_Typ with null record;
@@ -91,9 +91,9 @@ package TGen.Types.Enum_Types is
 
    function Encode (Self : Bool_Typ; Val : JSON_Value) return JSON_Value;
 
-   function As_Bool_Typ (Self : SP.Ref) return Bool_Typ'Class
-   is (Bool_Typ'Class (Self.Unchecked_Get.all))
-   with Pre => not SP.Is_Null (Self) and then Self.Get.Kind in Bool_Kind;
+   function As_Bool_Typ (Self : Typ_Access) return Bool_Typ'Class
+   is (Bool_Typ'Class (Self.all))
+   with Pre => Self /= null and then Self.all.Kind in Bool_Kind;
    pragma Inline (As_Bool_Typ);
 
    package Enum_Literal_Maps is new
@@ -133,9 +133,9 @@ package TGen.Types.Enum_Types is
 
    function Encode (Self : Other_Enum_Typ; Val : JSON_Value) return JSON_Value;
 
-   function As_Other_Enum_Typ (Self : SP.Ref) return Other_Enum_Typ'Class
-   is (Other_Enum_Typ'Class (Self.Unchecked_Get.all))
-   with Pre => not SP.Is_Null (Self) and then Self.Get.Kind in Enum_Kind;
+   function As_Other_Enum_Typ (Self : Typ_Access) return Other_Enum_Typ'Class
+   is (Other_Enum_Typ'Class (Self.all))
+   with Pre => Self /= null and then Self.all.Kind in Enum_Kind;
    pragma Inline (As_Other_Enum_Typ);
 
 end TGen.Types.Enum_Types;

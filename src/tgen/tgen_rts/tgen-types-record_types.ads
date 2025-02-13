@@ -43,10 +43,10 @@ package TGen.Types.Record_Types is
    package Component_Maps is new
      Ada.Containers.Hashed_Maps
        (Key_Type        => Unbounded_String,
-        Element_Type    => SP.Ref,
+        Element_Type    => Typ_Access,
         Hash            => Ada.Strings.Unbounded.Hash,
         Equivalent_Keys => Ada.Strings.Unbounded.Equal_Case_Insensitive,
-        "="             => SP."=");
+        "="             => TGen.Types."=");
    subtype Component_Map is Component_Maps.Map;
    --  Maps for discriminants and components, from their defining name to
    --  their type translation. Since the order of the elements in these maps is
@@ -75,7 +75,7 @@ package TGen.Types.Record_Types is
    function Encode (Self : Record_Typ; Val : JSON_Value) return JSON_Value;
 
    function Supports_Gen (Self : Record_Typ) return Boolean
-   is (for all Comp of Self.Component_Types => Comp.Get.Supports_Gen);
+   is (for all Comp of Self.Component_Types => Comp.all.Supports_Gen);
 
    package Strategy_Maps is new
      Ada.Containers.Hashed_Maps
@@ -87,7 +87,7 @@ package TGen.Types.Record_Types is
    subtype Strategy_Map is Strategy_Maps.Map;
 
    type Record_Strategy_Type is new Random_Strategy_Type with record
-      T                : SP.Ref;
+      T                : Typ_Access;
       Component_Strats : Strategy_Map;
    end record;
    --  Strategy to generate record / discriminated record types
@@ -108,10 +108,9 @@ package TGen.Types.Record_Types is
    --  record values, using the component types' default enumerative strategy
    --  to generate component values.
 
-   function As_Record_Typ (Self : SP.Ref) return Record_Typ'Class
-   is (Record_Typ'Class (Self.Unchecked_Get.all))
-   with
-     Pre => not SP.Is_Null (Self) and then Self.Get.Kind in Record_Typ_Range;
+   function As_Record_Typ (Self : Typ_Access) return Record_Typ'Class
+   is (Record_Typ'Class (Self.all))
+   with Pre => Self /= null and then Self.all.Kind in Record_Typ_Range;
    pragma Inline (As_Record_Typ);
 
    type Enum_Strat_Component_Info is record
@@ -162,11 +161,9 @@ package TGen.Types.Record_Types is
    is (Non_Disc_Record_Kind);
 
    function As_Nondiscriminated_Record_Typ
-     (Self : SP.Ref) return Nondiscriminated_Record_Typ'Class
-   is (Nondiscriminated_Record_Typ'Class (Self.Unchecked_Get.all))
-   with
-     Pre =>
-       not SP.Is_Null (Self) and then Self.Get.Kind in Non_Disc_Record_Kind;
+     (Self : Typ_Access) return Nondiscriminated_Record_Typ'Class
+   is (Nondiscriminated_Record_Typ'Class (Self.all))
+   with Pre => Self /= null and then Self.all.Kind in Non_Disc_Record_Kind;
    pragma Inline (As_Nondiscriminated_Record_Typ);
 
    type Variant_Part;
@@ -220,7 +217,7 @@ package TGen.Types.Record_Types is
             --  one of the discriminants of the ancestor part, which is then
             --  not constrained.
 
-         when others =>
+         when False =>
             null;
       end case;
    end record;
@@ -299,7 +296,7 @@ package TGen.Types.Record_Types is
       return JSON_Value;
 
    type Disc_Record_Enum_Strat_Type is new Enum_Strategy_Type with record
-      T : SP.Ref;
+      T : Typ_Access;
       --  Type for which we are generating a value
 
       Disc_Strat : Enum_Record_Strategy_Type;
@@ -348,10 +345,9 @@ package TGen.Types.Record_Types is
    --  information.
 
    function As_Discriminated_Record_Typ
-     (Self : SP.Ref) return Discriminated_Record_Typ'Class
-   is (Discriminated_Record_Typ'Class (Self.Unchecked_Get.all))
-   with
-     Pre => not SP.Is_Null (Self) and then Self.Get.Kind in Disc_Record_Kind;
+     (Self : Typ_Access) return Discriminated_Record_Typ'Class
+   is (Discriminated_Record_Typ'Class (Self.all))
+   with Pre => Self /= null and then Self.all.Kind in Disc_Record_Kind;
    pragma Inline (As_Discriminated_Record_Typ);
 
    type Parameter_Mode is (In_Mode, In_Out_Mode, Out_Mode);
@@ -374,7 +370,7 @@ package TGen.Types.Record_Types is
    type Function_Typ is new Record_Typ with record
       Subp_UID : Unbounded_String;
       Long_UID : Unbounded_String;
-      Ret_Typ  : SP.Ref;
+      Ret_Typ  : Typ_Access;
 
       Param_Modes : Param_Mode_Map;
       Param_Order : String_Vectors.Vector;
@@ -438,9 +434,9 @@ package TGen.Types.Record_Types is
    function Get_Diagnostics
      (Self : Function_Typ; Prefix : String := "") return String_Vector;
 
-   function As_Function_Typ (Self : SP.Ref) return Function_Typ'Class
-   is (Function_Typ'Class (Self.Unchecked_Get.all))
-   with Pre => not SP.Is_Null (Self) and then Self.Get.Kind in Function_Kind;
+   function As_Function_Typ (Self : Typ_Access) return Function_Typ'Class
+   is (Function_Typ'Class (Self.all))
+   with Pre => Self /= null and then Self.all.Kind in Function_Kind;
    pragma Inline (As_Function_Typ);
 
 end TGen.Types.Record_Types;

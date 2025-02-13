@@ -163,10 +163,13 @@ package TGen.Types.Constraints is
    --  range of the index type. TODO: why can't we put the discrete range
    --  constraint either way?
 
+   type Index_Constraint_Access is access Index_Constraint;
+
    function Static (Self : Index_Constraint) return Boolean
    is (if Self.Present then Self.Discrete_Range.Static);
 
-   type Index_Constraint_Arr is array (Positive range <>) of Index_Constraint;
+   type Index_Constraint_Arr is
+     array (Positive range <>) of Index_Constraint_Access;
 
    type Index_Constraints (Num_Dims : Positive) is new Constraint with record
       Constraint_Array : Index_Constraint_Arr (1 .. Num_Dims);
@@ -176,7 +179,8 @@ package TGen.Types.Constraints is
    function Image (Self : Index_Constraints) return String;
 
    function Static (Self : Index_Constraints) return Boolean
-   is (for all J in 1 .. Self.Num_Dims => Static (Self.Constraint_Array (J)));
+   is (for all J in 1 .. Self.Num_Dims
+       => Static (Self.Constraint_Array (J).all));
 
    package Discriminant_Constraint_Maps is new
      Ada.Containers.Hashed_Maps
@@ -203,28 +207,28 @@ package TGen.Types.Constraints is
        => Val.Kind in Static | Discriminant);
 
    type Anonymous_Typ is new Typ with record
-      Named_Ancestor      : SP.Ref;
+      Named_Ancestor      : Typ_Access;
       Subtype_Constraints : Constraint_Acc;
    end record;
 
    function Kind (Self : Anonymous_Typ) return Typ_Kind
    is (Anonymous_Kind);
 
-   function As_Anonymous_Typ (Self : SP.Ref) return Anonymous_Typ'Class
-   is (Anonymous_Typ'Class (Self.Unchecked_Get.all))
-   with Pre => not SP.Is_Null (Self) and then Self.Get.Kind in Anonymous_Kind;
+   function As_Anonymous_Typ (Self : Typ_Access) return Anonymous_Typ'Class
+   is (Anonymous_Typ'Class (Self.all))
+   with Pre => Self /= null and then Self.all.Kind in Anonymous_Kind;
    pragma Inline (As_Anonymous_Typ);
 
    function Image (Self : Anonymous_Typ) return String;
 
-   function As_Named_Typ (Self : Anonymous_Typ) return SP.Ref;
+   function As_Named_Typ (Self : Anonymous_Typ) return Typ_Access;
    --  Return a copy of Self.Ancestor_Type but with the constraints applied
    --  to it. The returned type will have the name of the ancestor.
    --  This operation performs lots of map copies for record types so it may be
    --  relatively slow.
 
    function Supports_Static_Gen (Self : Anonymous_Typ) return Boolean
-   is (Self.Named_Ancestor.Get.Supports_Static_Gen
+   is (Self.Named_Ancestor.all.Supports_Static_Gen
        and then Self.Subtype_Constraints.Static);
    --  Whether values for this Typ can be statically generated
 
@@ -232,7 +236,7 @@ package TGen.Types.Constraints is
 
    function Get_Diagnostics
      (Self : Anonymous_Typ; Prefix : String := "") return String_Vector
-   is (Self.Named_Ancestor.Get.Get_Diagnostics (Prefix));
+   is (Self.Named_Ancestor.all.Get_Diagnostics (Prefix));
 
    overriding
    function Default_Strategy (Self : Anonymous_Typ) return Strategy_Type'Class;
@@ -244,19 +248,19 @@ package TGen.Types.Constraints is
    procedure Free_Content (Self : in out Anonymous_Typ);
 
    function Supports_Gen (Self : Anonymous_Typ) return Boolean
-   is (Self.Named_Ancestor.Get.Supports_Gen);
+   is (Self.Named_Ancestor.all.Supports_Gen);
 
    type Instance_Typ is new Typ with record
-      Orig_Typ : SP.Ref;
+      Orig_Typ : Typ_Access;
    end record;
    --  Special type to handle strategy customization
 
    function Kind (Self : Instance_Typ) return Typ_Kind
    is (Instance_Kind);
 
-   function As_Instance_Typ (Self : SP.Ref) return Instance_Typ'Class
-   is (Instance_Typ'Class (Self.Unchecked_Get.all))
-   with Pre => not SP.Is_Null (Self) and then Self.Get.Kind in Instance_Kind;
+   function As_Instance_Typ (Self : Typ_Access) return Instance_Typ'Class
+   is (Instance_Typ'Class (Self.all))
+   with Pre => Self /= null and then Self.all.Kind in Instance_Kind;
    pragma Inline (As_Instance_Typ);
 
    function Image (Self : Instance_Typ) return String;
@@ -267,10 +271,10 @@ package TGen.Types.Constraints is
 
    function Get_Diagnostics
      (Self : Instance_Typ; Prefix : String := "") return String_Vector
-   is (Self.Orig_Typ.Get.Get_Diagnostics (Prefix));
+   is (Self.Orig_Typ.all.Get_Diagnostics (Prefix));
 
    function Supports_Gen (Self : Instance_Typ) return Boolean
-   is (Self.Orig_Typ.Get.Supports_Gen);
+   is (Self.Orig_Typ.all.Supports_Gen);
 
    overriding
    function Default_Strategy (Self : Instance_Typ) return Strategy_Type'Class

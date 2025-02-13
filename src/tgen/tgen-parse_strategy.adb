@@ -90,10 +90,9 @@ package body TGen.Parse_Strategy is
             Result.Component_Types.Clear;
             for Comp in Rec_Type.Component_Types.Iterate loop
                declare
-                  Comp_Typ : constant Typ'Class := Clone (Element (Comp).Get);
-                  Comp_Ref : SP.Ref;
+                  Comp_Ref : constant Typ_Access :=
+                    new Typ'Class'(Clone (Element (Comp).all));
                begin
-                  Comp_Ref.Set (Comp_Typ);
                   Result.Component_Types.Include (Key (Comp), Comp_Ref);
                end;
             end loop;
@@ -163,7 +162,7 @@ package body TGen.Parse_Strategy is
                      --  Add to the strategy map an element and specialize
                      --  the type.
 
-                     Result.Orig_Typ.Set (T);
+                     Result.Orig_Typ := new Typ'Class'(Typ'Class (T));
                      Result.Name := Prefix;
                      Result.Last_Comp_Unit_Idx := Last_Comp_Unit_Index;
                      Strat.Generate_Name := +(+Strategy.As_Base_Id.Text);
@@ -225,12 +224,12 @@ package body TGen.Parse_Strategy is
                     Check_Strategy
                       (Prefix & TGen.Strings.Ada_Identifier (Assoc_Identifier),
                        Last_Comp_Unit_Index,
-                       Rec_Typ.Component_Types.Element (Assoc_Identifier).Get,
+                       Rec_Typ.Component_Types.Element (Assoc_Identifier).all,
                        Assoc.As_Aggregate_Assoc.F_R_Expr,
                        Strategies);
-                  New_Typ_Ref : SP.Ref;
+                  New_Typ_Ref : Typ_Access;
                begin
-                  New_Typ_Ref.Set (New_Typ);
+                  New_Typ_Ref := new Typ'Class'(New_Typ);
                   Result.Component_Types.Include
                     (Assoc_Identifier, New_Typ_Ref);
                end;

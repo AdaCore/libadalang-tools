@@ -99,13 +99,13 @@
 @@--  Template for the specification of index constraints
 @@ELSIF@@ @_CONSTRAINT_@ = "Index_Constraints"
    @_TY_PREFIX_@_Constraint : aliased TGen.Types.Constraints.Index_Constraints :=
-   (Num_Dims         => @_NUM_DIMS_@,
-    Constraint_Array =>
-      @@TABLE@@
-      @_LPAR()_@@_INDEX_NUMBER_@ =>
-         @_INDEX_CONSTRAINT(@_PRESENT_@, @_CONSTRAINT_KIND_LB_@, @_VALUE_LB_@, @_CONSTRAINT_KIND_UB_@, @_VALUE_UB_@)_@@_RVPAR()_@
-      @@END_TABLE@@
-   );
+      (Num_Dims         => @_NUM_DIMS_@,
+       Constraint_Array =>
+         @@TABLE@@
+         @_LPAR()_@@_INDEX_NUMBER_@ =>
+            new TGen.Types.Constraints.Index_Constraint'(@_INDEX_CONSTRAINT(@_PRESENT_@, @_CONSTRAINT_KIND_LB_@, @_VALUE_LB_@, @_CONSTRAINT_KIND_UB_@, @_VALUE_UB_@)_@)@_RVPAR()_@
+         @@END_TABLE@@
+      );
 @@--
 @@--
 @@--  Template for the specification of discriminant constraints

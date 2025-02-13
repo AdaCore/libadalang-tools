@@ -18,7 +18,7 @@
    @_CONSTRAINT_SPEC_@
 @@END_IF@@
 @@--
-   @_TY_PREFIX_@_Typ : TGen.Types.Array_Types.@_ARRAY_TYP_@ :=
+   @_TY_PREFIX_@_Typ : aliased TGen.Types.Array_Types.@_ARRAY_TYP_@ :=
       (Num_Dims => @_NUM_DIMS_@,
        Name      => TGen.Strings.To_Qualified_Name ("@_TY_NAME_@"),
        others => <>);

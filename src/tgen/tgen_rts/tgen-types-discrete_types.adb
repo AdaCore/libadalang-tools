@@ -90,7 +90,7 @@ package body TGen.Types.Discrete_Types is
    is
       Strat : Sample_Strategy_Type;
    begin
-      SP.From_Element (Strat.T, Self'Unrestricted_Access);
+      Strat.T := Self'Unrestricted_Access;
       Strat.Samples := Samples;
       return Strat;
    end Generate_Sampling_Strategy;
@@ -150,7 +150,7 @@ package body TGen.Types.Discrete_Types is
      (S : in out Array_Index_Strategy_Type; Disc_Context : Disc_Value_Map)
       return JSON_Value
    is
-      T_Classwide : constant Typ'Class := S.T.Get;
+      T_Classwide : constant Typ'Class := S.T.all;
       T_Discrete  : constant Discrete_Typ'Class :=
         Discrete_Typ'Class (T_Classwide);
    begin
@@ -358,7 +358,7 @@ package body TGen.Types.Discrete_Types is
          Strat.Other_Index_Constraint := ILB;
       end if;
 
-      SP.From_Element (Strat.T, Self'Unrestricted_Access);
+      Strat.T := Self'Unrestricted_Access;
       Strat.Average_Size := Average_Size;
       Strat.Min_Size := Min_Size;
       Strat.Max_Size := Max_Size;
@@ -378,7 +378,7 @@ package body TGen.Types.Discrete_Types is
    is
       Strat : Identity_Constraint_Strategy_Type;
    begin
-      SP.From_Element (Strat.T, Self'Unrestricted_Access);
+      Strat.T := Self'Unrestricted_Access;
       Strat.Constraint := Constraint;
       return Strat;
    end Generate_Identity_Constraint_Strategy;
@@ -401,8 +401,7 @@ package body TGen.Types.Discrete_Types is
      (S : in out First_Last_Strategy_Type; Disc_Context : Disc_Value_Map)
       return JSON_Value
    is
-      Discrete_T : Discrete_Typ'Class
-        renames Discrete_Typ'Class (S.T.Unchecked_Get.all);
+      Discrete_T : Discrete_Typ'Class renames Discrete_Typ'Class (S.T.all);
    begin
       case S.Generation is
          when First =>
@@ -428,7 +427,7 @@ package body TGen.Types.Discrete_Types is
    is
       Strat : First_Last_Strategy_Type;
    begin
-      SP.From_Element (Strat.T, Self'Unrestricted_Access);
+      Strat.T := Self'Unrestricted_Access;
       return Strat;
    end Default_Enum_Strategy;
 
@@ -494,11 +493,10 @@ package body TGen.Types.Discrete_Types is
    ----------------------------------------
 
    function Make_Single_Array_Constraint_Strat
-     (T : SP.Ref; Constraints : Index_Constraint)
+     (T : Typ_Access; Constraints : Index_Constraint)
       return Enum_Strategy_Type'Class
    is
-      Self       : Discrete_Typ'Class
-        renames Discrete_Typ'Class (T.Unchecked_Get.all);
+      Self       : Discrete_Typ'Class renames Discrete_Typ'Class (T.all);
       Res        : Sequence_Enum_Strategy (3);
       Disc_Is_LB : constant Boolean :=
         Constraints.Discrete_Range.Low_Bound.Kind = Discriminant;
@@ -533,11 +531,11 @@ package body TGen.Types.Discrete_Types is
    --------------------------------------
 
    function Make_Dual_Array_Constraint_Strat
-     (T : SP.Ref; Constraint : Index_Constraint; Disc_Name : Unbounded_String)
-      return Enum_Strategy_Type'Class
+     (T          : Typ_Access;
+      Constraint : Index_Constraint;
+      Disc_Name  : Unbounded_String) return Enum_Strategy_Type'Class
    is
-      Self         : Discrete_Typ'Class
-        renames Discrete_Typ'Class (T.Unchecked_Get.all);
+      Self         : Discrete_Typ'Class renames Discrete_Typ'Class (T.all);
       Is_Low_Bound : constant Boolean :=
         Constraint.Discrete_Range.Low_Bound.Disc_Name = Disc_Name;
       Res          : Sequence_Enum_Strategy (if Is_Low_Bound then 2 else 3);
@@ -564,7 +562,7 @@ package body TGen.Types.Discrete_Types is
    is
       Strat : Basic_Strategy_Type;
    begin
-      SP.From_Element (Strat.T, Self'Unrestricted_Access);
+      Strat.T := Self'Unrestricted_Access;
       Strat.F := Generate_Value_Random'Access;
       return Strat;
    end Generate_Static_Common;

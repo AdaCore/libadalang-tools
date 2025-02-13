@@ -796,17 +796,17 @@ package body Test.Instrument is
 
       for Param of Decl.F_Subp_Spec.P_Params loop
          declare
-            Param_Typ : constant TGen.Types.SP.Ref :=
+            Param_Typ : constant TGen.Types.Typ_Access :=
               TGen.Types.Translation.Translate (Param.F_Type_Expr).Res;
          begin
 
-            if Param_Typ.Get.Package_Name = To_Qualified_Name ("standard") then
+            if Param_Typ.all.Package_Name = To_Qualified_Name ("standard") then
                for Name of Param.F_Ids loop
                   S_Put
                     (Pad + 6,
                      "TGen.TGen_Support."
                      & TGen.Marshalling.Output_Fname_For_Typ
-                         (Param_Typ.Get.Name)
+                         (Param_Typ.all.Name)
                      & " (GNATTEST_S, "
                      & Node_Image (Name)
                      & ");");
@@ -816,10 +816,10 @@ package body Test.Instrument is
                for Name of Param.F_Ids loop
                   S_Put
                     (Pad + 6,
-                     To_Ada (Param_Typ.Get.Package_Name)
+                     To_Ada (Param_Typ.all.Package_Name)
                      & ".TGen_Support."
                      & TGen.Marshalling.Output_Fname_For_Typ
-                         (Param_Typ.Get.Name)
+                         (Param_Typ.all.Name)
                      & " (GNATTEST_S, "
                      & Node_Image (Name)
                      & ");");

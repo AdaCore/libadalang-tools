@@ -27,8 +27,6 @@
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-with GNATCOLL.Refcount; use GNATCOLL.Refcount;
-
 limited with TGen.Strategies;
 with TGen.Big_Int;   use TGen.Big_Int;
 with TGen.Big_Reals; use TGen.Big_Reals;
@@ -221,20 +219,16 @@ package TGen.Types is
    procedure Free_Content_Wide (Self : in out Typ'Class);
    --  Helper for shared pointers
 
-   package SP is new
-     Shared_Pointers (Element_Type => Typ'Class, Release => Free_Content_Wide);
+   type Typ_Access is access all Typ'Class;
 
-   function "<" (L, R : SP.Ref) return Boolean
-   is (To_Ada (L.Get.Name) < To_Ada (R.Get.Name));
+   function "<" (L, R : Typ_Access) return Boolean
+   is (To_Ada (L.all.Name) < To_Ada (R.all.Name));
 
-   function "=" (L, R : SP.Ref) return Boolean
-   is ((L.Is_Null and then R.Is_Null)
-       or else (not L.Is_Null
-                and then not R.Is_Null
-                and then L.Get.Name = R.Get.Name));
+   function "=" (L, R : Typ'Class) return Boolean
+   is (L.Name = R.Name);
 
    function Try_Generate_Static
-     (Self : SP.Ref) return TGen.Strategies.Strategy_Type'Class;
+     (Self : Typ_Access) return TGen.Strategies.Strategy_Type'Class;
    --  Return a static strategy if the type supports it, otherwise return
    --  a Commented_Out_Strategy or raise program error depending on the
    --  behavior specified in the context.

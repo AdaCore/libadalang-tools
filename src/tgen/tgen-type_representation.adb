@@ -368,7 +368,7 @@ package body TGen.Type_Representation is
 
       --  Start with writing the ancestor
 
-      Insert (Assocs, Assoc ("TY_PREFIX_ANCESTOR", T.Named_Ancestor.Get.Slug));
+      Insert (Assocs, Assoc ("TY_PREFIX_ANCESTOR", T.Named_Ancestor.all.Slug));
 
       --  Then write down the constraint
 
@@ -423,7 +423,7 @@ package body TGen.Type_Representation is
 
       --  Start with writing the original type
 
-      Insert (Assocs, Assoc ("ORIG_TY_PREFIX", T.Orig_Typ.Get.Slug));
+      Insert (Assocs, Assoc ("ORIG_TY_PREFIX", T.Orig_Typ.all.Slug));
 
       T_Decl := Parse (Instance_Typ_Decl_Template, Assocs);
       T_Init := Parse (Instance_Typ_Init_Template, Assocs);
@@ -588,7 +588,7 @@ package body TGen.Type_Representation is
                Anonymous_Decl :=
                  Anonymous_Decl
                  & (+Ano_Typ.Slug (Is_Top_Level_Gen))
-                 & "_Typ_Ref : TGen.Types.SP.Ref;";
+                 & "_Typ_Ref : TGen.Types.Typ_Access;";
             end;
          else
             Component_Ty_Prefix := +T.Slug (Is_Top_Level_Gen);
@@ -634,7 +634,7 @@ package body TGen.Type_Representation is
                      Component_Ty_Prefix                    : Unbounded_String;
                   begin
                      Collect_Info_For_Component
-                       (Element (Comp).Get,
+                       (Element (Comp).all,
                         Anonymous_Typ_Decl,
                         Anonymous_Typ_Init,
                         Component_Ty_Prefix);
@@ -789,7 +789,7 @@ package body TGen.Type_Representation is
                      Anonymous_Typ_Init, Anonymous_Typ_Decl : Unbounded_String;
                   begin
                      Collect_Info_For_Component
-                       (Element (Cur).Get,
+                       (Element (Cur).all,
                         Anonymous_Typ_Decl,
                         Anonymous_Typ_Init,
                         Discr_Ty_Prefix);
@@ -821,7 +821,7 @@ package body TGen.Type_Representation is
                Anonymous_Typ_Init, Anonymous_Typ_Decl : Unbounded_String;
             begin
                Collect_Info_For_Component
-                 (Element (Cur).Get,
+                 (Element (Cur).all,
                   Anonymous_Typ_Decl,
                   Anonymous_Typ_Init,
                   Comp_Ty_Prefix);
@@ -853,7 +853,7 @@ package body TGen.Type_Representation is
                for Cur in Function_Type.Globals.Iterate loop
                   Global_Names := Global_Names & Component_Maps.Key (Cur);
                   Global_Types :=
-                    Global_Types & Component_Maps.Element (Cur).Get.Slug;
+                    Global_Types & Component_Maps.Element (Cur).all.Slug;
                end loop;
                Insert (Assocs, Assoc ("GLOBAL_NAME", Global_Names));
                Insert (Assocs, Assoc ("GLOBAL_TYPE", Global_Types));
@@ -903,7 +903,7 @@ package body TGen.Type_Representation is
             Anonymous_Typ_Init, Anonymous_Typ_Decl : Unbounded_String;
          begin
             Collect_Info_For_Component
-              (T.Component_Type.Get,
+              (T.Component_Type.all,
                Anonymous_Typ_Decl,
                Anonymous_Typ_Init,
                Component_Ty_Prefix);
@@ -921,7 +921,7 @@ package body TGen.Type_Representation is
                Anonymous_Typ_Init, Anonymous_Typ_Decl : Unbounded_String;
             begin
                Collect_Info_For_Component
-                 (Index_T.Get,
+                 (Index_T.all,
                   Anonymous_Typ_Init,
                   Anonymous_Typ_Decl,
                   Index_Ty_Prefix);
@@ -992,7 +992,7 @@ package body TGen.Type_Representation is
 
                   To_JSON_Fname : constant String :=
                     TGen.Marshalling.Output_Fname_For_Typ
-                      (Instance_Typ'Class (Typ).Orig_Typ.Get.Name);
+                      (Instance_Typ'Class (Typ).Orig_Typ.all.Name);
                begin
                   Insert
                     (Assocs,
@@ -1014,7 +1014,8 @@ package body TGen.Type_Representation is
             Collect_Info_For_Record
               (Record_Typ'Class (Typ), Record_Typ_Decl, Record_Typ_Init);
             Put_Line
-              (F_Spec, "   " & Ty_Prefix & "_Typ_Ref : TGen.Types.SP.Ref;");
+              (F_Spec,
+               "   " & Ty_Prefix & "_Typ_Ref : TGen.Types.Typ_Access;");
             Put_Line (F_Body, +Record_Typ_Decl);
             Init_Package_Code := Init_Package_Code & Record_Typ_Init;
          end;
@@ -1034,7 +1035,9 @@ package body TGen.Type_Representation is
                Is_Top_Level_Gen);
             Put_Line
               (F_Spec,
-               "   " & Anonymous_Typ'Class (Typ).Slug & "_Typ_Ref : SP.Ref;");
+               "   "
+               & Anonymous_Typ'Class (Typ).Slug
+               & "_Typ_Ref : Typ_Access;");
             Put_Line (F_Body, +Anonymous_Typ_Decl);
             Init_Package_Code := Init_Package_Code & Anonymous_Typ_Init;
          end;
@@ -1051,7 +1054,8 @@ package body TGen.Type_Representation is
                Instance_Typ_Init,
                Is_Top_Level_Gen);
             Put_Line
-              (F_Spec, "   " & Ty_Prefix & "_Typ_Ref : TGen.Types.SP.Ref;");
+              (F_Spec,
+               "   " & Ty_Prefix & "_Typ_Ref : TGen.Types.Typ_Access;");
             Put_Line (F_Body, +Instance_Typ_Decl);
             Init_Package_Code := Init_Package_Code & Instance_Typ_Init;
          end;
@@ -1063,7 +1067,8 @@ package body TGen.Type_Representation is
             Collect_Info_For_Array
               (Array_Typ'Class (Typ), Array_Typ_Decl, Array_Typ_Init);
             Put_Line
-              (F_Spec, "   " & Ty_Prefix & "_Typ_Ref : TGen.Types.SP.Ref;");
+              (F_Spec,
+               "   " & Ty_Prefix & "_Typ_Ref : TGen.Types.Typ_Access;");
             Put_Line (F_Body, +Array_Typ_Decl);
             Init_Package_Code := Init_Package_Code & Array_Typ_Init;
          end;
@@ -1096,7 +1101,8 @@ package body TGen.Type_Representation is
                Scalar_Typ_Init,
                Is_Top_Level_Gen);
             Put_Line
-              (F_Spec, "   " & Ty_Prefix & "_Typ_Ref : TGen.Types.SP.Ref;");
+              (F_Spec,
+               "   " & Ty_Prefix & "_Typ_Ref : TGen.Types.Typ_Access;");
             Put_Line (F_Body, +Scalar_Typ_Decl);
             Init_Package_Code := Init_Package_Code & Scalar_Typ_Init;
          end;

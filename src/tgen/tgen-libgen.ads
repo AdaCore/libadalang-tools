@@ -78,7 +78,8 @@ package TGen.Libgen is
       Root_Templates_Dir : GNATCOLL.VFS.Virtual_File) return Libgen_Context;
    --  Same as above, but with virtual files
 
-   function Supported_Subprogram (Subp : LAL.Basic_Decl'Class) return SP.Ref;
+   function Supported_Subprogram
+     (Subp : LAL.Basic_Decl'Class) return Typ_Access;
    --  If the Subp is a supported subprogram profile, return a Function_Typ,
    --  otherwise return an Unsupported_Typ with the reason why it is not
    --  supported inlined in the Unsupported_Typ.Reason field.

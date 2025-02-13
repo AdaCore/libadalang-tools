@@ -180,7 +180,7 @@ package body TGen.Marshalling is
       declare
          Associations : Tag;
          Ancestor     : constant TGen.Types.Typ'Class :=
-           Anonymous_Typ'Class (Comp_Ty).Named_Ancestor.Get;
+           Anonymous_Typ'Class (Comp_Ty).Named_Ancestor.all;
          Constraint   : constant Constraint_Acc :=
            Anonymous_Typ'Class (Comp_Ty).Subtype_Constraints;
 
@@ -227,9 +227,9 @@ package body TGen.Marshalling is
                for Index in Idx_Constrs.Constraint_Array'Range loop
                   declare
                      Idx_Constr : constant Index_Constraint :=
-                       Idx_Constrs.Constraint_Array (Index);
+                       Idx_Constrs.Constraint_Array (Index).all;
                      Idx_Typ    : constant TGen.Types.Typ'Class :=
-                       A_Typ.Index_Types (Index).Get;
+                       A_Typ.Index_Types (Index).all;
                      Dim        : constant String := Trim (Index'Image, Left);
                   begin
                      if Idx_Constr.Present then
@@ -277,7 +277,7 @@ package body TGen.Marshalling is
                      Discr_Constr : constant Discrete_Constraint_Value :=
                        Discriminant_Constraint_Maps.Element (Cu);
                      Discr_Typ    : constant TGen.Types.Typ'Class :=
-                       D_Typ.Discriminant_Types.Element (Discr_Text).Get;
+                       D_Typ.Discriminant_Types.Element (Discr_Text).all;
                   begin
                      Append_Association
                        (Name         =>
@@ -348,9 +348,9 @@ package body TGen.Marshalling is
       for I in U_Typ.Index_Types'Range loop
          declare
             Index_Type : constant String :=
-              U_Typ.Index_Types (I).Get.FQN (No_Std => True);
+              U_Typ.Index_Types (I).all.FQN (No_Std => True);
             Index_Pref : constant String :=
-              Prefix_For_Typ (U_Typ.Index_Types (I).Get.Slug);
+              Prefix_For_Typ (U_Typ.Index_Types (I).all.Slug);
             Assocs     : constant Translate_Table := [1 => Assoc ("DIM", I)];
          begin
             Fst_Name_Tag :=
@@ -361,7 +361,7 @@ package body TGen.Marshalling is
             Pref_Tag := Pref_Tag & Index_Pref;
             Is_Enum_Tag :=
               Is_Enum_Tag
-              & (U_Typ.Index_Types (I).Get.Kind
+              & (U_Typ.Index_Types (I).all.Kind
                  in Bool_Kind | Char_Kind | Enum_Kind);
          end;
       end loop;
@@ -405,9 +405,9 @@ package body TGen.Marshalling is
          declare
             Discr_Name : constant String := (+Component_Maps.Key (Cu));
             Discr_Typ  : constant String :=
-              (Component_Maps.Element (Cu).Get.FQN (No_Std => True));
+              (Component_Maps.Element (Cu).all.FQN (No_Std => True));
             Discr_Pref : constant String :=
-              Prefix_For_Typ (Component_Maps.Element (Cu).Get.Slug);
+              Prefix_For_Typ (Component_Maps.Element (Cu).all.Slug);
          begin
             Name_Tag := Name_Tag & Discr_Name;
             Typ_Tag := Typ_Tag & Discr_Typ;
@@ -523,7 +523,7 @@ package body TGen.Marshalling is
       is
          Named_Comp_Ty    : constant TGen.Types.Typ'Class :=
            (if Comp_Ty in Anonymous_Typ'Class
-            then Anonymous_Typ'Class (Comp_Ty).Named_Ancestor.Get
+            then Anonymous_Typ'Class (Comp_Ty).Named_Ancestor.all
             else Comp_Ty);
          Comp_Scalar      : constant Boolean :=
            Named_Comp_Ty in Scalar_Typ'Class;
@@ -573,7 +573,7 @@ package body TGen.Marshalling is
          for Cu in Components.Iterate loop
             declare
                Comp_Ty   : constant TGen.Types.Typ'Class :=
-                 Component_Maps.Element (Cu).Get;
+                 Component_Maps.Element (Cu).all;
                Comp_Name : constant String := +Component_Maps.Key (Cu);
                Read      : Unbounded_String;
                Write     : Unbounded_String;
@@ -613,9 +613,9 @@ package body TGen.Marshalling is
          Object_Name   : String)
       is
          Discr_Name    : constant String := +V.Discr_Name;
-         Discr_Typ     : constant TGen.Types.SP.Ref :=
+         Discr_Typ     : constant TGen.Types.Typ_Access :=
            Discriminants (V.Discr_Name);
-         Discr_Typ_FQN : constant String := Discr_Typ.Get.FQN (No_Std => True);
+         Discr_Typ_FQN : constant String := Discr_Typ.all.FQN (No_Std => True);
 
          Choices_Tag          : Matrix_Tag;
          Comp_Read_Tag        : Matrix_Tag;
@@ -634,7 +634,7 @@ package body TGen.Marshalling is
 
             Choices_Tag :=
               Choices_Tag
-              & Create_Tag_For_Intervals (V_Choice.Alt_Set, Discr_Typ.Get);
+              & Create_Tag_For_Intervals (V_Choice.Alt_Set, Discr_Typ.all);
 
             --  Hanlde the components
 
@@ -843,10 +843,10 @@ package body TGen.Marshalling is
       elsif Typ in Array_Typ'Class then
          declare
             Comp_Ty            : constant TGen.Types.Typ'Class :=
-              Array_Typ'Class (Typ).Component_Type.Get;
+              Array_Typ'Class (Typ).Component_Type.all;
             Named_Comp_Ty      : constant TGen.Types.Typ'Class :=
               (if Comp_Ty in Anonymous_Typ'Class
-               then Anonymous_Typ'Class (Comp_Ty).Named_Ancestor.Get
+               then Anonymous_Typ'Class (Comp_Ty).Named_Ancestor.all
                else Comp_Ty);
             Component_Read     : Unbounded_String;
             Component_Write    : Unbounded_String;
@@ -1004,7 +1004,7 @@ package body TGen.Marshalling is
                --  Check components
 
                for Cu in V_Choice.Components.Iterate loop
-                  if not Is_Supported_Type (Element (Cu).Get) then
+                  if not Is_Supported_Type (Element (Cu).all) then
                      return False;
                   end if;
                end loop;
@@ -1026,11 +1026,11 @@ package body TGen.Marshalling is
       elsif Typ in Constrained_Array_Typ'Class then
          return
            Is_Supported_Type
-             (Constrained_Array_Typ'Class (Typ).Component_Type.Get);
+             (Constrained_Array_Typ'Class (Typ).Component_Type.all);
       elsif Typ in Unconstrained_Array_Typ'Class then
          return
            Is_Supported_Type
-             (Unconstrained_Array_Typ'Class (Typ).Component_Type.Get);
+             (Unconstrained_Array_Typ'Class (Typ).Component_Type.all);
       elsif Typ in Record_Typ'Class then
 
          --  Check specific components of discriminated records
@@ -1044,7 +1044,7 @@ package body TGen.Marshalling is
                --  Check that the discriminant types are supported
 
                for Cu in D_Typ.Discriminant_Types.Iterate loop
-                  if not Is_Supported_Type (Element (Cu).Get) then
+                  if not Is_Supported_Type (Element (Cu).all) then
                      return False;
                   end if;
                end loop;
@@ -1060,7 +1060,7 @@ package body TGen.Marshalling is
          --  Check regular component types
 
          for Cu in Record_Typ'Class (Typ).Component_Types.Iterate loop
-            if not Is_Supported_Type (Element (Cu).Get) then
+            if not Is_Supported_Type (Element (Cu).all) then
                return False;
             end if;
          end loop;
@@ -1072,12 +1072,12 @@ package body TGen.Marshalling is
          --  We don't support real constraints yet, as they are (incorrectly)
          --  handled using Long_Float by libadalang.
 
-         if Anonymous_Typ'Class (Typ).Named_Ancestor.Get in Real_Typ'Class then
+         if Anonymous_Typ'Class (Typ).Named_Ancestor.all in Real_Typ'Class then
             Ada.Text_IO.Put_Line ("real constraints");
             return False;
          else
             return
-              Is_Supported_Type (Anonymous_Typ'Class (Typ).Named_Ancestor.Get);
+              Is_Supported_Type (Anonymous_Typ'Class (Typ).Named_Ancestor.all);
          end if;
 
       else

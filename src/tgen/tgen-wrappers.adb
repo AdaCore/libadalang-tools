@@ -71,7 +71,7 @@ package body TGen.Wrappers is
      (F_Body : File_Type; Call_To_Orig_Subp : String; Formula : Formula_Type);
 
    function Subp_Kind (F : Function_Typ) return Ada_Subp_Kind
-   is (if F.Ret_Typ.Is_Null then Ada_Subp_Kind_Procedure
+   is (if F.Ret_Typ = null then Ada_Subp_Kind_Procedure
        else Ada_Subp_Kind_Function);
 
    ---------
@@ -224,7 +224,7 @@ package body TGen.Wrappers is
             Append (Result, "(");
             for Param_Name of F.Param_Order loop
                declare
-                  Param_Type : constant SP.Ref :=
+                  Param_Type : constant Typ_Access :=
                     F.Component_Types.Element (Param_Name);
                begin
                   Append (Result, Param_Name);
@@ -234,7 +234,7 @@ package body TGen.Wrappers is
                   Append
                     (Result,
                      "TGen.TGen_Std."
-                     & Param_Type.Get.FQN (No_Std => True)
+                     & Param_Type.all.FQN (No_Std => True)
                      & " ");
                   if Param_Name /= F.Param_Order.Last_Element then
                      Append (Result, " ; ");
@@ -249,7 +249,7 @@ package body TGen.Wrappers is
          if Kind = Ada_Subp_Kind_Function then
             Append (Result, " return ");
             Append
-              (Result, "TGen.TGen_Std." & F.Ret_Typ.Get.FQN (No_Std => True));
+              (Result, "TGen.TGen_Std." & F.Ret_Typ.all.FQN (No_Std => True));
          end if;
 
          return To_String (Result);

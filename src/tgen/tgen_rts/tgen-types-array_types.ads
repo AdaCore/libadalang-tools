@@ -38,11 +38,11 @@ package TGen.Types.Array_Types is
    High_Bound_Disc_Name : constant Unbounded_String :=
      +String'("Magic_TGen_High_Bound");
 
-   type Index_Typ_Arr is array (Positive range <>) of TGen.Types.SP.Ref;
+   type Index_Typ_Arr is array (Positive range <>) of TGen.Types.Typ_Access;
 
    type Array_Typ (Num_Dims : Positive) is new Composite_Typ with record
       Index_Types    : Index_Typ_Arr (1 .. Num_Dims);
-      Component_Type : TGen.Types.SP.Ref;
+      Component_Type : TGen.Types.Typ_Access;
       Static_Gen     : Boolean := False;
    end record;
    --  Represents an array type.
@@ -55,13 +55,13 @@ package TGen.Types.Array_Types is
      (Self : Array_Typ; Prefix : String := "") return String_Vector;
 
    function Supports_Gen (Self : Array_Typ) return Boolean
-   is (Self.Component_Type.Get.Supports_Gen);
+   is (Self.Component_Type.all.Supports_Gen);
    --  Index types are discrete; we can always generate them, only the
    --  component type could prevent us from doing so.
 
-   function As_Array_Typ (Self : SP.Ref) return Array_Typ'Class
-   is (Array_Typ'Class (Self.Unchecked_Get.all))
-   with Pre => not SP.Is_Null (Self) and then Self.Get.Kind in Array_Typ_Range;
+   function As_Array_Typ (Self : Typ_Access) return Array_Typ'Class
+   is (Array_Typ'Class (Self.all))
+   with Pre => Self /= null and then Self.all.Kind in Array_Typ_Range;
    pragma Inline (As_Array_Typ);
 
    type Unconstrained_Array_Typ is new Array_Typ with null record;
@@ -81,12 +81,9 @@ package TGen.Types.Array_Types is
      (Self : Unconstrained_Array_Typ; Val : JSON_Value) return JSON_Value;
 
    function As_Unconstrained_Array_Typ
-     (Self : SP.Ref) return Unconstrained_Array_Typ'Class
-   is (Unconstrained_Array_Typ'Class (Self.Unchecked_Get.all))
-   with
-     Pre =>
-       not SP.Is_Null (Self)
-       and then Self.Get.Kind in Unconstrained_Array_Kind;
+     (Self : Typ_Access) return Unconstrained_Array_Typ'Class
+   is (Unconstrained_Array_Typ'Class (Self.all))
+   with Pre => Self /= null and then Self.all.Kind in Unconstrained_Array_Kind;
    pragma Inline (As_Unconstrained_Array_Typ);
 
    type Constrained_Array_Typ (Num_Dims : Positive) is new Array_Typ (Num_Dims)
@@ -110,7 +107,7 @@ package TGen.Types.Array_Types is
    --  static. Return an unspecified negative value otherwise.
 
    type Constr_Array_Enum_Strat is new Enum_Strategy_Type with record
-      Arr_T : SP.Ref;
+      Arr_T : Typ_Access;
       --  Type of the array for which we are generating values
 
       Comp_Strat : Enum_Strategy_Type_Acc;
@@ -201,11 +198,9 @@ package TGen.Types.Array_Types is
    --  type A is array (1 .. I) of Integer; --  A is constrained by I
 
    function As_Constrained_Array_Typ
-     (Self : SP.Ref) return Constrained_Array_Typ'Class
-   is (Constrained_Array_Typ'Class (Self.Unchecked_Get.all))
-   with
-     Pre =>
-       not SP.Is_Null (Self) and then Self.Get.Kind in Constrained_Array_Kind;
+     (Self : Typ_Access) return Constrained_Array_Typ'Class
+   is (Constrained_Array_Typ'Class (Self.all))
+   with Pre => Self /= null and then Self.all.Kind in Constrained_Array_Kind;
    pragma Inline (As_Constrained_Array_Typ);
 
 end TGen.Types.Array_Types;

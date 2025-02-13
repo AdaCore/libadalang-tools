@@ -38,8 +38,6 @@ with Ada.Strings.Maps;      use Ada.Strings.Maps;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Strings.Unbounded.Equal_Case_Insensitive;
 
-with GNATCOLL.Projects; use GNATCOLL.Projects;
-
 package TGen.Strings is
 
    package String_Maps is new

@@ -178,16 +178,16 @@ package body TGen.Types is
    -------------------------
 
    function Try_Generate_Static
-     (Self : SP.Ref) return TGen.Strategies.Strategy_Type'Class is
+     (Self : Typ_Access) return TGen.Strategies.Strategy_Type'Class is
    begin
-      if Self.Get.Supports_Static_Gen then
-         return Self.Get.Default_Enum_Strategy;
+      if Self.all.Supports_Static_Gen then
+         return Self.all.Default_Enum_Strategy;
       else
          return
            raise Program_Error
              with
                "Type "
-               & To_Ada (Self.Get.Name)
+               & To_Ada (Self.all.Name)
                & " does not support static generation";
       end if;
    end Try_Generate_Static;

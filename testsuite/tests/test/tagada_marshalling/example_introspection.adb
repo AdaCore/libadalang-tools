@@ -36,7 +36,7 @@ procedure Example_Introspection is
 
    procedure Test_T1 is
       T1_Typ : Signed_Int_Typ renames
-        Signed_Int_Typ (my_file_t1_Typ_Ref.Unchecked_Get.all);
+        Signed_Int_Typ (my_file_t1_Typ_Ref.all);
    begin
       Assert
         (T1_Typ.Range_Value.Min = To_Big_Integer (1 - 2 ** 31));
@@ -53,7 +53,7 @@ procedure Example_Introspection is
 
    procedure Test_T2 is
       T2_Typ : Signed_Int_Typ renames
-         Signed_Int_Typ (my_file_t2_Typ_Ref.Unchecked_Get.all);
+         Signed_Int_Typ (my_file_t2_Typ_Ref.all);
    begin
       Assert
         (T2_Typ.Range_Value.Min = To_Big_Integer (0));
@@ -86,14 +86,13 @@ procedure Example_Introspection is
    procedure Test_Constr_Array
    is
       my_file_constr_array_Typ : Constrained_Array_Typ renames
-        Constrained_Array_Typ (my_file_constr_array_Typ_Ref.Unchecked_Get.all);
+        Constrained_Array_Typ (my_file_constr_array_Typ_Ref.all);
       Idx_Constraint : constant Index_Constraint :=
-           my_file_constr_array_Typ.Index_Constraints (1);
+           my_file_constr_array_Typ.Index_Constraints (1).all;
       Comp_Type : constant Signed_Int_Typ'Class :=
         Signed_Int_Typ
           (As_Named_Typ
-            (As_Anonymous_Typ (my_file_constr_array_Typ.Component_Type))
-            .Unchecked_Get.all);
+            (As_Anonymous_Typ (my_file_constr_array_Typ.Component_Type)).all);
    begin
       Assert (my_file_constr_array_Typ.Num_Dims = 1);
       Assert
@@ -122,7 +121,7 @@ procedure Example_Introspection is
    procedure Test_Matrix
    is
       my_file_matrix_Typ : Unconstrained_Array_Typ renames
-        Unconstrained_Array_Typ (my_file_matrix_Typ_Ref.Unchecked_Get.all);
+        Unconstrained_Array_Typ (my_file_matrix_Typ_Ref.all);
       First_Index_Type : constant Signed_Int_Typ'Class :=
         As_Signed_Int_Typ (my_file_matrix_Typ.Index_Types (1));
       Second_Index_Type : constant Char_Typ'Class :=
@@ -149,7 +148,7 @@ procedure Example_Introspection is
 
    procedure Test_Fixed_1 is
       my_file_fixed_1_Typ : Ordinary_Fixed_Typ renames
-        Ordinary_Fixed_Typ (my_file_fixed_1_Typ_Ref.Unchecked_Get.all);
+        Ordinary_Fixed_Typ (my_file_fixed_1_Typ_Ref.all);
    begin
       Assert
         (my_file_fixed_1_Typ.Delta_Value = From_Universal_Image ("0.0001"));
@@ -169,7 +168,7 @@ procedure Example_Introspection is
 
    procedure Test_Fixed_2 is
       my_file_fixed_2_Typ : Decimal_Fixed_Typ renames
-        Decimal_Fixed_Typ (my_file_fixed_2_Typ_Ref.Unchecked_Get.all);
+        Decimal_Fixed_Typ (my_file_fixed_2_Typ_Ref.all);
    begin
       Assert
         (my_file_fixed_2_Typ.Delta_Value =
@@ -193,7 +192,7 @@ procedure Example_Introspection is
    procedure Test_Shape_Kind is
       use Enum_Literal_Maps;
       my_file_shape_kind_Typ : Other_Enum_Typ renames
-        Other_Enum_Typ (my_file_shape_kind_Typ_Ref.Unchecked_Get.all);
+        Other_Enum_Typ (my_file_shape_kind_Typ_Ref.all);
    begin
       for Cur in my_file_shape_kind_Typ.Literals.Iterate loop
          Assert
@@ -211,7 +210,7 @@ procedure Example_Introspection is
 
    procedure Test_Name_Size_Ty is
       my_file_name_Size_ty_typ : Signed_Int_Typ renames
-        Signed_Int_Typ (my_file_name_size_ty_Typ_Ref.Unchecked_Get.all);
+        Signed_Int_Typ (my_file_name_size_ty_Typ_Ref.all);
    begin
       Assert
         (my_file_name_size_ty_Typ.Range_Value.Min = To_Big_Integer (0));
@@ -251,7 +250,7 @@ procedure Example_Introspection is
    is
       use Component_Maps;
       Rec_Typ : Discriminated_Record_Typ renames
-        Discriminated_Record_Typ (my_file_shape_typ_ref.Unchecked_Get.all);
+        Discriminated_Record_Typ (my_file_shape_typ_ref.all);
    begin
       Assert (Rec_Typ.Mutable);
 
@@ -261,7 +260,7 @@ procedure Example_Introspection is
          declare
             use Component_Maps;
             Disc_Name : constant String := +Key (Cur);
-            Disc_Type : constant SP.Ref := Element (Cur);
+            Disc_Type : constant Typ_Access := Element (Cur);
          begin
             if Disc_Name = "K" then
                Assert (Disc_Type = my_file_shape_kind_Typ_Ref);
@@ -301,7 +300,7 @@ procedure Example_Introspection is
                       (As_Anonymous_Typ
                          (Element (Cur)).As_Named_Typ);
                   Constr : constant Index_Constraint :=
-                    Comp_Type.Index_Constraints (1);
+                    Comp_Type.Index_Constraints (1).all;
                begin
                   Assert
                     (+Constr.Discrete_Range.Low_Bound.Int_Val =
@@ -584,9 +583,9 @@ procedure Example_Introspection is
    procedure Test_Shape_Array is
       Arr_Typ : Unconstrained_Array_Typ renames
         Unconstrained_Array_Typ
-          (my_file_shape_array_Typ_Ref.Unchecked_Get.all);
+          (my_file_shape_array_Typ_Ref.all);
       Index_Typ : Signed_Int_Typ renames
-        Signed_Int_Typ (Arr_Typ.Index_Types (1).Unchecked_Get.all);
+        Signed_Int_Typ (Arr_Typ.Index_Types (1).all);
    begin
       Assert (Arr_Typ.Num_Dims = 1);
       Assert (Index_Typ.Is_Static);
@@ -604,7 +603,7 @@ procedure Example_Introspection is
       use Component_Maps;
       Rec_Typ : Discriminated_Record_Typ renames
         Discriminated_Record_Typ
-          (my_file_small_shape_array_Typ_Ref.Unchecked_Get.all);
+          (my_file_small_shape_array_Typ_Ref.all);
    begin
       Assert (Rec_Typ.Discriminant_Types.Length = 1);
       Assert (+Key (Rec_Typ.Discriminant_Types.First) = "L");
@@ -615,7 +614,7 @@ procedure Example_Introspection is
       declare
          Comp_Typ : Anonymous_Typ renames
            Anonymous_Typ
-             (Element (Rec_Typ.Component_Types.First).Unchecked_Get.all);
+             (Element (Rec_Typ.Component_Types.First).all);
          Cst      : Index_Constraints renames
            Index_Constraints (Comp_Typ.Subtype_Constraints.all);
       begin
@@ -658,7 +657,7 @@ procedure Example_Introspection is
       Index : Positive := 1;
       my_file_r_Typ : Nondiscriminated_Record_Typ renames
         Nondiscriminated_Record_Typ
-          (my_file_r_Typ_Ref.Unchecked_Get.all);
+          (my_file_r_Typ_Ref.all);
    begin
       for Comp_Cur in my_file_r_Typ.Component_Types.Iterate loop
          declare
@@ -687,7 +686,7 @@ procedure Example_Introspection is
             elsif Comp_Name = "G3" then
                declare
                   Ano_Typ : Anonymous_Typ renames
-                    Anonymous_Typ (Element (Comp_Cur).Unchecked_Get.all);
+                    Anonymous_Typ (Element (Comp_Cur).all);
                   Cst     : Index_Constraints renames
                     Index_Constraints (Ano_Typ.Subtype_Constraints.all);
                begin
@@ -722,7 +721,7 @@ procedure Example_Introspection is
                declare
                   use Discriminant_Constraint_Maps;
                   Ano_Typ : Anonymous_Typ renames
-                    Anonymous_Typ (Element (Comp_Cur).Unchecked_Get.all);
+                    Anonymous_Typ (Element (Comp_Cur).all);
                   Cst     : Discriminant_Constraints renames
                     Discriminant_Constraints (Ano_Typ.Subtype_Constraints.all);
                   Discr_Index : Positive := 1;
@@ -772,7 +771,7 @@ procedure Example_Introspection is
    procedure Test_R2 is
       use Component_Maps;
       my_file_r2_typ : Nondiscriminated_Record_Typ renames
-        Nondiscriminated_Record_Typ (my_file_r2_Typ_Ref.Unchecked_Get.all);
+        Nondiscriminated_Record_Typ (my_file_r2_Typ_Ref.all);
    begin
       Assert (my_file_r2_Typ.Component_Types.Length = 2);
       for Comp_Cur in my_file_r2_Typ.Component_Types.iterate loop

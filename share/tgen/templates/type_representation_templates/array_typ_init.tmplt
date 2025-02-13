@@ -20,4 +20,4 @@
 @@TABLE'ALIGN_ON("=>")@@
             @_LPAR()_@@_TABLE_LINE_@ => @_INDEX_TY_PREFIX_@_Typ_Ref@_RVPAR(;)_@
 @@END_TABLE@@
-   @_TY_PREFIX_@_Typ_Ref.Set (@_TY_PREFIX_@_Typ);
+   @_TY_PREFIX_@_Typ_Ref := (@_TY_PREFIX_@_Typ'Access);
