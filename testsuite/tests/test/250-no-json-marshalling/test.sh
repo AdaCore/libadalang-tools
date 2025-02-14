@@ -15,9 +15,6 @@ make -C ./obj/gnattest/harness test_driver-build-inst &> /dev/null
 mkdir -p $TGEN_LIGHT_OUTPUT/light_marshalling_lib
 TGEN_NO_JSON_MARSHALLING=1 light_marshalling_lib user_project.gpr $TEMPLATES_PATH src/*.ads
 
-# Copy the TGen light runtime
-cp -r $LALTOOLS_ROOT/src/tgen/tgen_rts obj/light_marshalling_lib
-
 # Build an executable that uses the light runtime. Here, we're building
 # the tgen light runtime alongside the executable to keep the test
 # simple.  In a real world scenario it would be better to build the
