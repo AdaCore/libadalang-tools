@@ -30,13 +30,13 @@ package TGen.Dependency_Graph is
 
    package Typ_Maps is new
      Ada.Containers.Ordered_Maps
-       (Key_Type     => SP.Ref,
+       (Key_Type     => Typ_Access,
         Element_Type => Typ_Set,
         "="          => Typ_Sets."=");
    subtype Typ_Map is Typ_Maps.Map;
 
    function Type_Dependencies
-     (T : SP.Ref; Transitive : Boolean := False) return Typ_Set;
+     (T : Typ_Access; Transitive : Boolean := False) return Typ_Set;
    --  Return all the types that T needs to have visibility on (i.e. index/
    --  component / discriminant types). If transitive is True, this returns
    --  the transitive closure of types on which self depends.
@@ -46,13 +46,13 @@ package TGen.Dependency_Graph is
       Succ, Pred : Typ_Map;
    end record;
 
-   procedure Create_Node (G : in out Graph_Type; New_Node : SP.Ref);
+   procedure Create_Node (G : in out Graph_Type; New_Node : Typ_Access);
 
-   procedure Create_Edge (G : in out Graph_Type; From, To : SP.Ref)
+   procedure Create_Edge (G : in out Graph_Type; From, To : Typ_Access)
    with Pre => G.Nodes.Contains (From) and then G.Nodes.Contains (To);
 
    procedure Traverse
-     (G : Graph_Type; Callback : access procedure (N : SP.Ref));
+     (G : Graph_Type; Callback : access procedure (N : Typ_Access));
    --  Traverse the graph in the topological order and call callback on every
    --  node.
 

@@ -32,7 +32,7 @@ package body TGen.Dependency_Graph is
    -----------------------
 
    function Type_Dependencies
-     (T : SP.Ref; Transitive : Boolean := False) return Typ_Set
+     (T : Typ_Access; Transitive : Boolean := False) return Typ_Set
    is
       use TGen.Types.Array_Types;
 
@@ -50,7 +50,7 @@ package body TGen.Dependency_Graph is
          for Choice of Var.Variant_Choices loop
             for Comp of Choice.Components loop
                Res.Include (Comp);
-               if Transitive or else Comp.Get.Kind = Anonymous_Kind then
+               if Transitive or else Comp.all.Kind = Anonymous_Kind then
                   Res.Union (Type_Dependencies (Comp, Transitive));
                end if;
             end loop;
@@ -59,7 +59,7 @@ package body TGen.Dependency_Graph is
       end Inspect_Variant;
 
    begin
-      case T.Get.Kind is
+      case T.all.Kind is
          when Anonymous_Kind =>
             Res.Include (As_Anonymous_Typ (T).Named_Ancestor);
             if Transitive then
@@ -70,10 +70,11 @@ package body TGen.Dependency_Graph is
 
          when Array_Typ_Range =>
             declare
-               Comp_Ty : constant SP.Ref := As_Array_Typ (T).Component_Type;
+               Comp_Ty : constant Typ_Access :=
+                 As_Array_Typ (T).Component_Type;
             begin
                Res.Include (Comp_Ty);
-               if Transitive or else Comp_Ty.Get.Kind = Anonymous_Kind then
+               if Transitive or else Comp_Ty.all.Kind = Anonymous_Kind then
                   Res.Union (Type_Dependencies (Comp_Ty, Transitive));
                end if;
             end;
@@ -83,7 +84,7 @@ package body TGen.Dependency_Graph is
 
             for Idx_Typ of As_Array_Typ (T).Index_Types loop
                Res.Include (Idx_Typ);
-               if Idx_Typ.Get.Kind = Anonymous_Kind then
+               if Idx_Typ.all.Kind = Anonymous_Kind then
                   Res.Union (Type_Dependencies (Idx_Typ, Transitive));
                end if;
             end loop;
@@ -92,7 +93,7 @@ package body TGen.Dependency_Graph is
             for Comp_Typ of As_Nondiscriminated_Record_Typ (T).Component_Types
             loop
                Res.Include (Comp_Typ);
-               if Transitive or else Comp_Typ.Get.Kind = Anonymous_Kind then
+               if Transitive or else Comp_Typ.all.Kind = Anonymous_Kind then
                   Res.Union (Type_Dependencies (Comp_Typ, Transitive));
                end if;
             end loop;
@@ -115,7 +116,7 @@ package body TGen.Dependency_Graph is
             for Comp_Typ of As_Discriminated_Record_Typ (T).Component_Types
             loop
                Res.Include (Comp_Typ);
-               if Transitive or else Comp_Typ.Get.Kind = Anonymous_Kind then
+               if Transitive or else Comp_Typ.all.Kind = Anonymous_Kind then
                   Res.Union (Type_Dependencies (Comp_Typ, Transitive));
                end if;
             end loop;
@@ -126,7 +127,7 @@ package body TGen.Dependency_Graph is
             for Disc_Typ of As_Discriminated_Record_Typ (T).Discriminant_Types
             loop
                Res.Include (Disc_Typ);
-               if Transitive or else Disc_Typ.Get.Kind = Anonymous_Kind then
+               if Transitive or else Disc_Typ.all.Kind = Anonymous_Kind then
                   Res.Union (Type_Dependencies (Disc_Typ, Transitive));
                end if;
             end loop;
@@ -142,7 +143,7 @@ package body TGen.Dependency_Graph is
    -- Create_Node --
    -----------------
 
-   procedure Create_Node (G : in out Graph_Type; New_Node : SP.Ref) is
+   procedure Create_Node (G : in out Graph_Type; New_Node : Typ_Access) is
    begin
       G.Nodes.Insert (New_Node);
       G.Succ.Insert (New_Node, Typ_Sets.Empty);
@@ -153,7 +154,7 @@ package body TGen.Dependency_Graph is
    -- Create_Edge --
    -----------------
 
-   procedure Create_Edge (G : in out Graph_Type; From, To : SP.Ref) is
+   procedure Create_Edge (G : in out Graph_Type; From, To : Typ_Access) is
    begin
       G.Succ.Reference (From).Insert (New_Item => To);
       G.Pred.Reference (To).Insert (New_Item => From);
@@ -164,7 +165,7 @@ package body TGen.Dependency_Graph is
    --------------
 
    procedure Traverse
-     (G : Graph_Type; Callback : access procedure (N : SP.Ref))
+     (G : Graph_Type; Callback : access procedure (N : Typ_Access))
    is
       G_Copy : Graph_Type := G;
       Roots  : Typ_List;
@@ -224,13 +225,13 @@ package body TGen.Dependency_Graph is
       G            : Graph_Type;
       Sorted_Types : Typ_List;
 
-      procedure Append (T : SP.Ref);
+      procedure Append (T : Typ_Access);
 
       ------------
       -- Append --
       ------------
 
-      procedure Append (T : SP.Ref) is
+      procedure Append (T : Typ_Access) is
       begin
          Sorted_Types.Append (T);
       end Append;

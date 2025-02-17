@@ -39,4 +39,4 @@
 @@END_TABLE@@
 @@END_IF@@
 
-   @_TY_PREFIX_@_Typ_Ref.Set (@_TY_PREFIX_@_Typ);
+   @_TY_PREFIX_@_Typ_Ref := (@_TY_PREFIX_@_Typ'Access);

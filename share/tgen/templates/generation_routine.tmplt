@@ -4,7 +4,7 @@
 @@--  @_SUBP_NAME_@ Simple name of the subprogram for which test vectors will
 @@--                be generated.
 @@--  @_SUBP_UID_@ UID of the subprogram
-@@--  @_FN_TYP_REF_@ Name of the SP.Ref representing this subp in the value
+@@--  @_FN_TYP_REF_@ Name of the Typ_Access representing this subp in the value
 @@--                 library.
 @@--  @_PARAM_NAME_@ Simple name of the parameters of the subprogram
 @@--  @_PARAM_TY_@ Fully qualified name of the type of the parameters of the
@@ -37,11 +37,11 @@
      (Unit_JSON : in out TGen.JSON.JSON_Value)
    is
       use type TGen.JSON.JSON_Value;
-      Subp  : TGen.Types.SP.Ref renames @_FN_TYP_REF_@;
+      Subp  : TGen.Types.Typ_Access renames @_FN_TYP_REF_@;
 @@IF@@ @_ENUM_STRAT_@
-      Strat : TGen.Strategies.Strategy_Type'Class := Subp.Get.Default_Enum_Strategy;
+      Strat : TGen.Strategies.Strategy_Type'Class := Subp.all.Default_Enum_Strategy;
 @@ELSE@@
-      Strat : TGen.Strategies.Strategy_Type'Class := Subp.Get.Default_Strategy;
+      Strat : TGen.Strategies.Strategy_Type'Class := Subp.all.Default_Strategy;
 @@END_IF@@
 
       Num_Tests : Natural := 0;
@@ -52,7 +52,7 @@
       loop
          Generate_One : declare
             Values : constant TGen.JSON.JSON_Value :=
-              Subp.Get.Encode (Strat.Generate (TGen.Strategies.Disc_Value_Maps.Empty_Map));
+              Subp.all.Encode (Strat.Generate (TGen.Strategies.Disc_Value_Maps.Empty_Map));
 @@TABLE'ALIGN_ON(":")@@
             Ada_@_PARAM_NAME_@ : TGen.TGen_Std.@_PARAM_TY_@ :=
               @_INPUT_FN_@ (Values.Get ("param_values").Get ("@_PARAM_NAME_@"));
@@ -86,15 +86,15 @@
 
    procedure Gen_@_SUBP_NAME_@_@_SUBP_UID_@
    is
-      Subp  : TGen.Types.SP.Ref renames @_FN_TYP_REF_@;
-      Strat : TGen.Strategies.Strategy_Type'Class := Subp.Get.Default_Strategy;
+      Subp  : TGen.Types.Typ_Access renames @_FN_TYP_REF_@;
+      Strat : TGen.Strategies.Strategy_Type'Class := Subp.all.Default_Strategy;
       File  : Ada.Streams.Stream_IO.File_Type;
       Stream : Ada.Streams.Stream_IO.Stream_Access;
    begin
       for Test_Num in 1 .. @_NUM_TESTS_@ loop
          Generate_One : declare
             Values   : constant TGen.JSON.JSON_Value :=
-              Subp.Get.Encode
+              Subp.all.Encode
                 (Strat.Generate (TGen.Strategies.Disc_Value_Maps.Empty_Map));
 @@TABLE'ALIGN_ON(":")@@
             Ada_@_PARAM_NAME_@ : TGen.TGen_Std.@_PARAM_TY_@ :=

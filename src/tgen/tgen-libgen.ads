@@ -78,7 +78,8 @@ package TGen.Libgen is
       Root_Templates_Dir : GNATCOLL.VFS.Virtual_File) return Libgen_Context;
    --  Same as above, but with virtual files
 
-   function Supported_Subprogram (Subp : LAL.Basic_Decl'Class) return SP.Ref;
+   function Supported_Subprogram
+     (Subp : LAL.Basic_Decl'Class) return Typ_Access;
    --  If the Subp is a supported subprogram profile, return a Function_Typ,
    --  otherwise return an Unsupported_Typ with the reason why it is not
    --  supported inlined in the Unsupported_Typ.Reason field.
@@ -235,6 +236,12 @@ package TGen.Libgen is
    --  not present in the TGen context. This typically occurs if the analysis
    --  has not been performed yet, the requested subprogram does not exist, or
    --  it is not supported for test case generation.
+
+   function JSON_Marshalling_Enabled return Boolean;
+   --  Returns whether JSON marshalling code should be emitted in generated
+   --  harness. Some platform with limited Ada runtime support are not suitable
+   --  for JSON serialization. This switch can be enabled by setting the
+   --  `TGEN_NO_JSON_MARSHALLING` environment variable.
 
 private
    use TGen.Strings;

@@ -32,7 +32,7 @@ with TGen.Types.Record_Types; use TGen.Types.Record_Types;
 package TGen.Wrappers is
 
    type Subp_Information is record
-      T : TGen.Types.SP.Ref;
+      T : Typ_Access;
       --  Specification of the subprogram (pointer to a Function_Typ)
 
       Pre : Unbounded_String;

@@ -40,7 +40,7 @@ package TGen.Types.Real_Types is
    is (To_Real (0));
 
    type Real_Range_Strategy is new Enum_Strategy_Type with record
-      T : SP.Ref;
+      T : Typ_Access;
       --  Reference to the type we are generating values for
 
       Pitch : Big_Real;
@@ -116,9 +116,9 @@ package TGen.Types.Real_Types is
    function Default_Strategy (Self : Float_Typ) return Strategy_Type'Class;
    --  Generate a strategy to statically generate (in one pass) values for Self
 
-   function As_Float_Typ (Self : SP.Ref) return Float_Typ'Class
-   is (Float_Typ'Class (Self.Unchecked_Get.all))
-   with Pre => not SP.Is_Null (Self) and then Self.Get.Kind in Float_Kind;
+   function As_Float_Typ (Self : Typ_Access) return Float_Typ'Class
+   is (Float_Typ'Class (Self.all))
+   with Pre => Self /= null and then Self.all.Kind in Float_Kind;
    pragma Inline (As_Float_Typ);
 
    type Ordinary_Fixed_Typ (Is_Static : Boolean) is
@@ -159,9 +159,9 @@ package TGen.Types.Real_Types is
    is (Fixed_Kind);
 
    function As_Ordinary_Fixed_Typ
-     (Self : SP.Ref) return Ordinary_Fixed_Typ'Class
-   is (Ordinary_Fixed_Typ'Class (Self.Unchecked_Get.all))
-   with Pre => not SP.Is_Null (Self) and then Self.Get.Kind in Fixed_Kind;
+     (Self : Typ_Access) return Ordinary_Fixed_Typ'Class
+   is (Ordinary_Fixed_Typ'Class (Self.all))
+   with Pre => Self /= null and then Self.all.Kind in Fixed_Kind;
    pragma Inline (As_Ordinary_Fixed_Typ);
 
    type Decimal_Fixed_Typ (Is_Static, Has_Range : Boolean) is
@@ -207,9 +207,10 @@ package TGen.Types.Real_Types is
    --  Return the high bound for Self if it has one explicitly defined, or
    --  Long_Float'Last otherwise.
 
-   function As_Decimal_Fixed_Typ (Self : SP.Ref) return Decimal_Fixed_Typ'Class
-   is (Decimal_Fixed_Typ'Class (Self.Unchecked_Get.all))
-   with Pre => not SP.Is_Null (Self) and then Self.Get.Kind in Decimal_Kind;
+   function As_Decimal_Fixed_Typ
+     (Self : Typ_Access) return Decimal_Fixed_Typ'Class
+   is (Decimal_Fixed_Typ'Class (Self.all))
+   with Pre => Self /= null and then Self.all.Kind in Decimal_Kind;
    pragma Inline (As_Decimal_Fixed_Typ);
 
    generic

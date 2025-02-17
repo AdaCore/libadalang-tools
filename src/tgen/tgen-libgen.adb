@@ -25,6 +25,7 @@ with Ada.Characters.Handling;
 with Ada.Command_Line;
 with Ada.Containers;
 with Ada.Directories;
+with Ada.Environment_Variables;
 with Ada.Strings.Unbounded.Equal_Case_Insensitive;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -236,14 +237,19 @@ package body TGen.Libgen is
    begin
       Create (F_Spec, Out_File, File_Name & ".ads");
       Put_Line (F_Spec, "with TGen.Marshalling_Lib;");
-      Put_Line (F_Spec, "with TGen.JSON;");
       Put_Line (F_Spec, "with Interfaces;");
       Put_Line (F_Spec, "with Ada.Streams;");
-      Put_Line (F_Spec, "with TGen.Strings;");
       Put_Line (F_Spec, "with TGen.Big_Int;");
-      Put_Line (F_Spec, "with TGen.Types;");
-      Put_Line (F_Spec, "with TGen.Types.Discrete_Types;");
-      Put_Line (F_Spec, "with TGen.Types.Int_Types;");
+      Put_Line (F_Spec, "with TGen.Strings;");
+
+      if JSON_Marshalling_Enabled then
+         Put_Line (F_Spec, "with TGen.Types;");
+         Put_Line (F_Spec, "with TGen.Types.Discrete_Types;");
+         Put_Line (F_Spec, "with TGen.Types.Int_Types;");
+         Put_Line (F_Spec, "with TGen.JSON;");
+         Put_Line (F_Spec, "with TGen.Marshalling_Lib.JSON;");
+      end if;
+
       New_Line (F_Spec);
 
       --  Add the import of the original unit, to be able to declare
@@ -309,13 +315,12 @@ package body TGen.Libgen is
          for T of Typ_Dependencies loop
             Package_Dependency :=
               Support_Library_Package
-                (if T.Get.Kind in Anonymous_Kind
+                (if T.all.Kind in Anonymous_Kind
                  then
                    TGen.Types.Constraints.As_Anonymous_Typ (T)
-                     .Named_Ancestor
-                     .Get
+                     .Named_Ancestor.all
                      .Compilation_Unit_Name
-                 else T.Get.Compilation_Unit_Name);
+                 else T.all.Compilation_Unit_Name);
             if Package_Dependency /= Pack_Name then
                Package_Dependencies.Include (Package_Dependency);
             end if;
@@ -387,27 +392,29 @@ package body TGen.Libgen is
       begin
          for T of Sorted_Types loop
 
-            if Is_Supported_Type (T.Get)
+            if Is_Supported_Type (T.all)
 
               --  We ignore instance types when generating marshallers as they
               --  are not types per-se, but a convenient way of binding a type
               --  to its strategy context.
 
-              and then T.Get not in Instance_Typ'Class
+              and then T.all not in Instance_Typ'Class
             then
                Spec_Part_Acc :=
-                 (if T.Get.Fully_Private then Private_Part'Unrestricted_Access
+                 (if T.all.Fully_Private then Private_Part'Unrestricted_Access
                   else Spec_Part'Unrestricted_Access);
-               if T.Get.Kind in Function_Kind then
-                  TGen
-                    .Marshalling
-                    .JSON_Marshallers
-                    .Generate_TC_Serializers_For_Subp
-                       (Spec_Part_Acc,
-                        Private_Part'Unrestricted_Access,
-                        Body_Part'Unrestricted_Access,
-                        As_Function_Typ (T),
-                        TRD);
+               if T.all.Kind in Function_Kind then
+                  if JSON_Marshalling_Enabled then
+                     TGen
+                       .Marshalling
+                       .JSON_Marshallers
+                       .Generate_TC_Serializers_For_Subp
+                          (Spec_Part_Acc,
+                           Private_Part'Unrestricted_Access,
+                           Body_Part'Unrestricted_Access,
+                           As_Function_Typ (T),
+                           TRD);
+                  end if;
                else
                   TGen
                     .Marshalling
@@ -416,20 +423,23 @@ package body TGen.Libgen is
                        (Spec_Part_Acc,
                         Private_Part'Unrestricted_Access,
                         Body_Part'Unrestricted_Access,
-                        T.Get,
-                        T.Get.Kind in Discrete_Typ_Range
+                        T.all,
+                        T.all.Kind in Discrete_Typ_Range
                         and then Ctx.Array_Index_Types.Contains (T),
                         TRD);
-                  TGen
-                    .Marshalling
-                    .JSON_Marshallers
-                    .Generate_Marshalling_Functions_For_Typ
-                       (Spec_Part_Acc,
-                        Private_Part'Unrestricted_Access,
-                        Body_Part'Unrestricted_Access,
-                        T.Get,
-                        Ctx.Array_Index_Types.Contains (T),
-                        TRD);
+
+                  if JSON_Marshalling_Enabled then
+                     TGen
+                       .Marshalling
+                       .JSON_Marshallers
+                       .Generate_Marshalling_Functions_For_Typ
+                          (Spec_Part_Acc,
+                           Private_Part'Unrestricted_Access,
+                           Body_Part'Unrestricted_Access,
+                           T.all,
+                           Ctx.Array_Index_Types.Contains (T),
+                           TRD);
+                  end if;
                end if;
             end if;
          end loop;
@@ -558,16 +568,15 @@ package body TGen.Libgen is
          for T of Typ_Dependencies loop
             --  Ignore function type and anonymous named types
 
-            if T.Get.Kind /= Function_Kind then
+            if T.all.Kind /= Function_Kind then
                Package_Dependency :=
                  Support_Library_Package
-                   (if T.Get.Kind in Anonymous_Kind
+                   (if T.all.Kind in Anonymous_Kind
                     then
                       TGen.Types.Constraints.As_Anonymous_Typ (T)
-                        .Named_Ancestor
-                        .Get
+                        .Named_Ancestor.all
                         .Compilation_Unit_Name
-                    else T.Get.Compilation_Unit_Name);
+                    else T.all.Compilation_Unit_Name);
                if Package_Dependency /= Resolved_Pkg_Name
                  and then Generic_Package_Name
                             (Copy_Delete_Last (Package_Dependency))
@@ -581,13 +590,12 @@ package body TGen.Libgen is
 
             Package_Dependency :=
               Value_Library_Package
-                (if T.Get.Kind in Anonymous_Kind
+                (if T.all.Kind in Anonymous_Kind
                  then
                    TGen.Types.Constraints.As_Anonymous_Typ (T)
-                     .Named_Ancestor
-                     .Get
+                     .Named_Ancestor.all
                      .Compilation_Unit_Name
-                 else T.Get.Compilation_Unit_Name);
+                 else T.all.Compilation_Unit_Name);
             if Package_Dependency /= Resolved_Pkg_Name
               and then Generic_Package_Name
                          (Copy_Delete_Last (Package_Dependency))
@@ -643,7 +651,7 @@ package body TGen.Libgen is
 
             Generic_Pack_Cursor  : constant Subp_Info_Vectors_Maps.Cursor :=
               Ctx.Included_Subps.Find
-                (Extract_Package_Name (T.Get.Package_Name));
+                (Extract_Package_Name (T.all.Package_Name));
             Is_Top_Level_Generic : constant Boolean :=
               Generic_Pack_Cursor.Has_Element
               and then Generic_Pack_Cursor
@@ -655,7 +663,7 @@ package body TGen.Libgen is
               (F_Spec,
                F_Body,
                Ctx,
-               T.Get,
+               T.all,
                To_String (Ctx.Root_Templates_Dir),
                Ctx.Strategy_Map,
                Initialization_Code,
@@ -757,11 +765,11 @@ package body TGen.Libgen is
         access function (A : Ada_Qualified_Name) return Ada_Qualified_Name) is
    begin
       for T of Source loop
-         if not (T.Get.Kind in Anonymous_Kind) then
+         if not (T.all.Kind in Anonymous_Kind) then
             declare
                use Types_Per_Package_Maps;
                Pack_Name      : constant Ada_Qualified_Name :=
-                 Pack_Name_Fct (T.Get.Compilation_Unit_Name);
+                 Pack_Name_Fct (T.all.Compilation_Unit_Name);
                Cur            : Cursor := Dest.Find (Pack_Name);
                Dummy_Inserted : Boolean;
             begin
@@ -823,14 +831,16 @@ package body TGen.Libgen is
    -- Supported_Subprogram --
    --------------------------
 
-   function Supported_Subprogram (Subp : LAL.Basic_Decl'Class) return SP.Ref is
+   function Supported_Subprogram
+     (Subp : LAL.Basic_Decl'Class) return Typ_Access
+   is
       Diags     : String_Vectors.Vector;
       Trans_Res : constant Translation_Result :=
         Translate (Subp.As_Basic_Decl);
    begin
       Array_Limit_Frozen := True;
       if Trans_Res.Success then
-         Diags := Trans_Res.Res.Get.Get_Diagnostics;
+         Diags := Trans_Res.Res.all.Get_Diagnostics;
          if Diags.Is_Empty then
             return Trans_Res.Res;
          end if;
@@ -838,12 +848,10 @@ package body TGen.Libgen is
          Diags := String_Vectors.To_Vector (Trans_Res.Diagnostics, 1);
       end if;
       declare
-         Typ_Res : constant Unsupported_Types :=
-           Unsupported_Types'(Diags => Diags, others => <>);
-         Res     : SP.Ref;
+         Typ_Res : constant Typ_Access :=
+           new Unsupported_Types'(Diags => Diags, others => <>);
       begin
-         Res.Set (Typ_Res);
-         return Res;
+         return Typ_Res;
       end;
    end Supported_Subprogram;
 
@@ -878,11 +886,11 @@ package body TGen.Libgen is
 
       Dummy_Inserted : Boolean;
 
-      Trans_Res : constant SP.Ref := Supported_Subprogram (Subp);
+      Trans_Res : constant Typ_Access := Supported_Subprogram (Subp);
 
    begin
-      if Trans_Res.Get.Kind = Unsupported then
-         Diags := Trans_Res.Get.Get_Diagnostics;
+      if Trans_Res.all.Kind = Unsupported then
+         Diags := Trans_Res.all.Get_Diagnostics;
          return False;
       end if;
 
@@ -946,13 +954,12 @@ package body TGen.Libgen is
       end if;
 
       declare
-         Orig_Fct_Ref : SP.Ref;
          Fct_Typ      : Function_Typ'Class := As_Function_Typ (Trans_Res);
-         Fct_Ref      : SP.Ref;
+         Orig_Fct_Ref : constant Typ_Access := Trans_Res;
+         Fct_Ref      : Typ_Access;
       begin
          Fct_Typ.Top_Level_Generic := Is_Top_Level_Generic_Instantiation;
          Fct_Typ.Is_Generic := Subp.P_Generic_Instantiations'Size > 0;
-         Orig_Fct_Ref.Set (Fct_Typ);
 
          --  Check strategies. TODO???: integrate it into the type translation
          --  when this is more than a proof of concept.
@@ -970,24 +977,24 @@ package body TGen.Libgen is
 
          for Param of Fct_Typ.Component_Types loop
             Ctx.Support_Packs_Per_Unit.Reference (Support_Packs).Include
-              (Support_Library_Package (Param.Get.Compilation_Unit_Name));
+              (Support_Library_Package (Param.all.Compilation_Unit_Name));
          end loop;
 
          for Glob of Fct_Typ.Globals loop
             Ctx.Support_Packs_Per_Unit.Reference (Support_Packs).Include
-              (Support_Library_Package (Glob.Get.Compilation_Unit_Name));
+              (Support_Library_Package (Glob.all.Compilation_Unit_Name));
          end loop;
 
          --  Get the transitive closure of the types on which the parameters'
          --  types depend, that need to be included in the support library.
 
-         Fct_Ref.Set (Fct_Typ);
+         Fct_Ref := Trans_Res;
          Subp_Types := Type_Dependencies (Fct_Ref, Transitive => True);
 
          --  Store all the array index constraint types
 
          for T of Subp_Types loop
-            if T.Get.Kind in Constrained_Array_Kind | Unconstrained_Array_Kind
+            if T.all.Kind in Constrained_Array_Kind | Unconstrained_Array_Kind
             then
                for Index_Typ of As_Array_Typ (T).Index_Types loop
                   Ctx.Array_Index_Types.Include (Index_Typ);
@@ -1028,7 +1035,7 @@ package body TGen.Libgen is
          --  Only add the (instantiated) function types to the generation map.
          --  Skip unsupported subprograms.
 
-         if not Fct_Ref.Get.Supports_Gen then
+         if not Fct_Ref.all.Supports_Gen then
             Put_Line
               ("Warning (TGen): subprogram "
                & Image (Subp.P_Unique_Identifying_Name)
@@ -1062,8 +1069,8 @@ package body TGen.Libgen is
             Subp_Info.T := Fct_Ref;
             Ctx.Included_Subps.Insert
               ((if Is_Top_Level_Generic_Instantiation
-                then Generic_Package_Name (Fct_Ref.Get.Compilation_Unit_Name)
-                else Fct_Ref.Get.Compilation_Unit_Name),
+                then Generic_Package_Name (Fct_Ref.all.Compilation_Unit_Name)
+                else Fct_Ref.all.Compilation_Unit_Name),
                [],
                Cur,
                Dummy_Inserted);
@@ -1198,7 +1205,7 @@ package body TGen.Libgen is
                --  If all types are not supported, do not generate a support
                --  library.
                if not (for all T of Element (Cur)
-                       => not Is_Supported_Type (T.Get))
+                       => not Is_Supported_Type (T.all))
                then
                   if Pkg_Info.Has_Element then
                      if Pkg_Info.Element.Last_Element.Is_Generic_Instantiation
@@ -1236,7 +1243,7 @@ package body TGen.Libgen is
                --  library.
 
                if not (for all T of Element (Cur)
-                       => not Is_Supported_Type (T.Get))
+                       => not Is_Supported_Type (T.all))
                then
                   Generate_Value_Gen_Library
                     (Ctx,
@@ -1461,7 +1468,7 @@ package body TGen.Libgen is
 
             Subp_Name : constant String := As_Function_Typ (Subp).Slug;
 
-            Concrete_Typ : SP.Ref;
+            Concrete_Typ : Typ_Access;
             --  Shortcut to hold the concrete type of a parameter
 
             Params         : Component_Map
@@ -1481,9 +1488,9 @@ package body TGen.Libgen is
             Assocs.Insert
               (Assoc
                  ("FN_TYP_REF",
-                  Subp.Get.Slug
+                  Subp.all.Slug
                     (Top_Level_Generic =>
-                       Depends_On_Top_Level_Inst (Ctx, Subp.Get.Name))
+                       Depends_On_Top_Level_Inst (Ctx, Subp.all.Name))
                   & "_Typ_Ref"));
 
             --  Deal with parameters
@@ -1491,19 +1498,19 @@ package body TGen.Libgen is
             for Param_Name of Ordered_Params loop
                Param_Cur := Params.Find (Param_Name);
                Param_Names.Append (Unbounded_String (Key (Param_Cur)));
-               if Element (Param_Cur).Get.Kind in Anonymous_Kind then
+               if Element (Param_Cur).all.Kind in Anonymous_Kind then
                   Concrete_Typ :=
                     As_Anonymous_Typ (Element (Param_Cur)).Named_Ancestor;
-               elsif Element (Param_Cur).Get.Kind in Instance_Kind then
+               elsif Element (Param_Cur).all.Kind in Instance_Kind then
                   Concrete_Typ :=
                     As_Instance_Typ (Element (Param_Cur)).Orig_Typ;
                else
                   Concrete_Typ := Element (Param_Cur);
                end if;
-               Param_Types.Append (Concrete_Typ.Get.FQN (No_Std => True));
-               Input_FNs.Append (Input_Fname_For_Typ (Concrete_Typ.Get.Name));
+               Param_Types.Append (Concrete_Typ.all.FQN (No_Std => True));
+               Input_FNs.Append (Input_Fname_For_Typ (Concrete_Typ.all.Name));
                Output_FNs.Append
-                 (Output_Fname_For_Typ (Concrete_Typ.Get.Name));
+                 (Output_Fname_For_Typ (Concrete_Typ.all.Name));
             end loop;
             Assocs.Insert (Assoc ("PARAM_NAME", Param_Names));
             Assocs.Insert (Assoc ("PARAM_TY", Param_Types));
@@ -1515,19 +1522,19 @@ package body TGen.Libgen is
                Global_Slugs.Append
                  (To_Symbol
                     (To_Qualified_Name (+Key (Global_Cur)), Sep => '_'));
-               if Element (Global_Cur).Get.Kind in Anonymous_Kind then
+               if Element (Global_Cur).all.Kind in Anonymous_Kind then
                   Concrete_Typ :=
                     As_Anonymous_Typ (Element (Global_Cur)).Named_Ancestor;
-               elsif Element (Global_Cur).Get.Kind in Instance_Kind then
+               elsif Element (Global_Cur).all.Kind in Instance_Kind then
                   Concrete_Typ :=
                     As_Instance_Typ (Element (Global_Cur)).Orig_Typ;
                else
                   Concrete_Typ := Element (Global_Cur);
                end if;
                Global_Input_FNs.Append
-                 (Input_Fname_For_Typ (Concrete_Typ.Get.Name));
+                 (Input_Fname_For_Typ (Concrete_Typ.all.Name));
                Global_Output_FNs.Append
-                 (Output_Fname_For_Typ (Concrete_Typ.Get.Name));
+                 (Output_Fname_For_Typ (Concrete_Typ.all.Name));
             end loop;
             Assocs.Insert (Assoc ("GLOBAL_NAME", Global_Names));
             Assocs.Insert (Assoc ("GLOBAL_SLUG", Global_Slugs));
@@ -1885,7 +1892,7 @@ package body TGen.Libgen is
          declare
             Ty_FQN : constant Unbounded_String :=
               To_Unbounded_String
-                (Ty.Get.FQN
+                (Ty.all.FQN
                    (No_Std            => True,
                     Top_Level_Generic => Is_Top_Level_Generic));
          begin
@@ -1893,7 +1900,7 @@ package body TGen.Libgen is
             then
                return
                  To_Unbounded_String
-                   (Ty.Get.Slug (Top_Level_Generic => Is_Top_Level_Generic)
+                   (Ty.all.Slug (Top_Level_Generic => Is_Top_Level_Generic)
                     & "_Dump_TC");
             end if;
          end;
@@ -1901,6 +1908,7 @@ package body TGen.Libgen is
 
       return Ada.Strings.Unbounded.Null_Unbounded_String;
    end Get_Test_Case_Dump_Procedure_Name;
+
    ------------------------------
    -- Set_Minimum_Lang_Version --
    ------------------------------
@@ -1920,5 +1928,12 @@ package body TGen.Libgen is
          when Unspecified => "",
          when Ada_12 => """-gnat2012""",
          when Ada_22 => """-gnat2022""");
+
+   ------------------------------
+   -- JSON_Marshalling_Enabled --
+   ------------------------------
+
+   function JSON_Marshalling_Enabled return Boolean
+   is (not Ada.Environment_Variables.Exists ("TGEN_NO_JSON_MARSHALLING"));
 
 end TGen.Libgen;

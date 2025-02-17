@@ -31,13 +31,13 @@
    end @_TY_PREFIX_@_Write_No_Param;
 
    package @_TY_PREFIX_@_In_Out_JSON is
-     new @_MARSHALLING_LIB_@.@_GENERIC_NAME_@_JSON
+     new @_MARSHALLING_LIB_@.JSON.@_GENERIC_NAME_@_JSON
        (T     => TGen.TGen_Std.@_TY_NAME_@,
         Read  => @_TY_PREFIX_@_Read_No_Param,
         Write => @_TY_PREFIX_@_Write_No_Param);
 @@ELSE@@
    package @_TY_PREFIX_@_In_Out_JSON is
-     new @_MARSHALLING_LIB_@.@_GENERIC_NAME_@_JSON
+     new @_MARSHALLING_LIB_@.JSON.@_GENERIC_NAME_@_JSON
        (T      => TGen.TGen_Std.@_TY_NAME_@,
 @@IF@@ @_NEEDS_HEADER_@
         Header        => @_TY_PREFIX_@_Header_Type,

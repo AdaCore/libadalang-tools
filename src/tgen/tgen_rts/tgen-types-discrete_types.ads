@@ -92,7 +92,7 @@ package TGen.Types.Discrete_Types is
    --  Generate a strategy to statically generate (in one pass) values for Self
 
    type Sample_Strategy_Type is new Random_Strategy_Type with record
-      T       : SP.Ref;
+      T       : Typ_Access;
       Samples : Alternatives_Set_Vector;
    end record;
 
@@ -110,7 +110,7 @@ package TGen.Types.Discrete_Types is
    type Index_Kind is (Start_Index, End_Index);
 
    type Array_Index_Strategy_Type is new Random_Strategy_Type with record
-      T                                : SP.Ref;
+      T                                : Typ_Access;
       Average_Size, Min_Size, Max_Size : Natural;
       Index                            : Index_Kind;
       Other_Index_Constraint           : Discrete_Constraint_Value;
@@ -124,7 +124,7 @@ package TGen.Types.Discrete_Types is
 
    type Identity_Constraint_Strategy_Type is new Random_Strategy_Type
    with record
-      T          : SP.Ref;
+      T          : Typ_Access;
       Constraint : Discrete_Constraint_Value;
    end record;
    --  A strategy that simply generates the value of a constraint (if it is a
@@ -166,7 +166,7 @@ package TGen.Types.Discrete_Types is
    type First_Last_Type is (First, Last, Unknown);
 
    type First_Last_Strategy_Type is new Enum_Strategy_Type with record
-      T : SP.Ref;
+      T : Typ_Access;
 
       Generation : First_Last_Type := First;
    end record;
@@ -190,7 +190,7 @@ package TGen.Types.Discrete_Types is
    --  and the last element of the discrete type.
 
    function Make_Single_Array_Constraint_Strat
-     (T : SP.Ref; Constraints : Index_Constraint)
+     (T : Typ_Access; Constraints : Index_Constraint)
       return Enum_Strategy_Type'Class
    with Pre => Constraints.Present;
    --  The strategy returned by this function will generate three values, such
@@ -200,8 +200,9 @@ package TGen.Types.Discrete_Types is
    --  other bound is static.
 
    function Make_Dual_Array_Constraint_Strat
-     (T : SP.Ref; Constraint : Index_Constraint; Disc_Name : Unbounded_String)
-      return Enum_Strategy_Type'Class
+     (T          : Typ_Access;
+      Constraint : Index_Constraint;
+      Disc_Name  : Unbounded_String) return Enum_Strategy_Type'Class
    with
      Pre =>
        Constraint.Present
@@ -219,8 +220,8 @@ package TGen.Types.Discrete_Types is
    --  generated will be the low bound, the successor the the low bound and
    --  the low bound + 1000, constrained by the size of the subtype.
 
-   function As_Discrete_Typ (Self : SP.Ref) return Discrete_Typ'Class
-   is (Discrete_Typ'Class (Self.Unchecked_Get.all));
+   function As_Discrete_Typ (Self : Typ_Access) return Discrete_Typ'Class
+   is (Discrete_Typ'Class (Self.all));
    pragma Inline_Always (As_Discrete_Typ);
 
 end TGen.Types.Discrete_Types;

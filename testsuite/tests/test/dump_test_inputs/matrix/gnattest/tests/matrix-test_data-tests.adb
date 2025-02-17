@@ -7,6 +7,7 @@
 
 with AUnit.Assertions; use AUnit.Assertions;
 with System.Assertions;
+with Ada.Exceptions;
 
 --  begin read only
 --  id:2.2/00/
@@ -34,7 +35,7 @@ package body Matrix.Test_Data.Tests is
    procedure Test_Add_Matrix_7e2458 (Gnattest_T : in out Test) renames Test_Add_Matrix;
 --  id:2.2/7e2458b3356557fd/Add_Matrix/1/0/
    procedure Test_Add_Matrix (Gnattest_T : in out Test) is
-   --  matrix.ads:12:4:Add_Matrix
+   --  matrix.ads:8:4:Add_Matrix
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -66,7 +67,7 @@ package body Matrix.Test_Data.Tests is
    procedure Test_Multiply_Matrix_9ea73c (Gnattest_T : in out Test) renames Test_Multiply_Matrix;
 --  id:2.2/9ea73cc71730f240/Multiply_Matrix/1/0/
    procedure Test_Multiply_Matrix (Gnattest_T : in out Test) is
-   --  matrix.ads:14:4:Multiply_Matrix
+   --  matrix.ads:10:4:Multiply_Matrix
 --  end read only
 
       pragma Unreferenced (Gnattest_T);

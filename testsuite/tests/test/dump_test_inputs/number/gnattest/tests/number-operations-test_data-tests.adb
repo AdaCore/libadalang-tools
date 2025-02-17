@@ -7,6 +7,7 @@
 
 with AUnit.Assertions; use AUnit.Assertions;
 with System.Assertions;
+with Ada.Exceptions;
 
 --  begin read only
 --  id:2.2/00/
@@ -34,7 +35,7 @@ package body Number.Operations.Test_Data.Tests is
    procedure Test_Add_5658b0 (Gnattest_T : in out Test) renames Test_Add;
 --  id:2.2/5658b0f836a1d0ef/Add/1/0/
    procedure Test_Add (Gnattest_T : in out Test) is
-   --  number-operations.ads:7:4:Add
+   --  number-operations.ads:3:4:Add
 --  end read only
 
       pragma Unreferenced (Gnattest_T);
@@ -54,7 +55,7 @@ package body Number.Operations.Test_Data.Tests is
    procedure Test_Multiply_4339e5 (Gnattest_T : in out Test) renames Test_Multiply;
 --  id:2.2/4339e5cefa15c38f/Multiply/1/0/
    procedure Test_Multiply (Gnattest_T : in out Test) is
-   --  number-operations.ads:9:4:Multiply
+   --  number-operations.ads:5:4:Multiply
 --  end read only
 
       pragma Unreferenced (Gnattest_T);

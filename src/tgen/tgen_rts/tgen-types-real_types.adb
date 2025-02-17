@@ -36,10 +36,8 @@ package body TGen.Types.Real_Types is
 
    overriding
    procedure Init (S : in out Real_Range_Strategy) is
-      LB : Big_Real
-        renames Real_Typ'Class (S.T.Unchecked_Get.all).Low_Bound_Or_Default;
-      HB : Big_Real
-        renames Real_Typ'Class (S.T.Unchecked_Get.all).High_Bound_Or_Default;
+      LB : Big_Real renames Real_Typ'Class (S.T.all).Low_Bound_Or_Default;
+      HB : Big_Real renames Real_Typ'Class (S.T.all).High_Bound_Or_Default;
    begin
       S.Num_Generated := 0;
       S.Pitch := (HB - LB) / To_Real (S.Total_Values - 1);
@@ -75,7 +73,7 @@ package body TGen.Types.Real_Types is
    is
       Res : Real_Range_Strategy;
    begin
-      SP.From_Element (Res.T, Self'Unrestricted_Access);
+      Res.T := Self'Unrestricted_Access;
       Res.Total_Values := Num_Values;
       return Res;
    end Make_Real_Range_Strategy;
@@ -226,10 +224,10 @@ package body TGen.Types.Real_Types is
    ----------------------
 
    function Default_Strategy (Self : Float_Typ) return Strategy_Type'Class is
-      Type_Ref : SP.Ref;
+      Type_Ref : Typ_Access;
       Strat    : Basic_Strategy_Type;
    begin
-      SP.From_Element (Type_Ref, Self'Unrestricted_Access);
+      Type_Ref := Self'Unrestricted_Access;
       Strat.T := Type_Ref;
       Strat.F := Generate_Float_Typ'Access;
       return Strat;
@@ -341,10 +339,10 @@ package body TGen.Types.Real_Types is
    function Default_Strategy
      (Self : Ordinary_Fixed_Typ) return Strategy_Type'Class
    is
-      Type_Ref : SP.Ref;
+      Type_Ref : Typ_Access;
       Strat    : Basic_Strategy_Type;
    begin
-      SP.From_Element (Type_Ref, Self'Unrestricted_Access);
+      Type_Ref := Self'Unrestricted_Access;
       Strat.T := Type_Ref;
       Strat.F := Generate_Ordinary_Fixed_Typ'Access;
       return Strat;
@@ -354,10 +352,10 @@ package body TGen.Types.Real_Types is
    function Default_Strategy
      (Self : Decimal_Fixed_Typ) return Strategy_Type'Class
    is
-      Type_Ref : SP.Ref;
+      Type_Ref : Typ_Access;
       Strat    : Basic_Strategy_Type;
    begin
-      SP.From_Element (Type_Ref, Self'Unrestricted_Access);
+      Type_Ref := Self'Unrestricted_Access;
       Strat.T := Type_Ref;
       Strat.F := Generate_Decimal_Fixed_Typ'Access;
       return Strat;

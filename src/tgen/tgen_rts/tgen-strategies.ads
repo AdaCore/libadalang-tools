@@ -104,7 +104,7 @@ package TGen.Strategies is
    is (True);
 
    type Basic_Strategy_Type is new Random_Strategy_Type with record
-      T : SP.Ref;
+      T : Typ_Access;
       --  A generic strategy will always need to store the type it references,
       --  to do introspection and know, e.g. the bounds of the type if it is a
       --  scalar type.
@@ -118,7 +118,7 @@ package TGen.Strategies is
    function Generate
      (S : in out Basic_Strategy_Type; Disc_Context : Disc_Value_Map)
       return JSON_Value
-   is (S.F (S.T.Get));
+   is (S.F (S.T.all));
 
    type Dispatching_Strategy_Type is new Random_Strategy_Type with record
       Bias   : Float;
@@ -149,11 +149,12 @@ package TGen.Strategies is
    package Equivalence_Classes_Strategy_Package is
       type Equivalence_Class_Strategy_Type is new Random_Strategy_Type
       with record
-         T       : SP.Ref;
+         T       : Typ_Access;
          Classes : Equivalence_Classes_Vectors.Vector;
          Draw    :
            access function
-             (T : SP.Ref; Class : Equivalence_Class_Type) return JSON_Value;
+             (T : Typ_Access; Class : Equivalence_Class_Type)
+              return JSON_Value;
       end record;
       --  This strategy implements equivalence classes strategy, i.e.
       --  strategies where we will pick in an equivalence class each time

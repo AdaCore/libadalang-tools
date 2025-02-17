@@ -50,20 +50,58 @@ class Testsuite(e3.testsuite.Testsuite):
         parser.add_argument(
             "--setup-tgen-rts",
             action="store_true",
-            help="Build and install TGen_RTS to prevent tests from re-building"
-                 " the library. This is not needed if the environment already"
-                 " provides the installed project."
+            help="Build and install TGen_RTS (regular and light) to prevent tests "
+            "from re-building the library. This is not needed if the environment "
+            "already provides the installed project.",
         )
         parser.add_argument(
             "--gnatfuzz-tests",
             action="store_true",
             help="enable the special 'gnatfuzz testsuite' mode, where all"
-                 " tests are run with the gnattest_tgen driver. It is meant"
-                 " to be used when running the testsuite on tests from the"
-                 " gnatfuzz testsuite, to ensure TGen doesn't crash. It is"
-                 " possible to instruct gnattest to emit debug logs and"
-                 " preserve generation artifacts by setting the GNATTEST_DEBUG"
-                 " env variable to aid debugging."
+            " tests are run with the gnattest_tgen driver. It is meant"
+            " to be used when running the testsuite on tests from the"
+            " gnatfuzz testsuite, to ensure TGen doesn't crash. It is"
+            " possible to instruct gnattest to emit debug logs and"
+            " preserve generation artifacts by setting the GNATTEST_DEBUG"
+            " env variable to aid debugging.",
+        )
+
+    def setup_tgen_runtime(
+        self,
+        project_file: str,
+        rts_build_dir: str,
+        rts_install_dir: str,
+    ) -> None:
+        e3.testsuite.logger.info(f"Building {project_file} ...")
+        p_build = Run(
+            [
+                "gprbuild",
+                f"-P{os.path.join(rts_build_dir, project_file)}",
+                "-g",
+                "-bargs",
+                "-Es",
+            ]
+        )
+        if p_build.status != 0:
+            e3.testsuite.logger.fatal(f"Failed to build {project_file}: {p_build.out}")
+            exit(1)
+
+        e3.testsuite.logger.info(f"Installing {project_file} ...")
+        p_install = Run(
+            [
+                "gprinstall",
+                "-p",
+                f"-P{os.path.join(rts_build_dir, project_file)}",
+                f"--prefix={rts_install_dir}",
+            ]
+        )
+        if p_install.status != 0:
+            e3.testsuite.logger.fatal(
+                f"Failed to install {project_file}: {p_install.out}"
+            )
+            exit(1)
+        self.env.add_search_path(
+            "GPR_PROJECT_PATH", os.path.join(rts_install_dir, "share", "gpr")
         )
 
     def set_up(self):
@@ -89,40 +127,30 @@ class Testsuite(e3.testsuite.Testsuite):
         if self.main.args.setup_tgen_rts:
             # Copy the TGen_RTS sources from the tree to a temporary directory
             rts_build_dir = os.path.join(self.working_dir, "tgen_rts")
+            light_rts_build_dir = os.path.join(self.working_dir, "light_tgen_rts")
             rts_install_dir = os.path.join(rts_build_dir, "local")
+            light_rts_install_dir = os.path.join(light_rts_build_dir, "local")
             sync_tree(
                 os.path.join(self.root_dir, "..", "src", "tgen", "tgen_rts"),
-                rts_build_dir
+                rts_build_dir,
             )
-            e3.testsuite.logger.info("Building TGen_RTS ...")
-            p_build = Run([
-                "gprbuild",
-                f"-P{os.path.join(rts_build_dir, 'tgen_rts.gpr')}",
-                "-g",
-                "-bargs",
-                "-Es"
-            ])
-            if p_build.status != 0:
-                e3.testsuite.logger.fatal(
-                    f"Failed to build TGen_RTS: {p_build.out}"
-                )
-                exit(1)
+            sync_tree(
+                os.path.join(self.root_dir, "..", "src", "tgen", "tgen_rts"),
+                light_rts_build_dir,
+            )
 
-            e3.testsuite.logger.info("Installing TGen_RTS ...")
-            p_install = Run([
-                "gprinstall",
-                "-p",
-                f"-P{os.path.join(rts_build_dir, 'tgen_rts.gpr')}",
-                f"--prefix={rts_install_dir}",
-            ])
-            if p_install.status != 0:
-                e3.testsuite.logger.fatal(
-                    f"Failed to install TGen_RTS: {p_install.out}"
-                )
-                exit(1)
-            self.env.add_search_path(
-                "GPR_PROJECT_PATH",
-                os.path.join(rts_install_dir, "share", "gpr")
+            # Setup TGen runtime support
+            self.setup_tgen_runtime(
+                project_file="tgen_rts.gpr",
+                rts_build_dir=rts_build_dir,
+                rts_install_dir=rts_install_dir,
+            )
+
+            # Setup light TGen runtime support
+            self.setup_tgen_runtime(
+                project_file="tgen_marshalling_rts.gpr",
+                rts_build_dir=light_rts_build_dir,
+                rts_install_dir=light_rts_install_dir,
             )
 
         if self.env.valgrind:

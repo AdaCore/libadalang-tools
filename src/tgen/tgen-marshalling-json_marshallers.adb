@@ -309,9 +309,9 @@ package body TGen.Marshalling.JSON_Marshallers is
             Utils.String_Utilities.Escape_String_Literal
               (FN_Typ.FQN (No_Std => True))));
       Assocs.Insert (Assoc ("PROC_UID", FN_Typ.Subp_UID));
-      if FN_Typ.Ret_Typ /= SP.Null_Ref then
+      if FN_Typ.Ret_Typ /= null then
          Assocs.Insert
-           (Assoc ("PROC_RETURN_TY", FN_Typ.Ret_Typ.Get.FQN (No_Std => True)));
+           (Assoc ("PROC_RETURN_TY", FN_Typ.Ret_Typ.all.FQN (No_Std => True)));
       else
          Assocs.Insert (Assoc ("PROC_RETURN_TY", ""));
       end if;
@@ -321,15 +321,14 @@ package body TGen.Marshalling.JSON_Marshallers is
       for Param_Cur in FN_Typ.Component_Types.Iterate loop
          Param_Names.Append (Unbounded_String (Key (Param_Cur)));
          Param_Types.Append
-           (FN_Typ.Component_Types.Constant_Reference (Param_Cur).Get.FQN
+           (FN_Typ.Component_Types.Constant_Reference (Param_Cur).all.FQN
               (No_Std => True));
          Param_Full_Types.Append
-           (FN_Typ.Component_Types.Constant_Reference (Param_Cur).Get.FQN
+           (FN_Typ.Component_Types.Constant_Reference (Param_Cur).all.FQN
               (No_Std => False));
          Param_FNs.Append
            (Output_Fname_For_Typ
-              (FN_Typ.Component_Types.Constant_Reference (Param_Cur)
-                 .Get
+              (FN_Typ.Component_Types.Constant_Reference (Param_Cur).all
                  .Name));
       end loop;
       Assocs.Insert (Assoc ("PARAM_NAME", Param_Names));
@@ -342,14 +341,14 @@ package body TGen.Marshalling.JSON_Marshallers is
       for Global_Cur in FN_Typ.Globals.Iterate loop
          Global_Names.Append (Key (Global_Cur));
          Global_Types.Append
-           (FN_Typ.Globals.Constant_Reference (Global_Cur).Get.FQN
+           (FN_Typ.Globals.Constant_Reference (Global_Cur).all.FQN
               (No_Std => True));
          Global_Full_Types.Append
-           (FN_Typ.Globals.Constant_Reference (Global_Cur).Get.FQN
+           (FN_Typ.Globals.Constant_Reference (Global_Cur).all.FQN
               (No_Std => False));
          Global_Types_FNs.Append
            (Output_Fname_For_Typ
-              (FN_Typ.Globals.Constant_Reference (Global_Cur).Get.Name));
+              (FN_Typ.Globals.Constant_Reference (Global_Cur).all.Name));
          Global_Slugs.Append
            (To_Symbol (To_Qualified_Name (+Key (Global_Cur)), Sep => '_'));
       end loop;

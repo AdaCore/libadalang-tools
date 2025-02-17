@@ -10,4 +10,4 @@
       @_TY_PREFIX_@_Constraint'Access;
 @@END_IF@@
    @_TY_PREFIX_@_Typ.Named_Ancestor := @_TY_PREFIX_ANCESTOR_@_Typ_Ref;
-   @_TY_PREFIX_@_Typ_Ref.Set (@_TY_PREFIX_@_Typ);
+   @_TY_PREFIX_@_Typ_Ref := (@_TY_PREFIX_@_Typ'Access);
