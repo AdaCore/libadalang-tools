@@ -8,7 +8,12 @@ TGEN_LIGHT_OUTPUT=obj/tgen_light
 
 # Generate test cases and dump inputs
 gnattest -q -P user_project.gpr --gen-test-vectors --dump-test-inputs
-make -C ./obj/gnattest/harness test_driver-build-inst &> /dev/null
+gprbuild  -q \
+    -Pobj/gnattest/harness/test_driver.gpr \
+    --src-subdirs=gnattest-instr \
+    --implicit-with=obj/gnattest/harness/tgen_support/tgen_support.gpr \
+    -gargs \
+    -j0
 ./obj/gnattest/harness/test_runner
 
 # Generate support files, but without JSON
