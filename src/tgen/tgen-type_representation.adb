@@ -970,6 +970,8 @@ package body TGen.Type_Representation is
    begin
       Insert (Assocs, Assoc ("TY_NAME", Ty_Name));
       Insert (Assocs, Assoc ("TY_PREFIX", Ty_Prefix));
+      Insert
+        (Assocs, Assoc ("HAS_STATIC_PREDICATE", Typ.Has_Static_Predicate));
 
       --  If we have a strategy for the type, start off by generating it
 

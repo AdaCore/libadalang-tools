@@ -49,9 +49,11 @@ package TGen.Marshalling_Lib is
 
    generic
       type T is (<>);
+      T_First : T;
+      T_Last : T;
    package Read_Write_Enum is
 
-      function Size (First : T := T'First; Last : T := T'Last) return Natural;
+      function Size (First : T := T_First; Last : T := T_Last) return Natural;
       --  Return the number of bits used for values of the type
 
       procedure Write
@@ -59,24 +61,26 @@ package TGen.Marshalling_Lib is
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
          V      : T;
-         First  : T := T'First;
-         Last   : T := T'Last);
+         First  : T := T_First;
+         Last   : T := T_Last);
 
       procedure Read
         (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
          V      : out T;
-         First  : T := T'First;
-         Last   : T := T'Last);
+         First  : T := T_First;
+         Last   : T := T_Last);
 
    end Read_Write_Enum;
 
    generic
       type T is range <>;
+      T_First : T;
+      T_Last : T;
    package Read_Write_Signed is
 
-      function Size (First : T := T'First; Last : T := T'Last) return Natural;
+      function Size (First : T := T_First; Last : T := T_Last) return Natural;
       --  Return the number of bits used for values of the type
 
       procedure Write
@@ -84,24 +88,26 @@ package TGen.Marshalling_Lib is
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
          V      : T;
-         First  : T := T'First;
-         Last   : T := T'Last);
+         First  : T := T_First;
+         Last   : T := T_Last);
 
       procedure Read
         (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
          V      : out T;
-         First  : T := T'First;
-         Last   : T := T'Last);
+         First  : T := T_First;
+         Last   : T := T_Last);
 
    end Read_Write_Signed;
 
    generic
       type T is mod <>;
+      T_First : T;
+      T_Last : T;
    package Read_Write_Unsigned is
 
-      function Size (First : T := T'First; Last : T := T'Last) return Natural;
+      function Size (First : T := T_First; Last : T := T_Last) return Natural;
       --  Return the number of bits used for values of the type
 
       procedure Write
@@ -109,24 +115,26 @@ package TGen.Marshalling_Lib is
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
          V      : T;
-         First  : T := T'First;
-         Last   : T := T'Last);
+         First  : T := T_First;
+         Last   : T := T_Last);
 
       procedure Read
         (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
          V      : out T;
-         First  : T := T'First;
-         Last   : T := T'Last);
+         First  : T := T_First;
+         Last   : T := T_Last);
 
    end Read_Write_Unsigned;
 
    generic
       type T is delta <> digits <>;
+      T_First : T;
+      T_Last : T;
    package Read_Write_Decimal_Fixed is
 
-      function Size (First : T := T'First; Last : T := T'Last) return Natural;
+      function Size (First : T := T_First; Last : T := T_Last) return Natural;
       --  Return the number of bits used for values of the type
 
       procedure Write
@@ -134,25 +142,27 @@ package TGen.Marshalling_Lib is
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
          V      : T;
-         First  : T := T'First;
-         Last   : T := T'Last);
+         First  : T := T_First;
+         Last   : T := T_Last);
 
       procedure Read
         (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
          V      : out T;
-         First  : T := T'First;
-         Last   : T := T'Last);
+         First  : T := T_First;
+         Last   : T := T_Last);
 
    end Read_Write_Decimal_Fixed;
 
    generic
       type T is delta <>;
+      T_First : T;
+      T_Last : T;
    package Read_Write_Ordinary_Fixed is
       --!format on
 
-      function Size (First : T := T'First; Last : T := T'Last) return Natural;
+      function Size (First : T := T_First; Last : T := T_Last) return Natural;
       --  Return the number of bits used for values of the type
 
       procedure Write
@@ -160,22 +170,24 @@ package TGen.Marshalling_Lib is
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
          V      : T;
-         First  : T := T'First;
-         Last   : T := T'Last);
+         First  : T := T_First;
+         Last   : T := T_Last);
 
       procedure Read
         (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
          V      : out T;
-         First  : T := T'First;
-         Last   : T := T'Last);
+         First  : T := T_First;
+         Last   : T := T_Last);
 
    end Read_Write_Ordinary_Fixed;
 
    --!format off
    generic
       type T is digits <>;
+      T_First : T;
+      T_Last : T;
    package Read_Write_Float is
 
       pragma
@@ -189,7 +201,7 @@ package TGen.Marshalling_Lib is
       --  We only support standard floating point formats in targets that
       --  support them.
 
-      function Size (First : T := T'First; Last : T := T'Last) return Natural;
+      function Size (First : T := T_First; Last : T := T_Last) return Natural;
       --  Return the number of bits used for values of the type
 
       procedure Write
@@ -197,16 +209,16 @@ package TGen.Marshalling_Lib is
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
          V      : T;
-         First  : T := T'First;
-         Last   : T := T'Last);
+         First  : T := T_First;
+         Last   : T := T_Last);
 
       procedure Read
         (Stream : not null access Ada.Streams.Root_Stream_Type'Class;
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
          V      : out T;
-         First  : T := T'First;
-         Last   : T := T'Last);
+         First  : T := T_First;
+         Last   : T := T_Last);
 
    end Read_Write_Float;
 

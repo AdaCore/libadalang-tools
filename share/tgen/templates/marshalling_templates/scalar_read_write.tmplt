@@ -13,7 +13,15 @@
    --  Read and Write functions for @_TY_NAME_@
 
    package @_TY_PREFIX_@_Funs@_BASE_SUFFIX()_@ is new
-     @_MARSHALLING_LIB_@.@_GENERIC_NAME_@ (TGen.TGen_Std.@_TY_NAME_@);
+     @_MARSHALLING_LIB_@.@_GENERIC_NAME_@
+      (T => TGen.TGen_Std.@_TY_NAME_@,
+      @@IF@@ @_HAS_STATIC_PREDICATE_@
+       T_First => TGen.TGen_Std.@_TY_NAME_@'First_Valid,
+       T_Last => TGen.TGen_Std.@_TY_NAME_@'Last_Valid);
+      @@ELSE@@
+       T_First => TGen.TGen_Std.@_TY_NAME_@'First,
+       T_Last => TGen.TGen_Std.@_TY_NAME_@'Last);
+      @@END_IF@@
 
    function @_TY_PREFIX_@_Size@_BASE_SUFFIX()_@
      (@_GLOBAL_PREFIX_@_First : TGen.TGen_Std.@_TY_NAME_@ :=

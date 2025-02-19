@@ -431,7 +431,8 @@ package body TGen.Marshalling is
       Common_Assocs : constant Translate_Table :=
         [1 => Assoc ("GLOBAL_PREFIX", Global_Prefix),
          2 => Assoc ("TY_PREFIX", Ty_Prefix),
-         3 => Assoc ("TY_NAME", Ty_Name)];
+         3 => Assoc ("TY_NAME", Ty_Name),
+         4 => Assoc ("HAS_STATIC_PREDICATE", Typ.Has_Static_Predicate)];
 
       type Component_Kind is (Array_Component, Record_Component);
 

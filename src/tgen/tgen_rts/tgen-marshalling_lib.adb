@@ -347,7 +347,7 @@ package body TGen.Marshalling_Lib is
       -- Size --
       -----------
 
-      function Size (First : T := T'First; Last : T := T'Last) return Natural
+      function Size (First : T := T_First; Last : T := T_Last) return Natural
       is
          Max : Long_Long_Long_Unsigned := Norm (Last, First);
       begin
@@ -369,8 +369,8 @@ package body TGen.Marshalling_Lib is
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
          V      : T;
-         First  : T := T'First;
-         Last   : T := T'Last)
+         First  : T := T_First;
+         Last   : T := T_Last)
       is
          Max : constant Long_Long_Long_Unsigned := Norm (Last, First);
          Val : constant Long_Long_Long_Unsigned := Norm (V, First);
@@ -387,8 +387,8 @@ package body TGen.Marshalling_Lib is
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
          V      : out T;
-         First  : T := T'First;
-         Last   : T := T'Last)
+         First  : T := T_First;
+         Last   : T := T_Last)
       is
          Max : constant Long_Long_Long_Unsigned := Norm (Last, First);
          Val : Long_Long_Long_Unsigned;
@@ -416,13 +416,17 @@ package body TGen.Marshalling_Lib is
       --  'Fixed_Value. Use the longest possible integer in the architecture
       --  as a target (Long_Long_Long_Integer).
 
-      package Impl is new Read_Write_Signed (Long_Long_Long_Integer);
+      package Impl is new
+        Read_Write_Signed
+          (T       => Long_Long_Long_Integer,
+           T_First => Long_Long_Long_Integer'First,
+           T_Last  => Long_Long_Long_Integer'Last);
 
       -----------
       -- Size --
       -----------
 
-      function Size (First : T := T'First; Last : T := T'Last) return Natural
+      function Size (First : T := T_First; Last : T := T_Last) return Natural
       is (Impl.Size
             (Long_Long_Long_Integer'Integer_Value (First),
              Long_Long_Long_Integer'Integer_Value (Last)));
@@ -436,8 +440,8 @@ package body TGen.Marshalling_Lib is
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
          V      : T;
-         First  : T := T'First;
-         Last   : T := T'Last) is
+         First  : T := T_First;
+         Last   : T := T_Last) is
       begin
          Impl.Write
            (Stream,
@@ -457,8 +461,8 @@ package body TGen.Marshalling_Lib is
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
          V      : out T;
-         First  : T := T'First;
-         Last   : T := T'Last)
+         First  : T := T_First;
+         Last   : T := T_Last)
       is
          R : Long_Long_Long_Integer;
       begin
@@ -489,13 +493,17 @@ package body TGen.Marshalling_Lib is
       --  'Fixed_Value. Use the longest possible integer in the architecture
       --  as a target (Long_Long_Long_Integer).
 
-      package Impl is new Read_Write_Signed (Long_Long_Long_Integer);
+      package Impl is new
+        Read_Write_Signed
+          (T       => Long_Long_Long_Integer,
+           T_First => Long_Long_Long_Integer'First,
+           T_Last  => Long_Long_Long_Integer'Last);
 
       -----------
       -- Size --
       -----------
 
-      function Size (First : T := T'First; Last : T := T'Last) return Natural
+      function Size (First : T := T_First; Last : T := T_Last) return Natural
       is (Impl.Size
             (Long_Long_Long_Integer'Integer_Value (First),
              Long_Long_Long_Integer'Integer_Value (Last)));
@@ -509,8 +517,8 @@ package body TGen.Marshalling_Lib is
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
          V      : T;
-         First  : T := T'First;
-         Last   : T := T'Last) is
+         First  : T := T_First;
+         Last   : T := T_Last) is
       begin
          Impl.Write
            (Stream,
@@ -530,8 +538,8 @@ package body TGen.Marshalling_Lib is
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
          V      : out T;
-         First  : T := T'First;
-         Last   : T := T'Last)
+         First  : T := T_First;
+         Last   : T := T_Last)
       is
          R : Long_Long_Long_Integer;
       begin
@@ -576,7 +584,7 @@ package body TGen.Marshalling_Lib is
       -- Size --
       -----------
 
-      function Size (First : T := T'First; Last : T := T'Last) return Natural
+      function Size (First : T := T_First; Last : T := T_Last) return Natural
       is (case Get_Precision is
             when Single => 32,
             when Double => 64,
@@ -591,8 +599,8 @@ package body TGen.Marshalling_Lib is
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
          V      : T;
-         First  : T := T'First;
-         Last   : T := T'Last)
+         First  : T := T_First;
+         Last   : T := T_Last)
       is
          pragma Unreferenced (First, Last);
          --  Bounds cannot easily be taken into account for floating point
@@ -667,8 +675,8 @@ package body TGen.Marshalling_Lib is
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
          V      : out T;
-         First  : T := T'First;
-         Last   : T := T'Last)
+         First  : T := T_First;
+         Last   : T := T_Last)
       is
          --  Bounds cannot easily be taken into account for floating point
          --  types. We use saturation to get valid values.
@@ -868,7 +876,7 @@ package body TGen.Marshalling_Lib is
       -- Size --
       -----------
 
-      function Size (First : T := T'First; Last : T := T'Last) return Natural
+      function Size (First : T := T_First; Last : T := T_Last) return Natural
       is
          Max : Long_Long_Long_Unsigned;
       begin
@@ -891,8 +899,8 @@ package body TGen.Marshalling_Lib is
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
          V      : T;
-         First  : T := T'First;
-         Last   : T := T'Last)
+         First  : T := T_First;
+         Last   : T := T_Last)
       is
          Max : Long_Long_Long_Unsigned;
       begin
@@ -909,8 +917,8 @@ package body TGen.Marshalling_Lib is
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
          V      : out T;
-         First  : T := T'First;
-         Last   : T := T'Last)
+         First  : T := T_First;
+         Last   : T := T_Last)
       is
          Max : Long_Long_Long_Unsigned;
          Val : Long_Long_Long_Unsigned;
@@ -947,7 +955,7 @@ package body TGen.Marshalling_Lib is
       -- Size --
       -----------
 
-      function Size (First : T := T'First; Last : T := T'Last) return Natural
+      function Size (First : T := T_First; Last : T := T_Last) return Natural
       is
          Max : Long_Long_Long_Unsigned := Norm (Last, First);
       begin
@@ -969,8 +977,8 @@ package body TGen.Marshalling_Lib is
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
          V      : T;
-         First  : T := T'First;
-         Last   : T := T'Last)
+         First  : T := T_First;
+         Last   : T := T_Last)
       is
          Max : constant Long_Long_Long_Unsigned := Norm (Last, First);
          Val : constant Long_Long_Long_Unsigned := Norm (V, First);
@@ -987,8 +995,8 @@ package body TGen.Marshalling_Lib is
          Buffer : in out Unsigned_8;
          Offset : in out Offset_Type;
          V      : out T;
-         First  : T := T'First;
-         Last   : T := T'Last)
+         First  : T := T_First;
+         Last   : T := T_Last)
       is
          Max : constant Long_Long_Long_Unsigned := Norm (Last, First);
          Val : Long_Long_Long_Unsigned;
