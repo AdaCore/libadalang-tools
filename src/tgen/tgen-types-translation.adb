@@ -2911,7 +2911,9 @@ package body TGen.Types.Translation is
                 & Kind_Name (Node.F_Range.F_Range);
       end case;
 
-      return Eval_Discrete_Range (Create_Discrete_Range (Min, Max));
+      return
+        Eval_Discrete_Range
+          (Create_Discrete_Range (No_Base_Type_Decl, Min, Max));
 
    end Translate_Discrete_Range_Constraint;
 
@@ -3039,7 +3041,9 @@ package body TGen.Types.Translation is
                       (Kind (Cst.As_Bin_Op.F_Op) in Ada_Op_Double_Dot_Range);
                   Discr_Range :=
                     Create_Discrete_Range
-                      (Cst.As_Bin_Op.F_Left, Cst.As_Bin_Op.F_Right);
+                      (No_Base_Type_Decl,
+                       Cst.As_Bin_Op.F_Left,
+                       Cst.As_Bin_Op.F_Right);
 
                when Ada_Attribute_Ref_Range =>
                   Discr_Range :=
