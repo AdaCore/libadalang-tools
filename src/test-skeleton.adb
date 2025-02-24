@@ -6868,11 +6868,16 @@ package body Test.Skeleton is
          --  full hash of the subprogram. If not found, skip to the next
          --  subprogram.
 
-         if Unit_Content.Has_Field (Subp.Subp_Full_Hash.all) then
-            Subp_Content := Unit_Content.Get (Subp.Subp_Full_Hash.all);
-         else
-            Subp_Content := JSON_Null;
-         end if;
+         declare
+            Subp_Hash : constant String :=
+              Test.Common.Mangle_Hash_16 (Subp => Subp.Subp_Declaration);
+         begin
+            if Unit_Content.Has_Field (Subp_Hash) then
+               Subp_Content := Unit_Content.Get (Subp_Hash);
+            else
+               Subp_Content := JSON_Null;
+            end if;
+         end;
 
          if Subp_Content = JSON_Null
            or else Subp_Content.Get ("test_vectors") = Empty_Array
