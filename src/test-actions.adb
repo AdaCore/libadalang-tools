@@ -824,7 +824,7 @@ package body Test.Actions is
                (Dir.Display_Full_Name,
                 Resolve_Links  => False,
                 Case_Sensitive => False)
-            & Directory_Separator
+             & Directory_Separator
          then
             Cmd_Error_No_Help
               ("invalid harness directory, cannot mix up "

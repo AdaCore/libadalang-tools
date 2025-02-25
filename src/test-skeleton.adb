@@ -1584,8 +1584,8 @@ package body Test.Skeleton is
 
          if Owner_Decl
            /= No_Base_Type_Decl
-             --  If owner is incomplete private declaration (without "tagged"
-             --  keyword) subp should be treated as non-dispatching.
+              --  If owner is incomplete private declaration (without "tagged"
+              --  keyword) subp should be treated as non-dispatching.
          then
             if Owner_Decl.As_Base_Type_Decl.P_Is_Private then
                Owner_Decl := Owner_Decl.As_Base_Type_Decl.P_Private_Completion;
@@ -8599,8 +8599,8 @@ package body Test.Skeleton is
          if MD.Short_Name_Used
            and then MD.Short_Name.all
                     = Short_Name
-                     --  It is hard to understand what happens when test case
-                     --  name is changed, so we do not handle this scenario.
+                      --  It is hard to understand what happens when test case
+                      --  name is changed, so we do not handle this scenario.
            and then Markered_Data_Maps.Key (Cur).TC_Hash.all = TC_Hash
          then
             exit;
