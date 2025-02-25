@@ -2637,7 +2637,8 @@ package body Pp.Formatting is
                elsif Kind (Src_Tok) = '('
                  and then Kind (Prev_Lexeme (Src_Tok))
                           = '('
-                            --???Also check that the one before that is a tick!
+                            --  ???Also check that the one before
+                            --  that is a tick!
                then
                   Qual_Nesting := Qual_Nesting + 1;
                   Next_ss (Src_Tok);
