@@ -2327,7 +2327,7 @@ package body Pp.Formatting is
                        (All_LB,
                         All_LBI (F),
                         All_LBI (Next_Enabled (Lines_Data, F)))
-                    + Offset);
+                     + Offset);
             F := L;
          end loop; -- through line breaks
 
@@ -2637,7 +2637,7 @@ package body Pp.Formatting is
                elsif Kind (Src_Tok) = '('
                  and then Kind (Prev_Lexeme (Src_Tok))
                           = '('
-                           --???Also check that the one before that is a tick!
+                            --???Also check that the one before that is a tick!
                then
                   Qual_Nesting := Qual_Nesting + 1;
                   Next_ss (Src_Tok);
@@ -4552,8 +4552,8 @@ package body Pp.Formatting is
 
                                        elsif LB.Indentation
                                          /= L_Paren_Indent_For_Preserve
-                                           + Before_Indentation
-                                           + 1
+                                            + Before_Indentation
+                                            + 1
                                        then
                                           LB.Indentation :=
                                             L_Paren_Indent_For_Preserve

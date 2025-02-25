@@ -14,6 +14,8 @@ include:
       stage: check
       anod-spec: libadalang-tools
       gnatformat-args: -P src/build.gpr --check
+      install-gnatformat: true
+      install-gnatformat-extra-anod-args: -Qedge
 
   # Build
   - component: $CI_SERVER_FQDN/eng/gitlab-templates/build@~latest

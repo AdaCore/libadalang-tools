@@ -2675,7 +2675,7 @@ package body METRICS.Actions is
         Assert
           (Global_M.Vals (Complexity_Cyclomatic)
              = Global_M.Vals (Complexity_Statement)
-              + Global_M.Vals (Complexity_Expression));
+               + Global_M.Vals (Complexity_Expression));
 
       --  We're done with Metrix_Stack at this point. Printing uses the tree
       --  formed by Submetrix.
@@ -4623,7 +4623,7 @@ package body METRICS.Actions is
         Assert
           (File_M.Vals (Complexity_Cyclomatic)
              = File_M.Vals (Complexity_Statement)
-              + File_M.Vals (Complexity_Expression));
+               + File_M.Vals (Complexity_Expression));
 
       if Debug_Flag_V then
          Outdent;
