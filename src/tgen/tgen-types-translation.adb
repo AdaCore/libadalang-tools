@@ -22,6 +22,7 @@
 ------------------------------------------------------------------------------
 
 with Ada.Exceptions;
+with Ada.Strings.Wide_Wide_Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with GNATCOLL.GMP.Integers;
@@ -1462,6 +1463,11 @@ package body TGen.Types.Translation is
                              .F_Prefix
                              .P_Name_Designated_Type
                              .P_Is_Static_Decl
+                          and then not Range_Exp
+                                         .As_Attribute_Ref
+                                         .F_Prefix
+                                         .P_Name_Designated_Type
+                                         .P_Is_Enum_Type
                         then
                            Constraint_Min :=
                              Big_Int.From_String
@@ -1485,6 +1491,34 @@ package body TGen.Types.Translation is
                                   .Image);
                            Min_Static := True;
                            Max_Static := True;
+                        elsif Range_Exp
+                                .As_Attribute_Ref
+                                .F_Prefix
+                                .P_Name_Designated_Type
+                                .P_Is_Enum_Type
+                        then
+                           declare
+                              Designed_Ty : constant Unbounded_Text_Type :=
+                                (+Range_Exp.As_Attribute_Ref.F_Prefix.Text);
+                              use type Ada
+                                         .Strings
+                                         .Wide_Wide_Unbounded
+                                         .Unbounded_Wide_Wide_String;
+                           begin
+                              Min_Static := False;
+                              Max_Static := False;
+
+                              Min_Text :=
+                                (Designed_Ty
+                                 & "'Pos ("
+                                 & Designed_Ty
+                                 & "'First)");
+                              Max_Text :=
+                                (Designed_Ty
+                                 & "'Pos ("
+                                 & Designed_Ty
+                                 & "'Last)");
+                           end;
                         else
                            Min_Static := False;
                            Max_Static := False;
