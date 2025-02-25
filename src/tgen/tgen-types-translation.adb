@@ -3567,7 +3567,7 @@ package body TGen.Types.Translation is
          Specialized_Res.Res.all.Private_Extension :=
            Basic_Decl'(N.P_All_Parts (1)).As_Base_Type_Decl.P_Is_Private;
          Specialized_Res.Res.all.Is_Class_Wide :=
-           not N.P_Classwide_Type.Is_Null;
+           N.Kind in Ada_Classwide_Type_Decl_Range;
 
          --  Checks if the type has a static predicate aspect.
          Specialized_Res.Res.all.Has_Static_Predicate :=
