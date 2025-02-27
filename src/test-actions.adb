@@ -70,6 +70,8 @@ with Ada.Strings.Fixed;
 
 with TGen.Libgen;
 
+with Libadalang.Common;
+
 package body Test.Actions is
 
    SPT : GNATCOLL.Projects.Project_Tree
@@ -237,6 +239,7 @@ package body Test.Actions is
          return Result;
       end Process_Comma_Separated_String;
 
+      use Ada.Strings.Fixed;
    begin
       GNATCOLL.Traces.Parse_Config_File;
       Test.Common.Verbose := Arg (Cmd, Verbose);
@@ -249,6 +252,34 @@ package body Test.Actions is
       if Tool.Project_Tree.Root_Project.Is_Aggregate_Project then
          return;
       end if;
+
+      declare
+         Subp_Hash       : constant String_Access := Arg (Cmd, Dump_Subp_Hash);
+         Separator_Index : constant Natural :=
+           (if Subp_Hash /= null then Index (Subp_Hash.all, ":", 1) else 0);
+      begin
+         if Subp_Hash /= null then
+            if Separator_Index = 0 then
+               Cmd_Error_No_Help
+                 ("Unexpected format for --dump-subp-hash, expected <filename>"
+                  & ":<line>");
+            end if;
+            Test.Common.Subp_File_Name :=
+              new String'(Subp_Hash.all (1 .. Separator_Index - 1));
+            begin
+               Test.Common.Subp_Line_Nbr :=
+                 Natural'Value
+                   ((Subp_Hash.all (Separator_Index + 1 .. Subp_Hash'Length)));
+            exception
+               when others =>
+                  Cmd_Error_No_Help ("<line> must be a Natural.");
+            end;
+            Utils.Command_Lines.Append_File_Name
+              (Cmd, Test.Common.Subp_File_Name.all);
+            Test.Common.Quiet := True;
+            return;
+         end if;
+      end;
 
       Test.Common.Instrument := Arg (Cmd, Dump_Test_Inputs);
 
@@ -1135,9 +1166,17 @@ package body Test.Actions is
    -----------
 
    procedure Final (Tool : in out Test_Tool; Cmd : Command_Line) is
+      use Ada.Strings.Unbounded;
       Src_Prj : constant String :=
         Tool.Project_Tree.Root_Project.Project_Path.Display_Full_Name;
    begin
+
+      --  Abort here if we the switch --dump-subp-hash is on. This return
+      --  should not be moved further down.
+
+      if Test.Common.Subp_File_Name /= null then
+         return;
+      end if;
 
       --  If the tool project is an aggregate one, exit early and do nothing.
       --  The aggregated projects will be processed in sequence in subprocess
@@ -1238,12 +1277,48 @@ package body Test.Actions is
       BOM_Seen  : Boolean;
       Unit      : Analysis_Unit)
    is
+      use Libadalang.Common;
+      use Ada.Strings.Unbounded;
       pragma Unreferenced (Tool, Input, BOM_Seen); -- ????
    begin
       if Debug_Flag_V then
          Print (Unit);
          Put ("With trivia\n");
          PP_Trivia (Unit);
+      end if;
+
+      if Test.Common.Subp_File_Name /= null
+        and then Test.Common.Subp_File_Name.all = File_Name
+      then
+         declare
+            Found_Hash : Boolean := False;
+
+            function Visit (Node : Ada_Node'Class) return Visit_Status;
+
+            function Visit (Node : Ada_Node'Class) return Visit_Status is
+            begin
+               if Kind (Node) in Ada_Basic_Subp_Decl
+                 and then Natural (Node.Sloc_Range.Start_Line)
+                          = Test.Common.Subp_Line_Nbr
+               then
+                  Ada.Text_IO.Put (Test.Common.Mangle_Hash_16 (Node));
+                  Found_Hash := True;
+                  return Stop;
+               end if;
+               return Into;
+            end Visit;
+         begin
+            Traverse (Root (Unit), Visit'Access);
+            if not Found_Hash then
+               Ada.Text_IO.Put
+                 ("Subprogram in "
+                  & Test.Common.Subp_File_Name.all
+                  & " at line "
+                  & Natural'Image (Test.Common.Subp_Line_Nbr)
+                  & " could not be found.");
+            end if;
+            return;
+         end;
       end if;
 
       if Test.Common.Harness_Only then
@@ -1374,6 +1449,8 @@ package body Test.Actions is
         (" --gen-test-num=n                   - Specify the number of test inputs to be generated (experimental, defaults to 5)\n");
       Put
         (" --gen-test-subprograms=file:line   - Specify a comma separated list of subprograms declared at file:line to generate test cases for\n");
+      Put
+        (" --dump-subp-hash=file:line         - Print the hash of the subprogram at file:line in the standard output and bypass all other swicthes.\n");
       Put
         (" --serialized-test-dir=dir          - Specify in which directory test inputs should be generated (experimental)\n");
       Put
