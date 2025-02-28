@@ -1991,8 +1991,16 @@ package body METRICS.Actions is
 
    procedure Write_XML_Schema (Xsd_File_Name : String) is
       XSD_Out_File : Text_IO.File_Type;
+
+      Has_Parent_Directory : constant Boolean :=
+        Ada.Directories.Simple_Name (Xsd_File_Name) /= Xsd_File_Name;
+
    begin
       if not Output_To_Standard_Output then
+         if Has_Parent_Directory then
+            Ada.Directories.Create_Path
+              (Ada.Directories.Containing_Directory (Xsd_File_Name));
+         end if;
          Text_IO.Create (XSD_Out_File, Name => Xsd_File_Name);
          Text_IO.Set_Output (XSD_Out_File);
       end if;
@@ -2620,7 +2628,7 @@ package body METRICS.Actions is
          else Arg (Cmd, Xml_File_Name).all);
       --  ASIS-based gnatmetric ignores Output_Dir for the xml.
 
-      Has_Dir : constant Boolean :=
+      Has_Parent_Directory : constant Boolean :=
         Directories.Simple_Name (Xml_F_Name) /= Xml_F_Name;
       --  True if Xml_F_Name contains directory information
 
@@ -2727,6 +2735,10 @@ package body METRICS.Actions is
          --  Put initial lines of XML
 
          if not Output_To_Standard_Output then
+            if Has_Parent_Directory then
+               Ada.Directories.Create_Path
+                 (Ada.Directories.Containing_Directory (Xml_FD_Name));
+            end if;
             Text_IO.Create (XML_File, Name => Xml_FD_Name);
             Text_IO.Set_Output (XML_File);
          end if;
