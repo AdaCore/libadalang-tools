@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                    Copyright (C) 2021-2022, AdaCore                      --
+--                    Copyright (C) 2021-2025, AdaCore                      --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -48,7 +48,8 @@ package Stub.Command_Lines is
       No_Exception,
       No_Local_Header,
       Ignored_Reuse_Tree_File,
-      Ignored_Overwrite_Tree_File);
+      Ignored_Overwrite_Tree_File,
+      Spark_Mode_Off);
    --  Above "Ignored_" switches are legacy switches from the ASIS-based
    --  version.
 
@@ -65,7 +66,8 @@ package Stub.Command_Lines is
          No_Exception                => null,
          No_Local_Header             => null,
          Ignored_Reuse_Tree_File     => +"-r",
-         Ignored_Overwrite_Tree_File => +"-t"]);
+         Ignored_Overwrite_Tree_File => +"-t",
+         Spark_Mode_Off              => null]);
 
    type Stub_Strings is (Header_File, Output);
 
