@@ -298,6 +298,14 @@ package Test.Common is
    --  The root directory to place the test file hierarchy in case of
    --  --separate-root option.
 
+   Subp_File_Name : String_Access;
+   --  Name of the file from which we want to extract the hash in case of the
+   --  --dump-subp-hash option
+
+   Subp_Line_Nbr : Natural;
+   --  Line in Subp_File_Name from which we want to extract the hash in case of
+   --  the --dump-subp-hash option
+
    Test_Dir_Name : GNAT.OS_Lib.String_Access :=
      new String'("gnattest" & GNAT.OS_Lib.Directory_Separator & "tests");
    --  Name of default directory to place test files

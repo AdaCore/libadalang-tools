@@ -95,7 +95,8 @@ package Test.Command_Lines is
       Gen_Test_Subprograms,
       Serialized_Test_Dir,
       Cov_Level,
-      Minimization_Filter);
+      Minimization_Filter,
+      Dump_Subp_Hash);
 
    package Test_String_Switches is new
      String_Switches (Descriptor, Test_Strings);
@@ -117,7 +118,8 @@ package Test.Command_Lines is
          Gen_Test_Subprograms => '=',
          Serialized_Test_Dir  => '=',
          Cov_Level            => '=',
-         Minimization_Filter  => '=']);
+         Minimization_Filter  => '=',
+         Dump_Subp_Hash       => '=']);
 
    type Test_String_Seqs is (Exclude_From_Stubbing);
 
