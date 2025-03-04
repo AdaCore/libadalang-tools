@@ -514,6 +514,31 @@ package body Test.Actions is
 
       end if;
 
+      --  Forbid specifying a test subdir along with a source directoy path
+      --  ending with "**".
+      --  Upon running gnattest twice in a row, the subdirs created during the
+      --  first run will be taken as source directories during the second,
+      --  leading to an error.
+
+      if (Root_Prj.Has_Attribute (Subdir_Mode_Att)
+          or else Arg (Cmd, Subdirs) /= null)
+        and then Root_Prj.Has_Attribute (Source_Dirs_Attribute)
+      then
+         for Src_Dir_Path
+           of Root_Prj.Attribute_Value (Source_Dirs_Attribute).all
+         loop
+            if Src_Dir_Path'Length >= 2
+              and then Src_Dir_Path
+                         (Src_Dir_Path'Last - 1 .. Src_Dir_Path'Last)
+                       = "**"
+            then
+               Cmd_Error_No_Help
+                 ("cannot specify test subdir along with a source directory"
+                  & " path ending with ""**""");
+            end if;
+         end loop;
+      end if;
+
       if Arg (Cmd, Stubs_Dir) /= null then
 
          Free (Test.Common.Stub_Dir_Name);

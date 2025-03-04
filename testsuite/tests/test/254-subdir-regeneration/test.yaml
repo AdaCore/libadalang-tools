@@ -1,0 +1,9 @@
+description:
+  An error message should be emitted when a test subdir name is specified
+  (either throught --subdir or the Subdir gnattest project attribute) along
+  with a source directory path ending in "**" in the project file.
+  This is to avoid gnattest seeing a previouly generated test subdirectory
+  as a source directory when ran twice in row.
+
+driver: shell_script
+
