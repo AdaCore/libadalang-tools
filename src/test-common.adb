@@ -1424,8 +1424,15 @@ package body Test.Common is
    -----------------------------
 
    procedure Add_Allowed_Subprograms (Subp_Decl : String) is
+      Split_Index          : constant Natural :=
+        Ada.Strings.Fixed.Index (Subp_Decl, ":") - 1;
+      Filepath_Simple_Name : constant String :=
+        Ada.Directories.Simple_Name
+          (Subp_Decl (Subp_Decl'First .. Split_Index));
+      Subp_Decl_Location   : constant String :=
+        Filepath_Simple_Name & Subp_Decl (Split_Index + 1 .. Subp_Decl'Last);
    begin
-      Allowed_Subprograms.Include (Subp_Decl);
+      Allowed_Subprograms.Include (Subp_Decl_Location);
    end Add_Allowed_Subprograms;
 
    ---------------------------

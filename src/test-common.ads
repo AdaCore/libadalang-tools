@@ -468,6 +468,8 @@ package Test.Common is
    --  not explicitly allowed will be ignored during test case generation.
    --  The `Subp_Decl` parameter should have the following format
    --  `<subp_decl_filename>:<line_number>`.
+   --  Note: `subp_decl_filename` can be an absolute or relative path to the
+   --  source file. The filename will be extracted from the given path.
 
    function Is_Subprogram_Allowed (Subp : Basic_Decl'Class) return Boolean;
    --  Return if `Subp_Name` test case generation is allowed. If no subprograms
