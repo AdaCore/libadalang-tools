@@ -298,7 +298,7 @@ package Test.Common is
    --  The root directory to place the test file hierarchy in case of
    --  --separate-root option.
 
-   Subp_File_Name : String_Access;
+   Subp_File_Name : String_Access := null;
    --  Name of the file from which we want to extract the hash in case of the
    --  --dump-subp-hash option
 
@@ -475,6 +475,18 @@ package Test.Common is
    --  Return if `Subp_Name` test case generation is allowed. If no subprograms
    --  have been allowed before (the list of allowed subprograms is empty) all
    --  subprograms are considered to be allowed.
+
+   function Parse_File_And_Number
+     (Arg_Name, Arg_Val : String;
+      Line_Number       : out Natural;
+      Extract_File_Name : Boolean := False) return String;
+   --  Parse a file name and a line number separated by a single colon for
+   --  an argument `Arg_Name` and its associated value `Arg_Val`.
+   --  The parsed file name will be returned. If `Extract_File_Name` is set,
+   --  only the file name is returned.
+   --
+   --  CAUTION: **This function will call `Cmd_Error_No_Help`** if the input is
+   --  ill formated. This function is intended to handle user inputs.
 
    Preprocessor_Config : Libadalang.Preprocessing.Preprocessor_Data;
    --  Preprocessor config for the loaded user project.

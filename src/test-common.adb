@@ -1424,15 +1424,8 @@ package body Test.Common is
    -----------------------------
 
    procedure Add_Allowed_Subprograms (Subp_Decl : String) is
-      Split_Index          : constant Natural :=
-        Ada.Strings.Fixed.Index (Subp_Decl, ":") - 1;
-      Filepath_Simple_Name : constant String :=
-        Ada.Directories.Simple_Name
-          (Subp_Decl (Subp_Decl'First .. Split_Index));
-      Subp_Decl_Location   : constant String :=
-        Filepath_Simple_Name & Subp_Decl (Split_Index + 1 .. Subp_Decl'Last);
    begin
-      Allowed_Subprograms.Include (Subp_Decl_Location);
+      Allowed_Subprograms.Include (Subp_Decl);
    end Add_Allowed_Subprograms;
 
    ---------------------------
@@ -1451,5 +1444,45 @@ package body Test.Common is
         Allowed_Subprograms.Is_Empty
         or else Allowed_Subprograms.Contains (Decl_String);
    end Is_Subprogram_Allowed;
+
+   ---------------------------
+   -- Parse_File_And_Number --
+   ---------------------------
+
+   function Parse_File_And_Number
+     (Arg_Name, Arg_Val : String;
+      Line_Number       : out Natural;
+      Extract_File_Name : Boolean := False) return String
+   is
+      Split_Index : constant Natural := Ada.Strings.Fixed.Index (Arg_Val, ":");
+   begin
+      if Split_Index = 0 then
+         Cmd_Error_No_Help
+           ("Unexpected format for "
+            & Arg_Name
+            & ", expected <filename>"
+            & ":<line>");
+      end if;
+
+      declare
+         User_File_Path   : constant String :=
+           Arg_Val (Arg_Val'First .. Split_Index - 1);
+         User_Line_Number : constant String :=
+           Arg_Val (Split_Index + 1 .. Arg_Val'Last);
+      begin
+         begin
+            Line_Number := Natural'Value (User_Line_Number);
+         exception
+            when Constraint_Error =>
+               Cmd_Error_No_Help
+                 (User_Line_Number & " must be a positive number");
+         end;
+
+         return
+           (if Extract_File_Name
+            then Ada.Directories.Simple_Name (User_File_Path)
+            else User_File_Path);
+      end;
+   end Parse_File_And_Number;
 
 end Test.Common;
