@@ -1,0 +1,6 @@
+description: |
+  Check that `--gen-test-subprograms` accepts filepaths. Note that this test
+  only test TGen subprogram filtering feature which is independent from
+  the gnattest one.
+
+driver: shell_script

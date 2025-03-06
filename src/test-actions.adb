@@ -46,6 +46,7 @@ use Utils;
 use Utils.Command_Lines.Common;
 pragma Unreferenced (Utils.Command_Lines.Common); -- ????
 with Utils.Formatted_Output;
+with Utils.String_Utilities;
 
 with Utils_Debug; use Utils_Debug;
 
@@ -239,7 +240,6 @@ package body Test.Actions is
          return Result;
       end Process_Comma_Separated_String;
 
-      use Ada.Strings.Fixed;
    begin
       GNATCOLL.Traces.Parse_Config_File;
       Test.Common.Verbose := Arg (Cmd, Verbose);
@@ -253,33 +253,22 @@ package body Test.Actions is
          return;
       end if;
 
-      declare
-         Subp_Hash       : constant String_Access := Arg (Cmd, Dump_Subp_Hash);
-         Separator_Index : constant Natural :=
-           (if Subp_Hash /= null then Index (Subp_Hash.all, ":", 1) else 0);
-      begin
-         if Subp_Hash /= null then
-            if Separator_Index = 0 then
-               Cmd_Error_No_Help
-                 ("Unexpected format for --dump-subp-hash, expected <filename>"
-                  & ":<line>");
-            end if;
-            Test.Common.Subp_File_Name :=
-              new String'(Subp_Hash.all (1 .. Separator_Index - 1));
-            begin
-               Test.Common.Subp_Line_Nbr :=
-                 Natural'Value
-                   ((Subp_Hash.all (Separator_Index + 1 .. Subp_Hash'Length)));
-            exception
-               when others =>
-                  Cmd_Error_No_Help ("<line> must be a Natural.");
-            end;
+      if Arg (Cmd, Dump_Subp_Hash) /= null then
+         declare
+            Subp_File_Name : constant String :=
+              Test.Common.Parse_File_And_Number
+                ("--dump-subp-hash",
+                 Arg (Cmd, Dump_Subp_Hash).all,
+                 Test.Common.Subp_Line_Nbr);
+         begin
+            Test.Common.Subp_File_Name := new String'(Subp_File_Name);
             Utils.Command_Lines.Append_File_Name
               (Cmd, Test.Common.Subp_File_Name.all);
             Test.Common.Quiet := True;
-            return;
-         end if;
-      end;
+         end;
+
+         return;
+      end if;
 
       Test.Common.Instrument := Arg (Cmd, Dump_Test_Inputs);
 
@@ -1051,7 +1040,20 @@ package body Test.Actions is
                    (Arg (Cmd, Gen_Test_Subprograms).all);
             begin
                for E of Subp_List loop
-                  Test.Common.Add_Allowed_Subprograms (E.To_String);
+                  declare
+                     Line_Number : Natural;
+                     File_Path   : constant String :=
+                       Test.Common.Parse_File_And_Number
+                         ("--gen-test-subprograms",
+                          E.To_String,
+                          Line_Number,
+                          Extract_File_Name => True);
+                  begin
+                     Test.Common.Add_Allowed_Subprograms
+                       (File_Path
+                        & ":"
+                        & Utils.String_Utilities.Image (Line_Number));
+                  end;
                end loop;
             end;
          end if;
