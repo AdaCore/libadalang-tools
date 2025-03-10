@@ -320,6 +320,8 @@ package Test.Common is
 
    Stub_Mode_ON : Boolean := False;
 
+   Recursive_Stubbing_ON : Boolean := False;
+
    Transition : Boolean := False;
 
    Omit_Sloc : Boolean := False;

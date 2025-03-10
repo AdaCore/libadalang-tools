@@ -623,6 +623,7 @@ package body Test.Actions is
 
       begin
          Common.Stub_Mode_ON := Arg (Cmd, Stub);
+         Common.Recursive_Stubbing_ON := Arg (Cmd, Recursive_Stub);
 
          for File of File_Names (Cmd) loop
             if not Contains (Ignored, Simple_Name (File.all)) then
@@ -1428,6 +1429,8 @@ package body Test.Actions is
         (" --harness-only          - Treat argument sources as tests to add to the suite\n");
       Put
         (" --stub                  - Generate testing framework that uses stubs\n");
+      Put
+        (" --recursive-stub        - Recursively stub dependencies of stubbed units\n");
       Put ("\n");
 
       Put
