@@ -8346,15 +8346,13 @@ package body Test.Skeleton is
    procedure Get_Units_To_Stub
      (The_Unit : Compilation_Unit; Data : in out Data_Holder)
    is
-      Body_N    : Body_Node;
-      Body_Unit : Compilation_Unit;
-
-      Parent : Ada_Node;
-
       Already_Stubbing : String_Set.Set := String_Set.Empty_Set;
       --  It is generally easier to store units to stub in a list, however
       --  to avoid duplications we use this local set since it is easier
       --  and faster to check membership in a set.
+
+      procedure Do_Get_Stub_Units (The_Unit : Compilation_Unit);
+      --  Recursive implementation helper.
 
       function Good_To_Stub (Check_Unit : Analysis_Unit) return Boolean;
       --  Checks that given unit is suitable for stubbing
@@ -8364,7 +8362,7 @@ package body Test.Skeleton is
       --  units to stub.
 
       procedure Iterate_Separates (The_Unit : Compilation_Unit);
-      --  Looks for inuts withed in separate bodies
+      --  Looks for inputs withed in separate bodies
 
       -----------------------
       -- Add_Units_To_Stub --
@@ -8401,6 +8399,15 @@ package body Test.Skeleton is
                               Data.Units_To_Stub.Append
                                 (Withed_Spec.As_Ada_Node);
                               Trace (Me, Withed_Spec_Image);
+
+                              --  Recursively stub
+
+                              if Recursive_Stubbing_ON then
+                                 Trace (Me, "Recursively stub");
+                                 Do_Get_Stub_Units
+                                   (Withed_Spec.Unit.Root.As_Compilation_Unit);
+                              end if;
+
                            end if;
                         end;
 
@@ -8511,55 +8518,73 @@ package body Test.Skeleton is
          return True;
       end Good_To_Stub;
 
-   begin
-      Trace
-        (Me, "units to stub for " & Base_Name (The_Unit.Unit.Get_Filename));
-      Increase_Indent (Me);
+      -----------------------
+      -- Do_Get_Stub_Units --
+      -----------------------
 
-      --  Gathering with clauses from spec
-      Add_Units_To_Stub (The_Unit);
+      procedure Do_Get_Stub_Units (The_Unit : Compilation_Unit) is
+         Body_N    : Body_Node;
+         Body_Unit : Compilation_Unit;
 
-      Body_N :=
-        The_Unit
-          .F_Body
-          .As_Library_Item
-          .F_Item
-          .As_Basic_Decl
-          .P_Body_Part_For_Decl;
+         Parent : Ada_Node;
+      begin
+         Trace
+           (Me, "units to stub for " & Base_Name (The_Unit.Unit.Get_Filename));
+         Increase_Indent (Me);
 
-      --  Gathering with clauses from body
-      if Body_N /= No_Body_Node
-        and then Body_N.Unit.Root.Kind = Ada_Compilation_Unit
-      then
-         Body_Unit := Body_N.Unit.Root.As_Compilation_Unit;
-         Add_Units_To_Stub (Body_Unit);
-         Iterate_Separates (Body_Unit);
-      end if;
+         --  Gathering with clauses from spec
+         Add_Units_To_Stub (The_Unit);
 
-      --  Gathering parent packages
-      Parent :=
-        The_Unit.F_Body.As_Library_Item.F_Item.As_Ada_Node.P_Semantic_Parent;
-      while not Parent.Is_Null and then Parent.Unit /= Parent.P_Standard_Unit
-      loop
-         if Parent.Kind = Ada_Package_Decl then
-            declare
-               Parent_File : constant String := Parent.Unit.Get_Filename;
-            begin
-               if Good_To_Stub (Parent.Unit)
-                 and then not Already_Stubbing.Contains (Parent_File)
-               then
-                  Already_Stubbing.Include (Parent_File);
-                  Data.Units_To_Stub.Append (Parent);
-                  Trace (Me, Parent_File);
-               end if;
-            end;
+         Body_N :=
+           The_Unit
+             .F_Body
+             .As_Library_Item
+             .F_Item
+             .As_Basic_Decl
+             .P_Body_Part_For_Decl;
+
+         --  Gathering with clauses from body
+         if Body_N /= No_Body_Node
+           and then Body_N.Unit.Root.Kind = Ada_Compilation_Unit
+         then
+            Body_Unit := Body_N.Unit.Root.As_Compilation_Unit;
+            Add_Units_To_Stub (Body_Unit);
+            Iterate_Separates (Body_Unit);
          end if;
 
-         Parent := Parent.P_Semantic_Parent;
-      end loop;
+         --  Gathering parent packages
+         Parent :=
+           The_Unit
+             .F_Body
+             .As_Library_Item
+             .F_Item
+             .As_Ada_Node
+             .P_Semantic_Parent;
+         while not Parent.Is_Null
+           and then Parent.Unit /= Parent.P_Standard_Unit
+         loop
+            if Parent.Kind = Ada_Package_Decl then
+               declare
+                  Parent_File : constant String := Parent.Unit.Get_Filename;
+               begin
+                  if Good_To_Stub (Parent.Unit)
+                    and then not Already_Stubbing.Contains (Parent_File)
+                  then
+                     Already_Stubbing.Include (Parent_File);
+                     Data.Units_To_Stub.Append (Parent);
+                     Trace (Me, Parent_File);
+                  end if;
+               end;
+            end if;
 
-      Decrease_Indent (Me);
-      Already_Stubbing.Clear;
+            Parent := Parent.P_Semantic_Parent;
+         end loop;
+
+         Decrease_Indent (Me);
+         Already_Stubbing.Clear;
+      end Do_Get_Stub_Units;
+   begin
+      Do_Get_Stub_Units (The_Unit);
    end Get_Units_To_Stub;
 
    ----------------------
