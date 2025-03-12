@@ -135,14 +135,14 @@ package body Utils.Environment is
 
       if Temp_Dir_Parent /= "" then
          Change_Dir (Temp_Dir_Parent);
-         --  So when we create the Tool_Temp_Dir below, it will be a
-         --  subdirectory of Temp_Dir_Parent.
+      --  So when we create the Tool_Temp_Dir below, it will be a
+      --  subdirectory of Temp_Dir_Parent.
       elsif Obj_Dir /= "" then
          Parallel_Make_Dir (Obj_Dir);
          Change_Dir (Obj_Dir);
-         --  Otherwise if we have an argument project create tem dir inside
-         --  the object directory of the project. Object dir might not exist
-         --  yet so we need to create it in this case.
+      --  Otherwise if we have an argument project create tem dir inside
+      --  the object directory of the project. Object dir might not exist
+      --  yet so we need to create it in this case.
       end if;
 
       --  ??? We create the temp dir by first creating the temp file, then

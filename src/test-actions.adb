@@ -698,7 +698,8 @@ package body Test.Actions is
 
             elsif Skeleton_Default_Val /= "" then
                Cmd_Error_No_Help
-                 ((if Skeleton_Default_Switch /= null then "--skeleton-default"
+                 ((if Skeleton_Default_Switch /= null
+                   then "--skeleton-default"
                    else "Gnattest.Skeletons_Default")
                   & " should be either fail or pass");
             end if;

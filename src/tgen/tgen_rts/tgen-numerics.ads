@@ -94,9 +94,12 @@ package TGen.Numerics is
       --
       --  TODO???: this should use the Machine_Mantissa attribute.
 
-      (if Digits_Value <= 6 then Single
-       elsif Digits_Value <= 15 then Double
-       elsif Digits_Value <= 18 then Extended
+      (if Digits_Value <= 6
+       then Single
+       elsif Digits_Value <= 15
+       then Double
+       elsif Digits_Value <= 18
+       then Extended
        else raise Program_Error with "Unsupported digits value.");
 
    function First (Digits_Value : Natural) return Any_Float

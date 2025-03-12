@@ -272,7 +272,8 @@ package body Pp.Scanner is
    is (V.New_Sloc_First);
 
    function Next_Sloc_First (X : Tokn_Cursor) return Positive
-   is (if At_Last (X) then New_Sloc_First (X.V.all)
+   is (if At_Last (X)
+       then New_Sloc_First (X.V.all)
        else Sloc_First (Next (X)));
 
    function Text (X : Tokn_Cursor) return Symbol is
@@ -420,8 +421,8 @@ package body Pp.Scanner is
                      | Expected_Len + (L - 1)
                      | Expected_Len_With_Tabs);
 
-               --  The (L - 1) is in case the source has CRLF line endings;
-               --  Text does not include the intermediate CR characters.
+            --  The (L - 1) is in case the source has CRLF line endings;
+            --  Text does not include the intermediate CR characters.
             end;
          end if;
       end Debug_Token;
@@ -1302,7 +1303,7 @@ package body Pp.Scanner is
             Cur_Line := Cur_Line + 1;
             Cur_Col := 1;
 
-            --  Spaces
+         --  Spaces
 
          elsif Is_Space (Cur) then
             Tok := (Kind => Spaces, Sloc => Tok.Sloc, Text => <>);
@@ -1310,11 +1311,11 @@ package body Pp.Scanner is
                Get;
             end loop;
 
-            --  identifier
+         --  identifier
 
-            --  We allow '$' at the start of an identifier because that's what
-            --  preprocessor symbols look like, and this allows us to process
-            --  some files that use preprocessing.
+         --  We allow '$' at the start of an identifier because that's what
+         --  preprocessor symbols look like, and this allows us to process
+         --  some files that use preprocessing.
 
          elsif Is_Letter (Cur) or else (Lang = Ada_Lang and then Cur = '$')
          then
@@ -1803,7 +1804,7 @@ package body Pp.Scanner is
                   Tok := Tok_2;
                   exit;
 
-                  --  Tok_2 can be combined
+               --  Tok_2 can be combined
 
                elsif Tok.Sloc.Col = Tok_2.Sloc.Col
                  and then Tok.Leading_Blanks = Tok_2.Leading_Blanks
@@ -1813,13 +1814,13 @@ package body Pp.Scanner is
                   Tok.Sloc.Last := Tok_2.Sloc.Last;
                   Tok.Num_Lines := Tok.Num_Lines + 1;
                   Tok.Last_Line_Len := Tok_2.Last_Line_Len;
-                  --  Go around the loop again, in case the next Tok_2 can be
-                  --  combined.
+               --  Go around the loop again, in case the next Tok_2 can be
+               --  combined.
 
-                  --  Tok_2 cannot be combined, but it might start a new
-                  --  paragraph. Finish constructing Tok, send it to Result
-                  --  followed by Tok_EOL and Possible_Spaces, and use Tok_2 as
-                  --  the new Tok.
+               --  Tok_2 cannot be combined, but it might start a new
+               --  paragraph. Finish constructing Tok, send it to Result
+               --  followed by Tok_EOL and Possible_Spaces, and use Tok_2 as
+               --  the new Tok.
 
                else
                   Tok.Text := Intern (Name_Buffer);
@@ -1832,9 +1833,9 @@ package body Pp.Scanner is
                   --  the paragraph in Tok.
                end if;
 
-               --  Not a comment, so cannot be combined. Finish constructing
-               --  Tok, send it to Result followed by Tok_EOL, Possible_Spaces,
-               --  and Tok_2, then exit.
+            --  Not a comment, so cannot be combined. Finish constructing
+            --  Tok, send it to Result followed by Tok_EOL, Possible_Spaces,
+            --  and Tok_2, then exit.
 
             else
                pragma Assert (Tok_2.Kind not in Comment_Kind);
@@ -1882,8 +1883,8 @@ package body Pp.Scanner is
                   Append_To_Result (Tok);
                end if;
 
-               --  The simple case: Tok is not a comment, so just finish
-               --  constructing it and send it to Result.
+            --  The simple case: Tok is not a comment, so just finish
+            --  constructing it and send it to Result.
 
             else
                pragma Assert (Tok.Kind not in Comment_Kind);

@@ -678,8 +678,8 @@ package body Utils.Command_Lines is
       function Arg (Cmd : Command_Line; Switch : Switches) return Arg_Type is
       begin
          return Value (Cmd.Sw (To_All (Switch)).String_Val.all);
-         --  If the ".all" blows up because of a null pointer, that's because
-         --  the client forgot to instantiate Set_Defaults to set defaults.
+      --  If the ".all" blows up because of a null pointer, that's because
+      --  the client forgot to instantiate Set_Defaults to set defaults.
       end Arg;
 
       procedure Set_Arg
@@ -1062,15 +1062,15 @@ package body Utils.Command_Lines is
                           ("missing switch parameter for: " & Text);
                      end if;
 
-                     --  The case of:
-                     --
-                     --     command --switch=arg
-                     --
-                     --  or:
-                     --
-                     --     command --switcharg
-                     --
-                     --  Split out the "arg" part.
+                  --  The case of:
+                  --
+                  --     command --switch=arg
+                  --
+                  --  or:
+                  --
+                  --     command --switcharg
+                  --
+                  --  Split out the "arg" part.
 
                   else
                      pragma
@@ -1192,7 +1192,7 @@ package body Utils.Command_Lines is
                      end;
                   end loop;
 
-                  --  No wildcards:
+               --  No wildcards:
 
                else
                   Append (Cmd.File_Names, String_Ref (Text_Args (Cur)));

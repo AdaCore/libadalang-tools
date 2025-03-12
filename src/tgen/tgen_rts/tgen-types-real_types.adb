@@ -162,7 +162,8 @@ package body TGen.Types.Real_Types is
    function Low_Bound_Or_Default (Self : Decimal_Fixed_Typ) return Big_Real is
    begin
       return
-        (if Self.Has_Range then Self.Range_Value.Min
+        (if Self.Has_Range
+         then Self.Range_Value.Min
          else
            -(To_Real (10)**Self.Digits_Value - To_Real (1))
            * Self.Delta_Value);
@@ -171,7 +172,8 @@ package body TGen.Types.Real_Types is
    function High_Bound_Or_Default (Self : Decimal_Fixed_Typ) return Big_Real is
    begin
       return
-        (if Self.Has_Range then Self.Range_Value.Max
+        (if Self.Has_Range
+         then Self.Range_Value.Max
          else
            (To_Real (10)**Self.Digits_Value - To_Real (1)) * Self.Delta_Value);
    end High_Bound_Or_Default;

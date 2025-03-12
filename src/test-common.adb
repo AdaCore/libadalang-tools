@@ -420,7 +420,8 @@ package body Test.Common is
         (Me_Hash,
          "Mangle_Hash_Full for "
          & Subp_Name
-         & (if L_Subp_Span = No_Source_Location_Range then ""
+         & (if L_Subp_Span = No_Source_Location_Range
+            then ""
             else " at line" & L_Subp_Span.Start_Line'Img));
       Increase_Indent (Me_Hash);
 

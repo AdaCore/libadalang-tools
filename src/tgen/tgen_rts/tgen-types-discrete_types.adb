@@ -509,7 +509,8 @@ package body TGen.Types.Discrete_Types is
       Offsets : constant Big_Int_Array :=
         [To_Big_Integer (0), To_Big_Integer (1), To_Big_Integer (1000)];
       Base    : constant Big_Integer :=
-        (if Disc_Is_LB then Constraints.Discrete_Range.High_Bound.Int_Val
+        (if Disc_Is_LB
+         then Constraints.Discrete_Range.High_Bound.Int_Val
          else Constraints.Discrete_Range.Low_Bound.Int_Val);
    begin
       for I in Offsets'Range loop

@@ -100,8 +100,8 @@ package body METRICS.Line_Counting is
                     renames Result (Last_Index (Result) - 1);
                begin
                   pragma Assert (Last (Lines_Code) = Prev (Lines_Code) + 1);
-                  --  We must have seen a previous non-comment token on
-                  --  this line.
+               --  We must have seen a previous non-comment token on
+               --  this line.
                end;
 
                exit when K = Ada_Termination;

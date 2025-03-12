@@ -56,7 +56,8 @@ package body TGen.Types.Int_Types is
       return
         (Typ (Self).Image
          & ": Modular Integer"
-         & (if Self.Is_Static then " mod" & Big_Int.To_String (Self.Mod_Value)
+         & (if Self.Is_Static
+            then " mod" & Big_Int.To_String (Self.Mod_Value)
             else "(non static)"));
    end Image;
 

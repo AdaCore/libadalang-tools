@@ -61,7 +61,8 @@ package body TGen.Types is
    function Image (Self : Typ) return String is
    begin
       return
-        (if Self.Name = Ada_Identifier_Vectors.Empty_Vector then "Anonymous"
+        (if Self.Name = Ada_Identifier_Vectors.Empty_Vector
+         then "Anonymous"
          else Self.Type_Name);
    end Image;
 
@@ -98,7 +99,8 @@ package body TGen.Types is
       Top_Level_Generic : Boolean := False) return String
    is
       Name : constant Ada_Qualified_Name :=
-        (if Top_Level_Generic then Generic_Package_Instance_Name (Self.Name)
+        (if Top_Level_Generic
+         then Generic_Package_Instance_Name (Self.Name)
          else Self.Name);
 
       function Append_Class_Wide_If_Needed (Type_Name : String) return String
@@ -200,7 +202,8 @@ package body TGen.Types is
      (Self : Typ; Top_Level_Generic : Boolean := False) return String
    is
       Name : constant Ada_Qualified_Name :=
-        (if Top_Level_Generic then Generic_Package_Instance_Name (Self.Name)
+        (if Top_Level_Generic
+         then Generic_Package_Instance_Name (Self.Name)
          else Self.Name);
    begin
       return To_Symbol (Name, '_');

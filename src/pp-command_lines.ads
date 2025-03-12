@@ -490,9 +490,12 @@ package Pp.Command_Lines is
        or else Arg (Cmd, Obsolete_A5));
 
    function Alignment_Enabled (Cmd : Command_Line) return Boolean
-   is (if Explicit (Cmd, Layout) then Arg (Cmd, Alignment)
-       elsif Arg (Cmd, RM_Style_Spacing) then Explicit (Cmd, Alignment)
-       elsif Arg (Cmd, Obsolete_A0) then Obsolete_Alignment_Switch (Cmd)
+   is (if Explicit (Cmd, Layout)
+       then Arg (Cmd, Alignment)
+       elsif Arg (Cmd, RM_Style_Spacing)
+       then Explicit (Cmd, Alignment)
+       elsif Arg (Cmd, Obsolete_A0)
+       then Obsolete_Alignment_Switch (Cmd)
        else Arg (Cmd, Alignment) or Obsolete_Alignment_Switch (Cmd));
    --  Layout controls the alignment. The remaining condition are for legacy
    --  purposes.
@@ -619,7 +622,8 @@ package Pp.Command_Lines is
    function PP_Indent_Continuation (Cmd : Cmd_Line) return Positive
    is (if Arg (Cmd, Indent_Continuation) = 0
        then
-         (if PP_Indentation (Cmd) > 1 then PP_Indentation (Cmd) - 1
+         (if PP_Indentation (Cmd) > 1
+          then PP_Indentation (Cmd) - 1
           else PP_Indentation (Cmd))
        else Arg (Cmd, Indent_Continuation));
 

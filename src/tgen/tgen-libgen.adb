@@ -124,7 +124,8 @@ package body TGen.Libgen is
       Prefix             : constant Ada_Identifier :=
         Ada_Identifier (+"TGen_Generic_Instantiation_");
       Replace_Element    : constant Ada_Identifier :=
-        (if Replace_First then Pack_Name.First_Element
+        (if Replace_First
+         then Pack_Name.First_Element
          else Pack_Name.Last_Element);
       First_Element_Name : constant Ada_Identifier := Prefix & Replace_Element;
       Result             : Ada_Qualified_Name;
@@ -401,7 +402,8 @@ package body TGen.Libgen is
               and then T.all not in Instance_Typ'Class
             then
                Spec_Part_Acc :=
-                 (if T.all.Fully_Private then Private_Part'Unrestricted_Access
+                 (if T.all.Fully_Private
+                  then Private_Part'Unrestricted_Access
                   else Spec_Part'Unrestricted_Access);
                if T.all.Kind in Function_Kind then
                   if JSON_Marshalling_Enabled then
@@ -1113,7 +1115,8 @@ package body TGen.Libgen is
          Rel_Path : constant Filesystem_String :=
            Relative_Path
              ((if User_Prj.Is_Absolute_Path then User_Prj else Cwd / User_Prj),
-              (if Support_Prj.Is_Absolute_Path then Support_Prj
+              (if Support_Prj.Is_Absolute_Path
+               then Support_Prj
                else Cwd / Support_Prj));
       begin
          Create
@@ -1686,13 +1689,16 @@ package body TGen.Libgen is
       Rel_User_Path    : constant Filesystem_String :=
         Relative_Path
           ((if User_Prj.Is_Absolute_Path then User_Prj else Cwd / User_Prj),
-           (if VHarness_Dir.Is_Absolute_Path then VHarness_Dir
+           (if VHarness_Dir.Is_Absolute_Path
+            then VHarness_Dir
             else Cwd / VHarness_Dir));
       Rel_Support_Path : constant Filesystem_String :=
         Relative_Path
-          ((if Support_Prj.Is_Absolute_Path then Support_Prj
+          ((if Support_Prj.Is_Absolute_Path
+            then Support_Prj
             else Cwd / Support_Prj),
-           (if VHarness_Dir.Is_Absolute_Path then VHarness_Dir
+           (if VHarness_Dir.Is_Absolute_Path
+            then VHarness_Dir
             else Cwd / VHarness_Dir));
       Prj_File         : File_Type;
       Main_File        : File_Type;

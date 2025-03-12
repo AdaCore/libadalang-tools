@@ -651,7 +651,8 @@ package body Utils.Projects is
            Arg_Length (Cmd, Common.Files);
          --  Number of "-files=..." switches on the command line
          Argument_File_Specified : constant Boolean :=
-           (if Arg (Cmd) = Update_All then Num_Files_Switches > 0
+           (if Arg (Cmd) = Update_All
+            then Num_Files_Switches > 0
             else Num_Names > 0 or else Num_Files_Switches > 0);
          --  True if we have source files specified on the command line. If -U
          --  (Update_All) was specified, then the "file name" (if any) is taken
@@ -723,7 +724,7 @@ package body Utils.Projects is
                     and then Is_Ada_File (Files (F))
                   then
                      Append_File_Name (Cmd, Files (F).Display_Base_Name);
-                     --  No need to call Callback for non-switches
+                  --  No need to call Callback for non-switches
 
                   end if;
                end loop;
@@ -845,8 +846,8 @@ package body Utils.Projects is
                Phase              => Project_File,
                Callback           => Callback,
                Collect_File_Names => False);
-            --  Collect_File_Names doesn't matter, because we're only parsing
-            --  switches.
+         --  Collect_File_Names doesn't matter, because we're only parsing
+         --  switches.
 
          end if;
       end Extract_Tool_Options;
@@ -1117,8 +1118,8 @@ package body Utils.Projects is
             Cmd_Error ("'-U' cannot be specified for aggregate project");
          end if;
 
-         --  Information in 'else' below is not extracted from the aggregate
-         --  project itself.
+      --  Information in 'else' below is not extracted from the aggregate
+      --  project itself.
 
       else
          Extract_Tool_Options;
@@ -1280,7 +1281,7 @@ package body Utils.Projects is
       end loop;
 
       Tool_Current_Dir := new String'(Initial_Dir);
-      --  Leave Tool_Inner_Dir = null
+   --  Leave Tool_Inner_Dir = null
    end Post_Cmd_Line_1;
 
    procedure Process_Command_Line

@@ -94,14 +94,16 @@ package body TGen.Types.Enum_Types is
    end Lit_Image;
 
    function High_Bound (Self : Char_Typ) return Big_Integer
-   is (if Self.Has_Range then Self.Range_Value.High_Bound.Int_Val
+   is (if Self.Has_Range
+       then Self.Range_Value.High_Bound.Int_Val
        else Big_Int.To_Big_Integer (Character'Pos ('~')));
    --  Although Char_Typ represents Character, Wide_Character and
    --  Wide_Wide_Character, we'll conservatively use ~ (last printable ASCII
    --  character) as the high bound.
 
    function Low_Bound (Self : Char_Typ) return Big_Integer
-   is (if Self.Has_Range then Self.Range_Value.Low_Bound.Int_Val
+   is (if Self.Has_Range
+       then Self.Range_Value.Low_Bound.Int_Val
        else Big_Int.To_Big_Integer (Character'Pos (' ')));
    --  The space is not the first element of Character but we won't generate
    --  non printable characters as they need to be unparsable in sources.

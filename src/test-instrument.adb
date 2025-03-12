@@ -472,13 +472,13 @@ package body Test.Instrument is
                Process_Package_Body (D.As_Basic_Decl);
             end if;
 
-            --  Atm only the following constructs are processed (given that
-            --  corresponding specifications are declare in the unit spec):
-            --    *  regular subprogram body;
-            --    *  expression function body;
-            --    *  renaming as body;
-            --    *  null procedure.
-            --  Everything else is ignored.
+         --  Atm only the following constructs are processed (given that
+         --  corresponding specifications are declare in the unit spec):
+         --    *  regular subprogram body;
+         --    *  expression function body;
+         --    *  renaming as body;
+         --    *  null procedure.
+         --  Everything else is ignored.
          elsif D.Kind in Ada_Subp_Body then
 
             if not From_Same_Unit (D.As_Subp_Body.P_Decl_Part, D)
@@ -622,7 +622,8 @@ package body Test.Instrument is
                   S_Put
                     (Padding (D),
                      Node_Image (D.As_Expr_Function.F_Subp_Spec)
-                     & (if D.As_Expr_Function.F_Aspects.Is_Null then ";"
+                     & (if D.As_Expr_Function.F_Aspects.Is_Null
+                        then ";"
                         else
                           " "
                           & Node_Image (D.As_Expr_Function.F_Aspects)
@@ -694,7 +695,8 @@ package body Test.Instrument is
       Pad : constant Natural := Padding (Decl);
 
       Decl_Decl : constant Basic_Decl :=
-        (if Decl.P_Decl_Part.Is_Null then Decl.As_Basic_Decl
+        (if Decl.P_Decl_Part.Is_Null
+         then Decl.As_Basic_Decl
          else Decl.P_Decl_Part);
 
       use TGen.Strings.Ada_Identifier_Vectors;
@@ -1130,7 +1132,8 @@ package body Test.Instrument is
 
             declare
                N_Common : constant Wide_Wide_String :=
-                 (if Has_Dot then N1 (N1'First .. N1'First + Idx)
+                 (if Has_Dot
+                  then N1 (N1'First .. N1'First + Idx)
                   --  N1 and N2 are the same at this point. We reached the
                   --  end of the string without encountering a dot.
                   else N1);

@@ -172,7 +172,7 @@ package body Stub.Actions is
                 (Stub.Command_Lines.Descriptor, To_All (Update_Body)).all);
       end if;
 
-      --  Note that we never call Pp.Actions.Pp_Tool.Init
+   --  Note that we never call Pp.Actions.Pp_Tool.Init
    end Init;
 
    -----------
@@ -1070,7 +1070,8 @@ package body Stub.Actions is
                      Put
                        ("\ntype \1 is\2 null record;\n",
                         Full_Name (Get_Def_Name (Child).As_Name),
-                        (if Child.Kind = Ada_Incomplete_Type_Decl then ""
+                        (if Child.Kind = Ada_Incomplete_Type_Decl
+                         then ""
                          else " tagged"));
                   end loop;
                end if;
@@ -1218,14 +1219,15 @@ package body Stub.Actions is
             Unit_Name     : constant String := To_UTF8 (LC_Root_Node_Name);
             --  Unit_Name is correct for both library units and Ada stubs
             Part          : constant Unit_Parts :=
-              (if Root_Node.Kind in Ada_Body_Stub then Unit_Separate
+              (if Root_Node.Kind in Ada_Body_Stub
+               then Unit_Separate
                else Unit_Body);
          begin
             if Project (Arg_File_Info) /= No_Project then
                pragma
                  Assert
                    (Extending_Project (Project (Arg_File_Info)) = No_Project);
-               --  We don't want to modify extended projects
+            --  We don't want to modify extended projects
 
             end if;
 

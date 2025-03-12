@@ -443,7 +443,7 @@ package body Pp.Actions is
 
             if not Debug_Flag_N then
                GNAT.OS_Lib.Delete_File (File_Name_File_Name.all, Ignored);
-               --  No point in complaining on failure
+            --  No point in complaining on failure
 
             end if;
          exception
@@ -1783,7 +1783,8 @@ package body Pp.Actions is
                 (Replace_One
                    (Ada_Generic_Package_Instantiation,
                     From =>
-                      (if Arg (Cmd, RM_Style_Spacing) then "?[#(~,#1 ~)]~"
+                      (if Arg (Cmd, RM_Style_Spacing)
+                       then "?[#(~,#1 ~)]~"
                        else "?[# (~,#1 ~)]~"),
                     To   => "?[$(~,$0 ~)]~")),
             Generic_Subp_Instantiation_Vertical_Agg_Alt       =>
@@ -1791,7 +1792,8 @@ package body Pp.Actions is
                 (Replace_One
                    (Ada_Generic_Subp_Instantiation,
                     From =>
-                      (if Arg (Cmd, RM_Style_Spacing) then "?[#(~,#1 ~)]~"
+                      (if Arg (Cmd, RM_Style_Spacing)
+                       then "?[#(~,#1 ~)]~"
                        else "?[# (~,#1 ~)]~"),
                     To   => "?[$(~,$0 ~)]~")),
             Return_Stmt_Vertical_Agg_Alt                      =>
@@ -2328,9 +2330,9 @@ package body Pp.Actions is
            (Ada_Constrained_Array_Indices, "(?~,# ~~)", "?{{ (~,# ~)}}~");
          Replace_Tmp
            (Ada_Unconstrained_Array_Indices, "(?~,# ~~)", "?{{ (~,# ~)}}~");
-         --  Note the double indentation. It just happens that 3 more
-         --  characters place us just after "array ". Perhaps we should
-         --  use the Paren_Stack mechanism in PP.Formatting.
+      --  Note the double indentation. It just happens that 3 more
+      --  characters place us just after "array ". Perhaps we should
+      --  use the Paren_Stack mechanism in PP.Formatting.
 
       end if;
 
@@ -2723,7 +2725,8 @@ package body Pp.Actions is
          --  the appropriate option based on the Kind.
 
          Casing : constant PP_Casing :=
-           (if Id (1) = ''' then As_Declared
+           (if Id (1) = '''
+            then As_Declared
             elsif Id (1)
               = '"' -- operator symbol
                 --  Kind not in Ada_Attribute_Ref | Ada_Update_Attribute_Ref
@@ -2733,7 +2736,8 @@ package body Pp.Actions is
                 --   or else Id = Name_And_Then
                 --   or else Id = Name_Or_Else)
             then PP_Keyword_Casing (Cmd)
-            elsif Is_Predef and then Use_Predefined_Casing then As_Declared
+            elsif Is_Predef and then Use_Predefined_Casing
+            then As_Declared
             else
               (case Kind is
                  when Ada_Attribute_Ref | Ada_Update_Attribute_Ref =>
@@ -2769,7 +2773,8 @@ package body Pp.Actions is
                    PP_Name_Casing (Cmd),
 
                  when Ada_Object_Decl =>
-                   (if Is_Constant then PP_Constant_Casing (Cmd)
+                   (if Is_Constant
+                    then PP_Constant_Casing (Cmd)
                     else PP_Name_Casing (Cmd)),
 
                  when others => PP_Name_Casing (Cmd)));
@@ -3426,7 +3431,8 @@ package body Pp.Actions is
             Real_Start_Index : constant Natural :=
               (if Start_Child_Index = 0 then 1 else Start_Child_Index);
             Real_End_Index   : constant Natural :=
-              (if End_Child_Index = 0 then Subtree_Count (Tree)
+              (if End_Child_Index = 0
+               then Subtree_Count (Tree)
                else End_Child_Index);
          begin
             if Subtree_Count (Tree) = 0 then
@@ -3701,7 +3707,8 @@ package body Pp.Actions is
 
             procedure Do_Tab (Inst_Index : Instr_Index) is
                Par : constant Ada_Tree :=
-                 (if Tree = Parent_Tree then Ancestor_Tree (2)
+                 (if Tree = Parent_Tree
+                  then Ancestor_Tree (2)
                   --  up one more level
                   else Parent_Tree);
 
@@ -3723,8 +3730,8 @@ package body Pp.Actions is
                            | Ada_Extended_Return_Stmt_Object_Decl);
                      return Name_Tab_In_Out;
 
-                     --  Except for the above special cases, we return
-                     --  the text of the token after "^" in the template.
+                  --  Except for the above special cases, we return
+                  --  the text of the token after "^" in the template.
 
                   else
                      declare
@@ -3733,7 +3740,7 @@ package body Pp.Actions is
                      begin
                         if Next_Inst.Kind = Continuation_Outdent then
                            return Name_R_Sq;
-                           --  This happens for Comp_Clause_Alt.
+                        --  This happens for Comp_Clause_Alt.
 
                         else
                            pragma Assert (Next_Inst.Kind = Verbatim);
@@ -3870,7 +3877,8 @@ package body Pp.Actions is
                      end if;
                      Do_Subtree
                        (Subtree_Index =>
-                          (if Inst.Index = 0 then Cur_Subtree_Index
+                          (if Inst.Index = 0
+                           then Cur_Subtree_Index
                            else Inst.Index));
 
                   when Verbatim =>
@@ -4071,7 +4079,7 @@ package body Pp.Actions is
                               end if;
                            end;
 
-                           --  Outermost aggregate case
+                        --  Outermost aggregate case
 
                         else
                            declare
@@ -4122,11 +4130,11 @@ package body Pp.Actions is
                               end if;
                            end;
 
-                           --  Outermost aggregate case
-                           --  Here we can have the empty array situation
-                           --  that should be handled
-                           --  (i.e. Empty_Matrix : constant Matrix := [];)
-                           --  In this case Subtree_Count (Assocs) = 0.
+                        --  Outermost aggregate case
+                        --  Here we can have the empty array situation
+                        --  that should be handled
+                        --  (i.e. Empty_Matrix : constant Matrix := [];)
+                        --  In this case Subtree_Count (Assocs) = 0.
 
                         else
                            declare
@@ -4477,8 +4485,8 @@ package body Pp.Actions is
                   if Single_Name then
                      if Depends_Hack (Ancestor_Tree (3)) then
                         Interpret_Alt_Template (Depends_Hack_Alt);
-                        --  Avoid the usual " " after "=>"; see Do_Un_Op below for an
-                        --  explanation.
+                     --  Avoid the usual " " after "=>"; see Do_Un_Op below for an
+                     --  explanation.
                      elsif Vertical then
                         Interpret_Alt_Template
                           (Single_Name_Vertical_Assoc_Alt);
@@ -4514,8 +4522,8 @@ package body Pp.Actions is
                pragma Assert (Subtree (Expr, 1).Kind = Ada_Op_Plus);
                Interpret_Alt_Template (Un_Op_Space_Alt, Subtrees (Expr));
 
-               --  No special "[Refined_]Depends" case. Put a space after the
-               --  operator, except for "+" and "-".
+            --  No special "[Refined_]Depends" case. Put a space after the
+            --  operator, except for "+" and "-".
 
             else
                case Ada_Op'(F_Op (Expr)) is
@@ -4805,13 +4813,16 @@ package body Pp.Actions is
                when Ada_Int_Literal | Ada_Real_Literal =>
                   declare
                      Sharp      : constant Natural :=
-                       (if Find (S, "#") /= 0 then Find (S, "#")
+                       (if Find (S, "#") /= 0
+                        then Find (S, "#")
                         else Find (S, ":"));
                      Underscore : constant Natural := Find (S, "_");
 
                      Grouping : constant Natural :=
-                       (if Underscore /= 0 then 0
-                        elsif Sharp = 0 then Arg (Cmd, Decimal_Grouping)
+                       (if Underscore /= 0
+                        then 0
+                        elsif Sharp = 0
+                        then Arg (Cmd, Decimal_Grouping)
                         else Arg (Cmd, Based_Grouping));
 
                      Int_First, Int_Last, Frac_First, Frac_Last : Natural;
@@ -4937,7 +4948,8 @@ package body Pp.Actions is
                   T        : constant Alt_Templates :=
                     (if Vertical
                      then
-                       (if AM then Vertical_Agg_AM_Tab_4_Alt
+                       (if AM
+                        then Vertical_Agg_AM_Tab_4_Alt
                         else Vertical_Agg_Not_AM_Default_Alt)
                      else (if AM then AM_Tab_4_Alt else Not_AM_Default_Alt));
                begin
@@ -5148,7 +5160,7 @@ package body Pp.Actions is
                Is_Function := Present (F_Subp_Returns (Spec));
                if Is_Function then
                   Param_Count := Param_Count + 1;
-                  --  Add one extra for function result
+               --  Add one extra for function result
 
                end if;
             end if;
@@ -5350,8 +5362,10 @@ package body Pp.Actions is
               Id.Parent.Kind = Ada_Defining_Name;
 
             Decl : constant Basic_Decl :=
-              (if Is_Def_Name then P_Basic_Decl (Tree.Parent.As_Defining_Name)
-               elsif Arg (Cmd, Syntax_Only) then No_Basic_Decl
+              (if Is_Def_Name
+               then P_Basic_Decl (Tree.Parent.As_Defining_Name)
+               elsif Arg (Cmd, Syntax_Only)
+               then No_Basic_Decl
                else Denoted_Decl (Id));
 
             Def_Name : constant Base_Id := Denoted_Def_Name (Decl, Id);
@@ -5366,8 +5380,10 @@ package body Pp.Actions is
                                     .F_Attribute);
 
             K : constant Ada_Node_Kind_Type :=
-              (if Is_Attr_Name then Parent_Tree.Kind
-               elsif Decl.Is_Null then Null_Kind
+              (if Is_Attr_Name
+               then Parent_Tree.Kind
+               elsif Decl.Is_Null
+               then Null_Kind
                elsif Decl.Kind in Ada_Synthetic_Object_Decl_Range
                then Decl.Parent.Kind
                else Decl.Kind);
@@ -5578,10 +5594,10 @@ package body Pp.Actions is
          if Alignment_Enabled (Cmd) then
             Append
               (Tabs, Tab_Rec'(Parent | Tree => No_Ada_Node, others => <>));
-            --  Append a sentinel tab, whose Position is greater than any
-            --  actual position. This ensures that as we step through Tabs,
-            --  there is always one more. We don't need the sentinel in the
-            --  token stream.
+         --  Append a sentinel tab, whose Position is greater than any
+         --  actual position. This ensures that as we step through Tabs,
+         --  there is always one more. We don't need the sentinel in the
+         --  token stream.
 
          end if;
 
@@ -5790,7 +5806,8 @@ package body Pp.Actions is
          use Scanner;
       begin
          return
-           (if Requested_End_Of_Line = Nil then In_File_Format
+           (if Requested_End_Of_Line = Nil
+            then In_File_Format
             else Requested_End_Of_Line);
       end Out_File_Format;
 
@@ -5875,9 +5892,9 @@ package body Pp.Actions is
                   Delete_Last (Result);
                end if;
 
-               --  Optimize the case where we're not changing anything. The reason
-               --  Remove_Extra_Line_Breaks keeps the initial NL is that this
-               --  optimization wouldn't work otherwise.
+            --  Optimize the case where we're not changing anything. The reason
+            --  Remove_Extra_Line_Breaks keeps the initial NL is that this
+            --  optimization wouldn't work otherwise.
 
             else
                Result := To_Vector (Out_Buf);
@@ -6133,7 +6150,8 @@ package body Pp.Actions is
       Output_Name : constant String := Get_Output_Name (Resolve_Links => True);
 
       Temp_Output_Name : constant String :=
-        (if Output_Mode = Pipe then ""
+        (if Output_Mode = Pipe
+         then ""
          --  means standard output
          else Get_Output_Name (Resolve_Links => False) & "__GNATPP-TEMP");
 
@@ -6221,21 +6239,21 @@ package body Pp.Actions is
                   Do_Writes;
                end;
 
-               --  Otherwise, it's safe to do the writes without any locking. We
-               --  want to avoid locking when possible, because it reduces the
-               --  likelihood of stale locks left lying around. It's a little more
-               --  efficient too.
+            --  Otherwise, it's safe to do the writes without any locking. We
+            --  want to avoid locking when possible, because it reduces the
+            --  likelihood of stale locks left lying around. It's a little more
+            --  efficient too.
 
             else
                Do_Writes;
             end if;
          end if;
 
-         --  exception
-         --     when Lock_Error =>
-         --        Utils.Output.Error ("cannot create " & Lock_File_Name);
-         --        Utils.Output.Error ("delete it by hand if stale");
-         --        raise;
+      --  exception
+      --     when Lock_Error =>
+      --        Utils.Output.Error ("cannot create " & Lock_File_Name);
+      --        Utils.Output.Error ("delete it by hand if stale");
+      --        raise;
       end Write_File_Name_File;
 
       procedure Write_Str (Out_Vec : Char_Vector);
@@ -6317,7 +6335,8 @@ package body Pp.Actions is
          declare
             Backup_Simple_Name : constant String := File_Name & NPP_Suffix;
             Backup_Name        : constant String :=
-              (if Arg (Cmd, Output_Directory) = null then Backup_Simple_Name
+              (if Arg (Cmd, Output_Directory) = null
+               then Backup_Simple_Name
                else
                  Compose
                    (Arg (Cmd, Output_Directory).all,
@@ -6411,7 +6430,8 @@ package body Pp.Actions is
             declare
                use type Slocs.Source_Location;
                Loc : constant String :=
-                 (if Error_Sloc = Slocs.No_Source_Location then ""
+                 (if Error_Sloc = Slocs.No_Source_Location
+                  then ""
                   else ":" & Slocs.Image (Error_Sloc));
             begin
                Err_Out.Put

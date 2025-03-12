@@ -368,7 +368,8 @@ package body METRICS.Actions is
 
    function File_Name_To_Print
      (Cmd : Command_Line; File_Name : String) return String
-   is (if Arg (Cmd, Short_File_Names) then Directories.Simple_Name (File_Name)
+   is (if Arg (Cmd, Short_File_Names)
+       then Directories.Simple_Name (File_Name)
        else Normalize_Pathname (File_Name));
 
    function Lines_String
@@ -563,9 +564,9 @@ package body METRICS.Actions is
                if S = null then
                   S := M;
                   M.Is_Spec := True;
-                  --  ???Is_Spec could be wrong here. We need semantic
-                  --  information to know if this body is acting as a spec.
-                  --  It will be fixed up below if the spec comes along later.
+               --  ???Is_Spec could be wrong here. We need semantic
+               --  information to know if this body is acting as a spec.
+               --  It will be fixed up below if the spec comes along later.
 
                else
                   B := M;
@@ -595,7 +596,8 @@ package body METRICS.Actions is
          Result.Node := Node;
          Result.Knd := Get_Fine_Kind (Node);
          Result.Sloc :=
-           (if Node.Is_Null then Slocs.No_Source_Location_Range
+           (if Node.Is_Null
+            then Slocs.No_Source_Location_Range
             else Sloc_Range (Node));
          Result.Is_Private_Lib_Unit := Is_Private (Node);
          Result.Has_Complexity_Metrics :=
@@ -650,7 +652,8 @@ package body METRICS.Actions is
                   Result.LI_Sub :=
                     (if Length (Tool.Metrix_Stack) = 3
                      then
-                       (if Unit_Is_Subunit (Node) then Subunit_Sym
+                       (if Unit_Is_Subunit (Node)
+                        then Subunit_Sym
                         else Library_Item_Sym)
                      else Name_Empty);
                end if;
@@ -846,7 +849,8 @@ package body METRICS.Actions is
                R : constant Type_Expr := F_Subp_Returns (Get_Subp_Spec (Node));
             begin
                return
-                 (if R.Is_Null then Procedure_Body_Stub_Knd
+                 (if R.Is_Null
+                  then Procedure_Body_Stub_Knd
                   else Function_Body_Stub_Knd);
             end;
 
@@ -879,7 +883,8 @@ package body METRICS.Actions is
                --  ???R is null here even for functions
             begin
                return
-                 (if R.Is_Null then Generic_Procedure_Knd
+                 (if R.Is_Null
+                  then Generic_Procedure_Knd
                   else Generic_Function_Knd);
             end;
 
@@ -1243,7 +1248,8 @@ package body METRICS.Actions is
                then Num - 1
                else 0);
             Numerator_Metric : constant Metrics_Enum :=
-              (if Metric = Lines_Average then Lines_Code_In_Bodies
+              (if Metric = Lines_Average
+               then Lines_Code_In_Bodies
                else Metric);
             --  Metric whose value is used as the numerator when computing the
             --  average. For complexity metrics, that is the Metric itself, but
@@ -1330,9 +1336,12 @@ package body METRICS.Actions is
                   then XML_Metric_Name_String (I)
                   else Metric_Name_String (I));
                Indentation_Amount : constant Natural :=
-                 (if I = Lines_Average then 0
-                  elsif Depth = 1 then 2
-                  elsif Depth = 2 and then First in Lines_Metrics then 2
+                 (if I = Lines_Average
+                  then 0
+                  elsif Depth = 1
+                  then 2
+                  elsif Depth = 2 and then First in Lines_Metrics
+                  then 2
                   elsif Name = Average_Complexity_Metrics
                   then 2 * Default_Indentation_Amount
                   else Default_Indentation_Amount);
@@ -1340,8 +1349,10 @@ package body METRICS.Actions is
                --  intended to mimic some partially arbitrary
                --  behavior of gnatmetric.
                Tab                : constant Positive :=
-                 (if Depth = 1 and then I in Lines_Metrics then 22
-                  elsif Depth = 1 or else I in Lines_Metrics then 21
+                 (if Depth = 1 and then I in Lines_Metrics
+                  then 22
+                  elsif Depth = 1 or else I in Lines_Metrics
+                  then 21
                   else 26);
             begin
                Indent (Indentation_Amount);
@@ -1779,7 +1790,8 @@ package body METRICS.Actions is
                     ("<metric name=\1>\2</metric>\n",
                      Q (XML_Metric_Name_String (I)),
                      Val_To_Print
-                       ((if I = Complexity_Average then Complexity_Cyclomatic
+                       ((if I = Complexity_Average
+                         then Complexity_Cyclomatic
                          else I),
                         M,
                         XML => True));
@@ -1815,7 +1827,8 @@ package body METRICS.Actions is
 
       To_Print_First : constant Metrics_Set :=
         Metrics_To_Compute
-        and (if M.Kind = Ada_Compilation_Unit then not Complexity_Only
+        and (if M.Kind = Ada_Compilation_Unit
+             then not Complexity_Only
              else All_Metrics_Set);
       --  Set of metrics to print first, before printing subtrees. Same as
       --  Metrics_To_Compute, except at the top level, we leave out complexity
@@ -1853,7 +1866,8 @@ package body METRICS.Actions is
          Put
            ("<unit name=\1\2 line=\3 col=\4>\n",
             XML (Str (M.XML_Name).S),
-            (if Doing_Coupling_Metrics then ""
+            (if Doing_Coupling_Metrics
+             then ""
              else " kind=" & Q (Fine_Kind_String (M.Knd))),
             Q (Image (Integer (M.Sloc.Start_Line))),
             Q (Image (Integer (M.Sloc.Start_Column))));
@@ -1903,7 +1917,8 @@ package body METRICS.Actions is
       Object_Dir         : String)
    is
       Suffix         : constant String :=
-        (if Arg (Cmd, Output_Suffix) = null then ".metrix"
+        (if Arg (Cmd, Output_Suffix) = null
+         then ".metrix"
          else Arg (Cmd, Output_Suffix).all);
       use Ada.Text_IO;
       Text           : File_Type;
@@ -1911,7 +1926,8 @@ package body METRICS.Actions is
       Text_File_Name : constant String :=
         (if Arg (Cmd, Output_Directory) = null
          then
-           (if Object_Dir = "" then File_Name & Suffix
+           (if Object_Dir = ""
+            then File_Name & Suffix
             else
               Directories.Compose
                 (Object_Dir, Directories.Simple_Name (File_Name) & Suffix))
@@ -2307,9 +2323,9 @@ package body METRICS.Actions is
             end if;
 
             return (if Parent_Body = null then M else Get_Spec (Parent_Body));
-            --  This recursion will climb up a chain of nested subunits until
-            --  it reaches a library unit, and then we'll get the spec of that
-            --  library unit.
+         --  This recursion will climb up a chain of nested subunits until
+         --  it reaches a library unit, and then we'll get the spec of that
+         --  library unit.
          end;
       end if;
    end Get_Spec;
@@ -2599,7 +2615,8 @@ package body METRICS.Actions is
       Object_Dir : constant String := Get_Object_Dir;
 
       Xml_F_Name : constant String :=
-        (if Arg (Cmd, Xml_File_Name) = null then "metrix.xml"
+        (if Arg (Cmd, Xml_File_Name) = null
+         then "metrix.xml"
          else Arg (Cmd, Xml_File_Name).all);
       --  ASIS-based gnatmetric ignores Output_Dir for the xml.
 
@@ -2608,7 +2625,8 @@ package body METRICS.Actions is
       --  True if Xml_F_Name contains directory information
 
       Xml_FD_Name : constant String :=
-        (if Object_Dir = "" or else Has_Dir then Xml_F_Name
+        (if Object_Dir = "" or else Has_Dir
+         then Xml_F_Name
          else Directories.Compose (Object_Dir, Xml_F_Name));
 
       XML_File : Text_IO.File_Type;
@@ -3203,7 +3221,7 @@ package body METRICS.Actions is
                   --  end if;
                   --
                   Inc_Cyc (Complexity_Statement);
-                  --  <<Ignore_Static_Loop>>
+               --  <<Ignore_Static_Loop>>
 
                end if;
 
@@ -3223,7 +3241,8 @@ package body METRICS.Actions is
                   Num_Alts  : constant Metric_Nat :=
                     Children_Count (F_Guards (S));
                   Num_Else  : constant Metric_Nat :=
-                    (if Children_Count (F_Stmts (F_Else_Part (S))) = 0 then 0
+                    (if Children_Count (F_Stmts (F_Else_Part (S))) = 0
+                     then 0
                      else 1);
                   Num_Abort : constant Metric_Nat :=
                     (if Children_Count (F_Stmts (F_Then_Abort_Part (S))) = 0
@@ -3323,8 +3342,8 @@ package body METRICS.Actions is
              | Ada_Select_Stmt
          then
             Push (EC_Stack, EC_Rec'(Node, Counted => False));
-            --  (The corresponding Pop is at the end of
-            --  Gather_Metrics_And_Walk_Children.)
+         --  (The corresponding Pop is at the end of
+         --  Gather_Metrics_And_Walk_Children.)
 
          end if;
 
@@ -3523,9 +3542,9 @@ package body METRICS.Actions is
 
                   Lines_Count := Metric_Nat (Stop - Start + 1);
 
-                  --  If this is a compilation unit but not the only one in the
-                  --  analysis unit, then Line_Count must be computed
-                  --  accordingly.
+               --  If this is a compilation unit but not the only one in the
+               --  analysis unit, then Line_Count must be computed
+               --  accordingly.
 
                elsif M.Node.Kind = Ada_Compilation_Unit
                  and then not M.Node.Parent.Is_Null
@@ -3552,10 +3571,10 @@ package body METRICS.Actions is
 
                         Lines_Count := Metric_Nat (Stop - Start + 1);
 
-                        --  If this is the last compilation unit of the
-                        --  analysis unit then, we want to include all the
-                        --  comments and blank lines following the compilation
-                        --  unit until the end of the analysis unit.
+                     --  If this is the last compilation unit of the
+                     --  analysis unit then, we want to include all the
+                     --  comments and blank lines following the compilation
+                     --  unit until the end of the analysis unit.
 
                      elsif M.Node = Comp_Units (Comp_Units'Last) then
                         Start := M.Node.Sloc_Range.Start_Line;
@@ -3564,10 +3583,10 @@ package body METRICS.Actions is
 
                         Lines_Count := Metric_Nat (Stop - Start + 1);
 
-                        --  If this compilation unit is in the middle of the
-                        --  compilation unit list of this analysis unit, then
-                        --  we want to include all the comments and blank lines
-                        --  following the compilation unit until the next one.
+                     --  If this compilation unit is in the middle of the
+                     --  compilation unit list of this analysis unit, then
+                     --  we want to include all the comments and blank lines
+                     --  following the compilation unit until the next one.
 
                      else
                         for Idx in Comp_Units'First .. Comp_Units'Length loop
@@ -3997,8 +4016,8 @@ package body METRICS.Actions is
                end;
             end;
 
-            --  For a subprogram instantiation, we have to find the generic
-            --  subprogram, and call Count_Params on that spec.
+         --  For a subprogram instantiation, we have to find the generic
+         --  subprogram, and call Count_Params on that spec.
 
          elsif Kind (Node) = Ada_Generic_Subp_Instantiation then
             begin
@@ -4240,8 +4259,8 @@ package body METRICS.Actions is
          begin
             Set_Flags (Ada_Node (Node));
             return Into;
-            --  ???This could be more efficient if we return Over in cases
-            --  where we know there are no interesting subnodes.
+         --  ???This could be more efficient if we return Over in cases
+         --  where we know there are no interesting subnodes.
          end Visit;
 
          procedure Set_Flags (Node : Ada_Node) is
@@ -4253,8 +4272,8 @@ package body METRICS.Actions is
                        (P_Designated_Generic_Decl
                           (Node.As_Generic_Instantiation),
                         Visit'Access);
-                     --  Set one or both flags according to whether the generic
-                     --  package contains tagged types or subprograms.
+                  --  Set one or both flags according to whether the generic
+                  --  package contains tagged types or subprograms.
                   exception
                      when Property_Error =>
                         null;
