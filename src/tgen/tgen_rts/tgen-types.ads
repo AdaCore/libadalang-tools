@@ -121,7 +121,8 @@ package TGen.Types is
    --  Whether Self represents an anonymous type
 
    function Type_Name (Self : Typ) return String
-   is (if Ada_Identifier_Vectors.Is_Empty (Self.Name) then "anonymous"
+   is (if Ada_Identifier_Vectors.Is_Empty (Self.Name)
+       then "anonymous"
        else +Unbounded_String (Self.Name.Last_Element));
    --  Return the name of Self
 

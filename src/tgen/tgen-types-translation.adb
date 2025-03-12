@@ -3451,13 +3451,13 @@ package body TGen.Types.Translation is
                   ("Anonymous array or access type unsupported"),
               others => <>);
 
-         --  Types that are declared in a library level generic instantiation
-         --  are not supported at the moment, as the support packages would
-         --  need to be generic instances themselves (with other rules to
-         --  follow), see RM 10.1.1 (17/3, 18).
-         --
-         --  TODO??? Investigate if there are issues in generating the helper
-         --  packages as non-child units in this case, see #184.
+      --  Types that are declared in a library level generic instantiation
+      --  are not supported at the moment, as the support packages would
+      --  need to be generic instances themselves (with other rules to
+      --  follow), see RM 10.1.1 (17/3, 18).
+      --
+      --  TODO??? Investigate if there are issues in generating the helper
+      --  packages as non-child units in this case, see #184.
 
       elsif Comp_Unit_Decl.Kind in Ada_Generic_Instantiation then
          Specialized_Res := (Success => True, others => <>);

@@ -115,7 +115,8 @@ package body TGen.Types.Array_Types is
       Res :=
         Res
         & "of "
-        & (if Self.Component_Type /= null then Self.Component_Type.all.Image
+        & (if Self.Component_Type /= null
+           then Self.Component_Type.all.Image
            else "null type ..");
       return To_String (Res);
    end Image;

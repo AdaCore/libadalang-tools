@@ -262,7 +262,8 @@ package body Test.Suite_Min is
         Run
           (Run_Cmd,
            Stdout      =>
-             (if Real_Verbose then GNATCOLL.OS.FS.Standout
+             (if Real_Verbose
+              then GNATCOLL.OS.FS.Standout
               else GNATCOLL.OS.FS.Null_FD),
            Env         => Env,
            Inherit_Env => True);

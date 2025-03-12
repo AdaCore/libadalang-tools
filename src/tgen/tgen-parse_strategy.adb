@@ -97,7 +97,7 @@ package body TGen.Parse_Strategy is
                end;
             end loop;
          end;
-         --  TODO: rest of the implementation
+      --  TODO: rest of the implementation
       end if;
       return T;
    end Clone;

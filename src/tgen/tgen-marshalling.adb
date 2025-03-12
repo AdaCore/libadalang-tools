@@ -188,10 +188,10 @@ package body TGen.Marshalling is
          if Constraint = null then
             return +"";
 
-            --  For a discrete range constraint:
-            --    range Low .. High
-            --  We generate:
-            --    First => Low, Last => High
+         --  For a discrete range constraint:
+         --    range Low .. High
+         --  We generate:
+         --    First => Low, Last => High
 
          elsif Constraint.all in Discrete_Range_Constraint'Class then
             declare
@@ -210,12 +210,12 @@ package body TGen.Marshalling is
                   Associations => Associations);
             end;
 
-            --  For an array constraint:
-            --    (F1 .. L1, ...)
-            --  We generate:
-            --    First_1 => F1, Last_1  => L1, ...
-            --  If F1 or L1 are discriminants, we generate instead:
-            --    First_1 => F1_Min, Last_1  => L1_Max, ...
+         --  For an array constraint:
+         --    (F1 .. L1, ...)
+         --  We generate:
+         --    First_1 => F1, Last_1  => L1, ...
+         --  If F1 or L1 are discriminants, we generate instead:
+         --    First_1 => F1_Min, Last_1  => L1_Max, ...
 
          elsif Constraint.all in Index_Constraints'Class then
             declare
@@ -254,12 +254,12 @@ package body TGen.Marshalling is
                end loop;
             end;
 
-            --  For a discriminant constraint:
-            --    (D1 => V1, ...)
-            --  We generate:
-            --    D1_Min => V1, D1_Max => V1, ...
-            --  If V1 is a discriminant, we generate instead:
-            --    D1_Min => V1_Min, D1_Max => V1_Max, ...
+         --  For a discriminant constraint:
+         --    (D1 => V1, ...)
+         --  We generate:
+         --    D1_Min => V1, D1_Max => V1, ...
+         --  If V1 is a discriminant, we generate instead:
+         --    D1_Min => V1_Min, D1_Max => V1_Max, ...
 
          elsif Constraint.all in Discriminant_Constraints'Class then
             declare
@@ -450,15 +450,18 @@ package body TGen.Marshalling is
       Size_Arr_Spacing  : constant Natural := 9;
 
       function Max_Spacing (Spacing : Natural) return String
-      is (if Typ in Array_Typ'Class then [1 .. Max_Arr_Spacing => ' ']
+      is (if Typ in Array_Typ'Class
+          then [1 .. Max_Arr_Spacing => ' ']
           else [1 .. Max_Init_Spacing + Spacing * Var_Incr_Spacing => ' ']);
 
       function RW_Spacing (Spacing : Natural) return String
-      is (if Typ in Array_Typ'Class then [1 .. RW_Arr_Spacing => ' ']
+      is (if Typ in Array_Typ'Class
+          then [1 .. RW_Arr_Spacing => ' ']
           else [1 .. RW_Init_Spacing + Spacing * Var_Incr_Spacing => ' ']);
 
       function Size_Spacing (Spacing : Natural) return String
-      is (if Typ in Array_Typ'Class then [1 .. Size_Arr_Spacing => ' ']
+      is (if Typ in Array_Typ'Class
+          then [1 .. Size_Arr_Spacing => ' ']
           else [1 .. Size_Init_Spacing + Spacing * Var_Incr_Spacing => ' ']);
       --  Tags for the components of the header if any, their types, their
       --  prefix and the corresponding Ada Value.
@@ -803,8 +806,8 @@ package body TGen.Marshalling is
             Print_Header (Assocs);
          end;
 
-         --  If the type does not need a header, still generate definitions for
-         --  the size of the header.
+      --  If the type does not need a header, still generate definitions for
+      --  the size of the header.
 
       elsif not For_Base then
          Print_Default_Header (Common_Assocs);
@@ -820,10 +823,14 @@ package body TGen.Marshalling is
             Generic_Name : constant String :=
               (if Typ in Discrete_Typ'Class and then not Differentiate_Discrete
                then "Read_Write_Discrete"
-               elsif Typ in Signed_Int_Typ'Class then "Read_Write_Signed"
-               elsif Typ in Mod_Int_Typ'Class then "Read_Write_Unsigned"
-               elsif Typ in Enum_Typ'Class then "Read_Write_Enum"
-               elsif Typ in Float_Typ'Class then "Read_Write_Float"
+               elsif Typ in Signed_Int_Typ'Class
+               then "Read_Write_Signed"
+               elsif Typ in Mod_Int_Typ'Class
+               then "Read_Write_Unsigned"
+               elsif Typ in Enum_Typ'Class
+               then "Read_Write_Enum"
+               elsif Typ in Float_Typ'Class
+               then "Read_Write_Float"
                elsif Typ in Ordinary_Fixed_Typ'Class
                then "Read_Write_Ordinary_Fixed"
                else "Read_Write_Decimal_Fixed");
@@ -838,8 +845,8 @@ package body TGen.Marshalling is
             Print_Scalar (Assocs, For_Base);
          end;
 
-         --  3.2 For array types, we generate the calls for the components and
-         --      we instantiate the appropriate patterns.
+      --  3.2 For array types, we generate the calls for the components and
+      --      we instantiate the appropriate patterns.
 
       elsif Typ in Array_Typ'Class then
          declare
@@ -888,10 +895,10 @@ package body TGen.Marshalling is
             end;
          end;
 
-         --  3.3 For record types, we generate the calls for the components and
-         --      the variant part and instanciate the appropriate patterns.
+      --  3.3 For record types, we generate the calls for the components and
+      --      the variant part and instanciate the appropriate patterns.
 
-         --  Record types: generate a call per component
+      --  Record types: generate a call per component
 
       else
          pragma Assert (Typ in Record_Typ'Class);

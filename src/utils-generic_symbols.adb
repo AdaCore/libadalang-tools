@@ -215,7 +215,8 @@ package body Utils.Generic_Symbols is
 
             pragma
               Assert
-                (if Present (Temp) then Result /= New_Ptr.Same_Ignoring_Case
+                (if Present (Temp)
+                   then Result /= New_Ptr.Same_Ignoring_Case
                    else Result = New_Ptr.Same_Ignoring_Case);
 
             --  Gather statistics:

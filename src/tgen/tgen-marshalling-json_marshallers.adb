@@ -301,7 +301,8 @@ package body TGen.Marshalling.JSON_Marshallers is
       Assocs.Insert
         (Assoc
            ("PROC_NAME",
-            (if Is_Operator (Proc_Name) then Map_Operator_Name (Proc_Name)
+            (if Is_Operator (Proc_Name)
+             then Map_Operator_Name (Proc_Name)
              else Proc_Name)));
       Assocs.Insert
         (Assoc

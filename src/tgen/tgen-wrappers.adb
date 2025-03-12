@@ -71,7 +71,8 @@ package body TGen.Wrappers is
      (F_Body : File_Type; Call_To_Orig_Subp : String; Formula : Formula_Type);
 
    function Subp_Kind (F : Function_Typ) return Ada_Subp_Kind
-   is (if F.Ret_Typ = null then Ada_Subp_Kind_Procedure
+   is (if F.Ret_Typ = null
+       then Ada_Subp_Kind_Procedure
        else Ada_Subp_Kind_Function);
 
    ---------

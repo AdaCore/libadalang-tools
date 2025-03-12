@@ -45,7 +45,8 @@ package TGen.Types.Discrete_Types is
        & "]");
 
    function "<" (L, R : Int_Range) return Boolean
-   is (if Big_Int."=" (L.Min, R.Min) then Big_Int."<" (L.Max, R.Max)
+   is (if Big_Int."=" (L.Min, R.Min)
+       then Big_Int."<" (L.Max, R.Max)
        else Big_Int."<" (L.Min, R.Min));
 
    function "=" (L, R : Int_Range) return Boolean

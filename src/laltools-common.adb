@@ -78,10 +78,12 @@ package body Laltools.Common is
       Case_Sensitive : Boolean := False) return Boolean
    is
       T              : constant Text_Type :=
-        (if Case_Sensitive then Text (Token)
+        (if Case_Sensitive
+         then Text (Token)
          else Ada.Wide_Wide_Characters.Handling.To_Lower (Text (Token)));
       Actual_Pattern : constant Wide_Wide_String :=
-        (if Case_Sensitive then Pattern
+        (if Case_Sensitive
+         then Pattern
          else Ada.Wide_Wide_Characters.Handling.To_Lower (Pattern));
       Idx            : constant Integer :=
         Ada.Strings.Wide_Wide_Fixed.Index (T, Actual_Pattern);
@@ -190,7 +192,8 @@ package body Laltools.Common is
       use Ada.Strings.Wide_Wide_Fixed;
 
       Max_Line : constant Natural :=
-        (if Unit.Root.Is_Null then 0
+        (if Unit.Root.Is_Null
+         then 0
          else Natural (Unit.Root.Sloc_Range.End_Line) + 1);
 
       First_Line                 : constant Text_Type :=
@@ -207,7 +210,8 @@ package body Laltools.Common is
            - 1
            .. Last_Line'Last);
       First_Rest_Of_Last_Line_Non_Blank : constant Natural :=
-        (if Rest_Of_Last_Line'Length = 0 then 0
+        (if Rest_Of_Last_Line'Length = 0
+         then 0
          else
            Index_Non_Blank (Rest_Of_Last_Line)
            + 1
@@ -261,7 +265,8 @@ package body Laltools.Common is
                   Next_Line                 : constant Text_Type :=
                     Unit.Get_Line (Next_Line_Number);
                   Next_Line_First_Non_Blank : constant Natural :=
-                    (if Next_Line'Length /= 0 then Index_Non_Blank (Next_Line)
+                    (if Next_Line'Length /= 0
+                     then Index_Non_Blank (Next_Line)
                      else 0);
                begin
                   exit when
@@ -402,7 +407,8 @@ package body Laltools.Common is
         and then Semantic_Parent.Kind in Ada_Basic_Decl
         and then Is_Subprogram (Semantic_Parent.As_Basic_Decl);
       Semantic_Parent_Subp    : constant Basic_Decl :=
-        (if Is_Semantic_Parent_Subp then Semantic_Parent.As_Basic_Decl
+        (if Is_Semantic_Parent_Subp
+         then Semantic_Parent.As_Basic_Decl
          else No_Basic_Decl);
 
       Hierarchy : constant Basic_Decl_Array :=
@@ -1443,7 +1449,8 @@ package body Laltools.Common is
       return Compilation_Unit_Vector
    is
       Root : constant Ada_Node :=
-        (if Analysis_Unit = No_Analysis_Unit then No_Ada_Node
+        (if Analysis_Unit = No_Analysis_Unit
+         then No_Ada_Node
          else Analysis_Unit.Root);
    begin
       return Compilation_Units : Compilation_Unit_Vector do
@@ -2163,7 +2170,8 @@ package body Laltools.Common is
    -------------------
 
    function Get_Subp_Spec (Subp : Basic_Decl'Class) return Base_Subp_Spec
-   is (if Subp.Is_Null then No_Base_Subp_Spec
+   is (if Subp.Is_Null
+       then No_Base_Subp_Spec
        else Subp.P_Subp_Spec_Or_Null (True));
 
    --------------------------
@@ -2439,7 +2447,8 @@ package body Laltools.Common is
          declare
             Sibling : constant Ada_Node := Node.Next_Sibling;
             Text    : constant Wide_Wide_String :=
-              (if Sibling.Is_Null then ""
+              (if Sibling.Is_Null
+               then ""
                else Ada.Wide_Wide_Characters.Handling.To_Lower (Sibling.Text));
          begin
             return
@@ -2576,7 +2585,7 @@ package body Laltools.Common is
                   | Ada_Null_Subp_Decl
                   --  This is an "is null" procedure
                   | Ada_Expr_Function;
-      --  This is an expression function
+   --  This is an expression function
    end Is_Definition_Without_Separate_Implementation;
 
    ---------------------
@@ -2831,7 +2840,7 @@ package body Laltools.Common is
       Ref_Kind := Precise;
       if Name_Node.Is_Null then
          return No_Defining_Name;
-         --  P_Failsafe_Referenced_Def_Name doesn't work on the decl itself
+      --  P_Failsafe_Referenced_Def_Name doesn't work on the decl itself
       elsif Name_Node.P_Is_Defining then
          Result := Name_Node.P_Enclosing_Defining_Name.P_Canonical_Part;
       else

@@ -360,7 +360,7 @@ package body TGen.Random is
                     mod MS_Part;
                end;
 
-               --  Case where it lies in 'Last's binade
+            --  Case where it lies in 'Last's binade
 
             else
                Rand := Rand - Nb_Values_Between;

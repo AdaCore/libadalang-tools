@@ -62,7 +62,8 @@ package body Utils.Command_Lines.Common is
 
    function WCEM (Cmd : Command_Line) return Character is
       WCEM : constant String :=
-        (if Arg (Cmd, Wide_Character_Encoding) = null then "b"
+        (if Arg (Cmd, Wide_Character_Encoding) = null
+         then "b"
          else Arg (Cmd, Wide_Character_Encoding).all);
       C    : constant Character := WCEM (1);
    begin

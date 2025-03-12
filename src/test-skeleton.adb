@@ -3611,14 +3611,16 @@ package body Test.Skeleton is
            new String'
              (Base_Name (Data.Unit_File_Name.all)
               & ":"
-              & (if TC.Req.Is_Null then "0"
+              & (if TC.Req.Is_Null
+                 then "0"
                  else Trim (First_Line_Number (TC.Req)'Img, Both))
               & ":");
          TC.Ens_Line :=
            new String'
              (Base_Name (Data.Unit_File_Name.all)
               & ":"
-              & (if TC.Ens.Is_Null then "0"
+              & (if TC.Ens.Is_Null
+                 then "0"
                  else Trim (First_Line_Number (TC.Ens)'Img, Both))
               & ":");
 
@@ -3642,7 +3644,8 @@ package body Test.Skeleton is
                  & ":"
                  & Trim (First_Column_Number (TC.Elem)'Img, Both)
                  & ":"
-                 & (if Include_Subp_Name then "(" & TC.Name.all & ")"
+                 & (if Include_Subp_Name
+                    then "(" & TC.Name.all & ")"
                     else ""));
          else
             TR_Info_Add.TR_Info.Tested_Sloc :=
@@ -3688,7 +3691,8 @@ package body Test.Skeleton is
               & Test_Data_Unit_Name
               & "."
               & Test_Unit_Name
-              & (if Data.Is_Top_Level_Generic_Instantiation then ""
+              & (if Data.Is_Top_Level_Generic_Instantiation
+                 then ""
                  else ("." & Nesting_Difference (Data.Unit_Full_Name.all, S)));
          begin
             if Data.Unit_Full_Name.all /= S then
@@ -8590,7 +8594,8 @@ package body Test.Skeleton is
    is
       Short_Name : constant String := Subp.Subp_Text_Name.all;
       TC_Hash    : constant String :=
-        (if Subp.Has_TC_Info then Sanitize_TC_Name (Subp.TC_Info.Name.all)
+        (if Subp.Has_TC_Info
+         then Sanitize_TC_Name (Subp.TC_Info.Name.all)
          else "");
       Cur        : Markered_Data_Maps.Cursor := MD_Map.First;
       MD         : Markered_Data;

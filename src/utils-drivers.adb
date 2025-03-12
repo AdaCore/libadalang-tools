@@ -206,16 +206,16 @@ package body Utils.Drivers is
            Assert
              (Get_Current_Dir = Tool_Current_Dir.all & Directory_Separator);
 
-         --         if not Incremental_Mode then
-         --            Change_Dir (Tool_Temp_Dir.all);
-         --            Utils.Compiler_Options.Store_I_Options;
-         --         end if;
+      --         if not Incremental_Mode then
+      --            Change_Dir (Tool_Temp_Dir.all);
+      --            Utils.Compiler_Options.Store_I_Options;
+      --         end if;
 
-         --  Create output directory if necessary
+      --  Create output directory if necessary
 
-         --  if Out_Dir /= null then
-         --     Parallel_Make_Dir (Out_Dir.all, Give_Message => Verbose_Mode);
-         --  end if;
+      --  if Out_Dir /= null then
+      --     Parallel_Make_Dir (Out_Dir.all, Give_Message => Verbose_Mode);
+      --  end if;
       end;
 
       --  In Incremental_Mode, we invoke the builder instead of doing the
