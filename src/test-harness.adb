@@ -21,6 +21,7 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Directories;
 with GNATCOLL.JSON;
 with GNATCOLL.VFS;        use GNATCOLL.VFS;
 with GNATCOLL.Traces;     use GNATCOLL.Traces;
@@ -3149,42 +3150,42 @@ package body Test.Harness is
                  GNATCOLL.Projects.Project_From_Name
                    (Source_Project_Tree, P.Name_Of_Extended.all);
 
+               Exposed_List : constant String_List :=
+                 Project.Attribute_Value (Interfaces_Attribute).all;
+
                Driver_Sources_Present : constant Boolean :=
-                 P.Sources_List.First = List_Of_Strings.No_Element;
+                 P.Sources_List.First /= List_Of_Strings.No_Element;
             begin
                S_Put (3, "for Interfaces use (");
 
                --  Go through all units exposed in the interface and add them
                --  to the driver's interface.
-               declare
-                  Exposed_List : constant String_List :=
-                    Project.Attribute_Value (Interfaces_Attribute).all;
-               begin
-                  for Source of Exposed_List loop
-                     S_Put (0, """" & Source.all & """,");
-                  end loop;
-               end;
+
+               for Source of Exposed_List loop
+                  S_Put (0, """" & Source.all & """,");
+               end loop;
 
                --  If there are source for this test driver, add all of them to
                --  the interface. If not, only add the relevant unit.
 
                if Driver_Sources_Present then
-                  S_Put (0, """" & Base_Name (P.UUT_File_Name.all) & """");
-               else
                   declare
                      Cur : String_Set.Cursor := Sources_Names.First;
                   begin
                      while Cur /= String_Set.No_Element loop
-                        S_Put (0, """" & String_Set.Element (Cur) & """");
-
+                        S_Put (0, """" & String_Set.Element (Cur) & """,");
                         Next (Cur);
-
-                        if Cur /= String_Set.No_Element then
-                           S_Put (0, ",");
-                        end if;
                      end loop;
                   end;
                end if;
+
+               --  Always add the unit under test to the interface
+
+               S_Put
+                 (0,
+                  """"
+                  & Ada.Directories.Simple_Name (P.UUT_File_Name.all)
+                  & """");
 
                S_Put (0, ");");
 
