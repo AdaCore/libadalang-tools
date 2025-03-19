@@ -1,0 +1,3 @@
+simple.ads:4:4: info: corresponding test PASSED
+simple.ads:4:4: error: corresponding test FAILED: Test not implemented. (simple-test_data-tests.adb:44)
+2 tests run: 1 passed; 1 failed; 0 crashed.
