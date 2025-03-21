@@ -1,0 +1,30 @@
+{
+   "26200d904c5a6ab4":{
+      "fully_qualified_name":"simple.add_array",
+      "generation_complete":true,
+      "return_type":"simple.t",
+      "test_vectors":[
+         {
+            "origin":"TGen",
+            "param_values":[
+               {
+                  "name":"A",
+                  "type_name":"simple.my_array",
+                  "value":{
+                     "sizes":[
+                        " 3"
+                     ],
+                      "aggregate" : {
+			  "1" : "5",
+			  "others" : "2"
+		      }
+                  }
+               }
+            ],
+            "global_values":[
+               
+            ]
+         }
+      ]
+   }
+}

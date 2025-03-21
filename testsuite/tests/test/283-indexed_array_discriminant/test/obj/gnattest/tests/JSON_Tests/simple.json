@@ -1,0 +1,36 @@
+{
+   "9b65de4c7c5959c3":{
+      "fully_qualified_name":"simple.check_record",
+      "generation_complete":true,
+      "test_vectors":[
+         {
+            "origin":"TGen",
+            "param_values":[
+               {
+                  "name":"R",
+                  "type_name":"simple.my_record",
+                  "value":{
+                     "discriminants":{
+                        "Size":" 9"
+                     },
+                     "components":{
+                        "Data":{
+                           "sizes":[
+                               "10"
+                           ],
+                            "aggregate" : {
+				"5" : "42",
+				"others" : "0"
+			    } 
+                        }
+                     }
+                  }
+               }
+            ],
+            "global_values":[
+               
+            ]
+         }
+      ]
+   }
+}

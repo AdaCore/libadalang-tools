@@ -1,0 +1,56 @@
+{
+    "14952cbf931c3280": {
+        "fully_qualified_name": "simple.check_town",
+        "generation_complete": true,
+        "test_vectors": [
+            {
+                "origin": "TGen",
+                "param_values": [
+                    {
+                        "name": "T",
+                        "type_name": "simple.town",
+                        "value": {
+                            "components": {
+                                "Name": {
+                                    "aggregate": {
+                                        "others": "NUL"
+                                    },
+                                    "dimensions": [
+                                        {
+                                            "First": "1",
+                                            "Last": "15"
+                                        }
+                                    ],
+                                    "sizes": [
+                                        "15"
+                                    ]
+                                },
+                                "People": {
+                                    "aggregate": {
+                                        "others": {
+                                            "components": {
+                                                "Age": "0"
+                                            },
+                                            "discriminants": {}
+                                        }
+                                    },
+                                    "dimensions": [
+                                        {
+                                            "First": "0",
+                                            "Last": "20"
+                                        }
+                                    ],
+                                    "sizes": [
+                                        "21"
+                                    ]
+                                }
+                            },
+                            "discriminants": {}
+                        }
+                    }
+                ],
+                "global_values": []
+            }
+        ]
+    }
+}

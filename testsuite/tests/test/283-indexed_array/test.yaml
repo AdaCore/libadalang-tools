@@ -1,0 +1,4 @@
+description: Test JSON containing an array in
+             indexed format
+
+driver: shell_script
