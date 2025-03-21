@@ -467,15 +467,16 @@ package body TGen.Marshalling is
       --  prefix and the corresponding Ada Value.
 
       procedure Collect_Info_For_Component
-        (Comp_Kind    : Component_Kind;
-         Comp_Name    : String;
-         Comp         : String;
-         Comp_Ty      : TGen.Types.Typ'Class;
-         Read_Tag     : out Unbounded_String;
-         Write_Tag    : out Unbounded_String;
-         Size_Tag     : out Unbounded_String;
-         Size_Max_Tag : out Unbounded_String;
-         Spacing      : Natural);
+        (Comp_Kind        : Component_Kind;
+         Comp_Name        : String;
+         Comp             : String;
+         Comp_Ty          : TGen.Types.Typ'Class;
+         Read_Tag         : out Unbounded_String;
+         Read_Indexed_Tag : out Unbounded_String;
+         Write_Tag        : out Unbounded_String;
+         Size_Tag         : out Unbounded_String;
+         Size_Max_Tag     : out Unbounded_String;
+         Spacing          : Natural);
       --  Generate the parts of the subprograms Read, Write, Size, and Size_Max
       --  for a component Comp_Name of type Comp_Ty. Also generate base
       --  functions for Comp_Ty.
@@ -515,15 +516,16 @@ package body TGen.Marshalling is
       --------------------------------
 
       procedure Collect_Info_For_Component
-        (Comp_Kind    : Component_Kind;
-         Comp_Name    : String;
-         Comp         : String;
-         Comp_Ty      : TGen.Types.Typ'Class;
-         Read_Tag     : out Unbounded_String;
-         Write_Tag    : out Unbounded_String;
-         Size_Tag     : out Unbounded_String;
-         Size_Max_Tag : out Unbounded_String;
-         Spacing      : Natural)
+        (Comp_Kind        : Component_Kind;
+         Comp_Name        : String;
+         Comp             : String;
+         Comp_Ty          : TGen.Types.Typ'Class;
+         Read_Tag         : out Unbounded_String;
+         Read_Indexed_Tag : out Unbounded_String;
+         Write_Tag        : out Unbounded_String;
+         Size_Tag         : out Unbounded_String;
+         Size_Max_Tag     : out Unbounded_String;
+         Spacing          : Natural)
       is
          Named_Comp_Ty    : constant TGen.Types.Typ'Class :=
            (if Comp_Ty in Anonymous_Typ'Class
@@ -550,6 +552,9 @@ package body TGen.Marshalling is
       begin
          Read_Tag :=
            Component_Read (Assocs & Assoc ("SPACING", RW_Spacing (Spacing)));
+         Read_Indexed_Tag :=
+           Component_Read_Indexed
+             (Assocs & Assoc ("SPACING", RW_Spacing (Spacing)));
          Write_Tag :=
            Component_Write (Assocs & Assoc ("SPACING", RW_Spacing (Spacing)));
          Size_Tag :=
@@ -576,13 +581,14 @@ package body TGen.Marshalling is
 
          for Cu in Components.Iterate loop
             declare
-               Comp_Ty   : constant TGen.Types.Typ'Class :=
+               Comp_Ty      : constant TGen.Types.Typ'Class :=
                  Component_Maps.Element (Cu).all;
-               Comp_Name : constant String := +Component_Maps.Key (Cu);
-               Read      : Unbounded_String;
-               Write     : Unbounded_String;
-               Size      : Unbounded_String;
-               Size_Max  : Unbounded_String;
+               Comp_Name    : constant String := +Component_Maps.Key (Cu);
+               Read         : Unbounded_String;
+               Read_Indexed : Unbounded_String;
+               Write        : Unbounded_String;
+               Size         : Unbounded_String;
+               Size_Max     : Unbounded_String;
             begin
                Collect_Info_For_Component
                  (Record_Component,
@@ -590,6 +596,7 @@ package body TGen.Marshalling is
                   Object_Name & "." & Comp_Name,
                   Comp_Ty,
                   Read,
+                  Read_Indexed,
                   Write,
                   Size,
                   Size_Max,
@@ -850,16 +857,17 @@ package body TGen.Marshalling is
 
       elsif Typ in Array_Typ'Class then
          declare
-            Comp_Ty            : constant TGen.Types.Typ'Class :=
+            Comp_Ty                : constant TGen.Types.Typ'Class :=
               Array_Typ'Class (Typ).Component_Type.all;
-            Named_Comp_Ty      : constant TGen.Types.Typ'Class :=
+            Named_Comp_Ty          : constant TGen.Types.Typ'Class :=
               (if Comp_Ty in Anonymous_Typ'Class
                then Anonymous_Typ'Class (Comp_Ty).Named_Ancestor.all
                else Comp_Ty);
-            Component_Read     : Unbounded_String;
-            Component_Write    : Unbounded_String;
-            Component_Size     : Unbounded_String;
-            Component_Size_Max : Unbounded_String;
+            Component_Read         : Unbounded_String;
+            Component_Read_Indexed : Unbounded_String;
+            Component_Write        : Unbounded_String;
+            Component_Size         : Unbounded_String;
+            Component_Size_Max     : Unbounded_String;
          begin
             --  Contruct the calls for the components
 
@@ -869,6 +877,7 @@ package body TGen.Marshalling is
                Global_Prefix & "_E",
                Comp_Ty,
                Component_Read,
+               Component_Read_Indexed,
                Component_Write,
                Component_Size,
                Component_Size_Max,
@@ -879,16 +888,19 @@ package body TGen.Marshalling is
             declare
                Assocs : constant Translate_Table :=
                  Common_Assocs
-                 & [1 => Assoc ("COMPONENT_READ", Component_Read),
-                    2 => Assoc ("COMPONENT_WRITE", Component_Write),
-                    3 => Assoc ("COMPONENT_SIZE", Component_Size),
-                    4 => Assoc ("COMPONENT_SIZE_MAX", Component_Size_Max),
-                    5 =>
+                 & [1  => Assoc ("COMPONENT_READ", Component_Read),
+                    2  => Assoc ("COMPONENT_WRITE", Component_Write),
+                    3  => Assoc ("COMPONENT_SIZE", Component_Size),
+                    4  => Assoc ("COMPONENT_SIZE_MAX", Component_Size_Max),
+                    5  =>
                       Assoc ("COMP_TYP", Named_Comp_Ty.FQN (No_Std => True)),
-                    6 => Assoc ("ADA_DIM", Ada_Dim_Tag),
-                    7 => Assoc ("FIRST_NAME", First_Name_Tag),
-                    8 => Assoc ("LAST_NAME", Last_Name_Tag),
-                    9 => Assoc ("BOUND_TYP", Comp_Typ_Tag)];
+                    6  => Assoc ("ADA_DIM", Ada_Dim_Tag),
+                    7  => Assoc ("FIRST_NAME", First_Name_Tag),
+                    8  => Assoc ("LAST_NAME", Last_Name_Tag),
+                    9  => Assoc ("BOUND_TYP", Comp_Typ_Tag),
+                    10 =>
+                      Assoc
+                        ("COMPONENT_READ_INDEXED", Component_Read_Indexed)];
 
             begin
                Print_Array (Assocs);
@@ -904,15 +916,16 @@ package body TGen.Marshalling is
          pragma Assert (Typ in Record_Typ'Class);
 
          declare
-            Object_Name        : constant String := Global_Prefix & "_V";
-            Component_Read     : Tag;
-            Component_Write    : Tag;
-            Component_Size     : Tag;
-            Component_Size_Max : Tag;
-            Variant_Read       : Tag;
-            Variant_Write      : Tag;
-            Variant_Size       : Tag;
-            Variant_Size_Max   : Tag;
+            Object_Name            : constant String := Global_Prefix & "_V";
+            Component_Read         : Tag;
+            Component_Read_Indexed : Tag;
+            Component_Write        : Tag;
+            Component_Size         : Tag;
+            Component_Size_Max     : Tag;
+            Variant_Read           : Tag;
+            Variant_Write          : Tag;
+            Variant_Size           : Tag;
+            Variant_Size_Max       : Tag;
          begin
             --  Construct the calls for the components
 
@@ -960,7 +973,10 @@ package body TGen.Marshalling is
                     7  => Assoc ("VARIANT_SIZE", Variant_Size),
                     8  => Assoc ("VARIANT_SIZE_MAX", Variant_Size_Max),
                     9  => Assoc ("DISCR_NAME", Discr_Name_Tag),
-                    10 => Assoc ("DISCR_TYP", Comp_Typ_Tag)];
+                    10 => Assoc ("DISCR_TYP", Comp_Typ_Tag),
+                    11 =>
+                      Assoc
+                        ("COMPONENT_READ_INDEXED", Component_Read_Indexed)];
             begin
                Print_Record (Assocs);
             end;

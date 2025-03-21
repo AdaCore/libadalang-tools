@@ -36,20 +36,46 @@
      (@_GLOBAL_PREFIX_@_JSON : TGen.JSON.JSON_Value;
       @_GLOBAL_PREFIX_@_V    : out TGen.TGen_Std.@_TY_NAME_@)
    is
-      @_GLOBAL_PREFIX_@_JSON_Array : constant TGen.JSON.JSON_Array :=
-         TGen.JSON.Get (@_GLOBAL_PREFIX_@_JSON, "array");
-      Current_Index : Positive :=
-         TGen.JSON.Array_First (@_GLOBAL_PREFIX_@_JSON_Array);
    begin
-      for @_GLOBAL_PREFIX_@_E of @_GLOBAL_PREFIX_@_V loop
-@_COMPONENT_READ_@
+      if TGen.JSON.Has_Field (@_GLOBAL_PREFIX_@_JSON, "aggregate") then	
+@@IF@@ @_ADA_DIM_@ = ""
+         declare
+            @_GLOBAL_PREFIX_@_Aggregate : constant TGen.JSON.JSON_Value :=	
+	       TGen.JSON.Get (@_GLOBAL_PREFIX_@_JSON, "aggregate");
+	    @_GLOBAL_PREFIX_@_Value : TGen.JSON.JSON_Value;
+	 begin 
+	    for Current_Index in @_GLOBAL_PREFIX_@_V'First .. @_GLOBAL_PREFIX_@_V'Last	
+	    loop 
+	       if TGen.JSON.Has_Field (@_GLOBAL_PREFIX_@_Aggregate, Current_Index'Image) then	
+	       	  @_GLOBAL_PREFIX_@_Value := 		  
+		      TGen.JSON.Get (@_GLOBAL_PREFIX_@_Aggregate, Current_Index'Image);				  
+	       else
+	          @_GLOBAL_PREFIX_@_Value := 		  
+		      TGen.JSON.Get (@_GLOBAL_PREFIX_@_Aggregate, "others");	
+	       end if;		    
+	       @_COMPONENT_READ_INDEXED_@
+	    end loop;
+	 end;
+@@ELSE@@
+	 raise TGen.Marshalling_Lib.Invalid_Value;
+@@END_IF@@
+      else
+      declare
+         @_GLOBAL_PREFIX_@_JSON_Array : constant TGen.JSON.JSON_Array :=
+            TGen.JSON.Get (@_GLOBAL_PREFIX_@_JSON, "array");
+         Current_Index : Positive :=
+            TGen.JSON.Array_First (@_GLOBAL_PREFIX_@_JSON_Array);
+      begin
+         for @_GLOBAL_PREFIX_@_E of @_GLOBAL_PREFIX_@_V loop
+	     @_COMPONENT_READ_@
+             @@--  Increment the array index
+             Current_Index := TGen.JSON.Array_Next
+                (@_GLOBAL_PREFIX_@_JSON_Array, Current_Index);
+      	  end loop;
 
-         @@--  Increment the array index
-         Current_Index := TGen.JSON.Array_Next
-            (@_GLOBAL_PREFIX_@_JSON_Array, Current_Index);
-      end loop;
-
-      if @_GLOBAL_PREFIX_@_V not in TGen.TGen_Std.@_TY_NAME_@ then
-        raise Invalid_Value;
+      	  if @_GLOBAL_PREFIX_@_V not in TGen.TGen_Std.@_TY_NAME_@ then
+             raise Invalid_Value;
+      	  end if;	
+      end;    
       end if;
    end @_TY_PREFIX_@_Read;
