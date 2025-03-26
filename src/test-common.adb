@@ -1312,4 +1312,19 @@ package body Test.Common is
       end if;
    end Is_Ghost_Code;
 
+   -----------
+   -- Print --
+   -----------
+
+   procedure Print (L : List_Of_Strings.List) is
+      use List_Of_Strings;
+
+      Cur : List_Of_Strings.Cursor := L.First;
+   begin
+      while Cur /= List_Of_Strings.No_Element loop
+         Ada.Text_IO.Put_Line (Element (Cur));
+         Next (Cur);
+      end loop;
+   end Print;
+
 end Test.Common;

@@ -21,6 +21,7 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Command_Line;
 with Ada.Containers.Indefinite_Ordered_Maps;
 
 with Ada.Characters.Handling;    use Ada.Characters.Handling;
@@ -153,6 +154,7 @@ package body Test.Aggregator is
    Total_Passed  : Natural := 0;
    Total_Failed  : Natural := 0;
    Total_Crashed : Natural := 0;
+   Total_Unsure  : Natural := 0;
 
    -------------------------------
    -- Get_Index_For_New_Process --
@@ -232,6 +234,7 @@ package body Test.Aggregator is
       Trace (Me, "Set_Terminated_Process_Index");
       Increase_Indent (Me);
       --  We are waiting for the first driver to terminate.
+
       Wait_Process (Next_Proc, Success);
       Trace
         (Me,
@@ -431,6 +434,7 @@ package body Test.Aggregator is
                --  Example: 7 tests run: 6 passed; 1 failed; 0 crashed.
                --  If the line does not follow this format, test driver
                --  probably crashed.
+
                declare
                   Passed_Add, Failed_Add, Crashed_Add : Integer;
                   Unexpected : Boolean := False;
@@ -460,8 +464,8 @@ package body Test.Aggregator is
                         Crashed_Add := Get_Val (S);
                      end if;
                   end if;
-
                   if Unexpected then
+                     Total_Unsure := Total_Unsure + 1;
                      Cumulative_Output_Unsure.Append (S);
                      Cumulative_Output_Unsure.Append
                        ("error: test driver did not terminate properly");
@@ -509,8 +513,6 @@ package body Test.Aggregator is
    --------------------------
 
    procedure Process_Drivers_List is
-      Cur : List_Of_Strings.Cursor;
-
       use List_Of_Strings;
    begin
 
@@ -559,7 +561,6 @@ package body Test.Aggregator is
         or else Get_Next_Driver_To_Analyze /= ""
         or else Unfinished_Processes
       loop
-
          Run_More_Drivers;
          Set_Terminated_Process_Index;
          if For_Analysis /= No_Process then
@@ -567,37 +568,24 @@ package body Test.Aggregator is
          end if;
       end loop;
 
-      if
-        Cumulative_Output_Passed.Is_Empty and then
-        Cumulative_Output_Failed.Is_Empty and then
-        Cumulative_Output_Crashed.Is_Empty and then
-        Cumulative_Output_Unsure.Is_Empty
+      --  If there we were not able to collect information of passed, failed,
+      --  or crashed test at all then all test drivers terminated unexpectedly.
+
+      if Total_Passed = 0
+        and then Total_Failed = 0
+        and then Total_Crashed = 0
+        and then Total_Unsure > 0
       then
-         Cmd_Error_No_Help ("no test drivers terminated succesfully");
+         Cmd_Error_No_Help ("no test driver terminated succesfully");
       end if;
 
       if Show_Passed_Tests then
-         Cur := Cumulative_Output_Passed.First;
-         while Cur /= List_Of_Strings.No_Element loop
-            Ada.Text_IO.Put_Line (List_Of_Strings.Element (Cur));
-            Next (Cur);
-         end loop;
+         Print (Cumulative_Output_Passed);
       end if;
-      Cur := Cumulative_Output_Failed.First;
-      while Cur /= List_Of_Strings.No_Element loop
-         Ada.Text_IO.Put_Line (List_Of_Strings.Element (Cur));
-         Next (Cur);
-      end loop;
-      Cur := Cumulative_Output_Crashed.First;
-      while Cur /= List_Of_Strings.No_Element loop
-         Ada.Text_IO.Put_Line (List_Of_Strings.Element (Cur));
-         Next (Cur);
-      end loop;
-      Cur := Cumulative_Output_Unsure.First;
-      while Cur /= List_Of_Strings.No_Element loop
-         Ada.Text_IO.Put_Line (List_Of_Strings.Element (Cur));
-         Next (Cur);
-      end loop;
+
+      Print (Cumulative_Output_Failed);
+      Print (Cumulative_Output_Crashed);
+      Print (Cumulative_Output_Unsure);
 
       Ada.Text_IO.Put_Line
         (Trim
@@ -705,11 +693,29 @@ package body Test.Aggregator is
 
       pragma Assert (Idx in First_Process .. Queues_Number);
 
-      if Success then
+      --  The process either has a zero exit status (success), an unexpected
+      --  non-zero exit status (failure), or and expected non-zero exit status
+      --  indicating the good execution of the test driver but the failure of
+      --  at least one of its tests (through the use of "--exit-status=on").
+      --  This last case is treated like the first in order to still display
+      --  all the information available concerning the execution.
+
+      if Success or else (not Success and then Add_Exit_Status) then
+
+         --  If the drivers' execution did not succeed, set the exit status
+         --  of gnattest to be non-zero. This indicates that at least one
+         --  test in one of the test drivers failed.
+
+         if not Success then
+            Ada.Command_Line.Set_Exit_Status (1);
+         end if;
+
          Trace (Me, " for pid:" & Integer'Image (Pid_To_Integer (Process)));
          Mark_As_Analysis (Driver_Process_Table (Idx).Name.all);
          For_Analysis := Idx;
       else
+         --  The execution was unsuccessful and we did not expect a non-zero
+         --  return value. The process has crashed.
          Report_Std
            ("warning: (gnattest) test driver "
             & Driver_Process_Table (Idx).Name.all
