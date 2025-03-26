@@ -50,6 +50,9 @@ package TGen.Libgen is
       Test_Generation_Part => True,
       Wrappers_Part        => True];
 
+   type Ada_Language_Version is (Unspecified, Ada_12, Ada_22);
+   --  Ada language versions
+
    type Libgen_Context is private;
 
    function Create
@@ -160,6 +163,16 @@ package TGen.Libgen is
    --  Supported_Subprogram to ensure consistency of the array limit used in
    --  all the marshallers, otherwise Constraint_Error is raised.
 
+   procedure Set_Minimum_Lang_Version
+     (Ctx : in out Libgen_Context; Version : Ada_Language_Version);
+   --  Set the desired language version to be used in project compilation
+   --  switches. Note that if not set, no languages version switches will be
+   --  added to the generated project files.
+   --
+   --  TGen also requires at least an Ada_2012 compiler to be available, so
+   --  setting a version lower than that will result in -gnat12 being used in
+   --  the compiler switches, instead of the specified language version.
+
 private
    use TGen.Strings;
    use TGen.Context;
@@ -226,6 +239,10 @@ private
       Array_Index_Types : Typ_Set;
       --  Set of types used to instantiate array index constraints
 
+      Lang_Version : Ada_Language_Version := Unspecified;
+      --  Language version to be used in the compilation switches of the
+      --  generated projects. If Unspecified, no language version switch will
+      --  be added to the projects.
    end record;
 
 end TGen.Libgen;

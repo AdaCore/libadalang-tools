@@ -217,6 +217,9 @@ package body Test.Actions is
 
       Test.Common.Instrument := Arg (Cmd, Dump_Test_Inputs);
 
+      Test.Common.Lang_Version :=
+        Utils.Command_Lines.Common.Ada_Version_Switches.Arg (Cmd);
+
       if Arg (Cmd, Passed_Tests) /= null then
          if Arg (Cmd, Passed_Tests).all = "hide" then
             Test.Common.Show_Passed_Tests := False;
@@ -873,6 +876,15 @@ package body Test.Actions is
             & GNAT.OS_Lib.Directory_Separator & "share"
             & GNAT.OS_Lib.Directory_Separator & "tgen"
             & GNAT.OS_Lib.Directory_Separator & "templates"));
+
+      TGen.Libgen.Set_Minimum_Lang_Version
+        (Test.Common.TGen_Libgen_Ctx,
+         (case Test.Common.Lang_Version is
+             when Ada_83 |
+                  Ada_95 |
+                  Ada_2005 |
+                  Ada_2012 => TGen.Libgen.Ada_12,
+             when Ada_2022 => TGen.Libgen.Ada_22));
 
       if Arg (Cmd, Gen_Test_Vectors) then
          Test.Common.Generate_Test_Vectors := True;
