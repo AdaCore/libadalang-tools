@@ -59,6 +59,8 @@ package Test.Common is
    package List_Of_Strings is new
      Ada.Containers.Indefinite_Doubly_Linked_Lists (String);
 
+   procedure Print (L : List_Of_Strings.List);
+
    package Ada_Nodes_List is new
      Ada.Containers.Indefinite_Doubly_Linked_Lists (Ada_Node);
 

@@ -296,6 +296,33 @@ package body Test.Actions is
          end if;
       end;
 
+      --  Exit status
+      --
+      --  If this switch is used and set to "on" for the test drivers'
+      --  generation it must also be used at the test driver's execution if
+      --  it is done throught the "gnattest test_drivers.list" command. This
+      --  is needed to avoid confusing an unexpected non-zero error code
+      --  (crash) of a driver with one that simply signals the failure of at
+      --  least on test.
+      declare
+         Exit_Status_Switch : constant String_Ref := Arg (Cmd, Exit_Status);
+         Present            : constant Boolean := Exit_Status_Switch /= null;
+         Exit_Status_Val    : constant String :=
+           (if Present then To_Lower (Exit_Status_Switch.all) else "");
+      begin
+         if Present then
+            if Exit_Status_Val = "off" then
+               Test.Common.Add_Exit_Status := False;
+
+            elsif Exit_Status_Val = "on" then
+               Test.Common.Add_Exit_Status := True;
+
+            else
+               Cmd_Error_No_Help ("--exit-status should be either on or off");
+            end if;
+         end if;
+      end;
+
       if Status (Tool.Project_Tree.all) = Empty then
 
          if Arg (Cmd, Subdirs) /= null then
@@ -702,26 +729,6 @@ package body Test.Actions is
                    then "--skeleton-default"
                    else "Gnattest.Skeletons_Default")
                   & " should be either fail or pass");
-            end if;
-         end if;
-      end;
-
-      --  Exit status
-      declare
-         Exit_Status_Switch : constant String_Ref := Arg (Cmd, Exit_Status);
-         Present            : constant Boolean := Exit_Status_Switch /= null;
-         Exit_Status_Val    : constant String :=
-           (if Present then To_Lower (Exit_Status_Switch.all) else "");
-      begin
-         if Present then
-            if Exit_Status_Val = "off" then
-               Test.Common.Add_Exit_Status := False;
-
-            elsif Exit_Status_Val = "on" then
-               Test.Common.Add_Exit_Status := True;
-
-            else
-               Cmd_Error_No_Help ("--exit-status should be either on or off");
             end if;
          end if;
       end;
