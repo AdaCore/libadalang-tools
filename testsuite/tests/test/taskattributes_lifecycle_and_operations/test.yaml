@@ -1,0 +1,5 @@
+description: |
+  From acats testsuite (`cxc7002a`).
+  Original test here https://github.com/simonjwright/ACATS/blob/master/tests/cxc/cxc7002.a
+
+driver: shell_script

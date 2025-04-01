@@ -4167,7 +4167,11 @@ package body Test.Skeleton is
          Gen_Tests.Gen_Unit_Full_Name := new String'(Data.Unit_Full_Name.all);
       end if;
 
-      if Data.Is_Top_Level_Generic_Instantiation then
+      --  If the top level generic instantiation contains no subprograms to
+      --  test, there's no need to update generic packages for test generation.
+      if Data.Is_Top_Level_Generic_Instantiation
+        and not Data.Package_Data_List.Is_Empty
+      then
          pragma Assert (not Data.Package_Data_List.Is_Empty);
          Current_Pack := Data.Package_Data_List.First_Element;
          Update_Generic_Packages (Current_Pack.Generic_Containing_Package.all);
