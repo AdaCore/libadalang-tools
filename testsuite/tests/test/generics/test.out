@@ -1,0 +1,3 @@
+Units remaining: 2     Units remaining: 1     
+my_generic.ads:4:4: instance at my_instance.ads:4:4: error: corresponding test FAILED: Test not implemented. (my_generic-test_data-tests.adb:44)
+1 tests run: 0 passed; 1 failed; 0 crashed.
