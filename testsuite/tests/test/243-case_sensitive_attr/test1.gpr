@@ -1,0 +1,9 @@
+project Test1 is
+   package Gnattest is
+     for Gnattest_Switches use
+        ("--passed-tests=show",
+         "--skeleton-default=Fail",
+         "--separate-drivers=TesT",
+         "--exit-status=ON");
+   end Gnattest;
+end Test1;
