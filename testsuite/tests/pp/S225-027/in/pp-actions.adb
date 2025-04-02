@@ -5021,7 +5021,7 @@ package body Pp.Actions is
       Put ("    b - Brackets encoding (default)\n");
       Put ("\n");
 
-      Put ("\n\nReport bugs to report@adacore.com\n");
+      Put ("\n\nReport bugs to support@adacore.com\n");
 
       pragma Style_Checks ("M79");
    end Tool_Help;
