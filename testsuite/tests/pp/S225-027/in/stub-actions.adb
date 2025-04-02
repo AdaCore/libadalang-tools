@@ -1607,7 +1607,7 @@ package body Stub.Actions is
       Put ("  --quiet / -q           quiet mode\n");
       Put ("  --verbose / -v         verbose mode\n");
 
-      Put ("\n\nReport bugs to support@adacore.com\n");
+      Put ("\n\nReport bugs to report@adacore.com\n");
 
       pragma Style_Checks ("M79");
    end Tool_Help;
