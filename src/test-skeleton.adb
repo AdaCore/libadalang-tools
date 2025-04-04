@@ -988,6 +988,12 @@ package body Test.Skeleton is
             return Over;
          end if;
 
+         if Node.Kind = Ada_Package_Decl and (Data.Is_Generic or Inside_Inst)
+         then
+            Trace (Me, "Skip nested package " & Node.Image);
+            return Over;
+         end if;
+
          case Kind (Node) is
             when Ada_Package_Decl =>
                if Get_Nesting (Node) = "" then
@@ -1005,6 +1011,7 @@ package body Test.Skeleton is
                Package_Data.Is_Generic := False;
                Package_Data.Data_Kind := Declaration_Data;
                Package_Data.Element := Node.As_Ada_Node;
+               Trace (Me, "1009 Package_Data_List Append " & Node.Image);
                Data.Package_Data_List.Append (Package_Data);
 
             when Ada_Generic_Package_Decl =>
@@ -1030,6 +1037,7 @@ package body Test.Skeleton is
                   Package_Data.Is_Generic := True;
                   Package_Data.Data_Kind := Declaration_Data;
                   Package_Data.Element := Node.As_Ada_Node;
+                  Trace (Me, "Append package Data: " & Node.Image);
                   Data.Package_Data_List.Append (Package_Data);
                end if;
 
@@ -1071,6 +1079,7 @@ package body Test.Skeleton is
                   Package_Data.Generic_Containing_Package :=
                     new String'(Node_Image (Gen_Decl.P_Defining_Name));
                   Package_Data.Element := Node.As_Ada_Node;
+                  Trace (Me, "1077 Package_Data_List Append " & Node.Image);
                   Data.Package_Data_List.Append (Package_Data);
                   return Over;
                end;
@@ -1306,6 +1315,7 @@ package body Test.Skeleton is
          Type_Data.Type_Number := Type_Counter;
          Type_Counter := Type_Counter + 1;
 
+         Trace (Me, "Append type " & Type_Data.Main_Type_Elem.Image);
          Data.Type_Data_List.Append (Type_Data);
 
          if Type_Data.Nesting.all = Data.Unit_Full_Name.all then
@@ -1426,13 +1436,23 @@ package body Test.Skeleton is
                  & ":"
                  & Trim (First_Column_Number (Node)'Img, Both)
                  & ":");
+
+            Increase_Indent
+              (Me, "traversing top level instantiation " & Node.Image);
             Traverse
               (Node.As_Generic_Instantiation.P_Designated_Generic_Decl,
                Get_Subprograms'Access);
+            Decrease_Indent (Me);
             Inside_Top_Level_Inst := False;
             Inside_Inst := False;
             Free (Instance_Nesting);
             Free (Instance_Sloc);
+            return Over;
+         end if;
+
+         if Node.Kind = Ada_Package_Decl and (Data.Is_Generic or Inside_Inst)
+         then
+            Trace (Me, "Skip sub package in generic declaration");
             return Over;
          end if;
 
@@ -1441,6 +1461,7 @@ package body Test.Skeleton is
            and then not Inside_Top_Level_Inst
          then
             --  No processing for packages nested inside generic ones
+            Trace (Me, "Skip nested package in generic: " & Node.Image);
             return Over;
          end if;
 
@@ -3328,7 +3349,7 @@ package body Test.Skeleton is
       end if;
 
       Increase_Indent
-        (Me_TC, "Looking for test cases of " & Subp.Subp_Text_Name.all);
+        (Me_TC, "Looking for test cases of " & Subp.Subp_Declaration.Image);
 
       TC_Found := False;
 
@@ -3419,6 +3440,10 @@ package body Test.Skeleton is
 
       if Test_Cases.Is_Empty then
          if not Test_Case_Only then
+            Trace
+              (Me,
+               "Append subp to list (no testcase) "
+               & Subp.Subp_Declaration.Image);
             Data.Subp_List.Append (Subp);
             Suite_Data_List.TR_List.Append (TR_Info);
          end if;
@@ -3626,6 +3651,7 @@ package body Test.Skeleton is
 
          Subp_Add.TC_Info := TC;
 
+         Trace (Me, "Append subp to list " & Subp_Add.Subp_Declaration.Image);
          Data.Subp_List.Append (Subp_Add);
 
          TR_Info_Add := TR_Info;
@@ -4167,7 +4193,11 @@ package body Test.Skeleton is
          Gen_Tests.Gen_Unit_Full_Name := new String'(Data.Unit_Full_Name.all);
       end if;
 
-      if Data.Is_Top_Level_Generic_Instantiation then
+      --  If the top level generic instantiation contains no subprograms to
+      --  test, there's no need to update generic packages for test generation.
+      if Data.Is_Top_Level_Generic_Instantiation
+        and not Data.Package_Data_List.Is_Empty
+      then
          pragma Assert (not Data.Package_Data_List.Is_Empty);
          Current_Pack := Data.Package_Data_List.First_Element;
          Update_Generic_Packages (Current_Pack.Generic_Containing_Package.all);
@@ -6144,6 +6174,7 @@ package body Test.Skeleton is
             Put_New_Line;
 
             --  Declaring simple test type.
+            Trace (Me, "Current pack " & Current_Pack.Name.all);
             if Current_Pack.Data_Kind = Declaration_Data
               or Data.Is_Top_Level_Generic_Instantiation
             then
