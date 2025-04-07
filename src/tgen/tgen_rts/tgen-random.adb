@@ -24,14 +24,16 @@
 with Ada.Calendar; use Ada.Calendar;
 with Ada.Environment_Variables;
 with Ada.Numerics.Generic_Elementary_Functions;
+with Ada.Strings.Unbounded;
 with Ada.Unchecked_Conversion;
 
 with TGen.Logging;
 
 package body TGen.Random is
 
-   Random_Trace : constant TGen.Logging.GNATCOLL_Trace :=
-     TGen.Logging.Create_Trace ("RANDOM");
+   Random_Trace : constant TGen.Logging.TGen_Trace :=
+     TGen.Logging.Create_Trace
+       (Ada.Strings.Unbounded.To_Unbounded_String ("RANDOM"));
 
    ---------------
    -- Draw_Bits --
@@ -483,6 +485,7 @@ begin
    else
       Seed := Unsigned_32'Mod (To_U64 (Clock - Y2K));
    end if;
-   Random_Trace.Trace ("Random generator seed is " & Unsigned_32'Image (Seed));
+   TGen.Logging.Trace
+     (Random_Trace, "Random generator seed is " & Unsigned_32'Image (Seed));
    GNAT.Random_Numbers.Reset (Generator_Instance, Seed);
 end TGen.Random;
