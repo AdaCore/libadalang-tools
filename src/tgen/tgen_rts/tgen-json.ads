@@ -52,12 +52,11 @@
 --     Data.Append (Some_Array);
 
 with Ada.Finalization;
-with Ada.Strings.Unbounded;
-with GNATCOLL.Strings;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with GNAT.Strings;
+with System.Atomic_Counters;
 
 private with Ada.Containers.Vectors;
-private with GNATCOLL.Atomic;
-private with GNAT.Strings;
 
 with TGen.Big_Int;   use TGen.Big_Int;
 with TGen.Big_Reals; use TGen.Big_Reals;
@@ -105,7 +104,6 @@ package TGen.JSON is
    type UTF8_String_Access is access all UTF8_String;
 
    subtype UTF8_Unbounded_String is Ada.Strings.Unbounded.Unbounded_String;
-   subtype UTF8_XString is GNATCOLL.Strings.XString;
 
    type JSON_Value is tagged private;
    --  Store a JSON value, which can be either a simple type (integer, string,
@@ -275,10 +273,6 @@ package TGen.JSON is
    with Post => Create'Result.Kind = JSON_String_Type;
    --  Create a string-typed JSON value
 
-   function Create (Val : UTF8_XString) return JSON_Value
-   with Post => Create'Result.Kind = JSON_String_Type;
-   --  Create a string-typed JSON value
-
    function Create (Val : JSON_Array) return JSON_Value
    with Post => Create'Result.Kind = JSON_Array_Type;
    --  Create a JSON value from the JSON array
@@ -319,7 +313,7 @@ package TGen.JSON is
    --  one for the given Field_Name. The field value is Field afterwards.
 
    procedure Set_Field
-     (Val : JSON_Value; Field_Name : UTF8_XString; Field : JSON_Value)
+     (Val : JSON_Value; Field_Name : UTF8_Unbounded_String; Field : JSON_Value)
    with Pre => Val.Kind = JSON_Object_Type;
    --  Assuming Val is a JSON object, add a new field or modify the existing
    --  one for the given Field_Name. The field value is Field afterwards.
@@ -400,9 +394,6 @@ package TGen.JSON is
    with Pre => Val.Kind = JSON_String_Type;
 
    function Get (Val : JSON_Value) return UTF8_Unbounded_String
-   with Pre => Val.Kind = JSON_String_Type;
-
-   function Get (Val : JSON_Value) return UTF8_XString
    with Pre => Val.Kind = JSON_String_Type;
 
    function Get (Val : JSON_Value) return JSON_Array
@@ -533,7 +524,7 @@ private
             Flt_Value : Big_Real;
 
          when JSON_String_Type =>
-            Str_Value : UTF8_XString;
+            Str_Value : UTF8_Unbounded_String;
 
          when JSON_Array_Type =>
             Arr_Value : JSON_Array_Access;
@@ -566,7 +557,7 @@ private
    end record;
 
    type JSON_Array_Internal is record
-      Cnt : aliased GNATCOLL.Atomic.Atomic_Counter := 1;
+      Cnt : aliased System.Atomic_Counters.Atomic_Counter;
       Arr : JSON_Array;
    end record;
 
@@ -575,7 +566,7 @@ private
    --  JSON Object definition:
 
    type Object_Item is record
-      Key : UTF8_XString;
+      Key : UTF8_Unbounded_String;
       Val : JSON_Value;
    end record;
 
@@ -583,7 +574,7 @@ private
      Ada.Containers.Vectors (Positive, Object_Item);
 
    type JSON_Object_Internal is record
-      Cnt  : aliased GNATCOLL.Atomic.Atomic_Counter := 1;
+      Cnt  : aliased System.Atomic_Counters.Atomic_Counter;
       Vals : Object_Items_Pkg.Vector;
    end record;
 
@@ -599,11 +590,13 @@ private
    function Escape_Non_Print_Character (C : Wide_Wide_Character) return String;
 
    function Escape_String
-     (Text : UTF8_XString) return Ada.Strings.Unbounded.Unbounded_String;
+     (Text : UTF8_Unbounded_String)
+      return Ada.Strings.Unbounded.Unbounded_String;
    --  Translates an UTF-8 encoded unbounded string into a JSON-escaped string
 
    function Un_Escape_String
-     (Text : String; Low : Natural; High : Natural) return UTF8_XString;
+     (Text : String; Low : Natural; High : Natural)
+      return UTF8_Unbounded_String;
    --  Translates a JSON-escaped string into an UTF-8 encoded unbounded string
    --  Low represents the lower bound of the JSON string in Text
    --  High represents the higher bound of the JSON string in Text

@@ -1,5 +1,3 @@
-with "gnatcoll";
-
 library project TGen_RTS is
    type Any_Library_Type is ("static", "relocatable", "static-pic");
    Library_Type : Any_Library_Type := external ("LIBRARY_TYPE", "static");
