@@ -1,0 +1,4 @@
+description: Test that asserts that --stub --recursive-stub option will
+    indeed generate stubs for the withed units of stubbed units.
+
+driver: shell_script

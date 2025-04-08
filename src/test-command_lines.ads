@@ -39,6 +39,7 @@ package Test.Command_Lines is
       Recursive,
       Harness_Only,
       Stub,
+      Recursive_Stub,
       Validate_Type_Extensions,
       Inheritance_Check,
       Test_Case_Only,
