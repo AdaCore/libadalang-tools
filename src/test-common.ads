@@ -492,6 +492,10 @@ package Test.Common is
    --  CAUTION: **This function will call `Cmd_Error_No_Help`** if the input is
    --  ill formated. This function is intended to handle user inputs.
 
+   function Belongs_To_Pure_Package
+     (Subp : Libadalang.Analysis.Basic_Decl'Class) return Boolean;
+   --  Return if a given declaration belongs to a pure package
+
    Preprocessor_Config : Libadalang.Preprocessing.Preprocessor_Data;
    --  Preprocessor config for the loaded user project.
    --  Might be null if the project isn't using preprocessing. The
