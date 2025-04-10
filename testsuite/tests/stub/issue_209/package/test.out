@@ -1,2 +1,0 @@
-my_package_2.adb:11:10: warning: My_Procedure unimplemented [enabled by default]
-my_package_1.adb:13:10: warning: My_Procedure unimplemented [enabled by default]
