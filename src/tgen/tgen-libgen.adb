@@ -33,9 +33,8 @@ with GNAT.OS_Lib;
 
 with Langkit_Support.Text; use Langkit_Support.Text;
 
-with Libadalang.Analysis;  use Libadalang.Analysis;
+with Libadalang.Analysis; use Libadalang.Analysis;
 with Libadalang.Common;
-with Libadalang.Unparsing; use Libadalang.Unparsing;
 
 with Templates_Parser;
 
@@ -1065,8 +1064,12 @@ package body TGen.Libgen is
               Is_Top_Level_Generic_Instantiation;
 
             if Subp.P_Has_Aspect (Pre_Aspect) then
-               Subp_Info.Pre :=
-                 +Unparse (Subp.P_Get_Aspect_Spec_Expr (Pre_Aspect));
+               declare
+                  E : constant Expr :=
+                    Subp.P_Get_Aspect_Spec_Expr (Pre_Aspect);
+               begin
+                  Subp_Info.Pre := +Encode (E.Text, E.Unit.Get_Charset);
+               end;
             end if;
             Subp_Info.T := Fct_Ref;
             Ctx.Included_Subps.Insert
