@@ -118,6 +118,18 @@ package body Test.Instrument is
       Diags : String_Vector;
    begin
       if Kind (Node) = Ada_Package_Decl then
+
+         --  Test instrumentation causes side effects, making pure packages
+         --  impossible to instrument.
+
+         if Test.Common.Belongs_To_Pure_Package (Node.As_Basic_Decl) then
+            Report_Err
+              ("instrumentation of pure package "
+               & Image (Node.As_Basic_Decl.P_Defining_Name.Text)
+               & " is not supported");
+            return Over;
+         end if;
+
          return Into;
       elsif Kind (Node)
             in Ada_Single_Protected_Decl

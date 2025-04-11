@@ -1,0 +1,3 @@
+warning: (gnattest) pkg.ads:2:8: elaboration control aspect
+ this can cause circularity in the test harness
+gnattest: instrumentation of pure package Pkg is not supported

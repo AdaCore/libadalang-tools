@@ -1501,4 +1501,12 @@ package body Test.Common is
       end loop;
    end Print;
 
+   -----------------------------
+   -- Belongs_To_Pure_Package --
+   -----------------------------
+
+   function Belongs_To_Pure_Package
+     (Subp : Libadalang.Analysis.Basic_Decl'Class) return Boolean
+   is (Subp.P_Has_Aspect (To_Unbounded_Text ("Pure")));
+
 end Test.Common;
