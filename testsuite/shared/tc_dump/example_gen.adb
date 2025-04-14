@@ -72,8 +72,8 @@ begin
       TGen_Marshalling_X         => R_Inst,
       TGen_Marshalling_Y         => T2_Inst,
       TGen_Marshalling_Z         => R2_Inst,
-      TGen_Marshalling_Unit_JSON => Unit_JSON,
-      TGen_Marshalling_Origin    => "First write");
+      TGen_Unit_JSON => Unit_JSON,
+      TGen_Test_Origin    => "First write");
 
    My_File_Test_Proc_0e31b625e8e24f10_Dump_TC
      (TGen_Marshalling_A         => String_Inst,
@@ -83,8 +83,8 @@ begin
       TGen_Marshalling_X         => R_Inst,
       TGen_Marshalling_Y         => T2_Inst,
       TGen_Marshalling_Z         => R2_Inst,
-      TGen_Marshalling_Unit_JSON => Unit_JSON,
-      TGen_Marshalling_Origin    => "Second write");
+      TGen_Unit_JSON => Unit_JSON,
+      TGen_Test_Origin    => "Second write");
 
    my_file_actual_ident_5e1d01120f468a24_Dump_TC (T_Gen_Inst, Unit_JSON, "First write");
    my_file_actual_ident_5e1d01120f468a24_Dump_TC (T_Gen_Inst, Unit_JSON, "Second write");

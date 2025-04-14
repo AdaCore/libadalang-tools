@@ -74,8 +74,8 @@
 @@TABLE'ALIGN_ON(":")@@
                @_GLOBAL_PREFIX_@_@_GLOBAL_SLUG_@ => @_GLOBAL_NAME_@,
 @@END_TABLE@@
-               @_GLOBAL_PREFIX_@_Unit_JSON => Unit_JSON,
-               @_GLOBAL_PREFIX_@_Origin => "TGen");
+               TGen_Unit_JSON => Unit_JSON,
+               TGen_Test_Origin => "TGen");
             Num_Tests := Num_Tests + 1;
          end Generate_One;
       end loop;
