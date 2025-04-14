@@ -86,6 +86,23 @@ package body Test.Generation is
          return Over;
       end if;
 
+      --  Do not traverse private child packages
+
+      if Node.Kind = Ada_Library_Item
+        and then Node.As_Library_Item.F_Has_Private
+      then
+         Report_Std
+           ("gnattest-tgen: "
+            & Libadalang.Support.Text.Image
+                (Node
+                   .P_Enclosing_Compilation_Unit
+                   .P_Decl
+                   .P_Fully_Qualified_Name)
+            & ": Test input generation not supported for private packages;"
+            & " skipping");
+         return Over;
+      end if;
+
       if not Common_Subp_Node_Filter (Node) then
          return Over;
       end if;
