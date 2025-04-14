@@ -1,0 +1,5 @@
+description:
+  Test that gnattest detects private child packages when using tgen and skips
+  them correctly.
+
+driver: shell_script
