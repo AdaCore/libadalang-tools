@@ -383,7 +383,7 @@ package body METRICS.Actions is
    function Fine_Kind_String_For_Header (M : Metrix) return String;
    --  Name of the node kind for printing in both XML and text
 
-   procedure Write_XML_Schema (Xsd_File_Name : String);
+   procedure Write_Xsd (Xsd_Virtual_File : GNATCOLL.VFS.Virtual_File);
    --  Write the XSD file
 
    function XML (X : String) return String;
@@ -1985,16 +1985,26 @@ package body METRICS.Actions is
       Free (M);
    end Destroy;
 
-   ----------------------
-   -- Write_XML_Schema --
-   ----------------------
+   ---------------
+   -- Write_Xsd --
+   ---------------
 
-   procedure Write_XML_Schema (Xsd_File_Name : String) is
-      XSD_Out_File : Text_IO.File_Type;
+   procedure Write_Xsd (Xsd_Virtual_File : GNATCOLL.VFS.Virtual_File) is
+      use GNATCOLL.VFS;
+
+      Xsd_File : Ada.Text_IO.File_Type;
+
    begin
+      Xsd_Virtual_File.Normalize_Path;
+
       if not Output_To_Standard_Output then
-         Text_IO.Create (XSD_Out_File, Name => Xsd_File_Name);
-         Text_IO.Set_Output (XSD_Out_File);
+         if Xsd_Virtual_File.Get_Parent /= No_File then
+            Make_Dir (Xsd_Virtual_File.Get_Parent);
+         end if;
+
+         Ada.Text_IO.Create
+           (Xsd_File, Name => Xsd_Virtual_File.Display_Full_Name);
+         Ada.Text_IO.Set_Output (Xsd_File);
       end if;
 
       pragma Style_Checks ("M200"); -- Allow long lines
@@ -2065,10 +2075,10 @@ package body METRICS.Actions is
       pragma Style_Checks ("M79");
 
       if not Output_To_Standard_Output then
-         Text_IO.Set_Output (Text_IO.Standard_Output);
-         Text_IO.Close (XSD_Out_File);
+         Ada.Text_IO.Set_Output (Ada.Text_IO.Standard_Output);
+         Ada.Text_IO.Close (Xsd_File);
       end if;
-   end Write_XML_Schema;
+   end Write_Xsd;
 
    ----------
    -- Init --
@@ -2576,7 +2586,13 @@ package body METRICS.Actions is
       Outdent;
    end XML_Print_Coupling;
 
+   -----------
+   -- Final --
+   -----------
+
    procedure Final (Tool : in out Metrics_Tool; Cmd : Command_Line) is
+      use type GNATCOLL.VFS.Virtual_File;
+
       Metrics_To_Compute : Metrics_Set renames Tool.Metrics_To_Compute;
       Without_Coupling   : constant Metrics_Set :=
         Metrics_To_Compute and not Coupling_Only;
@@ -2593,66 +2609,110 @@ package body METRICS.Actions is
       --  switch was given. By default, this information is sent to standard
       --  output.
 
-      function Get_Object_Dir return String;
-      --  Name of the Object_Dir specified in the project file, if any
+      function Get_Object_Directory return GNATCOLL.VFS.Virtual_File;
+      --  Object_Dir specified in the project file.
+      --  Returns GNATCOLL.VFS.No_File is not specified.
 
-      function Get_Object_Dir return String is
-         use GNATCOLL.Projects, GNATCOLL.VFS;
-      begin
-         if Status (Tool.Project_Tree.all) = Empty then
-            return "";
-         else
-            declare
-               Prj  : constant Project_Type := Tool.Project_Tree.Root_Project;
-               Name : constant Filesystem_String :=
-                 Full_Name (Object_Dir (Prj));
-            begin
-               return String (Name);
-            end;
-         end if;
-      end Get_Object_Dir;
+      function Get_Xml_Virtual_File
+        (Object_Directory : GNATCOLL.VFS.Virtual_File)
+         return GNATCOLL.VFS.Virtual_File;
+      --  If the user supplies a full or relative file path, it is used
+      --  directly.
+      --  If the user provides only a filename (e.g., "data.xml"), it is
+      --  resolved relative to the object directory (if one is configured).
+      --  If no user-provided path or filename is given, the default
+      --  "metrix.xml" is used, also resolved relative to the object directory
+      --  (if configured).
 
-      Object_Dir : constant String := Get_Object_Dir;
-
-      Xml_F_Name : constant String :=
-        (if Arg (Cmd, Xml_File_Name) = null
-         then "metrix.xml"
-         else Arg (Cmd, Xml_File_Name).all);
-      --  ASIS-based gnatmetric ignores Output_Dir for the xml.
-
-      Has_Dir : constant Boolean :=
-        Directories.Simple_Name (Xml_F_Name) /= Xml_F_Name;
-      --  True if Xml_F_Name contains directory information
-
-      Xml_FD_Name : constant String :=
-        (if Object_Dir = "" or else Has_Dir
-         then Xml_F_Name
-         else Directories.Compose (Object_Dir, Xml_F_Name));
-
-      XML_File : Text_IO.File_Type;
-      --  All XML output for all source files goes to this file.
-
-      function Xsd_File_Name return String;
-      --  Return the name of the XSD (schema) file name, which is based
-      --  on the XML file name. In particular if the XML file name
-      --  ends in ".xml", that is replaced by ".xsd"; otherwise,
+      function Get_Xsd_Virtual_File
+        (Xml_Virtual_File : GNATCOLL.VFS.Virtual_File)
+         return GNATCOLL.VFS.Virtual_File;
+      --  Return the GNATCOLL.VFS.Virtual_File of the XSD (schema) file name,
+      --  which is based on the XML file name. In particular if the XML file
+      --  name ends in ".xml", that is replaced by ".xsd"; otherwise,
       --  ".xsd" is appended. So "foo.xml" --> "foo.xsd", but
       --  "foo.bar" --> "foo.bar.xsd".
       --
       --  Note that this name is written to the XML file, in addition
       --  to being used to open the XSD file.
 
-      function Xsd_File_Name return String is
-         Norm : constant String := Normalize_Pathname (Xml_FD_Name);
-         Xml  : constant String := ".xml";
-         Xsd  : constant String := ".xsd";
+      --------------------------
+      -- Get_Object_Directory --
+      --------------------------
+
+      function Get_Object_Directory return GNATCOLL.VFS.Virtual_File is
+         use GNATCOLL.Projects, GNATCOLL.VFS;
+
       begin
-         if Has_Suffix (Norm, Suffix => Xml) then
-            return Replace_String (Norm, Xml, Xsd);
+         if Status (Tool.Project_Tree.all) = Empty then
+            return No_File;
+
          else
-            return Norm & Xsd;
+            return Object_Dir (Tool.Project_Tree.Root_Project);
          end if;
-      end Xsd_File_Name;
+      end Get_Object_Directory;
+
+      --------------------------
+      -- Get_Xml_Virtual_File --
+      --------------------------
+
+      function Get_Xml_Virtual_File
+        (Object_Directory : GNATCOLL.VFS.Virtual_File)
+         return GNATCOLL.VFS.Virtual_File
+      is
+         use GNATCOLL.VFS;
+
+         Xml_Virtual_File_Aux : constant Virtual_File :=
+           (if Arg (Cmd, Xml_File_Name) = null
+            then Create_From_UTF8 ("metrix.xml")
+            else
+              Create_From_UTF8
+                (Arg (Cmd, Xml_File_Name).all, Normalize => True));
+      begin
+         return
+           (if Xml_Virtual_File_Aux.Is_Absolute_Path
+            then Xml_Virtual_File_Aux
+            elsif Object_Directory /= No_File
+            then Object_Directory / Xml_Virtual_File_Aux
+            else Get_Current_Dir / Xml_Virtual_File_Aux);
+      end Get_Xml_Virtual_File;
+
+      --------------------------
+      -- Get_Xsd_Virtual_File --
+      --------------------------
+
+      function Get_Xsd_Virtual_File
+        (Xml_Virtual_File : GNATCOLL.VFS.Virtual_File)
+         return GNATCOLL.VFS.Virtual_File
+      is
+         use GNATCOLL.VFS;
+
+         Normalized_Xml_Path : constant String :=
+           Xml_Virtual_File.Display_Full_Name;
+
+         Xml : constant String := ".xml";
+         Xsd : constant String := ".xsd";
+
+      begin
+         if Xml_Virtual_File.Has_Suffix (+Xml) then
+            return
+              Create_From_UTF8
+                (Replace_String (Normalized_Xml_Path, Xml, Xsd));
+         else
+            return Create_From_UTF8 (Normalized_Xml_Path & Xsd);
+         end if;
+      end Get_Xsd_Virtual_File;
+
+      Object_Directory : constant GNATCOLL.VFS.Virtual_File :=
+        Get_Object_Directory;
+
+      Xml_Virtual_File : constant GNATCOLL.VFS.Virtual_File :=
+        Get_Xml_Virtual_File (Object_Directory);
+      XML_File         : Text_IO.File_Type;
+      --  All XML output for all source files goes to this file.
+
+      Xsd_Virtual_File : constant GNATCOLL.VFS.Virtual_File :=
+        Get_Xsd_Virtual_File (Xml_Virtual_File);
 
       procedure Print_Computed_Metric
         (T        : Formatted_Output.Template;
@@ -2702,14 +2762,18 @@ package body METRICS.Actions is
       Pop (Metrix_Stack);
       Clear (Metrix_Stack);
 
-      if Object_Dir /= "" and then not Directories.Exists (Object_Dir) then
+      if Object_Directory /= GNATCOLL.VFS.No_File then
          begin
-            Directories.Create_Path (Object_Dir);
+            GNATCOLL.VFS.Make_Dir (Object_Directory);
+
          exception
-            when Directories.Name_Error | Directories.Use_Error =>
-               Cmd_Error ("cannot create directory " & Object_Dir);
+            when GNATCOLL.VFS.VFS_Directory_Error =>
+               Cmd_Error
+                 ("cannot create directory "
+                  & Object_Directory.Display_Full_Name (Normalize => True));
          end;
       end if;
+      Xml_Virtual_File.Normalize_Path;
 
       Dump (Tool, Global_M.all, "Initial:");
       Compute_Indirect_Dependencies (Global_M.all);
@@ -2721,14 +2785,19 @@ package body METRICS.Actions is
          --  Generate schema (XSD file), if requested
 
          if Arg (Cmd, Generate_XML_Schema) then
-            Write_XML_Schema (Xsd_File_Name);
+            Write_Xsd (Xsd_Virtual_File);
          end if;
 
          --  Put initial lines of XML
 
          if not Output_To_Standard_Output then
-            Text_IO.Create (XML_File, Name => Xml_FD_Name);
-            Text_IO.Set_Output (XML_File);
+            if Xml_Virtual_File.Get_Parent /= GNATCOLL.VFS.No_File then
+               GNATCOLL.VFS.Make_Dir (Xml_Virtual_File.Get_Parent);
+            end if;
+
+            Ada.Text_IO.Create
+              (XML_File, Name => Xml_Virtual_File.Display_Full_Name);
+            Ada.Text_IO.Set_Output (XML_File);
          end if;
          Put ("<?xml version=\1?>\n", Q ("1.0"));
 
@@ -2737,7 +2806,7 @@ package body METRICS.Actions is
               ("<global xmlns:xsi="
                & """http://www.w3.org/2001/XMLSchema-instance"" "
                & "xsi:noNamespaceSchemaLocation=""\1"">\n",
-               Xsd_File_Name);
+               Xsd_Virtual_File.Display_Full_Name);
          else
             Put ("<global>\n");
          end if;
@@ -2752,7 +2821,11 @@ package body METRICS.Actions is
       for File_M of Global_M.Submetrix loop
          pragma Assert (Debug_Flag_V or else Indentation_Level = 0);
          Print_File_Metrics
-           (Cmd, XML_File, File_M.all, Without_Coupling, Object_Dir);
+           (Cmd,
+            XML_File,
+            File_M.all,
+            Without_Coupling,
+            Object_Directory.Display_Full_Name);
          pragma Assert (Debug_Flag_V or else Indentation_Level = 0);
          --         Destroy (File_M);
       end loop;
