@@ -420,8 +420,7 @@ package body Test.Common is
         (Me_Hash,
          "Mangle_Hash_Full for "
          & Subp_Name
-         & (if L_Subp_Span = No_Source_Location_Range
-            then ""
+         & (if L_Subp_Span = No_Source_Location_Range then ""
             else " at line" & L_Subp_Span.Start_Line'Img));
       Increase_Indent (Me_Hash);
 
@@ -567,19 +566,16 @@ package body Test.Common is
 
    end Nesting_Common_Prefix;
 
-   function Skip_Prefix (Identifier : String; Prefix : String) return String is
-      L1 : Integer := Identifier'First;
-      L2 : Integer := Prefix'First;
-   begin
-      while L1 <= Identifier'Last
-        and then L2 <= Prefix'Last
-        and then Identifier (L1) = Prefix (L2)
-      loop
-         L1 := @ + 1;
-         L2 := @ + 1;
-      end loop;
+   -----------------
+   -- Skip_Prefix --
+   -----------------
 
-      return Identifier (L1 .. Identifier'Last);
+   function Skip_Prefix (Identifier : String; Prefix : String) return String is
+   begin
+      if Ada.Strings.Fixed.Index (Identifier, Prefix) = Identifier'First then
+         return Tail (Identifier, Identifier'Length - Prefix'Length);
+      end if;
+      return Identifier;
    end Skip_Prefix;
 
    ------------------------
