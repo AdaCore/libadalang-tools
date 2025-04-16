@@ -157,11 +157,6 @@ package TGen.Strings is
    function Hash2 (Self : Ada_Qualified_Name) return Ada.Containers.Hash_Type
    is (Ada.Strings.Hash (To_Ada (Self)));
 
-   function Copy_Delete_Last
-     (FQN : Ada_Qualified_Name) return Ada_Qualified_Name
-   with Pre => Ada.Containers.">=" (FQN.Length, 1);
-   --  Return a copy of FQN, deleting the last name in the process.
-
    function Copy_Delete_First
      (FQN : Ada_Qualified_Name) return Ada_Qualified_Name
    with Pre => Ada.Containers.">=" (FQN.Length, 1);
@@ -172,6 +167,13 @@ package TGen.Strings is
        (Element_Type => Ada_Qualified_Name,
         "="          => Ada_Identifier_Vectors."=");
    subtype Ada_Qualified_Name_Set is Ada_Qualified_Name_Sets.Set;
+
+   package Ada_Qualified_Name_Maps is new
+     Ada.Containers.Ordered_Maps
+       (Key_Type     => Ada_Qualified_Name,
+        Element_Type => Ada_Qualified_Name,
+        "="          => Ada_Identifier_Vectors."=");
+   subtype Ada_Qualified_Name_Map is Ada_Qualified_Name_Maps.Map;
 
    package Ada_Qualified_Name_Sets_Maps is new
      Ada.Containers.Ordered_Maps

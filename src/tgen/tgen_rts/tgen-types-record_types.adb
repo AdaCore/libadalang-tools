@@ -297,9 +297,9 @@ package body TGen.Types.Record_Types is
                Current_Comp.Index := @ + 1;
                exit;
 
-            --  Second case: We have already used all pre-existing values
-            --  for this component, but we can generate more. Lets do that
-            --  and increment the index.
+               --  Second case: We have already used all pre-existing values
+               --  for this component, but we can generate more. Lets do that
+               --  and increment the index.
 
             elsif Current_Comp.Strat.Has_Next then
                Append
@@ -308,8 +308,8 @@ package body TGen.Types.Record_Types is
                Current_Comp.Index := @ + 1;
                exit;
 
-            --  Last case: There are no new values for this component, we
-            --  must thus make another component vary its index.
+               --  Last case: There are no new values for this component, we
+               --  must thus make another component vary its index.
             else
                pragma
                  Assert

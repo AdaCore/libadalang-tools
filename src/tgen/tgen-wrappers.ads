@@ -35,17 +35,19 @@ package TGen.Wrappers is
       T : Typ_Access;
       --  Specification of the subprogram (pointer to a Function_Typ)
 
+      UID : Unbounded_String;
+      --  Unique identifier for the subprogram (to avoid duplicate entries)
+
       Pre : Unbounded_String;
       --  Precondition string of the subprogram
 
-      Is_Generic_Instantiation : Boolean;
-      --  Whether the package is a simply a generic instantiation or not.
-      --  foo.ads:
-      --
-      --  package Foo is new Bar (Integer);
-      --
-      --  where bar is a generic.
    end record;
+
+   function "=" (L, R : Subp_Information) return Boolean
+   is (L.UID = R.UID);
+
+   function "<" (L, R : Subp_Information) return Boolean
+   is (L.UID < R.UID);
 
    procedure Generate_Wrapper_For_Subprogram
      (F_Spec, F_Body     : File_Type;

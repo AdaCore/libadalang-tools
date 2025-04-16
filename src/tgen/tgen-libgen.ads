@@ -25,7 +25,7 @@
 --  generation).
 
 with Ada.Containers.Ordered_Maps;
-with Ada.Containers.Vectors;
+with Ada.Containers.Ordered_Sets;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO;
 
@@ -196,28 +196,22 @@ package TGen.Libgen is
    --  Get TGgen's support library output directory
 
    function Generic_Package_Name
-     (Pack_Name     : TGen.Strings.Ada_Qualified_Name;
-      Replace_First : Boolean := False) return TGen.Strings.Ada_Qualified_Name
-   with Pre => (not Pack_Name.Is_Empty);
-   --  Add generic instantiation prefix to a qualified name. By default, the
-   --  function will change the last identifier of a fully qualified name, the
-   --  `Replace_First` switch can be used to replace the first one instead.
-
-   function Pack_Is_Top_Level_Instantiation
-     (Ctx : Libgen_Context; Pack_Name : TGen.Strings.Ada_Qualified_Name)
-      return Boolean;
-   --  Return if the package is a top level generic instantiation
+     (Pkg_Name : TGen.Strings.Ada_Qualified_Name)
+      return TGen.Strings.Ada_Qualified_Name
+   with Pre => (not Pkg_Name.Is_Empty);
+   --  Add generic instantiation prefix to a qualified name
 
    procedure Create_Generic_Wrapper_Package_If_Not_Exists
-     (Unit_Name : String; Base_Name : String; Output_Dir : String);
+     (Ctx        : Libgen_Context;
+      Orig_Name  : TGen.Strings.Ada_Qualified_Name;
+      Output_Dir : String);
    --  Create a wrapper package for top level generic instantiations. In
    --  case a of top level generic instantiation, this wrapper allows
    --  creation of child packages. The only limitation of this approach
    --  is that private generic subprograms can't be accessed which is why
    --  they're not supported.
    --
-   --  `Pack_Name` being the wrapper fully qualified name and `Base_Name`
-   --  the library level instantiation fully qualified name.
+   --  `Orig_Name` is the library level instantiation fully qualified name.
 
    function Get_Test_Case_Dump_Procedure_Name
      (Ctx              : Libgen_Context;
@@ -243,6 +237,11 @@ package TGen.Libgen is
    --  for JSON serialization. This switch can be enabled by setting the
    --  `TGEN_NO_JSON_MARSHALLING` environment variable.
 
+   function Is_Top_Level_Generic_Inst
+     (Ctx : Libgen_Context; Pkg_Name : TGen.Strings.Ada_Qualified_Name)
+      return Boolean;
+   --  Returns whether the given package is a top level generic instantiation
+
 private
    use TGen.Strings;
    use TGen.Context;
@@ -255,18 +254,16 @@ private
 
    subtype Types_Per_Package_Map is Types_Per_Package_Maps.Map;
 
-   package Subp_Info_Vectors is new
-     Ada.Containers.Vectors
-       (Index_Type   => Positive,
-        Element_Type => Subp_Information);
-   subtype Subp_Info_Vector is Subp_Info_Vectors.Vector;
+   package Subp_Info_Sets is new
+     Ada.Containers.Ordered_Sets (Element_Type => Subp_Information);
+   subtype Subp_Info_Set is Subp_Info_Sets.Set;
 
-   package Subp_Info_Vectors_Maps is new
+   package Subp_Info_Sets_Maps is new
      Ada.Containers.Ordered_Maps
        (Key_Type     => Ada_Qualified_Name,
-        Element_Type => Subp_Info_Vector,
-        "="          => Subp_Info_Vectors."=");
-   subtype Subp_Info_Vectors_Map is Subp_Info_Vectors_Maps.Map;
+        Element_Type => Subp_Info_Set,
+        "="          => Subp_Info_Sets."=");
+   subtype Subp_Info_Sets_Map is Subp_Info_Sets_Maps.Map;
 
    type Libgen_Context is record
       Output_Dir : Unbounded_String;
@@ -302,12 +299,19 @@ private
 
       Generation_Map : Types_Per_Package_Map;
       --  Map of generation unit names to function types for which we should
-      --  create a value generation harness.
+      --  create a value generation harness. TODO??? clarify this sentence.
 
-      Included_Subps : Subp_Info_Vectors_Map;
+      Included_Subps : Subp_Info_Sets_Map;
       --  Map of package name to list of subprograms included. We store some
       --  information to be able to retrieve the subprogram specification +
       --  the precondition.
+
+      Generic_Package_Instantiations : Ada_Qualified_Name_Map;
+      --  Map of generic packages instantiations to their TGen namespace
+      --  (e.g. for a package Ascon.Xof, this would be
+      --  Ascon.TGen_Generic_Instantiations_Xof). A renaming of the original
+      --  package instantiation is made available under
+      --  <TGen_namespace>.Instance.
 
       Array_Index_Types : Typ_Set;
       --  Set of types used to instantiate array index constraints

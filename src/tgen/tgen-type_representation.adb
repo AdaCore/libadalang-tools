@@ -553,7 +553,8 @@ package body TGen.Type_Representation is
       is
          Is_Top_Level_Gen : constant Boolean :=
            not T.Package_Name.Is_Empty
-           and then Ctx.Pack_Is_Top_Level_Instantiation (T.Package_Name);
+           and then TGen.Libgen.Is_Top_Level_Generic_Inst
+                      (Ctx, T.Package_Name);
       begin
          --  We have to collect anonymous types there and instantiate a new
          --  prefix for them. It will be the type name + the anonymous type
