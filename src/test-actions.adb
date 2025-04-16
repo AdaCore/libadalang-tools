@@ -41,6 +41,7 @@ with GNATCOLL.Traces;
 with Libadalang; use Libadalang;
 with Libadalang.Project_Provider;
 
+with Utils;
 with Utils.Command_Lines.Common;
 use Utils;
 use Utils.Command_Lines.Common;
@@ -239,7 +240,6 @@ package body Test.Actions is
 
          return Result;
       end Process_Comma_Separated_String;
-
    begin
       GNATCOLL.Traces.Parse_Config_File;
       Test.Common.Verbose := Arg (Cmd, Verbose);
@@ -254,20 +254,14 @@ package body Test.Actions is
       end if;
 
       if Arg (Cmd, Dump_Subp_Hash) /= null then
-         declare
-            Subp_File_Name : constant String :=
-              Test.Common.Parse_File_And_Number
+         Test.Common.Subp_File_Name :=
+           new String'
+             (Test.Common.Parse_File_And_Number
                 ("--dump-subp-hash",
                  Arg (Cmd, Dump_Subp_Hash).all,
-                 Test.Common.Subp_Line_Nbr);
-         begin
-            Test.Common.Subp_File_Name := new String'(Subp_File_Name);
-            Utils.Command_Lines.Append_File_Name
-              (Cmd, Test.Common.Subp_File_Name.all);
-            Test.Common.Quiet := True;
-         end;
-
-         return;
+                 Test.Common.Subp_Line_Nbr));
+         Utils.Command_Lines.Common.Common_Flag_Switches.Set_Arg
+           (Cmd, Quiet, True);
       end if;
 
       Test.Common.Instrument := Arg (Cmd, Dump_Test_Inputs);
@@ -1323,38 +1317,47 @@ package body Test.Actions is
          PP_Trivia (Unit);
       end if;
 
-      if Test.Common.Subp_File_Name /= null
-        and then Test.Common.Subp_File_Name.all = File_Name
-      then
-         declare
-            Found_Hash : Boolean := False;
+      if Test.Common.Subp_File_Name /= null then
+         if Ada.Directories.Simple_Name (Test.Common.Subp_File_Name.all)
+           = Ada.Directories.Simple_Name (File_Name)
+         then
+            declare
+               Found_Hash : Boolean := False;
 
-            function Visit (Node : Ada_Node'Class) return Visit_Status;
+               function Visit (Node : Ada_Node'Class) return Visit_Status;
 
-            function Visit (Node : Ada_Node'Class) return Visit_Status is
+               function Visit (Node : Ada_Node'Class) return Visit_Status is
+               begin
+                  if Found_Hash then
+                     return Stop;
+                  end if;
+                  if Kind (Node) in Ada_Basic_Subp_Decl
+                    and then Natural (Node.Sloc_Range.Start_Line)
+                             = Test.Common.Subp_Line_Nbr
+                  then
+                     Ada.Text_IO.Put_Line (Test.Common.Mangle_Hash_16 (Node));
+                     Found_Hash := True;
+                     return Stop;
+                  end if;
+                  return Into;
+               end Visit;
+
             begin
-               if Kind (Node) in Ada_Basic_Subp_Decl
-                 and then Natural (Node.Sloc_Range.Start_Line)
-                          = Test.Common.Subp_Line_Nbr
-               then
-                  Ada.Text_IO.Put (Test.Common.Mangle_Hash_16 (Node));
-                  Found_Hash := True;
-                  return Stop;
+               Traverse (Root (Unit), Visit'Access);
+               if not Found_Hash then
+                  Ada.Text_IO.Put
+                    ("Subprogram in "
+                     & Test.Common.Subp_File_Name.all
+                     & " at line "
+                     & Natural'Image (Test.Common.Subp_Line_Nbr)
+                     & " could not be found.");
+                  return;
                end if;
-               return Into;
-            end Visit;
-         begin
-            Traverse (Root (Unit), Visit'Access);
-            if not Found_Hash then
-               Ada.Text_IO.Put
-                 ("Subprogram in "
-                  & Test.Common.Subp_File_Name.all
-                  & " at line "
-                  & Natural'Image (Test.Common.Subp_Line_Nbr)
-                  & " could not be found.");
-            end if;
-            return;
-         end;
+            end;
+
+         end if;
+         return;
+
       end if;
 
       if Test.Common.Harness_Only then
