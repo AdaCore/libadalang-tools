@@ -13,13 +13,13 @@ begin
 
    my_file_is_null_df697b40227a3e08_Dump_TC
      (TGen_Marshalling_S         => String_Inst,
-      TGen_Marshalling_Unit_JSON => Unit_JSON,
-      TGen_Marshalling_Origin    => "First write");
+      TGen_Unit_JSON => Unit_JSON,
+      TGen_Test_Origin    => "First write");
 
    my_file_is_null_df697b40227a3e08_Dump_TC
      (TGen_Marshalling_S         => String_Inst,
-      TGen_Marshalling_Unit_JSON => Unit_JSON,
-      TGen_Marshalling_Origin    => "First write");
+      TGen_Unit_JSON => Unit_JSON,
+      TGen_Test_Origin    => "First write");
 
    if TGen_Marshalling_Standard_String_Input
      (TGen_Marshalling_Standard_String_Output (String_Inst)) /= String_Inst

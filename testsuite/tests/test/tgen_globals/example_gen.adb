@@ -20,8 +20,8 @@ begin
 
    pkg_test_cst_11dedb213c57ec3a_Dump_TC
      (TGen_Marshalling_B         => False,
-      TGen_Marshalling_Unit_JSON => Unit_JSON,
-      TGen_Marshalling_Origin    => "Dummy");
+      TGen_Unit_JSON => Unit_JSON,
+      TGen_Test_Origin    => "Dummy");
 
    --  For the following procedure:
    --
@@ -33,8 +33,8 @@ begin
    pkg_test_supported_ff2074aeb77f6e9e_Dump_TC
      (TGen_Marshalling_B                    => False,
       TGen_Marshalling_Pkg_Supported_Global => 3,
-      TGen_Marshalling_Unit_JSON            => Unit_JSON,
-      TGen_Marshalling_Origin               => "Dummy");
+      TGen_Unit_JSON            => Unit_JSON,
+      TGen_Test_Origin               => "Dummy");
 
    --  For the following procedure:
    --
@@ -46,8 +46,8 @@ begin
 
    pkg_test_output_b0e4810aba0b5de7_Dump_TC
      (TGen_Marshalling_B         => False,
-      TGen_Marshalling_Unit_JSON => Unit_JSON,
-      TGen_Marshalling_Origin    => "Dummy");
+      TGen_Unit_JSON => Unit_JSON,
+      TGen_Test_Origin    => "Dummy");
 
    --  For the following procedure:
    --
@@ -60,8 +60,8 @@ begin
    pkg_test_input_2517761d8d4f768b_Dump_TC
      (TGen_Marshalling_B                    => False,
       TGen_Marshalling_Pkg_Supported_Global => 3,
-      TGen_Marshalling_Unit_JSON            => Unit_JSON,
-      TGen_Marshalling_Origin               => "Dummy");
+      TGen_Unit_JSON            => Unit_JSON,
+      TGen_Test_Origin               => "Dummy");
 
    --  For the following procedure:
    --
@@ -74,8 +74,8 @@ begin
    pkg_test_in_out_e4a3f036cf7f496b_Dump_TC
      (TGen_Marshalling_B                    => False,
       TGen_Marshalling_Pkg_Supported_Global => 3,
-      TGen_Marshalling_Unit_JSON            => Unit_JSON,
-      TGen_Marshalling_Origin               => "Dummy");
+      TGen_Unit_JSON            => Unit_JSON,
+      TGen_Test_Origin               => "Dummy");
 
    Put_Line (Unit_JSON.Write (Compact => False));
 

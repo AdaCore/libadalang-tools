@@ -30,10 +30,10 @@
 @@TABLE'ALIGN_ON(":")@@
       @_GLOBAL_PREFIX_@_@_GLOBAL_SLUG_@ : TGen.TGen_Std.@_GLOBAL_TY_@ := @_GLOBAL_NAME_@;
 @@END_TABLE@@
-      @_GLOBAL_PREFIX_@_Unit_JSON : in out TGen.JSON.JSON_Value;
+      TGen_Unit_JSON : in out TGen.JSON.JSON_Value;
 @@IF@@ @_FOR_SPEC_@
-      @_GLOBAL_PREFIX_@_Origin : String := "") with
-      Pre => @_GLOBAL_PREFIX_@_Unit_JSON.Kind in TGen.JSON.JSON_Object_Type;
+      TGen_Test_Origin : String := "") with
+      Pre => TGen_Unit_JSON.Kind in TGen.JSON.JSON_Object_Type;
    --  Serialize the test-case represented by the first parameters that
    --  correspond to those of @_PROC_NAME_@ (not necessarily in the same
    --  order), in JSON_Unit, which should be either an empty JSON_Object, or
@@ -43,7 +43,7 @@
    --  Origin is used to record which tool created the test-case being
    --  serialized.
 @@ELSE@@
-      @_GLOBAL_PREFIX_@_Origin : String := "")
+      TGen_Test_Origin : String := "")
    is
       Subp_JSON                : TGen.JSON.JSON_Value;
       Subp_Vectors             : TGen.JSON.JSON_Array;
@@ -52,8 +52,8 @@
       New_Test_Vec_Vals        : TGen.JSON.JSON_Array;
       New_Test_Vec_Global_Vals : TGen.JSON.JSON_Array;
    begin
-      if @_GLOBAL_PREFIX_@_Unit_JSON.Has_Field ("@_PROC_UID_@") then
-         Subp_JSON := @_GLOBAL_PREFIX_@_Unit_JSON.Get ("@_PROC_UID_@");
+      if TGen_Unit_JSON.Has_Field ("@_PROC_UID_@") then
+         Subp_JSON := TGen_Unit_JSON.Get ("@_PROC_UID_@");
          Subp_Vectors := Subp_JSON.Get ("test_vectors");
       else
          Subp_JSON := TGen.JSON.Create_Object;
@@ -63,7 +63,7 @@
          Subp_JSON.Set_Field ("return_type", "@_PROC_RETURN_TY_@");
 @@END_IF@@
       end if;
-      New_Test_Vec.Set_Field ("origin", @_GLOBAL_PREFIX_@_Origin);
+      New_Test_Vec.Set_Field ("origin", TGen_Test_Origin);
 @@TABLE@@
       declare
          Param_Obj : constant TGen.JSON.JSON_Value := TGen.JSON.Create_Object;
@@ -92,6 +92,6 @@
       New_Test_Vec.Set_Field ("global_values", New_Test_Vec_Global_Vals);
       TGen.JSON.Append (Subp_Vectors, New_Test_Vec);
       Subp_JSON.Set_Field ("test_vectors", Subp_Vectors);
-      @_GLOBAL_PREFIX_@_Unit_JSON.Set_Field ("@_PROC_UID_@", Subp_JSON);
+      TGen_Unit_JSON.Set_Field ("@_PROC_UID_@", Subp_JSON);
     end @_PROC_NAME_@_Dump_TC;
 @@END_IF@@
