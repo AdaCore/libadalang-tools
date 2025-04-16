@@ -39,16 +39,16 @@ package body TGen.Wrappers is
       Value : Unbounded_String;
    end record;
 
-   function "=" (L, R : Literal) return Boolean is
-     (L.Neg = R.Neg and then L.Value = R.Value);
+   function "=" (L, R : Literal) return Boolean
+   is (L.Neg = R.Neg and then L.Value = R.Value);
 
-   package Clause is new Ada.Containers.Vectors
-     (Index_Type   => Positive,
-      Element_Type => Literal);
-   package Clause_Vectors is new Ada.Containers.Vectors
-     (Index_Type   => Positive,
-      Element_Type => Clause.Vector,
-      "="          => Clause."=");
+   package Clause is new
+     Ada.Containers.Vectors (Index_Type => Positive, Element_Type => Literal);
+   package Clause_Vectors is new
+     Ada.Containers.Vectors
+       (Index_Type   => Positive,
+        Element_Type => Clause.Vector,
+        "="          => Clause."=");
    subtype Formula_Type is Clause_Vectors.Vector;
 
    type Polarity_Kind is new Boolean;
@@ -68,8 +68,7 @@ package body TGen.Wrappers is
      (F_Body : File_Type; Call_To_Orig_Subp : String; Formula : Formula_Type);
 
    function Subp_Kind (F : Function_Typ) return Ada_Subp_Kind
-   is (if F.Ret_Typ = null
-       then Ada_Subp_Kind_Procedure
+   is (if F.Ret_Typ = null then Ada_Subp_Kind_Procedure
        else Ada_Subp_Kind_Function);
 
    ---------
@@ -163,8 +162,8 @@ package body TGen.Wrappers is
       Result.Append
         (Clause.To_Vector
            (Literal'
-                (Neg   => not Boolean (Polarity),
-                 Value => To_Unbounded_String (+E.Text)),
+              (Neg   => not Boolean (Polarity),
+               Value => To_Unbounded_String (+E.Text)),
             1));
       return Result;
    end Dnf;
@@ -321,6 +320,8 @@ package body TGen.Wrappers is
       end loop;
       if Subprogram.Param_Order.Length > 0 then
          Append (Call_To_User_Subp, ");");
+      else
+         Append (Call_To_User_Subp, ";");
       end if;
 
       --  Declare the wrapper specification in the spec package
