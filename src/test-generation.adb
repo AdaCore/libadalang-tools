@@ -162,34 +162,6 @@ package body Test.Generation is
             end if;
          end;
 
-         for Inst of Node.As_Basic_Decl.P_Generic_Instantiations loop
-
-            --  If it is top level generic package instantiation, we call
-            --  `Include_Subp` but with the associated switch set.
-
-            if Inst.Unit.Root.As_Compilation_Unit.F_Body.Kind
-              = Libadalang.Common.Ada_Library_Item
-              and then Inst
-                         .Unit
-                         .Root
-                         .As_Compilation_Unit
-                         .F_Body
-                         .As_Library_Item
-                         .F_Item
-                       = Inst.As_Basic_Decl
-            then
-               if not Include_Subp
-                        (Test.Common.TGen_Libgen_Ctx,
-                         Node.As_Basic_Decl,
-                         Diags,
-                         Is_Top_Level_Generic_Instantiation => True)
-               then
-                  Report_Failures;
-               end if;
-               return Over;
-            end if;
-         end loop;
-
          if not Include_Subp
                   (Test.Common.TGen_Libgen_Ctx, Node.As_Basic_Decl, Diags)
          then

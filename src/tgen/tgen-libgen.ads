@@ -85,11 +85,9 @@ package TGen.Libgen is
    --  supported inlined in the Unsupported_Typ.Reason field.
 
    function Include_Subp
-     (Ctx                                : in out Libgen_Context;
-      Subp                               : LAL.Basic_Decl'Class;
-      Diags                              :
-        out TGen.Strings.String_Vectors.Vector;
-      Is_Top_Level_Generic_Instantiation : Boolean := False) return Boolean;
+     (Ctx   : in out Libgen_Context;
+      Subp  : LAL.Basic_Decl'Class;
+      Diags : out TGen.Strings.String_Vectors.Vector) return Boolean;
    --  Register all the types in the parameters of Subp in the set of types for
    --  which the marshalling library will be generated. This procedures does
    --  not actually generate any sources, call Generate to create the support
@@ -99,10 +97,6 @@ package TGen.Libgen is
    --  types, or if some of the types are unsupported for marshalling,
    --  and report diagnostics in Diags. In that case, the context is not
    --  modified. Otherwise, Diags should be ignored.
-   --
-   --  The `Is_Generic_Instantiation_Only` switch is used when a subp comes
-   --  from a top level generic instantiation. This flag is required because
-   --  it triggers the generation of a wrapper package to allow child packages.
 
    procedure Generate
      (Ctx : in out Libgen_Context; Part : Any_Library_Part := All_Parts);

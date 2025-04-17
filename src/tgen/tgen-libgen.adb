@@ -56,6 +56,13 @@ package body TGen.Libgen is
    --  If True, calls to Set_Array_Limit will raise a Constraint_Error.
    --  Should be set by any call to Include_Subp or Supported_Subprogram.
 
+   function Is_In_Top_Level_Generic_Instantiation
+     (Subp : Basic_Decl'Class) return Boolean;
+   --  Return whether the given subprogram belongs to a top level generic
+   --  package instantiation. In this case, the TGen libraries will not be
+   --  generated as child packages of the original package, but as child
+   --  packages of a generated wrapper package.
+
    procedure Generate_Support_Library
      (Ctx                       : Libgen_Context;
       Pkg_Name                  : Ada_Qualified_Name;
@@ -777,17 +784,50 @@ package body TGen.Libgen is
       end;
    end Supported_Subprogram;
 
+   -------------------------------------------
+   -- Is_In_Top_Level_Generic_Instantiation --
+   -------------------------------------------
+
+   function Is_In_Top_Level_Generic_Instantiation
+     (Subp : Basic_Decl'Class) return Boolean
+   is
+      use Libadalang.Common;
+   begin
+      for Inst of Subp.P_Generic_Instantiations loop
+
+         --  If it is top level generic package instantiation, we call
+         --  `Include_Subp` but with the associated switch set.
+
+         if Inst.Unit.Root.As_Compilation_Unit.F_Body.Kind
+           = Libadalang.Common.Ada_Library_Item
+           and then Inst
+                      .Unit
+                      .Root
+                      .As_Compilation_Unit
+                      .F_Body
+                      .As_Library_Item
+                      .F_Item
+                    = Inst.As_Basic_Decl
+         then
+            return True;
+         end if;
+      end loop;
+      return False;
+   end Is_In_Top_Level_Generic_Instantiation;
+
    ------------------
    -- Include_Subp --
    ------------------
 
    function Include_Subp
-     (Ctx                                : in out Libgen_Context;
-      Subp                               : Basic_Decl'Class;
-      Diags                              : out String_Vectors.Vector;
-      Is_Top_Level_Generic_Instantiation : Boolean := False) return Boolean
+     (Ctx   : in out Libgen_Context;
+      Subp  : Basic_Decl'Class;
+      Diags : out String_Vectors.Vector) return Boolean
    is
       use Ada_Qualified_Name_Sets_Maps;
+
+      Is_Top_Level_Generic_Instantiation : constant Boolean :=
+        Is_In_Top_Level_Generic_Instantiation (Subp);
 
       Subp_Types : Typ_Set;
       --  Transitive closure of required types for the parameters of the
