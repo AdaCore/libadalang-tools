@@ -1,6 +1,7 @@
 from glob import glob
 
 import os
+from pathlib import Path
 
 from typing import AnyStr
 
@@ -16,11 +17,9 @@ class Address_Hider(PatternSubstitute):
     Refiner that identifies addresses from a symbolic Ada traceback and hides
     the addresses, to stabilize the output
     """
+
     def __init__(self):
-        super().__init__(
-            pattern=r"0x[0-9a-f]{8,}",
-            replacement="<addr>"
-        )
+        super().__init__(pattern=r"0x[0-9a-f]{8,}", replacement="<addr>")
 
 
 class GNATTestTgenDriver(BaseDriver):
@@ -65,9 +64,7 @@ class GNATTestTgenDriver(BaseDriver):
 
         # Try to locate one in the test dir otherwise
         else:
-            gpr_file = glob(
-                os.path.join(self.working_dir(), "*.gpr"), recursive=False
-            )
+            gpr_file = glob(os.path.join(self.working_dir(), "*.gpr"), recursive=False)
             if len(gpr_file) == 0:
                 raise TestAbortWithError(
                     "Could not find gpr project file on which to run gnattest:"
@@ -102,21 +99,20 @@ class GNATTestTgenDriver(BaseDriver):
 
         # Get the object directory to be able to build the harness. This assumes
         # there is no Harness_Dir attribute in the project file.
-        harness_dir = os.path.join(
-            self.working_dir(), "obj", "gnattest", "harness"
+        harness_dir = self.test_env.get(
+            "harness_dir",
+            os.path.join(self.working_dir(), "obj", "gnattest", "harness"),
         )
+        harness_dir = ""
+        for path in Path(self.working_dir()).rglob('harness'):
+            harness_dir = path
+
         td_prj = os.path.join(harness_dir, "test_driver.gpr")
-        support_lib_prj = os.path.join(
-            harness_dir, "tgen_support", "tgen_support.gpr"
-        )
+        support_lib_prj = os.path.join(harness_dir, "tgen_support", "tgen_support.gpr")
         if not os.path.exists(td_prj):
             raise TestAbortWithError("Could not locate test harness project")
 
-        gprbuild_args = [
-            "gprbuild",
-            f"-P{td_prj}",
-            "-q"
-        ]
+        gprbuild_args = ["gprbuild", f"-P{td_prj}", "-q"]
 
         # Determine if the test harness needs to be compiled for test dumping mode
         has_test_dump = "--dump-test-inputs" in gnattest_args
@@ -135,8 +131,7 @@ class GNATTestTgenDriver(BaseDriver):
         # it is likely that some tests may crash the subprogram under test.
         td_runner = os.path.join(os.path.dirname(td_prj), "test_runner")
         self.shell(
-            [td_runner] + self.test_env.get("extra_run_args", []),
-            catch_error=False
+            [td_runner] + self.test_env.get("extra_run_args", []), catch_error=False
         )
 
         # Log the number of test files that were created by the test runner, if
