@@ -81,35 +81,37 @@ package TGen.Templates is
    end Binary_Marshalling;
 
    package JSON_Marshalling is
-      Array_Read_Write_Template     : constant String :=
+      Array_Read_Write_Template       : constant String :=
         Template_Folder & "array_read_write.tmplt";
-      Component_Write_Template      : constant String :=
+      Component_Write_Template        : constant String :=
         Template_Folder & "component_write.tmplt";
-      Component_Read_Template       : constant String :=
+      Component_Read_Template         : constant String :=
         Template_Folder & "component_read.tmplt";
-      Composite_Base_Spec_Template  : constant String :=
+      Component_Read_Indexed_Template : constant String :=
+        Template_Folder & "component_read_indexed.tmplt";
+      Composite_Base_Spec_Template    : constant String :=
         Template_Folder & "composite_base_spec.tmplt";
-      Header_Body_Template          : constant String :=
+      Header_Body_Template            : constant String :=
         Template_Folder & "header_body.tmplt";
-      Header_Spec_Template          : constant String :=
+      Header_Spec_Template            : constant String :=
         Template_Folder & "header_spec.tmplt";
-      Header_Wrappers_Body_Template : constant String :=
+      Header_Wrappers_Body_Template   : constant String :=
         Template_Folder & "header_wrappers_body.tmplt";
-      Header_Wrappers_Spec_Template : constant String :=
+      Header_Wrappers_Spec_Template   : constant String :=
         Template_Folder & "header_wrappers_spec.tmplt";
-      In_Out_Body_Template          : constant String :=
+      In_Out_Body_Template            : constant String :=
         Template_Folder & "in_out_body.tmplt";
-      In_Out_Spec_Template          : constant String :=
+      In_Out_Spec_Template            : constant String :=
         Template_Folder & "in_out_spec.tmplt";
-      Record_Read_Write_Template    : constant String :=
+      Record_Read_Write_Template      : constant String :=
         Template_Folder & "record_read_write.tmplt";
-      Scalar_Base_Spec_Template     : constant String :=
+      Scalar_Base_Spec_Template       : constant String :=
         Template_Folder & "scalar_base_spec.tmplt";
-      Scalar_Read_Write_Template    : constant String :=
+      Scalar_Read_Write_Template      : constant String :=
         Template_Folder & "scalar_read_write.tmplt";
-      Variant_Read_Write_Template   : constant String :=
+      Variant_Read_Write_Template     : constant String :=
         Template_Folder & "variant_read_write.tmplt";
-      Function_TC_Dump_Template     : constant String :=
+      Function_TC_Dump_Template       : constant String :=
         Template_Folder & "function_tc_dump.tmplt";
    end JSON_Marshalling;
 

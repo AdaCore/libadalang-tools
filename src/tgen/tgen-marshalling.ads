@@ -85,6 +85,11 @@ private
       --  Generate a call to read a record / array component
 
       with
+        function Component_Read_Indexed
+          (Assocs : Translate_Table) return Unbounded_String;
+      --  Generate a call to read a record / array component
+
+      with
         function Component_Write
           (Assocs : Translate_Table) return Unbounded_String;
       --  Generate a call to write a record / array component

@@ -66,6 +66,8 @@ package body TGen.Marshalling.JSON_Marshallers is
 
       function Component_Read
         (Assocs : Translate_Table) return Unbounded_String;
+      function Component_Read_Indexed
+        (Assocs : Translate_Table) return Unbounded_String;
       function Component_Write
         (Assocs : Translate_Table) return Unbounded_String;
       function Component_Size
@@ -103,6 +105,16 @@ package body TGen.Marshalling.JSON_Marshallers is
       begin
          return Parse (Component_Read_Template, Assocs);
       end Component_Read;
+
+      ----------------------------
+      -- Component_Read_Indexed --
+      ----------------------------
+
+      function Component_Read_Indexed
+        (Assocs : Translate_Table) return Unbounded_String is
+      begin
+         return Parse (Component_Read_Indexed_Template, Assocs);
+      end Component_Read_Indexed;
 
       --------------------
       -- Component_Size --
@@ -224,6 +236,7 @@ package body TGen.Marshalling.JSON_Marshallers is
         Generate_Base_Functions_For_Typ
           (Differentiate_Discrete => False,
            Component_Read         => Component_Read,
+           Component_Read_Indexed => Component_Read_Indexed,
            Component_Write        => Component_Write,
            Component_Size         => Component_Size,
            Component_Size_Max     => Component_Size_Max,

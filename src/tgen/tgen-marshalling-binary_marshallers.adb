@@ -68,6 +68,8 @@ package body TGen.Marshalling.Binary_Marshallers is
 
       function Component_Read
         (Assocs : Translate_Table) return Unbounded_String;
+      function Component_Read_Indexed
+        (Assocs : Translate_Table) return Unbounded_String;
       function Component_Write
         (Assocs : Translate_Table) return Unbounded_String;
       function Component_Size
@@ -98,6 +100,17 @@ package body TGen.Marshalling.Binary_Marshallers is
              (Component_Read_Write_Template,
               Assocs & Assoc ("ACTION", "Read"));
       end Component_Read;
+
+      ----------------------------
+      -- Component_Read_Indexed --
+      ----------------------------
+
+      function Component_Read_Indexed
+        (Assocs : Translate_Table) return Unbounded_String is
+      begin
+         pragma Unreferenced (Assocs);
+         return To_Unbounded_String ("%%_UNSUPPORTED_%%");
+      end Component_Read_Indexed;
 
       ---------------------
       -- Component_Write --
@@ -291,6 +304,7 @@ package body TGen.Marshalling.Binary_Marshallers is
         Generate_Base_Functions_For_Typ
           (Differentiate_Discrete => True,
            Component_Read         => Component_Read,
+           Component_Read_Indexed => Component_Read_Indexed,
            Component_Write        => Component_Write,
            Component_Size         => Component_Size,
            Component_Size_Max     => Component_Size_Max,
