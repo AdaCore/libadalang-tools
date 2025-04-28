@@ -1975,10 +1975,10 @@ package body Pp.Formatting is
          Lines_Data      : Lines_Data_Rec renames Lines_Data_P.all;
          All_LB          : Line_Break_Vector renames Lines_Data.All_LB;
          All_LBI         : Line_Break_Index_Vector renames Lines_Data.All_LBI;
-         Enabled_LBI     : Line_Break_Index_Vector
-           renames Lines_Data.Enabled_LBI;
-         Syntax_LBI      : Line_Break_Index_Vector
-           renames Lines_Data.Syntax_LBI;
+         Enabled_LBI     : Line_Break_Index_Vector renames
+           Lines_Data.Enabled_LBI;
+         Syntax_LBI      : Line_Break_Index_Vector renames
+           Lines_Data.Syntax_LBI;
          Saved_New_Tokns : aliased Scanner.Tokn_Vec;
          Ignore          : Boolean :=
            Move_Tokns (Target => Saved_New_Tokns, Source => Tokns);
@@ -2127,8 +2127,8 @@ package body Pp.Formatting is
          First_Line_Offset   : Natural renames Lines_Data.First_Line_Offset;
          Initial_Indentation : Natural renames Lines_Data.Initial_Indentation;
          All_LB              : Line_Break_Vector renames Lines_Data.All_LB;
-         All_LBI             : Line_Break_Index_Vector
-           renames Lines_Data.All_LBI;
+         All_LBI             : Line_Break_Index_Vector renames
+           Lines_Data.All_LBI;
          New_Tokns           : Scanner.Tokn_Vec renames Lines_Data.New_Tokns;
 
          function Worthwhile_Line_Break
@@ -2738,15 +2738,15 @@ package body Pp.Formatting is
          Initial_Indentation : Natural renames Lines_Data.Initial_Indentation;
          Cur_Indentation     : Natural renames Lines_Data.Cur_Indentation;
          All_LB              : Line_Break_Vector renames Lines_Data.All_LB;
-         Temp_LBI            : Line_Break_Index_Vector
-           renames Lines_Data.Temp_LBI;
-         Enabled_LBI         : Line_Break_Index_Vector
-           renames Lines_Data.Enabled_LBI;
-         Syntax_LBI          : Line_Break_Index_Vector
-           renames Lines_Data.Syntax_LBI;
+         Temp_LBI            : Line_Break_Index_Vector renames
+           Lines_Data.Temp_LBI;
+         Enabled_LBI         : Line_Break_Index_Vector renames
+           Lines_Data.Enabled_LBI;
+         Syntax_LBI          : Line_Break_Index_Vector renames
+           Lines_Data.Syntax_LBI;
          Src_Tokns           : Scanner.Tokn_Vec renames Lines_Data.Src_Tokns;
-         Saved_New_Tokns     : Scanner.Tokn_Vec
-           renames Lines_Data.Saved_New_Tokns;
+         Saved_New_Tokns     : Scanner.Tokn_Vec renames
+           Lines_Data.Saved_New_Tokns;
 
          procedure Reset_Indentation;
          --  Set the indentation to it's initial value (usually 0, but can be
@@ -3136,10 +3136,10 @@ package body Pp.Formatting is
                end;
             end New_Space_NL;
 
-            Prev_LB              : Line_Break
-              renames All_LB (Enabled_LBI (Enabled_Cur_Line - 1));
-            LB                   : Line_Break
-              renames All_LB (Enabled_LBI (Enabled_Cur_Line));
+            Prev_LB              : Line_Break renames
+              All_LB (Enabled_LBI (Enabled_Cur_Line - 1));
+            LB                   : Line_Break renames
+              All_LB (Enabled_LBI (Enabled_Cur_Line));
             Indentation          : constant Natural := Prev_LB.Indentation;
             New_Prev_Src_Tok     : constant Tokn_Cursor := Prev (Src_Tok);
             New_Preceding_Blanks : Natural :=
@@ -3244,8 +3244,8 @@ package body Pp.Formatting is
 
                   if Kind (New_Tok) = Enabled_LB_Token then
                      declare
-                        This_LB : Line_Break
-                          renames All_LB (Line_Break_Token_Index (New_Tok));
+                        This_LB : Line_Break renames
+                          All_LB (Line_Break_Token_Index (New_Tok));
                      begin
                         Append_Spaces
                           (New_Tokns, Count => This_LB.Indentation);
@@ -3618,8 +3618,8 @@ package body Pp.Formatting is
                      --  the Cur_Indentation in case of a parathesized context.
                      declare
                         P  : constant Tokn_Cursor := Prev (Prev (New_Tok));
-                        LB : Line_Break
-                          renames All_LB (Line_Break_Token_Index (P));
+                        LB : Line_Break renames
+                          All_LB (Line_Break_Token_Index (P));
                      begin
                         if LB.Enabled and then LB.Affects_Comments then
                            --  Do nothing when ');' is detected before
@@ -3657,8 +3657,8 @@ package body Pp.Formatting is
                      declare
                         P  : constant Tokn_Cursor :=
                           Prev (Prev (Prev (New_Tok)));
-                        LB : Line_Break
-                          renames All_LB (Line_Break_Token_Index (P));
+                        LB : Line_Break renames
+                          All_LB (Line_Break_Token_Index (P));
                      begin
                         if LB.Enabled and then LB.Affects_Comments then
                            Indentation := LB.Indentation;
@@ -3705,8 +3705,8 @@ package body Pp.Formatting is
                   then
                      declare
                         P  : constant Tokn_Cursor := Prev (Prev (New_Tok));
-                        LB : Line_Break
-                          renames All_LB (Line_Break_Token_Index (P));
+                        LB : Line_Break renames
+                          All_LB (Line_Break_Token_Index (P));
                      begin
                         Indentation := LB.Indentation;
                         Corrected_Indentation := Indentation;
@@ -3726,8 +3726,8 @@ package body Pp.Formatting is
                               and then Kind (Prev (Prev (New_Tok))) in Spaces)
                   then
                      declare
-                        LB : Line_Break
-                          renames All_LB (Line_Break_Token_Index (New_Tok));
+                        LB : Line_Break renames
+                          All_LB (Line_Break_Token_Index (New_Tok));
                      begin
                         Indentation := LB.Indentation;
                         Corrected_Indentation := Indentation;
@@ -4437,8 +4437,8 @@ package body Pp.Formatting is
 
                      if Kind (New_Tok) in Line_Break_Token then
                         declare
-                           LB : Line_Break
-                             renames All_LB (Line_Break_Token_Index (New_Tok));
+                           LB : Line_Break renames
+                             All_LB (Line_Break_Token_Index (New_Tok));
                         begin
 
                            --  If we have a line break with
@@ -4507,9 +4507,8 @@ package body Pp.Formatting is
                                  end if;
 
                                  declare
-                                    LB : Line_Break
-                                      renames All_LB
-                                                (Line_Break_Token_Index (P));
+                                    LB : Line_Break renames
+                                      All_LB (Line_Break_Token_Index (P));
                                  begin
                                     if Kind (P) = Disabled_LB_Token
                                       and then LB_Needs_To_Be_Enabled (Src_Tok)
@@ -4672,8 +4671,8 @@ package body Pp.Formatting is
 
                      declare
                         P  : constant Tokn_Cursor := Prev (Prev (New_Tok));
-                        LB : Line_Break
-                          renames All_LB (Line_Break_Token_Index (P));
+                        LB : Line_Break renames
+                          All_LB (Line_Break_Token_Index (P));
                      begin
                         LB.Enabled := True;
                         LB.Affects_Comments := True;
@@ -5244,8 +5243,8 @@ package body Pp.Formatting is
             Append_Tokn (New_Tokns, New_Tok);
             if Kind (New_Tok) in Line_Break_Token then
                declare
-                  LB : Line_Break
-                    renames All_LB (Line_Break_Token_Index (New_Tok));
+                  LB : Line_Break renames
+                    All_LB (Line_Break_Token_Index (New_Tok));
                   pragma Assert (LB.Enabled);
                   pragma Assert (Kind (Next (New_Tok)) /= Spaces);
                begin
@@ -5667,8 +5666,8 @@ package body Pp.Formatting is
                                 Assert
                                   (if Tab.Is_Fake then Tab.Num_Blanks = 0);
 
-                              for X_In_Line
-                                in Index_In_Line .. Last_Index (Line)
+                              for X_In_Line in
+                                Index_In_Line .. Last_Index (Line)
                               loop
                                  declare
                                     Tab_J : constant Tab_Index :=
@@ -5723,18 +5722,18 @@ package body Pp.Formatting is
                                (1))
                             /= 0);
 
-                     for Index_In_Line
-                       in 1
-                          .. Last_Index
-                               (Paragraphs_Maps.Element (All_Paragraphs_Cursor)
-                                  (1))
+                     for Index_In_Line in
+                       1
+                       .. Last_Index
+                            (Paragraphs_Maps.Element (All_Paragraphs_Cursor)
+                               (1))
                      loop
                         declare
                            Max_Col : Positive := 1;
 
                         begin
-                           for Line
-                             of Paragraphs_Maps.Element (All_Paragraphs_Cursor)
+                           for Line of
+                             Paragraphs_Maps.Element (All_Paragraphs_Cursor)
                            loop
                               if Index_In_Line <= Last_Index (Line) then
                                  declare
@@ -5748,8 +5747,8 @@ package body Pp.Formatting is
                               end if;
                            end loop;
 
-                           for Line
-                             of Paragraphs_Maps.Element (All_Paragraphs_Cursor)
+                           for Line of
+                             Paragraphs_Maps.Element (All_Paragraphs_Cursor)
                            loop
                               if Index_In_Line <= Last_Index (Line) then
                                  declare
@@ -5767,8 +5766,8 @@ package body Pp.Formatting is
                                         (if Tab.Is_Fake
                                            then Tab.Num_Blanks = 0);
 
-                                    for X_In_Line
-                                      in Index_In_Line .. Last_Index (Line)
+                                    for X_In_Line in
+                                      Index_In_Line .. Last_Index (Line)
                                     loop
                                        declare
                                           Tab_J : constant Tab_Index :=

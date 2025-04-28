@@ -245,7 +245,7 @@ package body LAL_Extensions is
          when Ada_Single_Protected_Decl =>
             --  This will recurse 2 levels!
             return Vis_Part (Node.As_Single_Protected_Decl.F_Definition);
-            --  Why doesn't this parallel tasks???
+         --  Why doesn't this parallel tasks???
 
          when Ada_Protected_Type_Decl =>
             return Vis_Part (Node.As_Protected_Type_Decl.F_Definition);
@@ -280,7 +280,7 @@ package body LAL_Extensions is
          when Ada_Single_Protected_Decl =>
             --  This will recurse 2 levels!
             return Priv_Part (Node.As_Single_Protected_Decl.F_Definition);
-            --  Why doesn't this parallel tasks???
+         --  Why doesn't this parallel tasks???
 
          when Ada_Protected_Type_Decl =>
             return Priv_Part (Node.As_Protected_Type_Decl.F_Definition);

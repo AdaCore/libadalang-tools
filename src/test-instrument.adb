@@ -344,11 +344,11 @@ package body Test.Instrument is
          S_Put (0, "with TGen.Instr_Support;");
          Put_New_Line;
 
-         for U
-           of TGen.Libgen.Required_Support_Packages
-                (TGen_Libgen_Ctx,
-                 TGen.LAL_Utils.Convert_Qualified_Name
-                   (CU.P_Syntactic_Fully_Qualified_Name))
+         for U of
+           TGen.Libgen.Required_Support_Packages
+             (TGen_Libgen_Ctx,
+              TGen.LAL_Utils.Convert_Qualified_Name
+                (CU.P_Syntactic_Fully_Qualified_Name))
          loop
             S_Put (0, "with " & To_Ada (U) & ";");
             Put_New_Line;

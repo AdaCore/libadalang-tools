@@ -26,8 +26,8 @@ with GNATCOLL.Terminal;
 
 package body Pp is
 
-   Info_Message_Style : GNATCOLL.Traces.Message_Style
-     renames GNATCOLL.Traces.Use_Default_Style;
+   Info_Message_Style : GNATCOLL.Traces.Message_Style renames
+     GNATCOLL.Traces.Use_Default_Style;
 
    Debug_Message_Style : constant GNATCOLL.Traces.Message_Style :=
      GNATCOLL.Traces.Message_Style'

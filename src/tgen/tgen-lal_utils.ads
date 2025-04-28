@@ -37,8 +37,8 @@ package TGen.LAL_Utils is
 
    function "+" (Str : String) return Text_Type renames From_UTF8;
 
-   function "+" (T : Text_Type) return Unbounded_Text_Type
-   renames To_Unbounded_Text;
+   function "+" (T : Text_Type) return Unbounded_Text_Type renames
+     To_Unbounded_Text;
 
    function "+" (T : Unbounded_Text_Type) return Text_Type renames To_Text;
 

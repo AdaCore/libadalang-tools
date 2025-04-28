@@ -45,8 +45,8 @@ package body TGen.Types is
    begin
       Result.Append (First_Element_Name);
       Result.Append (Ada_Identifier (+"Instance"));
-      for I
-        in Extended_Index'Succ (Pack_Name.First_Index) .. Pack_Name.Last_Index
+      for I in
+        Extended_Index'Succ (Pack_Name.First_Index) .. Pack_Name.Last_Index
       loop
          Result.Append (Pack_Name.Element (I));
       end loop;

@@ -89,8 +89,8 @@ package body Utils.Fast_Vectors is
 
       declare
          L  : constant Index_Type := Container.Last;
-         EA : Elements_Array
-           renames Container.Elements.EA (Index_Type'First .. L);
+         EA : Elements_Array renames
+           Container.Elements.EA (Index_Type'First .. L);
 
       begin
          Container.Elements := Empty_Elements'Access;

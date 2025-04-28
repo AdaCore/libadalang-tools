@@ -235,8 +235,8 @@ package body TGen.Types.Record_Types is
       --  values to generate, and all the component indices are maxed out.
 
       return
-        (for some Comp of S.Component_Strats
-         => Comp.Strat.Has_Next or else Comp.Index < Length (Comp.Values));
+        (for some Comp of S.Component_Strats =>
+           Comp.Strat.Has_Next or else Comp.Index < Length (Comp.Values));
    end Has_Next;
 
    --------------
@@ -869,8 +869,8 @@ package body TGen.Types.Record_Types is
       T          : Typ_Access;
       Local_Ctx  : out Disc_Value_Map)
    is
-      Disc_Record : Discriminated_Record_Typ
-        renames Discriminated_Record_Typ (T.all);
+      Disc_Record : Discriminated_Record_Typ renames
+        Discriminated_Record_Typ (T.all);
    begin
       Local_Ctx.Clear;
       for Constraint_Cursor in Disc_Record.Discriminant_Constraint.Iterate loop
@@ -1404,8 +1404,8 @@ package body TGen.Types.Record_Types is
      (S : in out Disc_Record_Enum_Strat_Type; Disc_Context : Disc_Value_Map)
       return JSON_Value
    is
-      Rec : Discriminated_Record_Typ
-        renames Discriminated_Record_Typ (S.T.all);
+      Rec : Discriminated_Record_Typ renames
+        Discriminated_Record_Typ (S.T.all);
    begin
 
       --  There are two cases in which we can't generate a new value fro the

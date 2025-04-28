@@ -60,8 +60,8 @@ package body Stub.Actions is
 
    use Utils.Char_Vectors.Char_Vectors;
 
-   function Image (X : Integer) return String
-   renames Utils.String_Utilities.Image;
+   function Image (X : Integer) return String renames
+     Utils.String_Utilities.Image;
 
    use Common_Flag_Switches, Common_String_Switches;
 
@@ -511,7 +511,7 @@ package body Stub.Actions is
          when Ada_Incomplete_Type_Decl | Ada_Incomplete_Tagged_Type_Decl =>
             return False;
 
-            --  Because these are handled specially in Walk
+         --  Because these are handled specially in Walk
 
          when others =>
             return False;
@@ -1277,8 +1277,8 @@ package body Stub.Actions is
       procedure Write_Output_File is
          Out_File   : constant File_Descriptor :=
            Create_File (Output_Name, Fmode => Binary);
-         Out_String : String
-           renames Elems (Pp_Out_Vec) (1 .. Last_Index (Pp_Out_Vec));
+         Out_String : String renames
+           Elems (Pp_Out_Vec) (1 .. Last_Index (Pp_Out_Vec));
          Status     : Boolean;
 
          --  Start of Processing for Write_Output_File

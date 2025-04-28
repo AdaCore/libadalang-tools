@@ -362,7 +362,7 @@ package body Pp.Buffers is
    end Initialize_Buffer;
 
    overriding
-   procedure Initialize (Buf : in out Buffer) renames Initialize_Buffer;
+   procedure Initialize (Buf : in out Buffer)renames Initialize_Buffer;
 
    procedure Maybe_Adjust_Marker (Buf : in out Buffer) is
    begin

@@ -185,8 +185,9 @@ package body TGen.Types.Array_Types is
    begin
       for I in Self.Index_Constraints'Range loop
          declare
-            Index_Constraint     : TGen.Types.Constraints.Index_Constraint
-              renames Self.Index_Constraints (I).all;
+            Index_Constraint     :
+              TGen.Types.Constraints.Index_Constraint renames
+                Self.Index_Constraints (I).all;
             Index_Type_Classwide : constant Typ'Class :=
               Self.Index_Types (I).all;
             Index_Type           : constant Discrete_Typ'Class :=
@@ -553,13 +554,15 @@ package body TGen.Types.Array_Types is
       --  sizes.
 
       Sizes :=
-        [for I in 1 .. Self.Num_Dims
-         => (Min_Size =>
-            Nat_Conversions.From_Big_Integer
-              (Index_Values (I).High_Bound - Index_Values (I).Low_Bound + 1),
-          Max_Size =>
-            Nat_Conversions.From_Big_Integer
-              (Index_Values (I).High_Bound - Index_Values (I).Low_Bound + 1))];
+        [for I in 1 .. Self.Num_Dims =>
+           (Min_Size =>
+              Nat_Conversions.From_Big_Integer
+                (Index_Values (I).High_Bound - Index_Values (I).Low_Bound + 1),
+            Max_Size =>
+              Nat_Conversions.From_Big_Integer
+                (Index_Values (I).High_Bound
+                 - Index_Values (I).Low_Bound
+                 + 1))];
 
       Strat := Generic_Array_Strategy (Sizes);
 
@@ -772,8 +775,8 @@ package body TGen.Types.Array_Types is
      (S : in out Unconst_Array_Enum_Strat; Disc_Context : Disc_Value_Map)
       return JSON_Value
    is
-      Arr_T  : Unconstrained_Array_Typ
-        renames Unconstrained_Array_Typ (S.Arr_T.all);
+      Arr_T  : Unconstrained_Array_Typ renames
+        Unconstrained_Array_Typ (S.Arr_T.all);
       Bounds : Index_Values_Array (1 .. Arr_T.Num_Dims);
       Len    : Natural renames S.Sizes (S.Current_Size);
       Res    : JSON_Value;
@@ -968,8 +971,8 @@ package body TGen.Types.Array_Types is
      (S : in out Constr_Array_Enum_Strat; Disc_Context : Disc_Value_Map)
       return JSON_Value
    is
-      Arr_T  : Constrained_Array_Typ'Class
-        renames Constrained_Array_Typ'Class (S.Arr_T.all);
+      Arr_T  : Constrained_Array_Typ'Class renames
+        Constrained_Array_Typ'Class (S.Arr_T.all);
       Bounds : Index_Values_Array (1 .. Arr_T.Num_Dims);
    begin
       S.Has_Generated := True;

@@ -286,8 +286,8 @@ package body TGen.Wrappers is
       --  Compute local name. Do not take into account the last element as this
       --  is its hash.
 
-      for I
-        in Subprogram.Last_Comp_Unit_Idx + 1 .. Subprogram.Name.Last_Index - 1
+      for I in
+        Subprogram.Last_Comp_Unit_Idx + 1 .. Subprogram.Name.Last_Index - 1
       loop
          Local_Package_Name.Append (Subprogram.Name.Element (I));
       end loop;

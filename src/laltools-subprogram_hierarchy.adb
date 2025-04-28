@@ -241,9 +241,9 @@ package body Laltools.Subprogram_Hierarchy is
       begin
          Decls_Callback (Aux_Decl);
 
-         for Instantiation
-           of Find_Generic_Subp_Instantiations
-                (Aux_Decl.As_Generic_Subp_Decl, Units)
+         for Instantiation of
+           Find_Generic_Subp_Instantiations
+             (Aux_Decl.As_Generic_Subp_Decl, Units)
          loop
             if Find_Calls then
                Find_Incoming_Calls
@@ -274,9 +274,9 @@ package body Laltools.Subprogram_Hierarchy is
 
       procedure Process_Subp is
       begin
-         for Subp_Decl
-           of Get_Subp_Hierarchy
-                (Aux_Decl, Units, Include_Base_Subps, Include_Overrides)
+         for Subp_Decl of
+           Get_Subp_Hierarchy
+             (Aux_Decl, Units, Include_Base_Subps, Include_Overrides)
          loop
             Decls_Callback (Subp_Decl);
 
@@ -409,8 +409,8 @@ package body Laltools.Subprogram_Hierarchy is
                for Root_Subp of Root_Subps loop
                   Hierarchy.Include (Root_Subp);
 
-                  for Root_Subp_Override
-                    of Root_Subp.P_Find_All_Overrides (Units)
+                  for Root_Subp_Override of
+                    Root_Subp.P_Find_All_Overrides (Units)
                   loop
                      Hierarchy.Include (Root_Subp_Override);
                   end loop;
@@ -442,8 +442,8 @@ package body Laltools.Subprogram_Hierarchy is
                for Root_Subp of Root_Subps loop
                   Hierarchy.Include (Root_Subp);
 
-                  for Root_Subp_Override
-                    of Root_Subp.P_Find_All_Overrides (Units)
+                  for Root_Subp_Override of
+                    Root_Subp.P_Find_All_Overrides (Units)
                   loop
                      Hierarchy.Include (Root_Subp_Override);
                   end loop;
