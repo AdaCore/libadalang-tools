@@ -830,10 +830,10 @@ package body Utils.Command_Lines is
                  and then Enabled (Descriptor, Switch2)
                then
                   declare
-                     Desc1 : Switch_Descriptor
-                       renames Descriptor.Allowed_Switches (Switch1);
-                     Desc2 : Switch_Descriptor
-                       renames Descriptor.Allowed_Switches (Switch2);
+                     Desc1 : Switch_Descriptor renames
+                       Descriptor.Allowed_Switches (Switch1);
+                     Desc2 : Switch_Descriptor renames
+                       Descriptor.Allowed_Switches (Switch2);
                   begin
                      if Desc1.Kind = Desc2.Kind
                        and then Desc1.Text.all = Desc2.Text.all
@@ -927,8 +927,8 @@ package body Utils.Command_Lines is
       for Switch in Descriptor.Allowed_Switches'Range loop
          if Enabled (Descriptor, Switch) then
             declare
-               Desc : Switch_Descriptor
-                 renames Descriptor.Allowed_Switches (Switch);
+               Desc : Switch_Descriptor renames
+                 Descriptor.Allowed_Switches (Switch);
             begin
                if DT = Desc.Text.all then
                   if not (Desc.Kind in String_Switch | String_Seq_Switch
@@ -1009,8 +1009,8 @@ package body Utils.Command_Lines is
          Descriptor : Command_Line_Descriptor renames Cmd.Descriptor.all;
          Switch     : constant All_Switches :=
            Text_To_Switch (Descriptor, Text);
-         Allowed    : String
-           renames Descriptor.Allowed_Switches (Switch).Text.all;
+         Allowed    : String renames
+           Descriptor.Allowed_Switches (Switch).Text.all;
          pragma Assert (Allowed'First = 1);
          Alias      : constant All_Switches :=
            Descriptor.Allowed_Switches (Switch).Alias;
@@ -1087,8 +1087,8 @@ package body Utils.Command_Lines is
                   end if;
 
                   declare
-                     Arg : String
-                       renames Text_Args (Cur) (First .. Text_Args (Cur)'Last);
+                     Arg : String renames
+                       Text_Args (Cur) (First .. Text_Args (Cur)'Last);
                      S   : constant String (1 .. Arg'Length) := Arg;
                      --  Slide it to start at 1
                   begin

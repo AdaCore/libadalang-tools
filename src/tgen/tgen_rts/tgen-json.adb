@@ -419,7 +419,7 @@ package body TGen.JSON is
          when ':' =>
             return Next_Char (J_COLON);
 
-            --  Only named value tokens can start with a letter
+         --  Only named value tokens can start with a letter
 
          when 'n' =>
             return Delimit_Keyword ("null", J_NULL);
@@ -1060,9 +1060,9 @@ package body TGen.JSON is
                Append (Ret, ASCII.LF);
             end if;
 
-            for J
-              in Item.Data.Arr_Value.Arr.Vals.First_Index
-                 .. Item.Data.Arr_Value.Arr.Vals.Last_Index
+            for J in
+              Item.Data.Arr_Value.Arr.Vals.First_Index
+              .. Item.Data.Arr_Value.Arr.Vals.Last_Index
             loop
                Do_Indent (Indent + 1);
                Write
@@ -1713,9 +1713,9 @@ package body TGen.JSON is
             then
                return False;
             else
-               for J
-                 in Left.Data.Arr_Value.Arr.Vals.First_Index
-                    .. Left.Data.Arr_Value.Arr.Vals.Last_Index
+               for J in
+                 Left.Data.Arr_Value.Arr.Vals.First_Index
+                 .. Left.Data.Arr_Value.Arr.Vals.Last_Index
                loop
                   if not (Left.Data.Arr_Value.Arr.Vals (J)
                           = Right.Data.Arr_Value.Arr.Vals (J))

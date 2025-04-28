@@ -179,8 +179,8 @@ package TGen.Types.Constraints is
    function Image (Self : Index_Constraints) return String;
 
    function Static (Self : Index_Constraints) return Boolean
-   is (for all J in 1 .. Self.Num_Dims
-       => Static (Self.Constraint_Array (J).all));
+   is (for all J in 1 .. Self.Num_Dims =>
+         Static (Self.Constraint_Array (J).all));
 
    package Discriminant_Constraint_Maps is new
      Ada.Containers.Hashed_Maps
@@ -203,8 +203,8 @@ package TGen.Types.Constraints is
    function Image (Self : Discriminant_Constraints) return String;
 
    function Static (Self : Discriminant_Constraints) return Boolean
-   is (for all Val of Self.Constraint_Map
-       => Val.Kind in Static | Discriminant);
+   is (for all Val of Self.Constraint_Map =>
+         Val.Kind in Static | Discriminant);
 
    type Anonymous_Typ is new Typ with record
       Named_Ancestor      : Typ_Access;

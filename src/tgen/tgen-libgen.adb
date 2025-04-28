@@ -1210,8 +1210,8 @@ package body TGen.Libgen is
             begin
                --  If all types are not supported, do not generate a support
                --  library.
-               if not (for all T of Element (Cur)
-                       => not Is_Supported_Type (T.all))
+               if not (for all T of Element (Cur) =>
+                         not Is_Supported_Type (T.all))
                then
                   if Pkg_Info.Has_Element then
                      if Pkg_Info.Element.Last_Element.Is_Generic_Instantiation
@@ -1248,8 +1248,8 @@ package body TGen.Libgen is
                --  If all types are not supported, do not generate a support
                --  library.
 
-               if not (for all T of Element (Cur)
-                       => not Is_Supported_Type (T.all))
+               if not (for all T of Element (Cur) =>
+                         not Is_Supported_Type (T.all))
                then
                   Generate_Value_Gen_Library
                     (Ctx,
@@ -1477,13 +1477,13 @@ package body TGen.Libgen is
             Concrete_Typ : Typ_Access;
             --  Shortcut to hold the concrete type of a parameter
 
-            Params         : Component_Map
-              renames As_Function_Typ (Subp).Component_Types;
+            Params         : Component_Map renames
+              As_Function_Typ (Subp).Component_Types;
             Param_Cur      : Component_Maps.Cursor;
-            Ordered_Params : String_Vectors.Vector
-              renames As_Function_Typ (Subp).Param_Order;
-            Globals        : Component_Map
-              renames As_Function_Typ (Subp).Globals;
+            Ordered_Params : String_Vectors.Vector renames
+              As_Function_Typ (Subp).Param_Order;
+            Globals        : Component_Map renames
+              As_Function_Typ (Subp).Globals;
          begin
             Assocs.Insert (Assoc ("GLOBAL_PREFIX", Global_Prefix));
             Assocs.Insert (Assoc ("NUM_TESTS", Default_Test_Num));

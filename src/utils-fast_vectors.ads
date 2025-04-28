@@ -123,15 +123,15 @@ is
    procedure Move (Target : in out Vector; Source : in out Vector);
 
    procedure Append (Container : in out Vector; New_Item : Element_Type);
-   procedure Push (Container : in out Vector; New_Item : Element_Type)
-   renames Append;
+   procedure Push (Container : in out Vector; New_Item : Element_Type)renames
+     Append;
 
    type Element_Access is access all Element_Type;
    function Last_Ptr (Container : in out Vector) return Element_Access;
    function Append (Container : in out Vector) return Element_Access;
 
    procedure Delete_Last (Container : in out Vector);
-   procedure Pop (Container : in out Vector) renames Delete_Last;
+   procedure Pop (Container : in out Vector)renames Delete_Last;
 
    function First (Container : Vector) return Cursor;
 

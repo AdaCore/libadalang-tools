@@ -429,8 +429,8 @@ package body Laltools.Common is
                   if Param_Definition.Text = Param.Text then
                      Param_References.Append
                        (Param.P_Canonical_Part.F_Name.As_Base_Id);
-                     for Reference
-                       of Param.P_Canonical_Part.P_Find_All_References (Units)
+                     for Reference of
+                       Param.P_Canonical_Part.P_Find_All_References (Units)
                      loop
                         Param_References.Append (Ref (Reference).As_Base_Id);
                      end loop;
@@ -443,8 +443,8 @@ package body Laltools.Common is
          --  This is a parameter of an access to a subprogram definition, so
          --  only replace its references.
 
-         for Reference
-           of Param_Definition.P_Canonical_Part.P_Find_All_References (Units)
+         for Reference of
+           Param_Definition.P_Canonical_Part.P_Find_All_References (Units)
          loop
             Param_References.Append (Ref (Reference).As_Base_Id);
          end loop;

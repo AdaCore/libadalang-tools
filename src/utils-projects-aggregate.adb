@@ -106,8 +106,8 @@ package body Utils.Projects.Aggregate is
 
       declare
          L            : constant Positive := Last_Index (Args_Vec);
-         Args         : GNAT.OS_Lib.String_List
-           renames Elems_Var (Args_Vec) (1 .. L);
+         Args         : GNAT.OS_Lib.String_List renames
+           Elems_Var (Args_Vec) (1 .. L);
          Prj_Name_Arg : String_Access renames Args (L);
       begin
          for Prj_Name of Aggregated_Projects loop

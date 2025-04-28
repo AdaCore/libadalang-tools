@@ -759,8 +759,8 @@ package body TGen.Marshalling is
 
          if Typ in Unconstrained_Array_Typ'Class then
             declare
-               U_Typ : Unconstrained_Array_Typ'Class
-                 renames Unconstrained_Array_Typ'Class (Typ);
+               U_Typ : Unconstrained_Array_Typ'Class renames
+                 Unconstrained_Array_Typ'Class (Typ);
 
             begin
                --  Fill the association maps
@@ -776,8 +776,8 @@ package body TGen.Marshalling is
 
          else
             declare
-               D_Typ : Discriminated_Record_Typ'Class
-                 renames Discriminated_Record_Typ'Class (Typ);
+               D_Typ : Discriminated_Record_Typ'Class renames
+                 Discriminated_Record_Typ'Class (Typ);
 
             begin
                --  Generate base functions for the discriminant types.
@@ -942,8 +942,8 @@ package body TGen.Marshalling is
 
             if Typ in Discriminated_Record_Typ'Class then
                declare
-                  D_Typ : Discriminated_Record_Typ'Class
-                    renames Discriminated_Record_Typ'Class (Typ);
+                  D_Typ : Discriminated_Record_Typ'Class renames
+                    Discriminated_Record_Typ'Class (Typ);
                begin
                   if D_Typ.Variant /= null then
                      Collect_Info_For_Variants
@@ -1061,8 +1061,8 @@ package body TGen.Marshalling is
 
          if Typ in Discriminated_Record_Typ'Class then
             declare
-               D_Typ : Discriminated_Record_Typ'Class
-                 renames Discriminated_Record_Typ'Class (Typ);
+               D_Typ : Discriminated_Record_Typ'Class renames
+                 Discriminated_Record_Typ'Class (Typ);
 
             begin
                --  Check that the discriminant types are supported

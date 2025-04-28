@@ -619,8 +619,8 @@ package body Pp.Scanner is
    begin
       return
         Token_Text'Length = 0
-        or else ((for all J in Token_Text'First .. Token_Text'Last - 1
-                  => Token_Text (J) = ' ')
+        or else ((for all J in Token_Text'First .. Token_Text'Last - 1 =>
+                    Token_Text (J) = ' ')
                  and Token_Text (Token_Text'Last) in NL | ' ');
    end Is_Empty_Comment;
 
@@ -1334,13 +1334,13 @@ package body Pp.Scanner is
                when W_NUL =>
                   Tok := (Kind => End_Of_Input, Sloc => Tok.Sloc);
 
-                  --  One_Space_Outdent instruction in the Template_Lang
+               --  One_Space_Outdent instruction in the Template_Lang
 
                when '_' =>
                   Tok := (Kind => '_', Sloc => Tok.Sloc);
                   Get;
 
-                  --  Minus sign or comment
+               --  Minus sign or comment
 
                when '-' =>
                   if Buffers.Lookahead (Input) = '-' then
@@ -1350,7 +1350,7 @@ package body Pp.Scanner is
                      Tok := (Kind => '-', Sloc => Tok.Sloc);
                   end if;
 
-                  --  numeric literal
+               --  numeric literal
 
                when '0' .. '9' =>
                   Tok :=
@@ -1393,7 +1393,7 @@ package body Pp.Scanner is
                         end if;
                   end case;
 
-                  --  single quote or character literal
+               --  single quote or character literal
 
                when ''' =>
                   Get;
@@ -1430,13 +1430,13 @@ package body Pp.Scanner is
                      Get;
                   end if;
 
-                  --  string literal
+               --  string literal
 
                when '"' | '%' =>
                   Tok := (Kind => String_Lit, Sloc => Tok.Sloc, others => <>);
                   Scan_String_Literal (Q_Char => Cur);
 
-                  --  One-character tokens
+               --  One-character tokens
 
                when '!' =>
                   Tok := (Kind => '!', Sloc => Tok.Sloc);
@@ -1529,8 +1529,8 @@ package body Pp.Scanner is
                   Tok := (Kind => '@', Sloc => Tok.Sloc);
                   Get;
 
-                  --  Multiple-character tokens. We need to distinguish between
-                  --  "=" and "=>", and between "." and ".." and so forth.
+               --  Multiple-character tokens. We need to distinguish between
+               --  "=" and "=>", and between "." and ".." and so forth.
 
                when '=' =>
                   Get;

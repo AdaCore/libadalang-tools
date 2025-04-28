@@ -281,8 +281,8 @@ package body TGen.Types.Translation is
 
    function Var_Choice_Supports_Static_Gen
      (Choice : Variant_Choice) return Boolean
-   is ((for all Comp_Ref of Choice.Components
-        => Comp_Ref.all.Supports_Static_Gen)
+   is ((for all Comp_Ref of Choice.Components =>
+          Comp_Ref.all.Supports_Static_Gen)
        and then Variant_Support_Static_Gen (Choice.Variant));
 
    --------------------------------
@@ -291,8 +291,8 @@ package body TGen.Types.Translation is
 
    function Variant_Support_Static_Gen (Var : Variant_Part_Acc) return Boolean
    is (Var = null
-       or else (for all Choice of Var.all.Variant_Choices
-                => Var_Choice_Supports_Static_Gen (Choice)));
+       or else (for all Choice of Var.all.Variant_Choices =>
+                  Var_Choice_Supports_Static_Gen (Choice)));
 
    ----------------------
    -- New_Eval_As_Int --
@@ -532,12 +532,8 @@ package body TGen.Types.Translation is
       Max, Min : Long_Long_Integer;
 
    begin
-      for Literal
-        of Root_Enum_Decl
-             .As_Type_Decl
-             .F_Type_Def
-             .As_Enum_Type_Def
-             .F_Enum_Literals
+      for Literal of
+        Root_Enum_Decl.As_Type_Decl.F_Type_Def.As_Enum_Type_Def.F_Enum_Literals
       loop
          Enum_Lits.Insert (To_Big_Integer (Index), +Literal.F_Name.Text);
          Index := Index + 1;
@@ -1239,14 +1235,14 @@ package body TGen.Types.Translation is
          when Ada_Type_Decl =>
             case Kind (Decl_Or_Constraint.As_Type_Decl.F_Type_Def) is
                when Ada_Array_Type_Def_Range =>
-                  for Node
-                    of Decl_Or_Constraint
-                         .As_Type_Decl
-                         .F_Type_Def
-                         .As_Array_Type_Def
-                         .F_Indices
-                         .As_Constrained_Array_Indices
-                         .F_List
+                  for Node of
+                    Decl_Or_Constraint
+                      .As_Type_Decl
+                      .F_Type_Def
+                      .As_Array_Type_Def
+                      .F_Indices
+                      .As_Constrained_Array_Indices
+                      .F_List
                   loop
                      Res (Current_Index) := Node.As_Ada_Node;
                      Current_Index := Current_Index + 1;
@@ -1647,8 +1643,8 @@ package body TGen.Types.Translation is
 
             Res_Typ.all.Static_Gen :=
               Res_Typ.all.Component_Type.all.Supports_Static_Gen
-              and then (for all Idx in 1 .. Res_Typ.all.Num_Dims
-                        => Static (Res_Typ.all.Index_Constraints (Idx).all));
+              and then (for all Idx in 1 .. Res_Typ.all.Num_Dims =>
+                          Static (Res_Typ.all.Index_Constraints (Idx).all));
 
             --  Check if the translated array type has less elements than what
             --  is allowed.
@@ -1735,8 +1731,8 @@ package body TGen.Types.Translation is
          end loop;
          Res_Typ.Static_Gen :=
            Res_Typ.Component_Type.all.Supports_Static_Gen
-           and then (for all Index_Ref of Res_Typ.Index_Types
-                     => Index_Ref.all.Supports_Static_Gen);
+           and then (for all Index_Ref of Res_Typ.Index_Types =>
+                       Index_Ref.all.Supports_Static_Gen);
 
          return Res : Translation_Result (Success => True) do
             Res.Res := Typ_Access (Res_Typ);
@@ -1864,8 +1860,8 @@ package body TGen.Types.Translation is
 
          when others =>
             return False;
-            --  we should not be able to end up in here, but if we do,
-            --  simply ignore the constraints.
+         --  we should not be able to end up in here, but if we do,
+         --  simply ignore the constraints.
       end case;
 
       if Is_Null (Ancestor_Type.F_Constraint) then
@@ -2109,15 +2105,15 @@ package body TGen.Types.Translation is
                              .As_Discriminant_Spec
                              .F_Default_Expr);
 
-         for Pair
-           of Decl
-                .F_Type_Def
-                .As_Derived_Type_Def
-                .F_Subtype_Indication
-                .F_Constraint
-                .As_Composite_Constraint
-                .F_Constraints
-                .P_Zip_With_Params
+         for Pair of
+           Decl
+             .F_Type_Def
+             .As_Derived_Type_Def
+             .F_Subtype_Indication
+             .F_Constraint
+             .As_Composite_Constraint
+             .F_Constraints
+             .P_Zip_With_Params
          loop
             if Kind (Actual (Pair)) in Ada_Name
               and then not Is_Null
@@ -2645,8 +2641,8 @@ package body TGen.Types.Translation is
 
             if Failure_Reason = Null_Unbounded_String then
                Trans_Res.all.Static_Gen :=
-                 (for all Comp_Ref of Trans_Res.all.Component_Types
-                  => Comp_Ref.all.Supports_Static_Gen);
+                 (for all Comp_Ref of Trans_Res.all.Component_Types =>
+                    Comp_Ref.all.Supports_Static_Gen);
 
                return Res : Translation_Result (Success => True) do
                   Res.Res := Typ_Access (Trans_Res);
@@ -2738,14 +2734,14 @@ package body TGen.Types.Translation is
             end if;
 
             Trans_Res.all.Static_Gen :=
-              (for all Comp_Ref of Trans_Res.all.Component_Types
-               => Comp_Ref.all.Supports_Static_Gen)
-              and then (for all Disc_Ref of Trans_Res.all.Discriminant_Types
-                        => Disc_Ref.all.Supports_Static_Gen)
+              (for all Comp_Ref of Trans_Res.all.Component_Types =>
+                 Comp_Ref.all.Supports_Static_Gen)
+              and then (for all Disc_Ref of Trans_Res.all.Discriminant_Types =>
+                          Disc_Ref.all.Supports_Static_Gen)
               and then (not Trans_Res.all.Constrained
-                        or else (for all Const
-                                   of Trans_Res.all.Discriminant_Constraint
-                                 => Const.Kind in Static | Discriminant))
+                        or else (for all Const of
+                                   Trans_Res.all.Discriminant_Constraint =>
+                                   Const.Kind in Static | Discriminant))
               and then Variant_Support_Static_Gen (Trans_Res.all.Variant);
 
             --  Apply_Constraints can actually return a type that isn't
@@ -3725,8 +3721,8 @@ package body TGen.Types.Translation is
                      --  output ...).
 
                      declare
-                        Designators_List : Ada_Node_List
-                          renames Ada_Node_List (Designators);
+                        Designators_List : Ada_Node_List renames
+                          Ada_Node_List (Designators);
                         Fst              : constant Positive :=
                           Ada_Node_List_First (Designators_List);
                      begin

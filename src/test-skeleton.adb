@@ -1286,9 +1286,8 @@ package body Test.Skeleton is
             Stored_Type : Base_Type_Info;
          begin
 
-            for I
-              in Data.Type_Data_List.First_Index
-                 .. Data.Type_Data_List.Last_Index
+            for I in
+              Data.Type_Data_List.First_Index .. Data.Type_Data_List.Last_Index
             loop
                Stored_Type := Data.Type_Data_List.Element (I);
                if Stored_Type.Main_Type_Elem = Cur_Node
@@ -1613,9 +1612,8 @@ package body Test.Skeleton is
             end if;
 
             Type_Found := False;
-            for I
-              in Data.Type_Data_List.First_Index
-                 .. Data.Type_Data_List.Last_Index
+            for I in
+              Data.Type_Data_List.First_Index .. Data.Type_Data_List.Last_Index
             loop
 
                if Data.Type_Data_List.Element (I).Main_Type_Elem = Owner_Decl
@@ -1845,10 +1843,10 @@ package body Test.Skeleton is
          Tmp_Subp.Subp_Hash_V1 := new String'("");
          Tmp_Subp.Subp_Hash_V2_1 := new String'("");
 
-         for K
-           in Suite_Data_List.Test_Types.First_Index
-              + Dummy_Type_Counter
-              .. Suite_Data_List.Test_Types.Last_Index
+         for K in
+           Suite_Data_List.Test_Types.First_Index
+           + Dummy_Type_Counter
+           .. Suite_Data_List.Test_Types.Last_Index
          loop
             if Suite_Data_List.Test_Types.Element (K).Original_Type.Kind
                in Ada_Task_Type_Decl | Ada_Protected_Type_Decl
@@ -2037,9 +2035,9 @@ package body Test.Skeleton is
                         if Tmp_Has_TC then
 
                            --  There were Test_Cases
-                           for I
-                             in Tmp_Suites_Data.TR_List.First_Index
-                                .. Tmp_Suites_Data.TR_List.Last_Index
+                           for I in
+                             Tmp_Suites_Data.TR_List.First_Index
+                             .. Tmp_Suites_Data.TR_List.Last_Index
                            loop
                               Tmp_TR :=
                                 Tmp_Suites_Data.TR_List.Element (I).TR_Info;
@@ -2193,9 +2191,9 @@ package body Test.Skeleton is
 
                   --  Inheritance depth of corresponding test type needs to be
                   --  updated
-                  for L
-                    in Suite_Data_List.Test_Types.First_Index
-                       .. Suite_Data_List.Test_Types.Last_Index
+                  for L in
+                    Suite_Data_List.Test_Types.First_Index
+                    .. Suite_Data_List.Test_Types.Last_Index
                   loop
 
                      Test_Type_Wrapper :=
@@ -4203,8 +4201,8 @@ package body Test.Skeleton is
          Update_Generic_Packages (Current_Pack.Generic_Containing_Package.all);
       end if;
 
-      for I
-        in Data.Type_Data_List.First_Index .. Data.Type_Data_List.Last_Index
+      for I in
+        Data.Type_Data_List.First_Index .. Data.Type_Data_List.Last_Index
       loop
          Current_Type := Data.Type_Data_List.Element (I);
 
@@ -5583,8 +5581,8 @@ package body Test.Skeleton is
                               & " has been changed)");
                         end if;
 
-                        for I
-                          in MD.TR_Text.First_Index .. MD.TR_Text.Last_Index
+                        for I in
+                          MD.TR_Text.First_Index .. MD.TR_Text.Last_Index
                         loop
                            if MD.Commented_Out then
                               S_Put
@@ -6829,8 +6827,8 @@ package body Test.Skeleton is
                                  & " has been changed)");
                            end if;
 
-                           for I
-                             in MD.TR_Text.First_Index .. MD.TR_Text.Last_Index
+                           for I in
+                             MD.TR_Text.First_Index .. MD.TR_Text.Last_Index
                            loop
                               if MD.Commented_Out then
                                  S_Put
@@ -6935,8 +6933,8 @@ package body Test.Skeleton is
                            New_Line_Counter,
                            1);
 
-                        for I
-                          in MD.TR_Text.First_Index .. MD.TR_Text.Last_Index
+                        for I in
+                          MD.TR_Text.First_Index .. MD.TR_Text.Last_Index
                         loop
                            if MD.Commented_Out then
                               S_Put (0, MD.TR_Text.Element (I));
@@ -7356,14 +7354,14 @@ package body Test.Skeleton is
             end if;
 
             if not Test.Common.Unparse_Test_Vectors then
-               for Pack
-                 of TGen.Libgen.Required_Support_Packages
-                      (Ctx       => Test.Common.TGen_Libgen_Ctx,
-                       Unit_Name =>
-                         To_Qualified_Name
-                           (if Data.Is_Top_Level_Generic_Instantiation
-                            then "TGen_" & Data.Unit_Full_Name.all
-                            else Data.Unit_Full_Name.all))
+               for Pack of
+                 TGen.Libgen.Required_Support_Packages
+                   (Ctx       => Test.Common.TGen_Libgen_Ctx,
+                    Unit_Name =>
+                      To_Qualified_Name
+                        (if Data.Is_Top_Level_Generic_Instantiation
+                         then "TGen_" & Data.Unit_Full_Name.all
+                         else Data.Unit_Full_Name.all))
                loop
                   Put_Line
                     (Body_Kind,

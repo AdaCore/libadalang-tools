@@ -3489,8 +3489,8 @@ package body Test.Harness is
             end;
             Put_New_Line;
          else
-            for K
-              in Separate_Projects.First_Index .. Separate_Projects.Last_Index
+            for K in
+              Separate_Projects.First_Index .. Separate_Projects.Last_Index
             loop
                P := Separate_Projects.Element (K);
                declare
@@ -3685,8 +3685,8 @@ package body Test.Harness is
                Switches := new GNAT.Strings.String_List'([]);
             end if;
             S_Put (0, "SWITCHES_INSTRUMENT=");
-            for Switch
-              of GNAT.Strings.String_List'(Common_Switches.all & Switches.all)
+            for Switch of
+              GNAT.Strings.String_List'(Common_Switches.all & Switches.all)
             loop
                S_Put (0, Switch.all & ' ');
             end loop;
@@ -3722,8 +3722,8 @@ package body Test.Harness is
                Switches := new GNAT.Strings.String_List'([]);
             end if;
             S_Put (0, "SWITCHES_RUN=");
-            for Switch
-              of GNAT.Strings.String_List'(Common_Switches.all & Switches.all)
+            for Switch of
+              GNAT.Strings.String_List'(Common_Switches.all & Switches.all)
             loop
                S_Put (0, Switch.all & ' ');
             end loop;
@@ -3753,8 +3753,8 @@ package body Test.Harness is
                Switches := new GNAT.Strings.String_List'([]);
             end if;
             S_Put (0, "SWITCHES_COVERAGE=");
-            for Switch
-              of GNAT.Strings.String_List'(Common_Switches.all & Switches.all)
+            for Switch of
+              GNAT.Strings.String_List'(Common_Switches.all & Switches.all)
             loop
                S_Put (0, Switch.all & ' ');
             end loop;
@@ -4877,10 +4877,9 @@ package body Test.Harness is
 
          Type_Ancestor := Current_TT.Tested_Type.As_Base_Type_Decl;
 
-         for K
-           in 1
-              .. Data.Test_Types.Element (Current_TT_Number)
-                   .Max_Inheritance_Depth
+         for K in
+           1
+           .. Data.Test_Types.Element (Current_TT_Number).Max_Inheritance_Depth
          loop
 
             Type_Ancestor := Parent_Type_Declaration (Type_Ancestor);

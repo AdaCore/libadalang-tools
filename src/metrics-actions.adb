@@ -130,8 +130,8 @@ package body METRICS.Actions is
       Unit_Coupling_Out           => True,
       Unit_Coupling_In            => True];
 
-   function Image (X : Integer) return String
-   renames Utils.String_Utilities.Image;
+   function Image (X : Integer) return String renames
+     Utils.String_Utilities.Image;
 
    --  Debugging printouts
    --  See also Libadalang.Debug.
@@ -418,8 +418,8 @@ package body METRICS.Actions is
       M                  : Metrix;
       Depth              : Positive;
       XML                : Boolean) return Boolean
-   is (for some Metric in First .. Last
-       => Should_Print (Metric, Metrics_To_Compute, M, Depth, XML));
+   is (for some Metric in First .. Last =>
+         Should_Print (Metric, Metrics_To_Compute, M, Depth, XML));
    --  True if at least one metric in the range should be printed
 
    function Val_To_Print
@@ -555,9 +555,9 @@ package body METRICS.Actions is
                B := M;
                M.Is_Spec := False;
 
-               --  A subprogram body could act as a spec. If we haven't seen
-               --  the spec (yet), we assume the body is a spec. If we later
-               --  see a spec, we move the body to the Bodies array.
+            --  A subprogram body could act as a spec. If we haven't seen
+            --  the spec (yet), we assume the body is a spec. If we later
+            --  see a spec, we move the body to the Bodies array.
 
             when Ada_Subp_Body =>
                pragma Assert (B = null);
@@ -1752,9 +1752,9 @@ package body METRICS.Actions is
                | Computed_Metrics
             =>
                null;
-               --  The above are not documented, and not printed unless
-               --  explicitly specified on the command line, so we don't
-               --  include them in the <config>.
+            --  The above are not documented, and not printed unless
+            --  explicitly specified on the command line, so we don't
+            --  include them in the <config>.
 
             when others =>
                Put
@@ -2521,8 +2521,8 @@ package body METRICS.Actions is
 
       for Index in 1 .. Units_For_Coupling.Last_Index loop
          declare
-            File_M     : Metrix
-              renames Element (Units_For_Coupling, Index).all;
+            File_M     : Metrix renames
+              Element (Units_For_Coupling, Index).all;
             Outer_Unit : Metrix renames Element (File_M.Submetrix, 1).all;
          begin
             if Should_Print_Any
@@ -4407,9 +4407,9 @@ package body METRICS.Actions is
                   end loop;
                end;
 
-               --  A child unit depends on its parent. We don't need to bother
-               --  with bodies here (except subprogram bodies), because the
-               --  coupling metrics treat spec and body as one.
+            --  A child unit depends on its parent. We don't need to bother
+            --  with bodies here (except subprogram bodies), because the
+            --  coupling metrics treat spec and body as one.
 
             when Ada_Generic_Subp_Instantiation
                | Ada_Generic_Package_Instantiation
@@ -4486,8 +4486,8 @@ package body METRICS.Actions is
             declare
                Global_M         : Metrix renames Element (Metrix_Stack, 1).all;
                File_M           : Metrix renames Element (Metrix_Stack, 2).all;
-               Parent           : Metrix
-                 renames Element (Metrix_Stack, Last_Index (Metrix_Stack)).all;
+               Parent           : Metrix renames
+                 Element (Metrix_Stack, Last_Index (Metrix_Stack)).all;
                M                : constant Metrix_Ref :=
                  Push_New_Metrix (Tool, Node, Arg (Cmd, Ignore_Assertions));
                Saved_Loop_Count : constant Natural := Loop_Count;
@@ -4551,8 +4551,8 @@ package body METRICS.Actions is
       end Rec;
 
       procedure Gather_Metrics_And_Walk_Children (Node : Ada_Node) is
-         M           : Metrix
-           renames Element (Metrix_Stack, Last_Index (Metrix_Stack)).all;
+         M           : Metrix renames
+           Element (Metrix_Stack, Last_Index (Metrix_Stack)).all;
          With_Trivia : constant Children_Array := Children_And_Trivia (Node);
          B           : Boolean;
 

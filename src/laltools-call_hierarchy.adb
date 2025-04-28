@@ -41,9 +41,9 @@ package body Laltools.Call_Hierarchy is
       Cancel : Boolean := False;
 
    begin
-      for Reference
-        of Definition.P_Find_All_Calls
-             (Units, Follow_Renamings, Imprecise_Fallback)
+      for Reference of
+        Definition.P_Find_All_Calls
+          (Units, Follow_Renamings, Imprecise_Fallback)
       loop
          Visit (Ref (Reference), Kind (Reference), Cancel);
 

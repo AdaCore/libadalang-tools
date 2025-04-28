@@ -48,8 +48,8 @@ package body Test.Suite_Min is
 
    Dir_Sep : Character renames GNAT.OS_Lib.Directory_Separator;
 
-   function Image (X : Integer) return String
-   renames Utils.String_Utilities.Image;
+   function Image (X : Integer) return String renames
+     Utils.String_Utilities.Image;
    --  Return the image of X, without the leading space for positive numbers.
    --
    --  Renaming to avoid pulling in visibility all other functions from

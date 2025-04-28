@@ -42,8 +42,8 @@ pragma Warnings (On);
 
 package body TGen.Type_Representation is
 
-   function Esc (Str : String) return String
-   renames Utils.String_Utilities.Escape_String_Literal;
+   function Esc (Str : String) return String renames
+     Utils.String_Utilities.Escape_String_Literal;
 
    procedure Collect_Info_For_Constraint
      (Ty_Prefix                : String;

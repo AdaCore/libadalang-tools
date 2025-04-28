@@ -76,8 +76,8 @@ with Libadalang.Common;
 
 package body Test.Actions is
 
-   SPT : GNATCOLL.Projects.Project_Tree
-     renames Test.Common.Source_Project_Tree;
+   SPT : GNATCOLL.Projects.Project_Tree renames
+     Test.Common.Source_Project_Tree;
 
    function Is_Externally_Built (File : Virtual_File) return Boolean;
    --  Checks if the given source file belongs to an externally build library
@@ -534,8 +534,8 @@ package body Test.Actions is
           or else Arg (Cmd, Subdirs) /= null)
         and then Root_Prj.Has_Attribute (Source_Dirs_Attribute)
       then
-         for Src_Dir_Path
-           of Root_Prj.Attribute_Value (Source_Dirs_Attribute).all
+         for Src_Dir_Path of
+           Root_Prj.Attribute_Value (Source_Dirs_Attribute).all
          loop
             if Src_Dir_Path'Length >= 2
               and then Src_Dir_Path

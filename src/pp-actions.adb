@@ -69,8 +69,8 @@ package body Pp.Actions is
 
    use Utils.Char_Vectors.WChar_Vectors;
 
-   function Image (X : Integer) return String
-   renames Utils.String_Utilities.Image;
+   function Image (X : Integer) return String renames
+     Utils.String_Utilities.Image;
 
    use Common_Flag_Switches, Common_String_Switches, Common_Boolean_Switches;
 
@@ -2259,8 +2259,8 @@ package body Pp.Actions is
             declare
                New_Template : constant Str_Template :=
                  Custom_Template_For_Kind (Kind);
-               Old_Template : Str_Template_Ptr
-                 renames Str_Template_Table (Kind);
+               Old_Template : Str_Template_Ptr renames
+                 Str_Template_Table (Kind);
 
             begin
                --  Only update the templates that are present in the file,
@@ -2419,9 +2419,9 @@ package body Pp.Actions is
                               Subtree_Count := Subtree_Count + 1;
                            end if;
 
-                           --  ??? "{" is always preceded by "$" (not always
-                           --  true for lalpp); we might want a short-hand for
-                           --  "${".
+                        --  ??? "{" is always preceded by "$" (not always
+                        --  true for lalpp); we might want a short-hand for
+                        --  "${".
 
                         when '{' =>
                            if Kind
@@ -3735,8 +3735,8 @@ package body Pp.Actions is
 
                   else
                      declare
-                        Next_Inst : Instr
-                          renames TT.Instructions (Inst_Index + 1);
+                        Next_Inst : Instr renames
+                          TT.Instructions (Inst_Index + 1);
                      begin
                         if Next_Inst.Kind = Continuation_Outdent then
                            return Name_R_Sq;
@@ -4055,7 +4055,7 @@ package body Pp.Actions is
                            Result := True;
                         end if;
 
-                        --  Qualified expression case; recurse on the suffix
+                     --  Qualified expression case; recurse on the suffix
 
                      when Ada_Qual_Expr =>
                         if Is_Vertical_Aggregate (X.As_Qual_Expr.F_Suffix) then
@@ -4185,16 +4185,16 @@ package body Pp.Actions is
            (Params : Param_Spec_List) return Boolean is
          begin
             return
-              (for some Param of Params
-               => Is_Vertical_Aggregate (Param.F_Default_Expr));
+              (for some Param of Params =>
+                 Is_Vertical_Aggregate (Param.F_Default_Expr));
          end Has_Vertical_Aggregates;
 
          function Has_Vertical_Aggregates (Assocs : Assoc_List) return Boolean
          is
          begin
             return
-              (for some Assoc of Assocs
-               => Is_Vertical_Aggregate (Assoc.As_Param_Assoc.F_R_Expr));
+              (for some Assoc of Assocs =>
+                 Is_Vertical_Aggregate (Assoc.As_Param_Assoc.F_R_Expr));
          end Has_Vertical_Aggregates;
 
          procedure Do_Aggregate is
@@ -4352,8 +4352,8 @@ package body Pp.Actions is
                   case Ada_Op'(Expr.As_Bin_Op.F_Op) is
                      when Ada_Op_In | Ada_Op_Not_In =>
                         raise Program_Error;
-                        --  ???Don't treat membership tests as operators, for now
-                        --               return 1;
+                     --  ???Don't treat membership tests as operators, for now
+                     --               return 1;
 
                      when Ada_Op_And_Then
                         | Ada_Op_Or_Else
@@ -4384,7 +4384,7 @@ package body Pp.Actions is
                      when Ada_Op_Pow =>
                         return 7;
 
-                        --  Unary-only operator
+                     --  Unary-only operator
 
                      when Ada_Op_Abs | Ada_Op_Not =>
                         raise Program_Error;
@@ -4393,8 +4393,8 @@ package body Pp.Actions is
                when Ada_Concat_Op =>
                   return 5;
 
-                  --  Assume anything else is a unary operator or a primary
-                  --  (highest precedence)
+               --  Assume anything else is a unary operator or a primary
+               --  (highest precedence)
 
                when others =>
                   return 8;
@@ -5046,8 +5046,8 @@ package body Pp.Actions is
          procedure Do_Instantiation is
             function Past_Call_Threshold (Actuals : Assoc_List) return Boolean
             is (Natural (Subtree_Count (Actuals)) > Arg (Cmd, Call_Threshold)
-                and then (for some Assoc of Subtrees (Actuals)
-                          => Present (Subtree (Assoc, 1))));
+                and then (for some Assoc of Subtrees (Actuals) =>
+                            Present (Subtree (Assoc, 1))));
             --  True if there are more parameter associations than the value
             --  given for the threshold and at least one of them is named.
 
@@ -5190,8 +5190,8 @@ package body Pp.Actions is
          procedure Do_Call_Expr is
             function Past_Call_Threshold (Actuals : Assoc_List) return Boolean
             is (Natural (Subtree_Count (Actuals)) > Arg (Cmd, Call_Threshold)
-                and then (for some Assoc of Subtrees (Actuals)
-                          => Present (Subtree (Assoc, 1))));
+                and then (for some Assoc of Subtrees (Actuals) =>
+                            Present (Subtree (Assoc, 1))));
             --  True if there are more parameter associations than the threshold,
             --  and at least one of them is named.
 
@@ -5336,8 +5336,8 @@ package body Pp.Actions is
                --  Search through the defining names of the declaration to find
                --  one with the same name.
                --  ???Use Xref instead (see metrics-actions.adb)?
-               for Def_Name
-                 of Decl.P_Defining_Names
+               for Def_Name of
+                 Decl.P_Defining_Names
                  when not Def_Name.Is_Null and not Def_Name.Is_Synthetic
                loop
                   if L_Name (Def_Name.P_Relative_Name) = L_Name (Id) then
@@ -5433,7 +5433,7 @@ package body Pp.Actions is
                | Ada_Multi_Dim_Array_Assoc
             =>
                raise Program_Error with Tree.Image & " encountered";
-               --  ???The above are not used
+            --  ???The above are not used
 
             when Ada_Compilation_Unit =>
                Do_Compilation_Unit;
@@ -6007,8 +6007,8 @@ package body Pp.Actions is
 
             Out_Vec : constant WChar_Vector :=
               Remove_Extra_Line_Breaks (Add_CR => Out_File_Format = CRLF);
-            Out_Arr : W_Str
-              renames Elems (Out_Vec) (2 .. Last_Index (Out_Vec));
+            Out_Arr : W_Str renames
+              Elems (Out_Vec) (2 .. Last_Index (Out_Vec));
             --  2 to skip sentinel newline
 
             procedure Append_One (C : Character);
@@ -6265,8 +6265,8 @@ package body Pp.Actions is
 
       procedure Write_Str (Out_Vec : Char_Vector) is
          Out_File   : File_Descriptor := Standout;
-         Out_String : String
-           renames Elems (Out_Vec) (1 .. Last_Index (Out_Vec));
+         Out_String : String renames
+           Elems (Out_Vec) (1 .. Last_Index (Out_Vec));
          Status     : Boolean;
          use System.WCh_Con;
       begin
