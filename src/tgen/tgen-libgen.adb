@@ -1634,9 +1634,6 @@ package body TGen.Libgen is
          Ada.Directories.Create_Path (Harness_Dir);
       end if;
 
-      if not Ctx.Lib_Support_Generated then
-         Generate (Ctx);
-      end if;
       Create
         (File => Prj_File,
          Mode => Out_File,
