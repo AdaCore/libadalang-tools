@@ -1092,11 +1092,12 @@ package body TGen.Types.Record_Types is
            Disc_Record.Components (Current_Context);
          R          : constant Nondiscriminated_Record_Typ :=
            (Name                => Disc_Record.Name,
-             Last_Comp_Unit_Idx => Disc_Record.Last_Comp_Unit_Idx,
+            Last_Comp_Unit_Idx => Disc_Record.Last_Comp_Unit_Idx,
             Component_Types     => Components,
             Static_Gen          => Disc_Record.Static_Gen,
             Fully_Private       => Disc_Record.Fully_Private,
-            Private_Extension   => Disc_Record.Private_Extension);
+            Private_Extension   => Disc_Record.Private_Extension,
+            Is_Class_Wide       => Disc_Record.Is_Class_Wide);
          R_Ref      : SP.Ref;
       begin
          R_Ref.Set (R);
@@ -1593,7 +1594,8 @@ package body TGen.Types.Record_Types is
    -- FQN --
    ---------
 
-   function FQN (Self : Function_Typ) return String is
+   function FQN (Self : Function_Typ; No_Std : Boolean := False) return String
+   is
       Result : Ada_Qualified_Name := Self.Name.Copy;
    begin
       Result.Delete_Last;
@@ -1853,11 +1855,12 @@ package body TGen.Types.Record_Types is
      (Self   : Function_Typ;
       Prefix : String := "") return String_Vector
    is
-      Global_Prefix : constant String := "(global input of " & Self.FQN & ") ";
+      Name          : constant String := Self.FQN;
+      Global_Prefix : constant String := "(global input of " & Name & ") ";
       Res           : String_Vector;
    begin
       Res.Append_Vector
-        (Get_Diagnostics (Self.Component_Types, Self.FQN & "."));
+        (Get_Diagnostics (Self.Component_Types, Name & "."));
       Res.Append_Vector (Get_Diagnostics (Self.Globals, Global_Prefix));
       return Res;
    end Get_Diagnostics;

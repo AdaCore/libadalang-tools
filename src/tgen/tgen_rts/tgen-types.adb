@@ -24,6 +24,7 @@
 with Ada.Containers;
 
 with TGen.Strategies; use TGen.Strategies;
+with Ada.Strings.Equal_Case_Insensitive;
 
 package body TGen.Types is
 
@@ -59,6 +60,33 @@ package body TGen.Types is
 
    function Image (Self : Access_Typ) return String is
      (Typ (Self).Image & ": access type");
+
+   ---------
+   -- FQN --
+   ---------
+
+   function FQN (Self : Typ; No_Std : Boolean := False) return String is
+      Name : constant Ada_Qualified_Name := Self.Name;
+
+      function Append_Class_Wide_If_Needed (Type_Name : String) return String
+      is ((if Self.Is_Class_Wide then
+           Type_Name & "'Class"
+           else Type_Name));
+   begin
+      if not No_Std
+        or else not Ada.Strings.Equal_Case_Insensitive
+                  (+Unbounded_String (Name.First_Element),
+                   "standard")
+      then
+         return Append_Class_Wide_If_Needed (To_Ada (Name));
+      end if;
+      declare
+         Stripped : Ada_Qualified_Name := Name;
+      begin
+         Stripped.Delete_First;
+         return Append_Class_Wide_If_Needed (To_Ada (Stripped));
+      end;
+   end FQN;
 
    ------------------
    -- Package_Name --
