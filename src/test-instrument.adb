@@ -616,14 +616,20 @@ package body Test.Instrument is
 
    procedure Process_Package_Spec (Decl : Basic_Decl) is
 
-      procedure Process_Declarations (Decls : Ada_Node_List);
+      type Declarations_Visibility is (Public_Decls, Private_Decls);
+      --  Specify whether declarations are part of the `public` or `private`
+      --  part of the given package spec.
+
+      procedure Process_Declarations
+        (Decls : Ada_Node_List; Visibility : Declarations_Visibility);
       --  Processes declarations of the package spec
 
       --------------------------
       -- Process_Declarations --
       --------------------------
 
-      procedure Process_Declarations (Decls : Ada_Node_List) is
+      procedure Process_Declarations
+        (Decls : Ada_Node_List; Visibility : Declarations_Visibility) is
       begin
          for D of Decls loop
             if D.Kind = Ada_Package_Decl then
@@ -643,10 +649,44 @@ package body Test.Instrument is
 
                   Subprograms_To_Body.Append (D.As_Ada_Node);
 
-                  if D.P_Semantic_Parent.As_Package_Decl.P_Body_Part.Is_Null
-                  then
-                     Bodyless_Specs.Append (D.P_Semantic_Parent.As_Ada_Node);
-                  end if;
+                  --  The semantic parent of a subprogram declaration isn't
+                  --  necessarily a package declaration. In the case of
+                  --  declarations in the private part of a package, the
+                  --  semantic parent is `PrivatePart`. In order to retrieve
+                  --  the corresponding package declaration, declarations that
+                  --  are part of a public and private part of a package should
+                  --  be handled individually.
+
+                  declare
+                     Semantic_Parent : constant Ada_Node :=
+                       D.P_Semantic_Parent;
+                  begin
+                     case Visibility is
+                        when Public_Decls =>
+                           if Semantic_Parent
+                                .As_Package_Decl
+                                .P_Body_Part
+                                .Is_Null
+                           then
+                              Bodyless_Specs.Append
+                                (Semantic_Parent.As_Ada_Node);
+                           end if;
+
+                        when Private_Decls =>
+                           if Semantic_Parent
+                                .As_Private_Part
+                                .P_Semantic_Parent
+                                .As_Package_Decl
+                                .P_Body_Part
+                                .Is_Null
+                           then
+                              Bodyless_Specs.Append
+                                (Semantic_Parent
+                                   .As_Private_Part
+                                   .P_Semantic_Parent);
+                           end if;
+                     end case;
+                  end;
 
                else
                   S_Put (Padding (D), Node_Image (D));
@@ -674,7 +714,8 @@ package body Test.Instrument is
             Decl.Unit.Get_Charset));
       Put_New_Line;
 
-      Process_Declarations (Decl.As_Package_Decl.F_Public_Part.F_Decls);
+      Process_Declarations
+        (Decl.As_Package_Decl.F_Public_Part.F_Decls, Public_Decls);
       Put_New_Line;
 
       if Decl.As_Package_Decl.F_Private_Part.Is_Null then
@@ -688,7 +729,8 @@ package body Test.Instrument is
       else
          S_Put (Padding (Decl), "private");
          Put_New_Line;
-         Process_Declarations (Decl.As_Package_Decl.F_Private_Part.F_Decls);
+         Process_Declarations
+           (Decl.As_Package_Decl.F_Private_Part.F_Decls, Private_Decls);
          S_Put
            (Padding (Decl),
             Image
