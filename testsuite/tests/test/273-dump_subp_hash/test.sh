@@ -2,6 +2,7 @@
 
 test() {
 gnattest -Psimple --dump-subp-hash=$1 1> my_hash 2>&1
+sed -i 's/\r$//' my_hash 
 gnattest -Psimple simple.ads --gen-test-vectors
 grep -o -E "^..([a-z]|[0-9]){16}" obj/gnattest/tests/JSON_Tests/simple.json | cut -c 3- > hash_ref
 
