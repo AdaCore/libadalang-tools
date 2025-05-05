@@ -143,8 +143,7 @@ package body Pp.Buffers is
       return Result : constant W_Char := Buf.Cur_Char do
          pragma
            Assert
-             (if Buf.From_First > Last_Index (Buf.From)
-                then Result = W_NUL
+             (if Buf.From_First > Last_Index (Buf.From) then Result = W_NUL
                 else Result = Buf.From (Buf.From_First));
       end return;
    end Cur;
@@ -154,8 +153,7 @@ package body Pp.Buffers is
    begin
       Buf.From_First := From_First;
       Buf.Cur_Char :=
-        (if From_First > Last_Index (Buf.From)
-         then W_NUL
+        (if From_First > Last_Index (Buf.From) then W_NUL
          else Buf.From (From_First));
       Maybe_Move_Marker (Buf);
    end Delete_Char;
@@ -331,8 +329,7 @@ package body Pp.Buffers is
       Buf.From_First := From_First;
       Append (Buf.To, Buf.Cur_Char);
       Buf.Cur_Char :=
-        (if From_First > Last_Index (Buf.From)
-         then W_NUL
+        (if From_First > Last_Index (Buf.From) then W_NUL
          else Buf.From (From_First));
       Maybe_Move_Marker (Buf);
    end Move_Forward;
@@ -345,8 +342,7 @@ package body Pp.Buffers is
       Buf.From_First := From_First;
       Append (Buf.To, Buf.Cur_Char);
       Result :=
-        (if From_First > Last_Index (Buf.From)
-         then W_NUL
+        (if From_First > Last_Index (Buf.From) then W_NUL
          else Buf.From (From_First));
       Buf.Cur_Char := Result;
       Maybe_Move_Marker (Buf);
@@ -362,7 +358,7 @@ package body Pp.Buffers is
    end Initialize_Buffer;
 
    overriding
-   procedure Initialize (Buf : in out Buffer)renames Initialize_Buffer;
+   procedure Initialize (Buf : in out Buffer) renames Initialize_Buffer;
 
    procedure Maybe_Adjust_Marker (Buf : in out Buffer) is
    begin
@@ -490,7 +486,7 @@ package body Pp.Buffers is
       if Is_Empty (Buf.To_Markers) then
          Append_New_Marker (Buf, Name); -- Create a new one
 
-      --  Avoid creating a new Marker if we already have one at 'point'
+         --  Avoid creating a new Marker if we already have one at 'point'
 
       elsif not At_Point (Buf, Last_Element (Buf.To_Markers)) then
          Append_New_Marker (Buf, Name); -- Create a new one
@@ -777,7 +773,7 @@ package body Pp.Buffers is
           (if C = NL
              then (Is_Empty (Buf.To) or else Last_Element (Buf.To) /= ' '));
 
-   --  No need to adjust Buf.Cur_Column
+      --  No need to adjust Buf.Cur_Column
    end Replace_Cur;
 
    procedure Replace_Previous (Buf : in out Buffer; C : W_Char) is
@@ -812,8 +808,7 @@ package body Pp.Buffers is
       Buf.From_Markers_First := 1;
       Buf.To_Flag := not Buf.To_Flag;
       Buf.Cur_Char :=
-        (if Buf.From_First > Last_Index (Buf.From)
-         then W_NUL
+        (if Buf.From_First > Last_Index (Buf.From) then W_NUL
          else Buf.From (Buf.From_First));
       Buf.Cur_Column := 1;
 
