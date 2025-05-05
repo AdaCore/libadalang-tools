@@ -1,0 +1,12 @@
+project Prj is
+
+   for Object_Dir use "obj";
+   for Source_Dirs use (".", "subdir");
+
+   package Gnattest is 
+
+      for Gnattest_Switches use ("--ignore=ignore-list.txt");
+
+   end Gnattest;
+
+end Prj;
