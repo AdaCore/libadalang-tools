@@ -141,6 +141,10 @@ private
       --  Output an unconstrained type (un)marshallers, (un)marshalling both
       --  the type's header and the type's component(s).
 
+      with procedure Print_Derived_Private_Subtype (Assocs : Translate_Table);
+      --  Output (un)marshallers for a type that is a derivation of a
+      --  private type.
+
      procedure Generate_Base_Functions_For_Typ
      (Typ : TGen.Types.Typ'Class; For_Base : Boolean := False)
    with

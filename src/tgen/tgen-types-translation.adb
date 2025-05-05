@@ -45,6 +45,7 @@ with TGen.Types.Real_Types;     use TGen.Types.Real_Types;
 with TGen.Types.Record_Types;   use TGen.Types.Record_Types;
 with TGen.Marshalling;
 with TGen.Numerics;
+with TGen.Strings;
 
 package body TGen.Types.Translation is
 
@@ -3464,6 +3465,56 @@ package body TGen.Types.Translation is
                   ("types declared a generic package instantiation that is a"
                    & " library item are unsupported"),
               others => <>);
+
+      elsif N.Kind = Ada_Concrete_Type_Decl
+        and then N.As_Concrete_Type_Decl.F_Type_Def.Kind = Ada_Derived_Type_Def
+        and then not N
+                       .As_Concrete_Type_Decl
+                       .F_Type_Def
+                       .As_Derived_Type_Def
+                       .F_Subtype_Indication
+                       .P_Designated_Type_Decl
+                       .P_Private_Completion
+                       .Is_Null
+      then
+
+         Specialized_Res := (Success => True, others => <>);
+
+         declare
+            Declaration_Type_Name : constant Ada_Qualified_Name :=
+              TGen.Strings.To_Qualified_Name
+                (Langkit_Support.Text.Encode
+                   (N.As_Concrete_Type_Decl.P_Fully_Qualified_Name, "utf-8"));
+            --  Translate the parent type
+            Parent_Type           : constant Translation_Result :=
+              Translate
+                (N
+                   .As_Concrete_Type_Decl
+                   .F_Type_Def
+                   .As_Derived_Type_Def
+                   .F_Subtype_Indication
+                   .P_Designated_Type_Decl);
+         begin
+            if Parent_Type.Success then
+               if TGen.Marshalling.Needs_Header (Parent_Type.Res.all) then
+                  Specialized_Res.Res :=
+                    new Unsupported_Typ'
+                      (Reason =>
+                         To_Unbounded_String
+                           ("Opaque type deriving an unconstrained "
+                            & "type is not supported"),
+                       others => <>);
+               else
+                  Specialized_Res.Res :=
+                    new Derived_Private_Subtype_Typ'
+                      (Declaration_Type_Name => Declaration_Type_Name,
+                       Parent_Type           => Parent_Type.Res,
+                       others                => <>);
+               end if;
+            else
+               return Parent_Type;
+            end if;
+         end;
 
       elsif Text.Image (N.P_Root_Type.P_Fully_Qualified_Name)
         = "System.Address"

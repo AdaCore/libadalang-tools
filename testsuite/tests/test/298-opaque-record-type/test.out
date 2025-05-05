@@ -1,0 +1,3 @@
+gnattest: Error while processing <ExprFunction ["Foo"] pkg.ads:8:4-8:51>:
+pkg.foo.X: pkg.opaque is not supported (Opaque type deriving an unconstrained type is not supported)
+

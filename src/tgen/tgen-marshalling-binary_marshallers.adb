@@ -250,6 +250,15 @@ package body TGen.Marshalling.Binary_Marshallers is
 
       end Print_Array;
 
+      procedure Print_Derived_Private_Subtype (Assocs : Translate_Table);
+
+      procedure Print_Derived_Private_Subtype (Assocs : Translate_Table) is
+      begin
+         New_Line (Body_Part);
+         Put_Line
+           (Body_Part, Parse (Derived_Private_Subtype_Template, Assocs));
+      end Print_Derived_Private_Subtype;
+
       ------------------
       -- Print_Record --
       ------------------
@@ -302,21 +311,22 @@ package body TGen.Marshalling.Binary_Marshallers is
 
       procedure Generate_Base_Functions_For_Typ_Instance is new
         Generate_Base_Functions_For_Typ
-          (Differentiate_Discrete => True,
-           Component_Read         => Component_Read,
-           Component_Read_Indexed => Component_Read_Indexed,
-           Component_Write        => Component_Write,
-           Component_Size         => Component_Size,
-           Component_Size_Max     => Component_Size_Max,
-           Variant_Read_Write     => Variant_Read_Write,
-           Variant_Size           => Variant_Size,
-           Variant_Size_Max       => Variant_Size_Max,
-           Print_Header           => Print_Header,
-           Print_Default_Header   => Print_Default_Header,
-           Print_Scalar           => Print_Scalar,
-           Print_Array            => Print_Array,
-           Print_Record           => Print_Record,
-           Print_Header_Wrappers  => Print_Header_Wrappers);
+          (Differentiate_Discrete        => True,
+           Component_Read                => Component_Read,
+           Component_Read_Indexed        => Component_Read_Indexed,
+           Component_Write               => Component_Write,
+           Component_Size                => Component_Size,
+           Component_Size_Max            => Component_Size_Max,
+           Variant_Read_Write            => Variant_Read_Write,
+           Variant_Size                  => Variant_Size,
+           Variant_Size_Max              => Variant_Size_Max,
+           Print_Header                  => Print_Header,
+           Print_Default_Header          => Print_Default_Header,
+           Print_Scalar                  => Print_Scalar,
+           Print_Array                   => Print_Array,
+           Print_Record                  => Print_Record,
+           Print_Header_Wrappers         => Print_Header_Wrappers,
+           Print_Derived_Private_Subtype => Print_Derived_Private_Subtype);
    begin
       --  Generate the base functions for Typ
 

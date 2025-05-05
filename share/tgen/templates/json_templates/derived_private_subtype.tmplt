@@ -1,0 +1,17 @@
+   procedure TGen_Marshalling_@_TY_SLUG_@_Read
+      (JSON : TGen.JSON.JSON_Value; V : out @_TY_NAME_@)
+   is
+      Value : @_PARENT_TY_NAME_@;
+   begin
+      @_PARENT_TY_PACKAGE_@.TGen_Support.TGen_Marshalling_@_PARENT_TY_NAME_SLUG_@_Read (JSON, Value);
+      V := @_PARENT_TY_NAME_SLUG_@_To_@_TY_SLUG_@ (Value);
+   end TGen_Marshalling_@_TY_SLUG_@_Read;
+
+   procedure TGen_Marshalling_@_TY_SLUG_@_Write
+      (JSON : in out TGen.JSON.JSON_Value;
+       V      : @_TY_NAME_@)
+   is
+      Value : constant @_PARENT_TY_NAME_@ := @_TY_SLUG_@_To_@_PARENT_TY_NAME_SLUG_@ (V);
+   begin
+      @_PARENT_TY_PACKAGE_@.TGen_Support.TGen_Marshalling_@_PARENT_TY_NAME_SLUG_@_Write (JSON, Value);
+   end TGen_Marshalling_@_TY_SLUG_@_Write;

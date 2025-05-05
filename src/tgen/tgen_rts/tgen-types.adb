@@ -239,4 +239,22 @@ package body TGen.Types is
       return String_Vectors.To_Vector (Diag, 1);
    end Get_Diagnostics;
 
+   ----------------------
+   -- Default_Strategy --
+   ----------------------
+
+   function Default_Strategy
+     (Self : Derived_Private_Subtype_Typ)
+      return TGen.Strategies.Strategy_Type'Class
+   is (Self.Parent_Type.Default_Strategy);
+
+   ---------------------------
+   -- Default_Enum_Strategy --
+   ---------------------------
+
+   function Default_Enum_Strategy
+     (Self : Derived_Private_Subtype_Typ)
+      return TGen.Strategies.Enum_Strategy_Type'Class
+   is (Self.Parent_Type.Default_Enum_Strategy);
+
 end TGen.Types;
