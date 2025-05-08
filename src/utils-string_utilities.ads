@@ -130,12 +130,12 @@ package Utils.String_Utilities is
 
    function To_UTF8
      (Item : W_Str; Output_BOM : Boolean := False)
-      return Ada.Strings.UTF_Encoding.UTF_8_String renames
-     Ada.Strings.UTF_Encoding.Wide_Strings.Encode;
+      return Ada.Strings.UTF_Encoding.UTF_8_String
+   renames Ada.Strings.UTF_Encoding.Wide_Strings.Encode;
 
    function From_UTF8
-     (Item : Ada.Strings.UTF_Encoding.UTF_8_String) return W_Str renames
-     Ada.Strings.UTF_Encoding.Wide_Strings.Decode;
+     (Item : Ada.Strings.UTF_Encoding.UTF_8_String) return W_Str
+   renames Ada.Strings.UTF_Encoding.Wide_Strings.Decode;
 
    procedure Text_IO_Put_Char (C : Character);
    procedure Wide_Text_IO_Put_Char (C : Character);

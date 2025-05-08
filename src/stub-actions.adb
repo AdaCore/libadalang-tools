@@ -60,8 +60,8 @@ package body Stub.Actions is
 
    use Utils.Char_Vectors.Char_Vectors;
 
-   function Image (X : Integer) return String renames
-     Utils.String_Utilities.Image;
+   function Image (X : Integer) return String
+   renames Utils.String_Utilities.Image;
 
    use Common_Flag_Switches, Common_String_Switches;
 

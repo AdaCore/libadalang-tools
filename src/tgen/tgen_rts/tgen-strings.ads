@@ -78,13 +78,11 @@ package TGen.Strings is
         "<"          => Ada.Strings.Unbounded."<");
    subtype UTT_Map is UTT_Maps.Map;
 
-   function "+"
-     (S : String) return Ada.Strings.Unbounded.Unbounded_String renames
-     Ada.Strings.Unbounded.To_Unbounded_String;
+   function "+" (S : String) return Ada.Strings.Unbounded.Unbounded_String
+   renames Ada.Strings.Unbounded.To_Unbounded_String;
 
-   function "+"
-     (S : Ada.Strings.Unbounded.Unbounded_String) return String renames
-     Ada.Strings.Unbounded.To_String;
+   function "+" (S : Ada.Strings.Unbounded.Unbounded_String) return String
+   renames Ada.Strings.Unbounded.To_String;
 
    function Remove_Trailing_Comma_And_Spaces
      (Text : Unbounded_String) return Unbounded_String
@@ -134,9 +132,8 @@ package TGen.Strings is
    --  Sequence of ada identifiers, representing a qualified name. For
    --  instance: Scope_A.Scope_B.Scope_C
 
-   function "&"
-     (Left, Right : Ada_Qualified_Name) return Ada_Qualified_Name renames
-     Ada_Identifier_Vectors."&";
+   function "&" (Left, Right : Ada_Qualified_Name) return Ada_Qualified_Name
+   renames Ada_Identifier_Vectors."&";
 
    function To_Ada (Name : Ada_Qualified_Name) return String;
    --  Turn the given qualified name into Ada syntax
