@@ -130,8 +130,8 @@ package body METRICS.Actions is
       Unit_Coupling_Out           => True,
       Unit_Coupling_In            => True];
 
-   function Image (X : Integer) return String renames
-     Utils.String_Utilities.Image;
+   function Image (X : Integer) return String
+   renames Utils.String_Utilities.Image;
 
    --  Debugging printouts
    --  See also Libadalang.Debug.
