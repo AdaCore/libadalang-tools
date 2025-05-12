@@ -1082,8 +1082,17 @@ package body Utils.Projects is
             if Preprocessing_Allowed then
                Result := True;
             else
-               Cmd_Error ("cannot preprocess argument file, " &
-                            "do preprocessing as a separate step");
+               --  GNATpp handles preprocessing directives in its own way and
+               --  Preprocessing_Allowed will be always False when the driver
+               --  is called for it.
+               --  For that reason the command error should be raised for the
+               --  other laltools, so excluding gnatpp.
+
+               if Utils.Tool_Names.Tool_Name /= "gnatpp" then
+                  Cmd_Error
+                    ("cannot preprocess argument file, "
+                     & "do preprocessing as a separate step");
+               end if;
             end if;
          elsif Option = "-gnat83"
            or else Option = "-gnat95"
