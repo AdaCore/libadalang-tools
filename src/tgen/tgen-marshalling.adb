@@ -907,6 +907,29 @@ package body TGen.Marshalling is
             end;
          end;
 
+      elsif Typ in Derived_Private_Subtype_Typ'Class then
+
+         declare
+            Derived_Typ : constant Derived_Private_Subtype_Typ :=
+              Derived_Private_Subtype_Typ (Typ);
+            Assocs      : constant Translate_Table :=
+              Common_Assocs
+              & [1 =>
+                   Assoc
+                     ("PARENT_TY_NAME",
+                      Derived_Typ.Parent_Type.FQN (No_Std => True)),
+                 2 =>
+                   Assoc ("PARENT_TY_NAME_SLUG", Derived_Typ.Parent_Type.Slug),
+                 3 => Assoc ("TY_SLUG", Derived_Typ.Slug),
+                 4 =>
+                   Assoc
+                     ("PARENT_TY_PACKAGE",
+                      TGen.Strings.To_Ada
+                        (Derived_Typ.Parent_Type.Package_Name))];
+         begin
+            Print_Derived_Private_Subtype (Assocs);
+         end;
+
       --  3.3 For record types, we generate the calls for the components and
       --      the variant part and instanciate the appropriate patterns.
 
@@ -1047,6 +1070,10 @@ package body TGen.Marshalling is
    begin
       if Typ in Scalar_Typ'Class then
          return True;
+      elsif Typ in Derived_Private_Subtype_Typ then
+         return
+           Is_Supported_Type
+             (Derived_Private_Subtype_Typ'Class (Typ).Parent_Type.all);
       elsif Typ in Constrained_Array_Typ'Class then
          return
            Is_Supported_Type

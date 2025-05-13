@@ -1109,6 +1109,30 @@ package body TGen.Type_Representation is
             Init_Package_Code := Init_Package_Code & Scalar_Typ_Init;
          end;
 
+      elsif Typ in Derived_Private_Subtype_Typ'Class then
+
+         Insert
+           (Assocs,
+            Assoc
+              ("PARENT_TY_PREFIX",
+               Derived_Private_Subtype_Typ (Typ).Parent_Type.Slug
+                 (Is_Top_Level_Gen)));
+
+         declare
+            Derived_Private_Subtype_Typ_Decl : constant Unbounded_String :=
+              Parse (Derived_Private_Subtype_Template, Assocs);
+            Derived_Private_Subtype_Typ_Init : constant Unbounded_String :=
+              Parse (Derived_Private_Subtype_Init_Template, Assocs);
+         begin
+            Put_Line
+              (F_Spec,
+               "   " & Ty_Prefix & "_Typ_Ref : TGen.Types.Typ_Access;");
+
+            Put_Line (F_Body, +Derived_Private_Subtype_Typ_Decl);
+            Init_Package_Code :=
+              Init_Package_Code & Derived_Private_Subtype_Typ_Init;
+         end;
+
       else
          raise Program_Error;
       end if;

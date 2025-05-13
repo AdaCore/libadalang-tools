@@ -95,6 +95,7 @@ package TGen.Types is
       Function_Kind,
       Anonymous_Kind,
       Instance_Kind,
+      Derived_Private_Subtype_Kind,
       Unsupported);
 
    subtype Discrete_Typ_Range is Typ_Kind range Signed_Int_Kind .. Enum_Kind;
@@ -274,6 +275,37 @@ package TGen.Types is
       --  Why this type is not supported.
 
    end record;
+
+   type Derived_Private_Subtype_Typ is new Typ with record
+      Declaration_Type_Name : Ada_Qualified_Name;
+      Parent_Type           : Typ_Access;
+   end record;
+   --  This type represents a type that is derived from a private type. For
+   --  example:
+   --  <foo.ads>
+   --  type Foo is private;
+   --  private ...
+   --  <bar.ads>
+   --  with Foo;
+   --  type Bar is new Foo; <- foo is private
+
+   function Kind (Self : Derived_Private_Subtype_Typ) return Typ_Kind
+   is (Derived_Private_Subtype_Kind);
+
+   function Get_Diagnostics
+     (Self : Derived_Private_Subtype_Typ; Prefix : String := "")
+      return String_Vector
+   is (String_Vectors.Empty_Vector);
+
+   function Default_Strategy
+     (Self : Derived_Private_Subtype_Typ)
+      return TGen.Strategies.Strategy_Type'Class;
+   --  Returns the strategy used by the parent type.
+
+   function Default_Enum_Strategy
+     (Self : Derived_Private_Subtype_Typ)
+      return TGen.Strategies.Enum_Strategy_Type'Class;
+   --  Returns the enum strategy used by the parent type.
 
    function Get_Diagnostics
      (Self : Unsupported_Types; Prefix : String := "") return String_Vector

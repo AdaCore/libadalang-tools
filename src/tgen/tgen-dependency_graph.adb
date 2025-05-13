@@ -133,6 +133,19 @@ package body TGen.Dependency_Graph is
             end loop;
             Inspect_Variant (As_Discriminated_Record_Typ (T).Variant);
 
+         when Derived_Private_Subtype_Kind =>
+
+            --  A derived type depends on its parent and its parent
+            --  dependencies.
+
+            declare
+               Derived_Typ : constant Derived_Private_Subtype_Typ :=
+                 Derived_Private_Subtype_Typ (T.all);
+            begin
+               Res.Include (Derived_Typ.Parent_Type);
+               Res.Union (Type_Dependencies (Derived_Typ.Parent_Type));
+            end;
+
          when others =>
             null;
       end case;

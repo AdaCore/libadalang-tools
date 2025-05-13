@@ -338,6 +338,12 @@ package body TGen.Libgen is
          end loop;
       end;
 
+      --  Types that are derived from a private type, use unchecked
+      --  conversions.
+      if (for some Ty of Types => Ty.Kind = Derived_Private_Subtype_Kind) then
+         Put_Line (F_Body, "with Ada.Unchecked_Conversion;");
+      end if;
+
       Put_Line (F_Body, "package body " & Ada_Pack_Name & " is");
       New_Line (F_Body);
 

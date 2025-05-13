@@ -1,0 +1,4 @@
+@_TY_PREFIX_@_Typ : aliased TGen.Types.Derived_Private_Subtype_Typ :=
+   (Name => TGen.Strings.To_Qualified_Name ("@_TY_NAME_@"),
+    Parent_Type => @_PARENT_TY_PREFIX_@_Typ_Ref,
+    others => <>);

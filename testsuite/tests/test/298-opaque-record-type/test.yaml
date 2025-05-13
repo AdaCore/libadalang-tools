@@ -1,0 +1,7 @@
+description: |
+  Check that TGen rejects types that are derived from an opaque type
+  whose parent has a header.
+
+default-gpr: true
+
+driver: shell_script

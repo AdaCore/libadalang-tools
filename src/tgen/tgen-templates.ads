@@ -28,132 +28,140 @@ generic
 package TGen.Templates is
 
    package Binary_Marshalling is
-      Array_Read_Write_Template     : constant String :=
+      Array_Read_Write_Template        : constant String :=
         Template_Folder & "array_read_write.tmplt";
-      Component_Read_Write_Template : constant String :=
+      Component_Read_Write_Template    : constant String :=
         Template_Folder & "component_read_write.tmplt";
-      Component_Size_Max_Template   : constant String :=
+      Component_Size_Max_Template      : constant String :=
         Template_Folder & "component_size_max.tmplt";
-      Component_Size_Template       : constant String :=
+      Component_Size_Template          : constant String :=
         Template_Folder & "component_size.tmplt";
-      Composite_Base_Spec_Template  : constant String :=
+      Composite_Base_Spec_Template     : constant String :=
         Template_Folder & "composite_base_spec.tmplt";
-      Composite_Size_Max_Template   : constant String :=
+      Composite_Size_Max_Template      : constant String :=
         Template_Folder & "composite_size_max.tmplt";
-      Header_Body_Template          : constant String :=
+      Header_Body_Template             : constant String :=
         Template_Folder & "header_body.tmplt";
-      Header_Private_Template       : constant String :=
+      Header_Private_Template          : constant String :=
         Template_Folder & "header_private.tmplt";
-      Default_Header_Spec_Template  : constant String :=
+      Default_Header_Spec_Template     : constant String :=
         Template_Folder & "default_header_spec.tmplt";
-      Header_Spec_Template          : constant String :=
+      Header_Spec_Template             : constant String :=
         Template_Folder & "header_spec.tmplt";
-      Header_Wrappers_Body_Template : constant String :=
+      Header_Wrappers_Body_Template    : constant String :=
         Template_Folder & "header_wrappers_body.tmplt";
-      Header_Wrappers_Spec_Template : constant String :=
+      Header_Wrappers_Spec_Template    : constant String :=
         Template_Folder & "header_wrappers_spec.tmplt";
-      In_Out_Body_Template          : constant String :=
+      In_Out_Body_Template             : constant String :=
         Template_Folder & "in_out_body.tmplt";
-      In_Out_Spec_Template          : constant String :=
+      In_Out_Spec_Template             : constant String :=
         Template_Folder & "in_out_spec.tmplt";
-      Record_Read_Write_Template    : constant String :=
+      Record_Read_Write_Template       : constant String :=
         Template_Folder & "record_read_write.tmplt";
-      Record_Size_Max_Template      : constant String :=
+      Record_Size_Max_Template         : constant String :=
         Template_Folder & "record_size_max.tmplt";
-      Record_Size_Template          : constant String :=
+      Record_Size_Template             : constant String :=
         Template_Folder & "record_size.tmplt";
-      Scalar_Base_Spec_Template     : constant String :=
+      Scalar_Base_Spec_Template        : constant String :=
         Template_Folder & "scalar_base_spec.tmplt";
-      Scalar_Base_Private_Template  : constant String :=
+      Scalar_Base_Private_Template     : constant String :=
         Template_Folder & "scalar_base_private.tmplt";
-      Scalar_Read_Write_Template    : constant String :=
+      Scalar_Read_Write_Template       : constant String :=
         Template_Folder & "scalar_read_write.tmplt";
-      Variant_Read_Write_Template   : constant String :=
+      Variant_Read_Write_Template      : constant String :=
         Template_Folder & "variant_read_write.tmplt";
-      Variant_Size_Max_Template     : constant String :=
+      Variant_Size_Max_Template        : constant String :=
         Template_Folder & "variant_size_max.tmplt";
-      Variant_Size_Template         : constant String :=
+      Variant_Size_Template            : constant String :=
         Template_Folder & "variant_size.tmplt";
-      Array_Size_Max_Template       : constant String :=
+      Array_Size_Max_Template          : constant String :=
         Template_Folder & "array_size_max.tmplt";
-      Array_Size_Template           : constant String :=
+      Array_Size_Template              : constant String :=
         Template_Folder & "array_size.tmplt";
+      Derived_Private_Subtype_Template : constant String :=
+        Template_Folder & "derived_private_subtype.tmplt";
    end Binary_Marshalling;
 
    package JSON_Marshalling is
-      Array_Read_Write_Template       : constant String :=
+      Array_Read_Write_Template        : constant String :=
         Template_Folder & "array_read_write.tmplt";
-      Component_Write_Template        : constant String :=
+      Component_Write_Template         : constant String :=
         Template_Folder & "component_write.tmplt";
-      Component_Read_Template         : constant String :=
+      Component_Read_Template          : constant String :=
         Template_Folder & "component_read.tmplt";
-      Component_Read_Indexed_Template : constant String :=
+      Component_Read_Indexed_Template  : constant String :=
         Template_Folder & "component_read_indexed.tmplt";
-      Composite_Base_Spec_Template    : constant String :=
+      Composite_Base_Spec_Template     : constant String :=
         Template_Folder & "composite_base_spec.tmplt";
-      Header_Body_Template            : constant String :=
+      Header_Body_Template             : constant String :=
         Template_Folder & "header_body.tmplt";
-      Header_Spec_Template            : constant String :=
+      Header_Spec_Template             : constant String :=
         Template_Folder & "header_spec.tmplt";
-      Header_Wrappers_Body_Template   : constant String :=
+      Header_Wrappers_Body_Template    : constant String :=
         Template_Folder & "header_wrappers_body.tmplt";
-      Header_Wrappers_Spec_Template   : constant String :=
+      Header_Wrappers_Spec_Template    : constant String :=
         Template_Folder & "header_wrappers_spec.tmplt";
-      In_Out_Body_Template            : constant String :=
+      In_Out_Body_Template             : constant String :=
         Template_Folder & "in_out_body.tmplt";
-      In_Out_Spec_Template            : constant String :=
+      In_Out_Spec_Template             : constant String :=
         Template_Folder & "in_out_spec.tmplt";
-      Record_Read_Write_Template      : constant String :=
+      Record_Read_Write_Template       : constant String :=
         Template_Folder & "record_read_write.tmplt";
-      Scalar_Base_Spec_Template       : constant String :=
+      Scalar_Base_Spec_Template        : constant String :=
         Template_Folder & "scalar_base_spec.tmplt";
-      Scalar_Read_Write_Template      : constant String :=
+      Scalar_Read_Write_Template       : constant String :=
         Template_Folder & "scalar_read_write.tmplt";
-      Variant_Read_Write_Template     : constant String :=
+      Variant_Read_Write_Template      : constant String :=
         Template_Folder & "variant_read_write.tmplt";
-      Function_TC_Dump_Template       : constant String :=
+      Function_TC_Dump_Template        : constant String :=
         Template_Folder & "function_tc_dump.tmplt";
+      Derived_Private_Subtype_Template : constant String :=
+        Template_Folder & "derived_private_subtype.tmplt";
    end JSON_Marshalling;
 
    package Type_Representation is
-      Scalar_Typ_Decl_Template     : constant String :=
+      Scalar_Typ_Decl_Template              : constant String :=
         Template_Folder & "scalar_typ_decl.tmplt";
-      Scalar_Typ_Init_Template     : constant String :=
+      Scalar_Typ_Init_Template              : constant String :=
         Template_Folder & "scalar_typ_init.tmplt";
-      Record_Typ_Decl_Template     : constant String :=
+      Record_Typ_Decl_Template              : constant String :=
         Template_Folder & "record_typ_decl.tmplt";
-      Record_Typ_Init_Template     : constant String :=
+      Record_Typ_Init_Template              : constant String :=
         Template_Folder & "record_typ_init.tmplt";
-      Anonymous_Typ_Decl_Template  : constant String :=
+      Anonymous_Typ_Decl_Template           : constant String :=
         Template_Folder & "anonymous_typ_decl.tmplt";
-      Anonymous_Typ_Init_Template  : constant String :=
+      Anonymous_Typ_Init_Template           : constant String :=
         Template_Folder & "anonymous_typ_init.tmplt";
-      Custom_Strat_Spec_Template   : constant String :=
+      Custom_Strat_Spec_Template            : constant String :=
         Template_Folder & "custom_strat_spec.tmplt";
-      Custom_Strat_Body_Template   : constant String :=
+      Custom_Strat_Body_Template            : constant String :=
         Template_Folder & "custom_strat_body.tmplt";
-      Variant_Choice_Decl_Template : constant String :=
+      Variant_Choice_Decl_Template          : constant String :=
         Template_Folder & "variant_choice_decl.tmplt";
-      Variant_Choice_Init_Template : constant String :=
+      Variant_Choice_Init_Template          : constant String :=
         Template_Folder & "variant_choice_init.tmplt";
-      Variant_Decl_Template        : constant String :=
+      Variant_Decl_Template                 : constant String :=
         Template_Folder & "variant_decl.tmplt";
-      Variant_Init_Template        : constant String :=
+      Variant_Init_Template                 : constant String :=
         Template_Folder & "variant_init.tmplt";
-      Constraint_Decl_Template     : constant String :=
+      Constraint_Decl_Template              : constant String :=
         Template_Folder & "constraint_decl.tmplt";
-      Constraint_Init_Template     : constant String :=
+      Constraint_Init_Template              : constant String :=
         Template_Folder & "constraint_init.tmplt";
-      Instance_Decl_Template       : constant String :=
+      Instance_Decl_Template                : constant String :=
         Template_Folder & "instance_typ_decl.tmplt";
-      Instance_Init_Template       : constant String :=
+      Instance_Init_Template                : constant String :=
         Template_Folder & "instance_typ_init.tmplt";
-      Array_Typ_Decl_Template      : constant String :=
+      Array_Typ_Decl_Template               : constant String :=
         Template_Folder & "array_typ_decl.tmplt";
-      Array_Typ_Init_Template      : constant String :=
+      Array_Typ_Init_Template               : constant String :=
         Template_Folder & "array_typ_init.tmplt";
-      Function_Typ_Init_Template   : constant String :=
+      Function_Typ_Init_Template            : constant String :=
         Template_Folder & "function_typ_init.tmplt";
+      Derived_Private_Subtype_Template      : constant String :=
+        Template_Folder & "derived_private_subtype.tmplt";
+      Derived_Private_Subtype_Init_Template : constant String :=
+        Template_Folder & "derived_private_subtype_init.tmplt";
    end Type_Representation;
 
 end TGen.Templates;
