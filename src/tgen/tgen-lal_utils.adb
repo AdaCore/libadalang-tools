@@ -160,4 +160,38 @@ package body TGen.LAL_Utils is
         Ada.Characters.Handling.To_Lower
           ("tgen_" & To_Symbol (Tmp, Sep => '_') & ".json");
    end Top_Level_Instantiation_Test_File_Name;
+
+   --------------------------
+   --  Derive_Opaque_Type  --
+   --------------------------
+
+   function Derive_Opaque_Type
+     (Ty_Decl : LAL.Base_Type_Decl'Class) return Boolean
+   is
+      Decl : LAL.Base_Type_Decl'Class := Ty_Decl;
+   begin
+      while (Decl.Kind = Ada_Concrete_Type_Decl
+             and then Decl.As_Concrete_Type_Decl.F_Type_Def.Kind
+                      = Ada_Derived_Type_Def)
+        or Decl.Kind in Ada_Subtype_Decl_Range
+      loop
+         if Decl.Kind = Ada_Concrete_Type_Decl then
+            Decl :=
+              LAL.Base_Type_Decl'Class
+                (Decl
+                   .As_Concrete_Type_Decl
+                   .F_Type_Def
+                   .As_Derived_Type_Def
+                   .F_Subtype_Indication
+                   .P_Designated_Type_Decl);
+         else
+            Decl :=
+              LAL.Base_Type_Decl'Class
+                (Decl.As_Subtype_Decl.F_Subtype.P_Designated_Type_Decl);
+         end if;
+      end loop;
+
+      return not Decl.P_Private_Completion.Is_Null;
+   end Derive_Opaque_Type;
+
 end TGen.LAL_Utils;

@@ -307,6 +307,10 @@ package TGen.Types is
       return TGen.Strategies.Enum_Strategy_Type'Class;
    --  Returns the enum strategy used by the parent type.
 
+   function Encode
+     (Self : Derived_Private_Subtype_Typ; Val : JSON_Value) return JSON_Value;
+   --  Inherits the parent type encode function.
+
    function Get_Diagnostics
      (Self : Unsupported_Types; Prefix : String := "") return String_Vector
    is (Self.Diags);

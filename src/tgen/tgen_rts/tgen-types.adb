@@ -257,4 +257,12 @@ package body TGen.Types is
       return TGen.Strategies.Enum_Strategy_Type'Class
    is (Self.Parent_Type.Default_Enum_Strategy);
 
+   --------------
+   --  Encode  --
+   --------------
+
+   function Encode
+     (Self : Derived_Private_Subtype_Typ; Val : JSON_Value) return JSON_Value
+   is (Self.Parent_Type.Encode (Val));
+
 end TGen.Types;

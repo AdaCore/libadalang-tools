@@ -87,4 +87,11 @@ package TGen.LAL_Utils is
    with Pre => Unit_Full_Name /= "";
    --  Get JSON file name when the unit is a library level generic
    --  instantiation.
+
+   function Derive_Opaque_Type
+     (Ty_Decl : LAL.Base_Type_Decl'Class) return Boolean;
+   --  Returns if a given type declaration is a derivation of an opaque type.
+   --  This function operates recursively in case of a multiple level type
+   --  hierarchy.
+
 end TGen.LAL_Utils;
