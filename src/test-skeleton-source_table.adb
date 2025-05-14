@@ -27,8 +27,9 @@ with Ada.Containers.Indefinite_Ordered_Maps;
 with GNAT.OS_Lib;                use GNAT.OS_Lib;
 with GNAT.Directory_Operations;  use GNAT.Directory_Operations;
 
-with GNATCOLL.VFS;               use GNATCOLL.VFS;
-with GNATCOLL.Traces;            use GNATCOLL.Traces;
+with GNAT.Strings;
+with GNATCOLL.VFS;    use GNATCOLL.VFS;
+with GNATCOLL.Traces; use GNATCOLL.Traces;
 
 with Ada.Characters.Handling; use Ada.Characters.Handling;
 
@@ -1671,46 +1672,8 @@ package body Test.Skeleton.Source_Table is
                   & """;");
                Put_New_Line;
 
-               declare
-                  Interfaces_Attribute : constant Attribute_Pkg_List :=
-                    Build ("", "interfaces");
+               Put_Interface_For_Project (Proj, Sources_Names);
 
-                  Project : constant Project_Type :=
-                    GNATCOLL.Projects.Project_From_Name
-                      (Source_Project_Tree, Proj);
-               begin
-                  S_Put (3, "for Interfaces use (");
-
-                  --  Go through all units exposed in the interface and
-                  --  add them to the driver's interface.
-                  declare
-                     Exposed_List : constant String_List :=
-                       Project.Attribute_Value
-                         (Interfaces_Attribute).all;
-                  begin
-                     for Source of Exposed_List loop
-                        S_Put (0, """" & Source.all & """,");
-                     end loop;
-                  end;
-
-                  --  Include all sources in the interface
-                  if not Sources_Names.Is_Empty then
-                     declare
-                        Cur : String_Set.Cursor := Sources_Names.First;
-                     begin
-                        while Cur /= String_Set.No_Element loop
-                           S_Put (0, """" & String_Set.Element (Cur) & """");
-
-                           Next (Cur);
-
-                           if Cur /= String_Set.No_Element then
-                              S_Put (0, ",");
-                           end if;
-                        end loop;
-                     end;
-                  end if;
-                  S_Put (3, ");");
-               end;
             end if;
             Put_New_Line;
 
@@ -1906,5 +1869,83 @@ package body Test.Skeleton.Source_Table is
          Subroot_Stub_Prj,
          Set_Present_Subset_For_Project'Access);
    end Enforce_Project_Extension;
+
+   -------------------------------
+   -- Put_Interface_For_Project --
+   -------------------------------
+
+   procedure Put_Interface_For_Project
+     (Project_Name : String; Source_List : String_Set.Set)
+   is
+      Interfaces_Attribute : constant Attribute_Pkg_List :=
+        Build ("", "interfaces");
+
+      Lib_Interface_Attribute : constant Attribute_Pkg_List :=
+        Build ("", "library_interface");
+
+      Project : constant Project_Type :=
+        GNATCOLL.Projects.Project_From_Name
+          (Source_Project_Tree, Project_Name);
+   begin
+      if Project.Has_Attribute (Interfaces_Attribute)
+        or else Project.Has_Attribute (Lib_Interface_Attribute)
+      then
+         S_Put (3, "for Interfaces use (");
+
+         --  Go through all files exposed in the interface and
+         --  add them to the driver's interface.
+         declare
+            Exposed_List : String_List_Access :=
+              Project.Attribute_Value (Interfaces_Attribute);
+         begin
+            for Source of Exposed_List.all loop
+               S_Put (0, """" & Source.all & """,");
+            end loop;
+            GNAT.Strings.Free (Exposed_List);
+         end;
+
+         --  Do the same for the library interface attribute. The
+         --  difference between the two is that Interfaces lists
+         --  filenames, whereas the Library_Interface lists units,
+         --  which we'll need to translate to spec filenames.
+
+         declare
+            Exposed_List : String_List_Access :=
+              Project.Attribute_Value (Lib_Interface_Attribute);
+         begin
+            for Unit of Exposed_List.all loop
+               S_Put
+                 (0,
+                  """"
+                  & String'
+                      (+Project.File_From_Unit
+                          (Unit.all,
+                           Unit_Spec,
+                           "Ada",
+                           File_Must_Exist => True))
+                  & """,");
+            end loop;
+            GNAT.Strings.Free (Exposed_List);
+         end;
+
+         --  Include all sources in the interface
+         if not Source_List.Is_Empty then
+            declare
+               Cur : String_Set.Cursor := Source_List.First;
+            begin
+               while Cur /= String_Set.No_Element loop
+                  S_Put (0, """" & String_Set.Element (Cur) & """");
+
+                  Next (Cur);
+
+                  if Cur /= String_Set.No_Element then
+                     S_Put (0, ",");
+                  end if;
+               end loop;
+            end;
+         end if;
+         S_Put (3, ");");
+      end if;
+   end Put_Interface_For_Project;
 
 end Test.Skeleton.Source_Table;

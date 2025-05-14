@@ -1,0 +1,74 @@
+gprbuild  -PPkg_2.Test_Data.Tests/test_driver.gpr  -gargs -j0
+Setup
+   [mkdir]        library directory for project Prj
+Compile
+   [Ada]          pkg_2-test_data-tests-suite-test_runner.adb
+   [Ada]          pkj.ads
+   [Ada]          pkh-stub_data.adb
+   [Ada]          pkh.adb
+   [Ada]          gnattest_generated.ads
+   [Ada]          gnattest_generated-persistent.adb
+   [Ada]          pkg_2-test_data-tests-suite.adb
+   [Ada]          pkg_2-test_data-tests.adb
+   [Ada]          pkg_2-test_data.adb
+   [Ada]          pkh_2.adb
+   [Ada]          pkh_2-stub_data.adb
+   [Ada]          pkg_2.adb
+Build Libraries
+   [gprlib]       stub_1_prj.lexch
+   [bind SAL]     stub_1_prj
+   [Ada]          b__stub_1_prj.adb
+   [objcopy]      p__stub_1_prj_0.o
+   [archive]      libstub_1_prj.a
+   [index]        libstub_1_prj.a
+Bind
+   [gprbind]      pkg_2-test_data-tests-suite-test_runner.bexch
+   [Ada]          pkg_2-test_data-tests-suite-test_runner.ali
+Link
+   [link]         pkg_2-test_data-tests-suite-test_runner.adb
+gprbuild  -PPkh.Test_Data.Tests/test_driver.gpr  -gargs -j0
+Compile
+   [Ada]          pkh-test_data-tests-suite-test_runner.adb
+   [Ada]          pkj.ads
+   [Ada]          pkh.adb
+   [Ada]          gnattest_generated.ads
+   [Ada]          gnattest_generated-persistent.adb
+   [Ada]          pkh-test_data-tests-suite.adb
+   [Ada]          pkh-test_data-tests.adb
+   [Ada]          pkh-test_data.adb
+Build Libraries
+   [gprlib]       prj.lexch
+   [bind SAL]     prj
+   [Ada]          b__prj.adb
+   [objcopy]      p__prj_0.o
+   [archive]      libprj.a
+   [index]        libprj.a
+Bind
+   [gprbind]      pkh-test_data-tests-suite-test_runner.bexch
+   [Ada]          pkh-test_data-tests-suite-test_runner.ali
+Link
+   [link]         pkh-test_data-tests-suite-test_runner.adb
+gprbuild  -PPkh_2.Test_Data.Tests/test_driver.gpr  -gargs -j0
+Compile
+   [Ada]          pkh_2-test_data-tests-suite-test_runner.adb
+   [Ada]          pkj.ads
+   [Ada]          pkh-stub_data.adb
+   [Ada]          pkh.adb
+   [Ada]          gnattest_generated.ads
+   [Ada]          gnattest_generated-persistent.adb
+   [Ada]          pkh_2-test_data-tests-suite.adb
+   [Ada]          pkh_2-test_data-tests.adb
+   [Ada]          pkh_2-test_data.adb
+   [Ada]          pkh_2.adb
+Build Libraries
+   [gprlib]       stub_3_prj.lexch
+   [bind SAL]     stub_3_prj
+   [Ada]          b__stub_3_prj.adb
+   [objcopy]      p__stub_3_prj_0.o
+   [archive]      libstub_3_prj.a
+   [index]        libstub_3_prj.a
+Bind
+   [gprbind]      pkh_2-test_data-tests-suite-test_runner.bexch
+   [Ada]          pkh_2-test_data-tests-suite-test_runner.ali
+Link
+   [link]         pkh_2-test_data-tests-suite-test_runner.adb
