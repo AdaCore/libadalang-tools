@@ -1,0 +1,5 @@
+description: Test that when an interface is specified through the
+  Library_Interface project attribute, gnattest preserves it when generating
+  the interface for the corresponding stub project.
+
+driver: shell_script
