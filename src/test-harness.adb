@@ -3137,62 +3137,19 @@ package body Test.Harness is
          Put_New_Line;
 
          --  If the project is a library, declare an interface exposing all the
-         --  originally exposed units and all other relevant units.
+         --  originally exposed units and all other relevant units. Add the
+         --  unit under test to the sources to be included in the interface.
 
-         if Test.Skeleton.Source_Table.Project_Is_Library
-              (P.Name_Of_Extended.all)
-         then
-            declare
-               Interfaces_Attribute : constant Attribute_Pkg_List :=
-                 Build ("", "interfaces");
+         Sources_Names.Include
+           (Ada.Directories.Simple_Name (P.UUT_File_Name.all));
 
-               Project : constant Project_Type :=
-                 GNATCOLL.Projects.Project_From_Name
-                   (Source_Project_Tree, P.Name_Of_Extended.all);
+         Test.Skeleton.Source_Table.Put_Interface_For_Project
+           (P.Name_Of_Extended.all, Sources_Names);
 
-               Exposed_List : constant String_List :=
-                 Project.Attribute_Value (Interfaces_Attribute).all;
+         --  Reset the sources list to be added to the interface
 
-               Driver_Sources_Present : constant Boolean :=
-                 P.Sources_List.First /= List_Of_Strings.No_Element;
-            begin
-               S_Put (3, "for Interfaces use (");
+         Sources_Names.Clear;
 
-               --  Go through all units exposed in the interface and add them
-               --  to the driver's interface.
-
-               for Source of Exposed_List loop
-                  S_Put (0, """" & Source.all & """,");
-               end loop;
-
-               --  If there are source for this test driver, add all of them to
-               --  the interface. If not, only add the relevant unit.
-
-               if Driver_Sources_Present then
-                  declare
-                     Cur : String_Set.Cursor := Sources_Names.First;
-                  begin
-                     while Cur /= String_Set.No_Element loop
-                        S_Put (0, """" & String_Set.Element (Cur) & """,");
-                        Next (Cur);
-                     end loop;
-                  end;
-               end if;
-
-               --  Always add the unit under test to the interface
-
-               S_Put
-                 (0,
-                  """"
-                  & Ada.Directories.Simple_Name (P.UUT_File_Name.all)
-                  & """");
-
-               S_Put (0, ");");
-
-               --  Reset the sources list to be added to the interface
-               Sources_Names := String_Set.Empty_Set;
-            end;
-         end if;
          Put_New_Line;
          Put_New_Line;
 
