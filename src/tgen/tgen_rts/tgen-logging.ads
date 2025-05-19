@@ -2,7 +2,7 @@
 --                                                                          --
 --                                  TGen                                    --
 --                                                                          --
---                    Copyright (C) 2022-2024, AdaCore                      --
+--                    Copyright (C) 2022-2025, AdaCore                      --
 --                                                                          --
 -- TGen  is  free software; you can redistribute it and/or modify it  under --
 -- under  terms of  the  GNU General  Public License  as  published by  the --
@@ -21,19 +21,44 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with GNATCOLL.Traces;
+--  TGen trace module, this module is a very simple trace implementation that
+--  is suitable for platforms that are not supported by GNATCOLL. Set the
+--  Set the `TGEN_RTS_TRACE` environnment variable to enable traces. By default
+--  no traces are emitted.
+--
+--  Usage:
+--
+--  with TGen.Logging; use TGen.Logging;
+--  Me : constant TGen_Trace := Create_Trace ("My_Module");
+--  ...
+--  Trace (Me, +"Useful debug message");
+
+with Ada.Strings.Unbounded;
+with Ada.Text_IO;
 
 package TGen.Logging is
 
-   subtype GNATCOLL_Trace is GNATCOLL.Traces.Logger;
-   --  Convenience subtype so that trace creation requires "with TGen.Logging;"
-   --  only instead of also "with GNATCOLL.Traces;".
+   use type Ada.Text_IO.File_Access;
 
-   GNATCOLL_Trace_Prefix : constant String := "tgen.";
-   --  Prefix to use for all GNATCOLL traces defined in TGen
+   type TGen_Trace is record
+      Unit_Name : Ada.Strings.Unbounded.Unbounded_String :=
+        Ada.Strings.Unbounded.Null_Unbounded_String;
+      Output    : Ada.Text_IO.File_Access := null;
+   end record;
 
-   function Create_Trace (Unit_Name : String) return GNATCOLL_Trace;
-   --  Wrapper around GNATCOLL.Traces.Create to create TGen-specific traces
-   --  (with GNATCOLL_Trace_Prefix and standard settings).
+   TGen_Trace_Prefix : constant String := "tgen.";
+   --  Prefix to use for all TGen traces.
+
+   function Create_Trace
+     (Unit_Name : Ada.Strings.Unbounded.Unbounded_String;
+      Output    : Ada.Text_IO.File_Access := Ada.Text_IO.Standard_Error)
+      return TGen_Trace;
+   --  Create a TGen trace object for a given unit name. `Output` parameter
+   --  can be used to control where logs are written. Logs are written to
+   --  standard error (stderr) by default.
+
+   procedure Trace (Self : TGen_Trace; Message : String)
+   with Pre => Self.Output /= null;
+   --  Write a message to the output with the configured package name.
 
 end TGen.Logging;

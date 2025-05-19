@@ -21,22 +21,18 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Characters.Handling;          use Ada.Characters.Handling;
 with Ada.Characters.Wide_Wide_Latin_1; use Ada.Characters.Wide_Wide_Latin_1;
 with Ada.Containers;                   use Ada.Containers;
 with Ada.Directories;
 with Ada.Exceptions;
-with Ada.Strings.Unbounded;            use Ada.Strings.Unbounded;
 with Ada.Text_IO;
+with Ada.Text_IO.Unbounded_IO;
 with Ada.Unchecked_Deallocation;
 with Interfaces;                       use Interfaces;
+with System.Atomic_Counters;           use System.Atomic_Counters;
 
 with GNAT.Encode_UTF8_String;
 with GNAT.Decode_UTF8_String;
-
-with GNATCOLL.Atomic;  use GNATCOLL.Atomic;
-with GNATCOLL.Strings; use GNATCOLL.Strings;
-with GNATCOLL.VFS;
 
 package body TGen.JSON is
 
@@ -699,7 +695,7 @@ package body TGen.JSON is
          when J_STRING =>
             begin
                declare
-                  Str_Value : constant UTF8_XString :=
+                  Str_Value : constant UTF8_Unbounded_String :=
                     Un_Escape_String
                       (Strm, Token_Start.Index, Token_End.Index);
                begin
@@ -860,7 +856,8 @@ package body TGen.JSON is
                         --  cannot fail.
 
                         declare
-                           Key_Str : constant UTF8_XString := Get (Key.Value);
+                           Key_Str : constant UTF8_Unbounded_String :=
+                             Get (Key.Value);
                         begin
                            Set_Field (Result.Value, Key_Str, Value.Value);
                         end;
@@ -1359,22 +1356,17 @@ package body TGen.JSON is
       Ret : JSON_Value;
    begin
       Ret.Data := (JSON_String_Type, Str_Value => <>);
-      Ret.Data.Str_Value.Set (Val);
+      Ret.Data.Str_Value := Ada.Strings.Unbounded.To_Unbounded_String (Val);
       return Ret;
    end Create;
 
    function Create (Val : UTF8_Unbounded_String) return JSON_Value is
       Ret : JSON_Value;
    begin
-      Ret.Data := (Kind => JSON_String_Type, Str_Value => Null_XString);
-      Ret.Data.Str_Value.Set (To_String (Val));
-      return Ret;
-   end Create;
-
-   function Create (Val : UTF8_XString) return JSON_Value is
-      Ret : JSON_Value;
-   begin
-      Ret.Data := (Kind => JSON_String_Type, Str_Value => Val);
+      Ret.Data :=
+        (Kind      => JSON_String_Type,
+         Str_Value => Ada.Strings.Unbounded.Null_Unbounded_String);
+      Ret.Data.Str_Value := Val;
       return Ret;
    end Create;
 
@@ -1385,7 +1377,8 @@ package body TGen.JSON is
          with
            Data =>
              (Kind      => JSON_Array_Type,
-              Arr_Value => new JSON_Array_Internal'(Cnt => 1, Arr => Val)));
+              Arr_Value =>
+                new JSON_Array_Internal'(Arr => Val, others => <>)));
    end Create;
 
    -------------------
@@ -1430,11 +1423,14 @@ package body TGen.JSON is
          end if;
       end loop;
 
-      Vals.Append (Object_Item'(Key => To_XString (Field_Name), Val => Field));
+      Vals.Append
+        (Object_Item'
+           (Key => Ada.Strings.Unbounded.To_Unbounded_String (Field_Name),
+            Val => Field));
    end Set_Field;
 
    procedure Set_Field
-     (Val : JSON_Value; Field_Name : UTF8_XString; Field : JSON_Value)
+     (Val : JSON_Value; Field_Name : UTF8_Unbounded_String; Field : JSON_Value)
    is
       Vals : Object_Items_Pkg.Vector renames Val.Data.Obj_Value.Vals;
    begin
@@ -1550,14 +1546,9 @@ package body TGen.JSON is
       return To_String (Val.Data.Str_Value);
    end Get;
 
-   function Get (Val : JSON_Value) return UTF8_XString is
-   begin
-      return Val.Data.Str_Value;
-   end Get;
-
    function Get (Val : JSON_Value) return UTF8_Unbounded_String is
    begin
-      return To_Unbounded_String (Val.Data.Str_Value.To_String);
+      return Val.Data.Str_Value;
    end Get;
 
    function Get (Val : JSON_Value; Field : UTF8_String) return JSON_Value is
@@ -1851,16 +1842,16 @@ package body TGen.JSON is
    -- Escape_String --
    -------------------
 
-   function Escape_String (Text : UTF8_XString) return Unbounded_String is
-      Str         : GNATCOLL.Strings.Char_Array;
-      Text_Length : Natural;
+   function Escape_String
+     (Text : UTF8_Unbounded_String) return Unbounded_String
+   is
+      Str         : constant String := Ada.Strings.Unbounded.To_String (Text);
+      Text_Length : constant Natural := Str'Length;
       Ret         : Unbounded_String;
       Low         : Natural;
       W_Chr       : Wide_Wide_Character;
 
    begin
-      Text.Get_String (Str, Text_Length);
-
       Append (Ret, '"');
       Low := 1;
 
@@ -1869,9 +1860,7 @@ package body TGen.JSON is
 
          begin
             GNAT.Decode_UTF8_String.Decode_Wide_Wide_Character
-              (String (Str (Low .. Natural'Min (Text_Length, Low + 3))),
-               Low,
-               W_Chr);
+              (Str (Low .. Natural'Min (Text_Length, Low + 3)), Low, W_Chr);
          exception
             when Constraint_Error =>
                --  Skip the character even if it is invalid.
@@ -1926,11 +1915,12 @@ package body TGen.JSON is
    ----------------------
 
    function Un_Escape_String
-     (Text : String; Low : Natural; High : Natural) return UTF8_XString
+     (Text : String; Low : Natural; High : Natural)
+      return UTF8_Unbounded_String
    is
       First : Integer;
       Last  : Integer;
-      Unb   : UTF8_XString;
+      Unb   : UTF8_Unbounded_String;
       Idx   : Natural;
 
    begin
@@ -1997,35 +1987,36 @@ package body TGen.JSON is
                         Idx := Idx + 6;
                      end if;
 
-                     Unb.Append
-                       (GNAT.Encode_UTF8_String.Encode_Wide_Wide_String
+                     Append
+                       (Unb,
+                        GNAT.Encode_UTF8_String.Encode_Wide_Wide_String
                           ([1 => Char]));
                      Idx := Idx + 4;
                   end;
 
                when '"' =>
-                  Unb.Append ('"');
+                  Append (Unb, '"');
 
                when '/' =>
-                  Unb.Append ('/');
+                  Append (Unb, '/');
 
                when '\' =>
-                  Unb.Append ('\');
+                  Append (Unb, '\');
 
                when 'b' =>
-                  Unb.Append (ASCII.BS);
+                  Append (Unb, ASCII.BS);
 
                when 'f' =>
-                  Unb.Append (ASCII.FF);
+                  Append (Unb, ASCII.FF);
 
                when 'n' =>
-                  Unb.Append (ASCII.LF);
+                  Append (Unb, ASCII.LF);
 
                when 'r' =>
-                  Unb.Append (ASCII.CR);
+                  Append (Unb, ASCII.CR);
 
                when 't' =>
-                  Unb.Append (ASCII.HT);
+                  Append (Unb, ASCII.HT);
 
                when others =>
                   raise Invalid_JSON_Stream
@@ -2033,7 +2024,7 @@ package body TGen.JSON is
             end case;
 
          else
-            Unb.Append (Text (Idx));
+            Append (Unb, Text (Idx));
          end if;
 
          Idx := Idx + 1;
@@ -2047,21 +2038,48 @@ package body TGen.JSON is
    -----------
    package body Utils is
 
+      function Read_Whole_File (Filename : String) return String;
+      --  Read the text content of `Filename`
+
+      ---------------------
+      -- Read_Whole_File --
+      ---------------------
+
+      function Read_Whole_File (Filename : String) return String is
+         use Ada.Text_IO;
+
+         FT     : File_Type;
+         Result : Unbounded_String;
+         Line   : Unbounded_String;
+      begin
+         Ada.Text_IO.Open (FT, Mode => In_File, Name => Filename);
+
+         loop
+            Unbounded_IO.Get_Line (FT, Line);
+            Append (Result, Line);
+
+            exit when Ada.Text_IO.End_Of_File (FT);
+         end loop;
+
+         Ada.Text_IO.Close (FT);
+         return To_String (Result);
+      end Read_Whole_File;
+
       ------------
       -- Create --
       ------------
 
       function Create (Filename : String) return JSON_Auto_IO is
-         use GNATCOLL.VFS;
-         VF      : constant Virtual_File := Create (+Filename);
-         Content : constant JSON_Value :=
-           (if Ada.Directories.Exists (Filename)
-            then Read (VF.Read_File.all, Filename)
-            else Create_Object);
+         Content : JSON_Value;
+      begin
+
          --  Use Ada.Directories here as it checks whether Filename can
          --  designate a file or not, and raises an exception if it is not the
          --  case.
-      begin
+         Content :=
+           (if Ada.Directories.Exists (Filename)
+            then Read (Read_Whole_File (Filename), Filename)
+            else Create_Object);
          return Res : JSON_Auto_IO do
             Res.Filename := new String'(Filename);
             Res.JSON_Content := Content;
