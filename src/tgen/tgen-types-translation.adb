@@ -335,6 +335,21 @@ package body TGen.Types.Translation is
       First_Part : constant Basic_Decl := N.P_All_Parts (1);
       Sem_Parent : Ada_Node := First_Part.P_Semantic_Parent;
    begin
+
+      --  If the basic declaration is a generic, we have to check that elements
+      --  that led to its creation are not fully private. We do it in reverse
+      --  order to avoid infinite loops while calling this function recursively
+      --  (the last element of the generic instantiation chain being the
+      --  declaration itself).
+
+      if N.P_Generic_Instantiations'Length > 0 then
+         for Inst_Item of reverse N.P_Generic_Instantiations loop
+            if Decl_Is_Fully_Private (Inst_Item.As_Basic_Decl) then
+               return True;
+            end if;
+         end loop;
+      end if;
+
       --  Consider that N is fully private if there is a private part node
       --  among the chain of semantic parents of the first part of N, until we
       --  reach a library level package declaration.
@@ -3879,27 +3894,6 @@ package body TGen.Types.Translation is
              .As_Generic_Subp_Instantiation
              .P_Designated_Generic_Decl
              .As_Basic_Decl;
-      end if;
-
-      --  Check whether this is a private subprogram with private parameter
-      --  types.
-
-      if Decl_Is_Fully_Private (N) then
-         for Param of Designated_Decl.P_Subp_Spec_Or_Null.P_Params loop
-            if Decl_Is_Fully_Private (Param.F_Type_Expr.P_Designated_Type_Decl)
-            then
-               Result.Res :=
-                 new Unsupported_Typ'
-                   (Reason =>
-                      To_Unbounded_String
-                        ("private subprograms with private parameters are"
-                         & " unsupported"),
-                    Name   =>
-                      Convert_Qualified_Name (N.P_Fully_Qualified_Name_Array),
-                    others => <>);
-               return Result;
-            end if;
-         end loop;
       end if;
 
       F_Typ.all.Last_Comp_Unit_Idx := Comp_Unit_Idx;

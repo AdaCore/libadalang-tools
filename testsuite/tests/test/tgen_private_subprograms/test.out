@@ -1,12 +1,14 @@
-gnattest: Error while processing <SubpDecl ["Foo"] pkg.ads:4:4-4:28>:
-pkg.foo is not supported (private subprograms with private parameters are unsupported)
-
 Units remaining: 2     Units remaining: 1     
 pkg.ads:5:4: info: corresponding test PASSED
 pkg.ads:5:4: info: corresponding test PASSED
 pkg.ads:5:4: info: corresponding test PASSED
 pkg.ads:5:4: info: corresponding test PASSED
 pkg.ads:5:4: info: corresponding test PASSED
+pkg.ads:4:4: info: corresponding test PASSED
+pkg.ads:4:4: info: corresponding test PASSED
+pkg.ads:4:4: info: corresponding test PASSED
+pkg.ads:4:4: info: corresponding test PASSED
+pkg.ads:4:4: info: corresponding test PASSED
 pkg.ads:4:4: error: corresponding test FAILED: Test not implemented. (pkg-test_data-tests.adb:45)
 pkg.ads:5:4: error: corresponding test FAILED: Test not implemented. (pkg-test_data-tests.adb:66)
-7 tests run: 5 passed; 2 failed; 0 crashed.
+12 tests run: 10 passed; 2 failed; 0 crashed.

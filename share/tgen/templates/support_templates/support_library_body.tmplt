@@ -6,6 +6,13 @@ with @_PACKAGE_DEP_@; use @_PACKAGE_DEP_@;
 with Ada.Unchecked_Conversion;
 @@END_IF@@
 
+@@IF@@ @_DEPENDS_ON_PRIVATE_@
+with @_BASE_PACK_NAME_@_Private; use @_BASE_PACK_NAME_@_Private;
+@@END_IF@@
+@@IF@@ @_DEPENDS_ON_PUBLIC_@
+with @_BASE_PACK_NAME_@; use @_BASE_PACK_NAME_@;
+@@END_IF@@
+
 package body @_SUPPORT_PACK_NAME_@ is
    use Ada.Streams;
    use Interfaces;

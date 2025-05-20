@@ -62,7 +62,6 @@ package TGen.Marshalling.JSON_Marshallers is
 
    procedure Generate_TC_Serializers_For_Subp
      (Spec_Part          : US_Access;
-      Private_Part       : US_Access;
       Body_Part          : US_Access;
       FN_Typ             : Function_Typ'Class;
       Templates_Root_Dir : String);

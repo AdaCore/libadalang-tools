@@ -20,10 +20,13 @@ with @_IMPORT_UNIT_NAME_@;
 with @_SUPPORT_UNIT_NAME_@;
 @@END_TABLE@@
 
+@@IF@@ @_IS_PRIVATE_SUPPORT_PACKAGE_@
+private
+@@END_IF@@
 package @_SUPPORT_PACK_NAME_@ is
-   @@--  Create a dummy null procedure in each support package, in case we end
-   @@--  up not generating anything, to ensure that the body is still legal
-   @@--  and the support library still builds.
+   --  Create a dummy null procedure in each support package, in case we end
+   --  up not generating anything, to ensure that the body is still legal
+   --  and the support library still builds.
 
    procedure Dummy;
 

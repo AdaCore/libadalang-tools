@@ -1,0 +1,7 @@
+description: |
+  Check that private types declared within package and child packages are
+  properly handled by TGen and gnattest.
+
+driver: gnattest_tgen
+
+default-gpr: true

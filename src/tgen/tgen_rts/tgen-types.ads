@@ -49,10 +49,10 @@ package TGen.Types is
       --  which this type is declared.
 
       Fully_Private : Boolean := False;
-      --  Wether this type has no public declaration whatsoever, i.e. it cannot
-      --  be referenced outside of the private part of its declaration package,
-      --  or outside of the private part of child packages of its declaration
-      --  package.
+      --  Whether this type has no public declaration whatsoever, i.e. it
+      --  cannot be referenced outside of the private part of its declaration
+      --  package, or outside of the private part of child packages of its
+      --  declaration package.
 
       Private_Extension : Boolean := False;
       --  Whether this type has a private extension. Note that if Fully_Private

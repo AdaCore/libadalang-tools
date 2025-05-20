@@ -874,8 +874,12 @@ package body Test.Instrument is
 
       for Param of Decl.F_Subp_Spec.P_Params loop
          declare
-            Param_Typ : constant TGen.Types.Typ_Access :=
+            Param_Typ        : constant TGen.Types.Typ_Access :=
               TGen.Types.Translation.Translate (Param.F_Type_Expr).Res;
+            Support_Pkg_Name : constant String :=
+              (if Param_Typ.Fully_Private
+               then ".TGen_Support_Private."
+               else ".TGen_Support.");
          begin
 
             if Param_Typ.all.Package_Name = To_Qualified_Name ("standard") then
@@ -895,7 +899,7 @@ package body Test.Instrument is
                   S_Put
                     (Pad + 6,
                      To_Ada (Param_Typ.all.Package_Name)
-                     & ".TGen_Support."
+                     & Support_Pkg_Name
                      & TGen.Marshalling.Output_Fname_For_Typ
                          (Param_Typ.all.Name)
                      & " (GNATTEST_S, "

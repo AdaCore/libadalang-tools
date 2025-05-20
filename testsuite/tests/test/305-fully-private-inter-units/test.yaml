@@ -1,0 +1,6 @@
+description: |
+  Check if a fully private subprogram using type declared in a different unit
+  is handled properly by TGen and gnattest.
+
+driver: gnattest_tgen
+default-gpr: true
