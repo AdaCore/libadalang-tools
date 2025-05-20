@@ -44,6 +44,7 @@ with TGen.LAL_Utils;
 with TGen.Marshalling;        use TGen.Marshalling;
 with TGen.Marshalling.Binary_Marshallers;
 with TGen.Marshalling.JSON_Marshallers;
+with TGen.Templates;
 with TGen.Type_Representation;
 with TGen.Types.Array_Types;  use TGen.Types.Array_Types;
 with TGen.Types.Constraints;  use TGen.Types.Constraints;
@@ -192,16 +193,16 @@ package body TGen.Libgen is
       Is_Top_Level_Generic_Inst : Boolean := False)
    is
       use Ada_Identifier_Vectors;
+      use Templates_Parser;
 
       Support_Lib_Name : constant Ada_Qualified_Name :=
         (if Is_Top_Level_Generic_Inst
          then
            Support_Library_Package
              (Ctx.Generic_Package_Instantiations (Pkg_Name))
-         else Support_Library_Package (Pkg_Name));
-      F_Spec           : File_Type;
-      F_Body           : File_Type;
-      Ada_Support_Name : constant String := To_Ada (Support_Lib_Name);
+         else Pkg_Name);
+      Ada_Pack_Name    : constant String := To_Ada (Pkg_Name);
+      Origin_Unit      : Ada_Qualified_Name := Pkg_Name.Copy;
       Typ_Dependencies : Typ_Set;
       File_Name        : constant String :=
         Ada.Directories.Compose
@@ -211,27 +212,34 @@ package body TGen.Libgen is
       Types : constant Types_Per_Package_Maps.Constant_Reference_Type :=
         Ctx.Types_Per_Package.Constant_Reference (Pkg_Name);
 
-      TRD : constant String := To_String (Ctx.Root_Templates_Dir);
+      TRD         : constant String := To_String (Ctx.Root_Templates_Dir);
+      Support_TRD : constant String :=
+        To_String
+          (Ctx.Root_Templates_Dir
+           & GNAT.OS_Lib.Directory_Separator
+           & "support_templates"
+           & GNAT.OS_Lib.Directory_Separator);
 
       Sorted_Types : Typ_List;
 
+      Assocs : Translate_Set;
+
+      Imported_Units            : Vector_Tag;
+      Required_Support_Packages : Vector_Tag;
+      Package_Dependency_Tags   : Vector_Tag;
+
+      Spec_Marshalling_Fun_Public_Part  : Vector_Tag;
+      Spec_Marshalling_Fun_Private_Part : Vector_Tag;
+      Body_Marshalling_Fun              : Vector_Tag;
    begin
-      Create (F_Spec, Out_File, File_Name & ".ads");
-      Put_Line (F_Spec, "with TGen.Marshalling_Lib;");
-      Put_Line (F_Spec, "with Interfaces;");
-      Put_Line (F_Spec, "with Ada.Streams;");
-      Put_Line (F_Spec, "with TGen.Big_Int;");
-      Put_Line (F_Spec, "with TGen.Strings;");
+      Assocs.Insert (Assoc ("SUPPORT_PACK_NAME", Ada_Pack_Name));
+      Assocs.Insert (Assoc ("HAS_JSON_MARSHALLING", JSON_Marshalling_Enabled));
+      Assocs.Insert
+        (Assoc
+           ("HAS_DERIVED_PRIVATE",
+            (for some Ty of Types => Ty.Kind = Derived_Private_Subtype_Kind)));
 
-      if JSON_Marshalling_Enabled then
-         Put_Line (F_Spec, "with TGen.Types;");
-         Put_Line (F_Spec, "with TGen.Types.Discrete_Types;");
-         Put_Line (F_Spec, "with TGen.Types.Int_Types;");
-         Put_Line (F_Spec, "with TGen.JSON;");
-         Put_Line (F_Spec, "with TGen.Marshalling_Lib.JSON;");
-      end if;
-
-      New_Line (F_Spec);
+      Origin_Unit.Delete_Last;
 
       --  Add the import of the original unit, to be able to declare
       --  subprograms with the same profile as in the original unit.
@@ -239,7 +247,7 @@ package body TGen.Libgen is
       if Ctx.Imports_Per_Unit.Contains (Pkg_Name) then
          for Dep of Ctx.Imports_Per_Unit.Constant_Reference (Pkg_Name) loop
             if To_Ada (Dep) /= To_Ada (Pkg_Name) then
-               Put_Line (F_Spec, "with " & To_Ada (Dep) & ";");
+               Imported_Units.Append (To_Ada (Dep));
             end if;
          end loop;
       end if;
@@ -250,25 +258,12 @@ package body TGen.Libgen is
       if Ctx.Support_Packs_Per_Unit.Contains (Pkg_Name) then
          for Dep of Ctx.Support_Packs_Per_Unit.Constant_Reference (Pkg_Name)
          loop
-            if To_Ada (Dep) /= To_Ada (Support_Lib_Name) then
-               Put_Line
-                 (F_Spec,
-                  "with " & To_Ada (Dep) & "; use " & To_Ada (Dep) & ";");
+            if To_Ada (Dep) /= To_Ada (Pkg_Name) then
+               Required_Support_Packages.Append (To_Ada (Dep));
             end if;
          end loop;
+
       end if;
-
-      Put_Line (F_Spec, "package " & Ada_Support_Name & " is");
-      New_Line (F_Spec);
-
-      --  Create a dummy null procedure in each support package, in case we end
-      --  up not generating anything, to ensure that the body is still legal
-      --  and the support library still builds.
-
-      Put_Line (F_Spec, "   procedure Dummy;");
-      New_Line (F_Spec);
-
-      Create (F_Body, Out_File, File_Name & ".adb");
 
       --  Also include the needed library support package dependencies, as
       --  the types marshalling / unmarshalling functions may depend on
@@ -300,43 +295,13 @@ package body TGen.Libgen is
          end loop;
 
          for Dep of Package_Dependencies loop
-            if To_Ada (Dep) /= Ada_Support_Name then
-               Put_Line
-                 (F_Body,
-                  "with " & To_Ada (Dep) & "; use " & To_Ada (Dep) & ";");
+            if To_Ada (Dep) /= To_Ada (Pkg_Name) then
+               Package_Dependency_Tags.Append (To_Ada (Dep));
             end if;
          end loop;
       end;
 
-      --  Types that are derived from a private type, use unchecked
-      --  conversions.
-
-      if (for some Ty of Types => Ty.Kind = Derived_Private_Subtype_Kind) then
-         Put_Line (F_Body, "with Ada.Unchecked_Conversion;");
-      end if;
-
-      Put_Line (F_Body, "package body " & Ada_Support_Name & " is");
-      New_Line (F_Body);
-
-      --  Put the `use` clauses under the package body to prevent compiler
-      --  errors when the base package is predefined (use clauses are forbidden
-      --  in predefined specs).
-
-      Put_Line (F_Body, "use Ada.Streams;");
-      Put_Line (F_Body, "use Interfaces;");
-      Put_Line (F_Body, "use TGen.Marshalling_Lib;");
-      New_Line (F_Body);
-
-      --  Complete the dummy null procedure
-
-      Put_Line (F_Body, "procedure Dummy is null;");
-      New_Line (F_Body);
-
-      --  Disable predicate checks in the marshalling and unmarshalling
-      --  functions.
-
-      Put_Line (F_Body, "   pragma Assertion_Policy (Predicate => Ignore);");
-      New_Line (F_Body);
+      Assocs.Insert (Assoc ("PACKAGE_DEP", Package_Dependency_Tags));
 
       --  Generate the marshalling support lib. Make sure to sort the types
       --  in dependency order otherwise we will get access before elaboration
@@ -356,18 +321,18 @@ package body TGen.Libgen is
       --  the visibility of the type, and have the implementation details
       --  generated in the correct order.
 
-      declare
-         Spec_Part, Private_Part, Body_Part : aliased Unbounded_String;
+      for T of Sorted_Types loop
+         declare
+            Spec_Part, Private_Part, Body_Part : aliased Unbounded_String;
 
-         Spec_Part_Acc : US_Access;
-         --  This indicates where we should write the specification
-         --  declarations for the current type (private or public spec). It
-         --  points to Private_Part, if the type is fully private (i.e. the
-         --  parent package of its first part is a private package), or to
-         --  Spec_Part otherwise.
+            Spec_Part_Acc : US_Access;
+            --  This indicates where we should write the specification
+            --  declarations for the current type (private or public spec). It
+            --  points to Private_Part, if the type is fully private (i.e. the
+            --  parent package of its first part is a private package), or to
+            --  Spec_Part otherwise.
 
-      begin
-         for T of Sorted_Types loop
+         begin
 
             if Is_Supported_Type (T.all)
 
@@ -420,17 +385,53 @@ package body TGen.Libgen is
                   end if;
                end if;
             end if;
-         end loop;
-         Put_Line (F_Body, +Body_Part);
-         Put_Line (F_Spec, +Spec_Part);
-         Put_Line (F_Spec, "private");
-         Put_Line (F_Spec, +Private_Part);
+
+            Spec_Marshalling_Fun_Public_Part.Append (Spec_Part);
+            Spec_Marshalling_Fun_Private_Part.Append (Private_Part);
+            Body_Marshalling_Fun.Append (Body_Part);
+         end;
+      end loop;
+
+      Assocs.Insert
+        (Assoc
+           ("SPEC_MARSHALLING_FUN_PUBLIC_PART",
+            Spec_Marshalling_Fun_Public_Part));
+      Assocs.Insert
+        (Assoc
+           ("SPEC_MARSHALLING_FUN_PRIVATE_PART",
+            Spec_Marshalling_Fun_Private_Part));
+      Assocs.Insert (Assoc ("BODY_MARSHALLING_FUN", Body_Marshalling_Fun));
+
+      --  Run the templates engine and write the produced content in the
+      --  associated file.
+
+      declare
+         package Support_Templates is new
+           TGen.Templates (Template_Folder => Support_TRD);
+
+         Spec_Template : constant String :=
+           Parse
+             (Support_Templates.Support_Library.Support_Spec_Template, Assocs);
+         Body_Template : constant String :=
+           Parse
+             (Support_Templates.Support_Library.Support_Body_Template, Assocs);
+
+         Spec_Filename : constant String := File_Name & ".ads";
+         Body_Filename : constant String := File_Name & ".adb";
+
+         Spec_File : File_Type;
+         Body_File : File_Type;
+      begin
+         Create (Spec_File, Out_File, Spec_Filename);
+         Create (Body_File, Out_File, Body_Filename);
+
+         Put (Spec_File, Spec_Template);
+         Put (Body_File, Body_Template);
+
+         Close (Spec_File);
+         Close (Body_File);
       end;
 
-      Put_Line (F_Body, "end " & Ada_Support_Name & ";");
-      Close (F_Body);
-      Put_Line (F_Spec, "end " & Ada_Support_Name & ";");
-      Close (F_Spec);
    end Generate_Support_Library;
 
    --------------------------------

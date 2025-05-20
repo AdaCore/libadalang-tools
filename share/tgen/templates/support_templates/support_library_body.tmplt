@@ -1,0 +1,24 @@
+@@TABLE@@
+with @_PACKAGE_DEP_@; use @_PACKAGE_DEP_@;
+@@END_TABLE@@
+
+@@IF@@ @_HAS_DERIVED_PRIVATE_@
+with Ada.Unchecked_Conversion;
+@@END_IF@@
+
+package body @_SUPPORT_PACK_NAME_@ is
+   use Ada.Streams;
+   use Interfaces;
+   use TGen.Marshalling_Lib;
+
+   procedure Dummy is null;
+
+   pragma Assertion_Policy (Predicate => Ignore);
+
+   @@TABLE@@
+
+   @_BODY_MARSHALLING_FUN_@
+
+   @@END_TABLE@@
+
+end @_SUPPORT_PACK_NAME_@;

@@ -1,0 +1,44 @@
+with TGen.Marshalling_Lib;
+with Interfaces;
+with Ada.Streams;
+with TGen.Big_Int;
+with TGen.Strings;
+
+@@IF@@ @_HAS_JSON_MARSHALLING_@
+with TGen.Types;
+with TGen.Types.Discrete_Types;
+with TGen.Types.Int_Types;
+with TGen.JSON;
+with TGen.Marshalling_Lib.JSON;
+@@END_IF@@
+
+@@TABLE@@
+with @_IMPORT_UNIT_NAME_@;
+@@END_TABLE@@
+
+@@TABLE@@
+with @_SUPPORT_UNIT_NAME_@;
+@@END_TABLE@@
+
+package @_SUPPORT_PACK_NAME_@ is
+   @@--  Create a dummy null procedure in each support package, in case we end
+   @@--  up not generating anything, to ensure that the body is still legal
+   @@--  and the support library still builds.
+
+   procedure Dummy;
+
+   @@TABLE@@
+
+   @_SPEC_MARSHALLING_FUN_PUBLIC_PART_@
+
+   @@END_TABLE@@
+
+private
+
+   @@TABLE@@
+
+   @_SPEC_MARSHALLING_FUN_PRIVATE_PART_@
+
+   @@END_TABLE@@
+
+end @_SUPPORT_PACK_NAME_@;

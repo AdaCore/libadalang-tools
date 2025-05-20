@@ -164,4 +164,11 @@ package TGen.Templates is
         Template_Folder & "derived_private_subtype_init.tmplt";
    end Type_Representation;
 
+   package Support_Library is
+      Support_Body_Template : constant String :=
+        Template_Folder & "support_library_body.tmplt";
+      Support_Spec_Template : constant String :=
+        Template_Folder & "support_library_spec.tmplt";
+   end Support_Library;
+
 end TGen.Templates;
