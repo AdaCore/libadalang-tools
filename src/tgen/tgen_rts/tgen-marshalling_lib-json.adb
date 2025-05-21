@@ -81,12 +81,13 @@ package body TGen.Marshalling_Lib.JSON is
       ----------
 
       procedure Read (JSON : TGen.JSON.JSON_Value; V : out T) is
+         Value : constant JSON_Value := Get (JSON, "value");
       begin
-         --  Decode the big real from the string encoded as a quotient string
+         --  Decode the big real from the string encoded as a quotient string.
 
          V :=
            T_Conversions.From_Big_Real
-             (Big_Reals.From_Quotient_String (Get (JSON, "value")));
+             (Big_Reals.From_Quotient_String (Get (Value)));
       end Read;
 
    end Read_Write_Decimal_Fixed_JSON;

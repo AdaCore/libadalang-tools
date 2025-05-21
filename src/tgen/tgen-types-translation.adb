@@ -3466,16 +3466,26 @@ package body TGen.Types.Translation is
                    & " library item are unsupported"),
               others => <>);
 
-      elsif N.Kind = Ada_Concrete_Type_Decl
-        and then N.As_Concrete_Type_Decl.F_Type_Def.Kind = Ada_Derived_Type_Def
-        and then not N
-                       .As_Concrete_Type_Decl
-                       .F_Type_Def
-                       .As_Derived_Type_Def
-                       .F_Subtype_Indication
-                       .P_Designated_Type_Decl
-                       .P_Private_Completion
-                       .Is_Null
+      elsif Text.Image (N.P_Root_Type.P_Fully_Qualified_Name)
+        = "System.Address"
+      then
+
+         --  Special case for System.Address, which is actually defined as a
+         --  modular integer but for which we do not want to generate any
+         --  values.
+
+         Specialized_Res := (Success => True, others => <>);
+         Specialized_Res.Res :=
+           new Unsupported_Typ'
+             (Reason => To_Unbounded_String ("System.Address unsupported"),
+              others => <>);
+
+      elsif (N.Kind = Ada_Concrete_Type_Decl
+             and then N.As_Concrete_Type_Decl.F_Type_Def.Kind
+                      = Ada_Derived_Type_Def
+             and then TGen.LAL_Utils.Derive_Opaque_Type (N))
+        or (N.Kind in Ada_Subtype_Decl_Range
+            and then TGen.LAL_Utils.Derive_Opaque_Type (N.As_Base_Type_Decl))
       then
 
          Specialized_Res := (Success => True, others => <>);
@@ -3484,16 +3494,21 @@ package body TGen.Types.Translation is
             Declaration_Type_Name : constant Ada_Qualified_Name :=
               TGen.Strings.To_Qualified_Name
                 (Langkit_Support.Text.Encode
-                   (N.As_Concrete_Type_Decl.P_Fully_Qualified_Name, "utf-8"));
+                   (N.As_Base_Type_Decl.P_Fully_Qualified_Name, "utf-8"));
             --  Translate the parent type
             Parent_Type           : constant Translation_Result :=
-              Translate
-                (N
-                   .As_Concrete_Type_Decl
-                   .F_Type_Def
-                   .As_Derived_Type_Def
-                   .F_Subtype_Indication
-                   .P_Designated_Type_Decl);
+              (if N.Kind = Ada_Concrete_Type_Decl
+               then
+                 Translate
+                   (N
+                      .As_Concrete_Type_Decl
+                      .F_Type_Def
+                      .As_Derived_Type_Def
+                      .F_Subtype_Indication
+                      .P_Designated_Type_Decl)
+               else
+                 Translate
+                   (N.As_Subtype_Decl.F_Subtype.P_Designated_Type_Decl));
          begin
             if Parent_Type.Success then
                if TGen.Marshalling.Needs_Header (Parent_Type.Res.all) then
@@ -3516,19 +3531,6 @@ package body TGen.Types.Translation is
             end if;
          end;
 
-      elsif Text.Image (N.P_Root_Type.P_Fully_Qualified_Name)
-        = "System.Address"
-      then
-
-         --  Special case for System.Address, which is actually defined as a
-         --  modular integer but for which we do not want to generate any
-         --  values.
-
-         Specialized_Res := (Success => True, others => <>);
-         Specialized_Res.Res :=
-           new Unsupported_Typ'
-             (Reason => To_Unbounded_String ("System.Address unsupported"),
-              others => <>);
       elsif First_Part.As_Base_Type_Decl.P_Is_Private
         and then Positive (FQN.Length) - Comp_Unit_Idx > 1
       then
