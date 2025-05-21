@@ -4,3 +4,6 @@ description: |
 default-gpr: true
 
 driver: gnattest_tgen
+
+control:
+    - [XFAIL, 'x86', 'Marshalling not working for 32bits (UB03-008)']
