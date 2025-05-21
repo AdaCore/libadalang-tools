@@ -1455,7 +1455,11 @@ package body Test.Common is
       Line_Number       : out Natural;
       Extract_File_Name : Boolean := False) return String
    is
-      Split_Index : constant Natural := Ada.Strings.Fixed.Index (Arg_Val, ":");
+      --  Search the index of ':' from the back, to avoid issues with Windows
+      --  paths beginning with a drive letter (e.g. C:\...)
+
+      Split_Index : constant Natural :=
+        Ada.Strings.Fixed.Index (Arg_Val, ":", Going => Ada.Strings.Backward);
    begin
       if Split_Index = 0 then
          Cmd_Error_No_Help
