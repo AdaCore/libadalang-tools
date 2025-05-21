@@ -378,7 +378,8 @@ package body TGen.Libgen is
               and then T.all not in Instance_Typ'Class
             then
                Spec_Part_Acc :=
-                 (if T.all.Fully_Private then Private_Part'Unrestricted_Access
+                 (if T.all.Fully_Private
+                  then Private_Part'Unrestricted_Access
                   else Spec_Part'Unrestricted_Access);
                if T.all.Kind in Function_Kind then
                   if JSON_Marshalling_Enabled then
@@ -697,8 +698,8 @@ package body TGen.Libgen is
          if not (T.all.Kind in Anonymous_Kind) then
             declare
                use Types_Per_Package_Maps;
-               Pkg_Name       : Ada_Qualified_Name
-                 renames T.all.Compilation_Unit_Name;
+               Pkg_Name       : Ada_Qualified_Name renames
+                 T.all.Compilation_Unit_Name;
                Cur            : Cursor := Dest.Find (Pkg_Name);
                Dummy_Inserted : Boolean;
             begin
@@ -1076,7 +1077,8 @@ package body TGen.Libgen is
          Rel_Path : constant Filesystem_String :=
            Relative_Path
              ((if User_Prj.Is_Absolute_Path then User_Prj else Cwd / User_Prj),
-              (if Support_Prj.Is_Absolute_Path then Support_Prj
+              (if Support_Prj.Is_Absolute_Path
+               then Support_Prj
                else Cwd / Support_Prj));
       begin
          Create
@@ -1164,8 +1166,8 @@ package body TGen.Libgen is
             begin
                --  If no type is supported, do not generate a support library
 
-               if not (for all T of Element (Cur)
-                       => not Is_Supported_Type (T.all))
+               if not (for all T of Element (Cur) =>
+                         not Is_Supported_Type (T.all))
                then
                   if Is_Generic_Inst then
                      Create_Generic_Wrapper_Package_If_Not_Exists
@@ -1282,7 +1284,8 @@ package body TGen.Libgen is
         / (+"generation_routine.tmplt");
 
       Pkg_Name_With_Generic : constant Ada_Qualified_Name :=
-        (if Is_Generic_Instantiation then Generic_Package_Name (Pkg_Name)
+        (if Is_Generic_Instantiation
+         then Generic_Package_Name (Pkg_Name)
          else Pkg_Name);
       --  Name of the original package, accounting for the particular case
       --  when it is a top level generic instantiation: in this case, it will
@@ -1619,13 +1622,16 @@ package body TGen.Libgen is
       Rel_User_Path    : constant Filesystem_String :=
         Relative_Path
           ((if User_Prj.Is_Absolute_Path then User_Prj else Cwd / User_Prj),
-           (if VHarness_Dir.Is_Absolute_Path then VHarness_Dir
+           (if VHarness_Dir.Is_Absolute_Path
+            then VHarness_Dir
             else Cwd / VHarness_Dir));
       Rel_Support_Path : constant Filesystem_String :=
         Relative_Path
-          ((if Support_Prj.Is_Absolute_Path then Support_Prj
+          ((if Support_Prj.Is_Absolute_Path
+            then Support_Prj
             else Cwd / Support_Prj),
-           (if VHarness_Dir.Is_Absolute_Path then VHarness_Dir
+           (if VHarness_Dir.Is_Absolute_Path
+            then VHarness_Dir
             else Cwd / VHarness_Dir));
       Prj_File         : File_Type;
       Main_File        : File_Type;
@@ -1689,7 +1695,8 @@ package body TGen.Libgen is
             Is_Generic          : constant Boolean :=
               Ctx.Generic_Package_Instantiations.Contains (Pkg_Name);
             Generation_Pkg_Name : constant Ada_Qualified_Name :=
-              (if Is_Generic then Generation_Harness_Package_Generic (Pkg_Name)
+              (if Is_Generic
+               then Generation_Harness_Package_Generic (Pkg_Name)
                else Generation_Harness_Package (Pkg_Name));
          begin
             Put_Line

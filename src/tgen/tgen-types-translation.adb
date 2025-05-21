@@ -3888,14 +3888,15 @@ package body TGen.Types.Translation is
          for Param of Designated_Decl.P_Subp_Spec_Or_Null.P_Params loop
             if Decl_Is_Fully_Private (Param.F_Type_Expr.P_Designated_Type_Decl)
             then
-               Result.Res := new Unsupported_Typ'
-                 (Reason =>
-                    To_Unbounded_String
-                      ("private subprograms with private parameters are"
-                       & " unsupported"),
-                  Name   =>
-                    Convert_Qualified_Name (N.P_Fully_Qualified_Name_Array),
-                  others => <>);
+               Result.Res :=
+                 new Unsupported_Typ'
+                   (Reason =>
+                      To_Unbounded_String
+                        ("private subprograms with private parameters are"
+                         & " unsupported"),
+                    Name   =>
+                      Convert_Qualified_Name (N.P_Fully_Qualified_Name_Array),
+                    others => <>);
                return Result;
             end if;
          end loop;

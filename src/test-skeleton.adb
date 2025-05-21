@@ -1605,8 +1605,8 @@ package body Test.Skeleton is
 
          if Owner_Decl
            /= No_Base_Type_Decl
-             --  If owner is incomplete private declaration (without "tagged"
-             --  keyword) subp should be treated as non-dispatching.
+              --  If owner is incomplete private declaration (without "tagged"
+              --  keyword) subp should be treated as non-dispatching.
          then
             if Owner_Decl.As_Base_Type_Decl.P_Is_Private then
                Owner_Decl := Owner_Decl.As_Base_Type_Decl.P_Private_Completion;
@@ -3635,14 +3635,16 @@ package body Test.Skeleton is
            new String'
              (Base_Name (Data.Unit_File_Name.all)
               & ":"
-              & (if TC.Req.Is_Null then "0"
+              & (if TC.Req.Is_Null
+                 then "0"
                  else Trim (First_Line_Number (TC.Req)'Img, Both))
               & ":");
          TC.Ens_Line :=
            new String'
              (Base_Name (Data.Unit_File_Name.all)
               & ":"
-              & (if TC.Ens.Is_Null then "0"
+              & (if TC.Ens.Is_Null
+                 then "0"
                  else Trim (First_Line_Number (TC.Ens)'Img, Both))
               & ":");
 
@@ -3667,7 +3669,8 @@ package body Test.Skeleton is
                  & ":"
                  & Trim (First_Column_Number (TC.Elem)'Img, Both)
                  & ":"
-                 & (if Include_Subp_Name then "(" & TC.Name.all & ")"
+                 & (if Include_Subp_Name
+                    then "(" & TC.Name.all & ")"
                     else ""));
          else
             TR_Info_Add.TR_Info.Tested_Sloc :=
@@ -3713,7 +3716,8 @@ package body Test.Skeleton is
               & Test_Data_Unit_Name
               & "."
               & Test_Unit_Name
-              & (if Data.Is_Top_Level_Generic_Instantiation then ""
+              & (if Data.Is_Top_Level_Generic_Instantiation
+                 then ""
                  else ("." & Nesting_Difference (Data.Unit_Full_Name.all, S)));
          begin
             if Data.Unit_Full_Name.all /= S then
@@ -7375,14 +7379,14 @@ package body Test.Skeleton is
             end if;
 
             if not Test.Common.Unparse_Test_Vectors then
-               for Pack
-                 of TGen.Libgen.Required_Support_Packages
-                      (Ctx       => Test.Common.TGen_Libgen_Ctx,
-                       Unit_Name =>
-                         To_Qualified_Name
-                           (Skip_Prefix
-                              (Data.Unit_Full_Name.all,
-                               Generic_Instantiation_Name)))
+               for Pack of
+                 TGen.Libgen.Required_Support_Packages
+                   (Ctx       => Test.Common.TGen_Libgen_Ctx,
+                    Unit_Name =>
+                      To_Qualified_Name
+                        (Skip_Prefix
+                           (Data.Unit_Full_Name.all,
+                            Generic_Instantiation_Name)))
                loop
                   Put_Line
                     (Body_Kind,
@@ -8669,7 +8673,8 @@ package body Test.Skeleton is
    is
       Short_Name : constant String := Subp.Subp_Text_Name.all;
       TC_Hash    : constant String :=
-        (if Subp.Has_TC_Info then Sanitize_TC_Name (Subp.TC_Info.Name.all)
+        (if Subp.Has_TC_Info
+         then Sanitize_TC_Name (Subp.TC_Info.Name.all)
          else "");
       Cur        : Markered_Data_Maps.Cursor := MD_Map.First;
       MD         : Markered_Data;
@@ -8683,8 +8688,8 @@ package body Test.Skeleton is
          if MD.Short_Name_Used
            and then MD.Short_Name.all
                     = Short_Name
-                     --  It is hard to understand what happens when test case
-                     --  name is changed, so we do not handle this scenario.
+                      --  It is hard to understand what happens when test case
+                      --  name is changed, so we do not handle this scenario.
            and then Markered_Data_Maps.Key (Cur).TC_Hash.all = TC_Hash
          then
             exit;
