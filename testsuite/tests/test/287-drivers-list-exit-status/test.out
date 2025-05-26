@@ -1,52 +1,25 @@
+
 # All tests passing #
--- Enabling --exit-status
-pkg.ads:2:5: info: corresponding test PASSED
-pkg.ads:3:5: info: corresponding test PASSED
-pkh.ads:2:5: info: corresponding test PASSED
-pkh.ads:3:5: info: corresponding test PASSED
-4 tests run: 4 passed; 0 failed; 0 crashed.
-Exit status: 0 (should be 0)
--- Enabling --exit-status and hiding the passing tests
-4 tests run: 4 passed; 0 failed; 0 crashed.
-Exit status: 0 (should be 0)
--- Disabling --exit-status
-pkg.ads:2:5: info: corresponding test PASSED
-pkg.ads:3:5: info: corresponding test PASSED
-pkh.ads:2:5: info: corresponding test PASSED
-pkh.ads:3:5: info: corresponding test PASSED
-4 tests run: 4 passed; 0 failed; 0 crashed.
-Exit status: 0 (should be 0)
+
+# Enabling --exit-status
+OK
+# Enabling --exit-status, hiding passed tests
+OK
+# Disabling --exit-status
+OK
+
 # All tests failing #
--- Enabling --exit-status
-pkg.ads:2:5: error: corresponding test FAILED: Always fails (pkg-test_data-tests.adb:44)
-pkg.ads:3:5: error: corresponding test FAILED: Always fails (pkg-test_data-tests.adb:63)
-pkh.ads:2:5: error: corresponding test FAILED: Always fails (pkh-test_data-tests.adb:44)
-pkh.ads:3:5: error: corresponding test FAILED: Always fails (pkh-test_data-tests.adb:63)
-4 tests run: 0 passed; 4 failed; 0 crashed.
-Exit status: 1 (should be 1)
--- Disabling --exit-status
-pkg.ads:2:5: error: corresponding test FAILED: Always fails (pkg-test_data-tests.adb:44)
-pkg.ads:3:5: error: corresponding test FAILED: Always fails (pkg-test_data-tests.adb:63)
-pkh.ads:2:5: error: corresponding test FAILED: Always fails (pkh-test_data-tests.adb:44)
-pkh.ads:3:5: error: corresponding test FAILED: Always fails (pkh-test_data-tests.adb:63)
-4 tests run: 0 passed; 4 failed; 0 crashed.
-Exit status: 0 (should be 0)
+
+# Enabling --exit-status
+OK
+# Disabling --exit-status
+OK
+
 # One test failing, three passing #
--- Enabling --exit-status
-pkg.ads:3:5: info: corresponding test PASSED
-pkh.ads:2:5: info: corresponding test PASSED
-pkh.ads:3:5: info: corresponding test PASSED
-pkg.ads:2:5: error: corresponding test FAILED: Always fails (pkg-test_data-tests.adb:44)
-4 tests run: 3 passed; 1 failed; 0 crashed.
-Exit status: 1 (should be 1)
--- Enabling --exit-status and hiding the passing tests
-pkg.ads:2:5: error: corresponding test FAILED: Always fails (pkg-test_data-tests.adb:44)
-4 tests run: 3 passed; 1 failed; 0 crashed.
-Exit status: 1 (should be 1)
--- Disabling --exit-status
-pkg.ads:3:5: info: corresponding test PASSED
-pkh.ads:2:5: info: corresponding test PASSED
-pkh.ads:3:5: info: corresponding test PASSED
-pkg.ads:2:5: error: corresponding test FAILED: Always fails (pkg-test_data-tests.adb:44)
-4 tests run: 3 passed; 1 failed; 0 crashed.
-Exit status: 0 (should be 0)
+
+# Enabling --exit-status
+OK
+# Enabling --exit-status, hiding passed tests
+OK
+# Disabling --exit-status
+OK
