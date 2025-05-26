@@ -197,7 +197,8 @@ package body Test.Skeleton is
       --  CU itself.
 
       Unit_Full_Name : String_Access;
-      --  Fully expanded Ada name of the CU
+      --  Fully expanded Ada name of the CU, with a Generic_Instantiation
+      --  prefix when it is a top level generic.
 
       Unit_File_Name : String_Access;
       --  Full name of the file, containing the CU
@@ -3738,12 +3739,36 @@ package body Test.Skeleton is
          Package_Info_List.Next (Cur);
       end loop;
 
-      --  Create generic instantiation package if it does not already exists
+      --  If we are generating test data for a top level generic instantiation,
+      --  create the hosting parent package.
+
       if Data.Is_Top_Level_Generic_Instantiation then
-         TGen.Libgen.Create_Generic_Wrapper_Package_If_Not_Exists
-           (Unit_To_File_Name (Data.Unit_Full_Name.all),
-            Skip_Prefix (Data.Unit_Full_Name.all, Generic_Instantiation_Name),
-            Output_Dir);
+         declare
+            File_Name : constant String :=
+              Output_Dir
+              & GNAT.OS_Lib.Directory_Separator
+              & (+(GNATCOLL.VFS.Create
+                     (+Unit_To_File_Name (Data.Unit_Full_Name.all))
+                     .Base_Name))
+              & ".ads";
+            F_Type    : File_Type;
+
+         begin
+            if Create (+File_Name).Is_Readable then
+               return;
+            end if;
+
+            Create (F_Type, Out_File, File_Name);
+            Put_Line
+              (F_Type,
+               "with "
+               & Skip_Prefix
+                   (Data.Unit_Full_Name.all, Generic_Instantiation_Name)
+               & ";");
+            Put_Line (F_Type, "package " & Data.Unit_Full_Name.all & " is");
+            Put_Line (F_Type, "end " & Data.Unit_Full_Name.all & ";");
+            Close (F_Type);
+         end;
       end if;
 
       if not Data.Has_Simple_Case then
@@ -7359,9 +7384,9 @@ package body Test.Skeleton is
                    (Ctx       => Test.Common.TGen_Libgen_Ctx,
                     Unit_Name =>
                       To_Qualified_Name
-                        (if Data.Is_Top_Level_Generic_Instantiation
-                         then "TGen_" & Data.Unit_Full_Name.all
-                         else Data.Unit_Full_Name.all))
+                        (Skip_Prefix
+                           (Data.Unit_Full_Name.all,
+                            Generic_Instantiation_Name)))
                loop
                   Put_Line
                     (Body_Kind,

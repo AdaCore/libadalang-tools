@@ -129,7 +129,6 @@ package body Test.Instrument is
                & " is not supported");
             return Over;
          end if;
-
          return Into;
       elsif Kind (Node)
             in Ada_Single_Protected_Decl
@@ -162,6 +161,13 @@ package body Test.Instrument is
          Included_Subps.Include
            (Image (Node.As_Basic_Decl.P_Unique_Identifying_Name));
 
+         return Over;
+      end if;
+
+      --  Do not look into generic package: we only care about generic
+      --  instantiations.
+
+      if Kind (Node) in Ada_Generic_Decl then
          return Over;
       end if;
 

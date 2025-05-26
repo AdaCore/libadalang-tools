@@ -96,7 +96,8 @@ package body TGen.Marshalling_Lib is
          declare
             Byte : Unsigned_8;
             Num  : constant Offset_Type :=
-              (if M < 128 then Offset_Type'Min (-Offset, Size (Unsigned_8 (M)))
+              (if M < 128
+               then Offset_Type'Min (-Offset, Size (Unsigned_8 (M)))
                else -Offset);
          begin
             Read_Remainder (Stream, Buffer, Offset, Num, Byte);
@@ -238,7 +239,8 @@ package body TGen.Marshalling_Lib is
       if Offset /= 0 then
          declare
             Num  : constant Offset_Type :=
-              (if M < 128 then Offset_Type'Min (-Offset, Size (Unsigned_8 (M)))
+              (if M < 128
+               then Offset_Type'Min (-Offset, Size (Unsigned_8 (M)))
                else -Offset);
             Mask : constant Long_Long_Long_Unsigned := 2**Natural (Num) - 1;
          begin
@@ -704,7 +706,7 @@ package body TGen.Marshalling_Lib is
                   if not V_F'Valid then
                      raise Invalid_Value;
 
-                     --  Check for out-of-bounds values and apply saturation
+                  --  Check for out-of-bounds values and apply saturation
 
                   elsif V_F < Float (First) then
                      V_B := First;
@@ -743,7 +745,7 @@ package body TGen.Marshalling_Lib is
                   if not V_F'Valid then
                      raise Invalid_Value;
 
-                     --  Check for out-of-bounds values and apply saturation
+                  --  Check for out-of-bounds values and apply saturation
 
                   elsif V_F < Long_Float (First) then
                      V_B := First;
@@ -782,7 +784,7 @@ package body TGen.Marshalling_Lib is
                   if not V_F'Valid then
                      raise Invalid_Value;
 
-                     --  Check for out-of-bounds values and apply saturation
+                  --  Check for out-of-bounds values and apply saturation
 
                   elsif V_F < Long_Long_Float (First) then
                      V_B := First;
@@ -837,7 +839,8 @@ package body TGen.Marshalling_Lib is
       ------------
 
       function Denorm (V : Long_Long_Long_Unsigned; F : T) return T'Base
-      is (if Use_Coarse then T'Base (Coarse_Denorm (V))
+      is (if Use_Coarse
+          then T'Base (Coarse_Denorm (V))
           else
             T'Base (Long_Long_Long_Integer (F) + Long_Long_Long_Integer (V)));
 
@@ -846,7 +849,8 @@ package body TGen.Marshalling_Lib is
       ----------
 
       function Norm (V : T; F : T) return Long_Long_Long_Unsigned
-      is (if Use_Coarse then Coarse_Norm (Long_Long_Long_Integer (V))
+      is (if Use_Coarse
+          then Coarse_Norm (Long_Long_Long_Integer (V))
           else
             Long_Long_Long_Unsigned
               (Long_Long_Long_Integer (V) - Long_Long_Long_Integer (F)));

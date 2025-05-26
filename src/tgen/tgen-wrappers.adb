@@ -21,7 +21,6 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Containers.Ordered_Sets;
 with Ada.Containers.Vectors;
 
 with Libadalang.Common; use Libadalang.Common;
@@ -40,19 +39,17 @@ package body TGen.Wrappers is
       Value : Unbounded_String;
    end record;
 
-   function "<" (L, R : Literal) return Boolean
-   is (if L.Neg = R.Neg then L.Value < R.Value else L.Neg < R.Neg);
-
    function "=" (L, R : Literal) return Boolean
    is (L.Neg = R.Neg and then L.Value = R.Value);
 
-   package Literal_Sets is new Ada.Containers.Ordered_Sets (Literal);
-   package Literal_Set_Vectors is new
+   package Clause is new
+     Ada.Containers.Vectors (Index_Type => Positive, Element_Type => Literal);
+   package Clause_Vectors is new
      Ada.Containers.Vectors
        (Index_Type   => Positive,
-        Element_Type => Literal_Sets.Set,
-        "="          => Literal_Sets."=");
-   subtype Formula_Type is Literal_Set_Vectors.Vector;
+        Element_Type => Clause.Vector,
+        "="          => Clause."=");
+   subtype Formula_Type is Clause_Vectors.Vector;
 
    type Polarity_Kind is new Boolean;
    Dnf_Kind     : constant Polarity_Kind := True;
@@ -125,8 +122,13 @@ package body TGen.Wrappers is
                         then
                            for Clause_Left of Dnf_Left loop
                               for Clause_Right of Dnf_Right loop
-                                 Result.Append
-                                   (Clause_Left.Union (Clause_Right));
+                                 declare
+                                    Result_Clause : Clause.Vector;
+                                 begin
+                                    Result_Clause.Append (Clause_Left);
+                                    Result_Clause.Append (Clause_Right);
+                                    Result.Append (Result_Clause);
+                                 end;
                               end loop;
                            end loop;
 
@@ -159,10 +161,11 @@ package body TGen.Wrappers is
       end case;
 
       Result.Append
-        (Literal_Sets.To_Set
+        (Clause.To_Vector
            (Literal'
               (Neg   => not Boolean (Polarity),
-               Value => To_Unbounded_String (+E.Text))));
+               Value => To_Unbounded_String (+E.Text)),
+            1));
       return Result;
    end Dnf;
 
@@ -173,18 +176,18 @@ package body TGen.Wrappers is
    procedure Write_Wrapper
      (F_Body : File_Type; Call_To_Orig_Subp : String; Formula : Formula_Type)
    is
-      use type Literal_Sets.Set;
+      use type Clause.Vector;
       Indent : constant String := "      ";
    begin
-      for Literal_Set of Formula loop
-         if Literal_Set = Formula.First_Element then
+      for Clause of Formula loop
+         if Clause = Formula.First_Element then
             Put (F_Body, Indent & "if ");
          else
             Put (F_Body, Indent & "elsif ");
          end if;
 
-         for Literal of Literal_Set loop
-            if Literal /= Literal_Set.First_Element then
+         for Literal of Clause loop
+            if Literal /= Clause.First_Element then
                Put (F_Body, "and then ");
             end if;
             if Literal.Neg then
@@ -318,6 +321,8 @@ package body TGen.Wrappers is
       end loop;
       if Subprogram.Param_Order.Length > 0 then
          Append (Call_To_User_Subp, ");");
+      else
+         Append (Call_To_User_Subp, ";");
       end if;
 
       --  Declare the wrapper specification in the spec package

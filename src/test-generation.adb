@@ -143,39 +143,24 @@ package body Test.Generation is
          end if;
 
          --  Check, if the subprogram has zero parameters. If so, only add it
-         --  to the generation context if it has a global annotation.
+         --  to the generation context if it has a non null global annotation.
 
-         if Node.As_Basic_Decl.P_Subp_Spec_Or_Null.P_Params'Length = 0
-           and then not Node.As_Basic_Decl.P_Has_Aspect (Global_Aspect_Name)
-         then
-            return Over;
-         end if;
-
-         for Inst of Node.As_Basic_Decl.P_Generic_Instantiations loop
-            --  If it is top level generic package instantiation, we call
-            --  `Include_Subp` but with the associated switch set.
-            if Inst.Unit.Root.As_Compilation_Unit.F_Body.Kind
-              = Libadalang.Common.Ada_Library_Item
-              and then Inst
-                         .Unit
-                         .Root
-                         .As_Compilation_Unit
-                         .F_Body
-                         .As_Library_Item
-                         .F_Item
-                       = Inst.As_Basic_Decl
-            then
-               if not Include_Subp
-                        (Test.Common.TGen_Libgen_Ctx,
-                         Node.As_Basic_Decl,
-                         Diags,
-                         Is_Top_Level_Generic_Instantiation => True)
+         declare
+            Subp_Decl              : Basic_Decl renames Node.As_Basic_Decl;
+            Has_Global_Aspect      : constant Boolean :=
+              Subp_Decl.P_Has_Aspect (Global_Aspect_Name);
+            Has_Null_Global_Aspect : constant Boolean :=
+              (if Has_Global_Aspect
                then
-                  Report_Failures;
-               end if;
+                 Subp_Decl.P_Get_Aspect (Global_Aspect_Name).Value.Kind
+                 = Ada_Null_Literal);
+         begin
+            if Subp_Decl.P_Subp_Spec_Or_Null.P_Params'Length = 0
+              and then (not Has_Global_Aspect or else Has_Null_Global_Aspect)
+            then
                return Over;
             end if;
-         end loop;
+         end;
 
          if not Include_Subp
                   (Test.Common.TGen_Libgen_Ctx, Node.As_Basic_Decl, Diags)

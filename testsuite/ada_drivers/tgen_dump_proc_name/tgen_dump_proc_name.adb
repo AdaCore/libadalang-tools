@@ -37,17 +37,15 @@ procedure TGen_Dump_Proc_Name is
         LAL_GPR.Create_Project_Unit_Provider (Tree => Project, Env => Env);
    end Load_Project;
 
-   Context      : constant LAL.Analysis_Context :=
+   Context : constant LAL.Analysis_Context :=
      LAL.Create_Context (Unit_Provider => Load_Project);
-   TGen_Context : TGen.Libgen.Libgen_Context    :=
-     TGen.Libgen.Create ("obj/tgen", ".", Ada.Command_Line.Argument (2));
 
 begin
-   TGen.Libgen.Generate (TGen_Context);
    for I in 3 .. Ada.Command_Line.Argument_Count loop
       declare
          Filename : constant String := Ada.Command_Line.Argument (I);
-         Unit : constant LAL.Analysis_Unit := Context.Get_From_File (Filename);
+         Unit     : constant LAL.Analysis_Unit :=
+           Context.Get_From_File (Filename);
       begin
          Test.Generation.Process_Source (Unit);
       end;
@@ -63,8 +61,8 @@ begin
      (Ada.Strings.Unbounded.To_String
         (TGen.Libgen.Get_Test_Case_Dump_Procedure_Name
            (Test.Common.TGen_Libgen_Ctx,
-            TGen.Strings.To_Qualified_Name
-              ("TGen_Generic_Instantiation_user_instantiation"),
+            TGen.Strings.To_Qualified_Name ("user_instantiation"),
             Ada.Strings.Unbounded.To_Unbounded_String
-              ("user_instantiation.Plus_Two"))));
+              ("TGen_Generic_Instantiation_user_instantiation.Instance."
+               & "Plus_Two"))));
 end TGen_Dump_Proc_Name;

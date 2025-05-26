@@ -232,18 +232,6 @@ package body TGen.Strings is
       end if;
    end Map_Operator_Name;
 
-   ----------------------
-   -- Copy_Delete_Last --
-   ----------------------
-
-   function Copy_Delete_Last
-     (FQN : Ada_Qualified_Name) return Ada_Qualified_Name is
-   begin
-      return Res : Ada_Qualified_Name := FQN.Copy do
-         Res.Delete_Last;
-      end return;
-   end Copy_Delete_Last;
-
    -----------------------
    -- Copy_Delete_First --
    -----------------------
