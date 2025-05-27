@@ -1,0 +1,16 @@
+project Simple is
+   for Object_Dir use "obj";
+   for Source_Dirs use (".");
+
+   Reports_Directory := Project'Project_Dir & "/analysis/gnatsas";
+
+   package Metrics is
+      for Default_Switches ("Ada") use
+        ("--short-file-names",
+         "--generate-xml-output",
+         "--generate-xml-schema",
+         "--xml-file-name=" & Reports_Directory & "/metrics.xml",
+         "--no-text-output");
+   end Metrics;
+end Simple;
+
