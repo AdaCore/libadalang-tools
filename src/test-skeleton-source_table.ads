@@ -184,4 +184,12 @@ package Test.Skeleton.Source_Table is
       Subroot_Stub_Prj     : String;
       Current_Source_Infix : String);
 
+   procedure Put_Interface_For_Project
+     (Project_Name : String; Source_List : String_Set.Set);
+   --  Output (with S_Put) an Interfaces project attribute which includes the
+   --  original Interfaces or Library_Interface of Project_Name, as well as all
+   --  the sources in Source_List.
+   --
+   --  If Project_Name does not define an interface, this is a no-op.
+
 end Test.Skeleton.Source_Table;
