@@ -443,6 +443,8 @@ package body TGen.Libgen is
       Is_Generic_Package : Boolean := False)
    is
       use Templates_Parser;
+      use type TGen.Strings.Ada_Qualified_Name;
+
       F_Spec            : File_Type;
       F_Body            : File_Type;
       Resolved_Pkg_Name : constant Ada_Qualified_Name :=
@@ -465,26 +467,30 @@ package body TGen.Libgen is
       --  Code that should be put in the initialization section of the
       --  package body.
 
-      procedure Put_Deps (F : File_Type; Dep_Pkg_Name : Ada_Qualified_Name);
+      Lib_Type_Dependencies : Ada_Qualified_Name_Set;
+      --  All of the type representation packages we should have access to,
+      --  to instantiate our type definitions.
+
+      procedure Put_Deps
+        (F : File_Type; Dep_Pkg_Name : Ada_Qualified_Name; Is_Body : Boolean);
       --  Put dependencies while taking into account generic instantiations
 
-      procedure Put_Deps (F : File_Type; Dep_Pkg_Name : Ada_Qualified_Name) is
-         use type Ada_Qualified_Name;
+      procedure Put_Deps
+        (F : File_Type; Dep_Pkg_Name : Ada_Qualified_Name; Is_Body : Boolean)
+      is
          Actual_Dep_Pkg_Name : constant Ada_Qualified_Name :=
            (if Ctx.Generic_Package_Instantiations.Contains (Dep_Pkg_Name)
             then Ctx.Generic_Package_Instantiations.Element (Dep_Pkg_Name)
             else Dep_Pkg_Name);
       begin
-         --  Make sure to not introduce a circular dependency
-
          if Actual_Dep_Pkg_Name /= Resolved_Pkg_Name then
-            Put_Line
-              (F,
-               "with "
-               & To_Ada (Actual_Dep_Pkg_Name)
-               & "; use "
-               & To_Ada (Actual_Dep_Pkg_Name)
-               & ";");
+            Put (F, "with " & To_Ada (Actual_Dep_Pkg_Name) & "; ");
+
+            if Is_Body then
+               Put (F, "use " & To_Ada (Actual_Dep_Pkg_Name) & ";");
+            end if;
+
+            Put (F, ASCII.LF);
          end if;
       end Put_Deps;
 
@@ -524,10 +530,6 @@ package body TGen.Libgen is
          --  implement custom strategies. TODO: add dependencies only for
          --  custom strategies types here.
 
-         Lib_Type_Dependencies : Ada_Qualified_Name_Set;
-         --  All of the type representation packages we should have access to,
-         --  to instantiate our type definitions.
-
          Package_Dependency : Ada_Qualified_Name;
       begin
          for T of Typ_Dependencies loop
@@ -559,11 +561,11 @@ package body TGen.Libgen is
          end loop;
 
          for Pack_Name of Lib_Type_Dependencies loop
-            Put_Deps (F_Spec, Pack_Name);
+            Put_Deps (F_Spec, Pack_Name, Is_Body => False);
          end loop;
 
          for Pack_Name of Lib_Marshalling_Dependencies loop
-            Put_Deps (F_Body, Pack_Name);
+            Put_Deps (F_Body, Pack_Name, Is_Body => True);
          end loop;
       end;
 
@@ -580,6 +582,11 @@ package body TGen.Libgen is
 
       Put_Line (F_Body, "use Ada.Streams;");
       Put_Line (F_Body, "use Interfaces;");
+      for Pack_Name of Lib_Type_Dependencies loop
+         if Pack_Name /= Resolved_Pkg_Name then
+            Put_Line (F_Body, "use " & To_Ada (Pack_Name) & ";");
+         end if;
+      end loop;
       New_Line (F_Body);
 
       --  We have to make sure to generate the initialization code in the
