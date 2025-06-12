@@ -88,7 +88,7 @@ package body Test.Instrument is
 
    Included_Subps : String_Ordered_Set;
 
-   Remove_Declarations : String_Ordered_Set;
+   Remove_Expr_Func_Declarations : String_Ordered_Set;
    --  Expression functions specified in private part of package spec, which
    --  act as bodies for functions declared in the same spec. No special
    --  handling needed for corresponding specs, we just need to remove
@@ -145,7 +145,7 @@ package body Test.Instrument is
             Modify_Spec := True;
 
             if From_Same_Unit (Node.As_Expr_Function.P_Decl_Part, Node) then
-               Remove_Declarations.Include (Node.Image);
+               Remove_Expr_Func_Declarations.Include (Node.Image);
                return Over;
             end if;
 
@@ -242,7 +242,7 @@ package body Test.Instrument is
 
       Unit := CU.F_Body.As_Library_Item.F_Item;
       Included_Subps.Clear;
-      Remove_Declarations.Clear;
+      Remove_Expr_Func_Declarations.Clear;
       Subprograms_To_Body.Clear;
       Bodyless_Specs.Clear;
       Modify_Spec := False;
@@ -635,74 +635,81 @@ package body Test.Instrument is
       --------------------------
 
       procedure Process_Declarations
-        (Decls : Ada_Node_List; Visibility : Declarations_Visibility) is
+        (Decls : Ada_Node_List; Visibility : Declarations_Visibility)
+      is
+         procedure Register_Bodyless_Spec (Decl : Ada_Node);
+         --  Add the package declaration that holds the current declaration
+         --  node to Bodyless_Specs.
+
+         procedure Register_Bodyless_Spec (Decl : Ada_Node) is
+            --  The semantic parent of a subprogram declaration isn't
+            --  necessarily a package declaration. In the case of declarations
+            --  in the private part of a package, the semantic parent is
+            --  `PrivatePart`. In order to retrieve the corresponding package
+            --  declaration, declarations that are part of a public and private
+            --  part of a package should be handled individually.
+
+            Semantic_Parent : constant Ada_Node := Decl.P_Semantic_Parent;
+         begin
+            case Visibility is
+               when Public_Decls =>
+                  if Semantic_Parent.As_Package_Decl.P_Body_Part.Is_Null then
+                     Bodyless_Specs.Append (Semantic_Parent.As_Ada_Node);
+                  end if;
+
+               when Private_Decls =>
+                  if Semantic_Parent
+                       .As_Private_Part
+                       .P_Semantic_Parent
+                       .As_Package_Decl
+                       .P_Body_Part
+                       .Is_Null
+                  then
+                     Bodyless_Specs.Append
+                       (Semantic_Parent.As_Private_Part.P_Semantic_Parent);
+                  end if;
+            end case;
+         end Register_Bodyless_Spec;
+
       begin
          for D of Decls loop
-            if D.Kind = Ada_Package_Decl then
-               Process_Package_Spec (D.As_Basic_Decl);
+            case D.Kind is
+               when Ada_Package_Decl =>
+                  Process_Package_Spec (D.As_Basic_Decl);
 
-            elsif not Remove_Declarations.Contains (D.Image) then
-               if D.Kind = Ada_Expr_Function then
-                  S_Put
-                    (Padding (D),
-                     Node_Image (D.As_Expr_Function.F_Subp_Spec)
-                     & (if D.As_Expr_Function.F_Aspects.Is_Null
-                        then ";"
-                        else
-                          " "
-                          & Node_Image (D.As_Expr_Function.F_Aspects)
-                          & ";"));
+               when Ada_Expr_Function =>
+                  --  If D is an expression function, add it to the list of
+                  --  subprograms to write to the body, and register the spec
+                  --  as bodyless to create a body if necessary.
 
                   Subprograms_To_Body.Append (D.As_Ada_Node);
+                  Register_Bodyless_Spec (D.As_Ada_Node);
 
-                  --  The semantic parent of a subprogram declaration isn't
-                  --  necessarily a package declaration. In the case of
-                  --  declarations in the private part of a package, the
-                  --  semantic parent is `PrivatePart`. In order to retrieve
-                  --  the corresponding package declaration, declarations that
-                  --  are part of a public and private part of a package should
-                  --  be handled individually.
+                  if not Remove_Expr_Func_Declarations.Contains (D.Image) then
+                     --  In case D is not in Remove_Expr_Func_Declarations, it
+                     --  means that the expression function has no prior
+                     --  declaration, so we omit the "expression" part and just
+                     --  write the declaration to the instrumented spec.
 
-                  declare
-                     Semantic_Parent : constant Ada_Node :=
-                       D.P_Semantic_Parent;
-                  begin
-                     case Visibility is
-                        when Public_Decls =>
-                           if Semantic_Parent
-                                .As_Package_Decl
-                                .P_Body_Part
-                                .Is_Null
-                           then
-                              Bodyless_Specs.Append
-                                (Semantic_Parent.As_Ada_Node);
-                           end if;
+                     S_Put
+                       (Padding (D),
+                        Node_Image (D.As_Expr_Function.F_Subp_Spec)
+                        & (if D.As_Expr_Function.F_Aspects.Is_Null
+                           then ";"
+                           else
+                             " "
+                             & Node_Image (D.As_Expr_Function.F_Aspects)
+                             & ";"));
+                     Put_New_Line;
+                  end if;
 
-                        when Private_Decls =>
-                           if Semantic_Parent
-                                .As_Private_Part
-                                .P_Semantic_Parent
-                                .As_Package_Decl
-                                .P_Body_Part
-                                .Is_Null
-                           then
-                              Bodyless_Specs.Append
-                                (Semantic_Parent
-                                   .As_Private_Part
-                                   .P_Semantic_Parent);
-                           end if;
-                     end case;
-                  end;
+               when others =>
+                  --  In all other cases, just copy the declaration as is to
+                  --  the instrumented spec.
 
-               else
                   S_Put (Padding (D), Node_Image (D));
-               end if;
-               Put_New_Line;
-
-            elsif Remove_Declarations.Contains (D.Image) then
-               Subprograms_To_Body.Append (D.As_Ada_Node);
-
-            end if;
+                  Put_New_Line;
+            end case;
          end loop;
       end Process_Declarations;
    begin
