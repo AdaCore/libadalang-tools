@@ -46,6 +46,8 @@ include:
               - src/tgen/**/*
               - src/test-*
               - share/tgen/templates/**/*
+              - testsuite/testsuite.py
+              - testsuite/drivers/gnattest_tgen.py
             compare_to: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
 
   # Optional testing of ALS
