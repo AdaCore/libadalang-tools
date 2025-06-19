@@ -7185,6 +7185,22 @@ package body Test.Skeleton is
               Subp_Content.Get ("generation_complete");
             Is_Function         : constant Boolean :=
               Subp_Content.Has_Field ("return_type");
+            Subp_FQN            : constant String :=
+              Subp_Content.Get ("fully_qualified_name");
+            Is_Operator         : constant Boolean :=
+              Subp_FQN (Subp_FQN'Last) = '"';
+            --  The subprogram is an operator IIF the subprogram name ends in a
+            --  double quote (e.g. "+" or "not").
+
+            Op_Name : constant String :=
+              (if Is_Operator
+               then
+                 Subp_FQN
+                   (Index (Subp_FQN, ".", Going => Ada.Strings.Backward)
+                    + 2
+                    .. Subp_FQN'Last - 1)
+               else "");
+            --  Operator name, without surrounding double quotes
 
             Subp_Vectors : constant JSON_Array :=
               Subp_Content.Get ("test_vectors");
@@ -7224,6 +7240,15 @@ package body Test.Skeleton is
             procedure Pp_Subp_Call (F : File_Type; Initial_Pad : Natural := 0);
             --  Output a call to subp with the values in Param_Values, indented
             --  by Initial_Pad amount.
+
+            procedure Pp_Operator_Call
+              (F : File_Type; Initial_Pad : Natural := 0);
+            --  Output a call to Subp as if it is an operator.
+            --  If Param_Values has a single element, the call is printed as
+            --  a prefix operator call (e.g.  not Param), if there are two the
+            --  call is printed as an infix operator call
+            --  (e.g. Param1 * Param2), otherwise this will raise an
+            --  exception.
 
             procedure Put_Line (F : File_Kind; S : String);
             procedure New_Line (F : File_Kind);
@@ -7287,6 +7312,73 @@ package body Test.Skeleton is
                end if;
                Put (F, ";");
             end Pp_Subp_Call;
+
+            ----------------------
+            -- Pp_Operator_Call --
+            ----------------------
+
+            procedure Pp_Operator_Call
+              (F : File_Type; Initial_Pad : Natural := 0)
+            is
+               Pad_Str   : constant String (1 .. Initial_Pad + 1) :=
+                 [others => ' '];
+               Param_Idx : Positive := Array_First (Param_Values);
+            begin
+               Put (F, Pad_Str);
+               if Length (Param_Values) = 0 or else Length (Param_Values) > 2
+               then
+                  Report_Err
+                    ("Error while loading JSON test inputs for"
+                     & Subp_FQN
+                     & ": Operator expects one or two parameters but found"
+                     & Natural'(Length (Param_Values))'Image
+                     & " parameters");
+                  raise Program_Error;
+               elsif Length (Param_Values) = 2 then
+                  Put (F, "Param_");
+
+                  --  We need to find the actual parameter order as we can't
+                  --  rely on a parameter association here.
+
+                  declare
+                     First_JSON_Param_Name : constant String :=
+                       To_Lower
+                         (Array_Element (Param_Values, Param_Idx).Get
+                            ("name"));
+                     First_LAL_Param_Name  : constant String :=
+                       To_Lower
+                         (Node_Image
+                            (Defining_Name_List_Element
+                               (Subp
+                                  .Subp_Declaration
+                                  .As_Basic_Decl
+                                  .P_Subp_Spec_Or_Null
+                                  .P_Params (1)
+                                  .F_Ids,
+                                1)));
+                  begin
+                     Param_Idx := Array_Next (Param_Values, Param_Idx);
+                     if To_Lower (First_JSON_Param_Name) = First_LAL_Param_Name
+                     then
+                        Put (F, First_JSON_Param_Name);
+                     else
+                        Put
+                          (F,
+                           Array_Element (Param_Values, Param_Idx).Get
+                             ("name"));
+                        Param_Idx := Array_First (Param_Values);
+                     end if;
+                  end;
+                  Put (F, " ");
+               end if;
+
+               Put
+                 (F,
+                  Op_Name
+                  & " Param_"
+                  & Array_Element (Param_Values, Param_Idx).Get ("name")
+                  & ";");
+            end Pp_Operator_Call;
 
             ------------------------
             -- Pp_JSON_Object_Lit --
@@ -7635,7 +7727,11 @@ package body Test.Skeleton is
                          (Subp_Content.Get ("return_type"), "standard.")
                      & ":=");
                   Put (Files (Body_Kind), Com);
-                  Pp_Subp_Call (Files (Body_Kind), 8);
+                  if Is_Operator then
+                     Pp_Operator_Call (Files (Body_Kind), 8);
+                  else
+                     Pp_Subp_Call (Files (Body_Kind), 8);
+                  end if;
                   New_Line (Body_Kind);
                   Put_Line (Body_Kind, Com & "   begin");
                   Put_Line
@@ -7647,6 +7743,9 @@ package body Test.Skeleton is
                   Put_Line (Body_Kind, Com & "   end;");
                else
                   Put (Files (Body_Kind), Com);
+
+                  --  Procedures can't be operators
+
                   Pp_Subp_Call (Files (Body_Kind), 3);
                end if;
                New_Line (Body_Kind);
