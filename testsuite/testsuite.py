@@ -21,11 +21,17 @@ from drivers.gnattest_tgen import GNATTestTgenDriver
 
 class Testsuite(e3.testsuite.Testsuite):
     tests_subdir = "tests"
-    test_driver_map = {
-        "python_script": PythonScriptDriver,
-        "shell_script": ShellScriptDriver,
-        "gnattest_tgen": GNATTestTgenDriver,
-    }
+
+    @property
+    def test_driver_map(self):
+        return {
+                "python_script": PythonScriptDriver,
+                "shell_script": ShellScriptDriver,
+                "gnattest_tgen": GNATTestTgenDriver,
+                # Driver available only in the GNATfuzz testsuite.
+                # Uses GNATtest and TGen
+                "fuzz_everything": GNATTestTgenDriver,
+            }
 
     def add_options(self, parser):
         parser.add_argument(
@@ -165,6 +171,10 @@ class Testsuite(e3.testsuite.Testsuite):
         # control purposes).
         if self.main.args.gnatfuzz_tests:
             os.environ["GNATTEST_GNATFUZZ"] = "TRUE"
+
+            # Run all gnatfuzz tests, as we aren't that resource-constrained
+            # when generating tests through TGen
+            os.environ["GNATFUZZ_LOCAL_EXECUTION"] = "TRUE"
 
         # Turn on strict mode for gnattest to catch real errors
         os.environ["GNATTEST_STRICT"] = "TRUE"
