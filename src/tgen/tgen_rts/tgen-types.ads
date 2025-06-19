@@ -295,7 +295,7 @@ package TGen.Types is
    function Get_Diagnostics
      (Self : Derived_Private_Subtype_Typ; Prefix : String := "")
       return String_Vector
-   is (String_Vectors.Empty_Vector);
+   is (Self.Parent_Type.Get_Diagnostics (Prefix));
 
    function Default_Strategy
      (Self : Derived_Private_Subtype_Typ)
