@@ -773,6 +773,8 @@ package body Test.Instrument is
          then Decl.As_Basic_Decl
          else Decl.P_Decl_Part);
 
+      Subp_Wrapper_Name : Ada.Strings.Unbounded.Unbounded_String;
+
       use TGen.Strings.Ada_Identifier_Vectors;
    begin
       if Decl.Kind = Ada_Subp_Body then
@@ -919,13 +921,28 @@ package body Test.Instrument is
       Put_New_Line;
 
       --  Turn original subprogram into wrapper
+      declare
+         use Ada.Strings.Unbounded;
+      begin
+         if Decl.F_Subp_Spec.F_Subp_Name.F_Name.Kind in Ada_String_Literal then
+            Subp_Wrapper_Name :=
+              To_Unbounded_String
+                (Map_Operator_Name
+                   (Node_Image (Decl.F_Subp_Spec.F_Subp_Name)));
+         else
+            Subp_Wrapper_Name :=
+              To_Unbounded_String (Node_Image (Decl.F_Subp_Spec.F_Subp_Name));
+         end if;
+         Subp_Wrapper_Name := Subp_Wrapper_Name & "_GNATTEST";
+      end;
+
       S_Put
         (Pad + 3,
          Image
            (Decl.Token_Start,
-            Decl.F_Subp_Spec.F_Subp_Name.Token_End,
+            Previous (Decl.F_Subp_Spec.F_Subp_Name.Token_Start),
             Decl.Unit.Get_Charset)
-         & "_GNATTEST "
+         & Ada.Strings.Unbounded.To_String (Subp_Wrapper_Name)
          & Image
              (Next (Decl.F_Subp_Spec.F_Subp_Name.Token_End),
               Decl.F_Subp_Spec.Token_End,
@@ -966,7 +983,9 @@ package body Test.Instrument is
          Put_New_Line;
          S_Put
            (Pad + 3,
-            "end " & Node_Image (Decl.F_Subp_Spec.F_Subp_Name) & "_GNATTEST;");
+            "end "
+            & Ada.Strings.Unbounded.To_String (Subp_Wrapper_Name)
+            & ";");
          Put_New_Line;
          Put_New_Line;
       end if;
@@ -981,12 +1000,9 @@ package body Test.Instrument is
             "return GNATTEST_Result : "
             & Node_Image (Decl.F_Subp_Spec.F_Subp_Returns)
             & " := "
-            & Node_Image (Decl.F_Subp_Spec.F_Subp_Name)
-            & "_GNATTEST (");
+            & Ada.Strings.Unbounded.To_String (Subp_Wrapper_Name));
       else
-         S_Put
-           (Pad + 3,
-            Node_Image (Decl.F_Subp_Spec.F_Subp_Name) & "_GNATTEST  (");
+         S_Put (Pad + 3, Ada.Strings.Unbounded.To_String (Subp_Wrapper_Name));
       end if;
 
       declare
@@ -995,6 +1011,7 @@ package body Test.Instrument is
          for Param of Decl.F_Subp_Spec.P_Params loop
             for Name of Param.F_Ids loop
                if First_Param then
+                  S_Put (0, " (");
                   First_Param := False;
                   Put_New_Line;
                else
@@ -1004,12 +1021,17 @@ package body Test.Instrument is
                S_Put (Pad + 5, Node_Image (Name));
             end loop;
          end loop;
-      end;
 
+         --  First_Param can only be True if there are no parameters
+
+         if not First_Param then
+            S_Put (0, ")");
+         end if;
+      end;
       if Decl.F_Subp_Spec.F_Subp_Kind = Ada_Subp_Kind_Function then
-         S_Put (0, ") do");
+         S_Put (0, " do");
       else
-         S_Put (0, ");");
+         S_Put (0, ";");
       end if;
 
       Put_New_Line;

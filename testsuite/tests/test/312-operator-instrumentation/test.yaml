@@ -1,0 +1,7 @@
+description: Verify that gnattest correctly instruments operators.
+  It used to generated invalid sources by appending a suffix to the
+  operator name.
+
+driver: gnattest_tgen
+
+default-gpr: true
