@@ -22,6 +22,7 @@
 ------------------------------------------------------------------------------
 
 with Ada.Containers.Indefinite_Holders;
+with Ada.Containers.Hashed_Sets;
 with Ada.Characters.Conversions;
 with Ada.Directories; use Ada.Directories;
 with Ada.Strings.Unbounded;
@@ -101,7 +102,13 @@ package body Test.Instrument is
    --  List of expression functions that need to receive corresponding
    --  body wrappers
 
-   Bodyless_Specs : Ada_Nodes_List.List;
+   package Ada_Node_Sets is new
+     Ada.Containers.Hashed_Sets
+       (Element_Type        => Ada_Node,
+        Hash                => Hash,
+        Equivalent_Elements => Libadalang.Analysis."=");
+
+   Bodyless_Specs : Ada_Node_Sets.Set;
    --  List of nested package specs that contain expression functions
    --  and do not require a body in the original source. Only "leaf" specs
    --  are stored.
@@ -654,7 +661,7 @@ package body Test.Instrument is
             case Visibility is
                when Public_Decls =>
                   if Semantic_Parent.As_Package_Decl.P_Body_Part.Is_Null then
-                     Bodyless_Specs.Append (Semantic_Parent.As_Ada_Node);
+                     Bodyless_Specs.Include (Semantic_Parent.As_Ada_Node);
                   end if;
 
                when Private_Decls =>
@@ -665,7 +672,7 @@ package body Test.Instrument is
                        .P_Body_Part
                        .Is_Null
                   then
-                     Bodyless_Specs.Append
+                     Bodyless_Specs.Include
                        (Semantic_Parent.As_Private_Part.P_Semantic_Parent);
                   end if;
             end case;
@@ -1173,7 +1180,12 @@ package body Test.Instrument is
 
    begin
 
-      if N1'Length < N2'Length and then N1 = Head (N2, N1'Length) then
+      --  Nothing to do if N1 and N2 are the same
+
+      if N1 = N2 then
+         return;
+
+      elsif N1'Length < N2'Length and then N1 = Head (N2, N1'Length) then
          --  Need to start package body declarations
          Open_Decls (N1, N2);
 
