@@ -1,0 +1,26 @@
+pkg-child.ads:7:7: info: corresponding test PASSED
+pkg-child.ads:7:7: info: corresponding test PASSED
+pkg-child.ads:7:7: info: corresponding test PASSED
+pkg-child.ads:7:7: info: corresponding test PASSED
+pkg-child.ads:7:7: info: corresponding test PASSED
+pkg-child.ads:13:7: info: corresponding test PASSED
+pkg-child.ads:13:7: info: corresponding test PASSED
+pkg-child.ads:13:7: info: corresponding test PASSED
+pkg-child.ads:13:7: info: corresponding test PASSED
+pkg-child.ads:13:7: info: corresponding test PASSED
+pkg-child.ads:3:4: info: corresponding test PASSED
+pkg-child.ads:3:4: info: corresponding test PASSED
+pkg-child.ads:3:4: info: corresponding test PASSED
+pkg-child.ads:3:4: info: corresponding test PASSED
+pkg-child.ads:3:4: info: corresponding test PASSED
+pkg-child.ads:17:4: info: corresponding test PASSED
+pkg-child.ads:17:4: info: corresponding test PASSED
+pkg-child.ads:17:4: info: corresponding test PASSED
+pkg-child.ads:17:4: info: corresponding test PASSED
+pkg-child.ads:17:4: info: corresponding test PASSED
+pkg-child.ads:3:4: error: corresponding test FAILED: Test not implemented. (pkg-child-test_data-tests.adb:61)
+pkg-child.ads:17:4: error: corresponding test FAILED: Test not implemented. (pkg-child-test_data-tests.adb:97)
+pkg-child.ads:7:7: error: corresponding test FAILED: Test not implemented. (pkg-child-test_data-tests-inner_1-test_data-tests.adb:61)
+pkg-child.ads:13:7: error: corresponding test FAILED: Test not implemented. (pkg-child-test_data-tests-inner_2-test_data-tests.adb:61)
+24 tests run: 20 passed; 4 failed; 0 crashed.
+Test runner dumped 20 tests

@@ -1,0 +1,5 @@
+description: Test that gnattest correctly creates bodies for child units
+
+driver: gnattest_tgen
+
+default-gpr: true

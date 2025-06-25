@@ -22,6 +22,7 @@
 ------------------------------------------------------------------------------
 
 with Ada.Containers.Indefinite_Holders;
+with Ada.Containers.Hashed_Sets;
 with Ada.Characters.Conversions;
 with Ada.Directories; use Ada.Directories;
 with Ada.Strings.Unbounded;
@@ -101,7 +102,13 @@ package body Test.Instrument is
    --  List of expression functions that need to receive corresponding
    --  body wrappers
 
-   Bodyless_Specs : Ada_Nodes_List.List;
+   package Ada_Node_Sets is new
+     Ada.Containers.Hashed_Sets
+       (Element_Type        => Ada_Node,
+        Hash                => Hash,
+        Equivalent_Elements => Libadalang.Analysis."=");
+
+   Bodyless_Specs : Ada_Node_Sets.Set;
    --  List of nested package specs that contain expression functions
    --  and do not require a body in the original source. Only "leaf" specs
    --  are stored.
@@ -654,7 +661,7 @@ package body Test.Instrument is
             case Visibility is
                when Public_Decls =>
                   if Semantic_Parent.As_Package_Decl.P_Body_Part.Is_Null then
-                     Bodyless_Specs.Append (Semantic_Parent.As_Ada_Node);
+                     Bodyless_Specs.Include (Semantic_Parent.As_Ada_Node);
                   end if;
 
                when Private_Decls =>
@@ -665,7 +672,7 @@ package body Test.Instrument is
                        .P_Body_Part
                        .Is_Null
                   then
-                     Bodyless_Specs.Append
+                     Bodyless_Specs.Include
                        (Semantic_Parent.As_Private_Part.P_Semantic_Parent);
                   end if;
             end case;
@@ -765,6 +772,8 @@ package body Test.Instrument is
         (if Decl.P_Decl_Part.Is_Null
          then Decl.As_Basic_Decl
          else Decl.P_Decl_Part);
+
+      Subp_Wrapper_Name : Ada.Strings.Unbounded.Unbounded_String;
 
       use TGen.Strings.Ada_Identifier_Vectors;
    begin
@@ -912,13 +921,28 @@ package body Test.Instrument is
       Put_New_Line;
 
       --  Turn original subprogram into wrapper
+      declare
+         use Ada.Strings.Unbounded;
+      begin
+         if Decl.F_Subp_Spec.F_Subp_Name.F_Name.Kind in Ada_String_Literal then
+            Subp_Wrapper_Name :=
+              To_Unbounded_String
+                (Map_Operator_Name
+                   (Node_Image (Decl.F_Subp_Spec.F_Subp_Name)));
+         else
+            Subp_Wrapper_Name :=
+              To_Unbounded_String (Node_Image (Decl.F_Subp_Spec.F_Subp_Name));
+         end if;
+         Subp_Wrapper_Name := Subp_Wrapper_Name & "_GNATTEST";
+      end;
+
       S_Put
         (Pad + 3,
          Image
            (Decl.Token_Start,
-            Decl.F_Subp_Spec.F_Subp_Name.Token_End,
+            Previous (Decl.F_Subp_Spec.F_Subp_Name.Token_Start),
             Decl.Unit.Get_Charset)
-         & "_GNATTEST "
+         & Ada.Strings.Unbounded.To_String (Subp_Wrapper_Name)
          & Image
              (Next (Decl.F_Subp_Spec.F_Subp_Name.Token_End),
               Decl.F_Subp_Spec.Token_End,
@@ -959,7 +983,9 @@ package body Test.Instrument is
          Put_New_Line;
          S_Put
            (Pad + 3,
-            "end " & Node_Image (Decl.F_Subp_Spec.F_Subp_Name) & "_GNATTEST;");
+            "end "
+            & Ada.Strings.Unbounded.To_String (Subp_Wrapper_Name)
+            & ";");
          Put_New_Line;
          Put_New_Line;
       end if;
@@ -974,12 +1000,9 @@ package body Test.Instrument is
             "return GNATTEST_Result : "
             & Node_Image (Decl.F_Subp_Spec.F_Subp_Returns)
             & " := "
-            & Node_Image (Decl.F_Subp_Spec.F_Subp_Name)
-            & "_GNATTEST (");
+            & Ada.Strings.Unbounded.To_String (Subp_Wrapper_Name));
       else
-         S_Put
-           (Pad + 3,
-            Node_Image (Decl.F_Subp_Spec.F_Subp_Name) & "_GNATTEST  (");
+         S_Put (Pad + 3, Ada.Strings.Unbounded.To_String (Subp_Wrapper_Name));
       end if;
 
       declare
@@ -988,6 +1011,7 @@ package body Test.Instrument is
          for Param of Decl.F_Subp_Spec.P_Params loop
             for Name of Param.F_Ids loop
                if First_Param then
+                  S_Put (0, " (");
                   First_Param := False;
                   Put_New_Line;
                else
@@ -997,12 +1021,17 @@ package body Test.Instrument is
                S_Put (Pad + 5, Node_Image (Name));
             end loop;
          end loop;
-      end;
 
+         --  First_Param can only be True if there are no parameters
+
+         if not First_Param then
+            S_Put (0, ")");
+         end if;
+      end;
       if Decl.F_Subp_Spec.F_Subp_Kind = Ada_Subp_Kind_Function then
-         S_Put (0, ") do");
+         S_Put (0, " do");
       else
-         S_Put (0, ");");
+         S_Put (0, ";");
       end if;
 
       Put_New_Line;
@@ -1173,7 +1202,12 @@ package body Test.Instrument is
 
    begin
 
-      if N1'Length < N2'Length and then N1 = Head (N2, N1'Length) then
+      --  Nothing to do if N1 and N2 are the same
+
+      if N1 = N2 then
+         return;
+
+      elsif N1'Length < N2'Length and then N1 = Head (N2, N1'Length) then
          --  Need to start package body declarations
          Open_Decls (N1, N2);
 
