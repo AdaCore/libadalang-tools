@@ -9535,7 +9535,7 @@ package body Test.Skeleton is
          end if;
          S_Put (0, Node_Image (Params (I)));
          if I = Params'Last then
-            S_Put (0, ") ");
+            S_Put (0, ")");
          else
             S_Put (0, "; ");
          end if;
@@ -9700,7 +9700,7 @@ package body Test.Skeleton is
          end if;
          S_Put (0, Node_Image (Params (I)));
          if I = Params'Last then
-            S_Put (0, ") ");
+            S_Put (0, ")");
          else
             S_Put (0, "; ");
          end if;
