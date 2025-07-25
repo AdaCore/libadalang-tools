@@ -290,7 +290,6 @@ package body TGen.Marshalling.JSON_Marshallers is
 
    procedure Generate_TC_Serializers_For_Subp
      (Spec_Part          : US_Access;
-      Private_Part       : US_Access;
       Body_Part          : US_Access;
       FN_Typ             : Function_Typ'Class;
       Templates_Root_Dir : String)
@@ -387,15 +386,9 @@ package body TGen.Marshalling.JSON_Marshallers is
 
       --  First generate the spec, in the correct part of the spec
 
-      if FN_Typ.Fully_Private then
-         Assocs.Insert (Assoc ("FOR_SPEC", True));
-         Put_Line (Private_Part, Parse (Function_TC_Dump_Template, Assocs));
-         New_Line (Private_Part);
-      else
-         Assocs.Insert (Assoc ("FOR_SPEC", True));
-         Put_Line (Spec_Part, Parse (Function_TC_Dump_Template, Assocs));
-         New_Line (Spec_Part);
-      end if;
+      Assocs.Insert (Assoc ("FOR_SPEC", True));
+      Put_Line (Spec_Part, Parse (Function_TC_Dump_Template, Assocs));
+      New_Line (Spec_Part);
 
       --  Then the body
 

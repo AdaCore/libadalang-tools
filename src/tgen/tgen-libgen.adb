@@ -44,6 +44,7 @@ with TGen.LAL_Utils;
 with TGen.Marshalling;        use TGen.Marshalling;
 with TGen.Marshalling.Binary_Marshallers;
 with TGen.Marshalling.JSON_Marshallers;
+with TGen.Templates;
 with TGen.Type_Representation;
 with TGen.Types.Array_Types;  use TGen.Types.Array_Types;
 with TGen.Types.Constraints;  use TGen.Types.Constraints;
@@ -109,6 +110,9 @@ package body TGen.Libgen is
    function Support_Library_Package
      (Pack_Name : Ada_Qualified_Name) return Ada_Qualified_Name
    is (Library_Package (Pack_Name, "TGen_Support"));
+   function Support_Private_Library_Package
+     (Pack_Name : Ada_Qualified_Name) return Ada_Qualified_Name
+   is (Library_Package (Pack_Name, "TGen_Support_Private"));
    function Value_Library_Package
      (Pack_Name : Ada_Qualified_Name) return Ada_Qualified_Name
    is (Library_Package (Pack_Name, "TGen_Values"));
@@ -182,6 +186,142 @@ package body TGen.Libgen is
       return Result;
    end Library_Package;
 
+   procedure Generate_Marshalling_Functions
+     (Ctx                  : Libgen_Context;
+      Types                : Typ_List;
+      Spec_Marshalling_Fun_Public_Part,
+      Spec_Marshalling_Fun_Private_Part,
+      Body_Marshalling_Fun : in out Templates_Parser.Vector_Tag);
+   --  Output the marshalling subprograms for the types with a public part
+   --  first, then create the private part for the package and output the
+   --  marshalling subprograms for the fully private types. Hopefully this
+   --  won't break too much the topological order on the types, otherwise
+   --  we'll need to make marshaller generation much finer grain in order to
+   --  both be able to have the marshaller subprograms declarations respect
+   --  the visibility of the type, and have the implementation details
+   --  generated in the correct order.
+
+   --------------------------------------
+   --  Generate_Marshalling_Functions  --
+   --------------------------------------
+
+   procedure Generate_Marshalling_Functions
+     (Ctx                  : Libgen_Context;
+      Types                : Typ_List;
+      Spec_Marshalling_Fun_Public_Part,
+      Spec_Marshalling_Fun_Private_Part,
+      Body_Marshalling_Fun : in out Templates_Parser.Vector_Tag)
+   is
+      TRD : constant String := To_String (Ctx.Root_Templates_Dir);
+      --  Template root directory
+   begin
+      for T of Types loop
+         declare
+            Spec_Part, Private_Part, Body_Part : aliased Unbounded_String;
+         begin
+
+            if Is_Supported_Type (T.all)
+              --  We ignore instance types when generating marshallers as they
+              --  are not types per-se, but a convenient way of binding a type
+              --  to its strategy context.
+
+              and then T.all not in Instance_Typ'Class
+            then
+               if T.all.Kind in Function_Kind then
+                  if JSON_Marshalling_Enabled then
+                     TGen
+                       .Marshalling
+                       .JSON_Marshallers
+                       .Generate_TC_Serializers_For_Subp
+                          (Spec_Part'Unrestricted_Access,
+                           Body_Part'Unrestricted_Access,
+                           As_Function_Typ (T),
+                           TRD);
+                  end if;
+               else
+                  TGen
+                    .Marshalling
+                    .Binary_Marshallers
+                    .Generate_Marshalling_Functions_For_Typ
+                       (Spec_Part'Unrestricted_Access,
+                        Private_Part'Unrestricted_Access,
+                        Body_Part'Unrestricted_Access,
+                        T.all,
+                        T.all.Kind in Discrete_Typ_Range
+                        and then Ctx.Array_Index_Types.Contains (T),
+                        TRD);
+
+                  if JSON_Marshalling_Enabled then
+                     TGen
+                       .Marshalling
+                       .JSON_Marshallers
+                       .Generate_Marshalling_Functions_For_Typ
+                          (Spec_Part'Unrestricted_Access,
+                           Private_Part'Unrestricted_Access,
+                           Body_Part'Unrestricted_Access,
+                           T.all,
+                           Ctx.Array_Index_Types.Contains (T),
+                           TRD);
+                  end if;
+               end if;
+            end if;
+
+            Spec_Marshalling_Fun_Public_Part.Append (Spec_Part);
+            Spec_Marshalling_Fun_Private_Part.Append (Private_Part);
+            Body_Marshalling_Fun.Append (Body_Part);
+         end;
+      end loop;
+   end Generate_Marshalling_Functions;
+
+   procedure Render_Support_Templates
+     (Ctx       : Libgen_Context;
+      Assocs    : Templates_Parser.Translate_Set;
+      File_Name : String);
+   --  Render templates to produce a support library (package spec and body)
+
+   procedure Render_Support_Templates
+     (Ctx       : Libgen_Context;
+      Assocs    : Templates_Parser.Translate_Set;
+      File_Name : String)
+   is
+      use Templates_Parser;
+
+      Support_TRD : constant String :=
+        To_String
+          (Ctx.Root_Templates_Dir
+           & GNAT.OS_Lib.Directory_Separator
+           & "support_templates"
+           & GNAT.OS_Lib.Directory_Separator);
+
+      package Support_Templates is new
+        TGen.Templates (Template_Folder => Support_TRD);
+
+      --  Run the templates engine and write the produced content in the
+      --  associated file.
+
+      Spec_Template : constant String :=
+        Parse
+          (Support_Templates.Support_Library.Support_Spec_Template, Assocs);
+      Body_Template : constant String :=
+        Parse
+          (Support_Templates.Support_Library.Support_Body_Template, Assocs);
+
+      Spec_Filename : constant String := File_Name & ".ads";
+      Body_Filename : constant String := File_Name & ".adb";
+
+      Spec_File : File_Type;
+      Body_File : File_Type;
+   begin
+      Create (Spec_File, Out_File, Spec_Filename);
+      Create (Body_File, Out_File, Body_Filename);
+
+      Put (Spec_File, Spec_Template);
+      Put (Body_File, Body_Template);
+
+      Close (Spec_File);
+      Close (Body_File);
+   end Render_Support_Templates;
+
    ------------------------------
    -- Generate_Support_Library --
    ------------------------------
@@ -192,18 +332,20 @@ package body TGen.Libgen is
       Is_Top_Level_Generic_Inst : Boolean := False)
    is
       use Ada_Identifier_Vectors;
+      use Templates_Parser;
 
-      Support_Lib_Name : constant Ada_Qualified_Name :=
+      Support_Lib_Name         : constant Ada_Qualified_Name :=
         (if Is_Top_Level_Generic_Inst
          then
            Support_Library_Package
              (Ctx.Generic_Package_Instantiations (Pkg_Name))
          else Support_Library_Package (Pkg_Name));
-      F_Spec           : File_Type;
-      F_Body           : File_Type;
-      Ada_Support_Name : constant String := To_Ada (Support_Lib_Name);
-      Typ_Dependencies : Typ_Set;
-      File_Name        : constant String :=
+      Ada_Support_Name         : constant String := To_Ada (Support_Lib_Name);
+      Ada_Private_Support_Name : constant String :=
+        To_Ada (Support_Lib_Name) & "_Private";
+      Origin_Unit              : Ada_Qualified_Name := Pkg_Name.Copy;
+      Typ_Dependencies         : Typ_Set;
+      File_Name                : constant String :=
         Ada.Directories.Compose
           (Containing_Directory => To_String (Ctx.Output_Dir),
            Name                 => To_Filename (Support_Lib_Name));
@@ -211,27 +353,58 @@ package body TGen.Libgen is
       Types : constant Types_Per_Package_Maps.Constant_Reference_Type :=
         Ctx.Types_Per_Package.Constant_Reference (Pkg_Name);
 
-      TRD : constant String := To_String (Ctx.Root_Templates_Dir);
+      Sorted_Public_Types_Set  : Typ_Set;
+      Sorted_Private_Types_Set : Typ_Set;
+      Sorted_Public_Types      : Typ_List;
+      Sorted_Private_Types     : Typ_List;
 
-      Sorted_Types : Typ_List;
+      Assocs : Translate_Set;
+
+      Imported_Units            : Vector_Tag;
+      Required_Support_Packages : Vector_Tag;
+      Package_Dependency_Tags   : Vector_Tag;
+
+      Spec_Marshalling_Fun_Public_Part  : Vector_Tag;
+      Spec_Marshalling_Fun_Private_Part : Vector_Tag;
+      Body_Marshalling_Fun              : Vector_Tag;
+
+      function No_Circular_Dependencies
+        (Dependency_Name : String) return Boolean
+      is (Dependency_Name not in Ada_Support_Name | Ada_Private_Support_Name);
+      --  Detect if the dependency is the same or a child of the package that
+      --  we are currently generating the support library for. This check is
+      --  done to avoid circular dependencies in the support library.
+
+      function Is_Private_Support_Package
+        (Support_Dep : String) return Boolean;
+      --  Returns if a support package name is private (ends with "_Private").
+
+      function Is_Private_Support_Package (Support_Dep : String) return Boolean
+      is
+         Private_Suffix : constant String := "_Private";
+      begin
+         if Support_Dep'Length <= Private_Suffix'Length then
+            return False;
+         end if;
+
+         return
+           (for all Idx in reverse 0 .. Private_Suffix'Last - 1 =>
+              Support_Dep (Support_Dep'Last - Idx)
+              = Private_Suffix (Private_Suffix'Last - Idx));
+      end Is_Private_Support_Package;
 
    begin
-      Create (F_Spec, Out_File, File_Name & ".ads");
-      Put_Line (F_Spec, "with TGen.Marshalling_Lib;");
-      Put_Line (F_Spec, "with Interfaces;");
-      Put_Line (F_Spec, "with Ada.Streams;");
-      Put_Line (F_Spec, "with TGen.Big_Int;");
-      Put_Line (F_Spec, "with TGen.Strings;");
 
-      if JSON_Marshalling_Enabled then
-         Put_Line (F_Spec, "with TGen.Types;");
-         Put_Line (F_Spec, "with TGen.Types.Discrete_Types;");
-         Put_Line (F_Spec, "with TGen.Types.Int_Types;");
-         Put_Line (F_Spec, "with TGen.JSON;");
-         Put_Line (F_Spec, "with TGen.Marshalling_Lib.JSON;");
-      end if;
+      --  Pass some flags to the template
 
-      New_Line (F_Spec);
+      Assocs.Insert (Assoc ("BASE_PACK_NAME", To_Ada (Support_Lib_Name)));
+      Assocs.Insert (Assoc ("HAS_JSON_MARSHALLING", JSON_Marshalling_Enabled));
+      Assocs.Insert
+        (Assoc
+           ("HAS_DERIVED_PRIVATE",
+            (for some Ty of Types => Ty.Kind = Derived_Private_Subtype_Kind)));
+
+      Origin_Unit.Delete_Last;
 
       --  Add the import of the original unit, to be able to declare
       --  subprograms with the same profile as in the original unit.
@@ -239,10 +412,12 @@ package body TGen.Libgen is
       if Ctx.Imports_Per_Unit.Contains (Pkg_Name) then
          for Dep of Ctx.Imports_Per_Unit.Constant_Reference (Pkg_Name) loop
             if To_Ada (Dep) /= To_Ada (Pkg_Name) then
-               Put_Line (F_Spec, "with " & To_Ada (Dep) & ";");
+               Imported_Units.Append (To_Ada (Dep));
             end if;
          end loop;
       end if;
+
+      Assocs.Insert (Assoc ("IMPORT_UNIT_NAME", Imported_Units));
 
       --  Add the imports to the support packages for all the types of the
       --  subprograms declared in this package
@@ -250,25 +425,16 @@ package body TGen.Libgen is
       if Ctx.Support_Packs_Per_Unit.Contains (Pkg_Name) then
          for Dep of Ctx.Support_Packs_Per_Unit.Constant_Reference (Pkg_Name)
          loop
-            if To_Ada (Dep) /= To_Ada (Support_Lib_Name) then
-               Put_Line
-                 (F_Spec,
-                  "with " & To_Ada (Dep) & "; use " & To_Ada (Dep) & ";");
+            if No_Circular_Dependencies (To_Ada (Dep))
+              and then not Is_Private_Support_Package (To_Ada (Dep))
+            then
+               Required_Support_Packages.Append (To_Ada (Dep));
             end if;
          end loop;
+
       end if;
 
-      Put_Line (F_Spec, "package " & Ada_Support_Name & " is");
-      New_Line (F_Spec);
-
-      --  Create a dummy null procedure in each support package, in case we end
-      --  up not generating anything, to ensure that the body is still legal
-      --  and the support library still builds.
-
-      Put_Line (F_Spec, "   procedure Dummy;");
-      New_Line (F_Spec);
-
-      Create (F_Body, Out_File, File_Name & ".adb");
+      Assocs.Insert (Assoc ("SUPPORT_UNIT_NAME", Required_Support_Packages));
 
       --  Also include the needed library support package dependencies, as
       --  the types marshalling / unmarshalling functions may depend on
@@ -286,57 +452,46 @@ package body TGen.Libgen is
          Package_Dependency   : Ada_Qualified_Name;
       begin
          for T of Typ_Dependencies loop
-            Package_Dependency :=
-              Support_Library_Package
-                (if T.all.Kind in Anonymous_Kind
-                 then
-                   TGen.Types.Constraints.As_Anonymous_Typ (T)
-                     .Named_Ancestor.all
-                     .Compilation_Unit_Name
-                 else T.all.Compilation_Unit_Name);
-            if Package_Dependency /= Support_Lib_Name then
+            if T.Fully_Private then
+               Package_Dependency :=
+                 Support_Private_Library_Package
+                   (if T.all.Kind in Anonymous_Kind
+                    then
+                      TGen.Types.Constraints.As_Anonymous_Typ (T)
+                        .Named_Ancestor.all
+                        .Compilation_Unit_Name
+                    else T.all.Compilation_Unit_Name);
+            else
+               Package_Dependency :=
+                 Support_Library_Package
+                   (if T.all.Kind in Anonymous_Kind
+                    then
+                      TGen.Types.Constraints.As_Anonymous_Typ (T)
+                        .Named_Ancestor.all
+                        .Compilation_Unit_Name
+                    else T.all.Compilation_Unit_Name);
+            end if;
+            if No_Circular_Dependencies (To_Ada (Package_Dependency)) then
                Package_Dependencies.Include (Package_Dependency);
             end if;
          end loop;
 
          for Dep of Package_Dependencies loop
-            if To_Ada (Dep) /= Ada_Support_Name then
-               Put_Line
-                 (F_Body,
-                  "with " & To_Ada (Dep) & "; use " & To_Ada (Dep) & ";");
+
+            --  In case of a private support package, it is only possible
+            --  to "with" an other private package if `Dep` is a parent of
+            --  `Pkg_Name`.
+
+            if No_Circular_Dependencies (To_Ada (Dep))
+              and (not Is_Private_Support_Package (To_Ada (Dep))
+                   or else Dep.First_Element = Pkg_Name.First_Element)
+            then
+               Package_Dependency_Tags.Append (To_Ada (Dep));
             end if;
          end loop;
       end;
 
-      --  Types that are derived from a private type, use unchecked
-      --  conversions.
-
-      if (for some Ty of Types => Ty.Kind = Derived_Private_Subtype_Kind) then
-         Put_Line (F_Body, "with Ada.Unchecked_Conversion;");
-      end if;
-
-      Put_Line (F_Body, "package body " & Ada_Support_Name & " is");
-      New_Line (F_Body);
-
-      --  Put the `use` clauses under the package body to prevent compiler
-      --  errors when the base package is predefined (use clauses are forbidden
-      --  in predefined specs).
-
-      Put_Line (F_Body, "use Ada.Streams;");
-      Put_Line (F_Body, "use Interfaces;");
-      Put_Line (F_Body, "use TGen.Marshalling_Lib;");
-      New_Line (F_Body);
-
-      --  Complete the dummy null procedure
-
-      Put_Line (F_Body, "procedure Dummy is null;");
-      New_Line (F_Body);
-
-      --  Disable predicate checks in the marshalling and unmarshalling
-      --  functions.
-
-      Put_Line (F_Body, "   pragma Assertion_Policy (Predicate => Ignore);");
-      New_Line (F_Body);
+      Assocs.Insert (Assoc ("PACKAGE_DEP", Package_Dependency_Tags));
 
       --  Generate the marshalling support lib. Make sure to sort the types
       --  in dependency order otherwise we will get access before elaboration
@@ -344,93 +499,113 @@ package body TGen.Libgen is
       --  we need the Size_Max of all the dependencies of the components to be
       --  available before being able to compute the Size_Max for a composite
       --  type.
+      --  Generation is done in two steps. First step generates all marshalling
+      --  functions for types that are public. The second step generates all
+      --  marshalling functions for types that are declared privately.
 
-      Sorted_Types := Sort (Types);
+      for Ty of Types loop
+         if Ty.Fully_Private then
+            Sorted_Private_Types_Set.Insert (Ty);
+         else
+            Sorted_Public_Types_Set.Insert (Ty);
+         end if;
+      end loop;
 
-      --  Output the marshalling subprograms for the types with a public part
-      --  first, then create the private part for the package and output the
-      --  marshalling subprograms for the fully private types. Hopefully this
-      --  won't break too much the topological order on the types, otherwise
-      --  we'll need to make marshaller generation much finer grain in order to
-      --  both be able to have the marshaller subprograms declarations respect
-      --  the visibility of the type, and have the implementation details
-      --  generated in the correct order.
+      --  Finally, sort private and public types
+
+      Sorted_Public_Types := Sort (Sorted_Public_Types_Set);
+      Sorted_Private_Types := Sort (Sorted_Private_Types_Set);
 
       declare
-         Spec_Part, Private_Part, Body_Part : aliased Unbounded_String;
+         use type Ada.Containers.Count_Type;
 
-         Spec_Part_Acc : US_Access;
-         --  This indicates where we should write the specification
-         --  declarations for the current type (private or public spec). It
-         --  points to Private_Part, if the type is fully private (i.e. the
-         --  parent package of its first part is a private package), or to
-         --  Spec_Part otherwise.
-
+         type Type_Visibility is (Priv, Pub);
+         Generation_Array : constant array (Type_Visibility) of Typ_List :=
+           [Pub => Sorted_Public_Types, Priv => Sorted_Private_Types];
       begin
-         for T of Sorted_Types loop
+         for Vis in Type_Visibility'Range loop
 
-            if Is_Supported_Type (T.all)
+            --  Skip the support package generation if there's no type to
+            --  generate for this type of visibility.
 
-              --  We ignore instance types when generating marshallers as they
-              --  are not types per-se, but a convenient way of binding a type
-              --  to its strategy context.
-
-              and then T.all not in Instance_Typ'Class
-            then
-               Spec_Part_Acc :=
-                 (if T.all.Fully_Private
-                  then Private_Part'Unrestricted_Access
-                  else Spec_Part'Unrestricted_Access);
-               if T.all.Kind in Function_Kind then
-                  if JSON_Marshalling_Enabled then
-                     TGen
-                       .Marshalling
-                       .JSON_Marshallers
-                       .Generate_TC_Serializers_For_Subp
-                          (Spec_Part_Acc,
-                           Private_Part'Unrestricted_Access,
-                           Body_Part'Unrestricted_Access,
-                           As_Function_Typ (T),
-                           TRD);
-                  end if;
-               else
-                  TGen
-                    .Marshalling
-                    .Binary_Marshallers
-                    .Generate_Marshalling_Functions_For_Typ
-                       (Spec_Part_Acc,
-                        Private_Part'Unrestricted_Access,
-                        Body_Part'Unrestricted_Access,
-                        T.all,
-                        T.all.Kind in Discrete_Typ_Range
-                        and then Ctx.Array_Index_Types.Contains (T),
-                        TRD);
-
-                  if JSON_Marshalling_Enabled then
-                     TGen
-                       .Marshalling
-                       .JSON_Marshallers
-                       .Generate_Marshalling_Functions_For_Typ
-                          (Spec_Part_Acc,
-                           Private_Part'Unrestricted_Access,
-                           Body_Part'Unrestricted_Access,
-                           T.all,
-                           Ctx.Array_Index_Types.Contains (T),
-                           TRD);
-                  end if;
-               end if;
+            if Vis = Priv and then Generation_Array (Vis).Length = 0 then
+               goto Continue;
             end if;
+
+            --  Clear template data to avoid unwanted side effects between
+            --  private and public support packages.
+
+            Spec_Marshalling_Fun_Public_Part.Clear;
+            Spec_Marshalling_Fun_Private_Part.Clear;
+            Body_Marshalling_Fun.Clear;
+
+            --  We depends on the private counterpart package only if we are
+            --  generating the public package and there's a type in the
+            --  dependencies that belongs to this package and is fully private.
+
+            Assocs.Insert
+              (Assoc
+                 ("DEPENDS_ON_PRIVATE",
+                  Vis = Pub
+                  and then (for some Ty of Typ_Dependencies =>
+                              Ty.Fully_Private
+                              and Ty.Package_Name = Pkg_Name)));
+
+            --  We depends on the public counterpart package only if we are
+            --  generating the private package and there's a type in the
+            --  dependencies that belongs to this package and is not fully
+            --  private.
+
+            Assocs.Insert
+              (Assoc
+                 ("DEPENDS_ON_PUBLIC",
+                  Vis = Priv
+                  and then (for some Ty of Typ_Dependencies =>
+                              not Ty.Fully_Private
+                              and Ty.Package_Name = Pkg_Name)));
+
+            Generate_Marshalling_Functions
+              (Ctx,
+               Types                             => Generation_Array (Vis),
+               Spec_Marshalling_Fun_Public_Part  =>
+                 Spec_Marshalling_Fun_Public_Part,
+               Spec_Marshalling_Fun_Private_Part =>
+                 Spec_Marshalling_Fun_Private_Part,
+               Body_Marshalling_Fun              => Body_Marshalling_Fun);
+
+            declare
+               Private_Support_Package : constant Boolean := Vis = Priv;
+               Pack_Name               : constant String :=
+                 (if Private_Support_Package
+                  then To_Ada (Support_Lib_Name) & "_Private"
+                  else To_Ada (Support_Lib_Name));
+               Support_File_Name       : constant String :=
+                 (if Private_Support_Package
+                  then File_Name & "_private"
+                  else File_Name);
+            begin
+
+               Assocs.Insert
+                 (Assoc ("IS_PRIVATE_SUPPORT_PACKAGE", Vis = Priv));
+               Assocs.Insert (Assoc ("SUPPORT_PACK_NAME", Pack_Name));
+               Assocs.Insert
+                 (Assoc
+                    ("SPEC_MARSHALLING_FUN_PUBLIC_PART",
+                     Spec_Marshalling_Fun_Public_Part));
+               Assocs.Insert
+                 (Assoc
+                    ("SPEC_MARSHALLING_FUN_PRIVATE_PART",
+                     Spec_Marshalling_Fun_Private_Part));
+               Assocs.Insert
+                 (Assoc ("BODY_MARSHALLING_FUN", Body_Marshalling_Fun));
+
+               Render_Support_Templates (Ctx, Assocs, Support_File_Name);
+
+            end;
+            <<Continue>>
          end loop;
-         Put_Line (F_Body, +Body_Part);
-         Put_Line (F_Spec, +Spec_Part);
-         Put_Line (F_Spec, "private");
-         Put_Line (F_Spec, +Private_Part);
       end;
 
-      Put_Line (F_Body, "end " & Ada_Support_Name & ";");
-      Close (F_Body);
-      Put_Line (F_Spec, "end " & Ada_Support_Name & ";");
-      Close (F_Spec);
    end Generate_Support_Library;
 
    --------------------------------
@@ -960,15 +1135,36 @@ package body TGen.Libgen is
 
          --  Fill out the support package map with the parameter types and the
          --  global types.
+         --  If the package should be placed in a private support package
+         --  add the name <package name>.TGen_Support_Private. Otherwise just
+         --  use the regular name (<package name>.TGen_Support).
 
          for Param of Fct_Typ.Component_Types loop
             Ctx.Support_Packs_Per_Unit.Reference (Support_Packs).Include
-              (Support_Library_Package (Param.all.Compilation_Unit_Name));
+              (if Param.Fully_Private
+               then
+                 Support_Private_Library_Package
+                   (Param.all.Compilation_Unit_Name)
+               else Support_Library_Package (Param.all.Compilation_Unit_Name));
+
+            if Param.Fully_Private
+              and then Fct_Typ.Compilation_Unit_Name
+                       /= Param.Compilation_Unit_Name
+            then
+               Ctx.Support_Packs_Per_Unit.Reference (Support_Packs).Include
+                 (Support_Private_Library_Package
+                    (Fct_Typ.Compilation_Unit_Name));
+            end if;
          end loop;
 
          for Glob of Fct_Typ.Globals loop
             Ctx.Support_Packs_Per_Unit.Reference (Support_Packs).Include
-              (Support_Library_Package (Glob.all.Compilation_Unit_Name));
+              ((if Glob.Fully_Private
+                then
+                  Support_Private_Library_Package
+                    (Glob.all.Compilation_Unit_Name)
+                else
+                  Support_Library_Package (Glob.all.Compilation_Unit_Name)));
          end loop;
 
          --  Get the transitive closure of the types on which the parameters'
