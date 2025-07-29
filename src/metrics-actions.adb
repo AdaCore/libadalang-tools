@@ -3310,17 +3310,24 @@ package body METRICS.Actions is
 
             when Ada_Select_Stmt =>
                declare
-                  S         : constant Select_Stmt := Node.As_Select_Stmt;
-                  Num_Alts  : constant Metric_Nat :=
-                    Children_Count (F_Guards (S));
+                  S                 : constant Select_Stmt :=
+                    Node.As_Select_Stmt;
+                  S_Else_Part       : constant Else_Part := S.F_Else_Part;
+                  S_Then_Abort_Part : constant Then_Abort_Part :=
+                    S.F_Then_Abort_Part;
+
+                  Num_Alts  : constant Metric_Nat := S.F_Guards.Children_Count;
                   Num_Else  : constant Metric_Nat :=
-                    (if Children_Count (F_Stmts (F_Else_Part (S))) = 0
+                    (if S_Else_Part.Is_Null
+                       or else S_Else_Part.F_Stmts.Children_Count = 0
                      then 0
                      else 1);
                   Num_Abort : constant Metric_Nat :=
-                    (if Children_Count (F_Stmts (F_Then_Abort_Part (S))) = 0
+                    (if S_Then_Abort_Part.Is_Null
+                       or else S_Then_Abort_Part.F_Stmts.Children_Count = 0
                      then 0
                      else 1);
+
                begin
                   Inc_Cyc
                     (Complexity_Statement,

@@ -1,0 +1,23 @@
+Units remaining: 2     Units remaining: 1     Line metrics summed over 2 units
+  all lines            : 34
+  code lines           : 27
+  comment lines        : 0
+  end-of-line comments : 0
+  comment percentage   : 0.00
+  blank lines          : 7
+
+Average lines in body: 19.00
+
+Element metrics summed over 2 units
+  all statements      : 8
+  all declarations    : 13
+  logical SLOC        : 21
+
+Average cyclomatic complexity: 4.00
+
+Coupling metrics:
+=================
+   Unit TACHES (/src/taches.ads)
+      unit fan-out coupling     : 0
+      unit fan-in coupling      : 0
+

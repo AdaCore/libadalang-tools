@@ -1,0 +1,6 @@
+library project Taches is
+   for Source_Dirs use ("src");
+   for Library_Name use "taches";
+   for Library_Kind use "static";
+   for Library_Dir use "lib";
+end Taches;
