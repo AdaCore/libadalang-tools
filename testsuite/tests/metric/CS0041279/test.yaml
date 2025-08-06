@@ -1,2 +1,3 @@
 description: gnatmetric test
 driver: shell_script
+canonicalize_backslashes: True
