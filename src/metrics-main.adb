@@ -20,6 +20,8 @@
 -- the files COPYING3 and COPYING.RUNTIME respectively.  If not, see        --
 -- <http://www.gnu.org/licenses/>.                                          --
 ------------------------------------------------------------------------------
+
+with Ada.Text_IO;
 with GNAT.OS_Lib;
 
 with Utils_Debug; use Utils_Debug;
@@ -36,6 +38,13 @@ procedure METRICS.Main is
    --  Main procedure for lalmetric
 
    procedure Callback (Phase : Parse_Phase; Swit : Dynamically_Typed_Switch);
+
+   function Get_Fallback_Target return String;
+   --  Returns `gnatsas` if codepeer-gprconfig has only one `codepeer` target
+
+   --------------
+   -- Callback --
+   --------------
 
    procedure Callback (Phase : Parse_Phase; Swit : Dynamically_Typed_Switch) is
       use METRICS.Command_Lines;
@@ -60,6 +69,74 @@ procedure METRICS.Main is
       end if;
    end Callback;
 
+   -------------------------
+   -- Get_Fallback_Target --
+   -------------------------
+
+   function Get_Fallback_Target return String is
+      use GNAT.OS_Lib;
+      use Ada.Text_IO;
+
+      Exec_Access : String_Access :=
+        Locate_Exec_On_Path ("codepeer-gprconfig");
+
+      Apply : Boolean := False;
+      Lines : Natural := 0;
+      FD    : File_Descriptor;
+      Name  : String_Access;
+      Code  : Integer;
+      File  : Ada.Text_IO.File_Type;
+      Dummy : Boolean;
+
+   begin
+      if Exec_Access /= null then
+         Create_Temp_Output_File (FD, Name);
+
+         if FD /= Invalid_FD then
+            declare
+               Arg1 : aliased String := "--show-targets";
+               Arg2 : aliased String := "--config=Ada";
+               Args : constant Argument_List :=
+                 (Arg1'Unchecked_Access, Arg2'Unchecked_Access);
+            begin
+               Spawn (Exec_Access.all, Args, FD, Code);
+               Close (FD);
+
+               if Code = 0 then
+                  Open (File, In_File, Name.all);
+                  while not End_Of_File (File) loop
+                     declare
+                        S : constant String := Get_Line (File);
+                     begin
+                        Lines := Lines + 1;
+
+                        if Lines = 2 then
+                           Apply := S = "codepeer";
+
+                        elsif Lines = 3 then
+                           Apply := False;
+                           exit;
+                        end if;
+                     end;
+                  end loop;
+                  Close (File);
+               end if;
+            end;
+
+            Delete_File (Name.all, Dummy);
+            Free (Name);
+         end if;
+
+         Free (Exec_Access);
+      end if;
+
+      if Apply then
+         return "gnatsas";
+      else
+         return "";
+      end if;
+   end Get_Fallback_Target;
+
    Tool : Actions.Metrics_Tool;
    Cmd  : Command_Line (METRICS.Command_Lines.Descriptor'Access);
 
@@ -71,7 +148,8 @@ begin
      (Cmd,
       Tool,
       Tool_Package_Name => "metrics",
-      Callback          => Callback'Unrestricted_Access);
+      Callback          => Callback'Unrestricted_Access,
+      Fallback_Target   => Get_Fallback_Target);
 
    --  If syntax errors are detected during the processing then return a
    --  non zero exit code

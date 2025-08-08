@@ -38,7 +38,8 @@ package Utils.Projects is
       Tool_Package_Name       : String;
       Compute_Project_Closure : Boolean := True;
       Callback                : Parse_Callback := null;
-      Print_Help              : not null access procedure);
+      Print_Help              : not null access procedure;
+      Fallback_Target         : String := "");
    --  Processes the command line and (if specified on the command line) the
    --  project file.
    --
@@ -75,6 +76,9 @@ package Utils.Projects is
    --  written.
    --
    --  Print_Help is called if --help appears on the command line.
+   --
+   --  Fallback_Target is used if no target is specified in the project or
+   --  the command line switch.
 
    procedure Read_File_Names_From_File
      (Par_File_Name : String;
