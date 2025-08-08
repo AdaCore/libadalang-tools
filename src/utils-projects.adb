@@ -30,7 +30,6 @@ with Ada.Environment_Variables;
 with Ada.Exceptions;
 with Ada.Strings;       use Ada.Strings;
 with Ada.Strings.Fixed; use Ada.Strings.Fixed;
-with Ada.Text_IO;
 
 with GNAT.Directory_Operations;
 with GNAT.Traceback.Symbolic;
@@ -95,7 +94,8 @@ package body Utils.Projects is
       My_Project_Env          : Project_Environment_Access;
       Tool_Package_Name       : String;
       Compute_Project_Closure : Boolean;
-      Callback                : Parse_Callback);
+      Callback                : Parse_Callback;
+      Fallback_Target         : String := "");
 
    function Project_File_Name (Cmd : Command_Line) return String is
       Name : String renames Arg (Cmd, Project_File).all;
@@ -132,7 +132,8 @@ package body Utils.Projects is
       My_Project_Env          : Project_Environment_Access;
       Tool_Package_Name       : String;
       Compute_Project_Closure : Boolean;
-      Callback                : Parse_Callback)
+      Callback                : Parse_Callback;
+      Fallback_Target         : String := "")
    is
       use String_Access_Vectors;
 
@@ -263,12 +264,34 @@ package body Utils.Projects is
                  ("\1: project file \2 not found\n",
                   Tool_Name,
                   Project_File_Name (Cmd));
+
             else
                Err_Out.Put ("\1: \2\n", Tool_Name, S);
             end if;
             Error_Printed := True;
          end Errors;
       begin
+         if Fallback_Target /= "" then
+            --  Special case for the GNATmetric to fall back to the `gnatsas`
+            --  target when the target is not specified.
+
+            My_Project_Tree.Load
+              (GNATCOLL.VFS.Create (+Project_File_Name (Cmd)),
+               Project_Env,
+               Errors              => null,
+               Recompute_View      => False,
+               Report_Missing_Dirs => False);
+
+            if GNATCOLL.Projects."/="
+                 (My_Project_Tree.Status, GNATCOLL.Projects.Empty)
+              and then My_Project_Tree.Root_Project.Get_Target (False) = ""
+            then
+               Project_Env.Set_Target_And_Runtime
+                 (Target  => Fallback_Target,
+                  Runtime => My_Project_Tree.Root_Project.Get_Runtime);
+            end if;
+         end if;
+
          My_Project_Tree.Load
            (GNATCOLL.VFS.Create (+Project_File_Name (Cmd)),
             Project_Env,
@@ -1301,7 +1324,8 @@ package body Utils.Projects is
       Tool_Package_Name       : String;
       Compute_Project_Closure : Boolean := True;
       Callback                : Parse_Callback := null;
-      Print_Help              : not null access procedure)
+      Print_Help              : not null access procedure;
+      Fallback_Target         : String := "")
    is
       --  We have to Parse the command line BEFORE we Parse the project file,
       --  because command-line args tell us the name of the project file, and
@@ -1476,7 +1500,8 @@ package body Utils.Projects is
                Project_Env,
                Tool_Package_Name,
                Compute_Project_Closure,
-               Callback);
+               Callback,
+               Fallback_Target);
 
             Environment.Create_Temp_Dir
               (My_Project_Tree.Root_Project.Object_Dir.Display_Full_Name);

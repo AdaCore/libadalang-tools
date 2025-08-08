@@ -31,6 +31,7 @@ package Utils.Drivers is
       Tool                  : in out Tools.Tool_State'Class;
       Tool_Package_Name     : String;
       Preprocessing_Allowed : Boolean := True;
-      Callback              : Parse_Callback := null);
+      Callback              : Parse_Callback := null;
+      Fallback_Target       : String := "");
 
 end Utils.Drivers;

@@ -57,7 +57,8 @@ package body Utils.Drivers is
       Tool                  : in out Tool_State'Class;
       Tool_Package_Name     : String;
       Preprocessing_Allowed : Boolean := True;
-      Callback              : Parse_Callback := null)
+      Callback              : Parse_Callback := null;
+      Fallback_Target       : String := "")
    is
       use String_Sets;
 
@@ -187,7 +188,8 @@ package body Utils.Drivers is
          Preprocessing_Allowed => Preprocessing_Allowed,
          Tool_Package_Name     => Tool_Package_Name,
          Callback              => Local_Callback'Unrestricted_Access,
-         Print_Help            => Print_Help'Access);
+         Print_Help            => Print_Help'Access,
+         Fallback_Target       => Fallback_Target);
       --      Utils.Command_Lines.Common.Post.Postprocess_Common (Cmd);
 
       if Debug_Flag_C then
