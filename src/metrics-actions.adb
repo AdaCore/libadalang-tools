@@ -370,7 +370,9 @@ package body METRICS.Actions is
      (Cmd : Command_Line; File_Name : String) return String
    is (if Arg (Cmd, Short_File_Names)
        then Directories.Simple_Name (File_Name)
-       else Normalize_Pathname (File_Name));
+       else
+         Normalize_Pathname
+           (File_Name, Resolve_Links => not Arg (Cmd, Preserve_Symlinks)));
 
    function Lines_String
      (Sloc_Range : Slocs.Source_Location_Range) return String
