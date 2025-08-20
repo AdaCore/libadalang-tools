@@ -7,22 +7,14 @@ library project LAL_Tools is
    type Library_Type_Type is ("static", "static-pic", "relocatable");
    Library_Type : Library_Type_Type := external ("LIBRARY_TYPE", "static");
 
-   for Source_Dirs use
-     (".", "tgen", "tgen/tgen_rts",
-      "../share/tgen/templates",
-      "../share/tgen/templates/marshalling_templates",
-      "../share/tgen/templates/json_templates",
-      "../share/tgen/templates/type_representation_templates");
+   for Source_Dirs use (".");
 
    for Object_Dir use "../obj/" & LAL_Tools_Common.Superproject & "/lib/" & Library_Type;
    for Library_Kind use Library_Type;
    for Library_Dir use "../lib/" & Library_Type;
    for Library_Name use "lal_tools";
 
-   for Languages use ("Ada", "Templates");
-   package Naming is
-      for Implementation_Suffix ("Templates") use ".tmplt";
-   end Naming;
+   for Languages use ("Ada");
 
    for Excluded_Source_Files use
      ("pp-main.adb",

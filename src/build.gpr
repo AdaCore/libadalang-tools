@@ -17,7 +17,7 @@ project Build is
       "stub-main.adb",
       "utils-var_length_ints-test.adb");
 
-   for Source_Dirs use (".", "tgen");
+   for Source_Dirs use (".");
    for Object_Dir use "../obj";
    for Exec_Dir use "../bin";
    for Source_Files use Tools_Mains;
