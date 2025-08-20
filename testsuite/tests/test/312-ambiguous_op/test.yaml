@@ -1,6 +1,0 @@
-description: Check that gnattest does not generate ambiguous code when
-  generating a harness for operators.
-
-driver: gnattest_tgen
-
-default-gpr: true

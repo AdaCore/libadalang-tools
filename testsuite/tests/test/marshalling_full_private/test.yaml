@@ -1,8 +1,0 @@
-description:
-    Test that the support library does not violate visibility rules for types
-    with no visible part (i.e. only declared in the private part of the
-    package).
-
-driver: shell_script
-control:
-    - [XFAIL, 'x86', 'Marshalling not working for 32bits (UB03-008)']

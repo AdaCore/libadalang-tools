@@ -1,7 +1,0 @@
-description:
-  Ensure that all necessary units are exposed in the interfaces of all test
-  drivers by checking that the compilation of the test drivers of a stubbed
-  library project does not produce any error.
-
-driver: shell_script
-

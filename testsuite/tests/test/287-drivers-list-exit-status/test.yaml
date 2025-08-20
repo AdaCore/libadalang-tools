@@ -1,6 +1,0 @@
-description: Test the executions of test drivers through the
-  "gnattest test_drivers.list" command with the "--exit-status" and
-  "--passed-tests" switches and on different expected test results (all
-  passing, some passing, all failing).
-
-driver: python_script

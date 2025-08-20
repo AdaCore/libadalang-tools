@@ -1,5 +1,0 @@
-description: |
-  Check that test case generation for explicit subprograms via
-  `--gen-test-subprograms`.
-
-driver: shell_script

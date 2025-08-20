@@ -1,4 +1,0 @@
-gnattest: name resolution error for <Id "Some_Type" wrong_1.ads:3:56-3:65>
-gnattest: unexpected error while creating stub for wrong_1.ads
-gnattest: name resolution error for <Id "Some_Type" wrong_2.ads:3:46-3:55>
-gnattest: unexpected error while creating stub for wrong_2.ads

@@ -1,7 +1,0 @@
-description: |
-  Run TGen and dump test case inputs with an arrays whose index is an enum
-  Range.
-
-driver: gnattest_tgen
-
-default-gpr: true

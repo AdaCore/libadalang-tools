@@ -1,5 +1,0 @@
-description: |
-  Check private fully subprogram that takes fully private type coming from a
-  generic instantiation itself work.
-
-driver: shell_script

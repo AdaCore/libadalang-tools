@@ -1,7 +1,0 @@
-protec.ads:7:4: info: corresponding test PASSED
-protec.ads:7:4: info: corresponding test PASSED
-protec.ads:7:4: info: corresponding test PASSED
-protec.ads:7:4: info: corresponding test PASSED
-protec.ads:7:4: info: corresponding test PASSED
-protec.ads:7:4: error: corresponding test FAILED: Test not implemented. (protec-test_data-tests.adb:45)
-6 tests run: 5 passed; 1 failed; 0 crashed.

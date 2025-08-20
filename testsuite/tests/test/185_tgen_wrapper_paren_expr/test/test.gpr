@@ -1,6 +1,0 @@
-project Test is
-
-   for Object_Dir use "obj";
-   for Source_Dirs use (".");
-
-end Test;

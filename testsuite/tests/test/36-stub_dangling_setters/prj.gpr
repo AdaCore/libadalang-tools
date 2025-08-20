@@ -1,8 +1,0 @@
-project Prj is
-
-   type Source is ("old", "new");
-   for Source_Dirs use (external ("SRC_DIR", "old"));
-   for Object_Dir use "obj";
-
-end Prj;
-

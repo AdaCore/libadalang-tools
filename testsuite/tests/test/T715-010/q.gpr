@@ -1,3 +1,0 @@
-project q is
-   for Source_Dirs use ("src");
-end q;

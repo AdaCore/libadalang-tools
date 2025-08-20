@@ -1,7 +1,0 @@
-description:
-    Test that TGen does not crash when there are no supported subprogram for
-    testcase generation.
-
-driver: shell_script
-control:
-    - [XFAIL, 'x86', 'Marshalling not working for 32bits (UB03-008)']

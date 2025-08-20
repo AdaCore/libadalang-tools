@@ -1,3 +1,0 @@
-gnattest: Unexpected format for --gen-test-subprograms, expected <filename>:<line>
-gnattest: abc must be a positive number
->>>program returned status code 1

@@ -1,4 +1,0 @@
-description: Test JSON containing standard.float values
-    with quotient = false
-
-driver: shell_script

@@ -1,4 +1,0 @@
-description: |
-  Checks that gnattest works with a nested package declared within a generic
-
-driver: shell_script

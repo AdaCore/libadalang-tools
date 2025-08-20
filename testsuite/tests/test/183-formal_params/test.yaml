@@ -1,9 +1,0 @@
-description: Test that gnattest does not attempt to generate test inputs for
-  subprograms with generic formal parameters or return types.
-
-driver: shell_script
-
-canonicalize_backslashes: True
-
-control:
-    - [XFAIL, 'x86', 'Marshalling not working for 32bits (UB03-008)']
