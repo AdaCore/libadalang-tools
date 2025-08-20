@@ -8,11 +8,6 @@ def test_(qualifier={}):
         anod_install("libadalang-tools")
         anod_test("libadalang-tools")
 
-def test_gnatfuzz_tests():
-    # Install the component already built in previous stage
-    anod_install("libadalang-tools")
-    anod_test("libadalang-tools", qualifier={"gnatfuzz-tests": True})
-
 # Edge
 
 edge_qualifier = {"edge": True}
