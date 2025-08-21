@@ -2645,10 +2645,9 @@ package body Pp.Formatting is
                --  Check for "T'((X, Y, Z))" --> "T'(X, Y, Z)" case
 
                elsif Kind (Src_Tok) = '('
-                 and then Kind (Prev_Lexeme (Src_Tok))
-                          = '('
-                            --  ???Also check that the one before
-                            --  that is a tick!
+                 and then Kind (Prev_Lexeme (Src_Tok)) = '('
+                 --  ???Also check that the one before
+                 --  that is a tick!
                then
                   Qual_Nesting := Qual_Nesting + 1;
                   Next_ss (Src_Tok);
