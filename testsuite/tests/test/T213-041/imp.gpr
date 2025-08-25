@@ -1,7 +1,0 @@
-with "p/p.gpr";
-
-project imp is
-
-   package Builder renames P.Builder;
-
-end imp;

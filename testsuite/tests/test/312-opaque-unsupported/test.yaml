@@ -1,6 +1,0 @@
-description: Verify that opaque types that descend from and unsupported type
-  are flagged as unsupported as well.
-
-default-gpr: true
-
-driver: gnattest_tgen

@@ -1,3 +1,0 @@
-project simple is
-   for Source_Dirs use ("src");
-end simple;

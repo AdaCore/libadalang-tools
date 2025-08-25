@@ -1,7 +1,0 @@
-constrained_arrays.ads:6:4: info: corresponding test PASSED
-constrained_arrays.ads:6:4: info: corresponding test PASSED
-constrained_arrays.ads:6:4: info: corresponding test PASSED
-constrained_arrays.ads:6:4: info: corresponding test PASSED
-constrained_arrays.ads:6:4: info: corresponding test PASSED
-constrained_arrays.ads:6:4: error: corresponding test FAILED: Test not implemented. (constrained_arrays-test_data-tests.adb:45)
-6 tests run: 5 passed; 1 failed; 0 crashed.

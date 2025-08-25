@@ -1,7 +1,0 @@
-description: |
-  This test make sure that TGen ignores declaration with class wide return
-  types. Class wide types (`'Class`) are not supported yet.
-
-default-gpr: true
-
-driver: gnattest_tgen

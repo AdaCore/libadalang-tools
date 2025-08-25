@@ -1,4 +1,0 @@
-gnattest: Error while processing <| SubpDecl ["Subp_Under_Test"] bar.ads:8:4-12:25 [main_package.ads:2:1, foo.ads:9:4] |>:
-main_package.foo_bar.subp_under_test.Test_Data_2: main_package.foo_array is not supported (types declared a generic package instantiation that is a library item are unsupported)
-
-gnattest: cannot create main suite and test runner

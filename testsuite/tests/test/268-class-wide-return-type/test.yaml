@@ -1,6 +1,0 @@
-description: |
-  Test if private tagged types as return type are accepted and test cases can
-  be generated
-
-driver: gnattest_tgen
-default-gpr: true

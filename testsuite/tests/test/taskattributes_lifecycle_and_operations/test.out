@@ -1,4 +1,0 @@
-Units remaining: 4     Units remaining: 3     Units remaining: 2     Units remaining: 1     gnattest: no test skeletons generated because no subprogram to test
-          found in project /pkg.gpr
-gnattest: cannot create main suite and test runner
->>>program returned status code 1

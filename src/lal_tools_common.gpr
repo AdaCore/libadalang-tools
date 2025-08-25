@@ -10,13 +10,13 @@ abstract project LAL_Tools_Common is
 
    package Compiler is
       for Driver ("Templates") use "";
+
+      Common_Switches := ("-fPIC", "-gnatX", "-gnatyg");
+
       case Build_Mode is
          when "dev" =>
-            for Default_Switches ("Ada") use
-              ("-fPIC",
-               "-gnatX",
-               "-gnatyg",
-               "-gnatf",
+            for Default_Switches ("Ada") use Common_Switches &
+              ("-gnatf",
                "-gnatwae",
                "-gnatw.u", -- warn inappropriate use of unordered enums
                "-g",
@@ -24,22 +24,16 @@ abstract project LAL_Tools_Common is
                "-gnata",
                "-gnatVa");
          when "prod" =>
-            for Default_Switches ("Ada") use
-              ("-fPIC",
-               "-gnatX",
-               "-gnatyg",
-               "-g",
+            for Default_Switches ("Ada") use Common_Switches &
+              ("-g",
                "-Ofast",
                --  T915-005: deactivate -gnatp, as this seems to cause
                --  linking errors when linking the Ada Language Server
                --  "-gnatp"
                "-gnatn2");
          when "AddressSanitizer" =>
-           for Default_Switches ("Ada") use
-              ("-fPIC",
-               "-gnatX",
-               "-gnatyg",
-               "-gnatwae",
+           for Default_Switches ("Ada") use Common_Switches &
+              ("-gnatwae",
                "-gnatw.u", -- warn inappropriate use of unordered enums
                "-g",
                "-O0",

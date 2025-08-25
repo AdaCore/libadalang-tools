@@ -1,4 +1,0 @@
-description: Test that asserts that --dump-subp-hash=<filename>:<line>
-    indeed prints the correct hash.
-
-driver: python_script

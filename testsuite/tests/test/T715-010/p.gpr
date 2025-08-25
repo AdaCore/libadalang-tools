@@ -1,5 +1,0 @@
-with "q.gpr";
-project p is
-   for Languages    use ("Ada", "C");
-   for Main         use ("c_main.c", "main.adb");
-end p;

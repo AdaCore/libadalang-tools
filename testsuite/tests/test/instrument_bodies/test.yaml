@@ -1,6 +1,0 @@
-description:
-    Check instrumentation of subprograms declared in spec and having
-    renaming, expression function and a null body in the package body.
-
-driver: shell_script
-

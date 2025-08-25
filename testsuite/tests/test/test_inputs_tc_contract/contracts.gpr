@@ -1,7 +1,0 @@
-project Contracts is
-   package Gnattest is
-      for Gnattest_Switches use
-        ("--passed-tests=hide", "--skeleton-default=pass");
-   end Gnattest;
-end Contracts;
-

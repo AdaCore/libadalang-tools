@@ -1,7 +1,0 @@
-description: |
-  Generate test cases when a package is a simply a generic package
-  instantiation.
-
-driver: gnattest_tgen
-
-suppress_test_dump: True

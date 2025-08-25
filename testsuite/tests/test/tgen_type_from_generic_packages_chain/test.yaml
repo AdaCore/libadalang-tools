@@ -1,6 +1,0 @@
-description: |4
-     tgen test
-
-driver: gnattest_tgen
-
-suppress_test_dump: True

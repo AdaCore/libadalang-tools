@@ -1,6 +1,0 @@
-description:
-  Test that gnattest does not exit with an error if there are warnings when
-  loading the project file. Instead, only output those warnings and still
-  proceed with the rest of the tool.
-
-driver: shell_script

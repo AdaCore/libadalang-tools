@@ -1,4 +1,0 @@
-project simple is
-   for Target use "x86_64-linux";
-   for Runtime ("ada") use "default";
-end simple;

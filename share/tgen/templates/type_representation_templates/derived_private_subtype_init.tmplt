@@ -1,2 +1,0 @@
-@_TY_PREFIX_@_Typ.Parent_Type := @_PARENT_TY_PREFIX_@_Typ_Ref;
-@_TY_PREFIX_@_Typ_Ref := (@_TY_PREFIX_@_Typ'Access);

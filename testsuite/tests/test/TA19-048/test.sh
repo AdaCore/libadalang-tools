@@ -1,1 +1,0 @@
-gnattest -P p -q

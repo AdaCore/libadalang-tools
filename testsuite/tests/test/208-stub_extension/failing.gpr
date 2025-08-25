@@ -1,2 +1,0 @@
-project Failing extends "libext/libext.gpr" is
-end Failing;

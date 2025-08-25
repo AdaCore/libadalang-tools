@@ -1,5 +1,0 @@
-project simple is
-   package GNATTest is
-      for Harness_Dir use "h";
-   end GNATTest;
-end simple;

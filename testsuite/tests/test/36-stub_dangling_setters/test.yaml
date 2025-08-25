@@ -1,6 +1,0 @@
-description:
-  Check that dangling setters in a stubbing harness do not cause any compilation
-  issues. They used to not be commented out, which could result in lingering
-  references to types or objects no longer present in the codebase.
-
-driver: shell_script

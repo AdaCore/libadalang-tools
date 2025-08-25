@@ -1,6 +1,0 @@
-description: |
-  Check that TGen supports types that are derived from an opaque type.
-
-default-gpr: true
-
-driver: gnattest_tgen

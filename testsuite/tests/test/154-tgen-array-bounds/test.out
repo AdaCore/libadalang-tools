@@ -1,7 +1,0 @@
-pb_arrays.ads:25:4: info: corresponding test PASSED
-pb_arrays.ads:25:4: info: corresponding test PASSED
-pb_arrays.ads:25:4: info: corresponding test PASSED
-pb_arrays.ads:25:4: info: corresponding test PASSED
-pb_arrays.ads:25:4: info: corresponding test PASSED
-pb_arrays.ads:25:4: error: corresponding test FAILED: Test not implemented. (pb_arrays-test_data-tests.adb:45)
-6 tests run: 5 passed; 1 failed; 0 crashed.

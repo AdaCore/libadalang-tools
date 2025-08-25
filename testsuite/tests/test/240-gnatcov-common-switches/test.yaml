@@ -1,4 +1,0 @@
-description: Test that the common switches in the gnatcov package are correctly
-  mirrored in the generated coverage_settings.mk file.
-
-driver: shell_script

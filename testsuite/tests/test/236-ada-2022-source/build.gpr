@@ -1,8 +1,0 @@
-project Build is
-   for Source_Dirs use ("src");
-
-   package Compiler is
-      for Switches ("ada") use ("-gnat2022");
-   end Compiler;
-
-end Build;

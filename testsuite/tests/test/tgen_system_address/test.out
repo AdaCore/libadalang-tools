@@ -1,4 +1,0 @@
-Error during parameter translation of subprogram Pkg.Setvbuf:
-pkg.setvbuf.Buffer: interfaces.c_streams.chars is not supported (System.Address unsupported)
-
->>>program returned status code 1

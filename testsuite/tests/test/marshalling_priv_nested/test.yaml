@@ -1,5 +1,0 @@
-description:
-    test that private types declared in nested packages are correctly
-    rejected by TGen.
-
-driver: shell_script

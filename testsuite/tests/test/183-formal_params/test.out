@@ -1,7 +1,0 @@
-No subprogram supported for test case generation.
-Units remaining: 3     Units remaining: 2     Units remaining: 1     warning: (gnattest) gen.ads:1:1: no instance of Gen
- corresponding tests are not included into harness
-gnattest: no test skeletons generated because no subprogram to test
-          found in project /prj.gpr
-gnattest: cannot create main suite and test runner
->>>program returned status code 1

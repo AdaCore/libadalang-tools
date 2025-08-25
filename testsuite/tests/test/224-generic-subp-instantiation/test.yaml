@@ -1,5 +1,0 @@
-description: |
-  Check that generic sub-packages instantiation are taken into
-  account by gnattest and no warnings are emitted for this.
-
-driver: shell_script

@@ -1,7 +1,0 @@
-@_TY_PREFIX_@_Typ : aliased TGen.Types.Derived_Private_Subtype_Typ :=
-   (Name => TGen.Strings.To_Qualified_Name ("@_TY_NAME_@"),
-    @@--  As the parent type may be defined within the same package
-    @@--  (making @_PARENT_TY_PREFIX_@_Typ_Ref null as this point) it will be
-    @@--  assigned during the init phase (in the package body).
-    Parent_Type => null,
-    others => <>);

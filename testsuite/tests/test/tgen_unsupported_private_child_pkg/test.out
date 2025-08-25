@@ -1,3 +1,0 @@
-gnattest-tgen: Pkg.Child: Test input generation not supported for private packages; skipping
-Units remaining: 3     gnattest: Pkg.Child is private or child of private; skipping
-Units remaining: 2     Units remaining: 1     

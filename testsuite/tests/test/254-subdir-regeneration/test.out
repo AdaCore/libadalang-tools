@@ -1,3 +1,0 @@
-gnattest: cannot specify test subdir along with a source directory path ending with "**"
-gnattest: cannot specify test subdir along with a source directory path ending with "**"
->>>program returned status code 1

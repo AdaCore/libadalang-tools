@@ -1,5 +1,0 @@
-description: |
-  Check that gnattest rejects erroneous inputs that are not formatted following
-  this `<filename>:<number>` pattern.
-
-driver: shell_script

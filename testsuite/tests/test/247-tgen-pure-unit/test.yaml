@@ -1,4 +1,0 @@
-description: |
-  Check that TGen is able to skip subprograms that belongs to pure units
-
-driver: shell_script

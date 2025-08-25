@@ -1,4 +1,0 @@
-description: Test that gnattest does not crash when non-simple filenames
-  are present in the argument file passed to the --ignore switch
-
-driver: shell_script

@@ -1,3 +1,0 @@
-p.ads:4:4: overridden at p.ads:9:4: error: corresponding test FAILED: Do_Stuff is wrong for T (p-t_test_data-t_tests.adb:43)
-speed1.ads:7:4: overridden at speed2.ads:11:4: error: corresponding test FAILED: wrong speed after first assignment: 0 (speed1-controller_test_data-controller_tests.adb:63)
-10 tests run: 8 passed; 2 failed; 0 crashed.

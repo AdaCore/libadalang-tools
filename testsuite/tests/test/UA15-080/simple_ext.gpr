@@ -1,3 +1,0 @@
-project simple_ext extends "simple/simple.gpr" is
-
-end simple_ext;

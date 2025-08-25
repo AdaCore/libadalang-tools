@@ -1,7 +1,0 @@
-description: Test that GNATtest does not try to generate test cases for a
-  subprogram that has an explicit null Global aspect.
-
-driver: shell_script
-
-control:
-    - [XFAIL, 'x86', 'Marshalling not working for 32bits (UB03-008)']

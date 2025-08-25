@@ -1,9 +1,0 @@
-description: Check that the support library and gnattest harness are legal for
-  custom operators.
-
-driver: gnattest_tgen
-
-suppress_test_dump: True
-
-control:
-    - [XFAIL, 'x86', 'Marshalling not working for 32bits (UB03-008)']

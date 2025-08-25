@@ -1,7 +1,0 @@
-description:
-    Test that TGen rightly rejects subprogram profiles with a
-    System.Address formal.
-
-driver: shell_script
-control:
-    - [XFAIL, 'x86', 'Marshalling not working for 32bits (UB03-008)']

@@ -15,10 +15,9 @@ project Build is
      ("pp-main.adb",
       "metrics-main.adb",
       "stub-main.adb",
-      "test-main.adb",
       "utils-var_length_ints-test.adb");
 
-   for Source_Dirs use (".", "tgen");
+   for Source_Dirs use (".");
    for Object_Dir use "../obj";
    for Exec_Dir use "../bin";
    for Source_Files use Tools_Mains;
@@ -31,7 +30,6 @@ project Build is
       for Executable ("pp-main.adb") use "gnatpp";
       for Executable ("metrics-main.adb") use "gnatmetric";
       for Executable ("stub-main.adb") use "gnatstub";
-      for Executable ("test-main.adb") use "gnattest";
    end Builder;
 
    package Binder is

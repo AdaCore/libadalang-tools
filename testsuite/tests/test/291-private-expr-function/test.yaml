@@ -1,7 +1,0 @@
-description: |
-  Run TGen test case generation for a private (in a package private clause)
-  expression function.
-
-driver: gnattest_tgen
-
-default-gpr: true
