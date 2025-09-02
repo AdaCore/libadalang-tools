@@ -2835,18 +2835,17 @@ package body Laltools.Common is
       Ref_Kind  : out Libadalang.Common.Ref_Result_Kind) return Defining_Name
    is
       Result          : Defining_Name;
-      Failsafe_Result : Refd_Def;
+      Failsafe_Result : Refd_Decl;
    begin
       Ref_Kind := Precise;
       if Name_Node.Is_Null then
          return No_Defining_Name;
-      --  P_Failsafe_Referenced_Def_Name doesn't work on the decl itself
+      --  P_Failsafe_Referenced_Decl doesn't work on the decl itself
       elsif Name_Node.P_Is_Defining then
          Result := Name_Node.P_Enclosing_Defining_Name.P_Canonical_Part;
       else
          Failsafe_Result :=
-           Name_Node.P_Failsafe_Referenced_Def_Name
-             (Imprecise_Fallback => True);
+           Name_Node.P_Failsafe_Referenced_Decl (Imprecise_Fallback => True);
          Ref_Kind := Kind (Failsafe_Result);
          case Kind (Failsafe_Result) is
             when Precise | Imprecise =>
