@@ -517,9 +517,10 @@ package body Laltools.Common is
 
    function Is_Scopes_Owner (Node : Ada_Node'Class) return Boolean
    is (not Node.Is_Null
-       and then (Is_Declarative_Part_Owner (Node)
-                 or Is_Decl_Expr_Owner (Node)
-                 or Is_Params_Owner (Node)));
+       and then
+         (Is_Declarative_Part_Owner (Node)
+          or Is_Decl_Expr_Owner (Node)
+          or Is_Params_Owner (Node)));
 
    -----------------
    --  Get_Params --
@@ -535,8 +536,8 @@ package body Laltools.Common is
 
       if Node.Kind in Ada_Basic_Decl
         and then not Node.As_Basic_Decl.P_Subp_Spec_Or_Null.Is_Null
-        and then Node.As_Basic_Decl.P_Subp_Spec_Or_Null.Kind
-                 in Ada_Subp_Spec_Range
+        and then
+          Node.As_Basic_Decl.P_Subp_Spec_Or_Null.Kind in Ada_Subp_Spec_Range
       then
          return
            Node.As_Basic_Decl.P_Subp_Spec_Or_Null.As_Subp_Spec.F_Subp_Params;
@@ -934,17 +935,17 @@ package body Laltools.Common is
       end if;
 
       case Parent_Declarative_Part_Owner.Kind is
-         when Ada_Decl_Block_Range =>
+         when Ada_Decl_Block_Range     =>
             Body_Decl_Part :=
               Parent_Declarative_Part_Owner.As_Decl_Block.F_Decls;
             Stmts := Parent_Declarative_Part_Owner.As_Decl_Block.F_Stmts;
 
-         when Ada_Entry_Body_Range =>
+         when Ada_Entry_Body_Range     =>
             Body_Decl_Part :=
               Parent_Declarative_Part_Owner.As_Entry_Body.F_Decls;
             Stmts := Parent_Declarative_Part_Owner.As_Entry_Body.F_Stmts;
 
-         when Ada_Package_Body_Range =>
+         when Ada_Package_Body_Range   =>
             Body_Decl_Part :=
               Parent_Declarative_Part_Owner.As_Package_Body.F_Decls;
 
@@ -968,12 +969,12 @@ package body Laltools.Common is
               Parent_Declarative_Part_Owner.As_Entry_Body.F_Decls;
             Stmts := Parent_Declarative_Part_Owner.As_Entry_Body.F_Stmts;
 
-         when Ada_Subp_Body_Range =>
+         when Ada_Subp_Body_Range      =>
             Body_Decl_Part :=
               Parent_Declarative_Part_Owner.As_Subp_Body.F_Decls;
             Stmts := Parent_Declarative_Part_Owner.As_Subp_Body.F_Stmts;
 
-         when Ada_Subp_Decl_Range =>
+         when Ada_Subp_Decl_Range      =>
             declare
                Body_Part : constant Base_Subp_Body :=
                  Parent_Declarative_Part_Owner.As_Subp_Decl.P_Body_Part;
@@ -984,12 +985,12 @@ package body Laltools.Common is
                end if;
             end;
 
-         when Ada_Task_Body_Range =>
+         when Ada_Task_Body_Range      =>
             Body_Decl_Part :=
               Parent_Declarative_Part_Owner.As_Task_Body.F_Decls;
             Stmts := Parent_Declarative_Part_Owner.As_Task_Body.F_Stmts;
 
-         when Ada_Base_Package_Decl =>
+         when Ada_Base_Package_Decl    =>
             Public_Decl_Part :=
               Parent_Declarative_Part_Owner.As_Base_Package_Decl.F_Public_Part;
             Private_Decl_Part :=
@@ -1009,19 +1010,19 @@ package body Laltools.Common is
                end if;
             end;
 
-         when Ada_Protected_Def_Range =>
+         when Ada_Protected_Def_Range  =>
             Public_Decl_Part :=
               Parent_Declarative_Part_Owner.As_Protected_Def.F_Public_Part;
             Private_Decl_Part :=
               Parent_Declarative_Part_Owner.As_Protected_Def.F_Private_Part;
 
-         when Ada_Task_Def_Range =>
+         when Ada_Task_Def_Range       =>
             Public_Decl_Part :=
               Parent_Declarative_Part_Owner.As_Task_Def.F_Public_Part;
             Private_Decl_Part :=
               Parent_Declarative_Part_Owner.As_Task_Def.F_Private_Part;
 
-         when others =>
+         when others                   =>
             raise Assertion_Error;
       end case;
 
@@ -1257,13 +1258,13 @@ package body Laltools.Common is
    function Find_Subp_Body (Subp : Basic_Decl'Class) return Base_Subp_Body is
    begin
       case Subp.Kind is
-         when Ada_Subp_Decl_Range =>
+         when Ada_Subp_Decl_Range         =>
             return Subp.As_Subp_Decl.P_Body_Part;
 
          when Ada_Generic_Subp_Decl_Range =>
             return Subp.As_Generic_Subp_Decl.P_Body_Part;
 
-         when others =>
+         when others                      =>
             return No_Base_Subp_Body;
       end case;
    end Find_Subp_Body;
@@ -1343,8 +1344,9 @@ package body Laltools.Common is
          Aux_Token := Previous (Aux_Token);
          if not Is_Whole_Line_Comment (Aux_Token)
            or else not Is_Header_Edge (Aux_Token, Decl_Name)
-           or else Sloc_Range (Data (Aux_Token)).Start_Column
-                   /= Decl.Sloc_Range.Start_Column
+           or else
+             Sloc_Range (Data (Aux_Token)).Start_Column
+             /= Decl.Sloc_Range.Start_Column
          then
             return No_Source_Location_Range;
          end if;
@@ -1368,8 +1370,9 @@ package body Laltools.Common is
          Aux_Token := Previous (Aux_Token);
          if not Is_Whole_Line_Comment (Aux_Token)
            or else not Is_Header_Body (Aux_Token, Decl_Name)
-           or else Sloc_Range (Data (Aux_Token)).Start_Column
-                   /= Decl.Sloc_Range.Start_Column
+           or else
+             Sloc_Range (Data (Aux_Token)).Start_Column
+             /= Decl.Sloc_Range.Start_Column
          then
             return No_Source_Location_Range;
          end if;
@@ -1394,8 +1397,9 @@ package body Laltools.Common is
          Aux_Token := Previous (Aux_Token);
          if not Is_Whole_Line_Comment (Aux_Token)
            or else not Is_Header_Edge (Aux_Token, Decl_Name)
-           or else Sloc_Range (Data (Aux_Token)).Start_Column
-                   /= Decl.Sloc_Range.Start_Column
+           or else
+             Sloc_Range (Data (Aux_Token)).Start_Column
+             /= Decl.Sloc_Range.Start_Column
          then
             return No_Source_Location_Range;
          end if;
@@ -1456,7 +1460,7 @@ package body Laltools.Common is
       return Compilation_Units : Compilation_Unit_Vector do
          if not Root.Is_Null then
             case Root.Kind is
-               when Ada_Compilation_Unit =>
+               when Ada_Compilation_Unit      =>
                   Compilation_Units.Append (Root.As_Compilation_Unit);
 
                when Ada_Compilation_Unit_List =>
@@ -1464,7 +1468,7 @@ package body Laltools.Common is
                      Compilation_Units.Append (Node.As_Compilation_Unit);
                   end loop;
 
-               when others =>
+               when others                    =>
                   null;
             end case;
          end if;
@@ -1568,36 +1572,37 @@ package body Laltools.Common is
         (This_Node : Ada_Node'Class) return Declarative_Part is
       begin
          case This_Node.Kind is
-            when Ada_Decl_Block_Range =>
+            when Ada_Decl_Block_Range     =>
                return This_Node.As_Decl_Block.F_Decls;
 
-            when Ada_Entry_Body_Range =>
+            when Ada_Entry_Body_Range     =>
                return This_Node.As_Entry_Body.F_Decls;
 
-            when Ada_Package_Body_Range =>
+            when Ada_Package_Body_Range   =>
                return This_Node.As_Package_Body.F_Decls;
 
             when Ada_Protected_Body_Range =>
                return This_Node.As_Entry_Body.F_Decls;
 
-            when Ada_Subp_Body_Range =>
+            when Ada_Subp_Body_Range      =>
                return This_Node.As_Subp_Body.F_Decls;
 
-            when Ada_Subp_Decl_Range =>
+            when Ada_Subp_Decl_Range      =>
                declare
                   Body_Part : constant Base_Subp_Body :=
                     This_Node.As_Subp_Decl.P_Body_Part;
                begin
                   return
-                    (if Body_Part.Kind in Ada_Subp_Body_Range
+                    (if not Body_Part.Is_Null
+                       and then Body_Part.Kind in Ada_Subp_Body_Range
                      then Body_Part.As_Subp_Body.F_Decls
                      else No_Declarative_Part);
                end;
 
-            when Ada_Task_Body_Range =>
+            when Ada_Task_Body_Range      =>
                return This_Node.As_Task_Body.F_Decls;
 
-            when Ada_Base_Package_Decl =>
+            when Ada_Base_Package_Decl    =>
                return
                  (if Private_Part
                   then
@@ -1611,7 +1616,7 @@ package body Laltools.Common is
                       .F_Public_Part
                       .As_Declarative_Part);
 
-            when Ada_Protected_Def_Range =>
+            when Ada_Protected_Def_Range  =>
                return
                  (if Private_Part
                   then
@@ -1625,14 +1630,14 @@ package body Laltools.Common is
                       .F_Public_Part
                       .As_Declarative_Part);
 
-            when Ada_Task_Def_Range =>
+            when Ada_Task_Def_Range       =>
                return
                  (if Private_Part
                   then This_Node.As_Task_Def.F_Private_Part.As_Declarative_Part
                   else
                     This_Node.As_Task_Def.F_Public_Part.As_Declarative_Part);
 
-            when others =>
+            when others                   =>
                raise Assertion_Error;
          end case;
       end Get_Declarative_Part_From_Owner;
@@ -1677,13 +1682,13 @@ package body Laltools.Common is
 
    begin
       case Node.Kind is
-         when Ada_Decl_Block_Range =>
+         when Ada_Decl_Block_Range     =>
             Body_Decl_Part := Node.As_Decl_Block.F_Decls;
 
-         when Ada_Entry_Body_Range =>
+         when Ada_Entry_Body_Range     =>
             Body_Decl_Part := Node.As_Entry_Body.F_Decls;
 
-         when Ada_Package_Body_Range =>
+         when Ada_Package_Body_Range   =>
             Body_Decl_Part := Node.As_Package_Body.F_Decls;
 
             declare
@@ -1702,10 +1707,10 @@ package body Laltools.Common is
          when Ada_Protected_Body_Range =>
             Body_Decl_Part := Node.As_Entry_Body.F_Decls;
 
-         when Ada_Subp_Body_Range =>
+         when Ada_Subp_Body_Range      =>
             Body_Decl_Part := Node.As_Subp_Body.F_Decls;
 
-         when Ada_Subp_Decl_Range =>
+         when Ada_Subp_Decl_Range      =>
             declare
                Body_Part : constant Base_Subp_Body :=
                  Node.As_Subp_Decl.P_Body_Part;
@@ -1716,10 +1721,10 @@ package body Laltools.Common is
                end if;
             end;
 
-         when Ada_Task_Body_Range =>
+         when Ada_Task_Body_Range      =>
             Body_Decl_Part := Node.As_Task_Body.F_Decls;
 
-         when Ada_Base_Package_Decl =>
+         when Ada_Base_Package_Decl    =>
             Public_Decl_Part := Node.As_Base_Package_Decl.F_Public_Part;
             Private_Decl_Part := Node.As_Base_Package_Decl.F_Private_Part;
 
@@ -1733,15 +1738,15 @@ package body Laltools.Common is
                end if;
             end;
 
-         when Ada_Protected_Def_Range =>
+         when Ada_Protected_Def_Range  =>
             Public_Decl_Part := Node.As_Protected_Def.F_Public_Part;
             Private_Decl_Part := Node.As_Protected_Def.F_Private_Part;
 
-         when Ada_Task_Def_Range =>
+         when Ada_Task_Def_Range       =>
             Public_Decl_Part := Node.As_Task_Def.F_Public_Part;
             Private_Decl_Part := Node.As_Task_Def.F_Private_Part;
 
-         when others =>
+         when others                   =>
             raise Assertion_Error;
       end case;
 
@@ -1760,13 +1765,13 @@ package body Laltools.Common is
    is
    begin
       case Definition.F_Name.Kind is
-         when Ada_Identifier =>
+         when Ada_Identifier  =>
             return Definition.F_Name.As_Identifier;
 
          when Ada_Dotted_Name =>
             return Definition.F_Name.As_Dotted_Name.F_Suffix.As_Identifier;
 
-         when others =>
+         when others          =>
             raise Program_Error;
       end case;
    end Get_Defining_Name_Id;
@@ -2186,19 +2191,19 @@ package body Laltools.Common is
       end if;
 
       case Ada_Base_Subp_Spec (Subp_Spec.Kind) is
-         when Ada_Entry_Spec_Range =>
+         when Ada_Entry_Spec_Range      =>
             return Subp_Spec.As_Entry_Spec.F_Entry_Params;
 
-         when Ada_Enum_Subp_Spec_Range =>
+         when Ada_Enum_Subp_Spec_Range  =>
             return No_Params;
 
-         when Ada_Subp_Spec_Range =>
+         when Ada_Subp_Spec_Range       =>
             return Subp_Spec.As_Subp_Spec.F_Subp_Params;
 
          when Ada_Synthetic_Binary_Spec =>
             return No_Params;
 
-         when Ada_Synthetic_Unary_Spec =>
+         when Ada_Synthetic_Unary_Spec  =>
             return No_Params;
       end case;
    end Get_Subp_Spec_Params;
@@ -2264,7 +2269,7 @@ package body Laltools.Common is
       begin
          if not TLD.Is_Null then
             case TLD.Kind is
-               when Ada_Base_Package_Decl =>
+               when Ada_Base_Package_Decl                   =>
                   Public_Parts.Append (TLD.As_Base_Package_Decl.F_Public_Part);
 
                when Ada_Generic_Package_Instantiation_Range =>
@@ -2286,7 +2291,7 @@ package body Laltools.Common is
                           .As_Declarative_Part);
                   end if;
 
-               when Ada_Package_Renaming_Decl_Range =>
+               when Ada_Package_Renaming_Decl_Range         =>
                   --  If TLD is a Package_Renaming_Decl, unwind the renames
                   --  the final declaration if reached. This will be a package
                   --  Decl, which can be considered as a TLD. Therefore,
@@ -2296,7 +2301,7 @@ package body Laltools.Common is
                   Process_Top_Level_Decl
                     (TLD.As_Package_Renaming_Decl.P_Final_Renamed_Package);
 
-               when others =>
+               when others                                  =>
                   raise Assertion_Error;
             end case;
          end if;
@@ -2500,17 +2505,18 @@ package body Laltools.Common is
 
    function Is_Declarative_Part_Owner (Node : Ada_Node'Class) return Boolean
    is (not Node.Is_Null
-       and then Node.Kind
-                in Ada_Decl_Block_Range
-                 | Ada_Entry_Body_Range
-                 | Ada_Package_Body_Range
-                 | Ada_Protected_Body_Range
-                 | Ada_Subp_Body_Range
-                 | Ada_Subp_Decl_Range
-                 | Ada_Task_Body_Range
-                 | Ada_Base_Package_Decl
-                 | Ada_Protected_Def_Range
-                 | Ada_Task_Def_Range);
+       and then
+         Node.Kind
+         in Ada_Decl_Block_Range
+          | Ada_Entry_Body_Range
+          | Ada_Package_Body_Range
+          | Ada_Protected_Body_Range
+          | Ada_Subp_Body_Range
+          | Ada_Subp_Decl_Range
+          | Ada_Task_Body_Range
+          | Ada_Base_Package_Decl
+          | Ada_Protected_Def_Range
+          | Ada_Task_Def_Range);
 
    ------------------------
    -- Is_Decl_Expr_Owner --
@@ -2520,8 +2526,9 @@ package body Laltools.Common is
    is (not Node.Is_Null
        and then Node.Kind in Ada_Expr_Function
        and then Node.As_Expr_Function.F_Expr.Kind in Ada_Paren_Expr_Range
-       and then Node.As_Expr_Function.F_Expr.As_Paren_Expr.F_Expr.Kind
-                in Ada_Decl_Expr_Range);
+       and then
+         Node.As_Expr_Function.F_Expr.As_Paren_Expr.F_Expr.Kind
+         in Ada_Decl_Expr_Range);
 
    ---------------------
    -- Is_Params_Owner --
@@ -2529,14 +2536,17 @@ package body Laltools.Common is
 
    function Is_Params_Owner (Node : Ada_Node'Class) return Boolean
    is (not Node.Is_Null
-       and then ((Node.Kind in Ada_Basic_Decl
-                  and then not Node.As_Basic_Decl.P_Subp_Spec_Or_Null.Is_Null
-                  and then Node.As_Basic_Decl.P_Subp_Spec_Or_Null.Kind
-                           in Ada_Subp_Spec_Range)
-                 or else Node.Kind
-                         in Ada_Entry_Decl_Range
-                          | Ada_Accept_Stmt_Range
-                          | Ada_Entry_Body_Range));
+       and then
+         ((Node.Kind in Ada_Basic_Decl
+           and then not Node.As_Basic_Decl.P_Subp_Spec_Or_Null.Is_Null
+           and then
+             Node.As_Basic_Decl.P_Subp_Spec_Or_Null.Kind
+             in Ada_Subp_Spec_Range)
+          or else
+            Node.Kind
+            in Ada_Entry_Decl_Range
+             | Ada_Accept_Stmt_Range
+             | Ada_Entry_Body_Range));
 
    ---------------------------
    -- Is_Whole_Line_Comment --
@@ -2579,13 +2589,14 @@ package body Laltools.Common is
    begin
       return
         Parents'Length > 2
-        and then Parents (Parents'First + 2).Kind
-                 in Ada_Abstract_Subp_Decl
-                  --  This is as abstract subprogram
-                  | Ada_Null_Subp_Decl
-                  --  This is an "is null" procedure
-                  | Ada_Expr_Function;
-   --  This is an expression function
+        and then
+          Parents (Parents'First + 2).Kind
+          in Ada_Abstract_Subp_Decl
+           --  This is as abstract subprogram
+           | Ada_Null_Subp_Decl
+           --  This is an "is null" procedure
+           | Ada_Expr_Function;
+      --  This is an expression function
    end Is_Definition_Without_Separate_Implementation;
 
    ---------------------
@@ -2622,10 +2633,12 @@ package body Laltools.Common is
       --  Only consider renamable if a precise definition is found
       return
         Node_Name /= No_Name
-        and then (Node_Name.P_Is_Defining
-                  or else Node.As_Name.P_Referenced_Defining_Name
-                            (Imprecise_Fallback => False)
-                          /= No_Defining_Name);
+        and then
+          (Node_Name.P_Is_Defining
+           or else
+             Node.As_Name.P_Referenced_Defining_Name
+               (Imprecise_Fallback => False)
+             /= No_Defining_Name);
    end Is_Renamable;
 
    ------------------
@@ -2718,13 +2731,10 @@ package body Laltools.Common is
       --  implementation. Return this, and do not attempt to look
       --  for secondary implementations in this case.
       if Parents'Length > 2
-        and then Parents (Parents'First + 2).Kind
-                 in Libadalang
-                      .Common
-                      .Ada_Null_Subp_Decl     --  "is null" procedure?
-                  | Libadalang
-                      .Common
-                      .Ada_Expr_Function  --  expression function?
+        and then
+          Parents (Parents'First + 2).Kind
+          in Libadalang.Common.Ada_Null_Subp_Decl     --  "is null" procedure?
+           | Libadalang.Common.Ada_Expr_Function  --  expression function?
       then
          List.Append (Definition);
          return List;
@@ -2733,8 +2743,8 @@ package body Laltools.Common is
       --  If the definition that we found is a subprogram body, add this to the
       --  list
       if Parents'Length > 2
-        and then Parents (Parents'First + 2).Kind
-                 in Libadalang.Common.Ada_Subp_Body
+        and then
+          Parents (Parents'First + 2).Kind in Libadalang.Common.Ada_Subp_Body
       then
          List.Append (Definition);
       end if;
@@ -2852,10 +2862,10 @@ package body Laltools.Common is
                --  Nothing extra to do here
                null;
 
-            when Error =>
+            when Error               =>
                return No_Defining_Name;
 
-            when No_Ref =>
+            when No_Ref              =>
                return No_Defining_Name;
          end case;
 
