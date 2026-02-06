@@ -1319,7 +1319,7 @@ package body Utils.Projects is
      (Cmd                     : in out Command_Line;
       Global_Report_Dir       : out String_Ref;
       The_Project_Tree        : out not null Project_Tree_Access;
-      The_Project_Env         : out not null Project_Environment_Access;
+      The_Project_Env         : out Project_Environment_Access;
       Preprocessing_Allowed   : Boolean;
       Tool_Package_Name       : String;
       Compute_Project_Closure : Boolean := True;
