@@ -82,6 +82,7 @@ Units remaining: 6     Units remaining: 5     CompilationUnit[1:1-8:9]
 |  |  |  |  |  |  |  |  NullStmt[5:7-5:12]
 |  |  |  |  |  |  |f_exceptions:
 |  |  |  |  |  |  |  AdaNodeList[5:12-5:12]: <empty list>
+|  |  |  |  |  |  |f_finally_part: <null>
 |  |  |  |  |  |f_end_name:
 |  |  |  |  |  |  EndName[6:8-6:11]
 |  |  |  |  |  |  |f_name:
@@ -244,6 +245,7 @@ CompilationUnit[1:1-8:9]
 |  |  |  |  |  |  |  |  NullStmt[5:7-5:12]
 |  |  |  |  |  |  |f_exceptions:
 |  |  |  |  |  |  |  AdaNodeList[5:12-5:12]: <empty list>
+|  |  |  |  |  |  |f_finally_part: <null>
 |  |  |  |  |  |f_end_name:
 |  |  |  |  |  |  EndName[6:8-6:11]
 |  |  |  |  |  |  |f_name:
@@ -819,6 +821,7 @@ Units remaining: 3     CompilationUnit[1:1-6:10]
 |  |  |  |  |  |  |  |  |  Str[5:14-5:28]: "Hello World!"
 |  |  |  |f_exceptions:
 |  |  |  |  AdaNodeList[5:30-5:30]: <empty list>
+|  |  |  |f_finally_part: <null>
 |  |  |f_end_name:
 |  |  |  EndName[6:5-6:9]
 |  |  |  |f_name:
@@ -937,6 +940,7 @@ CompilationUnit[1:1-6:10]
 |  |  |  |  |  |  |  |  |  Str[5:14-5:28]: "Hello World!"
 |  |  |  |f_exceptions:
 |  |  |  |  AdaNodeList[5:30-5:30]: <empty list>
+|  |  |  |f_finally_part: <null>
 |  |  |f_end_name:
 |  |  |  EndName[6:5-6:9]
 |  |  |  |f_name:
@@ -1138,6 +1142,7 @@ Units remaining: 2     CompilationUnit[1:1-7:18]
 |  |  |  |  |  |  |  |  |  Real[6:12-6:15]: 1.0
 |  |  |  |f_exceptions:
 |  |  |  |  AdaNodeList[6:17-6:17]: <empty list>
+|  |  |  |f_finally_part: <null>
 |  |  |f_end_name:
 |  |  |  EndName[7:5-7:17]
 |  |  |  |f_name:
@@ -1277,6 +1282,7 @@ CompilationUnit[1:1-7:18]
 |  |  |  |  |  |  |  |  |  Real[6:12-6:15]: 1.0
 |  |  |  |f_exceptions:
 |  |  |  |  AdaNodeList[6:17-6:17]: <empty list>
+|  |  |  |f_finally_part: <null>
 |  |  |f_end_name:
 |  |  |  EndName[7:5-7:17]
 |  |  |  |f_name:
@@ -1581,6 +1587,7 @@ Units remaining: 1     CompilationUnitList[1:1-43:20]
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[14:38-14:39]: 4
 |  |  |  |  |f_exceptions:
 |  |  |  |  |  AdaNodeList[14:42-14:42]: <empty list>
+|  |  |  |  |f_finally_part: <null>
 |  |  |  |f_end_name:
 |  |  |  |  EndName[15:5-15:17]
 |  |  |  |  |f_name:
@@ -1721,6 +1728,7 @@ Units remaining: 1     CompilationUnitList[1:1-43:20]
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[28:38-28:39]: 4
 |  |  |  |  |f_exceptions:
 |  |  |  |  |  AdaNodeList[28:42-28:42]: <empty list>
+|  |  |  |  |f_finally_part: <null>
 |  |  |  |f_end_name:
 |  |  |  |  EndName[29:5-29:19]
 |  |  |  |  |f_name:
@@ -1861,6 +1869,7 @@ Units remaining: 1     CompilationUnitList[1:1-43:20]
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[42:38-42:39]: 4
 |  |  |  |  |f_exceptions:
 |  |  |  |  |  AdaNodeList[42:42-42:42]: <empty list>
+|  |  |  |  |f_finally_part: <null>
 |  |  |  |f_end_name:
 |  |  |  |  EndName[43:5-43:19]
 |  |  |  |  |f_name:
@@ -2378,6 +2387,7 @@ CompilationUnitList[1:1-43:20]
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[14:38-14:39]: 4
 |  |  |  |  |f_exceptions:
 |  |  |  |  |  AdaNodeList[14:42-14:42]: <empty list>
+|  |  |  |  |f_finally_part: <null>
 |  |  |  |f_end_name:
 |  |  |  |  EndName[15:5-15:17]
 |  |  |  |  |f_name:
@@ -2518,6 +2528,7 @@ CompilationUnitList[1:1-43:20]
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[28:38-28:39]: 4
 |  |  |  |  |f_exceptions:
 |  |  |  |  |  AdaNodeList[28:42-28:42]: <empty list>
+|  |  |  |  |f_finally_part: <null>
 |  |  |  |f_end_name:
 |  |  |  |  EndName[29:5-29:19]
 |  |  |  |  |f_name:
@@ -2658,6 +2669,7 @@ CompilationUnitList[1:1-43:20]
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[42:38-42:39]: 4
 |  |  |  |  |f_exceptions:
 |  |  |  |  |  AdaNodeList[42:42-42:42]: <empty list>
+|  |  |  |  |f_finally_part: <null>
 |  |  |  |f_end_name:
 |  |  |  |  EndName[43:5-43:19]
 |  |  |  |  |f_name:
@@ -3339,6 +3351,7 @@ CompilationUnitList[1:1-43:20]
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[14:38-14:39]: 4
 |  |  |  |  |f_exceptions:
 |  |  |  |  |  AdaNodeList[14:42-14:42]: <empty list>
+|  |  |  |  |f_finally_part: <null>
 |  |  |  |f_end_name:
 |  |  |  |  EndName[15:5-15:17]
 |  |  |  |  |f_name:
@@ -3479,6 +3492,7 @@ CompilationUnitList[1:1-43:20]
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[28:38-28:39]: 4
 |  |  |  |  |f_exceptions:
 |  |  |  |  |  AdaNodeList[28:42-28:42]: <empty list>
+|  |  |  |  |f_finally_part: <null>
 |  |  |  |f_end_name:
 |  |  |  |  EndName[29:5-29:19]
 |  |  |  |  |f_name:
@@ -3619,6 +3633,7 @@ CompilationUnitList[1:1-43:20]
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[42:38-42:39]: 4
 |  |  |  |  |f_exceptions:
 |  |  |  |  |  AdaNodeList[42:42-42:42]: <empty list>
+|  |  |  |  |f_finally_part: <null>
 |  |  |  |f_end_name:
 |  |  |  |  EndName[43:5-43:19]
 |  |  |  |  |f_name:
@@ -4276,6 +4291,7 @@ CompilationUnitList[1:1-43:20]
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[14:38-14:39]: 4
 |  |  |  |  |f_exceptions:
 |  |  |  |  |  AdaNodeList[14:42-14:42]: <empty list>
+|  |  |  |  |f_finally_part: <null>
 |  |  |  |f_end_name:
 |  |  |  |  EndName[15:5-15:17]
 |  |  |  |  |f_name:
@@ -4416,6 +4432,7 @@ CompilationUnitList[1:1-43:20]
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[28:38-28:39]: 4
 |  |  |  |  |f_exceptions:
 |  |  |  |  |  AdaNodeList[28:42-28:42]: <empty list>
+|  |  |  |  |f_finally_part: <null>
 |  |  |  |f_end_name:
 |  |  |  |  EndName[29:5-29:19]
 |  |  |  |  |f_name:
@@ -4556,6 +4573,7 @@ CompilationUnitList[1:1-43:20]
 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  Int[42:38-42:39]: 4
 |  |  |  |  |f_exceptions:
 |  |  |  |  |  AdaNodeList[42:42-42:42]: <empty list>
+|  |  |  |  |f_finally_part: <null>
 |  |  |  |f_end_name:
 |  |  |  |  EndName[43:5-43:19]
 |  |  |  |  |f_name:
