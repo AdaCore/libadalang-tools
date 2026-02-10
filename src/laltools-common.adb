@@ -1582,7 +1582,7 @@ package body Laltools.Common is
                return This_Node.As_Package_Body.F_Decls;
 
             when Ada_Protected_Body_Range =>
-               return This_Node.As_Entry_Body.F_Decls;
+               return This_Node.As_Protected_Body.F_Decls;
 
             when Ada_Subp_Body_Range      =>
                return This_Node.As_Subp_Body.F_Decls;
