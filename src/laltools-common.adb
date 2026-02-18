@@ -1705,7 +1705,7 @@ package body Laltools.Common is
             end;
 
          when Ada_Protected_Body_Range =>
-            Body_Decl_Part := Node.As_Entry_Body.F_Decls;
+            Body_Decl_Part := Node.As_Protected_Body.F_Decls;
 
          when Ada_Subp_Body_Range      =>
             Body_Decl_Part := Node.As_Subp_Body.F_Decls;
