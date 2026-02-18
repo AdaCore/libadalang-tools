@@ -48,8 +48,9 @@ package Laltools.Common is
 
    function "<" (Left, Right : Defining_Name) return Boolean
    is (Left.Text < Right.Text
-       or else (Left.Text = Right.Text
-                and then Left.Full_Sloc_Image < Right.Full_Sloc_Image));
+       or else
+         (Left.Text = Right.Text
+          and then Left.Full_Sloc_Image < Right.Full_Sloc_Image));
    --  The Ordered_Maps is using the "<" in its Equivalent_Keys function:
    --  this is too basic and it will assume that Left.Text = Right.Text implies
    --  Left = Right which is wrong.
@@ -529,8 +530,9 @@ package Laltools.Common is
    with
      Pre =>
        not Node.Is_Null
-       and then (Is_Declarative_Part_Owner (Node)
-                 or else Node.Kind in Ada_Handled_Stmts_Range);
+       and then
+         (Is_Declarative_Part_Owner (Node)
+          or else Node.Kind in Ada_Handled_Stmts_Range);
    --  Returns the Declarative_Part of Node. If Node.Kind is
    --  Ada_Base_Package_Decl | Ada_Protected_Def_Range | Ada_Task_Def_Range,
    --  it might have a Private_Part node. If Private_Part is True, then
@@ -652,8 +654,9 @@ package Laltools.Common is
      Inline,
      Pre =>
        Is_Subprogram (Subp)
-       or else (not Subp.Is_Null
-                and then Subp.Kind in Ada_Generic_Subp_Instantiation);
+       or else
+         (not Subp.Is_Null
+          and then Subp.Kind in Ada_Generic_Subp_Instantiation);
    --  Gets the Params node associated to Subp, if it exists.
    --  If it doesn't exist returns No_Params.
 
@@ -662,8 +665,9 @@ package Laltools.Common is
      Inline,
      Pre =>
        Is_Subprogram (Subp)
-       or else (not Subp.Is_Null
-                and then Subp.Kind in Ada_Generic_Subp_Instantiation);
+       or else
+         (not Subp.Is_Null
+          and then Subp.Kind in Ada_Generic_Subp_Instantiation);
    --  Gets the Subp_Spec node associated to Subp
 
    function Get_Subp_Spec_Params
@@ -728,10 +732,12 @@ package Laltools.Common is
 
    function Is_End_Label (Node : Ada_Node) return Boolean
    is (not Node.Parent.Is_Null
-       and then (Node.Parent.Kind in Ada_End_Name
-                 or else (Node.Parent.Kind in Ada_Dotted_Name
-                          and then not Node.Parent.Parent.Is_Null
-                          and then Node.Parent.Parent.Kind in Ada_End_Name)));
+       and then
+         (Node.Parent.Kind in Ada_End_Name
+          or else
+            (Node.Parent.Kind in Ada_Dotted_Name
+             and then not Node.Parent.Parent.Is_Null
+             and then Node.Parent.Parent.Kind in Ada_End_Name)));
    --  Return True if the node belongs to an end label node.
    --  Used to filter out end label references.
 
@@ -749,17 +755,18 @@ package Laltools.Common is
 
    function Is_Subprogram (Decl : Basic_Decl'Class) return Boolean
    is (not Decl.Is_Null
-       and then (Decl.P_Is_Subprogram
-                 or else Decl.Kind in Ada_Generic_Subp_Decl_Range)
+       and then
+         (Decl.P_Is_Subprogram
+          or else Decl.Kind in Ada_Generic_Subp_Decl_Range)
        and then not (Decl.Kind in Ada_Enum_Literal_Decl_Range));
    --  Checks if Decl is a subprogram excluding enum literals
 
    function Is_Type_Derivation (Node : Ada_Node) return Boolean
    is (not Node.Parent.Is_Null
-       and then (Node.Parent.Kind in Ada_Subtype_Indication_Range
-                 and then not Node.Parent.Parent.Is_Null
-                 and then Node.Parent.Parent.Kind
-                          in Ada_Derived_Type_Def_Range));
+       and then
+         (Node.Parent.Kind in Ada_Subtype_Indication_Range
+          and then not Node.Parent.Parent.Is_Null
+          and then Node.Parent.Parent.Kind in Ada_Derived_Type_Def_Range));
    --  Return True if the node belongs to derived type declaration.
 
    function Length (List : Assoc_List) return Natural;

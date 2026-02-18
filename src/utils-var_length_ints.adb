@@ -32,7 +32,7 @@ package body Utils.Var_Length_Ints is
    --  have to store up the Octets somewhere, and reverse the order when
    --  appending.
 
-   Radix : constant := 2**7;
+   Radix : constant := 2 ** 7;
 
    function Is_First (X : Octet) return Boolean
    is (X mod 2 = 0);

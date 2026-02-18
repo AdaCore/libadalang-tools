@@ -211,13 +211,13 @@ package body Pp.Scanner is
    function Text (X : Token) return Syms.Symbol is
    begin
       case X.Kind is
-         when Same_Text_Kind =>
+         when Same_Text_Kind   =>
             return Text (X.Kind);
 
          when Stored_Text_Kind =>
             return X.Text;
 
-         when Nil =>
+         when Nil              =>
             raise Program_Error;
       end case;
    end Text;
@@ -280,7 +280,7 @@ package body Pp.Scanner is
    begin
       pragma Assert (not After_Last (X));
       case Kind (X) is
-         when Same_Text_Kind =>
+         when Same_Text_Kind   =>
             return Token_To_Symbol_Map (Kind (X));
 
          when Stored_Text_Kind =>
@@ -330,8 +330,7 @@ package body Pp.Scanner is
       --  Number of lines in comment
    begin
       return
-        L
-        * (String'("--")'Length + X.Leading_Blanks)
+        L * (String'("--")'Length + X.Leading_Blanks)
         --  Each line is missing the "--  ".
         + (L - 1) * (X.Sloc.Col - 1)
         --  All but the first line are missing the spaces before "--".
@@ -387,11 +386,11 @@ package body Pp.Scanner is
          pragma
            Assert
              (if K not in EOL_Token | Comment_Kind | Tab_Token
-                then Length (X) = Text_Len);
+              then Length (X) = Text_Len);
          pragma
            Assert
              (if K in True_End_Of_Line
-                then Length (X) in 1 | 2 and then Text_Len in 1 | 2);
+              then Length (X) in 1 | 2 and then Text_Len in 1 | 2);
          --  2 is for CR/LF
          if Check_Comment_Length and then K in Comment_Kind then
             declare
@@ -399,8 +398,7 @@ package body Pp.Scanner is
                  (if K in Whole_Line_Comment then X.Num_Lines else 1);
                --  Number of lines in comment
                Expected_Len           : constant Positive :=
-                 L
-                 * (String'("--")'Length + X.Leading_Blanks)
+                 L * (String'("--")'Length + X.Leading_Blanks)
                  --  Each line is missing the "--  ".
                  + (L - 1) * (X.Sloc.Col - 1)
                  --  All but the first line are missing the spaces before "--".
@@ -421,8 +419,8 @@ package body Pp.Scanner is
                      | Expected_Len + (L - 1)
                      | Expected_Len_With_Tabs);
 
-            --  The (L - 1) is in case the source has CRLF line endings;
-            --  Text does not include the intermediate CR characters.
+               --  The (L - 1) is in case the source has CRLF line endings;
+               --  Text does not include the intermediate CR characters.
             end;
          end if;
       end Debug_Token;
@@ -482,7 +480,7 @@ package body Pp.Scanner is
             Sloc_First => Sloc.First,
             Origin     => Intern (Org)));
       case K is
-         when Same_Text_Kind =>
+         when Same_Text_Kind   =>
             if K in Line_Break_Token | Tab_Token then
                Encode (V.Octets, X.Index);
             end if;
@@ -583,7 +581,7 @@ package body Pp.Scanner is
          when End_Of_Line_Comment =>
             null;
 
-         when Whole_Line_Comment =>
+         when Whole_Line_Comment  =>
             pragma Assert (Kind (Last (V'Unrestricted_Access)) /= Spaces);
             Tok.Sloc.Last :=
               Tok.Sloc.Last - (Tok.Num_Lines - 1) * (Tok.Sloc.Col - 1);
@@ -603,10 +601,11 @@ package body Pp.Scanner is
         (Tkn_Txt'Length >= 2
          and then Tkn_Txt (Tkn_Txt'Last) = '-'
          and then Tkn_Txt (Tkn_Txt'Last - 1) = '-')
-        or else (Tkn_Txt'Length >= 3
-                 and then Tkn_Txt (Tkn_Txt'Last) = NL
-                 and then Tkn_Txt (Tkn_Txt'Last - 1) = '-'
-                 and then Tkn_Txt (Tkn_Txt'Last - 2) = '-');
+        or else
+          (Tkn_Txt'Length >= 3
+           and then Tkn_Txt (Tkn_Txt'Last) = NL
+           and then Tkn_Txt (Tkn_Txt'Last - 1) = '-'
+           and then Tkn_Txt (Tkn_Txt'Last - 2) = '-');
    end Is_Header_Comment;
 
    ----------------------
@@ -619,9 +618,10 @@ package body Pp.Scanner is
    begin
       return
         Token_Text'Length = 0
-        or else ((for all J in Token_Text'First .. Token_Text'Last - 1 =>
-                    Token_Text (J) = ' ')
-                 and Token_Text (Token_Text'Last) in NL | ' ');
+        or else
+          ((for all J in Token_Text'First .. Token_Text'Last - 1 =>
+              Token_Text (J) = ' ')
+           and Token_Text (Token_Text'Last) in NL | ' ');
    end Is_Empty_Comment;
 
    -------------------------
@@ -654,7 +654,7 @@ package body Pp.Scanner is
          when End_Of_Line_Comment =>
             null;
 
-         when Whole_Line_Comment =>
+         when Whole_Line_Comment  =>
             Tok.Num_Lines := 1;
             for J in Tx'Range loop
                if Tx (J) = NL then
@@ -673,8 +673,7 @@ package body Pp.Scanner is
             declare
                Text_Len     : constant Natural := Tx'Length;
                Expected_Len : constant Positive :=
-                 Tok.Num_Lines
-                 * (String'("--")'Length + Tok.Leading_Blanks)
+                 Tok.Num_Lines * (String'("--")'Length + Tok.Leading_Blanks)
                  --  Each line is missing the "--  ".
                  + (Tok.Num_Lines - 1) * (Tok.Sloc.Col - 1)
                  --  All but the first line are missing the spaces before "--".
@@ -819,7 +818,7 @@ package body Pp.Scanner is
       --  Append_Tokn.
 
       case Kind (Cur) is
-         when Same_Text_Kind =>
+         when Same_Text_Kind   =>
             if Kind (Cur) in Line_Break_Token | Tab_Token then
                Next (Cur.V.Octets, Cur.Oc);
             end if;
@@ -851,7 +850,7 @@ package body Pp.Scanner is
    begin
       Cur.Fi := Cur.Fi - 1;
       case Kind (Cur) is
-         when Same_Text_Kind =>
+         when Same_Text_Kind   =>
             if Kind (Cur) in Line_Break_Token | Tab_Token then
                Prev (Cur.V.Octets, Cur.Oc);
             end if;
@@ -1136,11 +1135,12 @@ package body Pp.Scanner is
 
          if Comments_Special_On
            and then Kind_Of_Comment = Other_Whole_Line_Comment
-           and then not (Is_Letter (Cur)
-                         or else Is_Digit (Cur)
-                         or else Is_Space (Cur)
-                         or else Is_Line_Terminator (Cur)
-                         or else Cur = '-')
+           and then
+             not (Is_Letter (Cur)
+                  or else Is_Digit (Cur)
+                  or else Is_Space (Cur)
+                  or else Is_Line_Terminator (Cur)
+                  or else Cur = '-')
            --  We don't consider "-----" to be special, because otherwise
            --  various comments are misformatted.
          then
@@ -1212,7 +1212,7 @@ package body Pp.Scanner is
                end if;
 
                case Kind_Of_Comment is
-                  when Pp_Off_Comment =>
+                  when Pp_Off_Comment           =>
                      Tok :=
                        (Pp_Off_Comment,
                         Tok.Sloc,
@@ -1222,7 +1222,7 @@ package body Pp.Scanner is
                         Num_Lines      => 1,
                         Last_Line_Len  => Cur_Col - Tok.Sloc.Col);
 
-                  when Pp_On_Comment =>
+                  when Pp_On_Comment            =>
                      Tok :=
                        (Pp_On_Comment,
                         Tok.Sloc,
@@ -1232,7 +1232,7 @@ package body Pp.Scanner is
                         Num_Lines      => 1,
                         Last_Line_Len  => Cur_Col - Tok.Sloc.Col);
 
-                  when Special_Comment =>
+                  when Special_Comment          =>
                      Tok :=
                        (Special_Comment,
                         Tok.Sloc,
@@ -1242,7 +1242,7 @@ package body Pp.Scanner is
                         Num_Lines      => 1,
                         Last_Line_Len  => Cur_Col - Tok.Sloc.Col);
 
-                  when Fillable_Comment =>
+                  when Fillable_Comment         =>
                      Tok :=
                        (Fillable_Comment,
                         Tok.Sloc,
@@ -1262,7 +1262,7 @@ package body Pp.Scanner is
                         Num_Lines      => 1,
                         Last_Line_Len  => Cur_Col - Tok.Sloc.Col);
 
-                  when End_Of_Line_Comment =>
+                  when End_Of_Line_Comment      =>
                      Tok :=
                        (End_Of_Line_Comment,
                         Tok.Sloc,
@@ -1325,24 +1325,24 @@ package body Pp.Scanner is
 
          else
             case Cur is
-               when W_HT =>
+               when W_HT       =>
                   Tok := (Kind => Tab_Token, Sloc => Tok.Sloc, Index => <>);
                   while Cur = W_HT loop
                      Get;
                   end loop;
 
-               when W_NUL =>
+               when W_NUL      =>
                   Tok := (Kind => End_Of_Input, Sloc => Tok.Sloc);
 
                --  One_Space_Outdent instruction in the Template_Lang
 
-               when '_' =>
+               when '_'        =>
                   Tok := (Kind => '_', Sloc => Tok.Sloc);
                   Get;
 
                --  Minus sign or comment
 
-               when '-' =>
+               when '-'        =>
                   if Buffers.Lookahead (Input) = '-' then
                      Scan_Comment (Tok, Allow_Short_Fillable);
                   else
@@ -1361,7 +1361,7 @@ package body Pp.Scanner is
                      when Template_Lang =>
                         null; -- we're done
 
-                     when Ada_Lang =>
+                     when Ada_Lang      =>
                         if Cur in '#' | ':'
                           and then Buffers.Lookahead (Input) in Extended_Digit
                         then
@@ -1395,7 +1395,7 @@ package body Pp.Scanner is
 
                --  single quote or character literal
 
-               when ''' =>
+               when '''        =>
                   Get;
 
                   --  We distinguish a single quote token from a character
@@ -1432,23 +1432,23 @@ package body Pp.Scanner is
 
                --  string literal
 
-               when '"' | '%' =>
+               when '"' | '%'  =>
                   Tok := (Kind => String_Lit, Sloc => Tok.Sloc, others => <>);
                   Scan_String_Literal (Q_Char => Cur);
 
                --  One-character tokens
 
-               when '!' =>
+               when '!'        =>
                   Tok := (Kind => '!', Sloc => Tok.Sloc);
                   Get;
 
-               when '#' =>
+               when '#'        =>
                   case Lang is
                      when Template_Lang =>
                         Tok := (Kind => '#', Sloc => Tok.Sloc);
                         Get;
 
-                     when Ada_Lang =>
+                     when Ada_Lang      =>
                         Tok :=
                           (Kind   => Preprocessor_Directive,
                            Sloc   => Tok.Sloc,
@@ -1456,75 +1456,75 @@ package body Pp.Scanner is
                         Skip_To_EOL;
                   end case;
 
-               when '$' =>
+               when '$'        =>
                   Tok := (Kind => '$', Sloc => Tok.Sloc);
                   Get;
 
-               when '?' =>
+               when '?'        =>
                   Tok := (Kind => '?', Sloc => Tok.Sloc);
                   Get;
 
-               when '[' =>
+               when '['        =>
                   Tok := (Kind => '[', Sloc => Tok.Sloc);
                   Get;
 
-               when '\' =>
+               when '\'        =>
                   Tok := (Kind => '\', Sloc => Tok.Sloc);
                   Get;
 
-               when ']' =>
+               when ']'        =>
                   Tok := (Kind => ']', Sloc => Tok.Sloc);
                   Get;
 
-               when '^' =>
+               when '^'        =>
                   Tok := (Kind => '^', Sloc => Tok.Sloc);
                   Get;
 
-               when '`' =>
+               when '`'        =>
                   Tok := (Kind => '`', Sloc => Tok.Sloc);
                   Get;
 
-               when '{' =>
+               when '{'        =>
                   Tok := (Kind => '{', Sloc => Tok.Sloc);
                   Get;
 
-               when '}' =>
+               when '}'        =>
                   Tok := (Kind => '}', Sloc => Tok.Sloc);
                   Get;
 
-               when '~' =>
+               when '~'        =>
                   Tok := (Kind => '~', Sloc => Tok.Sloc);
                   Get;
 
-               when '&' =>
+               when '&'        =>
                   Tok := (Kind => '&', Sloc => Tok.Sloc);
                   Get;
 
-               when '(' =>
+               when '('        =>
                   Tok := (Kind => '(', Sloc => Tok.Sloc);
                   Get;
 
-               when ')' =>
+               when ')'        =>
                   Tok := (Kind => ')', Sloc => Tok.Sloc);
                   Get;
 
-               when '+' =>
+               when '+'        =>
                   Tok := (Kind => '+', Sloc => Tok.Sloc);
                   Get;
 
-               when ',' =>
+               when ','        =>
                   Tok := (Kind => ',', Sloc => Tok.Sloc);
                   Get;
 
-               when ';' =>
+               when ';'        =>
                   Tok := (Kind => ';', Sloc => Tok.Sloc);
                   Get;
 
-               when '|' =>
+               when '|'        =>
                   Tok := (Kind => '|', Sloc => Tok.Sloc);
                   Get;
 
-               when '@' =>
+               when '@'        =>
                   --  '@' is for target_name (see RM-5.2.1, AI12-0125-3)
                   Tok := (Kind => '@', Sloc => Tok.Sloc);
                   Get;
@@ -1532,7 +1532,7 @@ package body Pp.Scanner is
                --  Multiple-character tokens. We need to distinguish between
                --  "=" and "=>", and between "." and ".." and so forth.
 
-               when '=' =>
+               when '='        =>
                   Get;
 
                   if Cur = '>' then
@@ -1542,7 +1542,7 @@ package body Pp.Scanner is
                      Tok := (Kind => '=', Sloc => Tok.Sloc);
                   end if;
 
-               when '.' =>
+               when '.'        =>
                   Get;
 
                   if Cur = '.' then
@@ -1552,7 +1552,7 @@ package body Pp.Scanner is
                      Tok := (Kind => '.', Sloc => Tok.Sloc);
                   end if;
 
-               when '*' =>
+               when '*'        =>
                   Get;
 
                   if Cur = '*' then
@@ -1562,7 +1562,7 @@ package body Pp.Scanner is
                      Tok := (Kind => '*', Sloc => Tok.Sloc);
                   end if;
 
-               when '/' =>
+               when '/'        =>
                   Get;
 
                   if Cur = '=' then
@@ -1572,7 +1572,7 @@ package body Pp.Scanner is
                      Tok := (Kind => '/', Sloc => Tok.Sloc);
                   end if;
 
-               when '>' =>
+               when '>'        =>
                   Get;
 
                   if Cur = '=' then
@@ -1585,7 +1585,7 @@ package body Pp.Scanner is
                      Tok := (Kind => '>', Sloc => Tok.Sloc);
                   end if;
 
-               when '<' =>
+               when '<'        =>
                   Get;
 
                   if Cur = '=' then
@@ -1601,7 +1601,7 @@ package body Pp.Scanner is
                      Tok := (Kind => '<', Sloc => Tok.Sloc);
                   end if;
 
-               when ':' =>
+               when ':'        =>
                   Get;
 
                   if Cur = '=' then
@@ -1611,7 +1611,7 @@ package body Pp.Scanner is
                      Tok := (Kind => ':', Sloc => Tok.Sloc);
                   end if;
 
-               when others =>
+               when others     =>
                   Get;
                   Tok :=
                     (Kind   => Illegal_Character,
@@ -1624,7 +1624,7 @@ package body Pp.Scanner is
          pragma
            Assert
              (if Tok.Kind in Whole_Line_Comment
-                then Tok.Width = Tok.Sloc.Last - Tok.Sloc.First + 1);
+              then Tok.Width = Tok.Sloc.Last - Tok.Sloc.First + 1);
 
          pragma Assert (Tok.Kind /= Nil);
       end Get_Tokn;
@@ -1640,7 +1640,7 @@ package body Pp.Scanner is
                when Comment_Kind =>
                   pragma Assert (False);
 
-               when Ident =>
+               when Ident        =>
                   --  Check for reserved word. In T'Range, we consider "Range"
                   --  to be an identifier, not a reserved word, and similarly
                   --  for others.
@@ -1655,7 +1655,7 @@ package body Pp.Scanner is
                            when Reserved_Word =>
                               Poke_Kind (Tok, New_Kind => RW);
 
-                           when Ident =>
+                           when Ident         =>
                               null;
                         end case;
 
@@ -1664,7 +1664,7 @@ package body Pp.Scanner is
                      end;
                   end if;
 
-               when others =>
+               when others       =>
                   null;
             end case;
 
@@ -1700,19 +1700,19 @@ package body Pp.Scanner is
                pragma
                  Assert
                    (case Tok.Kind is
-                        when Comment_Kind => True,
-                        when EOL_Token =>
-                          Inp
-                          in [1 => W_LF]
-                           | [W_CR, W_LF]
-                           | [1 => W_FF]
-                           | [1 => W_VT]
-                           | [1 => W_CR]
-                          and then Outp
-                                   in [1 => NL] | [1 => W_CR] | [W_CR, W_LF],
-                        when Reserved_Word => To_Lower (Inp) = Outp,
-                        when Tab_Token => True,
-                        when others => Inp = Outp);
+                      when Comment_Kind  => True,
+                      when EOL_Token     =>
+                        Inp
+                        in [1 => W_LF]
+                         | [W_CR, W_LF]
+                         | [1 => W_FF]
+                         | [1 => W_VT]
+                         | [1 => W_CR]
+                        and then
+                          Outp in [1 => NL] | [1 => W_CR] | [W_CR, W_LF],
+                      when Reserved_Word => To_Lower (Inp) = Outp,
+                      when Tab_Token     => True,
+                      when others        => Inp = Outp);
             end;
          end if;
       end Append_To_Result;
@@ -1990,7 +1990,7 @@ package body Pp.Scanner is
       pragma
         Assert
           (if XX.Kind not in Comment_Kind
-             then Length (XX) = To_W_Str (Text (XX))'Length);
+           then Length (XX) = To_W_Str (Text (XX))'Length);
    end Check_Same_Token;
 
    procedure Check_Same_Tokens

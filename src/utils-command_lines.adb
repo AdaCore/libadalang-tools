@@ -86,7 +86,7 @@ package body Utils.Command_Lines is
             Result.Text := new String'(Result.Text.all);
          end if;
          case Result.Kind is
-            when String_Switch =>
+            when String_Switch     =>
                if Result.String_Val /= null then
                   Result.String_Val := new String'(Result.String_Val.all);
                end if;
@@ -94,7 +94,7 @@ package body Utils.Command_Lines is
             when String_Seq_Switch =>
                Result.Seq_Val := Copy (Result.Seq_Val);
 
-            when others =>
+            when others            =>
                null;
          end case;
       end return;
@@ -110,7 +110,7 @@ package body Utils.Command_Lines is
          Free (Object.Text);
       end if;
       case Object.Kind is
-         when String_Switch =>
+         when String_Switch     =>
             if Object.String_Val /= null then
                Free (Object.String_Val);
             end if;
@@ -118,7 +118,7 @@ package body Utils.Command_Lines is
          when String_Seq_Switch =>
             Destroy (Object.Seq_Val);
 
-         when others =>
+         when others            =>
             null;
       end case;
    end Destroy;
@@ -678,8 +678,8 @@ package body Utils.Command_Lines is
       function Arg (Cmd : Command_Line; Switch : Switches) return Arg_Type is
       begin
          return Value (Cmd.Sw (To_All (Switch)).String_Val.all);
-      --  If the ".all" blows up because of a null pointer, that's because
-      --  the client forgot to instantiate Set_Defaults to set defaults.
+         --  If the ".all" blows up because of a null pointer, that's because
+         --  the client forgot to instantiate Set_Defaults to set defaults.
       end Arg;
 
       procedure Set_Arg
@@ -941,7 +941,7 @@ package body Utils.Command_Lines is
                  and then Desc.Kind in String_Switch | String_Seq_Switch
                then
                   case Syntax (Descriptor, Switch) is
-                     when '=' =>
+                     when '='             =>
                         pragma Assert (DT'Length > Desc.Text'Length);
                         --  Otherwise it would have been equal, above
 
@@ -951,9 +951,9 @@ package body Utils.Command_Lines is
 
                      when ':' | '!' | '?' =>
                         if Result = All_Switches'Last
-                          or else Desc.Text'Length
-                                  > Descriptor.Allowed_Switches (Result)
-                                      .Text'Length
+                          or else
+                            Desc.Text'Length
+                            > Descriptor.Allowed_Switches (Result).Text'Length
                         then
                            Result := Switch;
                         end if;
@@ -1022,16 +1022,16 @@ package body Utils.Command_Lines is
          Dyn.Explicit := True;
 
          case Descriptor.Allowed_Switches (Switch).Kind is
-            when No_Such =>
+            when No_Such                           =>
                raise Program_Error;
 
-            when True_Switch =>
+            when True_Switch                       =>
                Dyn.Boolean_Val := True;
 
-            when False_Switch =>
+            when False_Switch                      =>
                Dyn.Boolean_Val := False;
 
-            when Enum_Switch =>
+            when Enum_Switch                       =>
                Dyn.Position := Cmd.Current_Position + 1;
 
             when String_Switch | String_Seq_Switch =>
@@ -1093,7 +1093,7 @@ package body Utils.Command_Lines is
                      --  Slide it to start at 1
                   begin
                      case Descriptor.Allowed_Switches (Switch).Kind is
-                        when String_Switch =>
+                        when String_Switch     =>
                            Descriptor.Allowed_Switches
                              (Descriptor.Allowed_Switches (Switch).Alias)
                              .Validator (S);
@@ -1125,11 +1125,11 @@ package body Utils.Command_Lines is
                               when Cmd_Line_1 | Project_File =>
                                  Append (Dyn.Seq_Val, new String'(S));
 
-                              when Cmd_Line_2 =>
+                              when Cmd_Line_2                =>
                                  null;
                            end case;
 
-                        when others =>
+                        when others            =>
                            raise Program_Error;
                      end case;
                   end;
@@ -1232,7 +1232,7 @@ package body Utils.Command_Lines is
                   when No_Such | False_Switch =>
                      raise Program_Error;
 
-                  when True_Switch =>
+                  when True_Switch            =>
                      Cmd.Sw (Switch) :=
                        (True_Switch,
                         Switch,
@@ -1241,7 +1241,7 @@ package body Utils.Command_Lines is
                         Boolean_Val =>
                           Descriptor.Allowed_Switches (Switch).Default_Bool);
 
-                  when Enum_Switch =>
+                  when Enum_Switch            =>
                      Cmd.Sw (Switch) :=
                        (Enum_Switch,
                         Switch,
@@ -1249,7 +1249,7 @@ package body Utils.Command_Lines is
                         Explicit => False,
                         Position => 0);
 
-                  when String_Switch =>
+                  when String_Switch          =>
                      Cmd.Sw (Switch) :=
                        (String_Switch,
                         Switch,
@@ -1264,7 +1264,7 @@ package body Utils.Command_Lines is
                                (Descriptor.Allowed_Switches (Switch)
                                   .Default.all)));
 
-                  when String_Seq_Switch =>
+                  when String_Seq_Switch      =>
                      Cmd.Sw (Switch) :=
                        (String_Seq_Switch,
                         Switch,
@@ -1402,17 +1402,17 @@ package body Utils.Command_Lines is
                   when No_Such | False_Switch =>
                      raise Program_Error;
 
-                  when True_Switch =>
+                  when True_Switch            =>
                      if Sw (Switch).Boolean_Val
                        = Descriptor.Allowed_Switches (Switch).Default_Bool
                      then
                         goto Continue;
                      end if;
 
-                  when Enum_Switch =>
+                  when Enum_Switch            =>
                      null; -- Too much trouble to determine default here
 
-                  when String_Switch =>
+                  when String_Switch          =>
                      if Sw (Switch).String_Val = null then
                         --  This means that
                         --     Descriptor.Allowed_Switches (Switch).Default
@@ -1420,14 +1420,14 @@ package body Utils.Command_Lines is
                         goto Continue;
                      end if;
                      if Descriptor.Allowed_Switches (Switch).Default /= null
-                       and then Sw (Switch).String_Val.all
-                                = Descriptor.Allowed_Switches (Switch)
-                                    .Default.all
+                       and then
+                         Sw (Switch).String_Val.all
+                         = Descriptor.Allowed_Switches (Switch).Default.all
                      then
                         goto Continue;
                      end if;
 
-                  when String_Seq_Switch =>
+                  when String_Seq_Switch      =>
                      if Last_Index (Sw (Switch).Seq_Val) = 0 then
                         goto Continue;
                      end if;
@@ -1444,20 +1444,20 @@ package body Utils.Command_Lines is
                when No_Such | False_Switch =>
                   raise Program_Error;
 
-               when True_Switch =>
+               when True_Switch            =>
                   Put (if Sw (Switch).Boolean_Val then "True" else "False");
 
-               when Enum_Switch =>
+               when Enum_Switch            =>
                   Put ("at" & Sw (Switch).Position'Img);
 
-               when String_Switch =>
+               when String_Switch          =>
                   if Sw (Switch).String_Val = null then
                      Put ("null");
                   else
                      Put ("""" & Sw (Switch).String_Val.all & """");
                   end if;
 
-               when String_Seq_Switch =>
+               when String_Seq_Switch      =>
                   Put ("(");
                   declare
                      First_Time : Boolean := True;

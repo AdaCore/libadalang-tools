@@ -46,8 +46,8 @@ package Laltools.Call_Hierarchy is
    with
      Pre =>
        Is_Subprogram (Definition.P_Basic_Decl)
-       or else Definition.P_Basic_Decl.Kind
-               in Ada_Generic_Subp_Instantiation_Range;
+       or else
+         Definition.P_Basic_Decl.Kind in Ada_Generic_Subp_Instantiation_Range;
    --  For all Units, finds all incomming calls of the subprogram given by
    --  Definition and calls Visit on each call that was found. Exits early if
    --  Cancel if modified by Visit to True.

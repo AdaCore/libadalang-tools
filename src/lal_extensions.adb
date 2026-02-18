@@ -151,7 +151,7 @@ package body LAL_Extensions is
    function Full_Name (Nm : Name) return W_Str is
    begin
       case Kind (Nm) is
-         when Ada_Dotted_Name =>
+         when Ada_Dotted_Name                     =>
             return
               Full_Name (Nm.As_Dotted_Name.F_Prefix)
               & "."
@@ -160,10 +160,10 @@ package body LAL_Extensions is
          when Ada_Identifier | Ada_String_Literal =>
             return Id_Name (Nm);
 
-         when Ada_Defining_Name =>
+         when Ada_Defining_Name                   =>
             return Full_Name (Nm.As_Defining_Name.F_Name);
 
-         when others =>
+         when others                              =>
             raise Program_Error with "Full_Name of " & Nm.Image;
       end case;
    end Full_Name;
@@ -180,13 +180,13 @@ package body LAL_Extensions is
          when Ada_Compilation_Unit =>
             return Get_Def_Name (Decl.As_Compilation_Unit.F_Body);
 
-         when Ada_Library_Item =>
+         when Ada_Library_Item     =>
             return Get_Def_Name (Decl.As_Library_Item.F_Item);
 
-         when Ada_Subunit =>
+         when Ada_Subunit          =>
             return Get_Def_Name (Decl.As_Subunit.F_Body);
 
-         when Ada_Basic_Decl =>
+         when Ada_Basic_Decl       =>
             declare
                D : constant Defining_Name_Array :=
                  Decl.As_Basic_Decl.P_Defining_Names;
@@ -195,7 +195,7 @@ package body LAL_Extensions is
                return D (1);
             end;
 
-         when others =>
+         when others               =>
             raise Program_Error with "Get_Def_Name of " & Decl.Image;
       end case;
    end Get_Def_Name;
@@ -211,10 +211,10 @@ package body LAL_Extensions is
          when Ada_Generic_Package_Decl =>
             return Node.As_Generic_Package_Decl.F_Formal_Part;
 
-         when Ada_Generic_Subp_Decl =>
+         when Ada_Generic_Subp_Decl    =>
             return Node.As_Generic_Subp_Decl.F_Formal_Part;
 
-         when others =>
+         when others                   =>
             raise Program_Error;
       end case;
    end G_Formal_Part;
@@ -223,23 +223,23 @@ package body LAL_Extensions is
       --  I'm confused about Base_Package_Decl
    begin
       case Kind (Node) is
-         when Ada_Package_Decl =>
+         when Ada_Package_Decl          =>
             return Node.As_Base_Package_Decl.F_Public_Part;
 
-         when Ada_Generic_Package_Decl =>
+         when Ada_Generic_Package_Decl  =>
             return Node.As_Generic_Package_Decl.F_Package_Decl.F_Public_Part;
 
-         when Ada_Task_Def =>
+         when Ada_Task_Def              =>
             return Node.As_Task_Def.F_Public_Part;
 
-         when Ada_Protected_Def =>
+         when Ada_Protected_Def         =>
             return Node.As_Protected_Def.F_Public_Part;
 
-         when Ada_Single_Task_Decl =>
+         when Ada_Single_Task_Decl      =>
             --  This will recurse 2 levels!
             return Vis_Part (Node.As_Single_Task_Decl.F_Task_Type);
 
-         when Ada_Task_Type_Decl =>
+         when Ada_Task_Type_Decl        =>
             return Vis_Part (Node.As_Task_Type_Decl.F_Definition);
 
          when Ada_Single_Protected_Decl =>
@@ -247,10 +247,10 @@ package body LAL_Extensions is
             return Vis_Part (Node.As_Single_Protected_Decl.F_Definition);
          --  Why doesn't this parallel tasks???
 
-         when Ada_Protected_Type_Decl =>
+         when Ada_Protected_Type_Decl   =>
             return Vis_Part (Node.As_Protected_Type_Decl.F_Definition);
 
-         when others =>
+         when others                    =>
             raise Program_Error;
       end case;
    end Vis_Part;
@@ -258,23 +258,23 @@ package body LAL_Extensions is
    function Priv_Part (Node : Ada_Node'Class) return Private_Part is
    begin
       case Kind (Node) is
-         when Ada_Package_Decl =>
+         when Ada_Package_Decl          =>
             return Node.As_Base_Package_Decl.F_Private_Part;
 
-         when Ada_Generic_Package_Decl =>
+         when Ada_Generic_Package_Decl  =>
             return Node.As_Generic_Package_Decl.F_Package_Decl.F_Private_Part;
 
-         when Ada_Task_Def =>
+         when Ada_Task_Def              =>
             return Node.As_Task_Def.F_Private_Part;
 
-         when Ada_Protected_Def =>
+         when Ada_Protected_Def         =>
             return Node.As_Protected_Def.F_Private_Part;
 
-         when Ada_Single_Task_Decl =>
+         when Ada_Single_Task_Decl      =>
             --  This will recurse 2 levels!
             return Priv_Part (Node.As_Single_Task_Decl.F_Task_Type);
 
-         when Ada_Task_Type_Decl =>
+         when Ada_Task_Type_Decl        =>
             return Priv_Part (Node.As_Task_Type_Decl.F_Definition);
 
          when Ada_Single_Protected_Decl =>
@@ -282,10 +282,10 @@ package body LAL_Extensions is
             return Priv_Part (Node.As_Single_Protected_Decl.F_Definition);
          --  Why doesn't this parallel tasks???
 
-         when Ada_Protected_Type_Decl =>
+         when Ada_Protected_Type_Decl   =>
             return Priv_Part (Node.As_Protected_Type_Decl.F_Definition);
 
-         when others =>
+         when others                    =>
             raise Program_Error;
       end case;
    end Priv_Part;
@@ -293,22 +293,22 @@ package body LAL_Extensions is
    function Body_Decls (Node : Ada_Node'Class) return Declarative_Part is
    begin
       case Kind (Node) is
-         when Ada_Entry_Body =>
+         when Ada_Entry_Body     =>
             return Node.As_Entry_Body.F_Decls;
 
-         when Ada_Package_Body =>
+         when Ada_Package_Body   =>
             return Node.As_Package_Body.F_Decls;
 
          when Ada_Protected_Body =>
             return Node.As_Protected_Body.F_Decls;
 
-         when Ada_Subp_Body =>
+         when Ada_Subp_Body      =>
             return Node.As_Subp_Body.F_Decls;
 
-         when Ada_Task_Body =>
+         when Ada_Task_Body      =>
             return Node.As_Task_Body.F_Decls;
 
-         when others =>
+         when others             =>
             raise Program_Error;
       end case;
    end Body_Decls;
@@ -316,7 +316,7 @@ package body LAL_Extensions is
    function Is_Program_Unit (Node : Ada_Node) return Boolean is
    begin
       case Kind (Node) is
-         when Ada_Entry_Decl =>
+         when Ada_Entry_Decl           =>
             return Kind (Parent (Parent (Parent (Node)))) = Ada_Protected_Def;
 
          when Ada_Task_Type_Decl
@@ -338,11 +338,10 @@ package body LAL_Extensions is
             | Ada_Task_Body_Stub
             | Ada_Protected_Body_Stub
             | Ada_Generic_Subp_Decl
-            | Ada_Generic_Package_Decl
-         =>
+            | Ada_Generic_Package_Decl =>
             return True;
 
-         when others =>
+         when others                   =>
             return False;
       end case;
    end Is_Program_Unit;
@@ -350,22 +349,22 @@ package body LAL_Extensions is
    function Get_Subp_Spec (Node : Ada_Node'Class) return Subp_Spec is
    begin
       case Kind (Node) is
-         when Ada_Classic_Subp_Decl =>
+         when Ada_Classic_Subp_Decl  =>
             return Node.As_Classic_Subp_Decl.F_Subp_Spec;
 
-         when Ada_Generic_Subp_Decl =>
+         when Ada_Generic_Subp_Decl  =>
             return Node.As_Generic_Subp_Decl.F_Subp_Decl.F_Subp_Spec;
 
-         when Ada_Subp_Body_Stub =>
+         when Ada_Subp_Body_Stub     =>
             return Node.As_Subp_Body_Stub.F_Subp_Spec;
 
-         when Ada_Base_Subp_Body =>
+         when Ada_Base_Subp_Body     =>
             return Node.As_Base_Subp_Body.F_Subp_Spec;
 
          when Ada_Access_To_Subp_Def =>
             return Node.As_Access_To_Subp_Def.F_Subp_Spec;
 
-         when others =>
+         when others                 =>
             raise Program_Error;
       end case;
    end Get_Subp_Spec;
@@ -373,13 +372,13 @@ package body LAL_Extensions is
    function Xref (Node : Ada_Node'Class) return Defining_Name is
    begin
       case Node.Kind is
-         when Ada_Identifier =>
+         when Ada_Identifier  =>
             return Node.As_Identifier.P_Referenced_Defining_Name;
 
          when Ada_Dotted_Name =>
             return Xref (Node.As_Dotted_Name.F_Suffix);
 
-         when others =>
+         when others          =>
             raise Program_Error;
       end case;
    end Xref;
@@ -403,11 +402,10 @@ package body LAL_Extensions is
             | Ada_While_Loop_Stmt
             | Ada_Accept_Stmt
             | Ada_Accept_Stmt_With_Stmts
-            | Ada_If_Stmt
-         =>
+            | Ada_If_Stmt =>
             return True;
 
-         when others =>
+         when others      =>
             return False;
       end case;
    end Adds_New_Nesting_Level;

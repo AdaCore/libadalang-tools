@@ -214,7 +214,7 @@ package body Laltools.Partial_GNATPP is
         and then Crt_Token_Kind in Ada_Comment | Ada_Whitespace
       loop
          case Look is
-            when Forward =>
+            when Forward  =>
                Crt_Token := Next (Crt_Token);
 
             when Backward =>
@@ -244,7 +244,7 @@ package body Laltools.Partial_GNATPP is
    begin
       while Crt_Tok /= No_Token loop
          case Search is
-            when Forward =>
+            when Forward  =>
                Crt_Tok := Next (Crt_Tok);
 
             when Backward =>
@@ -503,12 +503,12 @@ package body Laltools.Partial_GNATPP is
 
          return
            (Start_Node.Sloc_Range.Start_Line > End_Node.Sloc_Range.Start_Line
-            and then Start_Node.Sloc_Range.End_Line
-                     < End_Node.Sloc_Range.End_Line)
-           or else (Start_Node.Sloc_Range.Start_Line
-                    < End_Node.Sloc_Range.Start_Line
-                    and then Start_Node.Sloc_Range.End_Line
-                             > End_Node.Sloc_Range.End_Line);
+            and then
+              Start_Node.Sloc_Range.End_Line < End_Node.Sloc_Range.End_Line)
+           or else
+             (Start_Node.Sloc_Range.Start_Line < End_Node.Sloc_Range.Start_Line
+              and then
+                Start_Node.Sloc_Range.End_Line > End_Node.Sloc_Range.End_Line);
       end Are_Overlapping_Nodes;
 
       --------------------------
@@ -521,18 +521,18 @@ package body Laltools.Partial_GNATPP is
          pragma
            Assert
              (Start_Node /= End_Node
-                and then Are_Overlapping_Nodes (Start_Node, End_Node));
+              and then Are_Overlapping_Nodes (Start_Node, End_Node));
 
          if Start_Node.Sloc_Range.Start_Line > End_Node.Sloc_Range.Start_Line
-           and then Start_Node.Sloc_Range.End_Line
-                    < End_Node.Sloc_Range.End_Line
+           and then
+             Start_Node.Sloc_Range.End_Line < End_Node.Sloc_Range.End_Line
          then
             return End_Node;
 
          elsif Start_Node.Sloc_Range.Start_Line
            < End_Node.Sloc_Range.Start_Line
-           and then Start_Node.Sloc_Range.End_Line
-                    > End_Node.Sloc_Range.End_Line
+           and then
+             Start_Node.Sloc_Range.End_Line > End_Node.Sloc_Range.End_Line
          then
             return Start_Node;
          end if;
@@ -671,9 +671,9 @@ package body Laltools.Partial_GNATPP is
          begin
             Start_Col :=
               (if First_Non_Blank_Column /= 0
-                 and then First_Non_Blank_Column
-                          = Integer
-                              (Sloc_Range (Data (True_Start_Tok)).Start_Column)
+                 and then
+                   First_Non_Blank_Column
+                   = Integer (Sloc_Range (Data (True_Start_Tok)).Start_Column)
                then 1
                else Sloc_Range (Data (True_Start_Tok)).Start_Column);
          end;
@@ -794,11 +794,10 @@ package body Laltools.Partial_GNATPP is
                | Ada_While_Loop_Stmt
                | Ada_If_Stmt_Range
                | Ada_Case_Stmt_Range
-               | Ada_Case_Stmt_Alternative_Range
-            =>
+               | Ada_Case_Stmt_Alternative_Range =>
                Offset := Offset + PP_Indentation;
 
-            when others =>
+            when others                          =>
                null;
          end case;
 
@@ -825,8 +824,9 @@ package body Laltools.Partial_GNATPP is
              (Node.P_Parent_Basic_Decl.As_Ada_Node, PP_Indentation);
 
       elsif (not Prev_Sibling.Is_Null and not Next_Sibling.Is_Null)
-        and then Prev_Sibling.Sloc_Range.Start_Column
-                 = Next_Sibling.Sloc_Range.Start_Column
+        and then
+          Prev_Sibling.Sloc_Range.Start_Column
+          = Next_Sibling.Sloc_Range.Start_Column
       then
          Offset :=
            (if Prev_Sibling.Sloc_Range.Start_Column = 0
@@ -892,14 +892,16 @@ package body Laltools.Partial_GNATPP is
    begin
       if Node.Kind in Ada_Subp_Spec_Range then
          if Node.Previous_Sibling.Kind in Ada_Overriding_Overriding_Range
-           and then Node.Previous_Sibling.Sloc_Range.Start_Line
-                    = Node.Sloc_Range.Start_Line
+           and then
+             Node.Previous_Sibling.Sloc_Range.Start_Line
+             = Node.Sloc_Range.Start_Line
          then
             return Overriding_Text'Length;
          elsif Node.Previous_Sibling.Kind
                in Ada_Overriding_Not_Overriding_Range
-           and then Node.Previous_Sibling.Sloc_Range.Start_Line
-                    = Node.Sloc_Range.Start_Line
+           and then
+             Node.Previous_Sibling.Sloc_Range.Start_Line
+             = Node.Sloc_Range.Start_Line
          then
             return Not_Overriding_Text'Length;
          else
@@ -1066,8 +1068,8 @@ package body Laltools.Partial_GNATPP is
          pragma
            Assert
              (Original_Arr'Size > 0
-                and then Formatted_Arr'Size > 0
-                and then Original_Arr'Size <= Formatted_Arr'Size);
+              and then Formatted_Arr'Size > 0
+              and then Original_Arr'Size <= Formatted_Arr'Size);
 
          Orig_Line_Nb : constant Line_Number := Original_Arr (1).Line_Nb;
          Count        : Natural := 0;
@@ -1205,8 +1207,9 @@ package body Laltools.Partial_GNATPP is
 
       Source_Line_Breaks : constant Boolean :=
         Force_Source_Line_Breaks
-        or else Pp_Boolean_Switches.Arg
-                  (PP_Options, Pp.Command_Lines.Source_Line_Breaks);
+        or else
+          Pp_Boolean_Switches.Arg
+            (PP_Options, Pp.Command_Lines.Source_Line_Breaks);
 
       Final_PP_Options : Pp.Command_Lines.Cmd_Line := PP_Options;
 
@@ -1507,8 +1510,9 @@ package body Laltools.Partial_GNATPP is
 
             Is_Slice : constant Boolean :=
               Start_Node_Index /= End_Node_Index
-              and then (Start_Node_Index /= 1
-                        or End_Node_Index /= End_Node.Parent.Last_Child_Index);
+              and then
+                (Start_Node_Index /= 1
+                 or End_Node_Index /= End_Node.Parent.Last_Child_Index);
 
          begin
             Ada.Assertions.Assert (Start_Node.Parent = End_Node.Parent);
@@ -1534,9 +1538,9 @@ package body Laltools.Partial_GNATPP is
                        End_Node.Sloc_Range.End_Column - 1)));
             return
               (if Is_Slice
-                 or else (Start_Node_Index = 1
-                          and then End_Node_Index
-                                   = End_Node.Parent.Last_Child_Index)
+                 or else
+                   (Start_Node_Index = 1
+                    and then End_Node_Index = End_Node.Parent.Last_Child_Index)
                then
                  Formatting_Region_Type'
                    (Start_Token       => Start_Token,
@@ -1568,8 +1572,9 @@ package body Laltools.Partial_GNATPP is
 
             Is_Slice : constant Boolean :=
               Start_Node_Index /= End_Node_Index
-              and then (Start_Node_Index /= 1
-                        or End_Node_Index /= End_Node.Parent.Last_Child_Index);
+              and then
+                (Start_Node_Index /= 1
+                 or End_Node_Index /= End_Node.Parent.Last_Child_Index);
 
          begin
             Ada.Assertions.Assert (Start_Node.Parent = End_Node.Parent);
@@ -1595,9 +1600,9 @@ package body Laltools.Partial_GNATPP is
                        End_Node.Sloc_Range.End_Column - 1)));
             return
               (if Is_Slice
-                 or else (Start_Node_Index = 1
-                          and then End_Node_Index
-                                   = End_Node.Parent.Last_Child_Index)
+                 or else
+                   (Start_Node_Index = 1
+                    and then End_Node_Index = End_Node.Parent.Last_Child_Index)
                then
                  Formatting_Region_Type'
                    (Start_Token       => Start_Token,
@@ -1737,11 +1742,11 @@ package body Laltools.Partial_GNATPP is
             begin
                Start_Col :=
                  (if First_Non_Blank_Column /= 0
-                    and then First_Non_Blank_Column
-                             = Integer
-                                 (Sloc_Range
-                                    (Data (Formatting_Region.Start_Token))
-                                    .Start_Column)
+                    and then
+                      First_Non_Blank_Column
+                      = Integer
+                          (Sloc_Range (Data (Formatting_Region.Start_Token))
+                             .Start_Column)
                   then 1
                   else
                     Sloc_Range (Data (Formatting_Region.Start_Token))
@@ -1828,11 +1833,10 @@ package body Laltools.Partial_GNATPP is
                | Ada_Record_Type_Def_Range
                | Ada_Generic_Formal_Part_Range
                | Ada_Begin_Block_Range
-               | Ada_Decl_Block_Range
-            =>
+               | Ada_Decl_Block_Range                            =>
                Current_Indentation := @ + Indentation;
 
-            when Ada_Declarative_Part_Range =>
+            when Ada_Declarative_Part_Range                      =>
                --  When we type declare, a DeclBlock is created but not a
                --  DeclarativePart one. Only when you close the block with an
                --  end the node is created.
@@ -1844,7 +1848,7 @@ package body Laltools.Partial_GNATPP is
                   Current_Indentation := @ + Indentation;
                end if;
 
-            when Ada_Handled_Stmts_Range =>
+            when Ada_Handled_Stmts_Range                         =>
                --  HandledStmts can be children of DeclBlock and BeginBlock.
                --  These two add indentation, so HandledStmts should not
                --  double add if its their child.
@@ -1854,17 +1858,17 @@ package body Laltools.Partial_GNATPP is
                   Current_Indentation := @ + Indentation;
                end if;
 
-            when Ada_Subp_Spec_Range | Ada_Assign_Stmt_Range =>
+            when Ada_Subp_Spec_Range | Ada_Assign_Stmt_Range     =>
                Current_Indentation := @ + Inline_Indentation;
 
-            when Ada_Dotted_Name_Range =>
+            when Ada_Dotted_Name_Range                           =>
                Current_Indentation :=
                  Natural (Parent.Sloc_Range.Start_Column)
                  - 1
                  + Inline_Indentation;
                exit;
 
-            when Ada_Params_Range =>
+            when Ada_Params_Range                                =>
                Current_Indentation :=
                  Natural (Parent.Sloc_Range.Start_Column) - 1 + 1;
                exit;
@@ -1874,7 +1878,7 @@ package body Laltools.Partial_GNATPP is
                  Natural (Parent.Sloc_Range.Start_Column) - 1;
                exit;
 
-            when others =>
+            when others                                          =>
                null;
          end case;
       end loop;

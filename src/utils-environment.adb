@@ -82,7 +82,7 @@ package body Utils.Environment is
          pragma
            Assert
              (Get_Current_Dir = Tool_Temp_Dir.all & Directory_Separator
-                or else Get_Current_Dir = Initial_Dir & Directory_Separator);
+              or else Get_Current_Dir = Initial_Dir & Directory_Separator);
          --  It can be Initial_Dir if we fail early
          Change_Dir (Initial_Dir);
          --  to avoid being in the Tool_Temp_Dir when we delete it

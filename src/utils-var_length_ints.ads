@@ -38,7 +38,7 @@ package Utils.Var_Length_Ints is
    --  try prod mode.
 
    --   type Octet is range 0 .. 2**8 - 1;
-   type Octet is mod 2**8;
+   type Octet is mod 2 ** 8;
    type Octet_Index is new Positive;
    type Octet_Array is array (Octet_Index range <>) of Octet;
    for Octet_Array'Component_Size use 8; -- needed if Octet is signed

@@ -48,7 +48,7 @@ package body Pp is
    procedure Trace (Message : String; Level : Log_Level := Info) is
    begin
       case Level is
-         when Info =>
+         when Info  =>
             Info_Logger.Trace
               (Message => Message, Style => Info_Message_Style);
 
@@ -75,7 +75,7 @@ package body Pp is
       Level   : Log_Level := Error) is
    begin
       case Level is
-         when Info =>
+         when Info  =>
             Info_Logger.Trace
               (E => E, Msg => Message, Style => Info_Message_Style);
 

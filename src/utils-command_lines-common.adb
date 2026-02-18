@@ -84,12 +84,12 @@ package body Utils.Command_Lines.Common is
    begin
       return
         (case WCEM (Cmd) is
-           when 'h' => "Hex", -- not supported by GNATCOLL.Iconv
-           when 'u' => "Upper", -- not supported by GNATCOLL.Iconv
-           when 's' => GNATCOLL.Iconv.SHIFT_JIS,
-           when 'E' => "EUC", -- not supported by GNATCOLL.Iconv
-           when '8' => GNATCOLL.Iconv.UTF8,
-           when 'b' => GNATCOLL.Iconv.ISO_8859_1, -- BRACKETS
+           when 'h'    => "Hex", -- not supported by GNATCOLL.Iconv
+           when 'u'    => "Upper", -- not supported by GNATCOLL.Iconv
+           when 's'    => GNATCOLL.Iconv.SHIFT_JIS,
+           when 'E'    => "EUC", -- not supported by GNATCOLL.Iconv
+           when '8'    => GNATCOLL.Iconv.UTF8,
+           when 'b'    => GNATCOLL.Iconv.ISO_8859_1, -- BRACKETS
            when others => raise Program_Error);
    end Wide_Character_Encoding;
 
@@ -100,12 +100,12 @@ package body Utils.Command_Lines.Common is
    begin
       return
         (case WCEM (Cmd) is
-           when 'h' => WCEM_Hex,
-           when 'u' => WCEM_Upper,
-           when 's' => WCEM_Shift_JIS,
-           when 'e' => WCEM_EUC,
-           when '8' => WCEM_UTF8,
-           when 'b' => WCEM_Brackets,
+           when 'h'    => WCEM_Hex,
+           when 'u'    => WCEM_Upper,
+           when 's'    => WCEM_Shift_JIS,
+           when 'e'    => WCEM_EUC,
+           when '8'    => WCEM_UTF8,
+           when 'b'    => WCEM_Brackets,
            when others => raise Program_Error);
    end Wide_Character_Encoding;
 

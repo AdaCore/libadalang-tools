@@ -49,7 +49,7 @@ package Utils.Generic_Symbols is
    --  An abort in the middle of Intern will not damage data structures
    --  or leak memory.
 
-   type Symbol is range 1 .. 2**24 - 1; -- represents a character string
+   type Symbol is range 1 .. 2 ** 24 - 1; -- represents a character string
    subtype Opt_Symbol is Symbol'Base range 0 .. Symbol'Last;
    No_Symbol : constant Opt_Symbol := Opt_Symbol'First;
 

@@ -572,37 +572,37 @@ package Pp.Command_Lines is
    function PP_Name_Casing (Cmd : Cmd_Line) return PP_Casing
    is (case Name_Casing'(Arg (Cmd)) is
          when Name_Case_As_Declared => As_Declared,
-         when Name_Mixed_Case => Mixed,
-         when Name_Lower_Case => Lower_Case,
-         when Name_Upper_Case => Upper_Case);
+         when Name_Mixed_Case       => Mixed,
+         when Name_Lower_Case       => Lower_Case,
+         when Name_Upper_Case       => Upper_Case);
    --  Defines the casing for both defining and usage occurrences of the
    --  names
 
    function PP_Enum_Casing (Cmd : Cmd_Line) return PP_Casing
    is (case Enum_Casing'(Arg (Cmd)) is
          when Enum_Case_As_Declared => PP_Name_Casing (Cmd),
-         when Enum_Mixed_Case => Mixed,
-         when Enum_Lower_Case => Lower_Case,
-         when Enum_Upper_Case => Upper_Case);
+         when Enum_Mixed_Case       => Mixed,
+         when Enum_Lower_Case       => Lower_Case,
+         when Enum_Upper_Case       => Upper_Case);
    --  Defines the casing for both defining and usage occurrences of the
    --  enumeration literals.
 
    function PP_Type_Casing (Cmd : Cmd_Line) return PP_Casing
    is (case Type_Casing'(Arg (Cmd)) is
          when Type_Case_As_Declared => PP_Name_Casing (Cmd),
-         when Type_Mixed_Case => Mixed,
-         when Type_Lower_Case => Lower_Case,
-         when Type_Upper_Case => Upper_Case);
+         when Type_Mixed_Case       => Mixed,
+         when Type_Lower_Case       => Lower_Case,
+         when Type_Upper_Case       => Upper_Case);
    --  Defines the casing for both defining and usage occurrences of the
    --  type (and subtype???) names.
 
    function PP_Constant_Casing (Cmd : Cmd_Line) return PP_Casing
    is (case Constant_Casing'(Arg (Cmd)) is
          when Constant_Case_As_Non_Constant => PP_Name_Casing (Cmd),
-         when Constant_Case_As_Declared => As_Declared,
-         when Constant_Mixed_Case => Mixed,
-         when Constant_Lower_Case => Lower_Case,
-         when Constant_Upper_Case => Upper_Case);
+         when Constant_Case_As_Declared     => As_Declared,
+         when Constant_Mixed_Case           => Mixed,
+         when Constant_Lower_Case           => Lower_Case,
+         when Constant_Upper_Case           => Upper_Case);
    --  Defines the casing for both defining and usage occurrences of constant
    --  object declarations.
 
@@ -610,9 +610,9 @@ package Pp.Command_Lines is
    is (case Number_Casing'(Arg (Cmd)) is
          when Number_Case_As_Constant => PP_Constant_Casing (Cmd),
          when Number_Case_As_Declared => As_Declared,
-         when Number_Mixed_Case => Mixed,
-         when Number_Lower_Case => Lower_Case,
-         when Number_Upper_Case => Upper_Case);
+         when Number_Mixed_Case       => Mixed,
+         when Number_Lower_Case       => Lower_Case,
+         when Number_Upper_Case       => Upper_Case);
    --  Defines the casing for both defining and usage occurrences of the
    --  named numbers names.
 

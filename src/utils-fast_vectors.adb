@@ -119,7 +119,7 @@ package body Utils.Fast_Vectors is
       if Container.Last = Container.Elements.Last then
          if Container.Last = 0 then
             pragma Assert (Container.Elements = Empty_Elements'Access);
-            New_Elts := new Elements_Type (Last => 2**10);
+            New_Elts := new Elements_Type (Last => 2 ** 10);
          else
             New_Elts := new Elements_Type (Last => 2 * Container.Last);
             New_Elts.EA (1 .. Container.Last) := Container.Elements.EA;
@@ -340,7 +340,7 @@ package body Utils.Fast_Vectors is
                pragma
                  Assert
                    (Source.Last <= Index_Type'First
-                      or else not (SA (Source.Last) < SA (Source.Last - 1)));
+                    or else not (SA (Source.Last) < SA (Source.Last - 1)));
 
                if I < Index_Type'First then
                   TA (Index_Type'First .. J) :=
@@ -779,7 +779,7 @@ package body Utils.Fast_Vectors is
       if Container.Elements = Empty_Elements'Access then
          pragma Assert (Container.Last = 0);
          New_Elts :=
-           new Elements_Type (Last => Index_Type'Max (New_Last, 2**10));
+           new Elements_Type (Last => Index_Type'Max (New_Last, 2 ** 10));
          Container.Elements := New_Elts;
       elsif New_Last > Container.Elements.Last then
          New_Elts :=

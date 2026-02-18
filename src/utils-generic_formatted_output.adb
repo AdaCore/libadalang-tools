@@ -115,45 +115,45 @@ package body Utils.Generic_Formatted_Output is
          if T (J) = '\' then
             J := J + 1;
             case T (J) is
-               when 'n' =>
+               when 'n'    =>
                   Put_Char (Char_Type'Val (W_Char'Pos (NL)));
 
-               when 'r' =>
+               when 'r'    =>
                   Put_Char (Char_Type'Val (W_Char'Pos (W_CR)));
 
-               when 't' =>
+               when 't'    =>
                   Put_Char (Char_Type'Val (W_Char'Pos (W_HT)));
 
-               when '\' =>
+               when '\'    =>
                   Put_Char (Char_Type'Val (W_Char'Pos ('\')));
 
-               when 'i' =>
+               when 'i'    =>
                   Indent;
 
-               when 'o' =>
+               when 'o'    =>
                   Outdent;
 
-               when '1' =>
+               when '1'    =>
                   Used (1) := True;
                   Put_Str (X1);
 
-               when '2' =>
+               when '2'    =>
                   Used (2) := True;
                   Put_Str (X2);
 
-               when '3' =>
+               when '3'    =>
                   Used (3) := True;
                   Put_Str (X3);
 
-               when '4' =>
+               when '4'    =>
                   Used (4) := True;
                   Put_Str (X4);
 
-               when '5' =>
+               when '5'    =>
                   Used (5) := True;
                   Put_Str (X5);
 
-               when '6' =>
+               when '6'    =>
                   Used (6) := True;
                   Put_Str (X6);
 
