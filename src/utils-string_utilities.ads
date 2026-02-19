@@ -56,7 +56,7 @@ package Utils.String_Utilities is
    function Image (X : Integer) return String;
    --  Return X'Img without the annoying blank.
 
-   type Modular is mod 2**32;
+   type Modular is mod 2 ** 32;
    function Image (X : Modular) return String;
 
    function Capitalize (S : String) return String;
@@ -229,7 +229,7 @@ package Utils.String_Utilities is
    --  Ada.Strings.Bounded_Strings is too much hassle; we use a simple
    --  bounded string type here.
 
-   type Bounded_Str (Max_Length : Natural := 2**16 - 1) is limited record
+   type Bounded_Str (Max_Length : Natural := 2 ** 16 - 1) is limited record
       Length : Natural := 0;
       Chars  : String (1 .. Max_Length);
    end record;
@@ -239,7 +239,7 @@ package Utils.String_Utilities is
    function To_String (X : Bounded_Str) return String;
    function "+" (X : Bounded_Str) return String renames To_String;
 
-   type Bounded_W_Str (Max_Length : Natural := 2**16 - 1) is limited record
+   type Bounded_W_Str (Max_Length : Natural := 2 ** 16 - 1) is limited record
       Length : Natural := 0;
       Chars  : W_Str (1 .. Max_Length);
    end record;

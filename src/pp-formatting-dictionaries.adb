@@ -89,7 +89,7 @@ package body Pp.Formatting.Dictionaries is
          when Whole_Word =>
             Include (Whole_Word_Exceptions, Id);
 
-         when Subword =>
+         when Subword    =>
             Include (Subword_Exceptions, Id);
       end case;
    end Add_To_Dictionary;
@@ -164,13 +164,13 @@ package body Pp.Formatting.Dictionaries is
 
       begin
          case Casing is
-            when Lower_Case =>
+            when Lower_Case  =>
                Result := To_Lower (Result);
 
-            when Upper_Case =>
+            when Upper_Case  =>
                Result := To_Upper (Result);
 
-            when Mixed =>
+            when Mixed       =>
                Result := To_Lower (Result);
                Result (First_Idx) := To_Upper (Result (First_Idx));
 
@@ -246,7 +246,7 @@ package body Pp.Formatting.Dictionaries is
       C  : constant Name_Sets.Cursor :=
         (case Exception_Kind is
            when Whole_Word => Find (Whole_Word_Exceptions, Id),
-           when Subword => Find (Subword_Exceptions, Id));
+           when Subword    => Find (Subword_Exceptions, Id));
    begin
       return (if Has_Element (C) then Element (C) else Syms.No_Symbol);
    end Find_In_Dictionary;
@@ -347,8 +347,8 @@ package body Pp.Formatting.Dictionaries is
             end loop;
 
             if Result > Len
-              or else (Result = Len
-                       and then Is_White_Space (String_Buffer (Result)))
+              or else
+                (Result = Len and then Is_White_Space (String_Buffer (Result)))
             then
                Result := 0;
             end if;
@@ -364,10 +364,11 @@ package body Pp.Formatting.Dictionaries is
             Result : Natural := Idx;
          begin
             while Result < Len
-              and then not (Is_White_Space (String_Buffer (Result))
-                            or else (String_Buffer (Result) = '-'
-                                     and then String_Buffer (Result + 1)
-                                              = '-'))
+              and then
+                not (Is_White_Space (String_Buffer (Result))
+                     or else
+                       (String_Buffer (Result) = '-'
+                        and then String_Buffer (Result + 1) = '-'))
             loop
                Result := Result + 1;
             end loop;
@@ -453,9 +454,10 @@ package body Pp.Formatting.Dictionaries is
          Start_Word := Skip_White_Spaces (1);
 
          if Start_Word = 0
-           or else (Start_Word < Len
-                    and then String_Buffer (Start_Word) = '-'
-                    and then String_Buffer (Start_Word + 1) = '-')
+           or else
+             (Start_Word < Len
+              and then String_Buffer (Start_Word) = '-'
+              and then String_Buffer (Start_Word + 1) = '-')
          then
             --  blank or comment line
             return;
@@ -490,9 +492,10 @@ package body Pp.Formatting.Dictionaries is
                Start_Word := Skip_White_Spaces (End_Word + 1);
 
                if not (Start_Word = 0
-                       or else (Start_Word < Len
-                                and then String_Buffer (Start_Word) = '-'
-                                and then String_Buffer (Start_Word + 1) = '-'))
+                       or else
+                         (Start_Word < Len
+                          and then String_Buffer (Start_Word) = '-'
+                          and then String_Buffer (Start_Word + 1) = '-'))
                then
                   Err_Out.Put
                     ("\1:\2:\3: only one casing exception per line\n",

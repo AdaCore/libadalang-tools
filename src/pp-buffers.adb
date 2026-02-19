@@ -144,8 +144,8 @@ package body Pp.Buffers is
          pragma
            Assert
              (if Buf.From_First > Last_Index (Buf.From)
-                then Result = W_NUL
-                else Result = Buf.From (Buf.From_First));
+              then Result = W_NUL
+              else Result = Buf.From (Buf.From_First));
       end return;
    end Cur;
 
@@ -667,12 +667,12 @@ package body Pp.Buffers is
          --  Keep track of whether we're in a comment
 
          case State is
-            when In_Comment =>
+            when In_Comment                    =>
                if Is_Line_Terminator (C) then
                   State := Other;
                end if;
 
-            when In_String_Literal =>
+            when In_String_Literal             =>
                if C in '"' then
                   State := Other;
                end if;
@@ -682,7 +682,7 @@ package body Pp.Buffers is
                   State := Other;
                end if;
 
-            when Other =>
+            when Other                         =>
                if C = '-' and then Ptr <= Input'Last and then Input (Ptr) = '-'
                then
                   State := In_Comment;
@@ -775,9 +775,9 @@ package body Pp.Buffers is
       pragma
         Assert -- no trailing blanks
           (if C = NL
-             then (Is_Empty (Buf.To) or else Last_Element (Buf.To) /= ' '));
+           then (Is_Empty (Buf.To) or else Last_Element (Buf.To) /= ' '));
 
-   --  No need to adjust Buf.Cur_Column
+      --  No need to adjust Buf.Cur_Column
    end Replace_Cur;
 
    procedure Replace_Previous (Buf : in out Buffer; C : W_Char) is
@@ -786,9 +786,9 @@ package body Pp.Buffers is
       pragma
         Assert -- no trailing blanks
           (if C = NL
-             then
-               (Last_Index (Buf.To) = 1
-                or else Buf.To (Last_Index (Buf.To) - 1) /= ' '));
+           then
+             (Last_Index (Buf.To) = 1
+              or else Buf.To (Last_Index (Buf.To) - 1) /= ' '));
    end Replace_Previous;
 
    procedure Reset (Buf : in out Buffer) is
@@ -854,8 +854,8 @@ package body Pp.Buffers is
             pragma
               Assert
                 (Result
-                   = To_W_Str (Buf)
-                       (Position (Buf, First) .. Position (Buf, Last) - 1));
+                 = To_W_Str (Buf)
+                     (Position (Buf, First) .. Position (Buf, Last) - 1));
          end if;
          return Result;
       end;

@@ -173,7 +173,7 @@ package body METRICS.Actions is
       use Utils.Dbg_Out;
    begin
       case C.Kind is
-         when Child =>
+         when Child  =>
             Put ("Child: \1\n", C.Node.Image);
 
          when Trivia =>
@@ -228,8 +228,9 @@ package body METRICS.Actions is
    function Is_Ancestor_CU (Anc, Child : Metrix_Ref) return Boolean
    is (Anc /= null
        and then Child /= null
-       and then (Anc = Child
-                 or else Is_Ancestor_CU (Anc, Specs (Child.Child_Parent))));
+       and then
+         (Anc = Child
+          or else Is_Ancestor_CU (Anc, Specs (Child.Child_Parent))));
    --  True if Anc is an ancestor library unit of Child
 
    function Same_Hierarchy (M1, M2 : Metrix_Ref) return Boolean
@@ -357,7 +358,7 @@ package body METRICS.Actions is
    function Is_Assertion (Node : Ada_Node) return Boolean
    is (case Assertion_Kind (Node) is
          when Postcondition | Other_Assertion => True,
-         when Not_An_Assertion => False);
+         when Not_An_Assertion                => False);
    --  True for pragma Assert and for Pre, Post, Contract_Cases,
    --  Pre'Class, and Post'Class.
 
@@ -542,8 +543,7 @@ package body METRICS.Actions is
                | Ada_Package_Renaming_Decl
                | Ada_Abstract_Subp_Decl
                | Ada_Null_Subp_Decl
-               | Ada_Subp_Renaming_Decl
-            =>
+               | Ada_Subp_Renaming_Decl                =>
                pragma Assert (S = null);
                S := M;
                M.Is_Spec := True;
@@ -551,8 +551,7 @@ package body METRICS.Actions is
             when Ada_Package_Body
                | Ada_Protected_Body
                | Ada_Entry_Body
-               | Ada_Task_Body
-            =>
+               | Ada_Task_Body                         =>
                pragma Assert (B = null);
                B := M;
                M.Is_Spec := False;
@@ -561,7 +560,7 @@ package body METRICS.Actions is
             --  the spec (yet), we assume the body is a spec. If we later
             --  see a spec, we move the body to the Bodies array.
 
-            when Ada_Subp_Body =>
+            when Ada_Subp_Body                         =>
                pragma Assert (B = null);
                if S = null then
                   S := M;
@@ -584,7 +583,7 @@ package body METRICS.Actions is
                S := M;
                M.Is_Spec := True;
 
-            when others =>
+            when others                                =>
                raise Program_Error with M.Node.Image;
          end case;
       end Set_CU_Metrix;
@@ -702,9 +701,9 @@ package body METRICS.Actions is
         (case Kind (Lib_Item_Or_Subunit) is
            when Ada_Library_Item =>
              Lib_Item_Or_Subunit.As_Library_Item.F_Item.As_Ada_Node,
-           when Ada_Subunit =>
+           when Ada_Subunit      =>
              Lib_Item_Or_Subunit.As_Subunit.F_Body.As_Ada_Node,
-           when others => raise Program_Error);
+           when others           => raise Program_Error);
    end Get_Outer_Unit;
 
    function Assertion_Kind (Node : Ada_Node) return Assertion_Enum is
@@ -714,7 +713,7 @@ package body METRICS.Actions is
       Class          : constant W_Str := "class";
    begin
       case Kind (Node) is
-         when Ada_Pragma_Node =>
+         when Ada_Pragma_Node  =>
             if Pragma_Name (Node) = "assert" then
                return Other_Assertion;
             end if;
@@ -724,7 +723,7 @@ package body METRICS.Actions is
                Id : constant Name := Node.As_Aspect_Assoc.F_Id;
             begin
                case Kind (Id) is
-                  when Ada_Identifier =>
+                  when Ada_Identifier    =>
                      declare
                         Text : constant W_Str := L_Name (Id);
                      begin
@@ -751,12 +750,12 @@ package body METRICS.Actions is
                         end if;
                      end;
 
-                  when others =>
+                  when others            =>
                      raise Program_Error;
                end case;
             end;
 
-         when others =>
+         when others           =>
             null;
       end case;
 
@@ -771,7 +770,7 @@ package body METRICS.Actions is
       end if;
 
       case Kind (Node) is
-         when Ada_Compilation_Unit =>
+         when Ada_Compilation_Unit         =>
             --  At the file level, we print complexity metrics if the outermost
             --  unit has complexity metrics, or if it's a package decl, etc.
 
@@ -780,21 +779,21 @@ package body METRICS.Actions is
             begin
                return
                  Has_Complexity_Metrics (Outer_Unit, Ignore_Assertions)
-                 or else Kind (Outer_Unit)
-                         in Ada_Package_Decl
-                          | Ada_Generic_Package_Decl
-                          | Ada_Package_Body
-                          | Ada_Protected_Body;
+                 or else
+                   Kind (Outer_Unit)
+                   in Ada_Package_Decl
+                    | Ada_Generic_Package_Decl
+                    | Ada_Package_Body
+                    | Ada_Protected_Body;
             end;
 
          when Ada_Expr_Function
             | Ada_Entry_Body
             | Ada_Subp_Body
-            | Ada_Task_Body
-         =>
+            | Ada_Task_Body                =>
             return True;
 
-         when Ada_Package_Body =>
+         when Ada_Package_Body             =>
             --  Apparently, gnatmetric doesn't do nested package bodies if
             --  there are no statements.
             return not Node.As_Package_Body.F_Stmts.Is_Null;
@@ -802,7 +801,7 @@ package body METRICS.Actions is
          when Contract_Complexity_Eligible =>
             return not Ignore_Assertions;
 
-         when others =>
+         when others                       =>
             return False;
       end case;
    end Has_Complexity_Metrics;
@@ -814,31 +813,40 @@ package body METRICS.Actions is
       end if;
 
       case Kind (Node) is
-         when Ada_Compilation_Unit =>
+         when Ada_Compilation_Unit
+         =>
             return No_Such_Knd;
 
-         when Ada_Generic_Package_Decl =>
+         when Ada_Generic_Package_Decl
+         =>
             return Generic_Package_Knd;
 
-         when Ada_Package_Body =>
+         when Ada_Package_Body
+         =>
             return Package_Body_Knd;
 
-         when Ada_Package_Decl =>
+         when Ada_Package_Decl
+         =>
             return Package_Knd;
 
-         when Ada_Protected_Body =>
+         when Ada_Protected_Body
+         =>
             return Protected_Body_Knd;
 
-         when Ada_Single_Protected_Decl =>
+         when Ada_Single_Protected_Decl
+         =>
             return Protected_Object_Knd;
 
-         when Ada_Protected_Type_Decl =>
+         when Ada_Protected_Type_Decl
+         =>
             return Protected_Type_Knd;
 
-         when Ada_Entry_Body =>
+         when Ada_Entry_Body
+         =>
             return Entry_Body_Knd;
 
-         when Ada_Subp_Body =>
+         when Ada_Subp_Body
+         =>
             declare
                R : constant Type_Expr := F_Subp_Returns (Get_Subp_Spec (Node));
             begin
@@ -846,7 +854,8 @@ package body METRICS.Actions is
                  (if R.Is_Null then Procedure_Body_Knd else Function_Body_Knd);
             end;
 
-         when Ada_Subp_Body_Stub =>
+         when Ada_Subp_Body_Stub
+         =>
             declare
                R : constant Type_Expr := F_Subp_Returns (Get_Subp_Spec (Node));
             begin
@@ -856,30 +865,37 @@ package body METRICS.Actions is
                   else Function_Body_Stub_Knd);
             end;
 
-         when Ada_Task_Body =>
+         when Ada_Task_Body
+         =>
             return Task_Body_Knd;
 
-         when Ada_Single_Task_Decl =>
+         when Ada_Single_Task_Decl
+         =>
             return Task_Object_Knd;
 
-         when Ada_Task_Type_Decl =>
+         when Ada_Task_Type_Decl
+         =>
             return Task_Type_Knd;
 
-         when Ada_Generic_Package_Instantiation =>
+         when Ada_Generic_Package_Instantiation
+         =>
             return Package_Instantiation_Knd;
 
-         when Ada_Generic_Renaming_Decl =>
+         when Ada_Generic_Renaming_Decl
+         =>
             return Generic_Package_Renaming_Knd; -- ???Or proc/func
 
-         when Ada_Generic_Subp_Instantiation =>
+         when Ada_Generic_Subp_Instantiation
+         =>
             return
               (case Ada_Subp_Kind'
                  (Kind (Node.As_Generic_Subp_Instantiation.F_Kind))
                is
-                 when Ada_Subp_Kind_Function => Function_Instantiation_Knd,
+                 when Ada_Subp_Kind_Function  => Function_Instantiation_Knd,
                  when Ada_Subp_Kind_Procedure => Procedure_Instantiation_Knd);
 
-         when Ada_Generic_Subp_Decl =>
+         when Ada_Generic_Subp_Decl
+         =>
             declare
                R : constant Type_Expr := F_Subp_Returns (Get_Subp_Spec (Node));
                --  ???R is null here even for functions
@@ -890,7 +906,8 @@ package body METRICS.Actions is
                   else Generic_Function_Knd);
             end;
 
-         when Ada_Package_Renaming_Decl =>
+         when Ada_Package_Renaming_Decl
+         =>
             return Package_Renaming_Knd;
 
          when Ada_Abstract_Subp_Decl | Ada_Subp_Renaming_Decl | Ada_Subp_Decl
@@ -901,13 +918,16 @@ package body METRICS.Actions is
                return (if R.Is_Null then Procedure_Knd else Function_Knd);
             end;
 
-         when Ada_Null_Subp_Decl =>
+         when Ada_Null_Subp_Decl
+         =>
             return Null_Procedure_Knd;
 
-         when Ada_Expr_Function =>
+         when Ada_Expr_Function
+         =>
             return Expression_Function_Knd;
 
-         when others =>
+         when others
+         =>
             raise Program_Error;
       end case;
    end Get_Fine_Kind;
@@ -959,46 +979,46 @@ package body METRICS.Actions is
       --  is the same as the name in the XML, replacing "_" with " ".
 
       case Metric is
-         when Statements =>
+         when Statements           =>
             return "all statements";
 
-         when Declarations =>
+         when Declarations         =>
             return "all declarations";
 
          when Logical_Source_Lines =>
             return "logical SLOC";
 
-         when All_Types =>
+         when All_Types            =>
             return "all type definitions";
 
-         when Loop_Nesting =>
+         when Loop_Nesting         =>
             return "maximum loop nesting";
 
-         when All_Subprograms =>
+         when All_Subprograms      =>
             return "all subprogram bodies";
 
-         when Unit_Nesting =>
+         when Unit_Nesting         =>
             return "maximal unit nesting";
 
-         when Construct_Nesting =>
+         when Construct_Nesting    =>
             return "maximal construct nesting";
 
-         when Lines_Eol_Comment =>
+         when Lines_Eol_Comment    =>
             return "end-of-line comments";
 
-         when Lines_Average =>
+         when Lines_Average        =>
             return "Average lines in body";
 
-         when In_Parameters =>
+         when In_Parameters        =>
             return "IN parameters";
 
-         when Out_Parameters =>
+         when Out_Parameters       =>
             return "OUT parameters";
 
-         when In_Out_Parameters =>
+         when In_Out_Parameters    =>
             return "IN OUT parameters";
 
-         when others =>
+         when others               =>
             return
               Replace_String
                 (XML_Metric_Name_String (Metric), From => "_", To => " ");
@@ -1027,22 +1047,24 @@ package body METRICS.Actions is
 
       if Depth > 3
         and then M.Kind in Contract_Complexity_Eligible
-        and then Metric
-                 not in Contract_Complexity
-                      | Param_Number
-                      | In_Parameters
-                      | Out_Parameters
-                      | In_Out_Parameters
+        and then
+          Metric
+          not in Contract_Complexity
+               | Param_Number
+               | In_Parameters
+               | Out_Parameters
+               | In_Out_Parameters
       then
          return False;
       end if;
 
       if M.Kind in Ada_Subp_Body_Stub | Ada_Generic_Subp_Instantiation
-        and then Metric
-                 not in Param_Number
-                      | In_Parameters
-                      | Out_Parameters
-                      | In_Out_Parameters
+        and then
+          Metric
+          not in Param_Number
+               | In_Parameters
+               | Out_Parameters
+               | In_Out_Parameters
       then
          return False;
       end if;
@@ -1055,32 +1077,32 @@ package body METRICS.Actions is
             | Lines_Blank
             | Lines_Ratio
             | Lines_Code_In_Bodies
-            | Num_Bodies
-         =>
+            | Num_Bodies                                         =>
             return True;
 
-         when Lines_Average | Lines_Spark =>
+         when Lines_Average | Lines_Spark                        =>
             return Depth in 1 | 2;
 
-         when All_Subprograms =>
+         when All_Subprograms                                    =>
             return
               (Depth = 3
-               and then M.Kind
-                        in Ada_Package_Body
-                         | Ada_Subp_Body
-                         | Ada_Task_Body
-                         | Ada_Protected_Body)
+               and then
+                 M.Kind
+                 in Ada_Package_Body
+                  | Ada_Subp_Body
+                  | Ada_Task_Body
+                  | Ada_Protected_Body)
               or else (XML and then Depth = 1);
 
-         when All_Types | Public_Types =>
+         when All_Types | Public_Types                           =>
             return
               (Depth = 3 or else (XML and then Depth = 1))
               and then M.Vals (Metric) > 0;
 
-         when Private_Types =>
+         when Private_Types                                      =>
             return Depth = 3 and then M.Vals (Metric) > 0;
 
-         when Public_Subprograms =>
+         when Public_Subprograms                                 =>
             if Depth = 3
               and then (M.Is_Private_Lib_Unit or else M.LI_Sub = Subunit_Sym)
             then
@@ -1109,16 +1131,16 @@ package body METRICS.Actions is
 
             return False;
 
-         when Declarations | Statements | Logical_Source_Lines =>
+         when Declarations | Statements | Logical_Source_Lines   =>
             return M.Kind /= Ada_Compilation_Unit;
 
-         when Unit_Nesting | Construct_Nesting =>
+         when Unit_Nesting | Construct_Nesting                   =>
             return Depth >= 3 and then M.Vals (Metric) > 0;
 
-         when Current_Construct_Nesting =>
+         when Current_Construct_Nesting                          =>
             return False;
 
-         when Param_Number =>
+         when Param_Number                                       =>
             if M.Kind
                in Ada_Subp_Decl
                 | Ada_Generic_Subp_Instantiation
@@ -1139,34 +1161,33 @@ package body METRICS.Actions is
          when In_Parameters | Out_Parameters | In_Out_Parameters =>
             return
               M.Vals (Param_Number) > 0
-              and then Should_Print
-                         (Param_Number, Metrics_To_Compute, M, Depth, XML);
+              and then
+                Should_Print (Param_Number, Metrics_To_Compute, M, Depth, XML);
 
-         when Contract_Complexity =>
+         when Contract_Complexity                                =>
             return M.Kind in Contract_Complexity_Eligible and then M.Visible;
 
-         when Contract | Post | Contract_Complete =>
+         when Contract | Post | Contract_Complete                =>
             return M.Visible;
 
          when Complexity_Statement
             | Complexity_Expression
             | Complexity_Cyclomatic
             | Complexity_Essential
-            | Loop_Nesting
-         =>
+            | Loop_Nesting                                       =>
             return M.Has_Complexity_Metrics;
 
-         when Complexity_Average =>
+         when Complexity_Average                                 =>
             return XML and Depth = 1;
 
-         when Extra_Exit_Points =>
+         when Extra_Exit_Points                                  =>
             return
               M.Kind in Ada_Subp_Body | Ada_Task_Body | Ada_Entry_Body
-              or else (M.Kind = Ada_Package_Body
-                       and then M.Statements_Sloc
-                                /= Slocs.No_Source_Location_Range);
+              or else
+                (M.Kind = Ada_Package_Body
+                 and then M.Statements_Sloc /= Slocs.No_Source_Location_Range);
 
-         when Coupling_Metrics =>
+         when Coupling_Metrics                                   =>
             pragma Assert (Depth <= 3);
             return Result : Boolean do
                if Depth = 3 then
@@ -1174,14 +1195,13 @@ package body METRICS.Actions is
                      when Tagged_Coupling_Out
                         | Tagged_Coupling_In
                         | Hierarchy_Coupling_Out
-                        | Hierarchy_Coupling_In
-                     =>
+                        | Hierarchy_Coupling_In                      =>
                         Result := M.Comp_Unit.Has_Tagged_Type;
 
                      when Control_Coupling_Out | Control_Coupling_In =>
                         Result := M.Comp_Unit.Has_Subp;
 
-                     when Unit_Coupling_Out | Unit_Coupling_In =>
+                     when Unit_Coupling_Out | Unit_Coupling_In       =>
                         Result := True;
                   end case;
                else
@@ -1191,7 +1211,7 @@ package body METRICS.Actions is
                pragma Assert (if not Result then M.Vals (Metric) = 0);
             end return;
 
-         when Computed_Metrics =>
+         when Computed_Metrics                                   =>
             raise Program_Error;
       end case;
    end Should_Print;
@@ -1398,18 +1418,20 @@ package body METRICS.Actions is
          end if;
 
          if M.Kind in Contract_Complexity_Eligible
-           and then not (Should_Print
-                           (Contract_Complexity,
-                            Metrics_To_Compute,
-                            M,
-                            Depth,
-                            XML => True)
-                         or else Should_Print
-                                   (Param_Number,
-                                    Metrics_To_Compute,
-                                    M,
-                                    Depth,
-                                    XML => True))
+           and then
+             not (Should_Print
+                    (Contract_Complexity,
+                     Metrics_To_Compute,
+                     M,
+                     Depth,
+                     XML => True)
+                  or else
+                    Should_Print
+                      (Param_Number,
+                       Metrics_To_Compute,
+                       M,
+                       Depth,
+                       XML => True))
          then
             return True;
          end if;
@@ -1578,19 +1600,19 @@ package body METRICS.Actions is
    begin
       for C of X loop
          case C is
-            when '&' =>
+            when '&'    =>
                Append (Result, "&amp;");
 
-            when '<' =>
+            when '<'    =>
                Append (Result, "&lt;");
 
-            when '>' =>
+            when '>'    =>
                Append (Result, "&gt;");
 
-            when '"' =>
+            when '"'    =>
                Append (Result, "&quot;");
 
-            when ''' =>
+            when '''    =>
                Append (Result, "&apos;");
 
             when others =>
@@ -1603,139 +1625,139 @@ package body METRICS.Actions is
    function XML_Metric_Name_String (Metric : Metrics_Enum) return String is
    begin
       case Metric is
-         when Contract =>
+         when Contract                  =>
             return "contract";
 
-         when Post =>
+         when Post                      =>
             return "post";
 
-         when Contract_Complete =>
+         when Contract_Complete         =>
             return "contract_complete";
 
-         when Contract_Complexity =>
+         when Contract_Complexity       =>
             return "contract_complexity";
 
-         when Complexity_Statement =>
+         when Complexity_Statement      =>
             return "statement_complexity";
 
-         when Complexity_Expression =>
+         when Complexity_Expression     =>
             return "expression_complexity";
 
-         when Complexity_Cyclomatic =>
+         when Complexity_Cyclomatic     =>
             return "cyclomatic_complexity";
 
-         when Complexity_Essential =>
+         when Complexity_Essential      =>
             return "essential_complexity";
 
-         when Complexity_Average =>
+         when Complexity_Average        =>
             return "average_complexity";
 
-         when Loop_Nesting =>
+         when Loop_Nesting              =>
             return "max_loop_nesting";
 
-         when Extra_Exit_Points =>
+         when Extra_Exit_Points         =>
             return "extra_exit_points";
 
-         when Lines =>
+         when Lines                     =>
             return "all_lines";
 
-         when Lines_Code =>
+         when Lines_Code                =>
             return "code_lines";
 
-         when Lines_Comment =>
+         when Lines_Comment             =>
             return "comment_lines";
 
-         when Lines_Eol_Comment =>
+         when Lines_Eol_Comment         =>
             return "eol_comments";
 
-         when Lines_Blank =>
+         when Lines_Blank               =>
             return "blank_lines";
 
-         when Lines_Spark =>
+         when Lines_Spark               =>
             return "spark_lines";
 
-         when Lines_Average =>
+         when Lines_Average             =>
             return "average_lines_in_bodies";
 
-         when Lines_Code_In_Bodies =>
+         when Lines_Code_In_Bodies      =>
             return "lines_code_in_bodies";
 
-         when Num_Bodies =>
+         when Num_Bodies                =>
             return "num_bodies";
 
-         when Lines_Ratio =>
+         when Lines_Ratio               =>
             return "comment_percentage";
 
-         when Public_Types =>
+         when Public_Types              =>
             return "public_types";
 
-         when Private_Types =>
+         when Private_Types             =>
             return "private_types";
 
-         when All_Types =>
+         when All_Types                 =>
             return "all_types";
 
-         when Statements =>
+         when Statements                =>
             return "all_stmts";
 
-         when Declarations =>
+         when Declarations              =>
             return "all_dcls";
 
-         when Logical_Source_Lines =>
+         when Logical_Source_Lines      =>
             return "lsloc";
 
-         when Public_Subprograms =>
+         when Public_Subprograms        =>
             return "public_subprograms";
 
-         when All_Subprograms =>
+         when All_Subprograms           =>
             return "all_subprograms";
 
-         when Unit_Nesting =>
+         when Unit_Nesting              =>
             return "unit_nesting";
 
-         when Construct_Nesting =>
+         when Construct_Nesting         =>
             return "construct_nesting";
 
          when Current_Construct_Nesting =>
             raise Program_Error;
 
-         when Param_Number =>
+         when Param_Number              =>
             return "all_parameters";
 
-         when In_Parameters =>
+         when In_Parameters             =>
             return "in_parameters";
 
-         when Out_Parameters =>
+         when Out_Parameters            =>
             return "out_parameters";
 
-         when In_Out_Parameters =>
+         when In_Out_Parameters         =>
             return "in_out_parameters";
 
-         when Tagged_Coupling_Out =>
+         when Tagged_Coupling_Out       =>
             return "tagged_fan-out_coupling";
 
-         when Hierarchy_Coupling_Out =>
+         when Hierarchy_Coupling_Out    =>
             return "hierarchy_fan-out_coupling";
 
-         when Tagged_Coupling_In =>
+         when Tagged_Coupling_In        =>
             return "tagged_fan-in_coupling";
 
-         when Hierarchy_Coupling_In =>
+         when Hierarchy_Coupling_In     =>
             return "hierarchy_fan-in_coupling";
 
-         when Control_Coupling_Out =>
+         when Control_Coupling_Out      =>
             return "control_fan-out_coupling";
 
-         when Control_Coupling_In =>
+         when Control_Coupling_In       =>
             return "control_fan-in_coupling";
 
-         when Unit_Coupling_Out =>
+         when Unit_Coupling_Out         =>
             return "unit_fan-out_coupling";
 
-         when Unit_Coupling_In =>
+         when Unit_Coupling_In          =>
             return "unit_fan-in_coupling";
 
-         when Computed_Metrics =>
+         when Computed_Metrics          =>
             raise Program_Error;
       end case;
    end XML_Metric_Name_String;
@@ -1751,14 +1773,13 @@ package body METRICS.Actions is
             when Lines_Code_In_Bodies
                | Num_Bodies
                | Current_Construct_Nesting
-               | Computed_Metrics
-            =>
+               | Computed_Metrics =>
                null;
             --  The above are not documented, and not printed unless
             --  explicitly specified on the command line, so we don't
             --  include them in the <config>.
 
-            when others =>
+            when others           =>
                Put
                  ("<metric name=""\1"" display_name=""\2""/>\n",
                   XML_Metric_Name_String (Metric),
@@ -1802,13 +1823,13 @@ package body METRICS.Actions is
          end if;
 
          case I is
-            when Param_Number =>
+            when Param_Number      =>
                Indent;
 
             when In_Out_Parameters =>
                Outdent;
 
-            when others =>
+            when others            =>
                null;
          end case;
       end loop;
@@ -1829,19 +1850,20 @@ package body METRICS.Actions is
 
       To_Print_First : constant Metrics_Set :=
         Metrics_To_Compute
-        and (if M.Kind = Ada_Compilation_Unit
-             then not Complexity_Only
-             else All_Metrics_Set);
+        and
+          (if M.Kind = Ada_Compilation_Unit
+           then not Complexity_Only
+           else All_Metrics_Set);
       --  Set of metrics to print first, before printing subtrees. Same as
       --  Metrics_To_Compute, except at the top level, we leave out complexity
       --  metrics, because they will be printed last.
 
       To_Print_Last : constant Metrics_Set :=
         Metrics_To_Compute
-        and (if M.Kind = Ada_Compilation_Unit
-               and then M.Num_With_Complexity > 0
-             then Complexity_Only
-             else Empty_Metrics_Set);
+        and
+          (if M.Kind = Ada_Compilation_Unit and then M.Num_With_Complexity > 0
+           then Complexity_Only
+           else Empty_Metrics_Set);
       --  Set of metrics to print last, after printing subtrees. This is
       --  normally empty. At the top level it is the intersection of
       --  Metrics_To_Compute and Complexity_Only, but only if we have
@@ -2335,9 +2357,9 @@ package body METRICS.Actions is
             end if;
 
             return (if Parent_Body = null then M else Get_Spec (Parent_Body));
-         --  This recursion will climb up a chain of nested subunits until
-         --  it reaches a library unit, and then we'll get the spec of that
-         --  library unit.
+            --  This recursion will climb up a chain of nested subunits until
+            --  it reaches a library unit, and then we'll get the spec of that
+            --  library unit.
          end;
       end if;
    end Get_Spec;
@@ -2407,7 +2429,7 @@ package body METRICS.Actions is
 
       begin
          case Metric is
-            when Tagged_Coupling_Out | Tagged_Coupling_In =>
+            when Tagged_Coupling_Out | Tagged_Coupling_In       =>
                if From.Has_Tagged_Type and To.Has_Tagged_Type then
                   Do_Inc;
                end if;
@@ -2419,12 +2441,12 @@ package body METRICS.Actions is
                   end if;
                end if;
 
-            when Control_Coupling_Out | Control_Coupling_In =>
+            when Control_Coupling_Out | Control_Coupling_In     =>
                if From.Has_Subp and To.Has_Subp then
                   Do_Inc;
                end if;
 
-            when Unit_Coupling_Out | Unit_Coupling_In =>
+            when Unit_Coupling_Out | Unit_Coupling_In           =>
                Do_Inc;
          end case;
       end Do_Edge;
@@ -2754,8 +2776,8 @@ package body METRICS.Actions is
       pragma
         Assert
           (Global_M.Vals (Complexity_Cyclomatic)
-             = Global_M.Vals (Complexity_Statement)
-               + Global_M.Vals (Complexity_Expression));
+           = Global_M.Vals (Complexity_Statement)
+             + Global_M.Vals (Complexity_Expression));
 
       --  We're done with Metrix_Stack at this point. Printing uses the tree
       --  formed by Submetrix.
@@ -3056,8 +3078,9 @@ package body METRICS.Actions is
 
       function In_Visible_Part return Boolean
       is (Last_Index (Metrix_Stack) >= 3
-          and then Element (Metrix_Stack, 3).Kind
-                   in Ada_Package_Decl | Ada_Generic_Package_Decl
+          and then
+            Element (Metrix_Stack, 3).Kind
+            in Ada_Package_Decl | Ada_Generic_Package_Decl
           and then not Element (Metrix_Stack, 3).Is_Private_Lib_Unit
           and then Private_Part_Count = 0);
       --  True if we're within only visible parts. Note that it is possible to
@@ -3270,7 +3293,7 @@ package body METRICS.Actions is
             when Ada_If_Stmt | Ada_Elsif_Stmt_Part | Ada_While_Loop_Spec =>
                Inc_Cyc (Complexity_Statement);
 
-            when Ada_For_Loop_Spec =>
+            when Ada_For_Loop_Spec                                       =>
                if Quantified_Expr_Count = 0 then
                   --  We want to increment the statement count only for real
                   --  for loops, not for quantified expressions, which use the
@@ -3300,17 +3323,17 @@ package body METRICS.Actions is
 
                end if;
 
-            when Ada_Case_Stmt =>
+            when Ada_Case_Stmt                                           =>
                Inc_Cyc
                  (Complexity_Statement,
                   By => Node.As_Case_Stmt.F_Alternatives.Children_Count - 1);
 
-            when Ada_Exit_Stmt =>
+            when Ada_Exit_Stmt                                           =>
                if not Node.As_Exit_Stmt.F_Cond_Expr.Is_Null then
                   Inc_Cyc (Complexity_Statement);
                end if;
 
-            when Ada_Select_Stmt =>
+            when Ada_Select_Stmt                                         =>
                declare
                   S                 : constant Select_Stmt :=
                     Node.As_Select_Stmt;
@@ -3336,23 +3359,23 @@ package body METRICS.Actions is
                      By => Num_Alts + Num_Else + Num_Abort - 1);
                end;
 
-            when Ada_Expr_Function =>
+            when Ada_Expr_Function                                       =>
                null; -- It's already set to 1
 
-            when Ada_Bin_Op =>
+            when Ada_Bin_Op                                              =>
                if Node.As_Bin_Op.F_Op in Ada_Op_Or_Else | Ada_Op_And_Then then
                   Inc_Cyc (Complexity_Expression);
                end if;
 
-            when Ada_If_Expr | Ada_Elsif_Expr_Part =>
+            when Ada_If_Expr | Ada_Elsif_Expr_Part                       =>
                Inc_Cyc (Complexity_Expression);
 
-            when Ada_Case_Expr =>
+            when Ada_Case_Expr                                           =>
                Inc_Cyc
                  (Complexity_Expression,
                   By => Node.As_Case_Expr.F_Cases.Children_Count - 1);
 
-            when Ada_Quantified_Expr =>
+            when Ada_Quantified_Expr                                     =>
                Inc_Cyc (Complexity_Expression, By => 2);
 
             when Ada_For_Loop_Stmt | Ada_Loop_Stmt | Ada_While_Loop_Stmt =>
@@ -3370,7 +3393,7 @@ package body METRICS.Actions is
                   end if;
                end if;
 
-            when others =>
+            when others                                                  =>
                null;
          end case;
       end Cyclomate;
@@ -3437,8 +3460,8 @@ package body METRICS.Actions is
              | Ada_Raise_Stmt
              | Ada_Terminate_Alternative
              | Ada_Goto_Stmt
-           or else (Kind (Node) = Ada_Exit_Stmt
-                    and then Tool.Treat_Exit_As_Goto)
+           or else
+             (Kind (Node) = Ada_Exit_Stmt and then Tool.Treat_Exit_As_Goto)
          then
             declare
                X : EC_Index := Last_Index (EC_Stack);
@@ -3458,10 +3481,11 @@ package body METRICS.Actions is
                   exit when X = 1;
                   exit when
                     Kind (Node) = Ada_Exit_Stmt
-                    and then K
-                             in Ada_For_Loop_Stmt
-                              | Ada_Loop_Stmt
-                              | Ada_While_Loop_Stmt;
+                    and then
+                      K
+                      in Ada_For_Loop_Stmt
+                       | Ada_Loop_Stmt
+                       | Ada_While_Loop_Stmt;
 
                   X := X - 1;
                end loop;
@@ -3561,7 +3585,7 @@ package body METRICS.Actions is
             when Ada_Return_Stmt | Ada_Extended_Return_Stmt =>
                Inc (M.Vals (Extra_Exit_Points));
 
-            when Ada_Raise_Stmt =>
+            when Ada_Raise_Stmt                             =>
                --  We do some additional analysis to determine whether the
                --  exception will be handled locally, as best we can
                --  statically. If the exception is handled locally by these
@@ -3571,7 +3595,7 @@ package body METRICS.Actions is
                   Inc (M.Vals (Extra_Exit_Points));
                end if;
 
-            when others =>
+            when others                                     =>
                null;
          end case;
       end Gather_Extra_Exit_Points;
@@ -3585,13 +3609,13 @@ package body METRICS.Actions is
          function Should_Gather_Body_Lines return Boolean is
          begin
             case Kind (Node) is
-               when Ada_Package_Body =>
+               when Ada_Package_Body                               =>
                   return not Node.As_Package_Body.F_Stmts.Is_Null;
 
                when Ada_Entry_Body | Ada_Subp_Body | Ada_Task_Body =>
                   return True;
 
-               when others =>
+               when others                                         =>
                   return False;
             end case;
          end Should_Gather_Body_Lines;
@@ -3788,7 +3812,7 @@ package body METRICS.Actions is
             P : constant Ada_Node := M.Node;
          begin
             case Kind (P) is
-               when Ada_Compilation_Unit =>
+               when Ada_Compilation_Unit     =>
                   return P;
 
                when Ada_Package_Decl
@@ -3796,15 +3820,14 @@ package body METRICS.Actions is
                   | Ada_Protected_Type_Decl
                   | Ada_Single_Task_Decl
                   | Ada_Task_Type_Decl
-                  | Ada_Generic_Package_Decl
-               =>
+                  | Ada_Generic_Package_Decl =>
                   if Find_Pragma (F_Decls (Vis_Part (P))) then
                      return P;
                   elsif Find_Pragma (F_Decls (Priv_Part (P))) then
                      return Ada_Node (Priv_Part (P));
                   end if;
 
-               when Ada_Body_Node =>
+               when Ada_Body_Node            =>
                   if Kind (Node) = Ada_Package_Body
                     and then Find_Pragma (P.As_Package_Body.F_Stmts.F_Stmts)
                   then
@@ -3813,7 +3836,7 @@ package body METRICS.Actions is
                      return P;
                   end if;
 
-               when others =>
+               when others                   =>
                   raise Program_Error;
             end case;
 
@@ -3856,10 +3879,10 @@ package body METRICS.Actions is
             when Ada_Basic_Subp_Decl =>
                Prev_Subp_Decl := Node;
 
-            when Ada_Pragma_Node =>
+            when Ada_Pragma_Node     =>
                null; -- Leave Prev_Subp_Decl alone
 
-            when others =>
+            when others              =>
                Prev_Subp_Decl := No_Ada_Node;
          end case;
 
@@ -3870,11 +3893,11 @@ package body METRICS.Actions is
                ON := True;
             else
                case Node.As_Pragma_Node.F_Args.Children_Count is
-                  when 0 =>
+                  when 0      =>
                      ON := True;
                      pragma Assert (False);
 
-                  when 1 =>
+                  when 1      =>
                      declare
                         I : constant Base_Assoc :=
                           Node.As_Pragma_Node.F_Args.Child (1).As_Base_Assoc;
@@ -3931,15 +3954,14 @@ package body METRICS.Actions is
                   | Ada_Body_Node
                   | Ada_Abstract_Subp_Decl
                   | Ada_Subp_Decl
-                  | Ada_Generic_Subp_Decl
-               =>
+                  | Ada_Generic_Subp_Decl                =>
                   Inc (File_M.Vals (Lines_Spark), By => Range_Count);
                   Inc (Global_M.Vals (Lines_Spark), By => Range_Count);
 
                when Ada_Private_Part | Ada_Handled_Stmts =>
                   null;
 
-               when others =>
+               when others                               =>
                   raise Program_Error;
             end case;
          else
@@ -3992,11 +4014,11 @@ package body METRICS.Actions is
                begin
                   for I in 1 .. Children_Count (Assocs) loop
                      case Assertion_Kind (Childx (Assocs, I)) is
-                        when Postcondition =>
+                        when Postcondition    =>
                            Has_Contracts := True;
                            Has_Post := True;
 
-                        when Other_Assertion =>
+                        when Other_Assertion  =>
                            Has_Contracts := True;
 
                         when Not_An_Assertion =>
@@ -4060,10 +4082,10 @@ package body METRICS.Actions is
                      when Ada_Mode_Default | Ada_Mode_In =>
                         Inc (M.Vals (In_Parameters), By => Num);
 
-                     when Ada_Mode_Out =>
+                     when Ada_Mode_Out                   =>
                         Inc (M.Vals (Out_Parameters), By => Num);
 
-                     when Ada_Mode_In_Out =>
+                     when Ada_Mode_In_Out                =>
                         Inc (M.Vals (In_Out_Parameters), By => Num);
                   end case;
                end;
@@ -4178,22 +4200,23 @@ package body METRICS.Actions is
          pragma
            Assert
              (if Kind (Node) = Ada_Generic_Package_Internal
-                then Kind (Parent (Node)) = Ada_Generic_Package_Decl);
+              then Kind (Parent (Node)) = Ada_Generic_Package_Decl);
 
          if Kind (Node) in Ada_Basic_Decl | Ada_Entry_Index_Spec
-           and then Kind (Node)
-                    not in Ada_Generic_Formal
-                         | Ada_Generic_Formal_Obj_Decl
-                         | Ada_Generic_Formal_Package
-                         | Ada_Generic_Formal_Subp_Decl
-                         | Ada_Generic_Formal_Type_Decl
-                         | Ada_Generic_Package_Internal
-                         | Ada_Anonymous_Type_Decl
-                         | Ada_Named_Stmt_Decl
-                         | Ada_Label_Decl
-                         | Ada_Single_Task_Type_Decl
-                         | Ada_Generic_Subp_Internal
-                         | Ada_Exception_Handler
+           and then
+             Kind (Node)
+             not in Ada_Generic_Formal
+                  | Ada_Generic_Formal_Obj_Decl
+                  | Ada_Generic_Formal_Package
+                  | Ada_Generic_Formal_Subp_Decl
+                  | Ada_Generic_Formal_Type_Decl
+                  | Ada_Generic_Package_Internal
+                  | Ada_Anonymous_Type_Decl
+                  | Ada_Named_Stmt_Decl
+                  | Ada_Label_Decl
+                  | Ada_Single_Task_Type_Decl
+                  | Ada_Generic_Subp_Internal
+                  | Ada_Exception_Handler
          then
             Inc_All (Declarations);
             Inc_All (Logical_Source_Lines);
@@ -4225,10 +4248,9 @@ package body METRICS.Actions is
                      Def : constant Type_Def := Node.As_Type_Decl.F_Type_Def;
                   begin
                      if Kind (Def) = Ada_Private_Type_Def
-                       or else (Kind (Def) = Ada_Derived_Type_Def
-                                and then Def
-                                           .As_Derived_Type_Def
-                                           .F_Has_With_Private)
+                       or else
+                         (Kind (Def) = Ada_Derived_Type_Def
+                          and then Def.As_Derived_Type_Def.F_Has_With_Private)
                      then
                         Inc_All (Private_Types);
                      end if;
@@ -4298,9 +4320,10 @@ package body METRICS.Actions is
             pragma
               Assert
                 (M.Vals (Construct_Nesting) = 0
-                   or else Kind (Node)
-                           in Ada_Generic_Package_Instantiation
-                            | Ada_Generic_Subp_Instantiation);
+                 or else
+                   Kind (Node)
+                   in Ada_Generic_Package_Instantiation
+                    | Ada_Generic_Subp_Instantiation);
             if M.Vals (Construct_Nesting) = 0 then
                M.Vals (Construct_Nesting) := 1;
             end if;
@@ -4341,8 +4364,8 @@ package body METRICS.Actions is
          begin
             Set_Flags (Ada_Node (Node));
             return Into;
-         --  ???This could be more efficient if we return Over in cases
-         --  where we know there are no interesting subnodes.
+            --  ???This could be more efficient if we return Over in cases
+            --  where we know there are no interesting subnodes.
          end Visit;
 
          procedure Set_Flags (Node : Ada_Node) is
@@ -4364,23 +4387,23 @@ package body METRICS.Actions is
                         --  declared by a generic_renaming_declaration.
                   end;
 
-               when Ada_Interface_Type_Def =>
+               when Ada_Interface_Type_Def            =>
                   File_M.Has_Tagged_Type := True;
 
-               when Ada_Incomplete_Tagged_Type_Decl =>
+               when Ada_Incomplete_Tagged_Type_Decl   =>
                   File_M.Has_Tagged_Type := True;
 
-               when Ada_Private_Type_Def =>
+               when Ada_Private_Type_Def              =>
                   if Node.As_Private_Type_Def.F_Has_Tagged then
                      File_M.Has_Tagged_Type := True;
                   end if;
 
-               when Ada_Record_Type_Def =>
+               when Ada_Record_Type_Def               =>
                   if Node.As_Record_Type_Def.F_Has_Tagged then
                      File_M.Has_Tagged_Type := True;
                   end if;
 
-               when Ada_Derived_Type_Def =>
+               when Ada_Derived_Type_Def              =>
                   if not Node.As_Derived_Type_Def.F_Record_Extension.Is_Null
                     or else Node.As_Derived_Type_Def.F_Has_With_Private
                   then
@@ -4390,11 +4413,10 @@ package body METRICS.Actions is
                when Ada_Generic_Subp_Instantiation
                   | Ada_Subp_Renaming_Decl
                   | Ada_Subp_Decl
-                  | Ada_Subp_Body
-               =>
+                  | Ada_Subp_Body                     =>
                   File_M.Has_Subp := True;
 
-               when others =>
+               when others                            =>
                   null;
             end case;
          end Set_Flags;
@@ -4405,7 +4427,7 @@ package body METRICS.Actions is
          case Kind (Node) is
             --  For "with P, Q;" include P and Q
 
-            when Ada_With_Clause =>
+            when Ada_With_Clause     =>
                declare
                   Names : constant Name_List := Node.As_With_Clause.F_Packages;
                begin
@@ -4430,8 +4452,7 @@ package body METRICS.Actions is
                | Ada_Subp_Decl
                | Ada_Subp_Body
                | -- could be acting as spec
-               Ada_Generic_Subp_Decl
-            =>
+               Ada_Generic_Subp_Decl =>
                declare
                   Def_Name : constant Name := Get_Def_Name (Node).F_Name;
                begin
@@ -4443,7 +4464,7 @@ package body METRICS.Actions is
                   end if;
                end;
 
-            when others =>
+            when others              =>
                null;
          end case;
 
@@ -4458,25 +4479,25 @@ package body METRICS.Actions is
          end if;
 
          case Kind (Node) is
-            when Ada_Exception_Handler =>
+            when Ada_Exception_Handler                                   =>
                Inc (Exception_Handler_Count);
 
-            when Ada_Quantified_Expr =>
+            when Ada_Quantified_Expr                                     =>
                Inc (Quantified_Expr_Count);
 
-            when Ada_Expr_Function =>
+            when Ada_Expr_Function                                       =>
                Inc (Expr_Function_Count);
 
             when Ada_For_Loop_Stmt | Ada_Loop_Stmt | Ada_While_Loop_Stmt =>
                Inc (Loop_Count);
 
-            when Ada_Private_Part =>
+            when Ada_Private_Part                                        =>
                Inc (Private_Part_Count);
 
-            when Ada_Entry_Body | Ada_Subp_Body | Ada_Task_Body =>
+            when Ada_Entry_Body | Ada_Subp_Body | Ada_Task_Body          =>
                Inc (Non_Package_Body_Count);
 
-            when others =>
+            when others                                                  =>
                null;
          end case;
 
@@ -4531,25 +4552,25 @@ package body METRICS.Actions is
          end if;
 
          case Kind (Node) is
-            when Ada_Exception_Handler =>
+            when Ada_Exception_Handler                                   =>
                Dec (Exception_Handler_Count);
 
-            when Ada_Quantified_Expr =>
+            when Ada_Quantified_Expr                                     =>
                Dec (Quantified_Expr_Count);
 
-            when Ada_Expr_Function =>
+            when Ada_Expr_Function                                       =>
                Dec (Expr_Function_Count);
 
             when Ada_For_Loop_Stmt | Ada_Loop_Stmt | Ada_While_Loop_Stmt =>
                Dec (Loop_Count);
 
-            when Ada_Private_Part =>
+            when Ada_Private_Part                                        =>
                Dec (Private_Part_Count);
 
-            when Ada_Entry_Body | Ada_Subp_Body | Ada_Task_Body =>
+            when Ada_Entry_Body | Ada_Subp_Body | Ada_Task_Body          =>
                Dec (Non_Package_Body_Count);
 
-            when others =>
+            when others                                                  =>
                null;
          end case;
 
@@ -4593,7 +4614,7 @@ package body METRICS.Actions is
             pragma
               Assert
                 (Node.Parents (3)
-                   = Element (Node_Stack, Last_Index (Node_Stack) - 2));
+                 = Element (Node_Stack, Last_Index (Node_Stack) - 2));
          end if;
 
          if not In_Ignored_Assertion then
@@ -4617,8 +4638,8 @@ package body METRICS.Actions is
          end if;
 
          if (M.Has_Complexity_Metrics and then M.Kind /= Ada_Compilation_Unit)
-           or else (M.Kind in Contract_Complexity_Eligible
-                    and then In_Visible_Part)
+           or else
+             (M.Kind in Contract_Complexity_Eligible and then In_Visible_Part)
          then
             Cyclomate (Node, M);
             Gather_Essential_Complexity (Node, M);
@@ -4638,7 +4659,7 @@ package body METRICS.Actions is
                      pragma
                        Assert
                          ((I = 1)
-                            = (Cur_Child = G_Formal_Part (Node).As_Ada_Node));
+                          = (Cur_Child = G_Formal_Part (Node).As_Ada_Node));
                      pragma Assert (not In_Generic_Formal_Part);
                      if I = 1 then
                         In_Generic_Formal_Part := True;
@@ -4723,8 +4744,8 @@ package body METRICS.Actions is
       pragma
         Assert
           (File_M.Vals (Complexity_Cyclomatic)
-             = File_M.Vals (Complexity_Statement)
-               + File_M.Vals (Complexity_Expression));
+           = File_M.Vals (Complexity_Statement)
+             + File_M.Vals (Complexity_Expression));
 
       if Debug_Flag_V then
          Outdent;
@@ -4936,7 +4957,7 @@ package body METRICS.Actions is
       pragma
         Assert
           (M.Vals (Logical_Source_Lines)
-             = M.Vals (Statements) + M.Vals (Declarations));
+           = M.Vals (Statements) + M.Vals (Declarations));
 
       pragma
         Assert

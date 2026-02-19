@@ -718,9 +718,11 @@ package body Utils.Projects is
 
          if Compute_Project_Closure and then not Argument_File_Specified then
             if Arg (Cmd) = No_Subprojects
-              or else (Main_Unit_Names (Cmd)'Length = 0
-                       and then not (Arg (Cmd) = No_Source_Selection
-                                     and then Has_Ada_Mains_Only))
+              or else
+                (Main_Unit_Names (Cmd)'Length = 0
+                 and then
+                   not (Arg (Cmd) = No_Source_Selection
+                        and then Has_Ada_Mains_Only))
             then
                Prj := My_Project_Tree.Root_Project;
 
@@ -1029,8 +1031,8 @@ package body Utils.Projects is
             Scan_Switches;
 
             if Arg (Cmd) /= Update_All
-              and then Has_Attribute
-                         (Project_U, Compiler_Local_Configuration_Pragmas)
+              and then
+                Has_Attribute (Project_U, Compiler_Local_Configuration_Pragmas)
             then
                Attr_Proj :=
                  Attribute_Project
@@ -1052,8 +1054,8 @@ package body Utils.Projects is
             end if;
 
             if Arg (Cmd) /= Update_All
-              and then Has_Attribute
-                         (Project_U, Compiler_Local_Config_File, "ada")
+              and then
+                Has_Attribute (Project_U, Compiler_Local_Config_File, "ada")
             then
                Attr_Proj :=
                  Attribute_Project
@@ -1312,7 +1314,7 @@ package body Utils.Projects is
       end loop;
 
       Tool_Current_Dir := new String'(Initial_Dir);
-   --  Leave Tool_Inner_Dir = null
+      --  Leave Tool_Inner_Dir = null
    end Post_Cmd_Line_1;
 
    procedure Process_Command_Line

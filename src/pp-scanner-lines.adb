@@ -81,10 +81,10 @@ package body Pp.Scanner.Lines is
                   & Image (Integer (Break.Level)));
             end;
 
-         when Tab_Token =>
+         when Tab_Token        =>
             null; -- not yet implemented
 
-         when others =>
+         when others           =>
             raise Program_Error;
       end case;
    end Put_Index_Info;

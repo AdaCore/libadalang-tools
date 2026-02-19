@@ -74,9 +74,9 @@ package Laltools.Subprogram_Hierarchy is
    with
      Pre =>
        Subp.P_Is_Subprogram
-       or else Subp.Kind
-               in Ada_Generic_Subp_Decl_Range
-                | Ada_Generic_Subp_Instantiation_Range;
+       or else
+         Subp.Kind
+         in Ada_Generic_Subp_Decl_Range | Ada_Generic_Subp_Instantiation_Range;
    --  Returns an array with all renames of 'Subp'.
 
    function Find_Subp_Renaming_Declarations_Hierarchy
@@ -85,9 +85,9 @@ package Laltools.Subprogram_Hierarchy is
    with
      Pre =>
        Subp.P_Is_Subprogram
-       or else Subp.Kind
-               in Ada_Generic_Subp_Decl_Range
-                | Ada_Generic_Subp_Instantiation_Range;
+       or else
+         Subp.Kind
+         in Ada_Generic_Subp_Decl_Range | Ada_Generic_Subp_Instantiation_Range;
    --  Returns an array with all renames of 'Subp' including renames of
    --  renames, i.e., returns the entire rename tree.
 

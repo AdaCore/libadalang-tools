@@ -43,7 +43,7 @@ package body Utils.Versions is
    function Gnat_Free_Software return String is
    begin
       case Build_Type is
-         when GPL =>
+         when GPL     =>
             return
               "This is free software; see the source for copying conditions."
               & ASCII.LF
@@ -78,7 +78,7 @@ package body Utils.Versions is
    function Edition return String
    is (case Build_Type is
          when Gnatpro => "Pro",
-         when GPL => "Community");
+         when GPL     => "Community");
 
    procedure Print_Tool_Version is
       use Utils.Formatted_Output;

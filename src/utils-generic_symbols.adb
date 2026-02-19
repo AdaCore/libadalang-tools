@@ -91,7 +91,7 @@ package body Utils.Generic_Symbols is
    --  time a Symbol is created.
 
    Lg_Hash_Table_Size : constant := 16;
-   Hash_Table_Size    : constant := 2**Lg_Hash_Table_Size;
+   Hash_Table_Size    : constant := 2 ** Lg_Hash_Table_Size;
 
    Hash_Table :
      array (Hash_Type range 0 .. Hash_Table_Size - 1) of Opt_Symbol :=
@@ -216,8 +216,8 @@ package body Utils.Generic_Symbols is
             pragma
               Assert
                 (if Present (Temp)
-                   then Result /= New_Ptr.Same_Ignoring_Case
-                   else Result = New_Ptr.Same_Ignoring_Case);
+                 then Result /= New_Ptr.Same_Ignoring_Case
+                 else Result = New_Ptr.Same_Ignoring_Case);
 
             --  Gather statistics:
             if True then
@@ -363,7 +363,7 @@ package body Utils.Generic_Symbols is
          pragma
            Assert
              (Result
-                = (To_Lower_UTF8 (Str (S1).S) = To_Lower_UTF8 (Str (S2).S)));
+              = (To_Lower_UTF8 (Str (S1).S) = To_Lower_UTF8 (Str (S2).S)));
       end return;
    end Case_Insensitive_Equal;
 

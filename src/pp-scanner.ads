@@ -465,8 +465,9 @@ package Pp.Scanner is
 
    function Is_Blank_Line (X : Tokn_Cursor) return Boolean
    is ((Kind (X) in EOL_Token and then Kind (Prev (X)) in EOL_Token)
-       or else (Kind (X) in Enabled_LB_Token
-                and then Kind (Prev (X)) in Enabled_LB_Token));
+       or else
+         (Kind (X) in Enabled_LB_Token
+          and then Kind (Prev (X)) in Enabled_LB_Token));
 
    subtype Nonlexeme_Kind is Opt_Token_Kind
    with
