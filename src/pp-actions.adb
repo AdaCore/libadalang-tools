@@ -2982,8 +2982,7 @@ package body Pp.Actions is
 
                  when Ada_Aspect_Assoc | Ada_Pragma_Node           =>
                    --  Treat an aspect_mark like a pragma name.
-
-                     PP_Pragma_Casing (Cmd),
+                   PP_Pragma_Casing (Cmd),
 
                  when Ada_Enum_Literal_Decl                        =>
                    PP_Enum_Casing (Cmd),
