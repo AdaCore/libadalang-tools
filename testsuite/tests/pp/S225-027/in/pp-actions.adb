@@ -558,8 +558,6 @@ package body Pp.Actions is
            when Ada_Discrete_Base_Subtype_Decl => null,
            when Ada_Discrete_Subtype_Name => null,
            when Ada_Unconstrained_Array_Index => null,
-           when Ada_Contract_Case_Assoc => null,
-           when Ada_Contract_Cases => null,
            when Ada_Multi_Dim_Array_Assoc => null,
            when Ada_Unconstrained_Array_Indices => null,
            when Ada_Error_Decl => null,
@@ -3991,7 +3989,6 @@ package body Pp.Actions is
 
          case Tree.Kind is
             when Ada_Discrete_Subtype_Name | Ada_Unconstrained_Array_Index |
-              Ada_Contract_Case_Assoc | Ada_Contract_Cases |
               Ada_Multi_Dim_Array_Assoc | Ada_Unconstrained_Array_Indices =>
                raise Program_Error with Short_Image (Tree) & " encountered";
             --  ???The above are not used

@@ -785,10 +785,6 @@ package body Pp.Actions is
            => null,
            when Ada_Discrete_Subtype_Name
            => null,
-           when Ada_Contract_Case_Assoc
-           => null,
-           when Ada_Contract_Cases
-           => null,
            when Ada_Multi_Dim_Array_Assoc
            => null,
            when Ada_Error_Decl
@@ -5360,7 +5356,7 @@ package body Pp.Actions is
                Interpret_Alt_Template (Spec_No_Separate_Return_Alt);
             else
                Interpret_Alt_Template (Spec_Alt);
-               --  F_Name is optional for access-to-subp.
+            --  F_Name is optional for access-to-subp.
             end if;
          end Do_Subp_Spec;
 
@@ -5668,102 +5664,99 @@ package body Pp.Actions is
          Maybe_Blank_Line;
 
          case Tree.Kind is
-            when Ada_Discrete_Subtype_Name
-               | Ada_Contract_Case_Assoc
-               | Ada_Contract_Cases
-               | Ada_Multi_Dim_Array_Assoc                          =>
+            when Ada_Discrete_Subtype_Name | Ada_Multi_Dim_Array_Assoc =>
                raise Program_Error with Tree.Image & " encountered";
             --  ???The above are not used
 
-            when Ada_Compilation_Unit                               =>
+            when Ada_Compilation_Unit                                  =>
                Do_Compilation_Unit;
 
-            when Ada_Identifier                                     =>
+            when Ada_Identifier                                        =>
                Do_Def_Or_Usage_Name;
 
             when Ada_Int_Literal
                | Ada_Real_Literal
                | Ada_String_Literal
-               | Ada_Char_Literal                                   =>
+               | Ada_Char_Literal                                      =>
                Do_Literal;
 
-            when Ada_Label                                          =>
+            when Ada_Label                                             =>
                Do_Label;
 
-            when Ada_Pragma_Node                                    =>
+            when Ada_Pragma_Node                                       =>
                Do_Pragma;
 
-            when Ada_Un_Op                                          =>
+            when Ada_Un_Op                                             =>
                Do_Un_Op (Tree);
 
-            when Ada_Bin_Op | Ada_Relation_Op                       =>
+            when Ada_Bin_Op | Ada_Relation_Op                          =>
                Do_Bin_Op (Tree, Is_Right => False, Cur_Level => Cur_Level);
 
-            when Ada_Concat_Op                                      =>
+            when Ada_Concat_Op                                         =>
                Do_Concat_Op (Tree, Cur_Level => Cur_Level);
 
-            when Ada_For_Loop_Spec                                  =>
+            when Ada_For_Loop_Spec                                     =>
                Do_For_Loop_Spec;
 
-            when Ada_Task_Def                                       =>
+            when Ada_Task_Def                                          =>
                Do_Task_Def;
 
-            when Ada_Aspect_Assoc                                   =>
+            when Ada_Aspect_Assoc                                      =>
                Do_Aspect_Assoc;
 
             when Ada_Param_Assoc
                | Ada_Aggregate_Assoc
                | Ada_Composite_Constraint_Assoc
-               | Ada_Pragma_Argument_Assoc                          =>
+               | Ada_Pragma_Argument_Assoc                             =>
                Do_Assoc;
 
-            when Ada_Aggregate                                      =>
+            when Ada_Aggregate                                         =>
                Do_Aggregate;
 
-            when Ada_Bracket_Aggregate                              =>
+            when Ada_Bracket_Aggregate                                 =>
                Do_Bracket_Aggregate;
 
-            when Ada_Subtype_Indication                             =>
+            when Ada_Subtype_Indication                                =>
                Do_Subtype_Indication;
 
-            when Ada_Component_Clause                               =>
+            when Ada_Component_Clause                                  =>
                Do_Component_Clause;
 
-            when Ada_Handled_Stmts                                  =>
+            when Ada_Handled_Stmts                                     =>
                Do_Handled_Stmts;
 
-            when Ada_Return_Stmt                                    =>
+            when Ada_Return_Stmt                                       =>
                Do_Return_Stmt;
 
-            when Ada_Extended_Return_Stmt                           =>
+            when Ada_Extended_Return_Stmt                              =>
                Do_Extended_Return_Stmt;
 
-            when Ada_Param_Spec                                     =>
+            when Ada_Param_Spec                                        =>
                Do_Param_Spec;
 
-            when Ada_Object_Decl | Ada_No_Type_Object_Renaming_Decl =>
+            when Ada_Object_Decl | Ada_No_Type_Object_Renaming_Decl    =>
                Do_Object_Decl;
 
-            when Ada_Extended_Return_Stmt_Object_Decl_Range         =>
+            when Ada_Extended_Return_Stmt_Object_Decl_Range            =>
                Do_Extended_Return_Stmt_Object_Decl;
 
-            when Ada_Component_Decl                                 =>
+            when Ada_Component_Decl                                    =>
                Do_Component_Decl;
 
-            when Ada_Concrete_Type_Decl | Ada_Formal_Type_Decl      =>
+            when Ada_Concrete_Type_Decl | Ada_Formal_Type_Decl         =>
                Do_Type_Decl;
 
-            when Ada_Select_When_Part                               =>
+            when Ada_Select_When_Part                                  =>
                Do_Select_When_Part;
 
-            when Ada_Params                                         =>
+            when Ada_Params                                            =>
                Do_Params;
 
-            when Ada_Subp_Spec                                      =>
+            when Ada_Subp_Spec                                         =>
                Do_Subp_Spec;
 
             when Ada_Generic_Subp_Instantiation
-               | Ada_Generic_Package_Instantiation                  =>
+               | Ada_Generic_Package_Instantiation                     =>
                Do_Instantiation;
 
             when Ada_Subp_Decl
@@ -5777,19 +5770,19 @@ package body Pp.Actions is
                | Ada_Access_To_Subp_Def
                | Ada_Generic_Subp_Decl
                | Ada_Entry_Body
-               | Ada_Entry_Decl                                     =>
+               | Ada_Entry_Decl                                        =>
                Do_Subp_Decl;
 
-            when Ada_Call_Expr                                      =>
+            when Ada_Call_Expr                                         =>
                Do_Call_Expr;
 
-            when Ada_Ada_List                                       =>
+            when Ada_Ada_List                                          =>
                Do_List;
 
-            when Ada_Unconstrained_Array_Index                      =>
+            when Ada_Unconstrained_Array_Index                         =>
                Do_Unconstrained_Array_Index;
 
-            when others                                             =>
+            when others                                                =>
                Do_Others;
          end case;
 
