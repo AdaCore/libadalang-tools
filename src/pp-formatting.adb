@@ -2041,7 +2041,7 @@ package body Pp.Formatting is
                      end if;
                   else
                      Delete_Last (Tokns);
-                     --  It was appended above
+                  --  It was appended above
                   end if;
                end;
             else

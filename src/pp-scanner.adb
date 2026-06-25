@@ -562,8 +562,8 @@ package body Pp.Scanner is
             end;
          else
             Append_Tokn (V, Spaces, Intern (String'[1 .. Count => ' ']), Org);
-            --  ???For smallish Counts, we could look up the symbol in a table
-            --  indexed by Count.
+         --  ???For smallish Counts, we could look up the symbol in a table
+         --  indexed by Count.
          end if;
       end if;
    end Append_Spaces;
@@ -1829,8 +1829,8 @@ package body Pp.Scanner is
                   Name_Len := 0;
                   Append_Tok_Text (Tok_2);
                   Tok := Tok_2;
-                  --  Go around the loop again, with the new initial line of
-                  --  the paragraph in Tok.
+               --  Go around the loop again, with the new initial line of
+               --  the paragraph in Tok.
                end if;
 
             --  Not a comment, so cannot be combined. Finish constructing
