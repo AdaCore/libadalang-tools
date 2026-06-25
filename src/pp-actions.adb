@@ -785,10 +785,6 @@ package body Pp.Actions is
            => null,
            when Ada_Discrete_Subtype_Name
            => null,
-           when Ada_Contract_Case_Assoc
-           => null,
-           when Ada_Contract_Cases
-           => null,
            when Ada_Multi_Dim_Array_Assoc
            => null,
            when Ada_Error_Decl
@@ -5669,8 +5665,6 @@ package body Pp.Actions is
 
          case Tree.Kind is
             when Ada_Discrete_Subtype_Name
-               | Ada_Contract_Case_Assoc
-               | Ada_Contract_Cases
                | Ada_Multi_Dim_Array_Assoc                          =>
                raise Program_Error with Tree.Image & " encountered";
             --  ???The above are not used
