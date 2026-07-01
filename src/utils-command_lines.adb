@@ -23,6 +23,7 @@
 
 with Ada.Characters.Handling; use Ada.Characters.Handling;
 with Ada.Command_Line;
+with Ada.Directories;
 with Ada.Environment_Variables;
 with Ada.Exceptions;
 with Ada.Strings;             use Ada.Strings;
@@ -1174,15 +1175,25 @@ package body Utils.Command_Lines is
                --  interpreted w.r.t. project file directory), or the argument
                --  might not refer to file(s) (e.g. "-U main" where the file
                --  is main.adb).
+               --
+               --  We also skip expansion when the argument already names an
+               --  existing file or directory: a legitimate path may contain a
+               --  '[' (e.g. a Windows directory named "Repo-Main[student]"),
+               --  which would otherwise be taken for a wildcard set and fed to
+               --  System.Regexp, raising Error_In_Regexp on the '\' path
+               --  separators.
 
-               Has_Wildcards : constant Boolean :=
-                 (for some C of Text_Args (Cur).all => C in '*' | '?' | '[');
+               Arg : constant String := Text_Args (Cur).all;
 
                use GNAT.Command_Line;
+
+               Has_Wildcards : constant Boolean :=
+                 (for some C of Arg => C in '*' | '?' | '[');
+
                It : Expansion_Iterator;
             begin
-               if Has_Wildcards then
-                  Start_Expansion (It, Text_Args (Cur).all);
+               if Has_Wildcards and then not Ada.Directories.Exists (Arg) then
+                  Start_Expansion (It, Arg);
                   loop
                      declare
                         X : constant String := Expansion (It);
@@ -1192,11 +1203,19 @@ package body Utils.Command_Lines is
                      end;
                   end loop;
 
-               --  No wildcards:
+               --  No (usable) wildcards: take the argument literally.
 
                else
                   Append (Cmd.File_Names, String_Ref (Text_Args (Cur)));
                end if;
+            exception
+               --  An argument may contain '[' yet not be a valid wildcard
+               --  pattern (e.g. a path whose '\' separators make
+               --  System.Regexp raise Error_In_Regexp). Rather than let the
+               --  tool crash, fall back to treating it literally.
+
+               when others =>
+                  Append (Cmd.File_Names, String_Ref (Text_Args (Cur)));
             end;
          end if;
 

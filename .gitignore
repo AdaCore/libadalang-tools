@@ -22,3 +22,5 @@ testsuite/tests/internal
 
 # VScode settings, updated by ancr
 .vscode
+
+.env

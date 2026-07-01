@@ -1,0 +1,3 @@
+description:
+    partial gnatpp of a Handled_Stmts that has an Ada 2022 "finally" part
+driver: shell_script

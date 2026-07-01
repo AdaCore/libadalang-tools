@@ -1,0 +1,4 @@
+description:
+    gnatpp on a file whose name contains '[' (must not be treated as a wildcard)
+
+driver: shell_script
