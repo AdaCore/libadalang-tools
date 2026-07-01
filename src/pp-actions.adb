@@ -1413,6 +1413,9 @@ package body Pp.Actions is
            when Ada_With_Private_Present
            => L ("with private"),
 
+           when Ada_Finally_Part
+           => L ("$finally$", "{?~$~$}~"),
+
            when Ada_Reduce_Attribute_Ref
            => null,
            when Ada_Value_Sequence
@@ -1951,7 +1954,7 @@ package body Pp.Actions is
 
       procedure Init_Alternative_Templates is
          Stmts_And_Handlers : constant Str_Template :=
-           "{~$~$}~" & "?exception$" & "{~$~}~";
+           "{~$~$}~" & "?exception$" & "{~$~}~" & "?~~~";
       begin
          Str_Alt_Table :=
            [Empty_Alt                                         => L (""),
@@ -2055,7 +2058,7 @@ package body Pp.Actions is
             Handled_Stmts_With_Begin_Alt                      =>
               L ("?begin$" & Stmts_And_Handlers),
             Handled_Stmts_With_Begin_Alt_Partial_Mode         =>
-              L ("begin$" & "?{~$~$}~" & "?exception$" & "{~$~}~"),
+              L ("begin$" & "?{~$~$}~" & "?exception$" & "{~$~}~" & "?~~~"),
             Handled_Stmts_With_Do_Alt                         =>
               L ("# ?do$" & Stmts_And_Handlers),
             Handled_Stmts_With_Do_Vertical_Agg_Alt            =>
