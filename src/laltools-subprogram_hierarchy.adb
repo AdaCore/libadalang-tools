@@ -218,7 +218,7 @@ package body Laltools.Subprogram_Hierarchy is
       Find_Calls         : Boolean := False;
       Calls_Callback     :
         access procedure
-          (Call_Identifier : Base_Id'Class;
+          (Call_Identifier : Name'Class;
            Kind            : Ref_Result_Kind;
            Cancel          : in out Boolean) := null;
       Include_Base_Subps : Boolean := True;
