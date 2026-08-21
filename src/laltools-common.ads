@@ -57,9 +57,9 @@ package Laltools.Common is
    --  If Left.Text = Right.Text then Full_Sloc_Image will sort first by
    --  file and then by Sloc (first by line and then by column).
 
-   function "<" (Left, Right : Base_Id) return Boolean
+   function "<" (Left, Right : Name) return Boolean
    is (Left.Text < Right.Text or else Left.Sloc_Range < Right.Sloc_Range);
-   --  Use the Sloc to compare two Base_Id nodes when their text is equal.
+   --  Use the Sloc to compare two Name nodes when their text is equal.
 
    function Node_Equal
      (Left, Right : Libadalang.Analysis.Ada_Node) return Boolean
@@ -93,10 +93,10 @@ package Laltools.Common is
 
    subtype Ada_List_Hashed_Set is Ada_List_Hashed_Sets.Set;
 
-   package Base_Id_Vectors is new
+   package Name_Vectors is new
      Ada.Containers.Vectors
        (Index_Type   => Natural,
-        Element_Type => Base_Id,
+        Element_Type => Name,
         "="          => "=");
 
    package Basic_Decl_Vectors is new
@@ -143,7 +143,7 @@ package Laltools.Common is
 
    package References_Sets is new
      Ada.Containers.Ordered_Sets
-       (Element_Type => Base_Id,
+       (Element_Type => Name,
         "<"          => "<",
         "="          => "=");
 
@@ -234,7 +234,7 @@ package Laltools.Common is
 
    function Find_All_References_For_Renaming
      (Definition : Defining_Name; Units : Analysis_Unit_Array)
-      return Base_Id_Vectors.Vector
+      return Name_Vectors.Vector
    with Pre => not Definition.Is_Null;
    --  Returns a vector with all references of Definition.
    --  Depending if Definition is associated to a parameter spec or to a
@@ -244,7 +244,7 @@ package Laltools.Common is
 
    function Find_All_Param_References_In_Subp_Hierarchy
      (Param_Definition : Defining_Name; Units : Analysis_Unit_Array)
-      return Base_Id_Vectors.Vector
+      return Name_Vectors.Vector
    with
      Pre =>
        not Param_Definition.Is_Null
@@ -257,7 +257,7 @@ package Laltools.Common is
 
    function Find_All_Subp_References_In_Subp_Hierarchy
      (Subp : Basic_Decl; Units : Analysis_Unit_Array)
-      return Base_Id_Vectors.Vector
+      return Name_Vectors.Vector
    with Pre => Is_Subprogram (Subp);
    --  Retruns a vector with all references of Subp, and if Subp is
    --  a primitive subrogram of a type, then the vector includes references of

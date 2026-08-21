@@ -38,7 +38,7 @@ package Laltools.Call_Hierarchy is
       Units              : Analysis_Unit_Array;
       Visit              :
         not null access procedure
-          (Call_Identifier : Base_Id'Class;
+          (Call_Identifier : Name'Class;
            Kind            : Ref_Result_Kind;
            Cancel          : in out Boolean);
       Follow_Renamings   : Boolean := True;

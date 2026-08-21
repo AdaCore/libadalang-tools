@@ -332,9 +332,9 @@ package body Laltools.Common is
 
    function Find_All_References_For_Renaming
      (Definition : Defining_Name; Units : Analysis_Unit_Array)
-      return Base_Id_Vectors.Vector
+      return Name_Vectors.Vector
    is
-      All_References : Base_Id_Vectors.Vector;
+      All_References : Name_Vectors.Vector;
       Is_Param       : constant Boolean :=
         Definition.P_Basic_Decl.Kind in Ada_Param_Spec_Range;
       Is_Subp        : constant Boolean :=
@@ -347,17 +347,17 @@ package body Laltools.Common is
               .F_Name
               .As_Dotted_Name
               .F_Suffix
-              .As_Base_Id);
+              .As_Name);
       else
-         All_References.Append (Definition.P_Canonical_Part.F_Name.As_Base_Id);
+         All_References.Append (Definition.P_Canonical_Part.F_Name.As_Name);
       end if;
 
       for Reference of Definition.P_Find_All_References (Units) loop
-         All_References.Append (Ref (Reference).As_Base_Id);
+         All_References.Append (Ref (Reference).As_Name);
       end loop;
 
       declare
-         Vector : constant Base_Id_Vectors.Vector :=
+         Vector : constant Name_Vectors.Vector :=
            (if Is_Param
             then
               Find_All_Param_References_In_Subp_Hierarchy
@@ -366,7 +366,7 @@ package body Laltools.Common is
             then
               Find_All_Subp_References_In_Subp_Hierarchy
                 (Definition.P_Canonical_Part.P_Basic_Decl, Units)
-            else Base_Id_Vectors.Empty_Vector);
+            else Name_Vectors.Empty_Vector);
       begin
          for X of Vector loop
             All_References.Append (X);
@@ -382,7 +382,7 @@ package body Laltools.Common is
 
    function Find_All_Param_References_In_Subp_Hierarchy
      (Param_Definition : Defining_Name; Units : Analysis_Unit_Array)
-      return Base_Id_Vectors.Vector
+      return Name_Vectors.Vector
    is
       --  The semantic parent of this parameter can either be a subprogram
       --  declaration or an access to a subprogram definition.
@@ -416,7 +416,7 @@ package body Laltools.Common is
          then Get_Subp_Hierarchy (Semantic_Parent_Subp, Units)
          else []);
 
-      Param_References : Base_Id_Vectors.Vector;
+      Param_References : Name_Vectors.Vector;
 
    begin
       if Is_Semantic_Parent_Subp then
@@ -428,11 +428,11 @@ package body Laltools.Common is
                for Param of Param_Spec.F_Ids loop
                   if Param_Definition.Text = Param.Text then
                      Param_References.Append
-                       (Param.P_Canonical_Part.F_Name.As_Base_Id);
+                       (Param.P_Canonical_Part.F_Name.As_Name);
                      for Reference of
                        Param.P_Canonical_Part.P_Find_All_References (Units)
                      loop
-                        Param_References.Append (Ref (Reference).As_Base_Id);
+                        Param_References.Append (Ref (Reference).As_Name);
                      end loop;
                   end if;
                end loop;
@@ -446,7 +446,7 @@ package body Laltools.Common is
          for Reference of
            Param_Definition.P_Canonical_Part.P_Find_All_References (Units)
          loop
-            Param_References.Append (Ref (Reference).As_Base_Id);
+            Param_References.Append (Ref (Reference).As_Name);
          end loop;
       end if;
 
@@ -459,12 +459,12 @@ package body Laltools.Common is
 
    function Find_All_Subp_References_In_Subp_Hierarchy
      (Subp : Basic_Decl; Units : Analysis_Unit_Array)
-      return Base_Id_Vectors.Vector
+      return Name_Vectors.Vector
    is
       Hierarchy : constant Basic_Decl_Array :=
         Get_Subp_Hierarchy (Subp, Units);
 
-      Param_References : Base_Id_Vectors.Vector;
+      Param_References : Name_Vectors.Vector;
    begin
       for Decl of Hierarchy loop
          --  If Decl is a top level declaration then it can be a dotted name
@@ -472,14 +472,14 @@ package body Laltools.Common is
 
          if Decl.P_Defining_Name.F_Name.Kind in Ada_Dotted_Name then
             Param_References.Append
-              (Decl.P_Defining_Name.F_Name.As_Dotted_Name.F_Suffix);
+              (Decl.P_Defining_Name.F_Name.As_Dotted_Name.F_Suffix.As_Name);
          else
-            Param_References.Append (Decl.P_Defining_Name.F_Name.As_Base_Id);
+            Param_References.Append (Decl.P_Defining_Name.F_Name.As_Name);
          end if;
 
          for Reference of Decl.P_Defining_Name.P_Find_All_References (Units)
          loop
-            Param_References.Append (Ref (Reference).As_Base_Id);
+            Param_References.Append (Ref (Reference).As_Name);
          end loop;
       end loop;
       return Param_References;

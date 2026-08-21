@@ -170,13 +170,13 @@ procedure Outgoing_Calls is
                     Laltools.Common.References_By_Subprogram.Reference_Type
                     := Calls.Reference (Call_Definition);
                begin
-                  R.Include (Subp_Call.As_Base_Id);
+                  R.Include (Subp_Call.As_Name);
                end;
             else
                declare
                   L : Laltools.Common.References_Sets.Set;
                begin
-                  L.Include (Subp_Call.As_Base_Id);
+                  L.Include (Subp_Call.As_Name);
                   Calls.Insert (Call_Definition, L);
                end;
             end if;
