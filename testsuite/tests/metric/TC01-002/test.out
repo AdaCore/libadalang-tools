@@ -3130,8 +3130,8 @@ CompilationUnitList
                      -->Walk: <BinOp playground_1.adb:8:9-8:15>
                         -->Walk: <Int playground_1.adb:8:9-8:10>
                         <--Walk: <Int playground_1.adb:8:9-8:10>
-                        -->Walk: <OpDoubleDot ".." playground_1.adb:8:11-8:13>
-                        <--Walk: <OpDoubleDot ".." playground_1.adb:8:11-8:13>
+                        -->Walk: <OpDoubleDot playground_1.adb:8:11-8:13>
+                        <--Walk: <OpDoubleDot playground_1.adb:8:11-8:13>
                         -->Walk: <Int playground_1.adb:8:14-8:15>
                         <--Walk: <Int playground_1.adb:8:14-8:15>
                      <--Walk: <BinOp playground_1.adb:8:9-8:15>
@@ -3162,16 +3162,16 @@ CompilationUnitList
                               <--Walk: <Str ""Hi "" playground_1.adb:14:14-14:19>
                               -->Walk: <ConcatOperandList playground_1.adb:14:20-14:40>
                                  -->Walk: <ConcatOperand playground_1.adb:14:20-14:40>
-                                    -->Walk: <OpConcat "&" playground_1.adb:14:20-14:21>
-                                    <--Walk: <OpConcat "&" playground_1.adb:14:20-14:21>
+                                    -->Walk: <OpConcat playground_1.adb:14:20-14:21>
+                                    <--Walk: <OpConcat playground_1.adb:14:20-14:21>
                                     -->Walk: <CallExpr playground_1.adb:14:22-14:40>
                                        -->Walk: <Id "Full_Name" playground_1.adb:14:22-14:31>
                                        <--Walk: <Id "Full_Name" playground_1.adb:14:22-14:31>
                                        -->Walk: <BinOp playground_1.adb:14:33-14:39>
                                           -->Walk: <Int playground_1.adb:14:33-14:34>
                                           <--Walk: <Int playground_1.adb:14:33-14:34>
-                                          -->Walk: <OpDoubleDot ".." playground_1.adb:14:35-14:37>
-                                          <--Walk: <OpDoubleDot ".." playground_1.adb:14:35-14:37>
+                                          -->Walk: <OpDoubleDot playground_1.adb:14:35-14:37>
+                                          <--Walk: <OpDoubleDot playground_1.adb:14:35-14:37>
                                           -->Walk: <Int playground_1.adb:14:38-14:39>
                                           <--Walk: <Int playground_1.adb:14:38-14:39>
                                        <--Walk: <BinOp playground_1.adb:14:33-14:39>
@@ -4070,8 +4070,8 @@ CompilationUnitList
                      -->Walk: <BinOp playground_1.adb:22:9-22:15>
                         -->Walk: <Int playground_1.adb:22:9-22:10>
                         <--Walk: <Int playground_1.adb:22:9-22:10>
-                        -->Walk: <OpDoubleDot ".." playground_1.adb:22:11-22:13>
-                        <--Walk: <OpDoubleDot ".." playground_1.adb:22:11-22:13>
+                        -->Walk: <OpDoubleDot playground_1.adb:22:11-22:13>
+                        <--Walk: <OpDoubleDot playground_1.adb:22:11-22:13>
                         -->Walk: <Int playground_1.adb:22:14-22:15>
                         <--Walk: <Int playground_1.adb:22:14-22:15>
                      <--Walk: <BinOp playground_1.adb:22:9-22:15>
@@ -4102,16 +4102,16 @@ CompilationUnitList
                               <--Walk: <Str ""Hi "" playground_1.adb:28:14-28:19>
                               -->Walk: <ConcatOperandList playground_1.adb:28:20-28:40>
                                  -->Walk: <ConcatOperand playground_1.adb:28:20-28:40>
-                                    -->Walk: <OpConcat "&" playground_1.adb:28:20-28:21>
-                                    <--Walk: <OpConcat "&" playground_1.adb:28:20-28:21>
+                                    -->Walk: <OpConcat playground_1.adb:28:20-28:21>
+                                    <--Walk: <OpConcat playground_1.adb:28:20-28:21>
                                     -->Walk: <CallExpr playground_1.adb:28:22-28:40>
                                        -->Walk: <Id "Full_Name" playground_1.adb:28:22-28:31>
                                        <--Walk: <Id "Full_Name" playground_1.adb:28:22-28:31>
                                        -->Walk: <BinOp playground_1.adb:28:33-28:39>
                                           -->Walk: <Int playground_1.adb:28:33-28:34>
                                           <--Walk: <Int playground_1.adb:28:33-28:34>
-                                          -->Walk: <OpDoubleDot ".." playground_1.adb:28:35-28:37>
-                                          <--Walk: <OpDoubleDot ".." playground_1.adb:28:35-28:37>
+                                          -->Walk: <OpDoubleDot playground_1.adb:28:35-28:37>
+                                          <--Walk: <OpDoubleDot playground_1.adb:28:35-28:37>
                                           -->Walk: <Int playground_1.adb:28:38-28:39>
                                           <--Walk: <Int playground_1.adb:28:38-28:39>
                                        <--Walk: <BinOp playground_1.adb:28:33-28:39>
@@ -5010,8 +5010,8 @@ CompilationUnitList
                      -->Walk: <BinOp playground_1.adb:36:9-36:15>
                         -->Walk: <Int playground_1.adb:36:9-36:10>
                         <--Walk: <Int playground_1.adb:36:9-36:10>
-                        -->Walk: <OpDoubleDot ".." playground_1.adb:36:11-36:13>
-                        <--Walk: <OpDoubleDot ".." playground_1.adb:36:11-36:13>
+                        -->Walk: <OpDoubleDot playground_1.adb:36:11-36:13>
+                        <--Walk: <OpDoubleDot playground_1.adb:36:11-36:13>
                         -->Walk: <Int playground_1.adb:36:14-36:15>
                         <--Walk: <Int playground_1.adb:36:14-36:15>
                      <--Walk: <BinOp playground_1.adb:36:9-36:15>
@@ -5042,16 +5042,16 @@ CompilationUnitList
                               <--Walk: <Str ""Hi "" playground_1.adb:42:14-42:19>
                               -->Walk: <ConcatOperandList playground_1.adb:42:20-42:40>
                                  -->Walk: <ConcatOperand playground_1.adb:42:20-42:40>
-                                    -->Walk: <OpConcat "&" playground_1.adb:42:20-42:21>
-                                    <--Walk: <OpConcat "&" playground_1.adb:42:20-42:21>
+                                    -->Walk: <OpConcat playground_1.adb:42:20-42:21>
+                                    <--Walk: <OpConcat playground_1.adb:42:20-42:21>
                                     -->Walk: <CallExpr playground_1.adb:42:22-42:40>
                                        -->Walk: <Id "Full_Name" playground_1.adb:42:22-42:31>
                                        <--Walk: <Id "Full_Name" playground_1.adb:42:22-42:31>
                                        -->Walk: <BinOp playground_1.adb:42:33-42:39>
                                           -->Walk: <Int playground_1.adb:42:33-42:34>
                                           <--Walk: <Int playground_1.adb:42:33-42:34>
-                                          -->Walk: <OpDoubleDot ".." playground_1.adb:42:35-42:37>
-                                          <--Walk: <OpDoubleDot ".." playground_1.adb:42:35-42:37>
+                                          -->Walk: <OpDoubleDot playground_1.adb:42:35-42:37>
+                                          <--Walk: <OpDoubleDot playground_1.adb:42:35-42:37>
                                           -->Walk: <Int playground_1.adb:42:38-42:39>
                                           <--Walk: <Int playground_1.adb:42:38-42:39>
                                        <--Walk: <BinOp playground_1.adb:42:33-42:39>
