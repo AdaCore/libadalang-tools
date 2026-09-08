@@ -979,7 +979,9 @@ package body Laltools.Common is
                Body_Part : constant Base_Subp_Body :=
                  Parent_Declarative_Part_Owner.As_Subp_Decl.P_Body_Part;
             begin
-               if Body_Part.Kind in Ada_Subp_Body_Range then
+               if not Body_Part.Is_Null
+                 and then Body_Part.Kind in Ada_Subp_Body_Range
+               then
                   Body_Decl_Part := Body_Part.As_Subp_Body.F_Decls;
                   Stmts := Body_Part.As_Subp_Body.F_Stmts;
                end if;
@@ -1716,7 +1718,9 @@ package body Laltools.Common is
                  Node.As_Subp_Decl.P_Body_Part;
 
             begin
-               if Body_Part.Kind in Ada_Subp_Body_Range then
+               if not Body_Part.Is_Null
+                 and then Body_Part.Kind in Ada_Subp_Body_Range
+               then
                   Body_Decl_Part := Body_Part.As_Subp_Body.F_Decls;
                end if;
             end;
