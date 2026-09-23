@@ -13,6 +13,7 @@ library project LAL_Tools is
    for Library_Kind use Library_Type;
    for Library_Dir use "../lib/" & Library_Type;
    for Library_Name use "lal_tools";
+   for Run_Path_Option use ();
 
    for Languages use ("Ada");
 
