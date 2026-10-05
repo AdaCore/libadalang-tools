@@ -1,0 +1,5 @@
+description:
+    Empty comment with a trailing blank ending a comment paragraph, with
+    a pp off region (CS0043507)
+
+driver: shell_script
