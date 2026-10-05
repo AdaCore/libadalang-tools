@@ -1,0 +1,5 @@
+description:
+    End of line comment with no blank before it, preceded by a soft line
+    break (CS0043506)
+
+driver: shell_script

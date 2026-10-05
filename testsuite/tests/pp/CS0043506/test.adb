@@ -1,0 +1,18 @@
+with Ada.Text_IO;
+
+procedure Test is
+begin
+   if A and--comment
+     B
+   then
+      null;
+   end if;
+
+      if ((Pkg_A.Pkg_B.Some_Function(First_Argument) = First_Value and
+           Pkg_A.Pkg_B.Some_Function(Second_Argument) = Second_Value)  or
+      (not Pkg_A.Pkg_B.Pkg_C.Pkg_D.Another_Function(First_Argument) and--Pkg_E.Pkg_F.Some_Comment(First_Argument)) and
+        Pkg_A.Pkg_B.Pkg_C.Pkg_D.Another_Function(Second_Argument)) or--Pkg_E.Pkg_F.Some_Comment(Pkg_G.Some_Field))) or
+        Some_Record.Some_Component_Array(Pkg_H.Pkg_I.Pkg_J.Some_Index)) then
+         Ada.Text_IO.Put_Line ("Hello");
+      end if;
+end Test;

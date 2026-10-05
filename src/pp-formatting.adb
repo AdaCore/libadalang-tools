@@ -3161,8 +3161,14 @@ package body Pp.Formatting is
 
             if New_Space_NL then
 
-               pragma Assert (New_Preceding_Blanks > 0);
-               New_Preceding_Blanks := New_Preceding_Blanks - 1;
+               --  The space moved into New_Tokns below replaces one of the
+               --  source blanks preceding the comment. There might be none
+               --  in the source (e.g. "A and--comment"), in which case the
+               --  moved space is simply added.
+
+               if New_Preceding_Blanks > 0 then
+                  New_Preceding_Blanks := New_Preceding_Blanks - 1;
+               end if;
 
                --  Remove the Spaces token (which must exist) from
                --  Pending_Tokns.
