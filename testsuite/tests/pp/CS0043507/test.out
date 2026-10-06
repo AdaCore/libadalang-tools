@@ -1,0 +1,20 @@
+
+Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
+-----
+
+procedure Test is
+begin
+   --(
+   null;
+   --)
+
+   -- This comment is long enough to be considered as a fillable
+   --
+   null;
+
+   -- This comment is long enough to be considered as a fillable
+   -- comment paragraph.
+   --
+   -- Second paragraph.
+   null;
+end Test;

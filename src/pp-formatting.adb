@@ -1426,7 +1426,15 @@ package body Pp.Formatting is
             begin
                while X <= Text'Last loop
                   if White (X) then
-                     Append (Result, ' ');
+                     --  Also collapse blanks across comment boundaries, since
+                     --  comments might be grouped differently in Src_Tokns
+                     --  and Out_Tokns.
+
+                     if Is_Empty (Result) or else Last_Element (Result) /= ' '
+                     then
+                        Append (Result, ' ');
+                     end if;
+
                      while White (X) loop
                         X := X + 1;
                      end loop;
