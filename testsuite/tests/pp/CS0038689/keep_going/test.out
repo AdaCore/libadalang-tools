@@ -1,3 +1,7 @@
+
+Info: AdaCore provides a new formatter GNATformat, currently in beta. This will supersede GNATpp when leaving the beta program.
+-----
+
 package Test_1 is
    type Foo;
 end Test_X;
