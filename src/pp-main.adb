@@ -28,6 +28,7 @@ with GNAT.OS_Lib;
 with Utils.Command_Lines;
 with Utils.Drivers;
 with Utils.Err_Out;
+with Utils.Formatted_Output;
 
 with Pp.Actions;
 with Pp.Command_Lines;
@@ -39,15 +40,15 @@ procedure Pp.Main is
      Utils.Command_Lines.Command_Line (Pp.Command_Lines.Descriptor'Access);
 
 begin
-   --  By default, send errors to stdout
    Utils.Err_Out.Output_Enabled := True;
+   Utils.Formatted_Output.Output_Enabled := True;
 
    --  Deprecation message to advertise about GNATformat
-   Utils.Err_Out.Put
+   Utils.Formatted_Output.Put
      ("\n\1\n",
       "Info: AdaCore provides a new formatter GNATformat, currently in beta. "
       & "This will supersede GNATpp when leaving the beta program.");
-   Utils.Err_Out.Put ("-----\n\n");
+   Utils.Formatted_Output.Put ("-----\n\n");
 
    --  Override trace settings by parsing the config file
    GNATCOLL.Traces.Parse_Config_File;
