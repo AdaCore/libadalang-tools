@@ -653,7 +653,12 @@ private
                when Comment_Kind =>
                   Leading_Blanks : Natural;
                   case Kind is
-                     when Whole_Line_Comment =>
+                     when Pp_Off_Comment
+                        | Pp_On_Comment
+                        | Special_Comment
+                        | Fillable_Comment
+                        | Other_Whole_Line_Comment
+                     =>
                         Width : Positive;
 
                         --  The following are used to compute the Sloc of the
