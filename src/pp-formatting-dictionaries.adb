@@ -89,7 +89,7 @@ package body Pp.Formatting.Dictionaries is
          when Whole_Word =>
             Include (Whole_Word_Exceptions, Id);
 
-         when Subword    =>
+         when Subword =>
             Include (Subword_Exceptions, Id);
       end case;
    end Add_To_Dictionary;
@@ -164,13 +164,13 @@ package body Pp.Formatting.Dictionaries is
 
       begin
          case Casing is
-            when Lower_Case  =>
+            when Lower_Case =>
                Result := To_Lower (Result);
 
-            when Upper_Case  =>
+            when Upper_Case =>
                Result := To_Upper (Result);
 
-            when Mixed       =>
+            when Mixed =>
                Result := To_Lower (Result);
                Result (First_Idx) := To_Upper (Result (First_Idx));
 

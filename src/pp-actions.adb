@@ -310,7 +310,7 @@ package body Pp.Actions is
             Set_Arg_If_Not_Explicit (Cmd, Comments_Fill, False);
             Set_Arg_If_Not_Explicit (Cmd, Comments_Special, False);
 
-         when Tall    =>
+         when Tall =>
             Set_Arg (Cmd, Alignment, True);
             Set_Arg (Cmd, Align_Modes, True);
             Set_Arg (Cmd, RM_Style_Spacing, False);
@@ -1569,13 +1569,13 @@ package body Pp.Actions is
    begin
       for X of T.Instructions.all loop
          case X.Kind is
-            when Hard_Break            =>
+            when Hard_Break =>
                Append (Result, "$");
 
             when Hard_Break_No_Comment =>
                Append (Result, "$0");
 
-            when Soft_Break            =>
+            when Soft_Break =>
                Append (Result, "#");
                if X.Plus then
                   Append (Result, "+");
@@ -1584,49 +1584,49 @@ package body Pp.Actions is
                   Append (Result, Im (Integer (X.Level_Inc)));
                end if;
 
-            when Indent                =>
+            when Indent =>
                Append (Result, "{");
 
-            when Outdent               =>
+            when Outdent =>
                Append (Result, "}");
 
-            when Continuation_Indent   =>
+            when Continuation_Indent =>
                Append (Result, "[");
 
-            when Continuation_Outdent  =>
+            when Continuation_Outdent =>
                Append (Result, "]");
 
-            when One_Space_Indent      =>
+            when One_Space_Indent =>
                Append (Result, "*");
 
-            when One_Space_Outdent     =>
+            when One_Space_Outdent =>
                Append (Result, "_");
 
-            when '('                   =>
+            when '(' =>
                Append (Result, "(");
 
-            when ')'                   =>
+            when ')' =>
                Append (Result, ")");
 
-            when Tab                   =>
+            when Tab =>
                Append (Result, "^");
                if X.Index_In_Line /= 1 then
                   Append (Result, Im (Integer (X.Index_In_Line)));
                end if;
 
-            when Tab_Insert_Point      =>
+            when Tab_Insert_Point =>
                Append (Result, "`");
                if X.Index_In_Line /= 1 then
                   Append (Result, Im (Integer (X.Index_In_Line)));
                end if;
 
-            when Required_Subtree      =>
+            when Required_Subtree =>
                Append (Result, "!");
                if X.Index /= 0 then
                   Append (Result, Im (Integer (X.Index)));
                end if;
 
-            when Opt_Subtree_Or_List   =>
+            when Opt_Subtree_Or_List =>
                Append (Result, "?");
                if X.Index /= 0 then
                   Append (Result, Im (Integer (X.Index)));
@@ -1638,10 +1638,10 @@ package body Pp.Actions is
                Append (Result, W_Str (Back_To_Str_Templ (X.Post)));
                Append (Result, "~");
 
-            when Ignore_Subtree        =>
+            when Ignore_Subtree =>
                Append (Result, "/");
 
-            when Verbatim              =>
+            when Verbatim =>
                Append (Result, To_W_Str (X.Text));
          end case;
       end loop;
@@ -2219,7 +2219,7 @@ package body Pp.Actions is
          begin
             return Result : Instr do
                case Kind (Cur) is
-                  when '$'    =>
+                  when '$' =>
                      Next (Cur);
                      if Kind (Cur) = Numeric_Literal then
                         pragma Assert (Text (Cur) = Intern ("0"));
@@ -2229,7 +2229,7 @@ package body Pp.Actions is
                         Result := (Kind => Hard_Break);
                      end if;
 
-                  when '#'    =>
+                  when '#' =>
                      Next (Cur);
                      declare
                         Plus      : constant Boolean := Kind (Cur) = '+';
@@ -2251,39 +2251,39 @@ package body Pp.Actions is
                         Result := (Soft_Break, Plus, Level_Inc);
                      end;
 
-                  when '{'    =>
+                  when '{' =>
                      Result := (Kind => Indent);
                      Next (Cur);
 
-                  when '}'    =>
+                  when '}' =>
                      Result := (Kind => Outdent);
                      Next (Cur);
 
-                  when '['    =>
+                  when '[' =>
                      Result := (Kind => Continuation_Indent);
                      Next (Cur);
 
-                  when ']'    =>
+                  when ']' =>
                      Result := (Kind => Continuation_Outdent);
                      Next (Cur);
 
-                  when '*'    =>
+                  when '*' =>
                      Result := (Kind => One_Space_Indent);
                      Next (Cur);
 
-                  when '_'    =>
+                  when '_' =>
                      Result := (Kind => One_Space_Outdent);
                      Next (Cur);
 
-                  when '('    =>
+                  when '(' =>
                      Result := (Kind => '(');
                      Next (Cur);
 
-                  when ')'    =>
+                  when ')' =>
                      Result := (Kind => ')');
                      Next (Cur);
 
-                  when '^'    =>
+                  when '^' =>
                      Next (Cur);
                      if Kind (Cur) = Numeric_Literal then
                         Result :=
@@ -2295,7 +2295,7 @@ package body Pp.Actions is
                         Result := (Tab, Index_In_Line => 1);
                      end if;
 
-                  when '`'    =>
+                  when '`' =>
                      Next (Cur);
                      if Kind (Cur) = Numeric_Literal then
                         Result :=
@@ -2307,7 +2307,7 @@ package body Pp.Actions is
                         Result := (Tab_Insert_Point, Index_In_Line => 1);
                      end if;
 
-                  when '!'    =>
+                  when '!' =>
                      Next (Cur);
                      if Kind (Cur) = Numeric_Literal then
                         Result :=
@@ -2318,7 +2318,7 @@ package body Pp.Actions is
                         Result := (Required_Subtree, Index => 0);
                      end if;
 
-                  when '?'    =>
+                  when '?' =>
                      Next (Cur);
                      declare
                         Index : Query_Count := 0;
@@ -2341,7 +2341,7 @@ package body Pp.Actions is
                         end;
                      end;
 
-                  when '/'    =>
+                  when '/' =>
                      Result := (Kind => Ignore_Subtree);
                      Next (Cur);
 
@@ -2660,7 +2660,7 @@ package body Pp.Actions is
                         --  true for lalpp); we might want a short-hand for
                         --  "${".
 
-                        when '{'       =>
+                        when '{' =>
                            if Kind
                               in Ada_Component_List
                                | Ada_Public_Part
@@ -2680,7 +2680,7 @@ package body Pp.Actions is
                               pragma Assert (T (J - 1) = '$');
                            end if;
 
-                        when others    =>
+                        when others =>
                            null;
                      end case;
                   end loop;
@@ -2759,7 +2759,7 @@ package body Pp.Actions is
       use Utils.Dbg_Out;
    begin
       case C.Kind is
-         when Child  =>
+         when Child =>
             Put ("Child: \1\n", C.Node.Image);
 
          when Trivia =>
@@ -3024,13 +3024,13 @@ package body Pp.Actions is
             end return;
          else
             case Casing is
-               when Lower_Case  =>
+               when Lower_Case =>
                   return To_Lower (Id);
 
-               when Upper_Case  =>
+               when Upper_Case =>
                   return To_Upper (Id);
 
-               when Mixed       =>
+               when Mixed =>
                   if Kind
                      in Ada_Attribute_Ref
                       | Ada_Update_Attribute_Ref
@@ -3086,79 +3086,79 @@ package body Pp.Actions is
       procedure Append_And_Put (V : in out Tokn_Vec; X : Ada_Op) is
       begin
          case X is
-            when Ada_Op_And        =>
+            when Ada_Op_And =>
                Append_And_Put (V, Res_And);
 
-            when Ada_Op_Or         =>
+            when Ada_Op_Or =>
                Append_And_Put (V, Res_Or);
 
-            when Ada_Op_Or_Else    =>
+            when Ada_Op_Or_Else =>
                Append_And_Put (V, Res_Or);
                Append_And_Put (V, Spaces, Name_Space);
                Append_And_Put (V, Res_Else);
 
-            when Ada_Op_And_Then   =>
+            when Ada_Op_And_Then =>
                Append_And_Put (V, Res_And);
                Append_And_Put (V, Spaces, Name_Space);
                Append_And_Put (V, Res_Then);
 
-            when Ada_Op_Concat     =>
+            when Ada_Op_Concat =>
                Append_And_Put (V, '&');
 
-            when Ada_Op_Xor        =>
+            when Ada_Op_Xor =>
                Append_And_Put (V, Res_Xor);
 
-            when Ada_Op_In         =>
+            when Ada_Op_In =>
                Append_And_Put (V, Res_In);
 
-            when Ada_Op_Not_In     =>
+            when Ada_Op_Not_In =>
                Append_And_Put (V, Res_Not);
                Append_And_Put (V, Spaces, Name_Space);
                Append_And_Put (V, Res_In);
 
-            when Ada_Op_Abs        =>
+            when Ada_Op_Abs =>
                Append_And_Put (V, Res_Abs);
 
-            when Ada_Op_Not        =>
+            when Ada_Op_Not =>
                Append_And_Put (V, Res_Not);
 
-            when Ada_Op_Pow        =>
+            when Ada_Op_Pow =>
                Append_And_Put (V, Exp_Op);
 
-            when Ada_Op_Mult       =>
+            when Ada_Op_Mult =>
                Append_And_Put (V, '*');
 
-            when Ada_Op_Div        =>
+            when Ada_Op_Div =>
                Append_And_Put (V, '/');
 
-            when Ada_Op_Mod        =>
+            when Ada_Op_Mod =>
                Append_And_Put (V, Res_Mod);
 
-            when Ada_Op_Rem        =>
+            when Ada_Op_Rem =>
                Append_And_Put (V, Res_Rem);
 
-            when Ada_Op_Plus       =>
+            when Ada_Op_Plus =>
                Append_And_Put (V, '+');
 
-            when Ada_Op_Minus      =>
+            when Ada_Op_Minus =>
                Append_And_Put (V, '-');
 
-            when Ada_Op_Eq         =>
+            when Ada_Op_Eq =>
                Append_And_Put (V, '=');
 
-            when Ada_Op_Neq        =>
+            when Ada_Op_Neq =>
                Append_And_Put (V, Not_Equal);
 
-            when Ada_Op_Lt         =>
+            when Ada_Op_Lt =>
                Append_And_Put (V, '<');
 
-            when Ada_Op_Lte        =>
+            when Ada_Op_Lte =>
                Append_And_Put (V, Less_Or_Equal);
 
-            when Ada_Op_Gt         =>
+            when Ada_Op_Gt =>
                Append_And_Put (V, '>');
 
-            when Ada_Op_Gte        =>
+            when Ada_Op_Gte =>
                Append_And_Put (V, Greater_Or_Equal);
 
             when Ada_Op_Double_Dot =>
@@ -3547,7 +3547,7 @@ package body Pp.Actions is
                      | Ada_Extended_Return_Stmt_Object_Decl
                      | Ada_Number_Decl
                      | Ada_Discriminant_Spec
-                     | Ada_Component_Decl  =>
+                     | Ada_Component_Decl =>
                      if Is_Generic_Formal_Object_Decl (Tree) then
                         pragma Assert (Tree.Kind = Ada_Object_Decl);
                         --  generic formal object
@@ -3589,7 +3589,7 @@ package body Pp.Actions is
                         end if;
                      end if;
 
-                  when Ada_Param_Spec      =>
+                  when Ada_Param_Spec =>
                      if Index_In_Line = 3 then
                         pragma Assert (Token_Text = Name_Tab_In_Out);
                         Append
@@ -3608,7 +3608,7 @@ package body Pp.Actions is
                         Append_Tab_Tokn (New_Tokns, Last_Index (Tabs));
                      end if;
 
-                  when Ada_With_Clause     =>
+                  when Ada_With_Clause =>
                      if Index_In_Line = 1 then
                         pragma Assert (Token_Text = Name_With);
                         Append
@@ -3643,10 +3643,10 @@ package body Pp.Actions is
                      | Ada_Aspect_Assoc
                      | Ada_Composite_Constraint_Assoc
                      | Ada_Aggregate_Assoc
-                     | Ada_Param_Assoc     =>
+                     | Ada_Param_Assoc =>
                      null;
 
-                  when others              =>
+                  when others =>
                      --  No other tree kinds have tabs
                      pragma Assert (False, Tree.Kind'Img);
                end case;
@@ -3769,7 +3769,7 @@ package body Pp.Actions is
 
                   if Present (Subt) then
                      case Subt.Kind is
-                        when Ada_With_Clause        =>
+                        when Ada_With_Clause =>
                            if not Subt.As_With_Clause.F_Has_Limited
                              and then not Subt.As_With_Clause.F_Has_Private
                            then
@@ -3782,7 +3782,7 @@ package body Pp.Actions is
                         when Ada_Use_Package_Clause =>
                            null; -- Leave Prev_With alone
 
-                        when others                 =>
+                        when others =>
                            Prev_With := No_With_Clause;
                      end case;
 
@@ -3903,7 +3903,7 @@ package body Pp.Actions is
                           (Subt, Inst.Pre, Inst.Between, Inst.Post);
                         Pop (Tree_Stack);
 
-                     when others       =>
+                     when others =>
                         Interpret_Template
                           (Inst.Pre, Subtrees => Empty_Tree_Array);
                         pragma
@@ -3926,7 +3926,7 @@ package body Pp.Actions is
                Used (Subtree_Index) := True;
 
                case Inst.Kind is
-                  when Required_Subtree    =>
+                  when Required_Subtree =>
                      if not Subtrees (Subtree_Index).Is_Null then
                         Subtree_To_Ada
                           (Subt, New_Level (Cur_Level, TT), Subtree_Index);
@@ -3935,7 +3935,7 @@ package body Pp.Actions is
                   when Opt_Subtree_Or_List =>
                      Do_Opt_Subtree_Or_List (Subt, Subtree_Index);
 
-                  when others              =>
+                  when others =>
                      raise Program_Error;
                end case;
             end Do_Subtree;
@@ -4030,14 +4030,14 @@ package body Pp.Actions is
                Inst := TT.Instructions (Inst_Index);
 
                case Inst.Kind is
-                  when Hard_Break | Hard_Break_No_Comment     =>
+                  when Hard_Break | Hard_Break_No_Comment =>
                      Append_Line_Break
                        (Hard             => True,
                         Affects_Comments => Inst.Kind = Hard_Break,
                         Level            => Cur_Level,
                         Kind             => Kind);
 
-                  when Soft_Break                             =>
+                  when Soft_Break =>
                      --  Check whether we want to use a hard line break
                      --  in case of --vertical-case-alternatives or
                      --  --vertical-named-aggregates switches.
@@ -4074,36 +4074,36 @@ package body Pp.Actions is
                            Kind             => Kind);
                      end if;
 
-                  when Indent                                 =>
+                  when Indent =>
                      Indent (PP_Indentation (Cmd));
 
-                  when Outdent                                =>
+                  when Outdent =>
                      Indent (-PP_Indentation (Cmd));
 
-                  when Continuation_Indent                    =>
+                  when Continuation_Indent =>
                      Indent (PP_Indent_Continuation (Cmd));
 
-                  when Continuation_Outdent                   =>
+                  when Continuation_Outdent =>
                      Indent (-PP_Indent_Continuation (Cmd));
 
-                  when One_Space_Indent                       =>
+                  when One_Space_Indent =>
                      Indent (1);
 
-                  when One_Space_Outdent                      =>
+                  when One_Space_Outdent =>
                      Indent (-1);
 
-                  when '('                                    =>
+                  when '(' =>
                      Append_And_Put (New_Tokns, '(');
                      Indent (1); -- extra indentation
 
-                  when ')'                                    =>
+                  when ')' =>
                      Append_And_Put (New_Tokns, ')');
                      Indent (-1);
 
-                  when Tab | Tab_Insert_Point                 =>
+                  when Tab | Tab_Insert_Point =>
                      Do_Tab (Inst_Index);
 
-                  when Ignore_Subtree                         =>
+                  when Ignore_Subtree =>
                      Cur_Subtree_Index := Cur_Subtree_Index + 1;
                      Used (Cur_Subtree_Index) := True;
 
@@ -4117,14 +4117,14 @@ package body Pp.Actions is
                            then Cur_Subtree_Index
                            else Inst.Index));
 
-                  when Verbatim                               =>
+                  when Verbatim =>
                      if Label_Seen and then Inst.T_Kind = ';' then
                         Append_And_Put (New_Tokns, Inst.T_Kind);
                         Label_Seen := False;
                      else
 
                         case Scanner.Token_Kind'(Inst.T_Kind) is
-                           when Same_Text_Kind   =>
+                           when Same_Text_Kind =>
                               Append_And_Put (New_Tokns, Inst.T_Kind);
 
                            when Stored_Text_Kind =>
@@ -4155,7 +4155,7 @@ package body Pp.Actions is
             end if;
 
             case Tree.Kind is
-               when Ada_Compilation_Unit                  =>
+               when Ada_Compilation_Unit =>
                   Insert_Blank_Line_Before := True;
 
                when Ada_Type_Decl
@@ -4202,10 +4202,10 @@ package body Pp.Actions is
                      end if;
                   end;
 
-               when Ada_Elsif_Stmt_Part                   =>
+               when Ada_Elsif_Stmt_Part =>
                   Insert_Blank_Line_Before := True;
 
-               when others                                =>
+               when others =>
                   null;
             end case;
 
@@ -4286,19 +4286,19 @@ package body Pp.Actions is
                      --  Parenthesized expression case; recurse on inner
                      --  expression
 
-                     when Ada_Paren_Expr        =>
+                     when Ada_Paren_Expr =>
                         if Is_Vertical_Aggregate (X.As_Paren_Expr.F_Expr) then
                            Result := True;
                         end if;
 
                      --  Qualified expression case; recurse on the suffix
 
-                     when Ada_Qual_Expr         =>
+                     when Ada_Qual_Expr =>
                         if Is_Vertical_Aggregate (X.As_Qual_Expr.F_Suffix) then
                            Result := True;
                         end if;
 
-                     when Ada_Aggregate         =>
+                     when Ada_Aggregate =>
                         --  Subaggregate case; recurse on outer aggregate
 
                         if X.Parent.Kind = Ada_Aggregate_Assoc then
@@ -4410,7 +4410,7 @@ package body Pp.Actions is
                            end;
                         end if;
 
-                     when others                =>
+                     when others =>
                         null;
                   end case;
                end if;
@@ -4509,7 +4509,7 @@ package body Pp.Actions is
                   | Ada_Subp_Body
                   | Ada_Task_Body
                   | Ada_Begin_Block
-                  | Ada_Decl_Block             =>
+                  | Ada_Decl_Block =>
 
                   if Partial_GNATPP then
                      Interpret_Alt_Template
@@ -4518,7 +4518,7 @@ package body Pp.Actions is
                      Interpret_Alt_Template (Handled_Stmts_With_Begin_Alt);
                   end if;
 
-               when Ada_Extended_Return_Stmt   =>
+               when Ada_Extended_Return_Stmt =>
                   declare
                      Vertical : constant Boolean :=
                        Is_Vertical_Aggregate
@@ -4538,7 +4538,7 @@ package body Pp.Actions is
                when Ada_Accept_Stmt_With_Stmts =>
                   Interpret_Alt_Template (Handled_Stmts_With_Do_Alt);
 
-               when others                     =>
+               when others =>
                   raise Program_Error;
             end case;
          end Do_Handled_Stmts;
@@ -4585,7 +4585,7 @@ package body Pp.Actions is
             case Expr.Kind is
                when Ada_Bin_Op | Ada_Relation_Op =>
                   case Ada_Op'(Expr.As_Bin_Op.F_Op) is
-                     when Ada_Op_In | Ada_Op_Not_In                          =>
+                     when Ada_Op_In | Ada_Op_Not_In =>
                         raise Program_Error;
                      --  ???Don't treat membership tests as operators, for now
                      --               return 1;
@@ -4594,7 +4594,7 @@ package body Pp.Actions is
                         | Ada_Op_Or_Else
                         | Ada_Op_And
                         | Ada_Op_Or
-                        | Ada_Op_Xor                                         =>
+                        | Ada_Op_Xor =>
                         return 2;
 
                      when Ada_Op_Eq
@@ -4602,34 +4602,34 @@ package body Pp.Actions is
                         | Ada_Op_Gt
                         | Ada_Op_Gte
                         | Ada_Op_Lt
-                        | Ada_Op_Lte                                         =>
+                        | Ada_Op_Lte =>
                         return 3;
 
-                     when Ada_Op_Double_Dot                                  =>
+                     when Ada_Op_Double_Dot =>
                         return 4; -- ???
 
-                     when Ada_Op_Plus | Ada_Op_Minus | Ada_Op_Concat         =>
+                     when Ada_Op_Plus | Ada_Op_Minus | Ada_Op_Concat =>
                         return 5;
 
                      when Ada_Op_Mult | Ada_Op_Div | Ada_Op_Mod | Ada_Op_Rem =>
                         return 6;
 
-                     when Ada_Op_Pow                                         =>
+                     when Ada_Op_Pow =>
                         return 7;
 
                      --  Unary-only operator
 
-                     when Ada_Op_Abs | Ada_Op_Not                            =>
+                     when Ada_Op_Abs | Ada_Op_Not =>
                         raise Program_Error;
                   end case;
 
-               when Ada_Concat_Op                =>
+               when Ada_Concat_Op =>
                   return 5;
 
                --  Assume anything else is a unary operator or a primary
                --  (highest precedence)
 
-               when others                       =>
+               when others =>
                   return 8;
             end case;
          end Precedence;
@@ -4768,10 +4768,10 @@ package body Pp.Actions is
                      Interpret_Alt_Template
                        (Un_Op_No_Space_Alt, Subtrees (Expr));
 
-                  when Ada_Op_Abs | Ada_Op_Not    =>
+                  when Ada_Op_Abs | Ada_Op_Not =>
                      Interpret_Alt_Template (Un_Op_Space_Alt, Subtrees (Expr));
 
-                  when others                     =>
+                  when others =>
                      raise Program_Error;
                end case;
             end if;
@@ -4942,7 +4942,7 @@ package body Pp.Actions is
          procedure Do_For_Loop_Spec is
          begin
             case Ada_Node'(Parent (Tree)).Kind is
-               when Ada_For_Loop_Stmt   =>
+               when Ada_For_Loop_Stmt =>
                   Interpret_Alt_Template (For_Loop_Spec_Stmt_Alt);
 
                when Ada_Quantified_Expr =>
@@ -4950,7 +4950,7 @@ package body Pp.Actions is
                   --  "for ".
                   Interpret_Alt_Template (For_Loop_Spec_Quant_Alt);
 
-               when others              =>
+               when others =>
                   raise Program_Error;
             end case;
          end Do_For_Loop_Spec;
@@ -5041,10 +5041,10 @@ package body Pp.Actions is
             --  ":"; note that "10#...#" is considered based, not decimal.
 
             case Tree.Kind is
-               when Ada_String_Literal                 =>
+               when Ada_String_Literal =>
                   Append_And_Put (New_Tokns, String_Lit, W_Intern (S));
 
-               when Ada_Char_Literal                   =>
+               when Ada_Char_Literal =>
                   Append_And_Put (New_Tokns, Character_Literal, W_Intern (S));
 
                when Ada_Int_Literal | Ada_Real_Literal =>
@@ -5101,7 +5101,7 @@ package body Pp.Actions is
                      end if;
                   end;
 
-               when others                             =>
+               when others =>
                   raise Program_Error;
             end case;
          end Do_Literal;
@@ -5671,95 +5671,95 @@ package body Pp.Actions is
                raise Program_Error with Tree.Image & " encountered";
             --  ???The above are not used
 
-            when Ada_Compilation_Unit                                  =>
+            when Ada_Compilation_Unit =>
                Do_Compilation_Unit;
 
-            when Ada_Identifier                                        =>
+            when Ada_Identifier =>
                Do_Def_Or_Usage_Name;
 
             when Ada_Int_Literal
                | Ada_Real_Literal
                | Ada_String_Literal
-               | Ada_Char_Literal                                      =>
+               | Ada_Char_Literal =>
                Do_Literal;
 
-            when Ada_Label                                             =>
+            when Ada_Label =>
                Do_Label;
 
-            when Ada_Pragma_Node                                       =>
+            when Ada_Pragma_Node =>
                Do_Pragma;
 
-            when Ada_Un_Op                                             =>
+            when Ada_Un_Op =>
                Do_Un_Op (Tree);
 
-            when Ada_Bin_Op | Ada_Relation_Op                          =>
+            when Ada_Bin_Op | Ada_Relation_Op =>
                Do_Bin_Op (Tree, Is_Right => False, Cur_Level => Cur_Level);
 
-            when Ada_Concat_Op                                         =>
+            when Ada_Concat_Op =>
                Do_Concat_Op (Tree, Cur_Level => Cur_Level);
 
-            when Ada_For_Loop_Spec                                     =>
+            when Ada_For_Loop_Spec =>
                Do_For_Loop_Spec;
 
-            when Ada_Task_Def                                          =>
+            when Ada_Task_Def =>
                Do_Task_Def;
 
-            when Ada_Aspect_Assoc                                      =>
+            when Ada_Aspect_Assoc =>
                Do_Aspect_Assoc;
 
             when Ada_Param_Assoc
                | Ada_Aggregate_Assoc
                | Ada_Composite_Constraint_Assoc
-               | Ada_Pragma_Argument_Assoc                             =>
+               | Ada_Pragma_Argument_Assoc =>
                Do_Assoc;
 
-            when Ada_Aggregate                                         =>
+            when Ada_Aggregate =>
                Do_Aggregate;
 
-            when Ada_Bracket_Aggregate                                 =>
+            when Ada_Bracket_Aggregate =>
                Do_Bracket_Aggregate;
 
-            when Ada_Subtype_Indication                                =>
+            when Ada_Subtype_Indication =>
                Do_Subtype_Indication;
 
-            when Ada_Component_Clause                                  =>
+            when Ada_Component_Clause =>
                Do_Component_Clause;
 
-            when Ada_Handled_Stmts                                     =>
+            when Ada_Handled_Stmts =>
                Do_Handled_Stmts;
 
-            when Ada_Return_Stmt                                       =>
+            when Ada_Return_Stmt =>
                Do_Return_Stmt;
 
-            when Ada_Extended_Return_Stmt                              =>
+            when Ada_Extended_Return_Stmt =>
                Do_Extended_Return_Stmt;
 
-            when Ada_Param_Spec                                        =>
+            when Ada_Param_Spec =>
                Do_Param_Spec;
 
-            when Ada_Object_Decl | Ada_No_Type_Object_Renaming_Decl    =>
+            when Ada_Object_Decl | Ada_No_Type_Object_Renaming_Decl =>
                Do_Object_Decl;
 
-            when Ada_Extended_Return_Stmt_Object_Decl_Range            =>
+            when Ada_Extended_Return_Stmt_Object_Decl_Range =>
                Do_Extended_Return_Stmt_Object_Decl;
 
-            when Ada_Component_Decl                                    =>
+            when Ada_Component_Decl =>
                Do_Component_Decl;
 
-            when Ada_Concrete_Type_Decl | Ada_Formal_Type_Decl         =>
+            when Ada_Concrete_Type_Decl | Ada_Formal_Type_Decl =>
                Do_Type_Decl;
 
-            when Ada_Select_When_Part                                  =>
+            when Ada_Select_When_Part =>
                Do_Select_When_Part;
 
-            when Ada_Params                                            =>
+            when Ada_Params =>
                Do_Params;
 
-            when Ada_Subp_Spec                                         =>
+            when Ada_Subp_Spec =>
                Do_Subp_Spec;
 
             when Ada_Generic_Subp_Instantiation
-               | Ada_Generic_Package_Instantiation                     =>
+               | Ada_Generic_Package_Instantiation =>
                Do_Instantiation;
 
             when Ada_Subp_Decl
@@ -5773,19 +5773,19 @@ package body Pp.Actions is
                | Ada_Access_To_Subp_Def
                | Ada_Generic_Subp_Decl
                | Ada_Entry_Body
-               | Ada_Entry_Decl                                        =>
+               | Ada_Entry_Decl =>
                Do_Subp_Decl;
 
-            when Ada_Call_Expr                                         =>
+            when Ada_Call_Expr =>
                Do_Call_Expr;
 
-            when Ada_Ada_List                                          =>
+            when Ada_Ada_List =>
                Do_List;
 
-            when Ada_Unconstrained_Array_Index                         =>
+            when Ada_Unconstrained_Array_Index =>
                Do_Unconstrained_Array_Index;
 
-            when others                                                =>
+            when others =>
                Do_Others;
          end case;
 
