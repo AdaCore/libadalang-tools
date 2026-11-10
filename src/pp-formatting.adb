@@ -676,7 +676,7 @@ package body Pp.Formatting is
             --  first character of this (comment) token.
 
             case Comment_Kind'(Kind (Cur_Tok)) is
-               when Whole_Line_Comment  =>
+               when Whole_Line_Comment =>
                   Cur_Indentation := Sloc (Cur_Tok).Col - 1;
 
                when End_Of_Line_Comment =>
@@ -1323,30 +1323,30 @@ package body Pp.Formatting is
                      | End_Of_Input
                      | Tab_Token
                      | Other_Lexeme
-                     | Illegal_Character                     =>
+                     | Illegal_Character =>
                      pragma
                        Assert
                          (Equal_Ignoring_CR (Text (Src_Tok), Text (Out_Tok)));
                      R := True;
 
-                  when Reserved_Word                         =>
+                  when Reserved_Word =>
                      pragma
                        Assert
                          (Case_Insensitive_Equal
                             (Text (Src_Tok), Text (Out_Tok)));
                      R := True;
 
-                  when Ident                                 =>
+                  when Ident =>
                      R :=
                        Case_Insensitive_Equal (Text (Src_Tok), Text (Out_Tok));
 
-                  when Numeric_Literal                       =>
+                  when Numeric_Literal =>
                      R := Num_Lits_Match (Src_Tok, Out_Tok, Cmd);
 
-                  when Character_Literal                     =>
+                  when Character_Literal =>
                      R := Text (Src_Tok) = Text (Out_Tok);
 
-                  when String_Lit                            =>
+                  when String_Lit =>
                      if Is_Op_Sym_With_Letters (Text (Src_Tok)) then
                         R :=
                           Case_Insensitive_Equal
@@ -1355,10 +1355,10 @@ package body Pp.Formatting is
                         R := Text (Src_Tok) = Text (Out_Tok);
                      end if;
 
-                  when Preprocessor_Directive                =>
+                  when Preprocessor_Directive =>
                      R := Text (Src_Tok) = Text (Out_Tok);
 
-                  when Comment_Kind                          =>
+                  when Comment_Kind =>
                      R :=
                        (Arg (Cmd, Comments_Gnat_Beginning)
                         or else
@@ -2418,32 +2418,32 @@ package body Pp.Formatting is
                      when Start_Of_Input
                         | End_Of_Input
                         | Other_Lexeme
-                        | Illegal_Character      =>
+                        | Illegal_Character =>
                         pragma
                           Assert
                             (Equal_Ignoring_CR
                                (Text (Src_Tok), Text (Out_Tok)));
                         R := True;
 
-                     when Reserved_Word          =>
+                     when Reserved_Word =>
                         pragma
                           Assert
                             (Case_Insensitive_Equal
                                (Text (Src_Tok), Text (Out_Tok)));
                         R := True;
 
-                     when Ident                  =>
+                     when Ident =>
                         R :=
                           Case_Insensitive_Equal
                             (Text (Src_Tok), Text (Out_Tok));
 
-                     when Numeric_Literal        =>
+                     when Numeric_Literal =>
                         R := Num_Lits_Match (Src_Tok, Out_Tok, Cmd);
 
-                     when Character_Literal      =>
+                     when Character_Literal =>
                         R := Text (Src_Tok) = Text (Out_Tok);
 
-                     when String_Lit             =>
+                     when String_Lit =>
                         if Is_Op_Sym_With_Letters (Text (Src_Tok)) then
                            R :=
                              Case_Insensitive_Equal
@@ -2838,7 +2838,7 @@ package body Pp.Formatting is
                         | Spaces
                         | Comment_Kind
                         | Preprocessor_Directive
-                        | Line_Break_Token  =>
+                        | Line_Break_Token =>
                         raise Program_Error;
 
                      when Start_Of_Input
@@ -2852,25 +2852,25 @@ package body Pp.Formatting is
                                (Text (Src_Tok), Text (Out_Tok)));
                         R := True;
 
-                     when Reserved_Word     =>
+                     when Reserved_Word =>
                         pragma
                           Assert
                             (Case_Insensitive_Equal
                                (Text (Src_Tok), Text (Out_Tok)));
                         R := True;
 
-                     when Ident             =>
+                     when Ident =>
                         R :=
                           Case_Insensitive_Equal
                             (Text (Src_Tok), Text (Out_Tok));
 
-                     when Numeric_Literal   =>
+                     when Numeric_Literal =>
                         R := Num_Lits_Match (Src_Tok, Out_Tok, Cmd);
 
                      when Character_Literal =>
                         R := Text (Src_Tok) = Text (Out_Tok);
 
-                     when String_Lit        =>
+                     when String_Lit =>
                         if Is_Op_Sym_With_Letters (Text (Src_Tok)) then
                            R :=
                              Case_Insensitive_Equal
@@ -3520,7 +3520,7 @@ package body Pp.Formatting is
             --  that here, and abort processing if it's not true.
 
             case Whole_Line_Comment'(Kind (Src_Tok)) is
-               when Pp_Off_Comment   =>
+               when Pp_Off_Comment =>
                   if Pp_On then
                      Pp_On := False;
                      Last_Pp_Off_On := Src_Tok;
@@ -3534,7 +3534,7 @@ package body Pp.Formatting is
                      raise Post_Tree_Phases_Done;
                   end if;
 
-               when Pp_On_Comment    =>
+               when Pp_On_Comment =>
                   if Pp_On then
                      Utils.Char_Vectors.Char_Vectors.Append
                        (Message.Text,
@@ -4519,7 +4519,7 @@ package body Pp.Formatting is
                               when Res_Is | Comment_Kind =>
                                  Indentation := Before_Indentation;
 
-                              when others                =>
+                              when others =>
                                  while Kind (P) not in Line_Break_Token loop
                                     P := Prev (P);
                                  end loop;
@@ -5030,10 +5030,10 @@ package body Pp.Formatting is
                   when ',' | Arrow =>
                      return True;
 
-                  when ')'         =>
+                  when ')' =>
                      Count := Count + 1;
 
-                  when '('         =>
+                  when '(' =>
                      if Count = 0 then
                         if Call_Pattern_Found (Crt_Tok) then
                            return True;
@@ -5042,7 +5042,7 @@ package body Pp.Formatting is
                         Count := Count - 1;
                      end if;
 
-                  when others      =>
+                  when others =>
                      null;
                end case;
 
@@ -5192,13 +5192,13 @@ package body Pp.Formatting is
                         end if;
                      end;
 
-                  when '('              =>
+                  when '(' =>
                      OP_Count := OP_Count + 1;
 
-                  when ')'              =>
+                  when ')' =>
                      CP_Count := CP_Count + 1;
 
-                  when others           =>
+                  when others =>
                      null;
                end case;
             end loop;
@@ -5221,7 +5221,7 @@ package body Pp.Formatting is
 
          while not After_Last (New_Tok) loop
             case Kind (New_Tok) is
-               when Line_Break_Token  =>
+               when Line_Break_Token =>
                   declare
                      Index : constant Line_Break_Index :=
                        Line_Break_Token_Index (New_Tok);
@@ -5240,10 +5240,10 @@ package body Pp.Formatting is
                when False_End_Of_Line =>
                   null;
 
-               when True_End_Of_Line  =>
+               when True_End_Of_Line =>
                   pragma Assert (False);
 
-               when others            =>
+               when others =>
                   Append_Tokn (New_Tokns, New_Tok);
             end case;
 
@@ -5257,7 +5257,7 @@ package body Pp.Formatting is
 
          while not After_Last (New_Tok) loop
             case Kind (New_Tok) is
-               when Spaces    =>
+               when Spaces =>
                   if Kind (Prev (New_Tok)) in Line_Break_Token
                     or else Kind (Next (New_Tok)) in Line_Break_Token
                   then
@@ -5267,7 +5267,7 @@ package body Pp.Formatting is
                when EOL_Token =>
                   pragma Assert (False);
 
-               when others    =>
+               when others =>
                   null;
             end case;
 
@@ -6143,7 +6143,7 @@ package body Pp.Formatting is
             while not After_Last (New_Tok) loop
 
                case Kind (New_Tok) is
-                  when Enabled_LB_Token  =>
+                  when Enabled_LB_Token =>
                      Cur_Line_Num := Cur_Line_Num + 1;
                      Error_Sloc := (Slocs.Line_Number (Cur_Line_Num), 1);
                      Num_Spaces := 0;
@@ -6155,7 +6155,7 @@ package body Pp.Formatting is
                           in Enabled_LB_Token | End_Of_Input;
                      end loop;
 
-                  when Tab_Token         =>
+                  when Tab_Token =>
                      declare
                         Tab_X    : constant Tab_Index :=
                           Tab_Token_Index (New_Tok);
@@ -6202,7 +6202,7 @@ package body Pp.Formatting is
                   when Disabled_LB_Token =>
                      pragma Assert (False);
 
-                  when others            =>
+                  when others =>
                      null;
                end case;
 

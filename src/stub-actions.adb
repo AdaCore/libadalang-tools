@@ -240,7 +240,7 @@ package body Stub.Actions is
       use Utils.Dbg_Out;
    begin
       case C.Kind is
-         when Child  =>
+         when Child =>
             Put ("Child: \1\n", C.Node.Image);
 
          when Trivia =>
@@ -446,7 +446,7 @@ package body Stub.Actions is
 
    begin
       case N.Kind is
-         when Ada_Package_Decl | Ada_Generic_Package_Decl                =>
+         when Ada_Package_Decl | Ada_Generic_Package_Decl =>
             if Has_Elaborate_Body (N) then
                return True;
             end if;
@@ -463,13 +463,13 @@ package body Stub.Actions is
          when Ada_Single_Protected_Decl
             | Ada_Protected_Type_Decl
             | Ada_Single_Task_Decl
-            | Ada_Task_Type_Decl                                         =>
+            | Ada_Task_Type_Decl =>
             return True;
 
-         when Ada_Entry_Decl                                             =>
+         when Ada_Entry_Decl =>
             return True;
 
-         when Ada_Subp_Decl                                              =>
+         when Ada_Subp_Decl =>
             --  For a function defined in the public part of a package spec and
             --  implemented in the private part as an expression function,
             --  the P_Next_Part_For_Decl should return a non-null value
@@ -505,7 +505,7 @@ package body Stub.Actions is
 
             return not N.As_Basic_Subp_Decl.P_Is_Imported;
 
-         when Ada_Generic_Subp_Decl                                      =>
+         when Ada_Generic_Subp_Decl =>
             return not N.As_Generic_Subp_Decl.P_Is_Imported;
 
          when Ada_Incomplete_Type_Decl | Ada_Incomplete_Tagged_Type_Decl =>
@@ -513,7 +513,7 @@ package body Stub.Actions is
 
          --  Because these are handled specially in Walk
 
-         when others                                                     =>
+         when others =>
             return False;
       end case;
    end Needs_Completion;
@@ -821,10 +821,10 @@ package body Stub.Actions is
             when Ada_Subp_Decl | Ada_Generic_Subp_Decl =>
                Generate_Subp_Body (Decl, Name, Ada_Stub, Level);
 
-            when Ada_Entry_Decl                        =>
+            when Ada_Entry_Decl =>
                Generate_Entry_Body (Decl, Name);
 
-            when others                                =>
+            when others =>
                raise Program_Error;
          end case;
       end Generate_Subp_Or_Entry_Body;
@@ -928,8 +928,7 @@ package body Stub.Actions is
          case Decl.Kind is
             when Ada_Package_Decl
                | Ada_Generic_Package_Decl
-               | Ada_Package_Body_Stub
-            =>
+               | Ada_Package_Body_Stub =>
                Generate_Local_Header (Name, Level);
                Generate_Subunit_Start (Level);
                if Arg (Cmd, Spark_Mode_Off)
@@ -943,8 +942,7 @@ package body Stub.Actions is
 
             when Ada_Single_Protected_Decl
                | Ada_Protected_Type_Decl
-               | Ada_Protected_Body_Stub
-            =>
+               | Ada_Protected_Body_Stub =>
                Generate_Local_Header (Name, Level);
                Generate_Subunit_Start (Level);
                if Arg (Cmd, Spark_Mode_Off)
@@ -970,8 +968,7 @@ package body Stub.Actions is
                end if;
                Generate_Stub_Begin_End (Name, "task");
 
-            when Ada_Subp_Decl | Ada_Generic_Subp_Decl | Ada_Subp_Body_Stub
-            =>
+            when Ada_Subp_Decl | Ada_Generic_Subp_Decl | Ada_Subp_Body_Stub =>
                Generate_Local_Header (Name, Level);
                Generate_Subunit_Start (Level);
                Generate_Subp_Body
@@ -980,20 +977,17 @@ package body Stub.Actions is
                   Ada_Stub => Generating_Ada_Stubs,
                   Level    => Level);
 
-            when Ada_Entry_Decl
-            =>
+            when Ada_Entry_Decl =>
                Generate_Local_Header (Name, Level);
                Generate_Entry_Body (Decl, Name);
 
             when Ada_Subp_Body
                | Ada_Package_Body
                | Ada_Task_Body
-               | Ada_Protected_Body
-            =>
+               | Ada_Protected_Body =>
                null;
 
-            when others
-            =>
+            when others =>
                raise Program_Error;
          end case;
 
@@ -1005,7 +999,7 @@ package body Stub.Actions is
             when Ada_Package_Decl
                | Ada_Generic_Package_Decl
                | Ada_Single_Protected_Decl
-               | Ada_Protected_Type_Decl                         =>
+               | Ada_Protected_Type_Decl =>
                if not Vis_Part (Decl).Is_Null then
                   Collect_Local_Decls (F_Decls (Vis_Part (Decl)));
                end if;
@@ -1017,7 +1011,7 @@ package body Stub.Actions is
             when Ada_Subp_Body
                | Ada_Package_Body
                | Ada_Task_Body
-               | Ada_Protected_Body                              =>
+               | Ada_Protected_Body =>
                Collect_Local_Decls (F_Decls (Body_Decls (Decl)));
 
             when Ada_Package_Body_Stub | Ada_Protected_Body_Stub =>
@@ -1042,10 +1036,10 @@ package body Stub.Actions is
                | Ada_Task_Type_Decl
                | Ada_Entry_Decl
                | Ada_Task_Body_Stub
-               | Ada_Subp_Body_Stub                              =>
+               | Ada_Subp_Body_Stub =>
                null;
 
-            when others                                          =>
+            when others =>
                raise Program_Error;
          end case;
 
@@ -1077,7 +1071,7 @@ package body Stub.Actions is
                   end loop;
                end if;
 
-            when others                                      =>
+            when others =>
                null;
          end case;
 
@@ -1129,10 +1123,10 @@ package body Stub.Actions is
                | Ada_Subp_Body
                | Ada_Package_Body
                | Ada_Task_Body
-               | Ada_Protected_Body      =>
+               | Ada_Protected_Body =>
                null;
 
-            when others                  =>
+            when others =>
                raise Program_Error;
          end case;
       end Walk;
@@ -1462,7 +1456,7 @@ package body Stub.Actions is
 
                      when Ada_Subp_Decl
                         | Ada_Generic_Subp_Decl
-                        | Ada_Entry_Decl          =>
+                        | Ada_Entry_Decl =>
                         pragma Assert (Subp_Decl.Is_Null);
                         Subp_Decl := Decl;
 
@@ -1472,7 +1466,7 @@ package body Stub.Actions is
                              ("body for " & Decl_Name & " already exists");
                         end if;
 
-                     when others                  =>
+                     when others =>
                         null;
                   end case;
 
@@ -1640,7 +1634,7 @@ package body Stub.Actions is
                when ASCII.LF =>
                   exit;
 
-               when others   =>
+               when others =>
                   null;
             end case;
          end loop;
@@ -1755,7 +1749,7 @@ package body Stub.Actions is
                   & " does not require a body");
             end if;
 
-         when Ada_Body_Node                     =>
+         when Ada_Body_Node =>
             if not Arg (Cmd, Subunits) then
                Err_Out.Put
                  ("\1: input file looks like a body\n",
@@ -1767,7 +1761,7 @@ package body Stub.Actions is
                   & "spec files");
             end if;
 
-         when others                            =>
+         when others =>
             raise Program_Error;
       end case;
 
