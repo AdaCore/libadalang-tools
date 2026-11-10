@@ -2,7 +2,7 @@
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2013-2024, AdaCore                    --
+--                      Copyright (C) 2013-2026, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -603,46 +603,13 @@ package body Pp.Buffers is
    is
       pragma Assert (Expand_Tabs);
 
-      use type System.WCh_Con.WC_Encoding_Method;
-
       package Decoder is new
         GNAT.Decode_String (Encoding_Method => Wide_Character_Encoding);
-      package Brackets_Decoder is new
-        GNAT.Decode_String (Encoding_Method => System.WCh_Con.WCEM_Brackets);
       Ptr        : Natural := Input'First;
       C          : W_Char;
       Tab_Length : constant Natural := (if Tab_Len /= 0 then Tab_Len else 8);
       --  The Tab_Len parameter value will be used if not null otherwise the
       --  default is set to 8.
-
-      function At_Brackets_Start return Boolean
-      with Pre => Input (Ptr) = '[';
-      --  True if we're pointing to the start of a valid brackets sequence
-      --  to be interpreted as a wide character.
-
-      function At_Brackets_Start return Boolean
-      is (Ptr + 2 <= Input'Last
-          and then Input (Ptr + 1) = '"'
-          and then Input (Ptr + 2) in '0' .. '9' | 'a' .. 'f' | 'A' .. 'F');
-
-      type State_Enum is
-        (In_Comment, In_String_Literal, In_Obsolescent_String_Literal, Other);
-      State : State_Enum := Other;
-      --  We need to keep track of whether we're inside a comment, because
-      --  brackets encoding is disabled in that case. We need to keep track of
-      --  whether we're inside a string literal in order to keep track of
-      --  whether we're inside a comment ('--' doesn't start a comment inside a
-      --  string literal).
-      --
-      --  In_String_Literal is for normal string literals surrounded by double
-      --  quotes. In_Obsolescent_String_Literal is for string literals
-      --  surrounded by percent signs, as allowed by J.2(4). It is necessary to
-      --  distinguish these, because the surrounding characters have to match.
-      --  That is, if we see:
-      --
-      --     "Hello%world"
-      --
-      --  the percent doesn't end the string literal.
 
    begin
       if Input = "" then
@@ -651,47 +618,14 @@ package body Pp.Buffers is
       end if;
 
       while Ptr <= Input'Last loop
-         --  Set C to the current wide character
+         --  Preserve brackets encoding to match Libadalang token text.
 
-         if Input (Ptr) = '['
-           and then State /= In_Comment
-           and then At_Brackets_Start
-           and then Wide_Character_Encoding = System.WCh_Con.WCEM_Brackets
-         then
-            Brackets_Decoder.Decode_Wide_Character (Input, Ptr, C);
-
+         if Input (Ptr) = '[' then
+            C := '[';
+            Ptr := Ptr + 1;
          else
             Decoder.Decode_Wide_Character (Input, Ptr, C);
          end if;
-
-         --  Keep track of whether we're in a comment
-
-         case State is
-            when In_Comment                    =>
-               if Is_Line_Terminator (C) then
-                  State := Other;
-               end if;
-
-            when In_String_Literal             =>
-               if C in '"' then
-                  State := Other;
-               end if;
-
-            when In_Obsolescent_String_Literal =>
-               if C in '%' then
-                  State := Other;
-               end if;
-
-            when Other                         =>
-               if C = '-' and then Ptr <= Input'Last and then Input (Ptr) = '-'
-               then
-                  State := In_Comment;
-               elsif C = '"' then
-                  State := In_String_Literal;
-               elsif C = '%' then
-                  State := In_Obsolescent_String_Literal;
-               end if;
-         end case;
 
          --  Insert C into the buffer, expanding tabs. Turn other space
          --  characters, such as NO-BREAK SPACE, into ' '.
@@ -724,12 +658,7 @@ package body Pp.Buffers is
       Include_Trailing_Spaces : Boolean := False)
    is
       --  We read the file into a String, and convert to wide characters
-      --  according to the encoding method.
-      --
-      --  No matter what the encoding method is, we recognize brackets
-      --  encoding, but not within comments.
-      --
-      --  These behaviors are intended to match what the compiler does.
+      --  according to the encoding method (see Insert_Ada_Source).
 
       Input : String_Access := Read_File (File_Name);
       First : Natural := 1;
