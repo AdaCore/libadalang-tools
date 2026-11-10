@@ -1,0 +1,6 @@
+description:
+    Preserve literal brackets and encoded characters in strings, character
+    literals, identifiers and comments with brackets and UTF-8 encodings.
+    Check in-place formatting and idempotence.
+
+driver: python_script

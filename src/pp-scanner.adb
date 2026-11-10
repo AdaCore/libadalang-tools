@@ -1,9 +1,8 @@
-
 ------------------------------------------------------------------------------
 --                                                                          --
 --                             Libadalang Tools                             --
 --                                                                          --
---                      Copyright (C) 2012-2024, AdaCore                    --
+--                      Copyright (C) 2012-2026, AdaCore                    --
 --                                                                          --
 -- Libadalang Tools  is free software; you can redistribute it and/or modi- --
 -- fy  it  under  terms of the  GNU General Public License  as published by --
@@ -211,13 +210,13 @@ package body Pp.Scanner is
    function Text (X : Token) return Syms.Symbol is
    begin
       case X.Kind is
-         when Same_Text_Kind   =>
+         when Same_Text_Kind =>
             return Text (X.Kind);
 
          when Stored_Text_Kind =>
             return X.Text;
 
-         when Nil              =>
+         when Nil =>
             raise Program_Error;
       end case;
    end Text;
@@ -280,7 +279,7 @@ package body Pp.Scanner is
    begin
       pragma Assert (not After_Last (X));
       case Kind (X) is
-         when Same_Text_Kind   =>
+         when Same_Text_Kind =>
             return Token_To_Symbol_Map (Kind (X));
 
          when Stored_Text_Kind =>
@@ -480,7 +479,7 @@ package body Pp.Scanner is
             Sloc_First => Sloc.First,
             Origin     => Intern (Org)));
       case K is
-         when Same_Text_Kind   =>
+         when Same_Text_Kind =>
             if K in Line_Break_Token | Tab_Token then
                Encode (V.Octets, X.Index);
             end if;
@@ -581,7 +580,7 @@ package body Pp.Scanner is
          when End_Of_Line_Comment =>
             null;
 
-         when Whole_Line_Comment  =>
+         when Whole_Line_Comment =>
             pragma Assert (Kind (Last (V'Unrestricted_Access)) /= Spaces);
             Tok.Sloc.Last :=
               Tok.Sloc.Last - (Tok.Num_Lines - 1) * (Tok.Sloc.Col - 1);
@@ -654,7 +653,7 @@ package body Pp.Scanner is
          when End_Of_Line_Comment =>
             null;
 
-         when Whole_Line_Comment  =>
+         when Whole_Line_Comment =>
             Tok.Num_Lines := 1;
             for J in Tx'Range loop
                if Tx (J) = NL then
@@ -818,7 +817,7 @@ package body Pp.Scanner is
       --  Append_Tokn.
 
       case Kind (Cur) is
-         when Same_Text_Kind   =>
+         when Same_Text_Kind =>
             if Kind (Cur) in Line_Break_Token | Tab_Token then
                Next (Cur.V.Octets, Cur.Oc);
             end if;
@@ -850,7 +849,7 @@ package body Pp.Scanner is
    begin
       Cur.Fi := Cur.Fi - 1;
       case Kind (Cur) is
-         when Same_Text_Kind   =>
+         when Same_Text_Kind =>
             if Kind (Cur) in Line_Break_Token | Tab_Token then
                Prev (Cur.V.Octets, Cur.Oc);
             end if;
@@ -1006,6 +1005,14 @@ package body Pp.Scanner is
       --  Append the token onto Result, and set Preceding_Token and
       --  Preceding_Lexeme as appropriate.
 
+      function Brackets_Length return Natural;
+      --  If Cur starts a brackets sequence in Ada code (a wide character
+      --  written as ["hh"], with 2, 4, 6 or 8 hexadecimal digits), returns
+      --  the length of this sequence. Otherwise returns 0.
+
+      procedure Get_Encoded_Character;
+      --  Move ahead one character, including a brackets sequence
+
       procedure Scan_Decimal_Digit_Chars;
       procedure Scan_Identifier_Chars;
 
@@ -1062,6 +1069,50 @@ package body Pp.Scanner is
          Buffers.Move_Forward (Input);
       end Get;
 
+      ---------------------
+      -- Brackets_Length --
+      ---------------------
+
+      function Brackets_Length return Natural is
+         subtype Hex_Digit is W_Char
+         with Predicate => Hex_Digit in '0' .. '9' | 'A' .. 'F' | 'a' .. 'f';
+
+         Digits_Count : Natural := 0;
+      begin
+         if Lang /= Ada_Lang
+           or else Cur /= '['
+           or else Buffers.Lookahead (Input) /= '"'
+         then
+            return 0;
+         end if;
+
+         while Digits_Count < 8
+           and then Buffers.Lookahead (Input, 2 + Digits_Count) in Hex_Digit
+         loop
+            Digits_Count := Digits_Count + 1;
+         end loop;
+
+         if Digits_Count in 2 | 4 | 6 | 8
+           and then Buffers.Lookahead (Input, 2 + Digits_Count) = '"'
+           and then Buffers.Lookahead (Input, 3 + Digits_Count) = ']'
+         then
+            return Digits_Count + 4;
+         else
+            return 0;
+         end if;
+      end Brackets_Length;
+
+      ---------------------------
+      -- Get_Encoded_Character --
+      ---------------------------
+
+      procedure Get_Encoded_Character is
+      begin
+         for J in 1 .. Natural'Max (1, Brackets_Length) loop
+            Get;
+         end loop;
+      end Get_Encoded_Character;
+
       procedure Scan_Decimal_Digit_Chars is
       begin
          while Cur in '0' .. '9' | '_' loop
@@ -1072,19 +1123,21 @@ package body Pp.Scanner is
       procedure Scan_Identifier_Chars is
       begin
          loop
-            Get;
+            Get_Encoded_Character;
+
             exit when
               not (Is_Letter (Cur)
                    or else (Cur = '_' and Lang = Ada_Lang)
                    or else Is_Digit (Cur)
-                   or else Is_Mark (Cur));
+                   or else Is_Mark (Cur)
+                   or else Brackets_Length > 0);
          end loop;
       end Scan_Identifier_Chars;
 
       procedure Scan_String_Literal (Q_Char : W_Char) is
       begin
          loop
-            Get;
+            Get_Encoded_Character;
 
             pragma Assert (Cur /= W_NUL);
 
@@ -1212,7 +1265,7 @@ package body Pp.Scanner is
                end if;
 
                case Kind_Of_Comment is
-                  when Pp_Off_Comment           =>
+                  when Pp_Off_Comment =>
                      Tok :=
                        (Pp_Off_Comment,
                         Tok.Sloc,
@@ -1222,7 +1275,7 @@ package body Pp.Scanner is
                         Num_Lines      => 1,
                         Last_Line_Len  => Cur_Col - Tok.Sloc.Col);
 
-                  when Pp_On_Comment            =>
+                  when Pp_On_Comment =>
                      Tok :=
                        (Pp_On_Comment,
                         Tok.Sloc,
@@ -1232,7 +1285,7 @@ package body Pp.Scanner is
                         Num_Lines      => 1,
                         Last_Line_Len  => Cur_Col - Tok.Sloc.Col);
 
-                  when Special_Comment          =>
+                  when Special_Comment =>
                      Tok :=
                        (Special_Comment,
                         Tok.Sloc,
@@ -1242,7 +1295,7 @@ package body Pp.Scanner is
                         Num_Lines      => 1,
                         Last_Line_Len  => Cur_Col - Tok.Sloc.Col);
 
-                  when Fillable_Comment         =>
+                  when Fillable_Comment =>
                      Tok :=
                        (Fillable_Comment,
                         Tok.Sloc,
@@ -1262,7 +1315,7 @@ package body Pp.Scanner is
                         Num_Lines      => 1,
                         Last_Line_Len  => Cur_Col - Tok.Sloc.Col);
 
-                  when End_Of_Line_Comment      =>
+                  when End_Of_Line_Comment =>
                      Tok :=
                        (End_Of_Line_Comment,
                         Tok.Sloc,
@@ -1317,7 +1370,9 @@ package body Pp.Scanner is
          --  preprocessor symbols look like, and this allows us to process
          --  some files that use preprocessing.
 
-         elsif Is_Letter (Cur) or else (Lang = Ada_Lang and then Cur = '$')
+         elsif Is_Letter (Cur)
+           or else (Lang = Ada_Lang and then Cur = '$')
+           or else Brackets_Length > 0
          then
             Tok := (Kind => Ident, Sloc => Tok.Sloc, Text => <>);
             --  We will check for reserved words below
@@ -1325,24 +1380,24 @@ package body Pp.Scanner is
 
          else
             case Cur is
-               when W_HT       =>
+               when W_HT =>
                   Tok := (Kind => Tab_Token, Sloc => Tok.Sloc, Index => <>);
                   while Cur = W_HT loop
                      Get;
                   end loop;
 
-               when W_NUL      =>
+               when W_NUL =>
                   Tok := (Kind => End_Of_Input, Sloc => Tok.Sloc);
 
                --  One_Space_Outdent instruction in the Template_Lang
 
-               when '_'        =>
+               when '_' =>
                   Tok := (Kind => '_', Sloc => Tok.Sloc);
                   Get;
 
                --  Minus sign or comment
 
-               when '-'        =>
+               when '-' =>
                   if Buffers.Lookahead (Input) = '-' then
                      Scan_Comment (Tok, Allow_Short_Fillable);
                   else
@@ -1361,7 +1416,7 @@ package body Pp.Scanner is
                      when Template_Lang =>
                         null; -- we're done
 
-                     when Ada_Lang      =>
+                     when Ada_Lang =>
                         if Cur in '#' | ':'
                           and then Buffers.Lookahead (Input) in Extended_Digit
                         then
@@ -1395,7 +1450,7 @@ package body Pp.Scanner is
 
                --  single quote or character literal
 
-               when '''        =>
+               when ''' =>
                   Get;
 
                   --  We distinguish a single quote token from a character
@@ -1425,30 +1480,31 @@ package body Pp.Scanner is
                        (Kind   => Character_Literal,
                         Sloc   => Tok.Sloc,
                         others => <>);
-                     Get;
+
+                     Get_Encoded_Character;
                      pragma Assert (Cur = ''');
                      Get;
                   end if;
 
                --  string literal
 
-               when '"' | '%'  =>
+               when '"' | '%' =>
                   Tok := (Kind => String_Lit, Sloc => Tok.Sloc, others => <>);
                   Scan_String_Literal (Q_Char => Cur);
 
                --  One-character tokens
 
-               when '!'        =>
+               when '!' =>
                   Tok := (Kind => '!', Sloc => Tok.Sloc);
                   Get;
 
-               when '#'        =>
+               when '#' =>
                   case Lang is
                      when Template_Lang =>
                         Tok := (Kind => '#', Sloc => Tok.Sloc);
                         Get;
 
-                     when Ada_Lang      =>
+                     when Ada_Lang =>
                         Tok :=
                           (Kind   => Preprocessor_Directive,
                            Sloc   => Tok.Sloc,
@@ -1456,75 +1512,75 @@ package body Pp.Scanner is
                         Skip_To_EOL;
                   end case;
 
-               when '$'        =>
+               when '$' =>
                   Tok := (Kind => '$', Sloc => Tok.Sloc);
                   Get;
 
-               when '?'        =>
+               when '?' =>
                   Tok := (Kind => '?', Sloc => Tok.Sloc);
                   Get;
 
-               when '['        =>
+               when '[' =>
                   Tok := (Kind => '[', Sloc => Tok.Sloc);
                   Get;
 
-               when '\'        =>
+               when '\' =>
                   Tok := (Kind => '\', Sloc => Tok.Sloc);
                   Get;
 
-               when ']'        =>
+               when ']' =>
                   Tok := (Kind => ']', Sloc => Tok.Sloc);
                   Get;
 
-               when '^'        =>
+               when '^' =>
                   Tok := (Kind => '^', Sloc => Tok.Sloc);
                   Get;
 
-               when '`'        =>
+               when '`' =>
                   Tok := (Kind => '`', Sloc => Tok.Sloc);
                   Get;
 
-               when '{'        =>
+               when '{' =>
                   Tok := (Kind => '{', Sloc => Tok.Sloc);
                   Get;
 
-               when '}'        =>
+               when '}' =>
                   Tok := (Kind => '}', Sloc => Tok.Sloc);
                   Get;
 
-               when '~'        =>
+               when '~' =>
                   Tok := (Kind => '~', Sloc => Tok.Sloc);
                   Get;
 
-               when '&'        =>
+               when '&' =>
                   Tok := (Kind => '&', Sloc => Tok.Sloc);
                   Get;
 
-               when '('        =>
+               when '(' =>
                   Tok := (Kind => '(', Sloc => Tok.Sloc);
                   Get;
 
-               when ')'        =>
+               when ')' =>
                   Tok := (Kind => ')', Sloc => Tok.Sloc);
                   Get;
 
-               when '+'        =>
+               when '+' =>
                   Tok := (Kind => '+', Sloc => Tok.Sloc);
                   Get;
 
-               when ','        =>
+               when ',' =>
                   Tok := (Kind => ',', Sloc => Tok.Sloc);
                   Get;
 
-               when ';'        =>
+               when ';' =>
                   Tok := (Kind => ';', Sloc => Tok.Sloc);
                   Get;
 
-               when '|'        =>
+               when '|' =>
                   Tok := (Kind => '|', Sloc => Tok.Sloc);
                   Get;
 
-               when '@'        =>
+               when '@' =>
                   --  '@' is for target_name (see RM-5.2.1, AI12-0125-3)
                   Tok := (Kind => '@', Sloc => Tok.Sloc);
                   Get;
@@ -1532,7 +1588,7 @@ package body Pp.Scanner is
                --  Multiple-character tokens. We need to distinguish between
                --  "=" and "=>", and between "." and ".." and so forth.
 
-               when '='        =>
+               when '=' =>
                   Get;
 
                   if Cur = '>' then
@@ -1542,7 +1598,7 @@ package body Pp.Scanner is
                      Tok := (Kind => '=', Sloc => Tok.Sloc);
                   end if;
 
-               when '.'        =>
+               when '.' =>
                   Get;
 
                   if Cur = '.' then
@@ -1552,7 +1608,7 @@ package body Pp.Scanner is
                      Tok := (Kind => '.', Sloc => Tok.Sloc);
                   end if;
 
-               when '*'        =>
+               when '*' =>
                   Get;
 
                   if Cur = '*' then
@@ -1562,7 +1618,7 @@ package body Pp.Scanner is
                      Tok := (Kind => '*', Sloc => Tok.Sloc);
                   end if;
 
-               when '/'        =>
+               when '/' =>
                   Get;
 
                   if Cur = '=' then
@@ -1572,7 +1628,7 @@ package body Pp.Scanner is
                      Tok := (Kind => '/', Sloc => Tok.Sloc);
                   end if;
 
-               when '>'        =>
+               when '>' =>
                   Get;
 
                   if Cur = '=' then
@@ -1585,7 +1641,7 @@ package body Pp.Scanner is
                      Tok := (Kind => '>', Sloc => Tok.Sloc);
                   end if;
 
-               when '<'        =>
+               when '<' =>
                   Get;
 
                   if Cur = '=' then
@@ -1601,7 +1657,7 @@ package body Pp.Scanner is
                      Tok := (Kind => '<', Sloc => Tok.Sloc);
                   end if;
 
-               when ':'        =>
+               when ':' =>
                   Get;
 
                   if Cur = '=' then
@@ -1611,7 +1667,7 @@ package body Pp.Scanner is
                      Tok := (Kind => ':', Sloc => Tok.Sloc);
                   end if;
 
-               when others     =>
+               when others =>
                   Get;
                   Tok :=
                     (Kind   => Illegal_Character,
@@ -1640,7 +1696,7 @@ package body Pp.Scanner is
                when Comment_Kind =>
                   pragma Assert (False);
 
-               when Ident        =>
+               when Ident =>
                   --  Check for reserved word. In T'Range, we consider "Range"
                   --  to be an identifier, not a reserved word, and similarly
                   --  for others.
@@ -1655,7 +1711,7 @@ package body Pp.Scanner is
                            when Reserved_Word =>
                               Poke_Kind (Tok, New_Kind => RW);
 
-                           when Ident         =>
+                           when Ident =>
                               null;
                         end case;
 
@@ -1664,7 +1720,7 @@ package body Pp.Scanner is
                      end;
                   end if;
 
-               when others       =>
+               when others =>
                   null;
             end case;
 
