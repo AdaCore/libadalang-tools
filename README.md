@@ -17,6 +17,21 @@ for Ada:
 
 These are currently under development.
 
+Installing
+----------
+If you are only concerned in getting the suite of executables you can most easily do so by using the [Alire][alire] package manager to handle the building and installing for you. The steps are:
+```bash
+alr install libadalang_tools
+```
+The build step will require a substantial amount of CPU and RAM, but once successful you should find the executables in `$HOME/.alire/bin`. If this is not in the `$PATH` set up by your shell's resource files, you should do so now, typically doing something like this (example is using Bash):
+```bash
+echo 'export PATH="$HOME/.alire/bin:$PATH"' >> ~/.bashrc
+```
+
+Note that the crates on Alire are not always up to date with the [latest released version][releases].
+
+[alire]: https://alire.ada.dev/
+[releases]: https://github.com/AdaCore/libadalang-tools/releases
 
 Build
 -----
