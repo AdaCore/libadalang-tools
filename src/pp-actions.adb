@@ -2965,12 +2965,12 @@ package body Pp.Actions is
            (if Id (1) = '''
             then As_Declared
             elsif Id (1) = '"' -- operator symbol
-              --  Kind not in Ada_Attribute_Ref | Ada_Update_Attribute_Ref
-              --  and then
-              --  (Id (1) = '"') -- operator symbol
-              --   or else Is_Reserved_Word (Id, Utils.Ada_Version)
-              --   or else Id = Name_And_Then
-              --   or else Id = Name_Or_Else)
+            --  Kind not in Ada_Attribute_Ref | Ada_Update_Attribute_Ref
+            --  and then
+            --  (Id (1) = '"') -- operator symbol
+            --   or else Is_Reserved_Word (Id, Utils.Ada_Version)
+            --   or else Id = Name_And_Then
+            --   or else Id = Name_Or_Else)
             then PP_Keyword_Casing (Cmd)
             elsif Is_Predef and then Use_Predefined_Casing
             then As_Declared
