@@ -1194,8 +1194,8 @@ package body Pp.Scanner is
                   or else Is_Space (Cur)
                   or else Is_Line_Terminator (Cur)
                   or else Cur = '-')
-           --  We don't consider "-----" to be special, because otherwise
-           --  various comments are misformatted.
+         --  We don't consider "-----" to be special, because otherwise
+         --  various comments are misformatted.
          then
             Kind_Of_Comment := Special_Comment;
          end if;
