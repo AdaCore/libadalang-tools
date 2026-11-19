@@ -1,0 +1,7 @@
+with Types;
+separate (Routes)
+procedure Convert (X : Types.ID'Base) is
+   Local : Boolean := True;
+begin
+if local then null; end if;
+end Convert;

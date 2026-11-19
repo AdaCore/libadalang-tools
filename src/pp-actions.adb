@@ -5526,9 +5526,8 @@ package body Pp.Actions is
 
          function Is_Predef
            (Is_Def_Name : Boolean; Decl : Basic_Decl) return Boolean;
-         --  Return True iff Decl is predefined (is Standard, or is declared
-         --  immediately within Standard, or is declared within Ada, System,
-         --  Interfaces, or GNAT). Always False if Is_Def_Name.
+         --  True for uses of names known to come from Standard, Ada, System,
+         --  Interfaces, or GNAT.
 
          function Is_Predef
            (Is_Def_Name : Boolean; Decl : Basic_Decl) return Boolean
@@ -5560,6 +5559,10 @@ package body Pp.Actions is
                  First
                  in "standard" | "ada" | "system" | "interfaces" | "gnat";
             end;
+         exception
+            when Property_Error =>
+               --  A missing dependency can prevent resolving the unit name.
+               return False;
          end Is_Predef;
 
          function Denoted_Decl (Id : Base_Id) return Basic_Decl is
